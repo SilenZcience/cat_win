@@ -11,41 +11,11 @@
       Simple Command-line Tool made in Python
       <br/>
       <a href="https://github.com/SilenZcience/cat_win/blob/main/cat_win/cat.py">
-         <strong>Explore the code »</strong>
+         <strong>Explore the code</strong>
       </a>
       <br/>
-      <br/>
-      <a href="https://github.com/SilenZcience/cat_win/issues">Report Bug</a>
-      ·
-      <a href="https://github.com/SilenZcience/cat_win/issues">Request Feature</a>
    </p>
 </div>
-
-
-<details>
-   <summary>Table of Contents</summary>
-   <ol>
-      <li>
-         <a href="#about-the-project">About The Project</a>
-         <ul>
-            <li><a href="#made-with">Made With</a></li>
-         </ul>
-      </li>
-      <li>
-         <a href="#getting-started">Getting Started</a>
-         <ul>
-            <li><a href="#prerequisites">Prerequisites</a></li>
-            <li><a href="#installation">Installation</a></li>
-         </ul>
-      </li>
-      <li><a href="#usage">Usage</a>
-         <ul>
-         <li><a href="#examples">Examples</a></li>
-         </ul>
-      </li>
-      <li><a href="#contact">Contact</a></li>
-   </ol>
-</details>
 
 ## About The Project
 
@@ -65,7 +35,7 @@ Additionally it includes the feature to strip and reverse the content of any giv
 
 No Prerequisites are neccessary; The stand-alone executable `cat.exe` is sufficient.
 
-> :warning: **You should never trust any executable file!**
+> !!! **You should never trust any executable file!**
 
 ### Installation
 
@@ -89,16 +59,6 @@ pip install cat-win
 ```console
 cat --help
 ```
-
-### Examples
-
-![](img/help.png?raw=true "help.png")
-
-![](img/example1.png?raw=true "example1.png")
-
-![](img/example2.png?raw=true "example2.png")
-
-<p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Contact
 
