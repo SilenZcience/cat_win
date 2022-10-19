@@ -4,12 +4,18 @@ from re import match
 from os.path import isfile, realpath, isdir
 from cat_win.util.ArgConstants import *
 
+FILE_ENCODING = None
+
 def __addArgument__(args, known_files, unknown_files, param):
-    if match("\A\[.*\:.*\]\Z", param):
-        args.append([HIGHEST_ARG_ID+1, param])
+    if match("\Aenc\=.+\Z", param):
+        global FILE_ENCODING
+        FILE_ENCODING = param[4:]
+        return
+    elif match("\A\[.*\:.*\]\Z", param):
+        args.append([HIGHEST_ARG_ID+2, param])
         return
     elif match("\A\[.+\;.+\]\Z", param):
-        args.append([HIGHEST_ARG_ID+2, param])
+        args.append([HIGHEST_ARG_ID+3, param])
         return
     
     for x in ALL_ARGS:
