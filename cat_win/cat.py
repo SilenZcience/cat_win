@@ -72,7 +72,6 @@ def _getLinePrefix(index, line_num):
 def printFile(fileIndex = 1):
     content = []
     try:
-        print(ArgParser.FILE_ENCODING)
         with open(holder.files[fileIndex-1], 'r', encoding=ArgParser.FILE_ENCODING) as f:
             content = f.read().splitlines()
     except:
