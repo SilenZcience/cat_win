@@ -70,64 +70,69 @@ def _getLinePrefix(index, line_num):
     return file_prefix + line_prefix
     
 def printFile(fileIndex = 1):
+    show_bytecode = False
     content = []
     try:
         with open(holder.files[fileIndex-1], 'r', encoding=ArgParser.FILE_ENCODING) as f:
             content = f.read().splitlines()
     except:
         print("Failed to open:", holder.files[fileIndex-1])
-        print("Do you want to open the file as a binary? [y]")
+        print("Do you want to open the file as a binary without parameters? [Y]")
         inp = input()
         if not 'y' in inp and not 'Y' in inp: return
         try:
             with open(holder.files[fileIndex-1], 'rb') as f:
                 content = f.read().splitlines()
+            show_bytecode = True
         except:
             print("Operation failed! Try using the enc=X parameter.")
             return
     fLength = len(content)
-    for i, arg in enumerate(holder.args_id):
-        if arg == ARGS_NUMBER:
-            content = [_getLinePrefix(fileIndex, holder.fileCount-i if holder.reversed else holder.fileCount+i+1) + c for i, c in enumerate(content)]
-            holder.fileCount += (-fLength if holder.reversed else fLength)
-        if arg == ARGS_ENDS:
-            content = [c + "$" for c in content]
-        if arg == ARGS_TABS:
-            content = [c.replace("\t", "^I") for c in content]
-        if arg == ARGS_SQUEEZE:
-            content = [g[0] for g in groupby(content)]
-        if arg == ARGS_REVERSE:
-            content.reverse()
-        if arg == ARGS_BLANK:
-            content = [c for c in content if c]
-        if arg == ARGS_DEC:
-            if holder.args[i][1] == "-dec":
-                content = [converter._fromDEC(int(c), True) for c in content if converter.is_decimal(c)]
-            else:
-                content = [converter._fromDEC(int(c)) for c in content if converter.is_decimal(c)]
-        if arg == ARGS_HEX:
-            if holder.args[i][1] == "-hex":
-                content = [converter._fromHEX(c, True) for c in content if converter.is_hex(c)]
-            else:
-                content = [converter._fromHEX(c) for c in content if converter.is_hex(c)]
-        if arg == ARGS_BIN:
-            if holder.args[i][1] == "-bin":
-                content = [converter._fromBIN(c, True) for c in content if converter.is_bin(c)]
-            else:
-                content = [converter._fromBIN(c) for c in content if converter.is_bin(c)]
-        if arg == HIGHEST_ARG_ID+1:
-            try:
-                content = [eval(repr(c) + holder.args[i][1]) for c in content]
-            except:
-                print("Error at operation: ", holder.args[i][1])
-                return
-        if arg == HIGHEST_ARG_ID+2:
-            replace_values = holder.args[i][1][1:-1].split(";")
-            content = [c.replace(replace_values[0], replace_values[1]) for c in content]
+    if not show_bytecode:
+        for i, arg in enumerate(holder.args_id):
+            if arg == ARGS_NUMBER:
+                content = [_getLinePrefix(fileIndex, holder.fileCount-i if holder.reversed else holder.fileCount+i+1) + c for i, c in enumerate(content)]
+                holder.fileCount += (-fLength if holder.reversed else fLength)
+            if arg == ARGS_ENDS:
+                content = [c + "$" for c in content]
+            if arg == ARGS_TABS:
+                content = [c.replace("\t", "^I") for c in content]
+            if arg == ARGS_SQUEEZE:
+                content = [g[0] for g in groupby(content)]
+            if arg == ARGS_REVERSE:
+                content.reverse()
+            if arg == ARGS_BLANK:
+                content = [c for c in content if c]
+            if arg == ARGS_DEC:
+                if holder.args[i][1] == "-dec":
+                    content = [converter._fromDEC(int(c), True) for c in content if converter.is_decimal(c)]
+                else:
+                    content = [converter._fromDEC(int(c)) for c in content if converter.is_decimal(c)]
+            if arg == ARGS_HEX:
+                if holder.args[i][1] == "-hex":
+                    content = [converter._fromHEX(c, True) for c in content if converter.is_hex(c)]
+                else:
+                    content = [converter._fromHEX(c) for c in content if converter.is_hex(c)]
+            if arg == ARGS_BIN:
+                if holder.args[i][1] == "-bin":
+                    content = [converter._fromBIN(c, True) for c in content if converter.is_bin(c)]
+                else:
+                    content = [converter._fromBIN(c) for c in content if converter.is_bin(c)]
+            if arg == HIGHEST_ARG_ID+1:
+                try:
+                    content = [eval(repr(c) + holder.args[i][1]) for c in content]
+                except:
+                    print("Error at operation: ", holder.args[i][1])
+                    return
+            if arg == HIGHEST_ARG_ID+2:
+                replace_values = holder.args[i][1][1:-1].split(";")
+                content = [c.replace(replace_values[0], replace_values[1]) for c in content]
     
     print(*content, sep="\n")
-    if ARGS_CLIP in holder.args_id:
-        holder.clipBoard += "\n".join(content)
+    
+    if not show_bytecode:
+        if ARGS_CLIP in holder.args_id:
+            holder.clipBoard += "\n".join(content)
 
 def printFiles():
     start = len(holder.files)-1 if holder.reversed else 0
