@@ -25,6 +25,8 @@ def _showHelp():
     for x in ALL_ARGS:
         print("%-25s" % str("\t" + x.shortForm + ", " + x.longForm), end=x.help + "\n")
     print()
+    print("%-25s" % str("\t'enc=X':"), end="set file encoding to X.\n")
+    print()
     print("%-25s" % str("\t'[a;b]':"), end="replace a with b in every line.\n")
     print("%-25s" % str("\t'[a:b]':"), end="python-like string manipulation syntax.\n")
     print()
@@ -70,18 +72,19 @@ def _getLinePrefix(index, line_num):
 def printFile(fileIndex = 1):
     content = []
     try:
-        with open(holder.files[fileIndex-1], 'r') as f:
+        print(ArgParser.FILE_ENCODING)
+        with open(holder.files[fileIndex-1], 'r', encoding=ArgParser.FILE_ENCODING) as f:
             content = f.read().splitlines()
     except:
         print("Failed to open:", holder.files[fileIndex-1])
-        print("Do you want to open the file as a binary?")
+        print("Do you want to open the file as a binary? [y]")
         inp = input()
         if not 'y' in inp and not 'Y' in inp: return
         try:
             with open(holder.files[fileIndex-1], 'rb') as f:
                 content = f.read().splitlines()
         except:
-            print("Operation failed!")
+            print("Operation failed! Try using the enc=X parameter.")
             return
     fLength = len(content)
     for i, arg in enumerate(holder.args_id):

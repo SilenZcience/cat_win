@@ -6,7 +6,7 @@ with open(os.path.join(os.path.dirname(__file__), "README_PyPI.md")) as readme:
 
 setup(
     name='cat_win',
-    version='1.0.3',    
+    version='1.0.4',    
     description="Simple 'cat' Command-line Tool made in Python",
     url='https://github.com/SilenZcience/cat_win',
     author='Silas A. Kraume',
