@@ -12,10 +12,10 @@ def __addArgument__(args, known_files, unknown_files, param):
         FILE_ENCODING = param[4:]
         return
     elif match("\A\[.*\:.*\]\Z", param):
-        args.append([HIGHEST_ARG_ID+2, param])
+        args.append([ARGS_CUT, param])
         return
     elif match("\A\[.+\;.+\]\Z", param):
-        args.append([HIGHEST_ARG_ID+3, param])
+        args.append([ARGS_REPLACE, param])
         return
     
     for x in ALL_ARGS:
