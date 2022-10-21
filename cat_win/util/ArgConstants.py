@@ -23,6 +23,9 @@ ARGS_BIN = 15
 ARGS_VERSION = 16
 ARGS_DEBUG = 17
 
+ARGS_CUT = 18
+ARGS_REPLACE = 19
+
 ALL_ARGS = [[["-h", "--help"], "show this help message and exit", ARGS_HELP],
             [["-n", "--number"], "number all output lines", ARGS_NUMBER],
             [["-e", "--ends"], "display $ at end of each line", ARGS_ENDS],

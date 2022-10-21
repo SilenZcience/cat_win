@@ -1,8 +1,12 @@
 <div id="top"></div>
 
 <p>
-    <img src="https://static.pepy.tech/personalized-badge/cat-win?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Downloads" align="right">
-    <img src="https://visitor-badge.laobi.icu/badge?page_id=SilenZcience.cat_win" align="right">
+   <a href="https://pypi.org/project/cat-win/" alt="Downloads">
+      <img src="https://static.pepy.tech/personalized-badge/cat-win?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Downloads" align="right">
+   </a>
+   <a href="https://pypi.org/project/cat-win/" alt="Visitors">
+      <img src="https://visitor-badge.laobi.icu/badge?page_id=SilenZcience.cat_win" align="right">
+   </a>
 </p>
 
 [![OS-Windows]][OS-Windows]
@@ -81,7 +85,7 @@ cd cat_win\bin
 ```
 2. Add the directory to your system-environment `PATH`-variables.
 
-or simply
+or simply install the python package ([PyPI-cat_win](https://pypi.org/project/cat-win/)):
 ```console
 pip install cat-win
 ```
