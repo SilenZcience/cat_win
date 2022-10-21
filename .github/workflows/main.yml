@@ -1,0 +1,30 @@
+name: Build and Check
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        python-version: [3.6, 3.7, 3.8, 3.9, '3.10']
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v3
+      - name: Install Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Setup Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools
+          pip install pytest
+      - name: Check and Build Package
+        run: |
+          python setup.py check
+          python setup.py sdist
+      - name: Install Local Package
+        run: python ./tests/dist.py
