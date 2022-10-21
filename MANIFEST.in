@@ -1,1 +1,2 @@
 include README_PyPI.md
+exclude README.md
