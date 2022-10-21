@@ -102,7 +102,7 @@ cat --help
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/SilenZcience/Cat_For_Windows/blob/main/LICENSE) file for details
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/SilenZcience/cat_win/blob/main/LICENSE) file for details
 
 ## Contact
 
