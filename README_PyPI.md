@@ -1,5 +1,10 @@
 <div id="top"></div>
 
+<p>
+    <img src="https://static.pepy.tech/personalized-badge/cat-win?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Downloads" align="right">
+    <img src="https://visitor-badge.laobi.icu/badge?page_id=SilenZcience.cat_win" align="right">
+</p>
+
 [![OS-Windows]][OS-Windows]
 [![OS-Linux]][OS-Linux]
 [![OS-MacOS]][OS-MacOS]
