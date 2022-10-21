@@ -19,8 +19,7 @@
 
 ## About The Project
 
-This project copies the fundamental framework of the cat command-line tool from linux and translates its features to
-a windows executable file.
+This project copies the fundamental framework of the cat command-line tool from linux and translates its features to an OS Independent file.
 
 Additionally it includes the feature to strip and reverse the content of any given file, make use of the standard-input, which enables cat piping into each other, generating the checksum of any file, and even convert decimal, hexadecimal and binary numbers within any text.
 
@@ -59,6 +58,10 @@ pip install cat-win
 ```console
 cat --help
 ```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/SilenZcience/cat_win/blob/main/LICENSE) file for details
 
 ## Contact
 
