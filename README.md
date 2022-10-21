@@ -43,14 +43,14 @@
          <li><a href="#examples">Examples</a></li>
          </ul>
       </li>
+      <li><a href="#license">License</a></li>
       <li><a href="#contact">Contact</a></li>
    </ol>
 </details>
 
 ## About The Project
 
-This project copies the fundamental framework of the cat command-line tool from linux and translates its features to
-a windows executable file.
+This project copies the fundamental framework of the cat command-line tool from linux and translates its features to an OS Independent file.
 
 Additionally it includes the feature to strip and reverse the content of any given file, make use of the standard-input, which enables cat piping into each other, generating the checksum of any file, and even convert decimal, hexadecimal and binary numbers within any text.
 
@@ -99,6 +99,10 @@ cat --help
 ![](img/example2.png?raw=true "example2.png")
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/SilenZcience/Cat_For_Windows/blob/main/LICENSE) file for details
 
 ## Contact
 
