@@ -1,7 +1,7 @@
 import os
 from setuptools import setup
 
-with open(os.path.join(os.path.dirname(__file__), "README_PyPI.md")) as readme:
+with open(os.path.join(os.path.dirname(__file__), "README.md"), encoding="utf-8") as readme:
     README = readme.read()
 
 setup(
@@ -13,6 +13,7 @@ setup(
     author_email='silas.kraume1552@gmail.com',
     long_description=README,
     long_description_content_type='text/markdown',
+    download_url="https://github.com/SilenZcience/cat_win/tarball/master",
     license='MIT License',
     packages=['cat_win', 'cat_win.util'],
     install_requires=['pyperclip3==0.4.1'],
