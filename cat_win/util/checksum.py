@@ -1,7 +1,7 @@
 import hashlib
 from zlib import crc32 as crc32_hash
 
-def getChecksumFromFile(file: str):
+def getChecksumFromFile(file: str) -> str:
     """
     Takes a filepath of type String and
     returns a String representation of the

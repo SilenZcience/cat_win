@@ -5,11 +5,16 @@ from os.path import isfile, realpath, isdir
 from cat_win.util.ArgConstants import *
 
 FILE_ENCODING = None
+FILE_SEARCH = None
 
-def __addArgument__(args, known_files, unknown_files, param):
+def __addArgument__(args: list, known_files: list, unknown_files: list, param: str) -> None:
     if match("\Aenc\=.+\Z", param):
         global FILE_ENCODING
         FILE_ENCODING = param[4:]
+        return
+    elif match("\Afind\=.+\Z", param):
+        global FILE_SEARCH
+        FILE_SEARCH = param[5:]
         return
     elif match("\A\[.*\:.*\]\Z", param):
         args.append([ARGS_CUT, param])

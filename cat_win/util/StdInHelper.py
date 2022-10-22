@@ -1,17 +1,18 @@
 from sys import stdin
 from tempfile import NamedTemporaryFile
+from cat_win.util.ArgParser import FILE_ENCODING
 
-def writeTemp(content: str):
+def writeTemp(content: str) -> str:
     """
     Writes content into a generated temp-file and
     returns the path in type String.
     """
     tmp_file = NamedTemporaryFile(delete=False).name
-    with open(tmp_file, 'w') as f:
+    with open(tmp_file, 'w', encoding=FILE_ENCODING) as f:
         f.write(content)
     return tmp_file
 
-def getStdInContent():
+def getStdInContent() -> str:
     """
     returns a String delivered by the standard input.
     """
@@ -20,7 +21,7 @@ def getStdInContent():
         input += line
     return input
     
-def writeFiles(file_list: list, content: str):
+def writeFiles(file_list: list, content: str) -> None:
     """
     Simply writes the content into every
     file in the given list if there is a
@@ -28,11 +29,11 @@ def writeFiles(file_list: list, content: str):
     """
     if content == "": file_list.clear()
     for file in file_list:
-        with open(file, 'w') as f:
+        with open(file, 'w', encoding=FILE_ENCODING) as f:
             f.write(content)
     
     
-def readWriteFilesFromStdIn(file_list: list):
+def readWriteFilesFromStdIn(file_list: list) -> None:
     """
     Takes a list of files, waits for a String from
     the standard input and writes it into every file.

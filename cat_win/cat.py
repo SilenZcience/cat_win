@@ -26,6 +26,7 @@ def _showHelp():
         print("%-25s" % str("\t" + x.shortForm + ", " + x.longForm), end=x.help + "\n")
     print()
     print("%-25s" % str("\t'enc=X':"), end="set file encoding to X.\n")
+    print("%-25s" % str("\t'find=X':"), end="find X in the given files.\n")
     print()
     print("%-25s" % str("\t'[a;b]':"), end="replace a with b in every line.\n")
     print("%-25s" % str("\t'[a:b]':"), end="python-like string manipulation syntax.\n")
@@ -50,10 +51,14 @@ def _showDebug(args, known_files, unknown_files):
     print("Debug Information:")
     print("args: ", end="")
     print(args)
-    print("known_files:", end="")
+    print("known_files: ", end="")
     print(known_files)
-    print("unknown_files:", end="")
+    print("unknown_files: ", end="")
     print(unknown_files)
+    print("file encoding: ", end="")
+    print(ArgParser.FILE_ENCODING)
+    print("search keyword: ", end="")
+    print(ArgParser.FILE_SEARCH)
 
 def _getLinePrefix(index, line_num):
     line_prefix = str(line_num) + ") "
@@ -69,7 +74,20 @@ def _getLinePrefix(index, line_num):
         
     return file_prefix + line_prefix
     
-def printFile(fileIndex = 1):
+def printFile(content):
+    if ArgParser.FILE_SEARCH == None:
+        print(*content, sep="\n")
+        return
+    for line in content:
+        print(line)
+        if ArgParser.FILE_SEARCH in line:
+            print("---------- Found '" + ArgParser.FILE_SEARCH + "' ----------")
+            try: #fails when using -i mode, because the stdin will send en EOF char to input without prompting the user
+                input()
+            except EOFError as e:
+                pass
+    
+def editFile(fileIndex = 1):
     show_bytecode = False
     content = []
     try:
@@ -128,23 +146,22 @@ def printFile(fileIndex = 1):
                 replace_values = holder.args[i][1][1:-1].split(";")
                 content = [c.replace(replace_values[0], replace_values[1]) for c in content]
     
-    print(*content, sep="\n")
+    printFile(content)
     
     if not show_bytecode:
         if ARGS_CLIP in holder.args_id:
             holder.clipBoard += "\n".join(content)
 
-def printFiles():
+def editFiles():
     start = len(holder.files)-1 if holder.reversed else 0
     end = -1 if holder.reversed else len(holder.files)
     if ARGS_CHECKSUM in holder.args_id:
         for file in holder.files:
             print("Checksum of '" + file + "':")
-            print("type", type(file))
             print(checksum.getChecksumFromFile(file))
     else:
         for i in range(start, end, -1 if holder.reversed else 1):
-            printFile(i+1)
+            editFile(i+1)
         if ARGS_COUNT in holder.args_id:
             print()
             print("Lines: " + str(holder.lineSum))
@@ -179,7 +196,7 @@ def main():
     holder.generateValues()
     
     #print the cat-output
-    printFiles()
+    editFiles()
     
     #clean-up
     if exists(temp_file):
