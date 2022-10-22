@@ -93,19 +93,38 @@ pip install cat-win
 
 ## Usage
 
-1. run the following command in any cmd:
-
 ```console
+cat [FILE]... [OPTION]...
+
 cat --help
 ```
 
+| Argument               | Description                                       |
+|------------------------|---------------------------------------------------|
+| -n, --number           | number all output lines                           |
+| -e, --ends             | display $ at the end of each line                 |
+| -t, --tabs             | display TAB characters as ^I                      |
+| -s, --squeeze          | suppress repeated output lines                    |
+| -r, --reverse          | reverse output                                    |
+| -c, --count            | show sum of lines                                 |
+| -b, --blank            | hide empty lines                                  |
+| -f, --files            | list applied files                                |
+| -i, --interactive      | use stdin                                         |
+| -l, --clip             | copy output to clipboard                          |
+| -m, --checksum         | show the checksums of all files                   |
+| -dec, --dec            | convert decimal numbers to hexadecimal and binary |
+| -hex, --hex            | convert hexadecimal numbers to decimal and binary |
+| -bin, --bin            | convert binary numbers to decimal and hexadecimal |
+| -v, --version          | output version information                        |
+| enc=X                  | set file enconding to X.                          |
+| [a;b]                  | replace a with b in every line.                   |
+| [a:b]                  | python-like string manipulation syntax.           |
+
 ### Examples
 
-![](img/help.png?raw=true "help.png")
+![Example1](https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example1.png "example1")
 
-![](img/example1.png?raw=true "example1.png")
-
-![](img/example2.png?raw=true "example2.png")
+![Example2](https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example2.png "example2")
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
