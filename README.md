@@ -117,6 +117,7 @@ cat --help
 | -bin, --bin            | convert binary numbers to decimal and hexadecimal |
 | -v, --version          | output version information                        |
 | enc=X                  | set file enconding to X.                          |
+| find=X                 | find X in the given files..                       |
 | [a;b]                  | replace a with b in every line.                   |
 | [a:b]                  | python-like string manipulation syntax.           |
 
