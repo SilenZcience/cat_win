@@ -15,7 +15,6 @@ import cat_win.util.StdInHelper as StdInHelper
 
 from cat_win import __version__, __author__, __sysversion__
 
-holder = Holder.Holder()
 converter = Converter.Converter()
 
 def _showHelp():
@@ -60,7 +59,7 @@ def _showDebug(args, known_files, unknown_files):
     print("search keyword: ", end="")
     print(ArgParser.FILE_SEARCH)
 
-def _getLinePrefix(index, line_num):
+def _getLinePrefix(holder, index, line_num):
     line_prefix = str(line_num) + ") "
     for i in range(len(str(line_num)), holder.fileLineMaxLength):
         line_prefix += " "
@@ -74,7 +73,7 @@ def _getLinePrefix(index, line_num):
         
     return file_prefix + line_prefix
     
-def printFile(content):
+def printFile(holder, content):
     if ArgParser.FILE_SEARCH == None:
         print(*content, sep="\n")
         return
@@ -87,7 +86,7 @@ def printFile(content):
             except EOFError as e:
                 pass
     
-def editFile(fileIndex = 1):
+def editFile(holder, fileIndex = 1):
     show_bytecode = False
     content = []
     try:
@@ -109,7 +108,7 @@ def editFile(fileIndex = 1):
     if not show_bytecode:
         for i, arg in enumerate(holder.args_id):
             if arg == ARGS_NUMBER:
-                content = [_getLinePrefix(fileIndex, holder.fileCount-i if holder.reversed else holder.fileCount+i+1) + c for i, c in enumerate(content)]
+                content = [_getLinePrefix(holder, fileIndex, holder.fileCount-i if holder.reversed else holder.fileCount+i+1) + c for i, c in enumerate(content)]
                 holder.fileCount += (-fLength if holder.reversed else fLength)
             if arg == ARGS_ENDS:
                 content = [c + "$" for c in content]
@@ -146,13 +145,13 @@ def editFile(fileIndex = 1):
                 replace_values = holder.args[i][1][1:-1].split(";")
                 content = [c.replace(replace_values[0], replace_values[1]) for c in content]
     
-    printFile(content)
+    printFile(holder, content)
     
     if not show_bytecode:
         if ARGS_CLIP in holder.args_id:
             holder.clipBoard += "\n".join(content)
 
-def editFiles():
+def editFiles(holder):
     start = len(holder.files)-1 if holder.reversed else 0
     end = -1 if holder.reversed else len(holder.files)
     if ARGS_CHECKSUM in holder.args_id:
@@ -161,7 +160,7 @@ def editFiles():
             print(checksum.getChecksumFromFile(file))
     else:
         for i in range(start, end, -1 if holder.reversed else 1):
-            editFile(i+1)
+            editFile(holder, i+1)
         if ARGS_COUNT in holder.args_id:
             print()
             print("Lines: " + str(holder.lineSum))
@@ -177,6 +176,7 @@ def main():
     
     #read parameter-args
     args, known_files, unknown_files = ArgParser.getArguments()
+    holder = Holder.Holder()
     holder.setArgs(args)
     
     #check for special cases
@@ -196,7 +196,7 @@ def main():
     holder.generateValues()
     
     #print the cat-output
-    editFiles()
+    editFiles(holder)
     
     #clean-up
     if exists(temp_file):
