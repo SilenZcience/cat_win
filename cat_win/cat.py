@@ -8,7 +8,7 @@ from sys import exit as sysexit
 
 from cat_win.util.ArgConstants import *
 import cat_win.util.ArgParser as ArgParser
-import cat_win.util.Checksum as checksum
+import cat_win.util.checksum as checksum
 import cat_win.util.Converter as Converter
 import cat_win.util.Holder as Holder
 import cat_win.util.StdInHelper as StdInHelper

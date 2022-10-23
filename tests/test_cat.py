@@ -10,7 +10,7 @@ from cat_win.cat import editFiles
 from cat_win.util.Holder import Holder
 
 script_dir = os.path.dirname(__file__)
-test_file_dir = script_dir + "\\test.txt"
+test_file_dir = script_dir + "/test.txt"
 test_file_content = []
 with open(test_file_dir, 'r') as f:
     test_file_content = f.read().splitlines()
