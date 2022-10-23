@@ -22,6 +22,7 @@ class Converter():
         returns True if a String is a Binary number.
         returns False if it is not.
         """
+        if v[:2] == "0b": v = v[2:]
         v_set = set(v)
         return v_set == {'0', '1'} or v_set == {'0'} or v_set == {'1'}
 

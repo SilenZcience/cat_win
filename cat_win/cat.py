@@ -8,7 +8,7 @@ from sys import exit as sysexit
 
 from cat_win.util.ArgConstants import *
 import cat_win.util.ArgParser as ArgParser
-import cat_win.util.checksum as checksum
+import cat_win.util.Checksum as checksum
 import cat_win.util.Converter as Converter
 import cat_win.util.Holder as Holder
 import cat_win.util.StdInHelper as StdInHelper
@@ -73,7 +73,7 @@ def _getLinePrefix(holder, index, line_num):
         
     return file_prefix + line_prefix
     
-def printFile(holder, content):
+def printFile(content):
     if ArgParser.FILE_SEARCH == None:
         print(*content, sep="\n")
         return
@@ -145,7 +145,7 @@ def editFile(holder, fileIndex = 1):
                 replace_values = holder.args[i][1][1:-1].split(";")
                 content = [c.replace(replace_values[0], replace_values[1]) for c in content]
     
-    printFile(holder, content)
+    printFile(content)
     
     if not show_bytecode:
         if ARGS_CLIP in holder.args_id:

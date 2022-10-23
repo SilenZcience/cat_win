@@ -74,7 +74,7 @@ Additionally it includes the feature to strip and reverse the content of any giv
 
 No Prerequisites are neccessary; The stand-alone executable `cat.exe` is sufficient.
 
-> :warning: **You should never trust any executable file!**
+> ⚠️ **You should never trust any executable file!**
 
 ### Installation
 
@@ -117,7 +117,7 @@ cat --help
 | -bin, --bin            | convert binary numbers to decimal and hexadecimal |
 | -v, --version          | output version information                        |
 | enc=X                  | set file enconding to X.                          |
-| find=X                 | find X in the given files..                       |
+| find=X                 | find X in the given files.                        |
 | [a;b]                  | replace a with b in every line.                   |
 | [a:b]                  | python-like string manipulation syntax.           |
 
@@ -143,7 +143,5 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 [OS-MacOS]: https://svgshare.com/i/ZjP.svg
 
 [MadeWith-Python]: https://img.shields.io/badge/Made%20with-Python-brightgreen
-
-[Warning]: https://img.shields.io/badge/warning-orange?style=for-the-badge
 
 [GitHub-SilenZcience]: https://img.shields.io/badge/GitHub-SilenZcience-orange

@@ -1,0 +1,8 @@
+Sample Text:
+This is a Tab-Character: >	<
+These are Special Chars: äöüÄÖÜ
+N-Ary Summation: ∑
+The following Line is Empty:
+
+This Line is a Duplicate!
+This Line is a Duplicate!
