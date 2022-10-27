@@ -1,0 +1,34 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "cat_win"
+requires-python = ">=3.6"
+authors = [{name = "Silas A. Kraume", email = "silas.kraume1552@gmail.com"}]
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = [
+    "python",
+    "cli"
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Environment :: Console",
+    "Operating System :: OS Independent"
+]
+dependencies = [
+    "pyperclip3==0.4.1"
+]
+dynamic = [
+    "version",
+    "description"
+]
+
+[project.scripts]
+cat = "cat_win.cat:main"
+
+[project.urls]
+Github = "https://github.com/SilenZcience/cat_win"
+Download = "https://github.com/SilenZcience/cat_win/tarball/master"
