@@ -95,8 +95,11 @@ def editFile(holder, fileIndex = 1):
     except:
         print("Failed to open:", holder.files[fileIndex-1])
         print("Do you want to open the file as a binary without parameters? [Y]")
-        inp = input()
-        if not 'y' in inp and not 'Y' in inp: return
+        try:
+            inp = input()
+            if not 'y' in inp and not 'Y' in inp: return
+        except EOFError as e:
+            pass
         try:
             with open(holder.files[fileIndex-1], 'rb') as f:
                 content = f.read().splitlines()
