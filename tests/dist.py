@@ -1,7 +1,6 @@
 #!/usr/bin/python
 import os
 from sys import exit
-from re import search, IGNORECASE
 
 error_code = 1
 
@@ -10,33 +9,19 @@ dist_dir = os.path.join(script_dir, "../dist/" )
 print(script_dir)
 print(dist_dir)
 
-setup_file_dir = os.path.join(script_dir, "../setup.py")
-print(setup_file_dir)
-file = open(setup_file_dir, encoding="utf-8")
-version_search = search('version.*[\"\'](.*)[\"\']', file.read(), IGNORECASE)
-if not version_search:
-    exit(error_code)
-version_setup = version_search.group(1)
-print("setup.py - version:", version_setup)
-
-init_file_dir = os.path.join(script_dir, "../cat_win/__init__.py")
-print(init_file_dir)
-file = open(init_file_dir, encoding="utf-8")
-version_search = search('version.*[\"\'](.*)[\"\']', file.read(), IGNORECASE)
-if not version_search:
-    exit(error_code)
-version_init = version_search.group(1)
-print("__init__.py - version:", version_init)
-
-if not version_setup == version_init:
-    print("version mismatch!")
-    exit(error_code)
-
 target_package = os.listdir(dist_dir)
+print("Found packages:", target_package)
 
 if len(target_package) > 0:
-    print("Found package:", target_package[-1])
-    print(dist_dir + target_package[-1])
-    error_code = os.system('pip install --upgrade ' + dist_dir + target_package[-1])
-    
+    target_package_whl = [package for package in target_package if package[-4:] == ".whl"]
+    print(target_package_whl)
+    target_package_tar = [package for package in target_package if package[-7:] == ".tar.gz"]
+    print(target_package_tar)
+    for package in target_package_whl:
+        print("Package:", dist_dir + package)
+        error_code = os.system('pip install --upgrade ' + dist_dir + package)
+    for package in target_package_tar:
+        print("Package:", dist_dir + package)
+        error_code = os.system('pip install --upgrade ' + dist_dir + package)
+
 exit(error_code)
