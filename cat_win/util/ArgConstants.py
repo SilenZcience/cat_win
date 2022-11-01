@@ -5,26 +5,11 @@ class ArgConstant():
         self.help = help
         self.id = id
 
-ARGS_HELP = 0
-ARGS_NUMBER = 1
-ARGS_ENDS = 2
-ARGS_TABS = 3
-ARGS_SQUEEZE = 4
-ARGS_REVERSE = 5
-ARGS_COUNT = 6
-ARGS_BLANK = 7
-ARGS_FILES = 8
-ARGS_INTERACTIVE = 9
-ARGS_CLIP = 10
-ARGS_CHECKSUM = 11
-ARGS_DEC = 12
-ARGS_HEX = 13
-ARGS_BIN = 14
-ARGS_VERSION = 15
-ARGS_DEBUG = 16
 
-ARGS_CUT = 17
-ARGS_REPLACE = 18
+ARGS_HELP, ARGS_NUMBER, ARGS_ENDS, ARGS_TABS, ARGS_SQUEEZE = range(0, 5)
+ARGS_REVERSE, ARGS_COUNT, ARGS_BLANK, ARGS_FILES, ARGS_INTERACTIVE = range(5, 10)
+ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN = range(10, 15)
+ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE = range(15, 19)
 
 ALL_ARGS = [[["-h", "--help"], "show this help message and exit", ARGS_HELP],
             [["-n", "--number"], "number all output lines", ARGS_NUMBER],
