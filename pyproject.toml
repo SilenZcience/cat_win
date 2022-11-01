@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "cat_win"
-requires-python = ">=3.6"
+requires-python = ">=3.7"
 authors = [{name = "Silas A. Kraume", email = "silas.kraume1552@gmail.com"}]
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -19,7 +19,8 @@ classifiers = [
     "Operating System :: OS Independent"
 ]
 dependencies = [
-    "pyperclip3==0.4.1"
+    "pyperclip3==0.4.1",
+    "colorama==0.4.5"
 ]
 dynamic = [
     "version",

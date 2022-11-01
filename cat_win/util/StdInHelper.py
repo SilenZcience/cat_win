@@ -1,16 +1,17 @@
 from sys import stdin
 from tempfile import NamedTemporaryFile
-from cat_win.util.ArgParser import FILE_ENCODING
 
-def writeTemp(content: str) -> str:
+
+def writeTemp(content: str, file_encoding: str) -> str:
     """
     Writes content into a generated temp-file and
     returns the path in type String.
     """
     tmp_file = NamedTemporaryFile(delete=False).name
-    with open(tmp_file, 'w', encoding=FILE_ENCODING) as f:
+    with open(tmp_file, 'w', encoding=file_encoding) as f:
         f.write(content)
     return tmp_file
+
 
 def getStdInContent() -> str:
     """
@@ -20,32 +21,36 @@ def getStdInContent() -> str:
     for line in stdin:
         input += line
     return input
-    
-def writeFiles(file_list: list, content: str) -> None:
+
+
+def writeFiles(file_list: list, content: str, file_encoding: str) -> None:
     """
     Simply writes the content into every
     file in the given list if there is a
     valid content.
     """
-    if content == "": file_list.clear()
+    if content == "":
+        file_list.clear()
     for file in file_list:
-        with open(file, 'w', encoding=FILE_ENCODING) as f:
+        with open(file, 'w', encoding=file_encoding) as f:
             f.write(content)
-    
-    
-def readWriteFilesFromStdIn(file_list: list) -> None:
+
+
+def readWriteFilesFromStdIn(file_list: list, file_encoding: str) -> None:
     """
     Takes a list of files, waits for a String from
     the standard input and writes it into every file.
     """
-    if len(file_list) == 0: return
-    
+    if len(file_list) == 0:
+        return
+
     print("The given FILE(s)", end="")
     print("", *file_list, sep="\n\t")
     print("do/does not exist. Write the FILE(s) and finish with the '^Z'-suffix ((Ctrl + Z) + Enter):")
-    
-    input =  getStdInContent()
+
+    input = getStdInContent()
     input = input.rstrip()
-    if len(input) > 0 and ord(input[-1:]) == 26: input = input[:-1]
-    
-    writeFiles(file_list, input)
+    if len(input) > 0 and ord(input[-1:]) == 26:
+        input = input[:-1]
+
+    writeFiles(file_list, input, file_encoding)

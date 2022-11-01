@@ -99,6 +99,13 @@ cat [FILE]... [OPTION]...
 cat --help
 ```
 
+⚠️ *on linux or macOS systems you might need to define an alias or use:*
+```console
+python3 -m cat_win.cat [FILE]... [OPTION]...
+
+python3 -m cat_win.cat --help
+```
+
 | Argument               | Description                                       |
 |------------------------|---------------------------------------------------|
 | -n, --number           | number all output lines                           |
@@ -116,6 +123,7 @@ cat --help
 | -hex, --hex            | convert hexadecimal numbers to decimal and binary |
 | -bin, --bin            | convert binary numbers to decimal and hexadecimal |
 | -v, --version          | output version information                        |
+| -col, --color          | show colored output                               |
 | enc=X                  | set file enconding to X.                          |
 | find=X                 | find X in the given files.                        |
 | [a;b]                  | replace a with b in every line.                   |
