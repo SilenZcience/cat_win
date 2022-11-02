@@ -32,7 +32,7 @@ class Holder():
             return count + 1
 
     def __calcFilesLineSum__(self) -> None:
-        self.lineSum = sum([self.__getFileLinesSum__(file) for file in self.files])
+        self.lineSum = max([self.__getFileLinesSum__(file) for file in self.files])
 
     def __calcFileLineMaxLength__(self) -> None:
         self.fileLineMaxLength = len(str(self.lineSum))
