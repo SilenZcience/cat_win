@@ -26,7 +26,7 @@ class TestCat(TestCase):
         holder.setFiles([test_file_dir])
         holder.setArgs([])
 
-        check_against = "\n".join(test_file_content) + "\n" + "\x1b[0m\n"
+        check_against = "\n".join(test_file_content) + "\n"
 
         with patch('sys.stdout', new=StringIO()) as fake_out:
             editFiles()
@@ -37,7 +37,7 @@ class TestCat(TestCase):
         holder.setArgs([])
 
         check_against = ("\n".join(test_file_content) +
-                         "\n") * 3 + "\x1b[0m\n"
+                         "\n") * 3
 
         with patch('sys.stdout', new=StringIO()) as fake_out:
             editFiles()
@@ -45,12 +45,12 @@ class TestCat(TestCase):
 
     def test_cat_output_reverse(self):
         holder.setFiles([test_file_dir])
-        holder.setArgs([[5, '']])
+        holder.setArgs([[5, '']]) #reverse
 
         check_against = test_file_content
         check_against.reverse()
         check_against = ("\n".join(check_against) +
-                         "\n") + "\x1b[0m\n"
+                         "\n")
 
         with patch('sys.stdout', new=StringIO()) as fake_out:
             editFiles()
@@ -58,10 +58,10 @@ class TestCat(TestCase):
 
     def test_cat_output_ends_and_tabs(self):
         holder.setFiles([test_file_dir])
-        holder.setArgs([[2, ''], [3, '']])
+        holder.setArgs([[2, ''], [3, '']]) #ends & tabs
 
-        check_against = ("\n".join([c.replace("\t", "^I" + "\x1b[0m") + "$" + "\x1b[0m" for c in test_file_content]) +
-                         "\n") + "\x1b[0m\n"
+        check_against = ("\n".join([c.replace("\t", "^I") + "$" for c in test_file_content]) +
+                         "\n")
 
         with patch('sys.stdout', new=StringIO()) as fake_out:
             editFiles()

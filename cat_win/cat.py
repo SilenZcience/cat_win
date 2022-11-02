@@ -2,6 +2,7 @@ import pyperclip3 as pc
 import sys
 from os import path, remove
 from datetime import datetime
+from functools import cache
 from itertools import groupby
 from colorama import init as coloramaInit
 from colorama import Fore, Back, Style
@@ -16,6 +17,10 @@ from cat_win.util.ArgConstants import *
 from cat_win import __version__, __author__, __sysversion__
 
 coloramaInit()
+color_dic = {'reset': Style.RESET_ALL, 'number': Fore.GREEN, 'ends': Back.YELLOW, 
+             'tabs': Back.YELLOW, 'conversion': Fore.CYAN, 'replace': Fore.YELLOW, 
+             'found_keyword': Fore.RED, 'found_message': Fore.MAGENTA,
+             'checksum': Fore.CYAN, 'count_and_files': Fore.CYAN}
 converter = Converter.Converter()
 holder = Holder.Holder()
 
@@ -75,39 +80,45 @@ def _showDebug(args, known_files, unknown_files):
     print("colored output: ", end="")
     print(ArgParser.COLOR_ENCODING)
 
+@cache
+def _CalculatePrefixSpacing(fileCharLength, lineCharLength, includeFilePrefix):
+    file_prefix = color_dic["number"]
+    if includeFilePrefix:
+        file_prefix += "%i"
+        file_prefix += (" " * (holder.fileMaxLength - fileCharLength)) + "."
 
-def _getLinePrefix(index, line_num):
-    file_prefix = Fore.GREEN if ArgParser.COLOR_ENCODING else ""
+    line_prefix = "%i) " + (" " * (holder.fileLineMaxLength - lineCharLength))
+
+    return file_prefix + line_prefix + color_dic["reset"]
+
+def _getLinePrefix(index: int, line_num: int) -> str:
     if len(holder.files) > 1:
-        file_prefix += (str(index) + (" " * (holder.fileMaxLength - len(str(index)))) + ".")
-
-    line_prefix = str(line_num) + ") " + (" " * (holder.fileLineMaxLength - len(str(line_num))))
-
-    return file_prefix + line_prefix + Style.RESET_ALL
+        return _CalculatePrefixSpacing(len(str(index)), len(str(line_num)), True)  % (index, line_num)
+    return _CalculatePrefixSpacing(len(str(index)), len(str(line_num)), False)  % (line_num)
 
 
-def printFile(content):
-    if not ArgParser.FILE_SEARCH:
-        print(*content, sep="\n")
+def printFile(content: list, bytecode: bool):
+    if not ArgParser.FILE_SEARCH or bytecode:
+        print(*[(c[0] if bytecode else c[1] + c[0]) for c in content], sep="\n")
         return
-
-    for line in content:
+    
+    for line, line_number in content:
         found_list = []
         for keyword in ArgParser.FILE_SEARCH:
             if not keyword in line:
                 continue
             found_list.append(keyword)
-            if ArgParser.COLOR_ENCODING:
-                search_location = line.find(keyword)
-                line = line[:search_location] + Fore.RED + keyword + \
-                    Style.RESET_ALL + line[search_location+len(keyword):]
+            if not ArgParser.COLOR_ENCODING:
+                continue
+            search_location = line.find(keyword)
+            line = line[:search_location] + color_dic["found_keyword"] + keyword + \
+                color_dic["reset"] + line[search_location+len(keyword):]
 
-        print(line)
+        print(line_number + line)
         if found_list:
-            if ArgParser.COLOR_ENCODING:
-                print(Fore.MAGENTA)
+            print(color_dic["found_message"], end="")
             print("--------------- Found", found_list, "---------------")
-            print(Style.RESET_ALL)
+            print(color_dic["reset"], end="")
 
             try:  # fails when using -i mode, because the stdin will send en EOF char to input without prompting the user
                 input()
@@ -115,12 +126,12 @@ def printFile(content):
                 pass
 
 
-def editFile(fileIndex=1):
+def editFile(fileIndex: int = 1):
     show_bytecode = False
-    content = []
+    content = [["",""]]
     try:
         with open(holder.files[fileIndex-1], 'r', encoding=ArgParser.FILE_ENCODING) as f:
-            content = f.read().splitlines()
+            content = [[line, ""] for line in f.read().splitlines()]
     except:
         print("Failed to open:", holder.files[fileIndex-1])
         print(
@@ -133,85 +144,85 @@ def editFile(fileIndex=1):
             pass
         try:
             with open(holder.files[fileIndex-1], 'rb') as f:
-                content = f.read().splitlines()
+                content = [[line, ""] for line in f.read().splitlines()]
             show_bytecode = True
         except:
             print("Operation failed! Try using the enc=X parameter.")
             return
-    fLength = len(content)
-    if not show_bytecode:
+
+    if not show_bytecode:     
+        if ARGS_NUMBER in holder.args_id:
+            content = [[c[0], _getLinePrefix(fileIndex, j)] for j, c in enumerate(content, start=1)]
         for i, arg in enumerate(holder.args_id):
-            if arg == ARGS_NUMBER:
-                content = [_getLinePrefix(fileIndex, holder.fileCount -
-                                          j if holder.reversed else holder.fileCount+j+1) + c for j, c in enumerate(content)]
-                holder.fileCount += (-fLength if holder.reversed else fLength)
             if arg == ARGS_ENDS:
-                content = [c + (Back.YELLOW if ArgParser.COLOR_ENCODING else "") + "$" +
-                           Style.RESET_ALL for c in content]
+                content = [[c[0] + color_dic["ends"] + "$" +
+                           color_dic["reset"], c[1]] for c in content]
             if arg == ARGS_TABS:
-                content = [c.replace("\t", (Back.YELLOW if ArgParser.COLOR_ENCODING else "") + "^I" +
-                                     Style.RESET_ALL) for c in content]
+                content = [[c[0].replace("\t", color_dic["tabs"] + "^I" +
+                                     color_dic["reset"]), c[1]] for c in content]
             if arg == ARGS_SQUEEZE:
-                content = [g[0] for g in groupby(content)]
+                content = [list(group)[0] for _, group in groupby(content, lambda x: x[0])]
             if arg == ARGS_REVERSE:
                 content.reverse()
             if arg == ARGS_BLANK:
-                content = [c for c in content if c]
+                content = [[c[0], c[1]] for c in content if c[0]]
             if arg == ARGS_DEC:
                 if holder.args[i][1] == "-dec":
-                    content = [c + (Fore.CYAN if ArgParser.COLOR_ENCODING else "") + converter._fromDEC(int(c), True) +
-                               Style.RESET_ALL for c in content if converter.is_dec(c)]
+                    content = [[c[0] + color_dic["conversion"] + converter._fromDEC(int(c[0]), True) +
+                               color_dic["reset"], c[1]] for c in content if converter.is_dec(c[0])]
                 else:
-                    content = [c + (Fore.CYAN if ArgParser.COLOR_ENCODING else "") + converter._fromDEC(int(c)) +
-                               Style.RESET_ALL for c in content if converter.is_dec(c)]
+                    content = [[c[0] + color_dic["conversion"] + converter._fromDEC(int(c[0])) +
+                               color_dic["reset"], c[1]] for c in content if converter.is_dec(c[0])]
             if arg == ARGS_HEX:
                 if holder.args[i][1] == "-hex":
-                    content = [c + (Fore.CYAN if ArgParser.COLOR_ENCODING else "") + converter._fromHEX(c, True) +
-                               Style.RESET_ALL for c in content if converter.is_hex(c)]
+                    content = [[c[0] + color_dic["conversion"] + converter._fromHEX(c[0], True) +
+                               color_dic["reset"], c[1]] for c in content if converter.is_hex(c[0])]
                 else:
-                    content = [c + (Fore.CYAN if ArgParser.COLOR_ENCODING else "") + converter._fromHEX(c) +
-                               Style.RESET_ALL for c in content if converter.is_hex(c)]
+                    content = [[c[0] + color_dic["conversion"] + converter._fromHEX(c[0]) +
+                               color_dic["reset"], c[1]] for c in content if converter.is_hex(c[0])]
             if arg == ARGS_BIN:
                 if holder.args[i][1] == "-bin":
-                    content = [c + (Fore.CYAN if ArgParser.COLOR_ENCODING else "") + converter._fromBIN(c, True) +
-                               Style.RESET_ALL for c in content if converter.is_bin(c)]
+                    content = [[c[0] + color_dic["conversion"] + converter._fromBIN(c[0], True) +
+                               color_dic["reset"], c[1]] for c in content if converter.is_bin(c[0])]
                 else:
-                    content = [c + (Fore.CYAN if ArgParser.COLOR_ENCODING else "") + converter._fromBIN(c) +
-                               Style.RESET_ALL for c in content if converter.is_bin(c)]
+                    content = [[c[0] + color_dic["conversion"] + converter._fromBIN(c[0]) +
+                               color_dic["reset"], c[1]] for c in content if converter.is_bin(c[0])]
             if arg == ARGS_CUT:
                 try:
-                    content = [eval(repr(c) + holder.args[i][1])
+                    content = [[eval(repr(c[0]) + holder.args[i][1]), c[1]]
                                for c in content]
                 except:
                     print("Error at operation: ", holder.args[i][1])
                     return
             if arg == ARGS_REPLACE:
                 replace_values = holder.args[i][1][1:-1].split(";")
-                content = [c.replace(replace_values[0], (Fore.YELLOW if ArgParser.COLOR_ENCODING else "") + replace_values[1] + Style.RESET_ALL)
+                content = [[c[0].replace(replace_values[0], color_dic["replace"] + replace_values[1] + color_dic["reset"]), c[1]]
                            for c in content]
 
-    printFile(content)
+    printFile(content, show_bytecode)
 
     if not show_bytecode:
         if ARGS_CLIP in holder.args_id:
-            holder.clipBoard += "\n".join(content)
+            holder.clipBoard += "\n".join([c[1] + c[0] for c in content])
 
 
 def editFiles():
+    if not ArgParser.COLOR_ENCODING:
+        global color_dic
+        color_dic = dict.fromkeys(color_dic, "")
+        
     start = len(holder.files)-1 if holder.reversed else 0
     end = -1 if holder.reversed else len(holder.files)
     if ARGS_CHECKSUM in holder.args_id:
         for file in holder.files:
-            if ArgParser.COLOR_ENCODING:
-                print(Fore.CYAN)
+            print(color_dic["checksum"], end="")
             print("Checksum of '" + file + "':")
             print(checksum.getChecksumFromFile(file))
-            print(Style.RESET_ALL)
+            print(color_dic["reset"], end="")
     else:
         for i in range(start, end, -1 if holder.reversed else 1):
             editFile(i+1)
-        if ArgParser.COLOR_ENCODING:
-            print(Fore.CYAN)
+        print(color_dic["count_and_files"], end="")
         if ARGS_COUNT in holder.args_id:
             print()
             print("Lines: " + str(holder.lineSum))
@@ -219,7 +230,7 @@ def editFiles():
             print()
             print("applied FILE(s):", end="")
             print("", *holder.files, sep="\n\t")
-        print(Style.RESET_ALL)
+        print(color_dic["reset"], end="")
         if ARGS_CLIP in holder.args_id:
             pc.copy(holder.clipBoard)
 
@@ -255,7 +266,7 @@ def main():
     # fill holder object with neccessary values
     holder.setFiles([*known_files, *unknown_files])
     holder.generateValues()
-
+    
     # print the cat-output
     editFiles()
 
