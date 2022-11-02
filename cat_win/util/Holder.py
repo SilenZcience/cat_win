@@ -7,7 +7,6 @@ class Holder():
     args_id = []
     reversed = False
     lineSum = 0
-    fileCount = 0
     fileLineMaxLength = 0
     fileMaxLength = 0
     clipBoard = ""
@@ -34,10 +33,9 @@ class Holder():
 
     def __calcFilesLineSum__(self) -> None:
         self.lineSum = sum([self.__getFileLinesSum__(file) for file in self.files])
-        self.fileCount = self.lineSum if self.reversed else 0
 
     def __calcFileLineMaxLength__(self) -> None:
-        self.fileLineMaxLength = len(str(self.fileCount)) if self.reversed else len(str(self.lineSum))
+        self.fileLineMaxLength = len(str(self.lineSum))
 
     def __calcFileMaxLength__(self) -> None:
         self.fileMaxLength = len(str(len(self.files)))
