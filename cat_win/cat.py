@@ -229,7 +229,7 @@ def editFiles():
         if ARGS_FILES in holder.args_id:
             print()
             print("applied FILE(s):", end="")
-            print("", *holder.files, sep="\n\t")
+            print("", *holder.getAppliedFiles(), sep="\n\t")
         print(color_dic["reset"], end="")
         if ARGS_CLIP in holder.args_id:
             pc.copy(holder.clipBoard)
@@ -259,6 +259,7 @@ def main():
         known_files.append(temp_file)
         StdInHelper.writeFiles(unknown_files, piped_input,
                                ArgParser.FILE_ENCODING)
+        holder.setTempFile(temp_file)
     else:
         StdInHelper.readWriteFilesFromStdIn(
             unknown_files, ArgParser.FILE_ENCODING)

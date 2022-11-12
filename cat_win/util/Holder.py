@@ -5,6 +5,7 @@ class Holder():
     files = []
     args = []
     args_id = []
+    temp_file = None
     reversed = False
     lineSum = 0
     fileLineMaxLength = 0
@@ -19,6 +20,12 @@ class Holder():
         self.args_id = [x[0] for x in self.args]
         self.reversed = ARGS_REVERSE in self.args_id
 
+    def setTempFile(self, file: str) -> None:
+        self.temp_file = file
+        
+    def getAppliedFiles(self) -> list:
+        return ["<STDIN>" if f == self.temp_file else f for f in self.files]
+    
     def __count_generator__(self, reader) -> bytes:
         b = reader(1024 * 1024)
         while b:
