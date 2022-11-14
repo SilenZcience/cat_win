@@ -119,13 +119,15 @@ python3 -m cat_win.cat --help
 | -i, --interactive      | use stdin                                         |
 | -l, --clip             | copy output to clipboard                          |
 | -m, --checksum         | show the checksums of all files                   |
+| -a, --attributes       | show meta-information about the files             |
 | -dec, --dec            | convert decimal numbers to hexadecimal and binary |
 | -hex, --hex            | convert hexadecimal numbers to decimal and binary |
 | -bin, --bin            | convert binary numbers to decimal and hexadecimal |
 | -v, --version          | output version information                        |
 | -col, --color          | show colored output                               |
 | enc=X                  | set file enconding to X.                          |
-| find=X                 | find X in the given files.                        |
+| find=X                 | find X in the given files (literal).              |
+| rfind=X                | find X in the given files (regex).                |
 | [a;b]                  | replace a with b in every line.                   |
 | [a:b]                  | python-like string manipulation syntax.           |
 

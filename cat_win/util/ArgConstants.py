@@ -9,7 +9,7 @@ class ArgConstant():
 ARGS_HELP, ARGS_NUMBER, ARGS_ENDS, ARGS_TABS, ARGS_SQUEEZE = range(0, 5)
 ARGS_REVERSE, ARGS_COUNT, ARGS_BLANK, ARGS_FILES, ARGS_INTERACTIVE = range(5, 10)
 ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN = range(10, 15)
-ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE = range(15, 19)
+ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA = range(15, 20)
 
 ALL_ARGS = [[["-h", "--help"], "show this help message and exit", ARGS_HELP],
             [["-n", "--number"], "number all output lines", ARGS_NUMBER],
@@ -23,6 +23,7 @@ ALL_ARGS = [[["-h", "--help"], "show this help message and exit", ARGS_HELP],
             [["-i", "--interactive"], "use stdin", ARGS_INTERACTIVE],
             [["-l", "--clip"], "copy output to clipboard", ARGS_CLIP],
             [["-m", "--checksum"], "show the checksums of all files", ARGS_CHECKSUM],
+            [["-a", "--attributes"], "show meta-information about the files", ARGS_DATA],
             [["-dec", "--dec"], "convert decimal numbers to hexadecimal and binary", ARGS_DEC],
             [["-hex", "--hex"], "convert hexadecimal numbers to decimal and binary", ARGS_HEX],
             [["-bin", "--bin"], "convert binary numbers to decimal and hexadecimal", ARGS_BIN],
