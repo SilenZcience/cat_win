@@ -126,8 +126,8 @@ python3 -m cat_win.cat --help
 | -v, --version          | output version information                        |
 | -col, --color          | show colored output                               |
 | enc=X                  | set file enconding to X.                          |
-| find=X                 | find X in the given files (literal).              |
-| rfind=X                | find X in the given files (regex).                |
+| find=X                 | find substring X in the given files.              |
+| match=X                | find pattern X in the given files.                |
 | [a;b]                  | replace a with b in every line.                   |
 | [a:b]                  | python-like string manipulation syntax.           |
 
@@ -136,6 +136,8 @@ python3 -m cat_win.cat --help
 ![Example1](https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example1.png "example1")
 
 ![Example2](https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example2.png "example2")
+
+![Example3](https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example3.png "example3")
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

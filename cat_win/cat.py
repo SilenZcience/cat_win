@@ -1,21 +1,20 @@
 import pyperclip3 as pc
 import sys
-from os import path, remove, stat
+from os import path, remove
 from datetime import datetime
 from functools import cache
 from itertools import groupby
 from colorama import init as coloramaInit
 from colorama import Fore, Back, Style
-from math import log, pow, floor
-from datetime import datetime
-from re import finditer
 
 import cat_win.util.ArgParser as ArgParser
 import cat_win.util.checksum as checksum
 import cat_win.util.Converter as Converter
 import cat_win.util.Holder as Holder
 import cat_win.util.StdInHelper as StdInHelper
+import cat_win.util.StringFinder as StringFinder
 from cat_win.util.ArgConstants import *
+from cat_win.util.FileAttributes import printFileMetaData
 
 from cat_win import __version__, __author__, __sysversion__
 
@@ -23,7 +22,7 @@ coloramaInit()
 color_dic = {'reset': Style.RESET_ALL, 'number': Fore.GREEN, 'ends': Back.YELLOW, 
              'tabs': Back.YELLOW, 'conversion': Fore.CYAN, 'replace': Fore.YELLOW, 
              'found_keyword': Fore.RED, 'found_message': Fore.MAGENTA, 'found_reset': Fore.RESET,
-             'rfound_keyword': Back.LIGHTCYAN_EX, 'rfound_message': Fore.LIGHTCYAN_EX, 'rfound_reset': Back.RESET,
+             'matched_keyword': Back.CYAN, 'matched_message': Fore.LIGHTCYAN_EX, 'matched_reset': Back.RESET,
              'checksum': Fore.CYAN, 'count_and_files': Fore.CYAN}
 converter = Converter.Converter()
 holder = Holder.Holder()
@@ -46,7 +45,8 @@ def _showHelp():
     print("%-25s" % str("\t-col, --color:"), end="show colored output\n")
     print()
     print("%-25s" % str("\t'enc=X':"), end="set file encoding to X\n")
-    print("%-25s" % str("\t'find=X':"), end="find X in the given files\n")
+    print("%-25s" % str("\t'find=X':"), end="find substring X in the given files\n")
+    print("%-25s" % str("\t'match=X':"), end="find pattern X in the given files\n")
     print()
     print("%-25s" % str("\t'[a;b]':"), end="replace a with b in every line\n")
     print("%-25s" % str("\t'[a:b]':"), end="python-like string manipulation syntax\n")
@@ -86,30 +86,9 @@ def _showDebug(args, known_files, unknown_files):
     print("colored output: ", end="")
     print(ArgParser.COLOR_ENCODING)
 
-def _convert_size(size_bytes: int) -> str:
-    if size_bytes == 0:
-        return "0B"
-    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-    i = int(floor(log(size_bytes, 1024)))
-    p = pow(1024, i)
-    s = round(size_bytes / p, 2)
-    return "%s %s" % (s, size_name[i])
 
 def _showMeta(files: list):
-    stats = 0
-    for file in files:
-        try:
-            stats = stat(file)
-            print(file)
-            
-            print(f'{"Size:": <16}{_convert_size(stats.st_size)}')
-            print(f'{"AccessTime:": <16}{  datetime.fromtimestamp(stats.st_atime)}')
-            print(f'{"ModifiedTime:": <16}{datetime.fromtimestamp(stats.st_mtime)}')
-            print(f'{"CreationTime:": <16}{datetime.fromtimestamp(stats.st_ctime)}')
-            print()
-        except OSError:
-            continue
-        
+    printFileMetaData(files)
     sys.exit(0)
 
 @cache
@@ -128,86 +107,30 @@ def _getLinePrefix(index: int, line_num: int) -> str:
         return _CalculatePrefixSpacing(len(str(index)), len(str(line_num)), True)  % (index, line_num)
     return _CalculatePrefixSpacing(len(str(index)), len(str(line_num)), False)  % (line_num)
 
-
-def _optimizeIntervals(intervals: list[list]) -> list[list]:
-    """\
-        Merge overlapping intervalls for partially
-        color encoded lines. Needed when multiple
-        search-keywords apply to the same line.
-    """
-    if not intervals:
-        return []
-    intervals.sort()
-    stack = []
-    stack.append(intervals[0])
-    for interval in intervals:
-        if stack[-1][0] <= interval[0] <= stack[-1][-1]:
-            stack[-1][-1] = max(stack[-1][-1], interval[-1])
-        else:
-            stack.append(interval)
-    # stack.reverse()
-    return stack
-
-def _mergeKeywordIntervals(fList: list[list], rfList: list[list]) -> list[list]:
-    kwList = []
-    for f in fList:
-        kwList.append([f[0], "found_keyword"])
-        kwList.append([f[1], "found_reset"])
-    for rf in rfList:
-        kwList.append([rf[0], "rfound_keyword"])
-        kwList.append([rf[1], "rfound_reset"])
-    kwList.sort()
-    kwList.reverse()
-    return kwList
-
 def printFile(content: list, bytecode: bool):
     if (not ArgParser.FILE_SEARCH and not ArgParser.RFILE_SEARCH) or bytecode:
         print(*[(c[0] if bytecode else c[1] + c[0]) for c in content], sep="\n")
         return
     
+    stringFinder = StringFinder.StringFinder(ArgParser.FILE_SEARCH, ArgParser.RFILE_SEARCH)
+    
     for line, line_number in content:
-        found_list = []
-        found_position = []
-        rfound_list = []
-        rfound_positions = []
-        for keyword in ArgParser.FILE_SEARCH:
-            if not keyword in line:
-                continue
-            found_list.append(keyword)
-            if not ArgParser.COLOR_ENCODING:
-                continue
-            search_location = line.find(keyword)
-            found_position.append([search_location, search_location+len(keyword)])
-        
-        found_position = _optimizeIntervals(found_position)
-        
-        for keyword in ArgParser.RFILE_SEARCH:
-            try:
-                for match in finditer(fr'{keyword}', line):
-                    rfound_list.append(keyword)
-                    rfound_positions.append(list(match.span()))
-            except:
-                print()
-                raise Exception("RegEx Error")
-                
-        rfound_positions = _optimizeIntervals(rfound_positions)
-        
-        kw_positions = _mergeKeywordIntervals(found_position, rfound_positions)
-        
-        for kw_pos, kw_code in kw_positions:
+        intervals, fKeyWords, mKeywords = stringFinder.findKeywords(line, ArgParser.COLOR_ENCODING)
+
+        for kw_pos, kw_code in intervals:
             line = line[:kw_pos] + color_dic[kw_code] + line[kw_pos:]
         
         print(line_number + line)
         
         found_sth = False
-        if found_list:
+        if fKeyWords:
             print(color_dic["found_message"], end="")
-            print("--------------- Found", found_list, "---------------")
+            print("--------------- Found", fKeyWords, "---------------")
             print(color_dic["reset"], end="")
             found_sth = True
-        if rfound_list:
-            print(color_dic["rfound_message"], end="")
-            print("--------------- RFound", rfound_list, "---------------")
+        if mKeywords:
+            print(color_dic["matched_message"], end="")
+            print("--------------- RFound", mKeywords, "---------------")
             print(color_dic["reset"], end="")
             found_sth = True
 
