@@ -1,24 +1,25 @@
 from re import finditer
 
+
 class StringFinder:
     kw_literals = []
     kw_regex = []
-    
+
     def __init__(self, literals: list, regex: list):
         self.kw_literals = literals
         self.kw_regex = regex
-    
+
     def _findliterals(self, sub, s):
         l = len(sub)
         i = s.find(sub)
         while i != -1:
             yield [i, i+l]
             i = s.find(sub, i+1)
-            
+
     def _findregex(self, pattern, s):
         for match in finditer(fr'{pattern}', s):
             yield list(match.span())
-    
+
     def _optimizeIntervals(self, intervals: list[list]) -> list[list]:
         """\
             Merge overlapping intervalls for partially
@@ -49,22 +50,21 @@ class StringFinder:
             kwList.append([rf[1], "matched_reset"])
         kwList.sort(reverse=True)
         return kwList
-    
+
     def findKeywords(self, line: str, color_encoded: bool):
         found_list = []
         found_position = []
         matched_list = []
         matched_position = []
-        
+
         for keyword in self.kw_literals:
             for f in self._findliterals(keyword, line):
-                found_position.append(f) 
+                found_position.append(f)
                 found_list.append((keyword, f))
-        
+
         for keyword in self.kw_regex:
             for m in self._findregex(keyword, line):
                 matched_position.append(m)
                 matched_list.append((keyword, m))
-        
+
         return (self._mergeKeywordIntervals(found_position, matched_position), found_list, matched_list)
-    
