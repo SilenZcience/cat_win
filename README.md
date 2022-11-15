@@ -139,6 +139,8 @@ python3 -m cat_win.cat --help
 
 ![Example3](https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example3.png "example3")
 
+![Example4](https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example4.png "example4")
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## License
