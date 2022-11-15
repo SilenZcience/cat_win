@@ -15,7 +15,7 @@ def __addArgument__(args: list, known_files: list, unknown_files: list, param: s
         global FILE_ENCODING
         FILE_ENCODING = param[4:]
         return
-    elif match(r"\Arfind\=.+\Z", param):
+    elif match(r"\Amatch\=.+\Z", param):
         global RFILE_SEARCH
         RFILE_SEARCH.append(fr'{param[6:]}')
         return
