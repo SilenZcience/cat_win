@@ -5,8 +5,8 @@ from datetime import datetime
 from functools import cache
 from itertools import groupby
 from colorama import init as coloramaInit
-from colorama import Fore, Back, Style
 
+import cat_win.persistence.Config as Config
 import cat_win.util.ArgParser as ArgParser
 import cat_win.util.checksum as checksum
 import cat_win.util.Converter as Converter
@@ -17,15 +17,16 @@ from cat_win.util.ArgConstants import *
 from cat_win.util.FileAttributes import printFileMetaData
 
 from cat_win import __version__, __author__, __sysversion__
+workingDir = path.dirname(path.realpath(__file__))
 
 coloramaInit()
-color_dic = {'reset': Style.RESET_ALL, 'number': Fore.GREEN, 'ends': Back.YELLOW, 
-             'tabs': Back.YELLOW, 'conversion': Fore.CYAN, 'replace': Fore.YELLOW, 
-             'found_keyword': Fore.RED, 'found_message': Fore.MAGENTA, 'found_reset': Fore.RESET,
-             'matched_keyword': Back.CYAN, 'matched_message': Fore.LIGHTCYAN_EX, 'matched_reset': Back.RESET,
-             'checksum': Fore.CYAN, 'count_and_files': Fore.CYAN}
+config = Config.Config(workingDir)
+
+color_dic = config.loadConfig()
+
 converter = Converter.Converter()
 holder = Holder.Holder()
+
 
 def exception_handler(exception_type, exception, traceback, debug_hook=sys.excepthook):
     if ARGS_DEBUG in holder.args_id:
@@ -33,7 +34,9 @@ def exception_handler(exception_type, exception, traceback, debug_hook=sys.excep
         return
     print("\nError: {} {}".format(exception_type.__name__, exception))
 
+
 sys.excepthook = exception_handler
+
 
 def _showHelp():
     print("Usage: cat [FILE]... [OPTION]...")
@@ -60,7 +63,7 @@ def _showHelp():
 def _showVersion():
     print()
     print("------------------------------------------------------------")
-    print(f"Cat {__version__} - from {path.dirname(path.realpath(__file__))}")
+    print(f"Cat {__version__} - from {workingDir}")
     print("------------------------------------------------------------")
     print()
     print(f"Python: \t{__sysversion__}")  # sys.version
@@ -87,9 +90,12 @@ def _showDebug(args, known_files, unknown_files):
     print(ArgParser.COLOR_ENCODING)
 
 
-def _showMeta(files: list):
-    printFileMetaData(files)
+def _showMeta(files: list, colored: bool, colors: dict):
+    if not files:
+        return
+    printFileMetaData(files, colored, colors)
     sys.exit(0)
+
 
 @cache
 def _CalculatePrefixSpacing(fileCharLength: int, lineCharLength: int, includeFilePrefix: bool) -> str:
@@ -102,26 +108,29 @@ def _CalculatePrefixSpacing(fileCharLength: int, lineCharLength: int, includeFil
 
     return file_prefix + line_prefix + color_dic["reset"]
 
+
 def _getLinePrefix(index: int, line_num: int) -> str:
     if len(holder.files) > 1:
-        return _CalculatePrefixSpacing(len(str(index)), len(str(line_num)), True)  % (index, line_num)
-    return _CalculatePrefixSpacing(len(str(index)), len(str(line_num)), False)  % (line_num)
+        return _CalculatePrefixSpacing(len(str(index)), len(str(line_num)), True) % (index, line_num)
+    return _CalculatePrefixSpacing(len(str(index)), len(str(line_num)), False) % (line_num)
+
 
 def printFile(content: list, bytecode: bool):
     if (not ArgParser.FILE_SEARCH and not ArgParser.RFILE_SEARCH) or bytecode:
-        print(*[(c[0] if bytecode else c[1] + c[0]) for c in content], sep="\n")
+        print(*[(c[0] if bytecode else c[1] + c[0])
+              for c in content], sep="\n")
         return
-    
+
     stringFinder = StringFinder.StringFinder(ArgParser.FILE_SEARCH, ArgParser.RFILE_SEARCH)
-    
+
     for line, line_number in content:
         intervals, fKeyWords, mKeywords = stringFinder.findKeywords(line, ArgParser.COLOR_ENCODING)
 
         for kw_pos, kw_code in intervals:
             line = line[:kw_pos] + color_dic[kw_code] + line[kw_pos:]
-        
+
         print(line_number + line)
-        
+
         found_sth = False
         if fKeyWords:
             print(color_dic["found_message"], end="")
@@ -130,7 +139,7 @@ def printFile(content: list, bytecode: bool):
             found_sth = True
         if mKeywords:
             print(color_dic["matched_message"], end="")
-            print("--------------- RFound", mKeywords, "---------------")
+            print("--------------- Matched", mKeywords, "---------------")
             print(color_dic["reset"], end="")
             found_sth = True
 
@@ -143,7 +152,7 @@ def printFile(content: list, bytecode: bool):
 
 def editFile(fileIndex: int = 1):
     show_bytecode = False
-    content = [["",""]]
+    content = [["", ""]]
     try:
         with open(holder.files[fileIndex-1], 'r', encoding=ArgParser.FILE_ENCODING) as f:
             content = [[line, ""] for line in f.read().splitlines()]
@@ -165,18 +174,20 @@ def editFile(fileIndex: int = 1):
             print("Operation failed! Try using the enc=X parameter.")
             return
 
-    if not show_bytecode:     
+    if not show_bytecode:
         if ARGS_NUMBER in holder.args_id:
-            content = [[c[0], _getLinePrefix(fileIndex, j)] for j, c in enumerate(content, start=1)]
+            content = [[c[0], _getLinePrefix(fileIndex, j)]
+                       for j, c in enumerate(content, start=1)]
         for i, arg in enumerate(holder.args_id):
             if arg == ARGS_ENDS:
                 content = [[c[0] + color_dic["ends"] + "$" +
                            color_dic["reset"], c[1]] for c in content]
             if arg == ARGS_TABS:
                 content = [[c[0].replace("\t", color_dic["tabs"] + "^I" +
-                                     color_dic["reset"]), c[1]] for c in content]
+                                         color_dic["reset"]), c[1]] for c in content]
             if arg == ARGS_SQUEEZE:
-                content = [list(group)[0] for _, group in groupby(content, lambda x: x[0])]
+                content = [list(group)[0]
+                           for _, group in groupby(content, lambda x: x[0])]
             if arg == ARGS_REVERSE:
                 content.reverse()
             if arg == ARGS_BLANK:
@@ -225,7 +236,7 @@ def editFiles():
     if not ArgParser.COLOR_ENCODING:
         global color_dic
         color_dic = dict.fromkeys(color_dic, "")
-        
+
     start = len(holder.files)-1 if holder.reversed else 0
     end = -1 if holder.reversed else len(holder.files)
     if ARGS_CHECKSUM in holder.args_id:
@@ -262,12 +273,15 @@ def main():
     sys.stdin.reconfigure(encoding=ArgParser.FILE_ENCODING)
 
     # check for special cases
+    if ARGS_DEBUG in holder.args_id:
+        _showDebug(args, known_files, unknown_files)
     if (len(known_files) == 0 and len(unknown_files) == 0 and len(holder.args) == 0) or ARGS_HELP in holder.args_id:
         _showHelp()
     if ARGS_VERSION in holder.args_id:
         _showVersion()
-    if ARGS_DEBUG in holder.args_id:
-        _showDebug(args, known_files, unknown_files)
+    if ARGS_CONFIG in holder.args_id:
+        config.saveConfig()
+        sys.exit(0)
     if ARGS_INTERACTIVE in holder.args_id:
         piped_input = StdInHelper.getStdInContent()
         temp_file = StdInHelper.writeTemp(piped_input, ArgParser.FILE_ENCODING)
@@ -279,12 +293,17 @@ def main():
         StdInHelper.readWriteFilesFromStdIn(
             unknown_files, ArgParser.FILE_ENCODING)
 
+    if (len(known_files) == 0 and len(unknown_files) == 0):
+        sys.exit(0)
+    
     # fill holder object with neccessary values
     holder.setFiles([*known_files, *unknown_files])
     holder.generateValues()
-    
+
     if ARGS_DATA in holder.args_id:
-        _showMeta(holder.files)
+        _showMeta(holder.files, ArgParser.COLOR_ENCODING, {"reset": color_dic["reset"], "attrib": color_dic["attrib"],
+                                                           "attrib_positive": color_dic["attrib_positive"], "attrib_negative": color_dic["attrib_negative"]})
+
     # print the cat-output
     editFiles()
 

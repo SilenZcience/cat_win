@@ -1,6 +1,5 @@
 from math import log, pow, floor
 from datetime import datetime
-from colorama import Fore
 from os import stat
 from platform import system
 from stat import (
@@ -39,25 +38,32 @@ def read_attribs(file):
     )
 
 
-def printFileMetaData(files):
+def printFileMetaData(files: list, colored: bool, colors: dict):
     stats = 0
     for file in files:
         try:
             stats = stat(file)
+            print((colors["attrib"] if colored else ""), end="")
             print(file)
 
             print(f'{"Size:": <16}{_convert_size(stats.st_size)}')
             print(f'{"ATime:": <16}{  datetime.fromtimestamp(stats.st_atime)}')
             print(f'{"MTime:": <16}{datetime.fromtimestamp(stats.st_mtime)}')
             print(f'{"CTime:": <16}{datetime.fromtimestamp(stats.st_ctime)}')
+
+            print((colors["reset"] if colored else ""), end="")
             if system() != "Windows":
                 print()
                 continue
             attribs = read_attribs(file)
-            print(Fore.LIGHTGREEN_EX, ", ".join(
-                [x for x, y in attribs if y]), Fore.RESET, sep="")
-            print(Fore.LIGHTRED_EX, ", ".join(
-                [x for x, y in attribs if not y]), Fore.RESET, sep="")
+            print((colors["attrib_positive"] if colored else ""), end="")
+            print("+", ", ".join(
+                [x for x, y in attribs if y]))
+            print((colors["reset"] if colored else ""), end="")
+            print((colors["attrib_negative"] if colored else ""), end="")
+            print("-", ", ".join(
+                [x for x, y in attribs if not y]))
+            print((colors["reset"] if colored else ""), end="")
             print()
         except OSError:
             continue

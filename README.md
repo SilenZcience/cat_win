@@ -125,6 +125,7 @@ python3 -m cat_win.cat --help
 | -bin, --bin            | convert binary numbers to decimal and hexadecimal |
 | -v, --version          | output version information                        |
 | -col, --color          | show colored output                               |
+| --config, --config     | change color configuration                        |
 | enc=X                  | set file enconding to X.                          |
 | find=X                 | find substring X in the given files.              |
 | match=X                | find pattern X in the given files.                |
