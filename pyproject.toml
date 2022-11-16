@@ -19,8 +19,8 @@ classifiers = [
     "Operating System :: OS Independent"
 ]
 dependencies = [
-    "pyperclip3==0.4.1",
-    "colorama==0.4.5"
+    "pyperclip3>=0.4.1",
+    "colorama>=0.4.5"
 ]
 dynamic = [
     "version",
