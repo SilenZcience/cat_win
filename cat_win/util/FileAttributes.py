@@ -11,7 +11,7 @@ from stat import (
     FILE_ATTRIBUTE_COMPRESSED as C,
     FILE_ATTRIBUTE_ENCRYPTED as E
 )
-
+from cat_win.util.ColorConstants import C_KW
 
 def _convert_size(size_bytes: int) -> str:
     if size_bytes == 0:
@@ -43,7 +43,7 @@ def printFileMetaData(files: list, colored: bool, colors: dict):
     for file in files:
         try:
             stats = stat(file)
-            print((colors["attrib"] if colored else ""), end="")
+            print((colors[C_KW.ATTRIB] if colored else ""), end="")
             print(file)
 
             print(f'{"Size:": <16}{_convert_size(stats.st_size)}')
@@ -51,19 +51,19 @@ def printFileMetaData(files: list, colored: bool, colors: dict):
             print(f'{"MTime:": <16}{datetime.fromtimestamp(stats.st_mtime)}')
             print(f'{"CTime:": <16}{datetime.fromtimestamp(stats.st_ctime)}')
 
-            print((colors["reset"] if colored else ""), end="")
+            print((colors[C_KW.RESET_ALL] if colored else ""), end="")
             if system() != "Windows":
                 print()
                 continue
             attribs = read_attribs(file)
-            print((colors["attrib_positive"] if colored else ""), end="")
+            print((colors[C_KW.ATTRIB_POSITIVE] if colored else ""), end="")
             print("+", ", ".join(
                 [x for x, y in attribs if y]))
-            print((colors["reset"] if colored else ""), end="")
-            print((colors["attrib_negative"] if colored else ""), end="")
+            print((colors[C_KW.RESET_ALL] if colored else ""), end="")
+            print((colors[C_KW.ATTRIB_NEGATIVE] if colored else ""), end="")
             print("-", ", ".join(
                 [x for x, y in attribs if not y]))
-            print((colors["reset"] if colored else ""), end="")
+            print((colors[C_KW.RESET_ALL] if colored else ""), end="")
             print()
         except OSError:
             continue
