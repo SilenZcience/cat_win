@@ -1,5 +1,5 @@
 from re import finditer
-
+from cat_win.util.ColorConstants import C_KW
 
 class StringFinder:
     kw_literals = []
@@ -43,15 +43,15 @@ class StringFinder:
         mList = self._optimizeIntervals(mList)
         kwList = []
         for f in fList:
-            kwList.append([f[0], "found_keyword"])
-            kwList.append([f[1], "found_reset"])
+            kwList.append([f[0], C_KW.FOUND])
+            kwList.append([f[1], C_KW.RESET_FOUND])
         for rf in mList:
-            kwList.append([rf[0], "matched_keyword"])
-            kwList.append([rf[1], "matched_reset"])
+            kwList.append([rf[0], C_KW.MATCHED])
+            kwList.append([rf[1], C_KW.RESET_MATCHED])
         kwList.sort(reverse=True)
         return kwList
 
-    def findKeywords(self, line: str, color_encoded: bool):
+    def findKeywords(self, line: str):
         found_list = []
         found_position = []
         matched_list = []

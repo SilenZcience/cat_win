@@ -1,43 +1,5 @@
-from os import path
-from colorama import Fore, Back, Style
 from configparser import ConfigParser
-
-
-class ColoramaOptions:
-    C_Fore = {"BLACK": Fore.BLACK,
-              "RED": Fore.RED,
-              "GREEN": Fore.GREEN,
-              "YELLOW": Fore.YELLOW,
-              "BLUE": Fore.BLUE,
-              "MAGENTA": Fore.MAGENTA,
-              "CYAN": Fore.CYAN,
-              "WHITE": Fore.WHITE,
-              "LIGHTBLACK_EX": Fore.LIGHTBLACK_EX,
-              "LIGHTRED_EX": Fore.LIGHTRED_EX,
-              "LIGHTGREEN_EX": Fore.LIGHTGREEN_EX,
-              "LIGHTYELLOW_EX": Fore.LIGHTYELLOW_EX,
-              "LIGHTBLUE_EX": Fore.LIGHTBLUE_EX,
-              "LIGHTMAGENTA_EX": Fore.LIGHTMAGENTA_EX,
-              "LIGHTCYAN_EX": Fore.LIGHTCYAN_EX,
-              "LIGHTWHITE_EX": Fore.LIGHTWHITE_EX
-              }
-    C_Back = {"BLACK": Back.BLACK,
-              "RED": Back.RED,
-              "GREEN": Back.GREEN,
-              "YELLOW": Back.YELLOW,
-              "BLUE": Back.BLUE,
-              "MAGENTA": Back.MAGENTA,
-              "CYAN": Back.CYAN,
-              "WHITE": Back.WHITE,
-              "LIGHTBLACK_EX": Back.LIGHTBLACK_EX,
-              "LIGHTRED_EX": Back.LIGHTRED_EX,
-              "LIGHTGREEN_EX": Back.LIGHTGREEN_EX,
-              "LIGHTYELLOW_EX": Back.LIGHTYELLOW_EX,
-              "LIGHTBLUE_EX": Back.LIGHTBLUE_EX,
-              "LIGHTMAGENTA_EX": Back.LIGHTMAGENTA_EX,
-              "LIGHTCYAN_EX": Back.LIGHTCYAN_EX,
-              "LIGHTWHITE_EX": Back.LIGHTWHITE_EX
-              }
+from cat_win.util.ColorConstants import ColoramaOptions, C_KW
 
 
 class Config:
@@ -45,15 +7,23 @@ class Config:
     workingDir = ""
     configFile = ""
 
-    exclusive_definitions = {"Fore": ["found_keyword"],  # can only be Foreground
-                             "Back": ["matched_keyword"]}  # can only be Background
-    default_dic = {'number': Fore.GREEN, 'ends': Back.YELLOW,
-                   'tabs': Back.YELLOW, 'conversion': Fore.CYAN, 'replace': Fore.YELLOW,
-                   'found_keyword': Fore.RED, 'found_message': Fore.MAGENTA,
-                   'matched_keyword': Back.CYAN, 'matched_message': Fore.LIGHTCYAN_EX,
-                   'checksum': Fore.CYAN, 'count_and_files': Fore.CYAN, 'attrib_positive': Fore.LIGHTGREEN_EX,
-                   'attrib_negative': Fore.LIGHTRED_EX, 'attrib': Fore.CYAN}
-    elements = default_dic.keys()
+    exclusive_definitions = {"Fore": [C_KW.FOUND],  # can only be Foreground
+                             "Back": [C_KW.MATCHED]}  # can only be Background
+    default_dic = {C_KW.NUMBER: ColoramaOptions.C_Fore['GREEN'],
+                   C_KW.ENDS: ColoramaOptions.C_Back['YELLOW'],
+                   C_KW.TABS: ColoramaOptions.C_Back['YELLOW'],
+                   C_KW.CONVERSION: ColoramaOptions.C_Fore['CYAN'],
+                   C_KW.REPLACE: ColoramaOptions.C_Fore['YELLOW'],
+                   C_KW.FOUND: ColoramaOptions.C_Fore['RED'],
+                   C_KW.FOUND_MESSAGE: ColoramaOptions.C_Fore['MAGENTA'],
+                   C_KW.MATCHED: ColoramaOptions.C_Back['CYAN'],
+                   C_KW.MATCHED_MESSAGE: ColoramaOptions.C_Fore['LIGHTCYAN_EX'],
+                   C_KW.CHECKSUM: ColoramaOptions.C_Fore['CYAN'],
+                   C_KW.COUNT_AND_FILES: ColoramaOptions.C_Fore['CYAN'],
+                   C_KW.ATTRIB_POSITIVE: ColoramaOptions.C_Fore['LIGHTGREEN_EX'],
+                   C_KW.ATTRIB_NEGATIVE: ColoramaOptions.C_Fore['LIGHTRED_EX'],
+                   C_KW.ATTRIB: ColoramaOptions.C_Fore['CYAN']}
+    elements = list(default_dic.keys())
     color_dic = {}
 
     def __init__(self, workingDir):
@@ -74,44 +44,58 @@ class Config:
         except:
             self.color_dic = self.default_dic
 
-        self.color_dic["reset"] = Style.RESET_ALL
-        self.color_dic["found_reset"] = Fore.RESET
-        self.color_dic["matched_reset"] = Back.RESET
+        self.color_dic[C_KW.RESET_ALL] = ColoramaOptions.C_Style_Reset
+        self.color_dic[C_KW.RESET_FOUND] = ColoramaOptions.C_Fore_Reset
+        self.color_dic[C_KW.RESET_MATCHED] = ColoramaOptions.C_Back_Reset
 
         return self.color_dic
 
-    def _printAllAvailableColors(self):
+    def _printGetAllAvailableColors(self):
+        options = []
+        index = 0
         print("Here is a list of all available color options you may choose:")
         for key, value in ColoramaOptions.C_Fore.items():
-            print(value, "Fore.", key, Fore.RESET, sep="")
-        print(Fore.BLACK, end="")
+            option = "Fore." + key
+            print(f"{index: <2}: ", value, option, ColoramaOptions.C_Fore_Reset, sep="")
+            options.append(option)
+            index += 1
         for key, value in ColoramaOptions.C_Back.items():
-            print(value, "Back.", key, Back.RESET, sep="")
-        print(Style.RESET_ALL, end="")
-        return
+            option = "Back." + key
+            print(f"{index: <2}: ", value, option, ColoramaOptions.C_Back_Reset, sep="")
+            options.append(option)
+            index += 1
+        return options
 
     def _printAllAvailableElements(self):
         print("Here is a list of all available elements you may change:")
-        for element in self.elements:
-            print(self.color_dic[element], element, Style.RESET_ALL, sep="")
-        return
+        for index, element in enumerate(self.elements):
+            print(f"{index: <2}: ", self.color_dic[element], element,
+                  ColoramaOptions.C_Style_Reset, sep="")
 
     def saveConfig(self):
         # Assume, that the current config is already loaded/the method loadConfig() was already called.
         self._printAllAvailableElements()
         keyword = input("Input name of keyword to change: ")
+        if keyword.isdigit():
+            keyword = self.elements[int(keyword)] if (0 <= int(keyword) < len(self.elements)) else keyword
         while (not keyword in self.elements):
             print(f"Something went wrong. Unknown keyword '{keyword}'")
             keyword = input("Input name of keyword to change: ")
+            if keyword.isdigit():
+                keyword = self.elements[int(color)] if (0 <= int(keyword) < len(self.elements)) else keyword
 
         print(f"Successfully selected element '{keyword}'.")
 
-        self._printAllAvailableColors()
+        color_options = self._printGetAllAvailableColors()
         color = input("Input color: ")
-        while (not color in ["Fore."+key for key in ColoramaOptions.C_Fore.keys()]
-               and not color in ["Back."+key for key in ColoramaOptions.C_Back.keys()]):
-            print(f"Something went wrong. Unknown option '{color}'")
+        if color.isdigit():
+            color = color_options[int(color)] if (0 <= int(color) < len(color_options)) else color
+        while (not color in color_options):
+            print(f"Something went wrong. Unknown option '{color}'.")
             color = input("Input color: ")
+            if color.isdigit():
+                color = color_options[int(color)] if (0 <= int(color) < len(color_options)) else color
+                
 
         if keyword in self.exclusive_definitions["Fore"] and color.startswith("Back"):
             print(f"An Error occured: '{keyword}' can only be of style 'Fore'")
@@ -119,9 +103,9 @@ class Config:
         if keyword in self.exclusive_definitions["Back"] and color.startswith("Fore"):
             print(f"An Error occured: '{keyword}' can only be of style 'Back'")
             return
-        
+
         print(f"Successfully selected element '{color}'.")
-        
+
         self.configParser['COLORS'][keyword] = color
         try:
             with open(self.configFile, 'w') as conf:
@@ -130,5 +114,5 @@ class Config:
         except:
             print(f"Could not write to config file:\n\t{self.configFile}")
             pass
-            
+
         return

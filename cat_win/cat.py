@@ -14,6 +14,7 @@ import cat_win.util.Holder as Holder
 import cat_win.util.StdInHelper as StdInHelper
 import cat_win.util.StringFinder as StringFinder
 from cat_win.util.ArgConstants import *
+from cat_win.util.ColorConstants import C_KW
 from cat_win.util.FileAttributes import printFileMetaData
 
 from cat_win import __version__, __author__, __sysversion__
@@ -99,14 +100,14 @@ def _showMeta(files: list, colored: bool, colors: dict):
 
 @cache
 def _CalculatePrefixSpacing(fileCharLength: int, lineCharLength: int, includeFilePrefix: bool) -> str:
-    file_prefix = color_dic["number"]
+    file_prefix = color_dic[C_KW.NUMBER]
     if includeFilePrefix:
         file_prefix += "%i"
         file_prefix += (" " * (holder.fileMaxLength - fileCharLength)) + "."
 
     line_prefix = "%i) " + (" " * (holder.fileLineMaxLength - lineCharLength))
 
-    return file_prefix + line_prefix + color_dic["reset"]
+    return file_prefix + line_prefix + color_dic[C_KW.RESET_ALL]
 
 
 def _getLinePrefix(index: int, line_num: int) -> str:
@@ -124,23 +125,24 @@ def printFile(content: list, bytecode: bool):
     stringFinder = StringFinder.StringFinder(ArgParser.FILE_SEARCH, ArgParser.RFILE_SEARCH)
 
     for line, line_number in content:
-        intervals, fKeyWords, mKeywords = stringFinder.findKeywords(line, ArgParser.COLOR_ENCODING)
+        intervals, fKeyWords, mKeywords = stringFinder.findKeywords(line)
 
-        for kw_pos, kw_code in intervals:
-            line = line[:kw_pos] + color_dic[kw_code] + line[kw_pos:]
+        if ArgParser.COLOR_ENCODING:
+            for kw_pos, kw_code in intervals:
+                line = line[:kw_pos] + color_dic[kw_code] + line[kw_pos:]
 
         print(line_number + line)
 
         found_sth = False
         if fKeyWords:
-            print(color_dic["found_message"], end="")
+            print(color_dic[C_KW.FOUND_MESSAGE], end="")
             print("--------------- Found", fKeyWords, "---------------")
-            print(color_dic["reset"], end="")
+            print(color_dic[C_KW.RESET_ALL], end="")
             found_sth = True
         if mKeywords:
-            print(color_dic["matched_message"], end="")
+            print(color_dic[C_KW.MATCHED_MESSAGE], end="")
             print("--------------- Matched", mKeywords, "---------------")
-            print(color_dic["reset"], end="")
+            print(color_dic[C_KW.RESET_ALL], end="")
             found_sth = True
 
         if found_sth:
@@ -180,11 +182,11 @@ def editFile(fileIndex: int = 1):
                        for j, c in enumerate(content, start=1)]
         for i, arg in enumerate(holder.args_id):
             if arg == ARGS_ENDS:
-                content = [[c[0] + color_dic["ends"] + "$" +
-                           color_dic["reset"], c[1]] for c in content]
+                content = [[c[0] + color_dic[C_KW.ENDS] + "$" +
+                           color_dic[C_KW.RESET_ALL], c[1]] for c in content]
             if arg == ARGS_TABS:
-                content = [[c[0].replace("\t", color_dic["tabs"] + "^I" +
-                                         color_dic["reset"]), c[1]] for c in content]
+                content = [[c[0].replace("\t", color_dic[C_KW.TABS] + "^I" +
+                                         color_dic[C_KW.RESET_ALL]), c[1]] for c in content]
             if arg == ARGS_SQUEEZE:
                 content = [list(group)[0]
                            for _, group in groupby(content, lambda x: x[0])]
@@ -194,25 +196,25 @@ def editFile(fileIndex: int = 1):
                 content = [[c[0], c[1]] for c in content if c[0]]
             if arg == ARGS_DEC:
                 if holder.args[i][1] == "-dec":
-                    content = [[c[0] + color_dic["conversion"] + converter._fromDEC(int(c[0]), True) +
-                               color_dic["reset"], c[1]] for c in content if converter.is_dec(c[0])]
+                    content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromDEC(int(c[0]), True) +
+                               color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_dec(c[0])]
                 else:
-                    content = [[c[0] + color_dic["conversion"] + converter._fromDEC(int(c[0])) +
-                               color_dic["reset"], c[1]] for c in content if converter.is_dec(c[0])]
+                    content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromDEC(int(c[0])) +
+                               color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_dec(c[0])]
             if arg == ARGS_HEX:
                 if holder.args[i][1] == "-hex":
-                    content = [[c[0] + color_dic["conversion"] + converter._fromHEX(c[0], True) +
-                               color_dic["reset"], c[1]] for c in content if converter.is_hex(c[0])]
+                    content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromHEX(c[0], True) +
+                               color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_hex(c[0])]
                 else:
-                    content = [[c[0] + color_dic["conversion"] + converter._fromHEX(c[0]) +
-                               color_dic["reset"], c[1]] for c in content if converter.is_hex(c[0])]
+                    content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromHEX(c[0]) +
+                               color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_hex(c[0])]
             if arg == ARGS_BIN:
                 if holder.args[i][1] == "-bin":
-                    content = [[c[0] + color_dic["conversion"] + converter._fromBIN(c[0], True) +
-                               color_dic["reset"], c[1]] for c in content if converter.is_bin(c[0])]
+                    content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromBIN(c[0], True) +
+                               color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_bin(c[0])]
                 else:
-                    content = [[c[0] + color_dic["conversion"] + converter._fromBIN(c[0]) +
-                               color_dic["reset"], c[1]] for c in content if converter.is_bin(c[0])]
+                    content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromBIN(c[0]) +
+                               color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_bin(c[0])]
             if arg == ARGS_CUT:
                 try:
                     content = [[eval(repr(c[0]) + holder.args[i][1]), c[1]]
@@ -222,7 +224,7 @@ def editFile(fileIndex: int = 1):
                     return
             if arg == ARGS_REPLACE:
                 replace_values = holder.args[i][1][1:-1].split(";")
-                content = [[c[0].replace(replace_values[0], color_dic["replace"] + replace_values[1] + color_dic["reset"]), c[1]]
+                content = [[c[0].replace(replace_values[0], color_dic[C_KW.REPLACE] + replace_values[1] + color_dic[C_KW.RESET_ALL]), c[1]]
                            for c in content]
 
     printFile(content, show_bytecode)
@@ -241,14 +243,14 @@ def editFiles():
     end = -1 if holder.reversed else len(holder.files)
     if ARGS_CHECKSUM in holder.args_id:
         for file in holder.files:
-            print(color_dic["checksum"], end="")
+            print(color_dic[C_KW.CHECKSUM], end="")
             print("Checksum of '" + file + "':")
             print(checksum.getChecksumFromFile(file))
-            print(color_dic["reset"], end="")
+            print(color_dic[C_KW.RESET_ALL], end="")
     else:
         for i in range(start, end, -1 if holder.reversed else 1):
             editFile(i+1)
-        print(color_dic["count_and_files"], end="")
+        print(color_dic[C_KW.COUNT_AND_FILES], end="")
         if ARGS_COUNT in holder.args_id:
             print()
             print("Lines: " + str(holder.lineSum))
@@ -256,7 +258,7 @@ def editFiles():
             print()
             print("applied FILE(s):", end="")
             print("", *holder.getAppliedFiles(), sep="\n\t")
-        print(color_dic["reset"], end="")
+        print(color_dic[C_KW.RESET_ALL], end="")
         if ARGS_CLIP in holder.args_id:
             pc.copy(holder.clipBoard)
 
@@ -301,8 +303,10 @@ def main():
     holder.generateValues()
 
     if ARGS_DATA in holder.args_id:
-        _showMeta(holder.files, ArgParser.COLOR_ENCODING, {"reset": color_dic["reset"], "attrib": color_dic["attrib"],
-                                                           "attrib_positive": color_dic["attrib_positive"], "attrib_negative": color_dic["attrib_negative"]})
+        _showMeta(holder.files, ArgParser.COLOR_ENCODING, {C_KW.RESET_ALL: color_dic[C_KW.RESET_ALL],
+                                                           C_KW.ATTRIB: color_dic[C_KW.ATTRIB],
+                                                           C_KW.ATTRIB_POSITIVE: color_dic[C_KW.ATTRIB_POSITIVE],
+                                                           C_KW.ATTRIB_NEGATIVE: color_dic[C_KW.ATTRIB_NEGATIVE]})
 
     # print the cat-output
     editFiles()
