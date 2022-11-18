@@ -109,6 +109,7 @@ python3 -m cat_win.cat --help
 | Argument               | Description                                       |
 |------------------------|---------------------------------------------------|
 | -n, --number           | number all output lines                           |
+| -x, --linelength       | display the length of each line                   |
 | -e, --ends             | display $ at the end of each line                 |
 | -t, --tabs             | display TAB characters as ^I                      |
 | -s, --squeeze          | suppress repeated output lines                    |
