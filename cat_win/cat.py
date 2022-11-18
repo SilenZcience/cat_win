@@ -115,6 +115,10 @@ def _getLinePrefix(index: int, line_num: int) -> str:
         return _CalculatePrefixSpacing(len(str(index)), len(str(line_num)), True) % (index, line_num)
     return _CalculatePrefixSpacing(len(str(index)), len(str(line_num)), False) % (line_num)
 
+def _getLineLengthPrefix(prefix: str, line: str) -> str:
+    lengthPrefix = f"{len(line)}"
+    x = 16
+    return f'{prefix}{" " if prefix else ""}{color_dic[C_KW.LINE_LENGTH]}[{lengthPrefix: <{holder.maxlineLength}}] {color_dic[C_KW.RESET_ALL]}'
 
 def printFile(content: list, bytecode: bool):
     if (not ArgParser.FILE_SEARCH and not ArgParser.RFILE_SEARCH) or bytecode:
@@ -180,6 +184,9 @@ def editFile(fileIndex: int = 1):
         if ARGS_NUMBER in holder.args_id:
             content = [[c[0], _getLinePrefix(fileIndex, j)]
                        for j, c in enumerate(content, start=1)]
+        if ARGS_LLENGTH in holder.args_id:
+            content = [[c[0], _getLineLengthPrefix(c[1], c[0])]
+                       for c in content]
         for i, arg in enumerate(holder.args_id):
             if arg == ARGS_ENDS:
                 content = [[c[0] + color_dic[C_KW.ENDS] + "$" +

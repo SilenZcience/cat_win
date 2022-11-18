@@ -10,6 +10,7 @@ class Config:
     exclusive_definitions = {"Fore": [C_KW.FOUND],  # can only be Foreground
                              "Back": [C_KW.MATCHED]}  # can only be Background
     default_dic = {C_KW.NUMBER: ColoramaOptions.C_Fore['GREEN'],
+                   C_KW.LINE_LENGTH: ColoramaOptions.C_Fore['LIGHTBLUE_EX'],
                    C_KW.ENDS: ColoramaOptions.C_Back['YELLOW'],
                    C_KW.TABS: ColoramaOptions.C_Back['YELLOW'],
                    C_KW.CONVERSION: ColoramaOptions.C_Fore['CYAN'],
