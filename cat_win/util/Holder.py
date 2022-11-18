@@ -7,6 +7,7 @@ class Holder():
     args_id = []
     temp_file = None
     reversed = False
+    maxlineLength = 0
     lineSum = 0
     fileLineMaxLength = 0
     fileMaxLength = 0
@@ -47,7 +48,11 @@ class Holder():
     def __calcFileMaxLength__(self) -> None:
         self.fileMaxLength = len(str(len(self.files)))
 
+    def __calcMaxLineLength__(self) -> None:
+        self.maxlineLength = len(str(max([max([len(line)-1 for line in open(file, 'rb').readlines()]) for file in self.files])))
+
     def generateValues(self) -> None:
         self.__calcFilesLineSum__()
         self.__calcFileLineMaxLength__()
         self.__calcFileMaxLength__()
+        self.__calcMaxLineLength__()

@@ -36,17 +36,19 @@ class ColoramaOptions:
               "LIGHTCYAN_EX": Back.LIGHTCYAN_EX,
               "LIGHTWHITE_EX": Back.LIGHTWHITE_EX
               }
-    
+
     C_Fore_Reset = Fore.RESET
     C_Back_Reset = Back.RESET
     C_Style_Reset = Style.RESET_ALL
-    
+
+
 class C_KW:
     RESET_ALL = "reset_all"
     RESET_FOUND = "reset_found"
     RESET_MATCHED = "reset_matched"
-    
+
     NUMBER = "line_numbers"
+    LINE_LENGTH = "line_length"
     ENDS = "line_ends"
     TABS = "tab_characters"
     CONVERSION = "number_conversion"
