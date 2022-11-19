@@ -47,9 +47,18 @@ class Holder():
 
     def __calcFileMaxLength__(self) -> None:
         self.fileMaxLength = len(str(len(self.files)))
+    
+    def __remove_NLsuff__(self, input_string, suffix):
+        return input_string[:-len(suffix)] if (input_string.endswith(suffix)) else input_string
 
+    def __len_trimNL__(self, bLine):
+        return len(self.__remove_NLsuff__(self.__remove_NLsuff__(bLine, b'\n'), b'\r'))
+
+    def __getLineLength__(self, file) -> int:
+        return self.__len_trimNL__(max(open(file, 'rb'), key=self.__len_trimNL__))
+    
     def __calcMaxLineLength__(self) -> None:
-        self.maxlineLength = len(str(max([max([len(line)-1 for line in open(file, 'rb').readlines()]) for file in self.files])))
+        self.maxlineLength = len(str(max([self.__getLineLength__(file) for file in self.files])))
 
     def generateValues(self) -> None:
         self.__calcFilesLineSum__()
