@@ -103,9 +103,9 @@ def _CalculatePrefixSpacing(fileCharLength: int, lineCharLength: int, includeFil
     file_prefix = color_dic[C_KW.NUMBER]
     if includeFilePrefix:
         file_prefix += "%i"
-        file_prefix += (" " * (holder.fileMaxLength - fileCharLength)) + "."
+        file_prefix += (" " * (holder.fileNumberPlaceHolder - fileCharLength)) + "."
 
-    line_prefix = "%i) " + (" " * (holder.fileLineMaxLength - lineCharLength))
+    line_prefix = "%i) " + (" " * (holder.fileLineNumberPlaceHolder - lineCharLength))
 
     return file_prefix + line_prefix + color_dic[C_KW.RESET_ALL]
 
@@ -118,7 +118,7 @@ def _getLinePrefix(index: int, line_num: int) -> str:
 def _getLineLengthPrefix(prefix: str, line: str) -> str:
     lengthPrefix = f"{len(line)}"
     x = 16
-    return f'{prefix}{color_dic[C_KW.LINE_LENGTH]}[{lengthPrefix: <{holder.maxlineLength}}] {color_dic[C_KW.RESET_ALL]}'
+    return f'{prefix}{color_dic[C_KW.LINE_LENGTH]}[{lengthPrefix: <{holder.fileLineLengthPlaceHolder}}] {color_dic[C_KW.RESET_ALL]}'
 
 def printFile(content: list, bytecode: bool):
     if (not ArgParser.FILE_SEARCH and not ArgParser.RFILE_SEARCH) or bytecode:
@@ -260,7 +260,7 @@ def editFiles():
         print(color_dic[C_KW.COUNT_AND_FILES], end="")
         if ARGS_COUNT in holder.args_id:
             print()
-            print("Lines: " + str(holder.lineSum))
+            print("Lines: " + str(holder.allFilesLinesSum))
         if ARGS_FILES in holder.args_id:
             print()
             print("applied FILE(s):", end="")
