@@ -1,5 +1,5 @@
 from cat_win.util.ArgConstants import *
-
+from heapq import nlargest
 
 class Holder():
     files = []
@@ -48,17 +48,20 @@ class Holder():
     def __calcFileMaxLength__(self) -> None:
         self.fileMaxLength = len(str(len(self.files)))
     
-    def __remove_NLsuff__(self, input_string, suffix):
-        return input_string[:-len(suffix)] if (input_string.endswith(suffix)) else input_string
+    def __calcMaxLine__(self, file):
+        heap = []
+        lines = []
+        lines = open(file, "rb").readlines()
+        heap = nlargest(1, lines, len)
+        if len(heap) == 0: return 0
+        longest_line = heap[0][:-1]
+        
+        if longest_line.endswith(b'\r'):
+            longest_line = longest_line[:-1]
+        return len(str(max(len(longest_line), len(lines[-1]))))
 
-    def __len_trimNL__(self, bLine):
-        return len(self.__remove_NLsuff__(self.__remove_NLsuff__(bLine, b'\n'), b'\r'))
-
-    def __getLineLength__(self, file) -> int:
-        return self.__len_trimNL__(max(open(file, 'rb'), key=self.__len_trimNL__))
-    
     def __calcMaxLineLength__(self) -> None:
-        self.maxlineLength = len(str(max([self.__getLineLength__(file) for file in self.files])))
+        self.maxlineLength = max(self.__calcMaxLine__(file) for file in self.files)
 
     def generateValues(self) -> None:
         self.__calcFilesLineSum__()
