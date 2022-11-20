@@ -57,12 +57,14 @@ class Config:
         print("Here is a list of all available color options you may choose:")
         for key, value in ColoramaOptions.C_Fore.items():
             option = "Fore." + key
-            print(f"{index: <2}: ", value, option, ColoramaOptions.C_Fore_Reset, sep="")
+            print(f"{index: <2}: ", value, option,
+                  ColoramaOptions.C_Fore_Reset, sep="")
             options.append(option)
             index += 1
         for key, value in ColoramaOptions.C_Back.items():
             option = "Back." + key
-            print(f"{index: <2}: ", value, option, ColoramaOptions.C_Back_Reset, sep="")
+            print(f"{index: <2}: ", value, option,
+                  ColoramaOptions.C_Back_Reset, sep="")
             options.append(option)
             index += 1
         return options
@@ -78,25 +80,28 @@ class Config:
         self._printAllAvailableElements()
         keyword = input("Input name of keyword to change: ")
         if keyword.isdigit():
-            keyword = self.elements[int(keyword)] if (0 <= int(keyword) < len(self.elements)) else keyword
+            keyword = self.elements[int(keyword)] if (
+                0 <= int(keyword) < len(self.elements)) else keyword
         while (not keyword in self.elements):
             print(f"Something went wrong. Unknown keyword '{keyword}'")
             keyword = input("Input name of keyword to change: ")
             if keyword.isdigit():
-                keyword = self.elements[int(color)] if (0 <= int(keyword) < len(self.elements)) else keyword
+                keyword = self.elements[int(color)] if (
+                    0 <= int(keyword) < len(self.elements)) else keyword
 
         print(f"Successfully selected element '{keyword}'.")
 
         color_options = self._printGetAllAvailableColors()
         color = input("Input color: ")
         if color.isdigit():
-            color = color_options[int(color)] if (0 <= int(color) < len(color_options)) else color
+            color = color_options[int(color)] if (
+                0 <= int(color) < len(color_options)) else color
         while (not color in color_options):
             print(f"Something went wrong. Unknown option '{color}'.")
             color = input("Input color: ")
             if color.isdigit():
-                color = color_options[int(color)] if (0 <= int(color) < len(color_options)) else color
-                
+                color = color_options[int(color)] if (
+                    0 <= int(color) < len(color_options)) else color
 
         if keyword in self.exclusive_definitions["Fore"] and color.startswith("Back"):
             print(f"An Error occured: '{keyword}' can only be of style 'Fore'")

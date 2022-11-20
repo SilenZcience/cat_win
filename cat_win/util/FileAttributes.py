@@ -13,6 +13,7 @@ from stat import (
 )
 from cat_win.util.ColorConstants import C_KW
 
+
 def _convert_size(size_bytes: int) -> str:
     if size_bytes == 0:
         return "0B"

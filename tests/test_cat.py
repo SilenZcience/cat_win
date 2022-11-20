@@ -9,9 +9,9 @@ sys.path.append("../cat_win")
 
 
 script_dir = os.path.dirname(__file__)
-test_file_dir = script_dir + "/test.txt"
+test_file_path = script_dir + "/test.txt"
 test_file_content = []
-with open(test_file_dir, 'r') as f:
+with open(test_file_path, 'r') as f:
     test_file_content = f.read().splitlines()
 expected_output = ""
 
@@ -23,7 +23,7 @@ class TestCat(TestCase):
     maxDiff = None
 
     def test_cat_output_default_file(self):
-        holder.setFiles([test_file_dir])
+        holder.setFiles([test_file_path])
         holder.setArgs([])
 
         check_against = "\n".join(test_file_content) + "\n"
@@ -33,7 +33,7 @@ class TestCat(TestCase):
             self.assertEqual(fake_out.getvalue(), check_against)
 
     def test_cat_output_multiple_files(self):
-        holder.setFiles([test_file_dir, test_file_dir, test_file_dir])
+        holder.setFiles([test_file_path, test_file_path, test_file_path])
         holder.setArgs([])
 
         check_against = ("\n".join(test_file_content) +
@@ -44,7 +44,7 @@ class TestCat(TestCase):
             self.assertEqual(fake_out.getvalue(), check_against)
 
     def test_cat_output_reverse(self):
-        holder.setFiles([test_file_dir])
+        holder.setFiles([test_file_path])
         holder.setArgs([[5, '']]) #reverse
 
         check_against = test_file_content
@@ -57,7 +57,7 @@ class TestCat(TestCase):
             self.assertEqual(fake_out.getvalue(), check_against)
 
     def test_cat_output_ends_and_tabs(self):
-        holder.setFiles([test_file_dir])
+        holder.setFiles([test_file_path])
         holder.setArgs([[2, ''], [3, '']]) #ends & tabs
 
         check_against = ("\n".join([c.replace("\t", "^I") + "$" for c in test_file_content]) +
