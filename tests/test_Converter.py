@@ -1,5 +1,4 @@
 from cat_win.util.Converter import Converter
-from unittest.mock import patch
 from unittest import TestCase
 import sys
 sys.path.append("../cat_win")

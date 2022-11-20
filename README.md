@@ -106,6 +106,10 @@ python3 -m cat_win.cat [FILE]... [OPTION]...
 python3 -m cat_win.cat --help
 ```
 
+<table>
+   <!-- <tr><th> </th><th> </th></tr> -->
+   <tr><td>
+
 | Argument               | Description                                       |
 |------------------------|---------------------------------------------------|
 | -n, --number           | number all output lines                           |
@@ -121,17 +125,34 @@ python3 -m cat_win.cat --help
 | -l, --clip             | copy output to clipboard                          |
 | -m, --checksum         | show the checksums of all files                   |
 | -a, --attributes       | show meta-information about the files             |
+|                        |                                                   |
 | -dec, --dec            | convert decimal numbers to hexadecimal and binary |
 | -hex, --hex            | convert hexadecimal numbers to decimal and binary |
 | -bin, --bin            | convert binary numbers to decimal and hexadecimal |
-| -v, --version          | output version information                        |
+
+   </td>
+   <td>
+
+| Argument               | Description                                       |
+|------------------------|---------------------------------------------------|
 | -col, --color          | show colored output                               |
 | --config, --config     | change color configuration                        |
-| enc=X                  | set file enconding to X.                          |
-| find=X                 | find substring X in the given files.              |
-| match=X                | find pattern X in the given files.                |
-| [a;b]                  | replace a with b in every line.                   |
-| [a:b]                  | python-like string manipulation syntax.           |
+|                        |                                                   |
+| enc=X                  | set file enconding to X                           |
+| find=X                 | find substring X in the given files               |
+| match=X                | find pattern X in the given files                 |
+| trunc=X:Y              | truncate file to lines X and Y                    |
+|                        |                                                   |
+| [a;b]                  | replace a with b in every line                    |
+| [a:b]                  | python-like string manipulation syntax            |
+|                        |                                                   |
+| -h, --help             | show help message and exit                        |
+| -v, --version          | output version information                        |
+| -d, --debug            | show debug information                            |
+
+   </td>
+   </tr>
+</table>
 
 ### Examples
 

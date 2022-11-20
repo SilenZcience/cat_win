@@ -1,6 +1,7 @@
 from re import finditer
 from cat_win.util.ColorConstants import C_KW
 
+
 class StringFinder:
     kw_literals = []
     kw_regex = []

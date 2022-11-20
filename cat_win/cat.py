@@ -16,6 +16,7 @@ import cat_win.util.StringFinder as StringFinder
 from cat_win.util.ArgConstants import *
 from cat_win.util.ColorConstants import C_KW
 from cat_win.util.FileAttributes import printFileMetaData
+from cat_win.web.UpdateChecker import printUpdateInformation
 
 from cat_win import __version__, __author__, __sysversion__
 workingDir = path.dirname(path.realpath(__file__))
@@ -51,6 +52,7 @@ def _showHelp():
     print("%-25s" % str("\t'enc=X':"), end="set file encoding to X\n")
     print("%-25s" % str("\t'find=X':"), end="find substring X in the given files\n")
     print("%-25s" % str("\t'match=X':"), end="find pattern X in the given files\n")
+    print("%-25s" % str("\t'trunc=X:Y':"), end="truncate file to lines X and Y\n")
     print()
     print("%-25s" % str("\t'[a;b]':"), end="replace a with b in every line\n")
     print("%-25s" % str("\t'[a:b]':"), end="python-like string manipulation syntax\n")
@@ -58,6 +60,7 @@ def _showHelp():
     print("Examples:")
     print("%-25s" % str("\tcat f g -r"), end="Output g's contents in reverse order, then f's content in reverse order\n")
     print("%-25s" % str("\tcat f g -ne"), end="Output f's, then g's content, while numerating and showing the end of lines\n")
+    printUpdateInformation('cat_win', __version__)
     sys.exit(0)
 
 
@@ -70,6 +73,7 @@ def _showVersion():
     print(f"Python: \t{__sysversion__}")  # sys.version
     print(f"Build time: \t{datetime.fromtimestamp(path.getctime(path.realpath(__file__)))} CET")
     print(f"Author: \t{__author__}")
+    printUpdateInformation('cat_win', __version__)
     sys.exit(0)
 
 
@@ -87,6 +91,8 @@ def _showDebug(args, known_files, unknown_files):
     print(ArgParser.FILE_SEARCH)
     print("search match(es): ", end="")
     print(ArgParser.RFILE_SEARCH)
+    print("truncate file: ", end="")
+    print(ArgParser.FILE_TRUNCATE)
     print("colored output: ", end="")
     print(ArgParser.COLOR_ENCODING)
 
@@ -187,6 +193,7 @@ def editFile(fileIndex: int = 1):
         if ARGS_LLENGTH in holder.args_id:
             content = [[c[0], _getLineLengthPrefix(c[1], c[0])]
                        for c in content]
+        content = content[ArgParser.FILE_TRUNCATE[0]:ArgParser.FILE_TRUNCATE[1]]
         for i, arg in enumerate(holder.args_id):
             if arg == ARGS_ENDS:
                 content = [[c[0] + color_dic[C_KW.ENDS] + "$" +

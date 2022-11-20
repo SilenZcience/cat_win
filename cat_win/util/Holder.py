@@ -4,15 +4,15 @@ from heapq import nlargest
 
 class Holder():
     files = []  # all files, including tmp-file from stdin
-    args = [] # list of all used parameters: format [[id, param]]
+    args = []  # list of all used parameters: format [[id, param]]
     args_id = []
-    temp_file = None # if stdin is used, this temp_file will contain the stdin-input
+    temp_file = None  # if stdin is used, this temp_file will contain the stdin-input
     reversed = False
     
     allFilesLinesSum = 0 
     fileLineNumberPlaceHolder = 0
     fileNumberPlaceHolder = 0
-    fileLineLengthPlaceHolder = 0 # the amount of chars neccessary to display the longest line within all files
+    fileLineLengthPlaceHolder = 0  # the amount of chars neccessary to display the longest line within all files
     
     clipBoard = ""
 
