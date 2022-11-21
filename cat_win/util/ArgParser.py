@@ -7,7 +7,7 @@ from cat_win.util.ArgConstants import *
 FILE_ENCODING = None
 FILE_SEARCH = []
 RFILE_SEARCH = []
-FILE_TRUNCATE = [None, None]
+FILE_TRUNCATE = [None, None, None]
 COLOR_ENCODING = False
 
 
@@ -24,15 +24,18 @@ def __addArgument__(args: list, known_files: list, unknown_files: list, param: s
         global FILE_SEARCH
         FILE_SEARCH.append(param[5:])
         return
-    elif match(r"\Atrunc\=[0-9 ()+-]*\:[0-9 ()+-]*\Z", param):
+    elif match(r"\Atrunc\=[0-9 ()+-]*\:[0-9 ()+-]*\:?[0-9 ()+-]*\Z", param):
+        param = param[6:].split(":")
         global FILE_TRUNCATE
-        FILE_TRUNCATE = param[6:].split(":")
-        FILE_TRUNCATE[0] = None if FILE_TRUNCATE[0] == '' else (
-            0 if FILE_TRUNCATE[0] == '0' else int(eval(FILE_TRUNCATE[0]))-1)
-        FILE_TRUNCATE[1] = None if FILE_TRUNCATE[1] == '' else int(
-            eval(FILE_TRUNCATE[1]))
+        FILE_TRUNCATE[0] = None if param[0] == '' else (
+            0 if param[0] == '0' else int(eval(param[0]))-1)
+        FILE_TRUNCATE[1] = None if param[1] == '' else int(
+            eval(param[1]))
+        if len(param) == 3:
+            FILE_TRUNCATE[2] = None if param[2] == '' else int(
+                eval(param[2]))
         return
-    elif match(r"\A\[[0-9 ()+-]*\:\:?[0-9 ()+-]*\]\Z", param):
+    elif match(r"\A\[[0-9 ()+-]*\:[0-9 ()+-]*\:?[0-9 ()+-]*\]\Z", param):
         args.append([ARGS_CUT, param])
         return
     elif match(r"\A\[.+\;.+\]\Z", param):

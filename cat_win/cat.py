@@ -52,7 +52,7 @@ def _showHelp():
     print("%-25s" % str("\t'enc=X':"), end="set file encoding to X\n")
     print("%-25s" % str("\t'find=X':"), end="find substring X in the given files\n")
     print("%-25s" % str("\t'match=X':"), end="find pattern X in the given files\n")
-    print("%-25s" % str("\t'trunc=X:Y':"), end="truncate file to lines X and Y\n")
+    print("%-25s" % str("\t'trunc=X:Y':"), end="truncate file to lines X and Y (python-like)\n")
     print()
     print("%-25s" % str("\t'[a;b]':"), end="replace a with b in every line\n")
     print("%-25s" % str("\t'[a:b]':"), end="python-like string manipulation syntax\n")
@@ -193,7 +193,7 @@ def editFile(fileIndex: int = 1):
         if ARGS_LLENGTH in holder.args_id:
             content = [[c[0], _getLineLengthPrefix(c[1], c[0])]
                        for c in content]
-        content = content[ArgParser.FILE_TRUNCATE[0]:ArgParser.FILE_TRUNCATE[1]]
+        content = content[ArgParser.FILE_TRUNCATE[0]:ArgParser.FILE_TRUNCATE[1]:ArgParser.FILE_TRUNCATE[2]]
         for i, arg in enumerate(holder.args_id):
             if arg == ARGS_ENDS:
                 content = [[c[0] + color_dic[C_KW.ENDS] + "$" +
