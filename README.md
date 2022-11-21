@@ -141,7 +141,7 @@ python3 -m cat_win.cat --help
 | enc=X                  | set file enconding to X                           |
 | find=X                 | find substring X in the given files               |
 | match=X                | find pattern X in the given files                 |
-| trunc=X:Y              | truncate file to lines X and Y                    |
+| trunc=X:Y              | truncate file to lines X and Y (python-like)      |
 |                        |                                                   |
 | [a;b]                  | replace a with b in every line                    |
 | [a:b]                  | python-like string manipulation syntax            |
