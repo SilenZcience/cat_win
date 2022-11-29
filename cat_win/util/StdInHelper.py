@@ -30,13 +30,14 @@ def writeFiles(file_list: list, content: str, file_encoding: str) -> None:
     valid content.
     """
     if content == "":
-        abort_command = ""
+        abort_command = "" 
         try:
-            abort_command = input("You are about to create an empty file. Do you want to abort? [Y] (default is empty):")
+            print("You are about to create an empty file. Do you want to continue?")
+            abort_command = input("[Y/⏎] Yes, Continue       [N] No, Abort :")
         except EOFError:
             pass
         finally:
-            if abort_command.upper() == 'Y':
+            if abort_command and abort_command.upper() != 'Y':
                 print("Aborting...")
                 file_list.clear()
         
@@ -58,7 +59,7 @@ def readWriteFilesFromStdIn(file_list: list, file_encoding: str) -> None:
     print("do/does not exist. Write the FILE(s) and finish with the '^Z'-suffix ((Ctrl + Z) + Enter):")
 
     input = getStdInContent()
-    input = input.rstrip()
+    
     if len(input) > 0 and ord(input[-1:]) == 26: # chr(26) == ctrl-Z
         input = input[:-1]
 
