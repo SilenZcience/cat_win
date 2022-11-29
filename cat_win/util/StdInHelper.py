@@ -30,7 +30,16 @@ def writeFiles(file_list: list, content: str, file_encoding: str) -> None:
     valid content.
     """
     if content == "":
-        file_list.clear()
+        abort_command = ""
+        try:
+            abort_command = input("You are about to create an empty file. Do you want to abort? [Y] (default is empty):")
+        except EOFError:
+            pass
+        finally:
+            if abort_command.upper() == 'Y':
+                print("Aborting...")
+                file_list.clear()
+        
     for file in file_list:
         with open(file, 'w', encoding=file_encoding) as f:
             f.write(content)
@@ -50,7 +59,7 @@ def readWriteFilesFromStdIn(file_list: list, file_encoding: str) -> None:
 
     input = getStdInContent()
     input = input.rstrip()
-    if len(input) > 0 and ord(input[-1:]) == 26:
+    if len(input) > 0 and ord(input[-1:]) == 26: # chr(26) == ctrl-Z
         input = input[:-1]
 
     writeFiles(file_list, input, file_encoding)
