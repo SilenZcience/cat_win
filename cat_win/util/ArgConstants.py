@@ -10,7 +10,7 @@ ARGS_HELP, ARGS_NUMBER, ARGS_ENDS, ARGS_TABS, ARGS_SQUEEZE = range(0, 5)
 ARGS_REVERSE, ARGS_COUNT, ARGS_BLANK, ARGS_FILES, ARGS_INTERACTIVE = range(5, 10)
 ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN = range(10, 15)
 ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA = range(15, 20)
-ARGS_CONFIG, ARGS_LLENGTH = range(20, 22)
+ARGS_CONFIG, ARGS_LLENGTH, ARGS_ONELINE = range(20, 23)
 
 ALL_ARGS = [[["-h", "--help"], "show this help message and exit", ARGS_HELP],
             [["-n", "--number"], "number all output lines", ARGS_NUMBER],
@@ -23,6 +23,7 @@ ALL_ARGS = [[["-h", "--help"], "show this help message and exit", ARGS_HELP],
             [["-b", "--blank"], "hide empty lines", ARGS_BLANK],
             [["-f", "--files"], "list applied files", ARGS_FILES],
             [["-i", "--interactive"], "use stdin", ARGS_INTERACTIVE],
+            [["-o", "--oneline"], "take only the first stdin-line", ARGS_ONELINE],
             [["-l", "--clip"], "copy output to clipboard", ARGS_CLIP],
             [["-m", "--checksum"], "show the checksums of all files", ARGS_CHECKSUM],
             [["-a", "--attributes"], "show meta-information about the files", ARGS_DATA],

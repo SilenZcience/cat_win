@@ -13,10 +13,12 @@ def writeTemp(content: str, file_encoding: str) -> str:
     return tmp_file
 
 
-def getStdInContent() -> str:
+def getStdInContent(oneLine: bool = False) -> str:
     """
     returns a String delivered by the standard input.
     """
+    if oneLine:
+        return stdin.readline()
     input = ""
     for line in stdin:
         input += line
@@ -46,7 +48,7 @@ def writeFiles(file_list: list, content: str, file_encoding: str) -> None:
             f.write(content)
 
 
-def readWriteFilesFromStdIn(file_list: list, file_encoding: str) -> None:
+def readWriteFilesFromStdIn(file_list: list, file_encoding: str, oneLine: bool = False) -> None:
     """
     Takes a list of files, waits for a String from
     the standard input and writes it into every file.
@@ -58,7 +60,7 @@ def readWriteFilesFromStdIn(file_list: list, file_encoding: str) -> None:
     print("", *file_list, sep="\n\t")
     print("do/does not exist. Write the FILE(s) and finish with the '^Z'-suffix ((Ctrl + Z) + Enter):")
 
-    input = getStdInContent()
+    input = getStdInContent(oneLine)
     
     if len(input) > 0 and ord(input[-1:]) == 26: # chr(26) == ctrl-Z
         input = input[:-1]
