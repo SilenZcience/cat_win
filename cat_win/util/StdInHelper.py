@@ -19,7 +19,7 @@ def getStdInContent(oneLine: bool = False) -> str:
     """
     if oneLine:
         first_line = stdin.readline()
-        stdin.read()
+        stdin.flush()
         return first_line
     input = ""
     for line in stdin:
