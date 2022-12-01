@@ -18,7 +18,9 @@ def getStdInContent(oneLine: bool = False) -> str:
     returns a String delivered by the standard input.
     """
     if oneLine:
-        return stdin.readline()
+        first_line = stdin.readline()
+        stdin.read()
+        return first_line
     input = ""
     for line in stdin:
         input += line
