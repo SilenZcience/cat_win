@@ -299,7 +299,7 @@ def main():
         config.saveConfig()
         sys.exit(0)
     if ARGS_INTERACTIVE in holder.args_id:
-        piped_input = StdInHelper.getStdInContent()
+        piped_input = StdInHelper.getStdInContent(ARGS_ONELINE in holder.args_id)
         temp_file = StdInHelper.writeTemp(piped_input, ArgParser.FILE_ENCODING)
         known_files.append(temp_file)
         StdInHelper.writeFiles(unknown_files, piped_input,
@@ -307,7 +307,7 @@ def main():
         holder.setTempFile(temp_file)
     else:
         StdInHelper.readWriteFilesFromStdIn(
-            unknown_files, ArgParser.FILE_ENCODING)
+            unknown_files, ArgParser.FILE_ENCODING, ARGS_ONELINE in holder.args_id)
 
     if (len(known_files) == 0 and len(unknown_files) == 0):
         sys.exit(0)
