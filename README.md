@@ -122,6 +122,7 @@ python3 -m cat_win.cat --help
 | -b, --blank            | hide empty lines                                  |
 | -f, --files            | list applied files                                |
 | -i, --interactive      | use stdin                                         |
+| -o, --oneline          | take only the first stdin-line                    |
 | -l, --clip             | copy output to clipboard                          |
 | -m, --checksum         | show the checksums of all files                   |
 | -a, --attributes       | show meta-information about the files             |
