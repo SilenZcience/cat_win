@@ -89,7 +89,7 @@ def _showDebug(args, known_files, unknown_files):
 	print("search keyword(s): ", end="")
 	print(ArgParser.FILE_SEARCH)
 	print("search match(es): ", end="")
-	print(ArgParser.RFILE_SEARCH)
+	print(ArgParser.FILE_MATCH)
 	print("truncate file: ", end="")
 	print(ArgParser.FILE_TRUNCATE)
 	print("colored output: ", end="")
@@ -125,17 +125,14 @@ def _getLineLengthPrefix(prefix: str, line: str) -> str:
 	return f'{prefix}{color_dic[C_KW.LINE_LENGTH]}[{lengthPrefix: <{holder.fileLineLengthPlaceHolder}}] {color_dic[C_KW.RESET_ALL]}'
 
 def printFile(content: list, bytecode: bool):
-	if (not ArgParser.FILE_SEARCH and not ArgParser.RFILE_SEARCH) or bytecode:
-		try:
-			print(*[(c[0] if bytecode else c[1] + c[0])
-			  	for c in content], sep="\n")
-		except IOError:
-			devnull = os.open(os.devnull, os.O_WRONLY) 
-			os.dup2(devnull, sys.stdout.fileno()) 
-			sys.exit(1)  # Python exits with error code 1 on EPIPE 
+	if (not ArgParser.FILE_SEARCH and not ArgParser.FILE_MATCH) or bytecode:
+		
+		print(*[(c[0] if bytecode else c[1] + c[0])
+			for c in content], sep="\n")
+		
 		return
 
-	stringFinder = StringFinder.StringFinder(ArgParser.FILE_SEARCH, ArgParser.RFILE_SEARCH)
+	stringFinder = StringFinder.StringFinder(ArgParser.FILE_SEARCH, ArgParser.FILE_MATCH)
 
 	for line, line_number in content:
 		intervals, fKeyWords, mKeywords = stringFinder.findKeywords(line)
@@ -324,10 +321,15 @@ def main():
 														   C_KW.ATTRIB: color_dic[C_KW.ATTRIB],
 														   C_KW.ATTRIB_POSITIVE: color_dic[C_KW.ATTRIB_POSITIVE],
 														   C_KW.ATTRIB_NEGATIVE: color_dic[C_KW.ATTRIB_NEGATIVE]})
-
-	# print the cat-output
-	editFiles()
-
+	try:
+		# print the cat-output
+		editFiles()
+	except IOError:
+		# catch broken-pipe error
+		devnull = os.open(os.devnull, os.O_WRONLY) 
+		os.dup2(devnull, sys.stdout.fileno()) 
+		sys.exit(1)  # Python exits with error code 1 on EPIPE
+	
 	# clean-up
 	if os.path.exists(temp_file):
 		os.remove(temp_file)
