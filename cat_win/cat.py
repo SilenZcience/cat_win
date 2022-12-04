@@ -322,13 +322,13 @@ def main():
 														   C_KW.ATTRIB_POSITIVE: color_dic[C_KW.ATTRIB_POSITIVE],
 														   C_KW.ATTRIB_NEGATIVE: color_dic[C_KW.ATTRIB_NEGATIVE]})
 	try:
-		# print the cat-output
-		editFiles()
-	except IOError:
-		# catch broken-pipe error
-		devnull = os.open(os.devnull, os.O_WRONLY) 
-		os.dup2(devnull, sys.stdout.fileno()) 
-		sys.exit(1)  # Python exits with error code 1 on EPIPE
+		editFiles() # print the cat-output
+	except Exception as exception:
+		if isinstance(exception, IOError): # catch broken-pipe error
+			devnull = os.open(os.devnull, os.O_WRONLY) 
+			os.dup2(devnull, sys.stdout.fileno()) 
+			sys.exit(1)  # Python exits with error code 1 on EPIPE
+		pass
 	
 	# clean-up
 	if os.path.exists(temp_file):
