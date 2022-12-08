@@ -21,7 +21,7 @@ class StringFinder:
         for match in finditer(fr'{pattern}', s):
             yield list(match.span())
 
-    def _optimizeIntervals(self, intervals: list[list]) -> list[list]:
+    def _optimizeIntervals(self, intervals: list) -> list:
         """\
             Merge overlapping intervalls for partially
             color encoded lines. Needed when multiple
@@ -39,7 +39,7 @@ class StringFinder:
                 stack.append(interval)
         return stack
 
-    def _mergeKeywordIntervals(self, fList: list[list], mList: list[list]) -> list[list]:
+    def _mergeKeywordIntervals(self, fList: list, mList: list) -> list:
         fList = self._optimizeIntervals(fList)
         mList = self._optimizeIntervals(mList)
         kwList = []

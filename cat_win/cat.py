@@ -1,7 +1,7 @@
 import pyperclip3 as pc
 import sys, os
 from datetime import datetime
-from functools import cache
+from functools import lru_cache
 from itertools import groupby
 from colorama import init as coloramaInit
 
@@ -103,7 +103,7 @@ def _showMeta(files: list, colored: bool, colors: dict):
 	sys.exit(0)
 
 
-@cache
+@lru_cache(maxsize=None)
 def _CalculatePrefixSpacing(fileCharLength: int, lineCharLength: int, includeFilePrefix: bool) -> str:
 	file_prefix = color_dic[C_KW.NUMBER]
 	if includeFilePrefix:
