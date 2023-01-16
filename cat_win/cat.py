@@ -237,7 +237,7 @@ def editFile(fileIndex: int = 1):
 					print("Error at operation: ", holder.args[i][1])
 					return
 			if arg == ARGS_REPLACE:
-				replace_values = holder.args[i][1][1:-1].split(";")
+				replace_values = holder.args[i][1][1:-1].split(",")
 				content = [[c[0].replace(replace_values[0], color_dic[C_KW.REPLACE] + replace_values[1] + color_dic[C_KW.RESET_ALL]), c[1]]
 						   for c in content]
 
@@ -291,7 +291,7 @@ def main():
 	# check for special cases
 	if ARGS_DEBUG in holder.args_id:
 		_showDebug(args, known_files, unknown_files)
-	if (len(known_files) == 0 and len(unknown_files) == 0 and len(holder.args) == 0) or ARGS_HELP in holder.args_id:
+	if (len(known_files) + len(unknown_files) + len(holder.args) == 0) or ARGS_HELP in holder.args_id:
 		_showHelp()
 	if ARGS_VERSION in holder.args_id:
 		_showVersion()
@@ -309,7 +309,7 @@ def main():
 		StdInHelper.readWriteFilesFromStdIn(
 			unknown_files, ArgParser.FILE_ENCODING, ARGS_ONELINE in holder.args_id)
 
-	if (len(known_files) == 0 and len(unknown_files) == 0):
+	if (len(known_files) + len(unknown_files) == 0):
 		sys.exit(0)
 	
 	# fill holder object with neccessary values
