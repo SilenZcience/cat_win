@@ -24,7 +24,7 @@ def __addArgument__(args: list, known_files: list, unknown_files: list, param: s
         global FILE_SEARCH
         FILE_SEARCH.append(param[5:])
         return
-    elif match(r"\Atrunc\=[0-9 ()+-]*\:[0-9 ()+-]*\:?[0-9 ()+-]*\Z", param):
+    elif match(r"\Atrunc\=[0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\Z", param):
         param = param[6:].split(":")
         global FILE_TRUNCATE
         FILE_TRUNCATE[0] = None if param[0] == '' else (
@@ -35,10 +35,10 @@ def __addArgument__(args: list, known_files: list, unknown_files: list, param: s
             FILE_TRUNCATE[2] = None if param[2] == '' else int(
                 eval(param[2]))
         return
-    elif match(r"\A\[[0-9 ()+-]*\:[0-9 ()+-]*\:?[0-9 ()+-]*\]\Z", param):
+    elif match(r"\A\[[0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\]\Z", param):
         args.append([ARGS_CUT, param])
         return
-    elif match(r"\A\[.+\;.+\]\Z", param):
+    elif match(r"\A\[.+\,.+\]\Z", param):
         args.append([ARGS_REPLACE, param])
         return
     elif param in ["-col", "--color"]:

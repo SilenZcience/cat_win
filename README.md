@@ -101,9 +101,9 @@ cat --help
 
 ⚠️ *on linux or macOS systems you might need to define an alias or use:*
 ```console
-python3 -m cat_win.cat [FILE]... [OPTION]...
+python3 -m cat_win [FILE]... [OPTION]...
 
-python3 -m cat_win.cat --help
+python3 -m cat_win --help
 ```
 
 <table>
@@ -144,7 +144,7 @@ python3 -m cat_win.cat --help
 | match=X                | find pattern X in the given files                 |
 | trunc=X:Y              | truncate file to lines X and Y (python-like)      |
 |                        |                                                   |
-| [a;b]                  | replace a with b in every line                    |
+| [a,b]                  | replace a with b in every line                    |
 | [a:b]                  | python-like string manipulation syntax            |
 |                        |                                                   |
 | -h, --help             | show help message and exit                        |
