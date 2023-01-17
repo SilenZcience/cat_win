@@ -123,19 +123,20 @@ python3 -m cat_win --help
 | -f, --files            | list applied files                                |
 | -i, --interactive      | use stdin                                         |
 | -o, --oneline          | take only the first stdin-line                    |
+| -p, --peek             | only print the first and last lines               |
 | -l, --clip             | copy output to clipboard                          |
 | -m, --checksum         | show the checksums of all files                   |
 | -a, --attributes       | show meta-information about the files             |
-|                        |                                                   |
-| -dec, --dec            | convert decimal numbers to hexadecimal and binary |
-| -hex, --hex            | convert hexadecimal numbers to decimal and binary |
-| -bin, --bin            | convert binary numbers to decimal and hexadecimal |
 
    </td>
    <td>
 
 | Argument               | Description                                       |
 |------------------------|---------------------------------------------------|
+| -dec, --dec            | convert decimal numbers to hexadecimal and binary |
+| -hex, --hex            | convert hexadecimal numbers to decimal and binary |
+| -bin, --bin            | convert binary numbers to decimal and hexadecimal |
+|                        |                                                   |
 | -col, --color          | show colored output                               |
 | --config, --config     | change color configuration                        |
 |                        |                                                   |
