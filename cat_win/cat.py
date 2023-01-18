@@ -46,8 +46,6 @@ def _showHelp():
     for x in ALL_ARGS:
         print("%-25s" % str("\t" + x.shortForm + ", " + x.longForm), end=x.help + "\n")
     print()
-    print("%-25s" % str("\t-col, --color:"), end="show colored output\n")
-    print()
     print("%-25s" % str("\t'enc=X':"), end="set file encoding to X\n")
     print("%-25s" % str("\t'find=X':"), end="find substring X in the given files\n")
     print("%-25s" % str("\t'match=X':"), end="find pattern X in the given files\n")
@@ -92,14 +90,12 @@ def _showDebug(args, known_files, unknown_files):
     print(ArgParser.FILE_MATCH)
     print("truncate file: ", end="")
     print(ArgParser.FILE_TRUNCATE)
-    print("colored output: ", end="")
-    print(ArgParser.COLOR_ENCODING)
 
 
-def _showMeta(files: list, colored: bool, colors: dict):
+def _showMeta(files: list, colors: dict):
     if not files:
         return
-    printFileMetaData(files, colored, colors)
+    printFileMetaData(files, colors)
     sys.exit(0)
 
 
@@ -137,7 +133,7 @@ def printFile(content: list, bytecode: bool):
     for line, line_number in content:
         intervals, fKeyWords, mKeywords = stringFinder.findKeywords(line)
 
-        if ArgParser.COLOR_ENCODING:
+        if not ARGS_NOCOL in holder.args_id:
             for kw_pos, kw_code in intervals:
                 line = line[:kw_pos] + color_dic[kw_code] + line[kw_pos:]
 
@@ -273,10 +269,6 @@ def editFile(fileIndex: int = 1):
 
 
 def editFiles():
-    if not ArgParser.COLOR_ENCODING:
-        global color_dic
-        color_dic = dict.fromkeys(color_dic, "")
-
     start = len(holder.files)-1 if holder.reversed else 0
     end = -1 if holder.reversed else len(holder.files)
     if ARGS_CHECKSUM in holder.args_id:
@@ -337,15 +329,19 @@ def main():
     if (len(known_files) + len(unknown_files) == 0):
         sys.exit(0)
     
+    if ARGS_NOCOL in holder.args_id:
+        global color_dic
+        color_dic = dict.fromkeys(color_dic, "")
+    
     # fill holder object with neccessary values
     holder.setFiles([*known_files, *unknown_files])
     holder.generateValues()
 
     if ARGS_DATA in holder.args_id:
-        _showMeta(holder.files, ArgParser.COLOR_ENCODING, {C_KW.RESET_ALL: color_dic[C_KW.RESET_ALL],
-                                                           C_KW.ATTRIB: color_dic[C_KW.ATTRIB],
-                                                           C_KW.ATTRIB_POSITIVE: color_dic[C_KW.ATTRIB_POSITIVE],
-                                                           C_KW.ATTRIB_NEGATIVE: color_dic[C_KW.ATTRIB_NEGATIVE]})
+        _showMeta(holder.files, {C_KW.RESET_ALL: color_dic[C_KW.RESET_ALL],
+                                 C_KW.ATTRIB: color_dic[C_KW.ATTRIB],
+                                 C_KW.ATTRIB_POSITIVE: color_dic[C_KW.ATTRIB_POSITIVE],
+                                 C_KW.ATTRIB_NEGATIVE: color_dic[C_KW.ATTRIB_NEGATIVE]})
     try:
         editFiles() # print the cat-output
     except Exception as exception:

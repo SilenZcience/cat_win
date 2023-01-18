@@ -1,5 +1,5 @@
 from cat_win.util.Holder import Holder
-from cat_win.cat import editFiles
+from cat_win.cat import editFiles, color_dic
 from unittest.mock import patch
 from unittest import TestCase
 from io import StringIO
@@ -16,16 +16,17 @@ with open(test_file_path, 'r') as f:
 expected_output = ""
 
 holder = Holder()
-
+color_dic = dict.fromkeys(color_dic, "")
 
 @patch('cat_win.cat.holder', holder)
+@patch('cat_win.cat.color_dic', color_dic)
 class TestCat(TestCase):
     maxDiff = None
 
     def test_cat_output_default_file(self):
         holder.setFiles([test_file_path])
         holder.setArgs([])
-
+        
         check_against = "\n".join(test_file_content) + "\n"
 
         with patch('sys.stdout', new=StringIO()) as fake_out:

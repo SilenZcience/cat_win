@@ -137,7 +137,7 @@ python3 -m cat_win --help
 | -hex, --hex            | convert hexadecimal numbers to decimal and binary |
 | -bin, --bin            | convert binary numbers to decimal and hexadecimal |
 |                        |                                                   |
-| -col, --color          | show colored output                               |
+| -col, --nocolor        | disable colored output                            |
 | --config, --config     | change color configuration                        |
 |                        |                                                   |
 | enc=X                  | set file enconding to X                           |
