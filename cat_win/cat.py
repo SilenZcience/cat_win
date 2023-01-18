@@ -224,26 +224,14 @@ def editFile(fileIndex: int = 1):
             if arg == ARGS_BLANK:
                 content = [[c[0], c[1]] for c in content if c[0]]
             if arg == ARGS_DEC:
-                if holder.args[i][1] == "-dec":
-                    content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromDEC(int(c[0]), True) +
-                               color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_dec(c[0])]
-                else:
-                    content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromDEC(int(c[0])) +
-                               color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_dec(c[0])]
+                content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromDEC(int(c[0]), (holder.args[i][1] == "-dec")) +
+                            color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_dec(c[0])]
             if arg == ARGS_HEX:
-                if holder.args[i][1] == "-hex":
-                    content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromHEX(c[0], True) +
-                               color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_hex(c[0])]
-                else:
-                    content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromHEX(c[0]) +
-                               color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_hex(c[0])]
+                content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromHEX(c[0], (holder.args[i][1] == "-hex")) +
+                            color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_hex(c[0])]
             if arg == ARGS_BIN:
-                if holder.args[i][1] == "-bin":
-                    content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromBIN(c[0], True) +
-                               color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_bin(c[0])]
-                else:
-                    content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromBIN(c[0]) +
-                               color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_bin(c[0])]
+                content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromBIN(c[0], (holder.args[i][1] == "-bin")) +
+                            color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_bin(c[0])]
             if arg == ARGS_CUT:
                 try:
                     content = [[eval(repr(c[0]) + holder.args[i][1]), c[1]]
