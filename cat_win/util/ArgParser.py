@@ -8,7 +8,6 @@ FILE_ENCODING = None
 FILE_SEARCH = []
 FILE_MATCH = []
 FILE_TRUNCATE = [None, None, None]
-COLOR_ENCODING = False
 
 
 def __addArgument__(args: list, known_files: list, unknown_files: list, param: str) -> None:
@@ -40,10 +39,6 @@ def __addArgument__(args: list, known_files: list, unknown_files: list, param: s
         return
     elif match(r"\A\[.+\,.+\]\Z", param):
         args.append([ARGS_REPLACE, param])
-        return
-    elif param in ["-col", "--color"]:
-        global COLOR_ENCODING
-        COLOR_ENCODING = True
         return
 
     for x in ALL_ARGS:
