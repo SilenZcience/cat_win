@@ -30,7 +30,9 @@ jobs:
       - name: Test Code Execution
         if: ${{ matrix.python-version != '3.11' || matrix.os != 'macos-latest' }}
         run: |
-          python -m cat_win.cat -v
+          python -m cat_win.cat -h
+          python -m cat_win -v
+          python -m cat_win -p -n **/cat.config --nocolor
       - name: Check and Build Package
         run: |
           python -m build
