@@ -161,13 +161,13 @@ def printFile(content: list, bytecode: bool):
 def printExcludedByPeek(excludedByPeek: int, prefixLenght: int):
     if not excludedByPeek:
         return
-    excludedByPeekLength = len(str(excludedByPeek))//2
-    excludedByPeekIntend = " " * (prefixLenght - excludedByPeekLength + 10)
-    excludedByPeekIntendAdd = " " * excludedByPeekLength
+    excludedByPeekLength = (len(str(excludedByPeek))-1)//2
+    excludedByPeekIndent = " " * (prefixLenght - excludedByPeekLength + 10)
+    excludedByPeekIndentAdd = " " * excludedByPeekLength
     print(color_dic[C_KW.NUMBER], end="")
-    print(excludedByPeekIntend, excludedByPeekIntendAdd, " •", sep="")
-    print(excludedByPeekIntend, "(", excludedByPeek, ")", sep="")
-    print(excludedByPeekIntend, excludedByPeekIntendAdd, " •", sep="", end="")
+    print(excludedByPeekIndent, excludedByPeekIndentAdd, " •", sep="")
+    print(excludedByPeekIndent, "(", excludedByPeek, ")", sep="")
+    print(excludedByPeekIndent, excludedByPeekIndentAdd, " •", sep="", end="")
     print(color_dic[C_KW.RESET_ALL])
 
 
