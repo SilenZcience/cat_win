@@ -92,10 +92,20 @@ def _showDebug(args, known_files, unknown_files):
     print(ArgParser.FILE_TRUNCATE)
 
 
-def _showMeta(files: list, colors: dict):
-    if not files:
-        return
-    printFileMetaData(files, colors)
+def _showMeta():
+    printFileMetaData(holder.files, {C_KW.RESET_ALL: color_dic[C_KW.RESET_ALL],
+                                     C_KW.ATTRIB: color_dic[C_KW.ATTRIB],
+                                     C_KW.ATTRIB_POSITIVE: color_dic[C_KW.ATTRIB_POSITIVE],
+                                     C_KW.ATTRIB_NEGATIVE: color_dic[C_KW.ATTRIB_NEGATIVE]})
+    sys.exit(0)
+
+
+def _showChecksum():
+    for file in holder.files:
+        print(color_dic[C_KW.CHECKSUM], end="")
+        print("Checksum of '" + file + "':")
+        print(checksum.getChecksumFromFile(file))
+        print(color_dic[C_KW.RESET_ALL], end="")
     sys.exit(0)
 
 
@@ -259,13 +269,6 @@ def editFile(fileIndex: int = 1):
 def editFiles():
     start = len(holder.files)-1 if holder.reversed else 0
     end = -1 if holder.reversed else len(holder.files)
-    if ARGS_CHECKSUM in holder.args_id:
-        for file in holder.files:
-            print(color_dic[C_KW.CHECKSUM], end="")
-            print("Checksum of '" + file + "':")
-            print(checksum.getChecksumFromFile(file))
-            print(color_dic[C_KW.RESET_ALL], end="")
-        return
     
     for i in range(start, end, -1 if holder.reversed else 1):
         editFile(i+1)
@@ -323,13 +326,14 @@ def main():
     
     # fill holder object with neccessary values
     holder.setFiles([*known_files, *unknown_files])
-    holder.generateValues()
-
+    
     if ARGS_DATA in holder.args_id:
-        _showMeta(holder.files, {C_KW.RESET_ALL: color_dic[C_KW.RESET_ALL],
-                                 C_KW.ATTRIB: color_dic[C_KW.ATTRIB],
-                                 C_KW.ATTRIB_POSITIVE: color_dic[C_KW.ATTRIB_POSITIVE],
-                                 C_KW.ATTRIB_NEGATIVE: color_dic[C_KW.ATTRIB_NEGATIVE]})
+        _showMeta()
+    if ARGS_CHECKSUM in holder.args_id:
+        _showChecksum()
+    
+    holder.generateValues()
+    
     try:
         editFiles() # print the cat-output
     except Exception as exception:
