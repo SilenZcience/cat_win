@@ -31,7 +31,7 @@ holder = Holder.Holder()
 
 
 def exception_handler(exception_type, exception, traceback, debug_hook=sys.excepthook):
-    if ARGS_DEBUG in holder.args_id:
+    if holder.args_id[ARGS_DEBUG]:
         debug_hook(exception_type, exception, traceback)
         return
     print("\nError: {} {}".format(exception_type.__name__, exception))
@@ -139,6 +139,9 @@ def _CalculateLinePrefixSpacing(fileCharLength: int, lineCharLength: int, includ
 
 
 def _getLinePrefix(index: int, line_num: int) -> str:
+    """
+    returns the new line prefix including the line number.
+    """
     if len(holder.files) > 1:
         return _CalculateLinePrefixSpacing(len(str(index)), len(str(line_num)), True) % (index, line_num)
     return _CalculateLinePrefixSpacing(len(str(index)), len(str(line_num)), False) % (line_num)
@@ -150,15 +153,17 @@ def _CalculateLineLengthPrefixSpacing(lineCharLength: int) -> str:
     return '%s' + color_dic[C_KW.LINE_LENGTH] + lengthPrefix + color_dic[C_KW.RESET_ALL]
 
 
-def _getLineLengthPrefix(prefix: str, line: str) -> str:
+def _getLineLengthPrefix(prefix: str, line) -> str:
+    """
+    prefix is the current prefix.
+    line is of type string or bytes.
+    returns the new line prefix including the line length.
+    """
     return _CalculateLineLengthPrefixSpacing(len(str(len(line)))) % (prefix, len(line))
 
 
 def printFile(content: list, bytecode: bool) -> None:
-    if bytecode:
-        print(*[line for _, line in content], sep="\n")
-        return
-    if (not ArgParser.FILE_SEARCH and not ArgParser.FILE_MATCH):
+    if not (ArgParser.FILE_SEARCH or ArgParser.FILE_MATCH) or bytecode:
         print(*[prefix + line for prefix, line in content], sep="\n")
         return
 
@@ -168,7 +173,7 @@ def printFile(content: list, bytecode: bool) -> None:
     for line_prefix, line in content:
         intervals, fKeyWords, mKeywords = stringFinder.findKeywords(line)
 
-        if not ARGS_NOCOL in holder.args_id:
+        if not holder.args_id[ARGS_NOCOL]:
             for kw_pos, kw_code in intervals:
                 line = line[:kw_pos] + color_dic[kw_code] + line[kw_pos:]
 
@@ -229,28 +234,26 @@ def editFile(fileIndex: int = 1) -> None:
         except:
             print("Operation failed! Try using the enc=X parameter.")
             return
-    if ARGS_PEEK in holder.args_id and len(content) > 10:
+    
+    if holder.args_id[ARGS_NUMBER]:
+        content = [(_getLinePrefix(fileIndex, j), c[1])
+                   for j, c in enumerate(content, start=1)]
+    content = content[ArgParser.FILE_TRUNCATE[0]:ArgParser.FILE_TRUNCATE[1]:ArgParser.FILE_TRUNCATE[2]]
+    if holder.args_id[ARGS_PEEK] and len(content) > 10:
         excludedByPeek = len(content) - 10
         content = content[:5] + content[-5:]
+
     if not show_bytecode:
-        if ARGS_NUMBER in holder.args_id:
-            content = [(_getLinePrefix(fileIndex, j), c[1])
-                       for j, c in enumerate(content, start=1)]
-            if excludedByPeek:
-                content = content[:5] + [(_getLinePrefix(fileIndex, j), c[1])
-                                         for j, c in enumerate(content[5:], start=6+excludedByPeek)]
-        if ARGS_LLENGTH in holder.args_id:
-            content = [(_getLineLengthPrefix(c[0], c[1]), c[1]) for c in content]
-        content = content[ArgParser.FILE_TRUNCATE[0]:ArgParser.FILE_TRUNCATE[1]:ArgParser.FILE_TRUNCATE[2]]
-        for i, arg in enumerate(holder.args_id):
+        for arg, param in holder.args:
             if arg == ARGS_CUT:
                 try:
-                    content = [(prefix, eval(repr(line) + holder.args[i][1]))
-                               for prefix, line in content]
+                    content = [(prefix, eval(repr(line) + param))
+                                for prefix, line in content]
                 except:
-                    print("Error at operation: ", holder.args[i][1])
+                    print("Error at operation: ", param)
                     return
-        for i, arg in enumerate(holder.args_id):
+        
+        for arg, param in holder.args:
             if arg == ARGS_ENDS:
                 content = [(prefix, line + color_dic[C_KW.ENDS] + "$" + color_dic[C_KW.RESET_ALL])
                            for prefix, line in content]
@@ -264,22 +267,27 @@ def editFile(fileIndex: int = 1) -> None:
             elif arg == ARGS_BLANK:
                 content = [c for c in content if c[1]]
             elif arg == ARGS_DEC:
-                content = [(prefix, line + color_dic[C_KW.CONVERSION] + converter._fromDEC(int(line), (holder.args[i][1] == "-dec")) +
+                content = [(prefix, line + color_dic[C_KW.CONVERSION] + converter._fromDEC(int(line), (param == "-dec")) +
                             color_dic[C_KW.RESET_ALL]) for prefix, line in content if converter.is_dec(line)]
             elif arg == ARGS_HEX:
-                content = [(prefix, line + color_dic[C_KW.CONVERSION] + converter._fromHEX(line, (holder.args[i][1] == "-hex")) +
+                content = [(prefix, line + color_dic[C_KW.CONVERSION] + converter._fromHEX(line, (param == "-hex")) +
                             color_dic[C_KW.RESET_ALL]) for prefix, line in content if converter.is_hex(line)]
             elif arg == ARGS_BIN:
-                content = [(prefix, line + color_dic[C_KW.CONVERSION] + converter._fromBIN(line, (holder.args[i][1] == "-bin")) +
+                content = [(prefix, line + color_dic[C_KW.CONVERSION] + converter._fromBIN(line, (param == "-bin")) +
                             color_dic[C_KW.RESET_ALL]) for prefix, line in content if converter.is_bin(line)]
             elif arg == ARGS_REPLACE:
-                replace_values = holder.args[i][1][1:-1].split(",")
+                replace_values = param[1:-1].split(",")
                 content = [(prefix, line.replace(replace_values[0], color_dic[C_KW.REPLACE] + replace_values[1] + color_dic[C_KW.RESET_ALL]))
                            for prefix, line  in content]
-
+                
+    if holder.args_id[ARGS_LLENGTH]:
+        content = [(_getLineLengthPrefix(c[0], c[1]), c[1]) for c in content]
+    if show_bytecode:
+        content = [(prefix, str(line)) for prefix, line in content]
+    
     printFile(content[:5], show_bytecode)
     if excludedByPeek:
-        prefix = content[0][1]
+        prefix = content[0][0]
         prefix = prefix.replace(color_dic[C_KW.NUMBER], '')
         prefix = prefix.replace(color_dic[C_KW.LINE_LENGTH], '')
         prefix = prefix.replace(color_dic[C_KW.RESET_ALL], '')
@@ -287,7 +295,7 @@ def editFile(fileIndex: int = 1) -> None:
     printFile(content[5:], show_bytecode)
 
     if not show_bytecode:
-        if ARGS_CLIP in holder.args_id:
+        if holder.args_id[ARGS_CLIP]:
             holder.clipBoard += "\n".join([prefix + line for prefix, line in content])
 
 
@@ -298,15 +306,15 @@ def editFiles() -> None:
     for i in range(start, end, -1 if holder.reversed else 1):
         editFile(i+1)
     print(color_dic[C_KW.COUNT_AND_FILES], end="")
-    if ARGS_COUNT in holder.args_id:
+    if holder.args_id[ARGS_COUNT]:
         print()
         print("Lines: " + str(holder.allFilesLinesSum))
-    if ARGS_FILES in holder.args_id:
+    if holder.args_id[ARGS_FILES]:
         print()
         print("applied FILE(s):", end="")
         print("", *holder.getAppliedFiles(), sep="\n\t")
     print(color_dic[C_KW.RESET_ALL], end="")
-    if ARGS_CLIP in holder.args_id:
+    if holder.args_id[ARGS_CLIP]:
         pc.copy(holder.clipBoard)
 
 
@@ -320,38 +328,38 @@ def main():
 
     sys.stdout.reconfigure(encoding=ArgParser.FILE_ENCODING)
     sys.stdin.reconfigure(encoding=ArgParser.FILE_ENCODING)
-
+    
     # check for special cases
-    if ARGS_DEBUG in holder.args_id:
+    if holder.args_id[ARGS_DEBUG]:
         _showDebug(args, known_files, unknown_files)
-    if (len(known_files) + len(unknown_files) + len(holder.args) == 0) or ARGS_HELP in holder.args_id:
+    if (len(known_files) + len(unknown_files) + len(holder.args) == 0) or holder.args_id[ARGS_HELP]:
         _showHelp()
-    if ARGS_VERSION in holder.args_id:
+    if holder.args_id[ARGS_VERSION]:
         _showVersion()
-    if ARGS_CONFIG in holder.args_id:
+    if holder.args_id[ARGS_CONFIG]:
         config.saveConfig()
         sys.exit(0)
-    if ARGS_INTERACTIVE in holder.args_id:
-        piped_input = StdInHelper.getStdInContent(ARGS_ONELINE in holder.args_id)
+    if holder.args_id[ARGS_INTERACTIVE]:
+        piped_input = StdInHelper.getStdInContent(holder.args_id[ARGS_ONELINE])
         temp_file = StdInHelper.writeTemp(piped_input, ArgParser.FILE_ENCODING)
         known_files.append(temp_file)
         StdInHelper.writeFiles(unknown_files, piped_input, ArgParser.FILE_ENCODING)
         holder.setTempFile(temp_file)
     else:
         StdInHelper.readWriteFilesFromStdIn(
-            unknown_files, ArgParser.FILE_ENCODING, ARGS_ONELINE in holder.args_id)
+            unknown_files, ArgParser.FILE_ENCODING, holder.args_id[ARGS_ONELINE])
 
     if (len(known_files) + len(unknown_files) == 0):
         sys.exit(0)
-
-    if ARGS_NOCOL in holder.args_id:
+    
+    if holder.args_id[ARGS_NOCOL]:
         global color_dic
         color_dic = dict.fromkeys(color_dic, "")
 
     # fill holder object with neccessary values
     holder.setFiles([*known_files, *unknown_files])
 
-    _printMetaAndChecksum(ARGS_DATA in holder.args_id, ARGS_CHECKSUM in holder.args_id)
+    _printMetaAndChecksum(holder.args_id[ARGS_DATA], holder.args_id[ARGS_CHECKSUM])
 
     holder.generateValues()
 
