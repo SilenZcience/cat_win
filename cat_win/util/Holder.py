@@ -8,12 +8,13 @@ class Holder():
     args_id = []
     temp_file = None  # if stdin is used, this temp_file will contain the stdin-input
     reversed = False
-    
-    allFilesLinesSum = 0 
+
+    allFilesLinesSum = 0
     fileLineNumberPlaceHolder = 0
     fileNumberPlaceHolder = 0
-    fileLineLengthPlaceHolder = 0  # the amount of chars neccessary to display the longest line within all files
-    
+    # the amount of chars neccessary to display the longest line within all files
+    fileLineLengthPlaceHolder = 0
+
     clipBoard = ""
 
     def setFiles(self, files: list) -> None:
@@ -36,20 +37,18 @@ class Holder():
             yield b
             b = reader(1024 * 1024)
 
-    def __getFileLinesSum__(self, file) -> int:
+    def __getFileLinesSum__(self, file: str) -> int:
         with open(file, 'rb') as fp:
             c_generator = self.__count_generator__(fp.raw.read)
-            count = sum(buffer.count(b'\n') for buffer in c_generator)
-            return count + 1
+            return sum(buffer.count(b'\n') for buffer in c_generator) + 1
 
     def __calcPlaceHolder__(self) -> None:
-        fileLines = [self.__getFileLinesSum__(file)
-                           for file in self.files]
+        fileLines = [self.__getFileLinesSum__(file) for file in self.files]
         self.allFilesLinesSum = sum(fileLines)
         self.fileLineNumberPlaceHolder = len(str(max(fileLines)))
         self.fileNumberPlaceHolder = len(str(len(self.files)))
-    
-    def __calcMaxLine__(self, file):
+
+    def __calcMaxLine__(self, file: str) -> int:
         heap = []
         lines = []
         lines = open(file, "rb").readlines()
@@ -64,7 +63,7 @@ class Holder():
 
     def __calcfileLineLengthPlaceHolder__(self) -> None:
         self.fileLineLengthPlaceHolder = max(self.__calcMaxLine__(file)
-                                 for file in self.files)
+                                             for file in self.files)
 
     def generateValues(self) -> None:
         self.__calcPlaceHolder__()
