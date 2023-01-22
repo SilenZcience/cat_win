@@ -28,10 +28,10 @@ def getChecksumFromFile(file: str) -> str:
             crc32 = crc32_hash(data, crc32)
 
     crc32 = "%08X" % (crc32 & 0xFFFFFFFF)
-
-    checksum  = "%-10s" % "\tCRC23:"  + str(crc32) + "\n"
-    checksum += "%-10s" % "\tMD5:"    + str(md5.hexdigest()) + "\n"
-    checksum += "%-10s" % "\tSHA1:"   + str(sha1.hexdigest()) + "\n"
-    checksum += "%-10s" % "\tSHA256:" + str(sha256.hexdigest()) + "\n"
-    checksum += "%-10s" % "\tSHA512:" + str(sha512.hexdigest()) + "\n"
+    
+    checksum =  f'\t{"CRC23:" : <9}{str(crc32)}\n'
+    checksum += f'\t{"MD5:"   : <9}{str(md5.hexdigest())}\n'
+    checksum += f'\t{"SHA1:"  : <9}{str(sha1.hexdigest())}\n'
+    checksum += f'\t{"SHA256:": <9}{str(sha256.hexdigest())}\n'
+    checksum += f'\t{"SHA512:": <9}{str(sha512.hexdigest())}\n'
     return checksum

@@ -11,36 +11,41 @@ FILE_TRUNCATE = [None, None, None]
 
 
 def __addArgument__(args: list, known_files: list, unknown_files: list, param: str) -> None:
-    if match(r"\Aenc\=.+\Z", param):
+    # 'enc' + ('=' or ':') + FILE_ENCODING
+    if match(r"\Aenc[\=\:].+\Z", param):
         global FILE_ENCODING
         FILE_ENCODING = param[4:]
         return
-    elif match(r"\Amatch\=.+\Z", param):
+    # 'match' + ('=' or ':') + FILE_MATCH
+    elif match(r"\Amatch[\=\:].+\Z", param):
         global FILE_MATCH
         FILE_MATCH.append(fr'{param[6:]}')
         return
-    elif match(r"\Afind\=.+\Z", param):
+    # 'find' + ('=' or ':') + FILE_SEARCH
+    elif match(r"\Afind[\=\:].+\Z", param):
         global FILE_SEARCH
         FILE_SEARCH.append(param[5:])
         return
-    elif match(r"\Atrunc\=[0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\Z", param):
+    # 'trunc' + ('=' or ':') + FILE_TRUNCATE[0] + ':' + FILE_TRUNCATE[1] + ':' + FILE_TRUNCATE[2]
+    elif match(r"\Atrunc[\=\:][0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\Z", param):
         param = param[6:].split(":")
         global FILE_TRUNCATE
         FILE_TRUNCATE[0] = None if param[0] == '' else (
             0 if param[0] == '0' else int(eval(param[0]))-1)
-        FILE_TRUNCATE[1] = None if param[1] == '' else int(
-            eval(param[1]))
+        FILE_TRUNCATE[1] = None if param[1] == '' else int(eval(param[1]))
         if len(param) == 3:
-            FILE_TRUNCATE[2] = None if param[2] == '' else int(
-                eval(param[2]))
+            FILE_TRUNCATE[2] = None if param[2] == '' else int(eval(param[2]))
         return
+    # '[' + ARGS_CUT + ']'
     elif match(r"\A\[[0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\]\Z", param):
         args.append([ARGS_CUT, param])
         return
+    # '[' + ARGS_REPLACE + ']'
     elif match(r"\A\[.+\,.+\]\Z", param):
         args.append([ARGS_REPLACE, param])
         return
 
+    # default parameters
     for x in ALL_ARGS:
         if x.shortForm == param or x.longForm == param:
             args.append([x.id, param])
@@ -49,19 +54,14 @@ def __addArgument__(args: list, known_files: list, unknown_files: list, param: s
     possible_path = realpath(param)
     if match(r"\*", param):
         for filename in iglob("./" + param, recursive=True):
-            if isdir(filename):
-                continue
-            known_files.append(realpath(filename))
-        return
+            if isfile(filename):
+                known_files.append(realpath(filename))
     elif isdir(possible_path):
         for filename in iglob(possible_path + '**/**', recursive=True):
-            if isdir(filename):
-                continue
-            known_files.append(realpath(filename))
-        return
+            if isfile(filename):
+                known_files.append(realpath(filename))
     elif isfile(possible_path):
-        known_files.append(realpath(possible_path))
-        return
+        known_files.append(possible_path)
     elif param[0] == "-" and len(param) > 2:
         for i in range(1, len(param)):
             __addArgument__(args, known_files, unknown_files, "-" + param[i])
@@ -69,13 +69,18 @@ def __addArgument__(args: list, known_files: list, unknown_files: list, param: s
         unknown_files.append(realpath(param))
 
 
-def getArguments():
-    inputArgs = argv
+def getArguments() -> tuple:
+    """
+    Read all args to either a valid parameter,
+    a known file or an unknown file.
+    Return a tuple containing these three lists.
+    """
+    inputArgs = argv[1:]
     args = []
     known_files = []
     unknown_files = []
 
-    for i in range(1, len(inputArgs)):
-        __addArgument__(args, known_files, unknown_files, inputArgs[i])
+    for arg in inputArgs:
+        __addArgument__(args, known_files, unknown_files, arg)
 
     return (args, known_files, unknown_files)

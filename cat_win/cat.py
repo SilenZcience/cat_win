@@ -1,5 +1,6 @@
 import pyperclip3 as pc
-import sys, os
+import sys
+import os
 from datetime import datetime
 from functools import lru_cache
 from itertools import groupby
@@ -39,7 +40,10 @@ def exception_handler(exception_type, exception, traceback, debug_hook=sys.excep
 sys.excepthook = exception_handler
 
 
-def _showHelp():
+def _showHelp() -> None:
+    """
+    Show the Help message and exit.
+    """
     print("Usage: cat [FILE]... [OPTION]...")
     print("Concatenate FILE(s) to standard output.")
     print()
@@ -61,7 +65,10 @@ def _showHelp():
     sys.exit(0)
 
 
-def _showVersion():
+def _showVersion() -> None:
+    """
+    Show the Version message and exit.
+    """
     print()
     print("------------------------------------------------------------")
     print(f"Cat {__version__} - from {workingDir}")
@@ -74,7 +81,10 @@ def _showVersion():
     sys.exit(0)
 
 
-def _showDebug(args, known_files, unknown_files):
+def _showDebug(args: list, known_files: list, unknown_files: list) -> None:
+    """
+    Print all neccassary debug information
+    """
     print("Debug Information:")
     print("args: ", end="")
     print(args)
@@ -92,7 +102,7 @@ def _showDebug(args, known_files, unknown_files):
     print(ArgParser.FILE_TRUNCATE)
 
 
-def _showMeta(file: str):
+def _printMeta(file: str) -> None:
     metaData = getFileMetaData(file, {C_KW.RESET_ALL: color_dic[C_KW.RESET_ALL],
                                       C_KW.ATTRIB: color_dic[C_KW.ATTRIB],
                                       C_KW.ATTRIB_POSITIVE: color_dic[C_KW.ATTRIB_POSITIVE],
@@ -100,7 +110,7 @@ def _showMeta(file: str):
     print(metaData)
 
 
-def _showChecksum(file: str):
+def _printChecksum(file: str) -> None:
     print(color_dic[C_KW.CHECKSUM], end="")
     print("Checksum of '" + file + "':")
     print(checksum.getChecksumFromFile(file))
@@ -110,9 +120,9 @@ def _showChecksum(file: str):
 def _printMetaAndChecksum(showMeta: bool, showChecksum: bool) -> None:
     for file in holder.files:
         if showMeta:
-            _showMeta(file)
+            _printMeta(file)
         if showChecksum:
-            _showChecksum(file)
+            _printChecksum(file)
     if showMeta or showChecksum:
         sys.exit(0)
 
@@ -120,27 +130,31 @@ def _printMetaAndChecksum(showMeta: bool, showChecksum: bool) -> None:
 @lru_cache(maxsize=None)
 def _CalculateLinePrefixSpacing(fileCharLength: int, lineCharLength: int, includeFilePrefix: bool) -> str:
     line_prefix = (" " * (holder.fileLineNumberPlaceHolder - lineCharLength)) + "%i) "
-    
+
     if includeFilePrefix:
         file_prefix = (" " * (holder.fileNumberPlaceHolder - fileCharLength)) + "%i."
         return color_dic[C_KW.NUMBER] + file_prefix + line_prefix + color_dic[C_KW.RESET_ALL]
-    
+
     return color_dic[C_KW.NUMBER] + line_prefix + color_dic[C_KW.RESET_ALL]
+
 
 def _getLinePrefix(index: int, line_num: int) -> str:
     if len(holder.files) > 1:
         return _CalculateLinePrefixSpacing(len(str(index)), len(str(line_num)), True) % (index, line_num)
     return _CalculateLinePrefixSpacing(len(str(index)), len(str(line_num)), False) % (line_num)
 
+
 @lru_cache(maxsize=None)
 def _CalculateLineLengthPrefixSpacing(lineCharLength: int) -> str:
     lengthPrefix = '[' + ' ' * (holder.fileLineLengthPlaceHolder - lineCharLength) + '%i] '
     return '%s' + color_dic[C_KW.LINE_LENGTH] + lengthPrefix + color_dic[C_KW.RESET_ALL]
 
+
 def _getLineLengthPrefix(prefix: str, line: str) -> str:
     return _CalculateLineLengthPrefixSpacing(len(str(len(line)))) % (prefix, len(line))
 
-def printFile(content: list, bytecode: bool):
+
+def printFile(content: list, bytecode: bool) -> None:
     if bytecode:
         print(*[c[0] for c in content], sep="\n")
         return
@@ -148,7 +162,8 @@ def printFile(content: list, bytecode: bool):
         print(*[c[1] + c[0] for c in content], sep="\n")
         return
 
-    stringFinder = StringFinder.StringFinder(ArgParser.FILE_SEARCH, ArgParser.FILE_MATCH)
+    stringFinder = StringFinder.StringFinder(
+        ArgParser.FILE_SEARCH, ArgParser.FILE_MATCH)
 
     for line, line_number in content:
         intervals, fKeyWords, mKeywords = stringFinder.findKeywords(line)
@@ -178,7 +193,7 @@ def printFile(content: list, bytecode: bool):
                 pass
 
 
-def printExcludedByPeek(excludedByPeek: int, prefixLenght: int):
+def printExcludedByPeek(excludedByPeek: int, prefixLenght: int) -> None:
     if not excludedByPeek:
         return
     excludedByPeekLength = (len(str(excludedByPeek))-1)//2
@@ -191,7 +206,7 @@ def printExcludedByPeek(excludedByPeek: int, prefixLenght: int):
     print(color_dic[C_KW.RESET_ALL])
 
 
-def editFile(fileIndex: int = 1):
+def editFile(fileIndex: int = 1) -> None:
     show_bytecode = False
     excludedByPeek = 0
     content = [["", ""]]
@@ -223,7 +238,7 @@ def editFile(fileIndex: int = 1):
             content = [[c[0], _getLinePrefix(fileIndex, j)]
                        for j, c in enumerate(content, start=1)]
             if excludedByPeek:
-                content = content[:5] + [[c[0], _getLinePrefix(fileIndex, j)] 
+                content = content[:5] + [[c[0], _getLinePrefix(fileIndex, j)]
                                          for j, c in enumerate(content[5:], start=6+excludedByPeek)]
         if ARGS_LLENGTH in holder.args_id:
             content = [[c[0], _getLineLengthPrefix(c[1], c[0])] for c in content]
@@ -232,7 +247,7 @@ def editFile(fileIndex: int = 1):
             if arg == ARGS_CUT:
                 try:
                     content = [[eval(repr(c[0]) + holder.args[i][1]), c[1]]
-                                for c in content]
+                               for c in content]
                 except:
                     print("Error at operation: ", holder.args[i][1])
                     return
@@ -265,20 +280,22 @@ def editFile(fileIndex: int = 1):
 
     printFile(content[:5], show_bytecode)
     if excludedByPeek:
-        prefixLength = len(content[0][1].replace(color_dic[C_KW.NUMBER], '').replace(color_dic[C_KW.LINE_LENGTH], '').replace(color_dic[C_KW.RESET_ALL], ''))
-        printExcludedByPeek(excludedByPeek, prefixLength)
+        prefix = content[0][1]
+        prefix = prefix.replace(color_dic[C_KW.NUMBER], '')
+        prefix = prefix.replace(color_dic[C_KW.LINE_LENGTH], '')
+        prefix = prefix.replace(color_dic[C_KW.RESET_ALL], '')
+        printExcludedByPeek(excludedByPeek, len(prefix))
     printFile(content[5:], show_bytecode)
-    
 
     if not show_bytecode:
         if ARGS_CLIP in holder.args_id:
             holder.clipBoard += "\n".join([c[1] + c[0] for c in content])
 
 
-def editFiles():
+def editFiles() -> None:
     start = len(holder.files)-1 if holder.reversed else 0
     end = -1 if holder.reversed else len(holder.files)
-    
+
     for i in range(start, end, -1 if holder.reversed else 1):
         editFile(i+1)
     print(color_dic[C_KW.COUNT_AND_FILES], end="")
@@ -299,7 +316,7 @@ def main():
 
     # read parameter-args
     args, known_files, unknown_files = ArgParser.getArguments()
-    
+
     holder.setArgs(args)
 
     sys.stdout.reconfigure(encoding=ArgParser.FILE_ENCODING)
@@ -319,8 +336,7 @@ def main():
         piped_input = StdInHelper.getStdInContent(ARGS_ONELINE in holder.args_id)
         temp_file = StdInHelper.writeTemp(piped_input, ArgParser.FILE_ENCODING)
         known_files.append(temp_file)
-        StdInHelper.writeFiles(unknown_files, piped_input,
-                               ArgParser.FILE_ENCODING)
+        StdInHelper.writeFiles(unknown_files, piped_input, ArgParser.FILE_ENCODING)
         holder.setTempFile(temp_file)
     else:
         StdInHelper.readWriteFilesFromStdIn(
@@ -328,27 +344,27 @@ def main():
 
     if (len(known_files) + len(unknown_files) == 0):
         sys.exit(0)
-    
+
     if ARGS_NOCOL in holder.args_id:
         global color_dic
         color_dic = dict.fromkeys(color_dic, "")
-    
+
     # fill holder object with neccessary values
     holder.setFiles([*known_files, *unknown_files])
-    
+
     _printMetaAndChecksum(ARGS_DATA in holder.args_id, ARGS_CHECKSUM in holder.args_id)
-    
+
     holder.generateValues()
-    
+
     try:
-        editFiles() # print the cat-output
+        editFiles()  # print the cat-output
     except Exception as exception:
-        if isinstance(exception, IOError): # catch broken-pipe error
-            devnull = os.open(os.devnull, os.O_WRONLY) 
-            os.dup2(devnull, sys.stdout.fileno()) 
+        if isinstance(exception, IOError):  # catch broken-pipe error
+            devnull = os.open(os.devnull, os.O_WRONLY)
+            os.dup2(devnull, sys.stdout.fileno())
             sys.exit(1)  # Python exits with error code 1 on EPIPE
         pass
-    
+
     # clean-up
     if temp_file and os.path.exists(temp_file):
         os.remove(temp_file)

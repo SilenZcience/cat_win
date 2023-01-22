@@ -6,18 +6,28 @@ class StringFinder:
     kw_literals = []
     kw_regex = []
 
-    def __init__(self, literals: list, regex: list):
+    def __init__(self, literals: list, regex: list) -> None:
         self.kw_literals = literals
         self.kw_regex = regex
 
-    def _findliterals(self, sub, s):
+    def _findliterals(self, sub: str, s: str) -> list:
+        """
+        Generate lists containing the start and end index
+        of all found positions of substring 'sub'
+        within string 's'.
+        """
         l = len(sub)
         i = s.find(sub)
         while i != -1:
             yield [i, i+l]
             i = s.find(sub, i+1)
 
-    def _findregex(self, pattern, s):
+    def _findregex(self, pattern, s) -> list:
+        """
+        Generate lists containing the start and end index
+        of all found positions of regex-match 'pattern'
+        within string 's'.
+        """
         for match in finditer(fr'{pattern}', s):
             yield list(match.span())
 
@@ -52,7 +62,14 @@ class StringFinder:
         kwList.sort(reverse=True)
         return kwList
 
-    def findKeywords(self, line: str):
+    def findKeywords(self, line: str) -> tuple:
+        """
+        Takes a string and searches for all occurrences
+        of self.kw_literals and self.kw_regex.
+        Merges the Intervals to optimized/shortened Intervals.
+        Returns a tuple containing the index positions of all intervals,
+        and thee lists containing which elements have been found
+        """
         found_list = []
         found_position = []
         matched_list = []
