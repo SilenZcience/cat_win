@@ -3,26 +3,29 @@ from heapq import nlargest
 
 
 class Holder():
-    files = []  # all files, including tmp-file from stdin
-    args = []  # list of all used parameters: format [[id, param]]
-    args_id = []
-    temp_file = None  # if stdin is used, this temp_file will contain the stdin-input
-    reversed = False
+    def __init__(self) -> None:
+        self.files = []  # all files, including tmp-file from stdin
+        self.args = []  # list of all used parameters: format [[id, param]]
+        self.args_id = []
+        self.temp_file = None  # if stdin is used, this temp_file will contain the stdin-input
+        self.reversed = False
 
-    allFilesLinesSum = 0
-    fileLineNumberPlaceHolder = 0
-    fileNumberPlaceHolder = 0
-    # the amount of chars neccessary to display the longest line within all files
-    fileLineLengthPlaceHolder = 0
+        self.allFilesLinesSum = 0
+        self.fileLineNumberPlaceHolder = 0
+        self.fileNumberPlaceHolder = 0
+        # the amount of chars neccessary to display the longest line within all files
+        self.fileLineLengthPlaceHolder = 0
 
-    clipBoard = ""
-
+        self.clipBoard = ""
+    
     def setFiles(self, files: list) -> None:
         self.files = files
 
     def setArgs(self, args: list) -> None:
         self.args = args
-        self.args_id = [x[0] for x in self.args]
+        self.args_id = [False] * (HIGHEST_ARG_ID + 1)
+        for id, _ in self.args:
+            self.args_id[id] = True
         self.reversed = ARGS_REVERSE in self.args_id
 
     def setTempFile(self, file: str) -> None:

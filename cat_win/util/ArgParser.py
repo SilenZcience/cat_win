@@ -38,17 +38,17 @@ def __addArgument__(args: list, known_files: list, unknown_files: list, param: s
         return
     # '[' + ARGS_CUT + ']'
     elif match(r"\A\[[0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\]\Z", param):
-        args.append([ARGS_CUT, param])
+        args.append((ARGS_CUT, param))
         return
     # '[' + ARGS_REPLACE + ']'
     elif match(r"\A\[.+\,.+\]\Z", param):
-        args.append([ARGS_REPLACE, param])
+        args.append((ARGS_REPLACE, param))
         return
 
     # default parameters
     for x in ALL_ARGS:
         if x.shortForm == param or x.longForm == param:
-            args.append([x.id, param])
+            args.append((x.id, param))
             return
 
     possible_path = realpath(param)
