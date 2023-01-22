@@ -156,23 +156,23 @@ def _getLineLengthPrefix(prefix: str, line: str) -> str:
 
 def printFile(content: list, bytecode: bool) -> None:
     if bytecode:
-        print(*[c[0] for c in content], sep="\n")
+        print(*[line for _, line in content], sep="\n")
         return
     if (not ArgParser.FILE_SEARCH and not ArgParser.FILE_MATCH):
-        print(*[c[1] + c[0] for c in content], sep="\n")
+        print(*[prefix + line for prefix, line in content], sep="\n")
         return
 
     stringFinder = StringFinder.StringFinder(
         ArgParser.FILE_SEARCH, ArgParser.FILE_MATCH)
 
-    for line, line_number in content:
+    for line_prefix, line in content:
         intervals, fKeyWords, mKeywords = stringFinder.findKeywords(line)
 
         if not ARGS_NOCOL in holder.args_id:
             for kw_pos, kw_code in intervals:
                 line = line[:kw_pos] + color_dic[kw_code] + line[kw_pos:]
 
-        print(line_number + line)
+        print(line_prefix + line)
 
         found_sth = False
         if fKeyWords:
@@ -209,23 +209,22 @@ def printExcludedByPeek(excludedByPeek: int, prefixLenght: int) -> None:
 def editFile(fileIndex: int = 1) -> None:
     show_bytecode = False
     excludedByPeek = 0
-    content = [["", ""]]
+    content = [('', '')]
     try:
         with open(holder.files[fileIndex-1], 'r', encoding=ArgParser.FILE_ENCODING) as f:
-            content = [[line, ""] for line in f.read().splitlines()]
+            content = [('', line) for line in f.read().splitlines()]
     except:
         print("Failed to open:", holder.files[fileIndex-1])
-        print(
-            "Do you want to open the file as a binary without parameters? [Y]")
+        print("Do you want to open the file as a binary without parameters? [Y]")
         try:
             inp = input()
-            if not 'y' in inp and not 'Y' in inp:
+            if not 'Y' in inp.upper():
                 return
         except EOFError:
             pass
         try:
             with open(holder.files[fileIndex-1], 'rb') as f:
-                content = [[line, ""] for line in f.read().splitlines()]
+                content = [('', line) for line in f.read().splitlines()]
             show_bytecode = True
         except:
             print("Operation failed! Try using the enc=X parameter.")
@@ -235,48 +234,48 @@ def editFile(fileIndex: int = 1) -> None:
         content = content[:5] + content[-5:]
     if not show_bytecode:
         if ARGS_NUMBER in holder.args_id:
-            content = [[c[0], _getLinePrefix(fileIndex, j)]
+            content = [(_getLinePrefix(fileIndex, j), c[1])
                        for j, c in enumerate(content, start=1)]
             if excludedByPeek:
-                content = content[:5] + [[c[0], _getLinePrefix(fileIndex, j)]
+                content = content[:5] + [(_getLinePrefix(fileIndex, j), c[1])
                                          for j, c in enumerate(content[5:], start=6+excludedByPeek)]
         if ARGS_LLENGTH in holder.args_id:
-            content = [[c[0], _getLineLengthPrefix(c[1], c[0])] for c in content]
+            content = [(_getLineLengthPrefix(c[0], c[1]), c[1]) for c in content]
         content = content[ArgParser.FILE_TRUNCATE[0]:ArgParser.FILE_TRUNCATE[1]:ArgParser.FILE_TRUNCATE[2]]
         for i, arg in enumerate(holder.args_id):
             if arg == ARGS_CUT:
                 try:
-                    content = [[eval(repr(c[0]) + holder.args[i][1]), c[1]]
-                               for c in content]
+                    content = [(prefix, eval(repr(line) + holder.args[i][1]))
+                               for prefix, line in content]
                 except:
                     print("Error at operation: ", holder.args[i][1])
                     return
         for i, arg in enumerate(holder.args_id):
             if arg == ARGS_ENDS:
-                content = [[c[0] + color_dic[C_KW.ENDS] + "$" +
-                           color_dic[C_KW.RESET_ALL], c[1]] for c in content]
+                content = [(prefix, line + color_dic[C_KW.ENDS] + "$" + color_dic[C_KW.RESET_ALL])
+                           for prefix, line in content]
             elif arg == ARGS_TABS:
-                content = [[c[0].replace("\t", color_dic[C_KW.TABS] + "^I" +
-                                         color_dic[C_KW.RESET_ALL]), c[1]] for c in content]
+                content = [(prefix, line.replace("\t", color_dic[C_KW.TABS] + "^I" + color_dic[C_KW.RESET_ALL]))
+                           for prefix, line in content]
             elif arg == ARGS_SQUEEZE:
-                content = [list(group)[0] for _, group in groupby(content, lambda x: x[0])]
+                content = [list(group)[0] for _, group in groupby(content, lambda x: x[1])]
             elif arg == ARGS_REVERSE:
                 content.reverse()
             elif arg == ARGS_BLANK:
-                content = [[c[0], c[1]] for c in content if c[0]]
+                content = [c for c in content if c[1]]
             elif arg == ARGS_DEC:
-                content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromDEC(int(c[0]), (holder.args[i][1] == "-dec")) +
-                            color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_dec(c[0])]
+                content = [(prefix, line + color_dic[C_KW.CONVERSION] + converter._fromDEC(int(line), (holder.args[i][1] == "-dec")) +
+                            color_dic[C_KW.RESET_ALL]) for prefix, line in content if converter.is_dec(line)]
             elif arg == ARGS_HEX:
-                content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromHEX(c[0], (holder.args[i][1] == "-hex")) +
-                            color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_hex(c[0])]
+                content = [(prefix, line + color_dic[C_KW.CONVERSION] + converter._fromHEX(line, (holder.args[i][1] == "-hex")) +
+                            color_dic[C_KW.RESET_ALL]) for prefix, line in content if converter.is_hex(line)]
             elif arg == ARGS_BIN:
-                content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromBIN(c[0], (holder.args[i][1] == "-bin")) +
-                            color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_bin(c[0])]
+                content = [(prefix, line + color_dic[C_KW.CONVERSION] + converter._fromBIN(line, (holder.args[i][1] == "-bin")) +
+                            color_dic[C_KW.RESET_ALL]) for prefix, line in content if converter.is_bin(line)]
             elif arg == ARGS_REPLACE:
                 replace_values = holder.args[i][1][1:-1].split(",")
-                content = [[c[0].replace(replace_values[0], color_dic[C_KW.REPLACE] + replace_values[1] + color_dic[C_KW.RESET_ALL]), c[1]]
-                           for c in content]
+                content = [(prefix, line.replace(replace_values[0], color_dic[C_KW.REPLACE] + replace_values[1] + color_dic[C_KW.RESET_ALL]))
+                           for prefix, line  in content]
 
     printFile(content[:5], show_bytecode)
     if excludedByPeek:
@@ -289,7 +288,7 @@ def editFile(fileIndex: int = 1) -> None:
 
     if not show_bytecode:
         if ARGS_CLIP in holder.args_id:
-            holder.clipBoard += "\n".join([c[1] + c[0] for c in content])
+            holder.clipBoard += "\n".join([prefix + line for prefix, line in content])
 
 
 def editFiles() -> None:
