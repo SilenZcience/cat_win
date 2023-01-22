@@ -223,40 +223,40 @@ def editFile(fileIndex: int = 1):
             if arg == ARGS_ENDS:
                 content = [[c[0] + color_dic[C_KW.ENDS] + "$" +
                            color_dic[C_KW.RESET_ALL], c[1]] for c in content]
-            if arg == ARGS_TABS:
+            elif arg == ARGS_TABS:
                 content = [[c[0].replace("\t", color_dic[C_KW.TABS] + "^I" +
                                          color_dic[C_KW.RESET_ALL]), c[1]] for c in content]
-            if arg == ARGS_SQUEEZE:
+            elif arg == ARGS_SQUEEZE:
                 content = [list(group)[0]
                            for _, group in groupby(content, lambda x: x[0])]
-            if arg == ARGS_REVERSE:
+            elif arg == ARGS_REVERSE:
                 content.reverse()
-            if arg == ARGS_BLANK:
+            elif arg == ARGS_BLANK:
                 content = [[c[0], c[1]] for c in content if c[0]]
-            if arg == ARGS_DEC:
+            elif arg == ARGS_DEC:
                 content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromDEC(int(c[0]), (holder.args[i][1] == "-dec")) +
                             color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_dec(c[0])]
-            if arg == ARGS_HEX:
+            elif arg == ARGS_HEX:
                 content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromHEX(c[0], (holder.args[i][1] == "-hex")) +
                             color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_hex(c[0])]
-            if arg == ARGS_BIN:
+            elif arg == ARGS_BIN:
                 content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromBIN(c[0], (holder.args[i][1] == "-bin")) +
                             color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_bin(c[0])]
-            if arg == ARGS_CUT:
+            elif arg == ARGS_CUT:
                 try:
                     content = [[eval(repr(c[0]) + holder.args[i][1]), c[1]]
                                for c in content]
                 except:
                     print("Error at operation: ", holder.args[i][1])
                     return
-            if arg == ARGS_REPLACE:
+            elif arg == ARGS_REPLACE:
                 replace_values = holder.args[i][1][1:-1].split(",")
                 content = [[c[0].replace(replace_values[0], color_dic[C_KW.REPLACE] + replace_values[1] + color_dic[C_KW.RESET_ALL]), c[1]]
                            for c in content]
 
     printFile(content[:5], show_bytecode)
     if excludedByPeek:
-        prefixLength = len(content[0][1].replace(color_dic[C_KW.NUMBER], '').replace(color_dic[C_KW.RESET_ALL], ''))
+        prefixLength = len(content[0][1].replace(color_dic[C_KW.NUMBER], '').replace(color_dic[C_KW.LINE_LENGTH], '').replace(color_dic[C_KW.RESET_ALL], ''))
         printExcludedByPeek(excludedByPeek, prefixLength)
     printFile(content[5:], show_bytecode)
     
