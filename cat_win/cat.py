@@ -14,7 +14,7 @@ import cat_win.util.StdInHelper as StdInHelper
 import cat_win.util.StringFinder as StringFinder
 from cat_win.util.ArgConstants import *
 from cat_win.util.ColorConstants import C_KW
-from cat_win.util.FileAttributes import printFileMetaData
+from cat_win.util.FileAttributes import getFileMetaData
 from cat_win.web.UpdateChecker import printUpdateInformation
 
 from cat_win import __version__, __author__, __sysversion__
@@ -92,20 +92,27 @@ def _showDebug(args, known_files, unknown_files):
     print(ArgParser.FILE_TRUNCATE)
 
 
-def _showMeta():
-    printFileMetaData(holder.files, {C_KW.RESET_ALL: color_dic[C_KW.RESET_ALL],
-                                     C_KW.ATTRIB: color_dic[C_KW.ATTRIB],
-                                     C_KW.ATTRIB_POSITIVE: color_dic[C_KW.ATTRIB_POSITIVE],
-                                     C_KW.ATTRIB_NEGATIVE: color_dic[C_KW.ATTRIB_NEGATIVE]})
-    sys.exit(0)
+def _showMeta(file: str):
+    metaData = getFileMetaData(file, {C_KW.RESET_ALL: color_dic[C_KW.RESET_ALL],
+                                      C_KW.ATTRIB: color_dic[C_KW.ATTRIB],
+                                      C_KW.ATTRIB_POSITIVE: color_dic[C_KW.ATTRIB_POSITIVE],
+                                      C_KW.ATTRIB_NEGATIVE: color_dic[C_KW.ATTRIB_NEGATIVE]})
+    print(metaData)
 
 
-def _showChecksum():
+def _showChecksum(file: str):
+    print(color_dic[C_KW.CHECKSUM], end="")
+    print("Checksum of '" + file + "':")
+    print(checksum.getChecksumFromFile(file))
+    print(color_dic[C_KW.RESET_ALL], end="")
+
+
+def _printMetaAndChecksum(showMeta: bool, showChecksum: bool) -> None:
     for file in holder.files:
-        print(color_dic[C_KW.CHECKSUM], end="")
-        print("Checksum of '" + file + "':")
-        print(checksum.getChecksumFromFile(file))
-        print(color_dic[C_KW.RESET_ALL], end="")
+        if showMeta:
+            _showMeta(file)
+        if showChecksum:
+            _showChecksum(file)
     sys.exit(0)
 
 
@@ -327,10 +334,7 @@ def main():
     # fill holder object with neccessary values
     holder.setFiles([*known_files, *unknown_files])
     
-    if ARGS_DATA in holder.args_id:
-        _showMeta()
-    if ARGS_CHECKSUM in holder.args_id:
-        _showChecksum()
+    _printMetaAndChecksum(ARGS_DATA in holder.args_id, ARGS_CHECKSUM in holder.args_id)
     
     holder.generateValues()
     
