@@ -118,25 +118,27 @@ def _printMetaAndChecksum(showMeta: bool, showChecksum: bool) -> None:
 
 
 @lru_cache(maxsize=None)
-def _CalculatePrefixSpacing(fileCharLength: int, lineCharLength: int, includeFilePrefix: bool) -> str:
-    file_prefix = color_dic[C_KW.NUMBER]
+def _CalculateLinePrefixSpacing(fileCharLength: int, lineCharLength: int, includeFilePrefix: bool) -> str:
+    line_prefix = (" " * (holder.fileLineNumberPlaceHolder - lineCharLength)) + "%i) "
+    
     if includeFilePrefix:
-        file_prefix += "%i"
-        file_prefix += (" " * (holder.fileNumberPlaceHolder - fileCharLength)) + "."
-
-    line_prefix = "%i) " + (" " * (holder.fileLineNumberPlaceHolder - lineCharLength))
-
-    return file_prefix + line_prefix + color_dic[C_KW.RESET_ALL]
-
+        file_prefix = (" " * (holder.fileNumberPlaceHolder - fileCharLength)) + "%i."
+        return color_dic[C_KW.NUMBER] + file_prefix + line_prefix + color_dic[C_KW.RESET_ALL]
+    
+    return color_dic[C_KW.NUMBER] + line_prefix + color_dic[C_KW.RESET_ALL]
 
 def _getLinePrefix(index: int, line_num: int) -> str:
     if len(holder.files) > 1:
-        return _CalculatePrefixSpacing(len(str(index)), len(str(line_num)), True) % (index, line_num)
-    return _CalculatePrefixSpacing(len(str(index)), len(str(line_num)), False) % (line_num)
+        return _CalculateLinePrefixSpacing(len(str(index)), len(str(line_num)), True) % (index, line_num)
+    return _CalculateLinePrefixSpacing(len(str(index)), len(str(line_num)), False) % (line_num)
+
+@lru_cache(maxsize=None)
+def _CalculateLineLengthPrefixSpacing(lineCharLength: int) -> str:
+    lengthPrefix = '[' + ' ' * (holder.fileLineLengthPlaceHolder - lineCharLength) + '%i] '
+    return '%s' + color_dic[C_KW.LINE_LENGTH] + lengthPrefix + color_dic[C_KW.RESET_ALL]
 
 def _getLineLengthPrefix(prefix: str, line: str) -> str:
-    lengthPrefix = f"{len(line)}"
-    return f'{prefix}{color_dic[C_KW.LINE_LENGTH]}[{lengthPrefix: <{holder.fileLineLengthPlaceHolder}}] {color_dic[C_KW.RESET_ALL]}'
+    return _CalculateLineLengthPrefixSpacing(len(str(len(line)))) % (prefix, len(line))
 
 def printFile(content: list, bytecode: bool):
     if bytecode:
@@ -224,8 +226,7 @@ def editFile(fileIndex: int = 1):
                 content = content[:5] + [[c[0], _getLinePrefix(fileIndex, j)] 
                                          for j, c in enumerate(content[5:], start=6+excludedByPeek)]
         if ARGS_LLENGTH in holder.args_id:
-            content = [[c[0], _getLineLengthPrefix(c[1], c[0])]
-                       for c in content]
+            content = [[c[0], _getLineLengthPrefix(c[1], c[0])] for c in content]
         content = content[ArgParser.FILE_TRUNCATE[0]:ArgParser.FILE_TRUNCATE[1]:ArgParser.FILE_TRUNCATE[2]]
         for i, arg in enumerate(holder.args_id):
             if arg == ARGS_CUT:
