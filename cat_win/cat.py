@@ -113,7 +113,8 @@ def _printMetaAndChecksum(showMeta: bool, showChecksum: bool) -> None:
             _showMeta(file)
         if showChecksum:
             _showChecksum(file)
-    sys.exit(0)
+    if showMeta or showChecksum:
+        sys.exit(0)
 
 
 @lru_cache(maxsize=None)
@@ -227,6 +228,14 @@ def editFile(fileIndex: int = 1):
                        for c in content]
         content = content[ArgParser.FILE_TRUNCATE[0]:ArgParser.FILE_TRUNCATE[1]:ArgParser.FILE_TRUNCATE[2]]
         for i, arg in enumerate(holder.args_id):
+            if arg == ARGS_CUT:
+                try:
+                    content = [[eval(repr(c[0]) + holder.args[i][1]), c[1]]
+                                for c in content]
+                except:
+                    print("Error at operation: ", holder.args[i][1])
+                    return
+        for i, arg in enumerate(holder.args_id):
             if arg == ARGS_ENDS:
                 content = [[c[0] + color_dic[C_KW.ENDS] + "$" +
                            color_dic[C_KW.RESET_ALL], c[1]] for c in content]
@@ -234,8 +243,7 @@ def editFile(fileIndex: int = 1):
                 content = [[c[0].replace("\t", color_dic[C_KW.TABS] + "^I" +
                                          color_dic[C_KW.RESET_ALL]), c[1]] for c in content]
             elif arg == ARGS_SQUEEZE:
-                content = [list(group)[0]
-                           for _, group in groupby(content, lambda x: x[0])]
+                content = [list(group)[0] for _, group in groupby(content, lambda x: x[0])]
             elif arg == ARGS_REVERSE:
                 content.reverse()
             elif arg == ARGS_BLANK:
@@ -249,13 +257,6 @@ def editFile(fileIndex: int = 1):
             elif arg == ARGS_BIN:
                 content = [[c[0] + color_dic[C_KW.CONVERSION] + converter._fromBIN(c[0], (holder.args[i][1] == "-bin")) +
                             color_dic[C_KW.RESET_ALL], c[1]] for c in content if converter.is_bin(c[0])]
-            elif arg == ARGS_CUT:
-                try:
-                    content = [[eval(repr(c[0]) + holder.args[i][1]), c[1]]
-                               for c in content]
-                except:
-                    print("Error at operation: ", holder.args[i][1])
-                    return
             elif arg == ARGS_REPLACE:
                 replace_values = holder.args[i][1][1:-1].split(",")
                 content = [[c[0].replace(replace_values[0], color_dic[C_KW.REPLACE] + replace_values[1] + color_dic[C_KW.RESET_ALL]), c[1]]
