@@ -1,7 +1,7 @@
 from cat_win.util.Converter import Converter
 from unittest import TestCase
-import sys
-sys.path.append("../cat_win")
+# import sys
+# sys.path.append("../cat_win")
 
 
 expected_output = ""

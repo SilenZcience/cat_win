@@ -1,12 +1,12 @@
 from cat_win.util.checksum import getChecksumFromFile
 from unittest import TestCase
 import os
-import sys
-sys.path.append("../cat_win")
+# import sys
+# sys.path.append("../cat_win")
 
 
-script_dir = os.path.dirname(__file__)
-test_file_path = script_dir + "/test.txt"
+test_file_dir = os.path.dirname(__file__) + '/texts/'
+test_file_path = test_file_dir + "test.txt"
 
 
 class TestChecksum(TestCase):

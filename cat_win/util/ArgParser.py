@@ -1,4 +1,3 @@
-from sys import argv
 from glob import iglob
 from re import match
 from os.path import isfile, realpath, isdir
@@ -69,7 +68,7 @@ def __addArgument__(args: list, known_files: list, unknown_files: list, param: s
         unknown_files.append(realpath(param))
 
 
-def getArguments() -> tuple:
+def getArguments(argv: list) -> tuple:
     """
     Read all args to either a valid parameter,
     a known file or an unknown file.
