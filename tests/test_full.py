@@ -45,10 +45,10 @@ class TestCat(TestCase):
             main()
             self.assertEqual(fake_out.getvalue(), expected_output)
             
-    @patch('cat_win.cat.sys.argv', ['<CAT>', 'enc=ansi', test_file_path, '-sb', '[Sample,TEST]', '-col', '-xle'])
+    @patch('cat_win.cat.sys.argv', ['<CAT>', 'enc:utf-8', test_file_path, '-sb', '[Sample,TEST]', '-col', '-xle'])
     def test_cat_output_full_C(self):
         expected_output = ''
-        with open(test_file_dir + 'full_test_result_C.txt', 'r', encoding='ansi') as output:
+        with open(test_file_dir + 'full_test_result_C.txt', 'r', encoding='utf-8') as output:
             expected_output = output.read()
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             main()
