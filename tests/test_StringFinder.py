@@ -1,7 +1,7 @@
 from cat_win.util.StringFinder import StringFinder
 from unittest import TestCase
-import sys
-sys.path.append("../cat_win")
+# import sys
+# sys.path.append("../cat_win")
 
 
 class TestConverter(TestCase):

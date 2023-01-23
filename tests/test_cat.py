@@ -4,16 +4,16 @@ from unittest.mock import patch
 from unittest import TestCase
 from io import StringIO
 import os
-import sys
-sys.path.append("../cat_win")
+# import sys
+# sys.path.append("../cat_win")
 
 
-script_dir = os.path.dirname(__file__)
-test_file_path = script_dir + "/test.txt"
+test_file_dir = os.path.dirname(__file__) + '/texts/'
+test_file_path = test_file_dir + "test.txt"
 test_file_content = []
 with open(test_file_path, 'r') as f:
     test_file_content = f.read().splitlines()
-expected_output = ""
+
 
 holder = Holder()
 color_dic = dict.fromkeys(color_dic, "")

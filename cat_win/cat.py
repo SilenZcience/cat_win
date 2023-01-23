@@ -64,7 +64,6 @@ def _showHelp() -> None:
     helpMessage += f"\t{'cat f trunc=a:b:c': <25}Output f's content starting at line a, ending at line b, stepping c\n"
     print(helpMessage)
     printUpdateInformation('cat_win', __version__)
-    sys.exit(0)
 
 
 def _showVersion() -> None:
@@ -82,7 +81,6 @@ def _showVersion() -> None:
     versionMessage += f'Author: \t{__author__}\n'
     print(versionMessage)
     printUpdateInformation('cat_win', __version__)
-    sys.exit(0)
 
 
 def _showDebug(args: list, known_files: list, unknown_files: list) -> None:
@@ -127,8 +125,6 @@ def _printMetaAndChecksum(showMeta: bool, showChecksum: bool) -> None:
             _printMeta(file)
         if showChecksum:
             _printChecksum(file)
-    if showMeta or showChecksum:
-        sys.exit(0)
 
 
 @lru_cache(maxsize=None)
@@ -296,7 +292,8 @@ def editFile(fileIndex: int = 1) -> None:
         prefix = prefix.replace(color_dic[C_KW.LINE_LENGTH], '')
         prefix = prefix.replace(color_dic[C_KW.RESET_ALL], '')
         printExcludedByPeek(excludedByPeek, len(prefix))
-    printFile(content[5:], show_bytecode)
+    if len(content) > 5:
+        printFile(content[5:], show_bytecode)
 
     if not show_bytecode:
         if holder.args_id[ARGS_CLIP]:
@@ -326,7 +323,7 @@ def main():
     piped_input = temp_file = ""
 
     # read parameter-args
-    args, known_files, unknown_files = ArgParser.getArguments()
+    args, known_files, unknown_files = ArgParser.getArguments(sys.argv)
 
     holder.setArgs(args)
 
@@ -338,11 +335,13 @@ def main():
         _showDebug(args, known_files, unknown_files)
     if (len(known_files) + len(unknown_files) + len(holder.args) == 0) or holder.args_id[ARGS_HELP]:
         _showHelp()
+        return
     if holder.args_id[ARGS_VERSION]:
         _showVersion()
+        return
     if holder.args_id[ARGS_CONFIG]:
         config.saveConfig()
-        sys.exit(0)
+        return
     if holder.args_id[ARGS_INTERACTIVE]:
         piped_input = StdInHelper.getStdInContent(holder.args_id[ARGS_ONELINE])
         temp_file = StdInHelper.writeTemp(piped_input, ArgParser.FILE_ENCODING)
@@ -354,7 +353,7 @@ def main():
             unknown_files, ArgParser.FILE_ENCODING, holder.args_id[ARGS_ONELINE])
 
     if (len(known_files) + len(unknown_files) == 0):
-        sys.exit(0)
+        return
     
     if holder.args_id[ARGS_NOCOL]:
         global color_dic
@@ -363,7 +362,9 @@ def main():
     # fill holder object with neccessary values
     holder.setFiles([*known_files, *unknown_files])
 
-    _printMetaAndChecksum(holder.args_id[ARGS_DATA], holder.args_id[ARGS_CHECKSUM])
+    if holder.args_id[ARGS_DATA] or holder.args_id[ARGS_CHECKSUM]:
+        _printMetaAndChecksum(holder.args_id[ARGS_DATA], holder.args_id[ARGS_CHECKSUM])
+        return
 
     holder.generateValues()
 
