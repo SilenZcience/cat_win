@@ -30,7 +30,8 @@ converter = Converter.Converter()
 holder = Holder.Holder()
 
 
-def exception_handler(exception_type, exception, traceback, debug_hook=sys.excepthook):
+def exception_handler(exception_type: type, exception, traceback, debug_hook=sys.excepthook) -> None:
+    print(color_dic[C_KW.RESET_ALL])
     if holder.args_id[ARGS_DEBUG]:
         debug_hook(exception_type, exception, traceback)
         return
@@ -44,23 +45,24 @@ def _showHelp() -> None:
     """
     Show the Help message and exit.
     """
-    print("Usage: cat [FILE]... [OPTION]...")
-    print("Concatenate FILE(s) to standard output.")
-    print()
+    helpMessage = 'Usage: cat [FILE]... [OPTION]...\n'
+    helpMessage += 'Concatenate FILE(s) to standard output.\n\n'
     for x in ALL_ARGS:
-        print("%-25s" % str("\t" + x.shortForm + ", " + x.longForm), end=x.help + "\n")
-    print()
-    print("%-25s" % str("\t'enc=X':"), end="set file encoding to X\n")
-    print("%-25s" % str("\t'find=X':"), end="find substring X in the given files\n")
-    print("%-25s" % str("\t'match=X':"), end="find pattern X in the given files\n")
-    print("%-25s" % str("\t'trunc=X:Y':"), end="truncate file to lines X and Y (python-like)\n")
-    print()
-    print("%-25s" % str("\t'[a,b]':"), end="replace a with b in every line\n")
-    print("%-25s" % str("\t'[a:b]':"), end="python-like string manipulation syntax\n")
-    print()
-    print("Examples:")
-    print("%-25s" % str("\tcat f g -r"), end="Output g's contents in reverse order, then f's content in reverse order\n")
-    print("%-25s" % str("\tcat f g -ne"), end="Output f's, then g's content, while numerating and showing the end of lines\n")
+        helpMessage += f'\t{f"{x.shortForm}, {x.longForm}": <25}{x.help}\n'
+    helpMessage += '\n'
+    helpMessage += f'\t{"enc=X, enc:X"    : <25}set file encoding to X\n'
+    helpMessage += f'\t{"find=X, find:X"  : <25}find substring X in the given files\n'
+    helpMessage += f'\t{"match=X, match:X": <25}find pattern X in the given files\n'
+    helpMessage += f'\t{"trunc=X:Y, trunc:X:Y": <25}truncate file to lines x and y (python-like)\n'
+    helpMessage += '\n'
+    helpMessage += f'\t{"[a,b]": <25}replace a with b in every line\n'
+    helpMessage += f'\t{"[a:b]": <25}python-like string manipulation syntax\n'
+    helpMessage += '\n'
+    helpMessage += 'Examples:\n'
+    helpMessage += f"\t{'cat f g -r' : <25}Output g's contents in reverse order, then f's content in reverse order\n"
+    helpMessage += f"\t{'cat f g -ne': <25}Output f's, then g's content, while numerating and showing the end of lines\n"
+    helpMessage += f"\t{'cat f trunc=a:b:c': <25}Output f's content starting at line a, ending at line b, stepping c\n"
+    print(helpMessage)
     printUpdateInformation('cat_win', __version__)
     sys.exit(0)
 
@@ -69,14 +71,16 @@ def _showVersion() -> None:
     """
     Show the Version message and exit.
     """
-    print()
-    print("------------------------------------------------------------")
-    print(f"Cat {__version__} - from {workingDir}")
-    print("------------------------------------------------------------")
-    print()
-    print(f"Python: \t{__sysversion__}")  # sys.version
-    print(f"Build time: \t{datetime.fromtimestamp(os.path.getctime(os.path.realpath(__file__)))} CET")
-    print(f"Author: \t{__author__}")
+    catVersion = f'Cat {__version__} - from {workingDir}\n'
+    versionMessage = '\n'
+    versionMessage += '-' * len(catVersion) + '\n'
+    versionMessage += catVersion
+    versionMessage += '-' * len(catVersion) + '\n'
+    versionMessage += '\n'
+    versionMessage += f'Python: \t{__sysversion__}\n'  # sys.version
+    versionMessage += f'Build time: \t{datetime.fromtimestamp(os.path.getctime(os.path.realpath(__file__)))} CET\n'
+    versionMessage += f'Author: \t{__author__}\n'
+    print(versionMessage)
     printUpdateInformation('cat_win', __version__)
     sys.exit(0)
 
@@ -220,10 +224,10 @@ def editFile(fileIndex: int = 1) -> None:
             content = [('', line) for line in f.read().splitlines()]
     except:
         print("Failed to open:", holder.files[fileIndex-1])
-        print("Do you want to open the file as a binary without parameters? [Y]")
         try:
-            inp = input()
-            if not 'Y' in inp.upper():
+            inp = input("Do you want to open the file as a binary, without parameters? [Y/⏎]:")
+            if not 'Y' in inp.upper() and inp:
+                print("Aborting...")
                 return
         except EOFError:
             pass
@@ -365,12 +369,10 @@ def main():
 
     try:
         editFiles()  # print the cat-output
-    except Exception as exception:
-        if isinstance(exception, IOError):  # catch broken-pipe error
-            devnull = os.open(os.devnull, os.O_WRONLY)
-            os.dup2(devnull, sys.stdout.fileno())
-            sys.exit(1)  # Python exits with error code 1 on EPIPE
-        pass
+    except IOError: # catch broken-pipe error
+        devnull = os.open(os.devnull, os.O_WRONLY)
+        os.dup2(devnull, sys.stdout.fileno())
+        sys.exit(1)  # Python exits with error code 1 on EPIPE
 
     # clean-up
     if temp_file and os.path.exists(temp_file):
