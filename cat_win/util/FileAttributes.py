@@ -16,17 +16,17 @@ from cat_win.util.ColorConstants import C_KW
 
 def _convert_size(size_bytes: int) -> str:
     """
-    Takes an integer representing a filee ssize in bytes.
+    Takes an integer representing a file size in bytes.
     Returns a string representation containing the
     appropriate Suffix.
     """
     if size_bytes == 0:
-        return "0B"
+        return "0 B"
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
     i = int(floor(log(size_bytes, 1024)))
     p = pow(1024, i)
     s = round(size_bytes / p, 2)
-    return "%s %s" % (s, size_name[i])
+    return "%s %s" % (s, size_name[i] if i < 9 else '?')
 
 
 def read_attribs(file: str) -> list:
