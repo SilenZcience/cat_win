@@ -43,7 +43,8 @@ class Holder():
     def __getFileLinesSum__(self, file: str) -> int:
         with open(file, 'rb') as fp:
             c_generator = self.__count_generator__(fp.raw.read)
-            return sum(buffer.count(b'\n') for buffer in c_generator) + 1
+            linesSum = sum(buffer.count(b'\n') for buffer in c_generator) + 1
+        return linesSum
 
     def __calcPlaceHolder__(self) -> None:
         fileLines = [self.__getFileLinesSum__(file) for file in self.files]
@@ -54,7 +55,8 @@ class Holder():
     def __calcMaxLine__(self, file: str) -> int:
         heap = []
         lines = []
-        lines = open(file, "rb").readlines()
+        with open(file, "rb") as fp:
+            lines = fp.readlines()
         heap = nlargest(1, lines, len)
         if len(heap) == 0:
             return 0

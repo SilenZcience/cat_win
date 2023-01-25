@@ -128,7 +128,8 @@ def _printMetaAndChecksum(showMeta: bool, showChecksum: bool) -> None:
 
 
 @lru_cache(maxsize=None)
-def _CalculateLinePrefixSpacing(fileCharLength: int, lineCharLength: int, includeFilePrefix: bool) -> str:
+def _CalculateLinePrefixSpacing(lineCharLength: int,
+                                includeFilePrefix: bool = False, fileCharLength: int = None) -> str:
     line_prefix = (" " * (holder.fileLineNumberPlaceHolder - lineCharLength)) + "%i) "
 
     if includeFilePrefix:
@@ -138,13 +139,13 @@ def _CalculateLinePrefixSpacing(fileCharLength: int, lineCharLength: int, includ
     return color_dic[C_KW.NUMBER] + line_prefix + color_dic[C_KW.RESET_ALL]
 
 
-def _getLinePrefix(index: int, line_num: int) -> str:
+def _getLinePrefix(line_num: int, index: int) -> str:
     """
     returns the new line prefix including the line number.
     """
     if len(holder.files) > 1:
-        return _CalculateLinePrefixSpacing(len(str(index)), len(str(line_num)), True) % (index, line_num)
-    return _CalculateLinePrefixSpacing(len(str(index)), len(str(line_num)), False) % (line_num)
+        return _CalculateLinePrefixSpacing(len(str(line_num)), True, len(str(index))) % (index, line_num)
+    return _CalculateLinePrefixSpacing(len(str(line_num))) % (line_num)
 
 
 @lru_cache(maxsize=None)
@@ -236,7 +237,7 @@ def editFile(fileIndex: int = 1) -> None:
             return
     
     if holder.args_id[ARGS_NUMBER]:
-        content = [(_getLinePrefix(fileIndex, j), c[1])
+        content = [(_getLinePrefix(j, fileIndex), c[1])
                    for j, c in enumerate(content, start=1)]
     content = content[ArgParser.FILE_TRUNCATE[0]:ArgParser.FILE_TRUNCATE[1]:ArgParser.FILE_TRUNCATE[2]]
     if holder.args_id[ARGS_PEEK] and len(content) > 10:

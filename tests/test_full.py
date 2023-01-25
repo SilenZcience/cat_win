@@ -1,4 +1,4 @@
-from cat_win.cat import main
+import cat_win.cat as cat
 from unittest.mock import patch
 from unittest import TestCase
 from io import StringIO
@@ -25,15 +25,19 @@ class StdInMock(DontReadFromInput):
 
 
 @patch('cat_win.cat.sys.stdin', StdInMock())
-class TestCat(TestCase):
+class TestCatFull(TestCase):
     maxDiff = None
 
+    def tearDown(self):
+        cat._CalculateLinePrefixSpacing.cache_clear()
+        cat._CalculateLineLengthPrefixSpacing.cache_clear()
+    
     # no files parsed
     @patch('cat_win.cat.sys.argv', ['<CAT>', '-xn', '-col', '[::-2]', 'enc=utf8'])
     def test_cat_output_full_A(self):
         expected_output = ''
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            main()
+            cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
             
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, '-xn', '-col', '[::-2]', 'enc=utf8'])
@@ -42,7 +46,7 @@ class TestCat(TestCase):
         with open(test_file_dir + 'full_test_result_B.txt', 'r', encoding='utf-8') as output:
             expected_output = output.read()
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            main()
+            cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
             
     @patch('cat_win.cat.sys.argv', ['<CAT>', 'enc:utf-8', test_file_path, '-sb', '[Sample,TEST]', '-col', '-xe'])
@@ -51,7 +55,7 @@ class TestCat(TestCase):
         with open(test_file_dir + 'full_test_result_C.txt', 'r', encoding='utf-8') as output:
             expected_output = output.read()
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            main()
+            cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
             
     @patch('cat_win.cat.sys.argv', ['<CAT>', 'enc=utf-8', test_file_path, 'trunc=2:6', '-n', '--reverse', '-col', '-t'])
@@ -60,6 +64,7 @@ class TestCat(TestCase):
         with open(test_file_dir + 'full_test_result_D.txt', 'r', encoding='utf-8') as output:
             expected_output = output.read()
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            main()
+            cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
+
 # python -m unittest discover -s tests -p test*.py
