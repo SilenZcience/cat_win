@@ -20,9 +20,12 @@ def getStdInContent(oneLine: bool = False) -> str:
     if oneLine:
         first_line = stdin.readline()
         stdin.flush()
-        return first_line
+        return first_line.rstrip('\n')
     input = ""
     for line in stdin:
+        if line[-2:] == chr(26) + '\n':
+            input += line[:-2]
+            break
         input += line
     return input
 
@@ -63,8 +66,5 @@ def readWriteFilesFromStdIn(file_list: list, file_encoding: str, oneLine: bool =
     print("do/does not exist. Write the FILE(s) and finish with the '^Z'-suffix ((Ctrl + Z) + Enter):")
 
     input = getStdInContent(oneLine)
-    
-    if len(input) > 0 and ord(input[-1:]) == 26: # chr(26) == ctrl-Z
-        input = input[:-1]
 
     writeFiles(file_list, input, file_encoding)
