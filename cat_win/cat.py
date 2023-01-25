@@ -365,20 +365,20 @@ def main():
 
     if holder.args_id[ARGS_DATA] or holder.args_id[ARGS_CHECKSUM]:
         _printMetaAndChecksum(holder.args_id[ARGS_DATA], holder.args_id[ARGS_CHECKSUM])
-        return
+    else:
+        holder.generateValues()
 
-    holder.generateValues()
-
-    try:
-        editFiles()  # print the cat-output
-    except IOError: # catch broken-pipe error
-        devnull = os.open(os.devnull, os.O_WRONLY)
-        os.dup2(devnull, sys.stdout.fileno())
-        sys.exit(1)  # Python exits with error code 1 on EPIPE
+        try:
+            editFiles()  # print the cat-output
+        except IOError: # catch broken-pipe error
+            devnull = os.open(os.devnull, os.O_WRONLY)
+            os.dup2(devnull, sys.stdout.fileno())
+            sys.exit(1)  # Python exits with error code 1 on EPIPE
 
     # clean-up
     if temp_file and os.path.exists(temp_file):
-        os.remove(temp_file)
+        # os.remove(temp_file)
+        pass
 
 
 if __name__ == "__main__":
