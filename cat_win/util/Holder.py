@@ -26,6 +26,8 @@ class Holder():
         self.args_id = [False] * (HIGHEST_ARG_ID + 1)
         for id, _ in self.args:
             self.args_id[id] = True
+        if self.args_id[ARGS_B64E]:
+            self.args_id[ARGS_NOCOL] = True
         self.reversed = ARGS_REVERSE in self.args_id
 
     def setTempFile(self, file: str) -> None:
