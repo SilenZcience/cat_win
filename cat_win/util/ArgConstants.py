@@ -11,12 +11,14 @@ ARGS_REVERSE, ARGS_COUNT, ARGS_BLANK, ARGS_FILES, ARGS_INTERACTIVE = range(5, 10
 ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN = range(10, 15)
 ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA = range(15, 20)
 ARGS_CONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK, ARGS_NOCOL = range(20, 25)
+ARGS_EOF, ARGS_B64E, ARGS_B64D = range(25, 28)
 
 ALL_ARGS = [[["-h", "--help"], "show this help message and exit", ARGS_HELP],
             [["-n", "--number"], "number all output lines", ARGS_NUMBER],
             [["-x", "--linelength"], "display the length of each line", ARGS_LLENGTH],
             [["-e", "--ends"], "display $ at the end of each line", ARGS_ENDS],
             [["-t", "--tabs"], "display TAB characters as ^I", ARGS_TABS],
+            [["--eof", "--eof"], "display EOF characters as ^EOF", ARGS_EOF],
             [["-s", "--squeeze"], "suppress repeated output lines", ARGS_SQUEEZE],
             [["-r", "--reverse"], "reverse output", ARGS_REVERSE],
             [["-c", "--count"], "show sum of lines", ARGS_COUNT],

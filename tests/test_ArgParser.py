@@ -36,9 +36,16 @@ class TestArgParser(TestCase):
         self.assertCountEqual(unknown_files, [])
         
     def test_getArguments_concatenated_unknown(self):
-        args, known_files, unknown_files = ArgParser.getArguments(['CAT', '--abcde?fg'])
+        args, known_files, unknown_files = ArgParser.getArguments(['CAT', '-+abcde?fg'])
         args = list(map(lambda x: x[1], args))
         self.assertCountEqual(args, ['-a', '-b', '-c', '-d', '-e', '-f'])
+        self.assertCountEqual(known_files, [])
+        self.assertCountEqual(unknown_files, [])
+        
+    def test_getArguments_concatenated_invalid(self):
+        args, known_files, unknown_files = ArgParser.getArguments(['CAT', '--abcde?fg'])
+        args = list(map(lambda x: x[1], args))
+        self.assertCountEqual(args, [])
         self.assertCountEqual(known_files, [])
         self.assertCountEqual(unknown_files, [])
         
