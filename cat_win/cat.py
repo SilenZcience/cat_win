@@ -128,13 +128,6 @@ def _printMetaAndChecksum(showMeta: bool, showChecksum: bool) -> None:
             _printChecksum(file)
 
 
-def clearColorCodes(line: str) -> str:
-    if not holder.args_id[ARGS_NOCOL]:
-        for key in color_dic.keys():
-            line = line.replace(color_dic[key], '')
-    return line
-
-
 @lru_cache(maxsize=None)
 def _CalculateLinePrefixSpacing(lineCharLength: int,
                                 includeFilePrefix: bool = False, fileCharLength: int = None) -> str:
@@ -168,8 +161,9 @@ def _getLineLengthPrefix(prefix: str, line) -> str:
     line is of type string or bytes.
     returns the new line prefix including the line length.
     """
-    if type(line) == str:
-        line = clearColorCodes(line)
+    if not holder.args_id[ARGS_NOCOL] and type(line) == str:
+        for key in color_dic.keys():
+            line = line.replace(color_dic[key], '')
     return _CalculateLineLengthPrefixSpacing(len(str(len(line)))) % (prefix, len(line))
 
 
@@ -302,7 +296,6 @@ def editFile(fileIndex: int = 1) -> None:
     if show_bytecode:
         content = [(prefix, str(line)) for prefix, line in content]
     if holder.args_id[ARGS_B64E]:
-        content = [('', clearColorCodes(line)) for _, line in content]
         content = encodeBase64(content)
 
     printFile(content[:5], show_bytecode)
