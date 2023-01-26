@@ -116,6 +116,7 @@ python3 -m cat_win --help
 | -x, --linelength       | display the length of each line                   |
 | -e, --ends             | display $ at the end of each line                 |
 | -t, --tabs             | display TAB characters as ^I                      |
+| --eof, --eof           | display EOF characters as ^EOF                    |
 | -s, --squeeze          | suppress repeated output lines                    |
 | -r, --reverse          | reverse output                                    |
 | -c, --count            | show sum of lines                                 |

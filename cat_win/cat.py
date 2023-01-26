@@ -280,7 +280,10 @@ def editFile(fileIndex: int = 1) -> None:
                 replace_values = param[1:-1].split(",")
                 content = [(prefix, line.replace(replace_values[0], color_dic[C_KW.REPLACE] + replace_values[1] + color_dic[C_KW.RESET_ALL]))
                            for prefix, line  in content]
-                
+            elif arg == ARGS_EOF:
+                content = [(prefix, line.replace(chr(26), color_dic[C_KW.REPLACE] + '^EOF' + color_dic[C_KW.RESET_ALL]))
+                           for prefix, line in content]
+            
     if holder.args_id[ARGS_LLENGTH]:
         content = [(_getLineLengthPrefix(c[0], c[1]), c[1]) for c in content]
     if show_bytecode:
