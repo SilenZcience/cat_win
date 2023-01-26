@@ -389,8 +389,7 @@ def main():
 
     # clean-up
     if temp_file and os.path.exists(temp_file):
-        # os.remove(temp_file)
-        pass
+        os.remove(temp_file)
 
 
 if __name__ == "__main__":
