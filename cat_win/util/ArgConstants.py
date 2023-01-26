@@ -36,7 +36,9 @@ ALL_ARGS = [[["-h", "--help"], "show this help message and exit", ARGS_HELP],
             [["-v", "--version"], "output version information and exit", ARGS_VERSION],
             [["-d", "--debug"], "show debug information", ARGS_DEBUG],
             [["-col", "--nocolor"], "disable colored output", ARGS_NOCOL],
-            [["--config", "--config"], "change color configuration", ARGS_CONFIG]]
+            [["--config", "--config"], "change color configuration", ARGS_CONFIG],
+            [["--b64e", "--b64e"], "encode the input to base64", ARGS_B64E],
+            [["--b64d", "--b64d"], "decode the input from base64", ARGS_B64D]]
 
 ALL_ARGS = [ArgConstant(x[0][0], x[0][1], x[1], x[2]) for x in ALL_ARGS]
 HIGHEST_ARG_ID = max([m.id for m in ALL_ARGS])

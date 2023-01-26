@@ -113,18 +113,22 @@ class TestCat(TestCase):
     
     def test_cat__getLineLengthPrefix_string_excess(self):
         holder.fileLineLengthPlaceHolder = 5
+        holder.setArgs([])
         self.assertEqual(cat._getLineLengthPrefix('testtest', 'abcdefghi'), 'testtest[    9] ')
     
     def test_cat__getLineLengthPrefix_string_occupied(self):
         holder.fileLineLengthPlaceHolder = 2
+        holder.setArgs([])
         self.assertEqual(cat._getLineLengthPrefix('prefix', 'abcdefghij'), 'prefix[10] ')
         
     def test_cat__getLineLengthPrefix_bytes_excess(self):
         holder.fileLineLengthPlaceHolder = 5
+        holder.setArgs([])
         self.assertEqual(cat._getLineLengthPrefix('testtest', b'abcdefghi'), 'testtest[    9] ')
     
     def test_cat__getLineLengthPrefix_bytes_occupied(self):
         holder.fileLineLengthPlaceHolder = 2
+        holder.setArgs([])
         self.assertEqual(cat._getLineLengthPrefix('prefix', b'abcdefghij'), 'prefix[10] ')
 
 # python -m unittest discover -s tests -p test*.py

@@ -13,6 +13,7 @@ import cat_win.util.Converter as Converter
 import cat_win.util.Holder as Holder
 import cat_win.util.StdInHelper as StdInHelper
 import cat_win.util.StringFinder as StringFinder
+from cat_win.util.Base64 import decodeBase64, encodeBase64
 from cat_win.util.ArgConstants import *
 from cat_win.util.ColorConstants import C_KW
 from cat_win.util.FileAttributes import getFileMetaData
@@ -127,6 +128,13 @@ def _printMetaAndChecksum(showMeta: bool, showChecksum: bool) -> None:
             _printChecksum(file)
 
 
+def clearColorCodes(line: str) -> str:
+    if not holder.args_id[ARGS_NOCOL]:
+        for key in color_dic.keys():
+            line = line.replace(color_dic[key], '')
+    return line
+
+
 @lru_cache(maxsize=None)
 def _CalculateLinePrefixSpacing(lineCharLength: int,
                                 includeFilePrefix: bool = False, fileCharLength: int = None) -> str:
@@ -160,6 +168,8 @@ def _getLineLengthPrefix(prefix: str, line) -> str:
     line is of type string or bytes.
     returns the new line prefix including the line length.
     """
+    if type(line) == str:
+        line = clearColorCodes(line)
     return _CalculateLineLengthPrefixSpacing(len(str(len(line)))) % (prefix, len(line))
 
 
@@ -236,6 +246,9 @@ def editFile(fileIndex: int = 1) -> None:
             print("Operation failed! Try using the enc=X parameter.")
             return
     
+    if not show_bytecode and holder.args_id[ARGS_B64D]:
+        content = decodeBase64(content)
+    
     if holder.args_id[ARGS_NUMBER]:
         content = [(_getLinePrefix(j, fileIndex), c[1])
                    for j, c in enumerate(content, start=1)]
@@ -288,15 +301,18 @@ def editFile(fileIndex: int = 1) -> None:
         content = [(_getLineLengthPrefix(c[0], c[1]), c[1]) for c in content]
     if show_bytecode:
         content = [(prefix, str(line)) for prefix, line in content]
-    
+    if holder.args_id[ARGS_B64E]:
+        content = [('', clearColorCodes(line)) for _, line in content]
+        content = encodeBase64(content)
+
     printFile(content[:5], show_bytecode)
-    if excludedByPeek:
-        prefix = content[0][0]
-        prefix = prefix.replace(color_dic[C_KW.NUMBER], '')
-        prefix = prefix.replace(color_dic[C_KW.LINE_LENGTH], '')
-        prefix = prefix.replace(color_dic[C_KW.RESET_ALL], '')
-        printExcludedByPeek(excludedByPeek, len(prefix))
     if len(content) > 5:
+        if excludedByPeek:
+            prefix = content[0][0]
+            prefix = prefix.replace(color_dic[C_KW.NUMBER], '')
+            prefix = prefix.replace(color_dic[C_KW.LINE_LENGTH], '')
+            prefix = prefix.replace(color_dic[C_KW.RESET_ALL], '')
+            printExcludedByPeek(excludedByPeek, len(prefix))
         printFile(content[5:], show_bytecode)
 
     if not show_bytecode:
