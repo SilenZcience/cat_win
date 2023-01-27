@@ -70,10 +70,19 @@ class TestCatFull(TestCase):
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
             
-    @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, 'enc=ansi', '-col'])
-    def test_cat_output_full_ANSI(self):
+    @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, 'enc=cp1252', '-col'])
+    def test_cat_output_full_Cp1252(self):
         expected_output = ''
-        with open(test_file_path, 'r', encoding='ansi') as output:
+        with open(test_file_path, 'r', encoding='cp1252') as output:
+            expected_output = output.read() + '\n'
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            cat.main()
+            self.assertEqual(fake_out.getvalue(), expected_output)
+            
+    @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, 'enc=latin_1', '-col'])
+    def test_cat_output_full_Latin1(self):
+        expected_output = ''
+        with open(test_file_path, 'r', encoding='latin_1') as output:
             expected_output = output.read() + '\n'
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
