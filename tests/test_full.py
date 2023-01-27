@@ -1,4 +1,5 @@
 import cat_win.cat as cat
+import cat_win.util.ArgParser as ArgParser
 from unittest.mock import patch
 from unittest import TestCase
 from io import StringIO
@@ -31,6 +32,8 @@ class TestCatFull(TestCase):
     def tearDown(self):
         cat._CalculateLinePrefixSpacing.cache_clear()
         cat._CalculateLineLengthPrefixSpacing.cache_clear()
+        ArgParser.FILE_ENCODING = 'utf-8'
+        ArgParser.FILE_TRUNCATE = [None, None, None]
     
     # no files parsed
     @patch('cat_win.cat.sys.argv', ['<CAT>', '-xn', '-col', '[::-2]', 'enc=utf8'])
@@ -49,7 +52,7 @@ class TestCatFull(TestCase):
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
             
-    @patch('cat_win.cat.sys.argv', ['<CAT>', 'enc:utf-8', test_file_path, '-sb', '[Sample,TEST]', '-col', '-xe'])
+    @patch('cat_win.cat.sys.argv', ['<CAT>', 'enc:UTF-8', test_file_path, '-sb', '[Sample,TEST]', '-col', '-xe'])
     def test_cat_output_full_C(self):
         expected_output = ''
         with open(test_file_dir + 'full_test_result_C.txt', 'r', encoding='utf-8') as output:
@@ -63,6 +66,15 @@ class TestCatFull(TestCase):
         expected_output = ''
         with open(test_file_dir + 'full_test_result_D.txt', 'r', encoding='utf-8') as output:
             expected_output = output.read()
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            cat.main()
+            self.assertEqual(fake_out.getvalue(), expected_output)
+            
+    @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, 'enc=ansi', '-col'])
+    def test_cat_output_full_ANSI(self):
+        expected_output = ''
+        with open(test_file_path, 'r', encoding='ansi') as output:
+            expected_output = output.read() + '\n'
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)

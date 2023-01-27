@@ -3,7 +3,7 @@ from re import match
 from os.path import isfile, realpath, isdir
 from cat_win.util.ArgConstants import *
 
-FILE_ENCODING = None
+FILE_ENCODING = 'utf-8'
 FILE_SEARCH = []
 FILE_MATCH = []
 FILE_TRUNCATE = [None, None, None]
