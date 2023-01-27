@@ -241,7 +241,7 @@ def editFile(fileIndex: int = 1) -> None:
             return
     
     if not show_bytecode and holder.args_id[ARGS_B64D]:
-        content = decodeBase64(content)
+        content = decodeBase64(content, ArgParser.FILE_ENCODING)
     
     if holder.args_id[ARGS_NUMBER]:
         content = [(_getLinePrefix(j, fileIndex), c[1])
@@ -296,7 +296,7 @@ def editFile(fileIndex: int = 1) -> None:
     if show_bytecode:
         content = [(prefix, str(line)) for prefix, line in content]
     if holder.args_id[ARGS_B64E]:
-        content = encodeBase64(content)
+        content = encodeBase64(content, ArgParser.FILE_ENCODING)
 
     printFile(content[:5], show_bytecode)
     if len(content) > 5:
