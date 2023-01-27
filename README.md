@@ -144,7 +144,7 @@ python3 -m cat_win --help
 | --b64e, --b64e         | encode the input to base64                        |
 | --b64d, --b64d         | decode the input from base64                      |
 |                        |                                                   |
-| enc=X                  | set file enconding to X                           |
+| enc=X                  | set file enconding to X (default is utf-8)        |
 | find=X                 | find substring X in the given files               |
 | match=X                | find pattern X in the given files                 |
 | trunc=X:Y              | truncate file to lines X and Y (python-like)      |

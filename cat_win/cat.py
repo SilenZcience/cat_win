@@ -51,7 +51,7 @@ def _showHelp() -> None:
     for x in ALL_ARGS:
         helpMessage += f'\t{f"{x.shortForm}, {x.longForm}": <25}{x.help}\n'
     helpMessage += '\n'
-    helpMessage += f'\t{"enc=X, enc:X"    : <25}set file encoding to X\n'
+    helpMessage += f'\t{"enc=X, enc:X"    : <25}set file encoding to X (default is utf-8)\n'
     helpMessage += f'\t{"find=X, find:X"  : <25}find substring X in the given files\n'
     helpMessage += f'\t{"match=X, match:X": <25}find pattern X in the given files\n'
     helpMessage += f'\t{"trunc=X:Y, trunc:X:Y": <25}truncate file to lines x and y (python-like)\n'
