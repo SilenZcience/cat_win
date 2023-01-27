@@ -10,7 +10,7 @@ class TestArgParser(TestCase):
     
     @staticmethod
     def tearDown():
-        ArgParser.FILE_ENCODING = None
+        ArgParser.FILE_ENCODING = 'utf-8'
         ArgParser.FILE_MATCH = []
         ArgParser.FILE_SEARCH = []
         ArgParser.FILE_TRUNCATE = [None, None, None]
@@ -50,8 +50,8 @@ class TestArgParser(TestCase):
         self.assertCountEqual(unknown_files, [])
         
     def test_getArguments_encoding(self):
-        ArgParser.getArguments(['CAT', 'enc:utf8'])
-        self.assertEqual(ArgParser.FILE_ENCODING, 'utf8')
+        ArgParser.getArguments(['CAT', 'enc:ascii'])
+        self.assertEqual(ArgParser.FILE_ENCODING, 'ascii')
         ArgParser.getArguments(['CAT', 'enc=utf-8'])
         self.assertEqual(ArgParser.FILE_ENCODING, 'utf-8')
         

@@ -226,7 +226,12 @@ def editFile(fileIndex: int = 1) -> None:
     except:
         print("Failed to open:", holder.files[fileIndex-1])
         try:
-            inp = input("Do you want to open the file as a binary, without parameters? [Y/⏎]:")
+            enterChar = '⏎'
+            try:
+                enterChar.encode(ArgParser.FILE_ENCODING)
+            except UnicodeError:
+                enterChar = 'ENTER'
+            inp = input(f"Do you want to open the file as a binary, without parameters? [Y/{enterChar}]:")
             if not 'Y' in inp.upper() and inp:
                 print("Aborting...")
                 return
