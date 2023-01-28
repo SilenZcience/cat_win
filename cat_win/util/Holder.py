@@ -9,11 +9,14 @@ class Holder():
         self.args_id = []
         self.temp_file = None  # if stdin is used, this temp_file will contain the stdin-input
         self.reversed = False
-
+        
+        # the sum of all lines of all files
         self.allFilesLinesSum = 0
-        self.fileLineNumberPlaceHolder = 0
+        # the amount of chars neccessary to display the last file
         self.fileNumberPlaceHolder = 0
-        # the amount of chars neccessary to display the longest line within all files
+        # the amount of chars neccessary to display the last line (breaks on base64 decoding)
+        self.fileLineNumberPlaceHolder = 0
+        # the amount of chars neccessary to display the longest line within all files (breaks on base64 decoding)
         self.fileLineLengthPlaceHolder = 0
 
         self.clipBoard = ""

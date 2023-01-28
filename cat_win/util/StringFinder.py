@@ -3,9 +3,6 @@ from cat_win.util.ColorConstants import C_KW
 
 
 class StringFinder:
-    kw_literals = []
-    kw_regex = []
-
     def __init__(self, literals: list, regex: list) -> None:
         self.kw_literals = literals
         self.kw_regex = regex

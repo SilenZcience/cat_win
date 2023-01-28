@@ -3,12 +3,6 @@ from cat_win.util.ColorConstants import ColoramaOptions, C_KW
 
 
 class Config:
-    configParser = ConfigParser()
-    workingDir = ""
-    configFile = ""
-
-    exclusive_definitions = {'Fore': [C_KW.FOUND],  # can only be Foreground
-                             'Back': [C_KW.MATCHED]}  # can only be Background
     default_dic = {C_KW.NUMBER: ColoramaOptions.C_Fore['GREEN'],
                    C_KW.LINE_LENGTH: ColoramaOptions.C_Fore['LIGHTBLUE_EX'],
                    C_KW.ENDS: ColoramaOptions.C_Back['YELLOW'],
@@ -25,11 +19,15 @@ class Config:
                    C_KW.ATTRIB_NEGATIVE: ColoramaOptions.C_Fore['LIGHTRED_EX'],
                    C_KW.ATTRIB: ColoramaOptions.C_Fore['CYAN']}
     elements = list(default_dic.keys())
-    color_dic = {}
 
     def __init__(self, workingDir) -> None:
         self.workingDir = workingDir
         self.configFile = self.workingDir + "/cat.config"
+        
+        self.exclusive_definitions = {'Fore': [C_KW.FOUND],  # can only be Foreground
+                                      'Back': [C_KW.MATCHED]}  # can only be Background
+        self.configParser = ConfigParser()
+        self.color_dic = {}
 
     def loadConfig(self) -> dict:
         """
