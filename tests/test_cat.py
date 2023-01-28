@@ -12,7 +12,7 @@ test_file_dir = os.path.dirname(__file__) + '/texts/'
 test_file_path = test_file_dir + "test.txt"
 test_file_content = []
 with open(test_file_path, 'r', encoding='utf-8') as f:
-    test_file_content = f.read().splitlines()
+    test_file_content = f.read().split('\n')
 
 
 holder = Holder()

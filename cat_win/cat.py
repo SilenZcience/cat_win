@@ -222,7 +222,7 @@ def editFile(fileIndex: int = 1) -> None:
     content = [('', '')]
     try:
         with open(holder.files[fileIndex-1], 'r', encoding=ArgParser.FILE_ENCODING) as f:
-            content = [('', line) for line in f.read().splitlines()]
+            content = [('', line) for line in f.read().split('\n')]
     except:
         print("Failed to open:", holder.files[fileIndex-1])
         try:
@@ -239,14 +239,16 @@ def editFile(fileIndex: int = 1) -> None:
             pass
         try:
             with open(holder.files[fileIndex-1], 'rb') as f:
-                content = [('', line) for line in f.read().splitlines()]
+                content = [('', line) for line in f.read().split('\n')]
             show_bytecode = True
         except:
             print("Operation failed! Try using the enc=X parameter.")
             return
     
     if not show_bytecode and holder.args_id[ARGS_B64D]:
+        holder.allFilesLinesSum -= len(content)
         content = decodeBase64(content, ArgParser.FILE_ENCODING)
+        holder.allFilesLinesSum += len(content)
     
     if holder.args_id[ARGS_NUMBER]:
         content = [(_getLinePrefix(j, fileIndex), c[1])
