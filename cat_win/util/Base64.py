@@ -1,5 +1,6 @@
 from base64 import b64encode, b64decode
 
+
 def encodeBase64(content: list, encoding: str = 'utf-8') -> list:
     # concatenate all lines and join them with line breaks
     contentLines = list(map(lambda x: x[1], content))
@@ -10,6 +11,7 @@ def encodeBase64(content: list, encoding: str = 'utf-8') -> list:
     encoded_content = base64_bytes.decode(encoding='ascii')
     # return as a single line
     return [('', encoded_content)]
+
 
 def decodeBase64(content: list, encoding: str = 'utf-8') -> list:
     # concatenate all lines and join them
