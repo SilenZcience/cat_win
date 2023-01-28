@@ -11,7 +11,7 @@ from stat import (
     FILE_ATTRIBUTE_COMPRESSED as C,
     FILE_ATTRIBUTE_ENCRYPTED as E
 )
-from cat_win.util.ColorConstants import C_KW
+from cat_win.const.ColorConstants import C_KW
 
 
 def _convert_size(size_bytes: int) -> str:

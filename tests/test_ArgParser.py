@@ -1,5 +1,5 @@
 import cat_win.util.ArgParser as ArgParser
-from cat_win.util.ArgConstants import *
+from cat_win.const.ArgConstants import *
 from unittest import TestCase
 # import sys
 # sys.path.append("../cat_win")

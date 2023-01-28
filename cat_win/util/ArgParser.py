@@ -1,7 +1,8 @@
 from glob import iglob
 from re import match
 from os.path import isfile, realpath, isdir
-from cat_win.util.ArgConstants import *
+from cat_win.const.ArgConstants import *
+
 
 FILE_ENCODING = 'utf-8'
 FILE_SEARCH = []

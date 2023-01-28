@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from cat_win.util.ColorConstants import ColoramaOptions, C_KW
+from cat_win.const.ColorConstants import ColoramaOptions, C_KW
 
 
 class Config:

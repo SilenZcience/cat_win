@@ -1,5 +1,5 @@
 from re import finditer
-from cat_win.util.ColorConstants import C_KW
+from cat_win.const.ColorConstants import C_KW
 
 
 class StringFinder:

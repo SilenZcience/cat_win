@@ -1,5 +1,5 @@
 from requests import get as getRequest
-from cat_win.util.ColorConstants import ColoramaOptions
+from cat_win.const.ColorConstants import ColoramaOptions
 
 
 def getLastestPackageVersion(package: str) -> str:

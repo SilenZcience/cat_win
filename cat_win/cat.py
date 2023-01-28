@@ -14,9 +14,9 @@ import cat_win.util.Holder as Holder
 import cat_win.util.StdInHelper as StdInHelper
 import cat_win.util.StringFinder as StringFinder
 from cat_win.util.Base64 import decodeBase64, encodeBase64
-from cat_win.util.ArgConstants import *
-from cat_win.util.ColorConstants import C_KW
 from cat_win.util.FileAttributes import getFileMetaData
+from cat_win.const.ArgConstants import *
+from cat_win.const.ColorConstants import C_KW
 from cat_win.web.UpdateChecker import printUpdateInformation
 
 from cat_win import __version__, __author__, __sysversion__
