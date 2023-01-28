@@ -51,17 +51,17 @@ class TestConverter(TestCase):
 
     def test_fileNumberPlaceHolder(self):
         holder.setFiles([test_file_edge_case_1] * 9)
-        holder.__calcPlaceHolder__()
+        holder.__calcFileNumberPlaceHolder__()
         self.assertEqual(holder.fileNumberPlaceHolder, 1)
 
         holder.setFiles([test_file_edge_case_1] * 10)
-        holder.__calcPlaceHolder__()
+        holder.__calcFileNumberPlaceHolder__()
         self.assertEqual(holder.fileNumberPlaceHolder, 2)
 
         holder.setFiles([test_file_edge_case_1] * 99)
-        holder.__calcPlaceHolder__()
+        holder.__calcFileNumberPlaceHolder__()
         self.assertEqual(holder.fileNumberPlaceHolder, 2)
 
         holder.setFiles([test_file_edge_case_1] * 100)
-        holder.__calcPlaceHolder__()
+        holder.__calcFileNumberPlaceHolder__()
         self.assertEqual(holder.fileNumberPlaceHolder, 3)

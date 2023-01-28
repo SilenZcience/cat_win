@@ -90,7 +90,7 @@ def _showDebug(args: list, known_files: list, unknown_files: list) -> None:
     """
     print("Debug Information:")
     print("args: ", end="")
-    print(args)
+    print([(arg[0], arg[1], holder.args_id[arg[0]]) for arg in args])
     print("known_files: ", end="")
     print(known_files)
     print("unknown_files: ", end="")
@@ -239,16 +239,14 @@ def editFile(fileIndex: int = 1) -> None:
             pass
         try:
             with open(holder.files[fileIndex-1], 'rb') as f:
-                content = [('', line) for line in f.read().split('\n')]
+                content = [('', line) for line in f.read().splitlines()]
             show_bytecode = True
         except:
             print("Operation failed! Try using the enc=X parameter.")
             return
     
     if not show_bytecode and holder.args_id[ARGS_B64D]:
-        holder.allFilesLinesSum -= len(content)
         content = decodeBase64(content, ArgParser.FILE_ENCODING)
-        holder.allFilesLinesSum += len(content)
     
     if holder.args_id[ARGS_NUMBER]:
         content = [(_getLinePrefix(j, fileIndex), c[1])
@@ -385,7 +383,7 @@ def main():
     if holder.args_id[ARGS_DATA] or holder.args_id[ARGS_CHECKSUM]:
         _printMetaAndChecksum(holder.args_id[ARGS_DATA], holder.args_id[ARGS_CHECKSUM])
     else:
-        holder.generateValues()
+        holder.generateValues(ArgParser.FILE_ENCODING)
 
         try:
             editFiles()  # print the cat-output
@@ -395,8 +393,11 @@ def main():
             sys.exit(1)  # Python exits with error code 1 on EPIPE
 
     # clean-up
-    if temp_file and os.path.exists(temp_file):
-        os.remove(temp_file)
+    for tmp_file in holder.getTmpFiles():
+        if tmp_file and os.path.exists(tmp_file):
+            if holder.args_id[ARGS_DEBUG]:
+                print('cleaning ', tmp_file)
+            os.remove(tmp_file)
 
 
 if __name__ == "__main__":

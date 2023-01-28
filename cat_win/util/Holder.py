@@ -5,15 +5,16 @@ from heapq import nlargest
 class Holder():
     def __init__(self) -> None:
         self.files = []  # all files, including tmp-file from stdin
+        self.inner_files = []
         self.args = []  # list of all used parameters: format [[id, param]]
         self.args_id = []
         self.temp_file = None  # if stdin is used, this temp_file will contain the stdin-input
         self.reversed = False
         
-        # the sum of all lines of all files
-        self.allFilesLinesSum = 0
         # the amount of chars neccessary to display the last file
         self.fileNumberPlaceHolder = 0
+        # the sum of all lines of all files
+        self.allFilesLinesSum = 0
         # the amount of chars neccessary to display the last line (breaks on base64 decoding)
         self.fileLineNumberPlaceHolder = 0
         # the amount of chars neccessary to display the longest line within all files (breaks on base64 decoding)
@@ -22,7 +23,8 @@ class Holder():
         self.clipBoard = ""
     
     def setFiles(self, files: list) -> None:
-        self.files = files
+        self.files = files[:]
+        self.inner_files = files[:]
 
     def setArgs(self, args: list) -> None:
         self.args = args
@@ -31,13 +33,24 @@ class Holder():
             self.args_id[id] = True
         if self.args_id[ARGS_B64E]:
             self.args_id[ARGS_NOCOL] = True
-        self.reversed = ARGS_REVERSE in self.args_id
+            self.args_id[ARGS_LLENGTH] = False
+            self.args_id[ARGS_NUMBER] = False
+        self.reversed = self.args_id[ARGS_REVERSE]
 
     def setTempFile(self, file: str) -> None:
         self.temp_file = file
 
     def getAppliedFiles(self) -> list:
         return ["<STDIN>" if f == self.temp_file else f for f in self.files]
+    
+    def getTmpFiles(self) -> list:
+        tmpFiles = [self.temp_file]
+        if self.args_id[ARGS_B64D]:
+            tmpFiles += self.inner_files
+        return tmpFiles
+    
+    def __calcFileNumberPlaceHolder__(self) -> None:
+        self.fileNumberPlaceHolder = len(str(len(self.files)))
 
     def __count_generator__(self, reader) -> bytes:
         b = reader(1024 * 1024)
@@ -52,10 +65,9 @@ class Holder():
         return linesSum
 
     def __calcPlaceHolder__(self) -> None:
-        fileLines = [self.__getFileLinesSum__(file) for file in self.files]
+        fileLines = [self.__getFileLinesSum__(file) for file in self.inner_files]
         self.allFilesLinesSum = sum(fileLines)
         self.fileLineNumberPlaceHolder = len(str(max(fileLines)))
-        self.fileNumberPlaceHolder = len(str(len(self.files)))
 
     def __calcMaxLine__(self, file: str) -> int:
         heap = []
@@ -73,8 +85,18 @@ class Holder():
 
     def __calcfileLineLengthPlaceHolder__(self) -> None:
         self.fileLineLengthPlaceHolder = max(self.__calcMaxLine__(file)
-                                             for file in self.files)
+                                             for file in self.inner_files)
 
-    def generateValues(self) -> None:
+    def generateValues(self, encoding: str) -> None:
+        self.__calcFileNumberPlaceHolder__()
+        if self.args_id[ARGS_B64D]:
+            from tempfile import NamedTemporaryFile
+            from cat_win.util.Base64 import _decodeBase64
+            for i in range(len(self.files)):
+                tmp_file = NamedTemporaryFile(delete=False).name
+                with open(self.inner_files[i], 'r', encoding=encoding) as fp:
+                    with open(tmp_file, 'w', encoding=encoding) as f:
+                        f.write(_decodeBase64(fp.read(), encoding))
+                self.inner_files[i] = tmp_file
         self.__calcPlaceHolder__()
         self.__calcfileLineLengthPlaceHolder__()
