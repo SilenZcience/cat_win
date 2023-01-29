@@ -223,7 +223,10 @@ def editFile(fileIndex: int = 1) -> None:
     content = [('', '')]
     try:
         with open(holder.files[fileIndex-1], 'r', encoding=ArgParser.FILE_ENCODING) as f:
-            content = [('', line) for line in f.read().split('\n')]
+            # splitlines() gives a slight inaccuracy, in case the last line is empty.
+            # the alternative would be worse: split('\n') would increase the linecount each
+            # time cat touches a file.
+            content = [('', line) for line in f.read().splitlines()]
     except:
         print("Failed to open:", holder.files[fileIndex-1])
         try:
@@ -240,6 +243,7 @@ def editFile(fileIndex: int = 1) -> None:
             pass
         try:
             with open(holder.files[fileIndex-1], 'rb') as f:
+                # in binary splitlines() is our only option
                 content = [('', line) for line in f.read().splitlines()]
             show_bytecode = True
         except:
@@ -405,4 +409,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-# pyinstaller cat.py --onefile --clean --dist ../bin --version-file ../exeVersion
+# pyinstaller cat.py --onefile --clean --dist ../bin --version-file ../exeVersionFile
