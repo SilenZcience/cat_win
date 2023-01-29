@@ -5,7 +5,7 @@ from heapq import nlargest
 class Holder():
     def __init__(self) -> None:
         self.files = []  # all files, including tmp-file from stdin
-        self.inner_files = []
+        self._inner_files = []
         self.args = []  # list of all used parameters: format [[id, param]]
         self.args_id = []
         self.temp_file = None  # if stdin is used, this temp_file will contain the stdin-input
@@ -24,7 +24,7 @@ class Holder():
     
     def setFiles(self, files: list) -> None:
         self.files = files[:]
-        self.inner_files = files[:]
+        self._inner_files = files[:]
 
     def setArgs(self, args: list) -> None:
         self.args = args
@@ -43,12 +43,6 @@ class Holder():
     def getAppliedFiles(self) -> list:
         return ["<STDIN>" if f == self.temp_file else f for f in self.files]
     
-    def getTmpFiles(self) -> list:
-        tmpFiles = [self.temp_file]
-        if self.args_id[ARGS_B64D]:
-            tmpFiles += self.inner_files
-        return tmpFiles
-    
     def __calcFileNumberPlaceHolder__(self) -> None:
         self.fileNumberPlaceHolder = len(str(len(self.files)))
 
@@ -65,7 +59,7 @@ class Holder():
         return linesSum
 
     def __calcPlaceHolder__(self) -> None:
-        fileLines = [self.__getFileLinesSum__(file) for file in self.inner_files]
+        fileLines = [self.__getFileLinesSum__(file) for file in self._inner_files]
         self.allFilesLinesSum = sum(fileLines)
         self.fileLineNumberPlaceHolder = len(str(max(fileLines)))
 
@@ -85,18 +79,18 @@ class Holder():
 
     def __calcfileLineLengthPlaceHolder__(self) -> None:
         self.fileLineLengthPlaceHolder = max(self.__calcMaxLine__(file)
-                                             for file in self.inner_files)
+                                             for file in self._inner_files)
+        
+    def setDecodingTempFiles(self, temp_files: list) -> None:
+        self._inner_files = temp_files[:]
 
     def generateValues(self, encoding: str) -> None:
         self.__calcFileNumberPlaceHolder__()
         if self.args_id[ARGS_B64D]:
-            from tempfile import NamedTemporaryFile
             from cat_win.util.Base64 import _decodeBase64
-            for i in range(len(self.files)):
-                tmp_file = NamedTemporaryFile(delete=False).name
-                with open(self.inner_files[i], 'r', encoding=encoding) as fp:
-                    with open(tmp_file, 'w', encoding=encoding) as f:
+            for i, file in enumerate(self.files):
+                with open(file, 'r', encoding=encoding) as fp:
+                    with open(self._inner_files[i], 'w', encoding='ascii') as f:
                         f.write(_decodeBase64(fp.read(), encoding))
-                self.inner_files[i] = tmp_file
         self.__calcPlaceHolder__()
         self.__calcfileLineLengthPlaceHolder__()
