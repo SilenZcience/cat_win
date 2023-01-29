@@ -13,6 +13,7 @@ import cat_win.util.Converter as Converter
 import cat_win.util.Holder as Holder
 import cat_win.util.StdInHelper as StdInHelper
 import cat_win.util.StringFinder as StringFinder
+import cat_win.util.TmpFileHelper as TmpFileHelper
 from cat_win.util.Base64 import decodeBase64, encodeBase64
 from cat_win.util.FileAttributes import getFileMetaData
 from cat_win.const.ArgConstants import *
@@ -29,7 +30,7 @@ color_dic = config.loadConfig()
 
 converter = Converter.Converter()
 holder = Holder.Holder()
-
+tmpFileHelper = TmpFileHelper.TmpFileHelper()
 
 def exception_handler(exception_type: type, exception, traceback, debug_hook=sys.excepthook) -> None:
     print(color_dic[C_KW.RESET_ALL])
@@ -362,7 +363,7 @@ def main():
         return
     if holder.args_id[ARGS_INTERACTIVE]:
         piped_input = StdInHelper.getStdInContent(holder.args_id[ARGS_ONELINE])
-        temp_file = StdInHelper.writeTemp(piped_input, ArgParser.FILE_ENCODING)
+        temp_file = StdInHelper.writeTemp(piped_input, tmpFileHelper.generateTempFileName(), ArgParser.FILE_ENCODING)
         known_files.append(temp_file)
         StdInHelper.writeFiles(unknown_files, piped_input, ArgParser.FILE_ENCODING)
         holder.setTempFile(temp_file)
@@ -383,6 +384,8 @@ def main():
     if holder.args_id[ARGS_DATA] or holder.args_id[ARGS_CHECKSUM]:
         _printMetaAndChecksum(holder.args_id[ARGS_DATA], holder.args_id[ARGS_CHECKSUM])
     else:
+        if holder.args_id[ARGS_B64D]:
+            holder.setDecodingTempFiles([tmpFileHelper.generateTempFileName() for _ in holder.files])
         holder.generateValues(ArgParser.FILE_ENCODING)
 
         try:
@@ -393,7 +396,7 @@ def main():
             sys.exit(1)  # Python exits with error code 1 on EPIPE
 
     # clean-up
-    for tmp_file in holder.getTmpFiles():
+    for tmp_file in tmpFileHelper.getGeneratedTempFiles():
         if tmp_file and os.path.exists(tmp_file):
             if holder.args_id[ARGS_DEBUG]:
                 print('cleaning ', tmp_file)
@@ -402,4 +405,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-# pyinstaller cat.py --onefile --clean --dist ../bin
+# pyinstaller cat.py --onefile --clean --dist ../bin --version-file ../exeVersion

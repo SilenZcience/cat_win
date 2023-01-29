@@ -1,13 +1,11 @@
 from sys import stdin
-from tempfile import NamedTemporaryFile
 
 
-def writeTemp(content: str, file_encoding: str) -> str:
+def writeTemp(content: str, tmp_file: str, file_encoding: str) -> str:
     """
     Writes content into a generated temp-file and
     returns the path in type String.
     """
-    tmp_file = NamedTemporaryFile(delete=False).name
     with open(tmp_file, 'w', encoding=file_encoding) as f:
         f.write(content)
     return tmp_file
