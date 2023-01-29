@@ -40,8 +40,7 @@ class TestCat(TestCase):
         holder.setFiles([test_file_path, test_file_path, test_file_path])
         holder.setArgs([])
 
-        check_against = ("\n".join(test_file_content) +
-                         "\n") * 3
+        check_against = "\n".join(test_file_content * 3) + '\n'
 
         with patch('sys.stdout', new=StringIO()) as fake_out:
             cat.editFiles()
@@ -53,8 +52,7 @@ class TestCat(TestCase):
 
         check_against = test_file_content
         check_against.reverse()
-        check_against = ("\n".join(check_against) +
-                         "\n")
+        check_against = "\n".join(check_against) + "\n"
 
         with patch('sys.stdout', new=StringIO()) as fake_out:
             cat.editFiles()
