@@ -28,6 +28,9 @@ dynamic = [
     "description"
 ]
 
+[tool.flit.sdist]
+exclude = 	["cat_win/build", "**/**.spec", "**/**.txt"]
+
 [project.scripts]
 cat = "cat_win.cat:main"
 
