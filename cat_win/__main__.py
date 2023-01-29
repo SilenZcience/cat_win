@@ -8,6 +8,8 @@ except:
     print("an error occured while loading the module")
     exit(1)
 
+def entry_point():
+    cat.main()
 
 if __name__ == '__main__':
-    cat.main()
+    entry_point()
