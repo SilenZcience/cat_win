@@ -7,7 +7,7 @@ class Holder():
         self.files = []  # all files, including tmp-file from stdin
         self._inner_files = []
         self.args = []  # list of all used parameters: format [[id, param]]
-        self.args_id = []
+        self.args_id = [False] * (HIGHEST_ARG_ID + 1)
         self.temp_file = None  # if stdin is used, this temp_file will contain the stdin-input
         self.reversed = False
         
@@ -28,7 +28,6 @@ class Holder():
 
     def setArgs(self, args: list) -> None:
         self.args = args
-        self.args_id = [False] * (HIGHEST_ARG_ID + 1)
         for id, _ in self.args:
             self.args_id[id] = True
         if self.args_id[ARGS_B64E]:

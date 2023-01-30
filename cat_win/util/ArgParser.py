@@ -53,7 +53,7 @@ def __addArgument__(args: list, known_files: list, unknown_files: list, param: s
 
     possible_path = realpath(param)
     if match(r".*\*+.*", param):
-        for filename in iglob("./" + param, recursive=True):
+        for filename in iglob(param, recursive=True):
             if isfile(filename):
                 known_files.append(realpath(filename))
     elif isdir(possible_path):
