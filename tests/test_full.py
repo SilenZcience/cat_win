@@ -34,6 +34,8 @@ class TestCatFull(TestCase):
         cat._CalculateLineLengthPrefixSpacing.cache_clear()
         ArgParser.FILE_ENCODING = 'utf-8'
         ArgParser.FILE_TRUNCATE = [None, None, None]
+        for i in range(len(cat.holder.args_id)):
+            cat.holder.args_id[i] = False
     
     # no files parsed
     @patch('cat_win.cat.sys.argv', ['<CAT>', '-xn', '-col', '[::-2]', 'enc=utf8'])
