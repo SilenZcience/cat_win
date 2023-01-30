@@ -401,10 +401,13 @@ def main():
 
     # clean-up
     for tmp_file in tmpFileHelper.getGeneratedTempFiles():
-        if tmp_file and os.path.exists(tmp_file):
-            if holder.args_id[ARGS_DEBUG]:
-                print('cleaning ', tmp_file)
+        if holder.args_id[ARGS_DEBUG]:
+            print('Cleaning', tmp_file)
+        try:
             os.remove(tmp_file)
+        except FileNotFoundError:
+            if holder.args_id[ARGS_DEBUG]:
+                print('FileNotFoundError', tmp_file)
 
 
 if __name__ == "__main__":
