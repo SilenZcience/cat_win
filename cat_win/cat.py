@@ -169,6 +169,8 @@ def _getLineLengthPrefix(prefix: str, line) -> str:
 
 
 def printFile(content: list, bytecode: bool) -> None:
+    if not content:
+        return
     if not (ArgParser.FILE_SEARCH or ArgParser.FILE_MATCH) or bytecode:
         print(*[prefix + line for prefix, line in content], sep="\n")
         return
@@ -204,11 +206,16 @@ def printFile(content: list, bytecode: bool) -> None:
                 pass
 
 
-def printExcludedByPeek(excludedByPeek: int, prefixLenght: int) -> None:
-    if not excludedByPeek:
+def printExcludedByPeek(content: list, excludedByPeek: int) -> None:
+    if not excludedByPeek or len(content) <= 5:
         return
+    excludedByPeek = excludedByPeek + 10 - len(content)
+    prefix = content[0][0]
+    prefix = prefix.replace(color_dic[C_KW.NUMBER], '')
+    prefix = prefix.replace(color_dic[C_KW.LINE_LENGTH], '')
+    prefix = prefix.replace(color_dic[C_KW.RESET_ALL], '')
     excludedByPeekLength = (len(str(excludedByPeek))-1)//2
-    excludedByPeekIndent = " " * (prefixLenght - excludedByPeekLength + 10)
+    excludedByPeekIndent = " " * (len(prefix) - excludedByPeekLength + 10)
     excludedByPeekIndentAdd = " " * excludedByPeekLength
     print(color_dic[C_KW.NUMBER], end="")
     print(excludedByPeekIndent, excludedByPeekIndentAdd, " •", sep="")
@@ -309,14 +316,8 @@ def editFile(fileIndex: int = 1) -> None:
         content = encodeBase64(content, ArgParser.FILE_ENCODING)
 
     printFile(content[:5], show_bytecode)
-    if len(content) > 5:
-        if excludedByPeek:
-            prefix = content[0][0]
-            prefix = prefix.replace(color_dic[C_KW.NUMBER], '')
-            prefix = prefix.replace(color_dic[C_KW.LINE_LENGTH], '')
-            prefix = prefix.replace(color_dic[C_KW.RESET_ALL], '')
-            printExcludedByPeek(excludedByPeek, len(prefix))
-        printFile(content[5:], show_bytecode)
+    printExcludedByPeek(content, excludedByPeek)
+    printFile(content[5:], show_bytecode)
 
     if not show_bytecode:
         if holder.args_id[ARGS_CLIP]:
