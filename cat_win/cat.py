@@ -315,9 +315,9 @@ def editFile(fileIndex: int = 1) -> None:
     if holder.args_id[ARGS_B64E]:
         content = encodeBase64(content, ArgParser.FILE_ENCODING)
 
-    printFile(content[:5], show_bytecode)
+    printFile(content[:len(content)//2], show_bytecode)
     printExcludedByPeek(content, excludedByPeek)
-    printFile(content[5:], show_bytecode)
+    printFile(content[len(content)//2:], show_bytecode)
 
     if not show_bytecode:
         if holder.args_id[ARGS_CLIP]:
