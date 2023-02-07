@@ -11,7 +11,6 @@ from stat import (
     FILE_ATTRIBUTE_COMPRESSED as C,
     FILE_ATTRIBUTE_ENCRYPTED as E
 )
-from cat_win.const.ColorConstants import C_KW
 
 
 def _convert_size(size_bytes: int) -> str:
@@ -48,35 +47,34 @@ def read_attribs(file: str) -> list:
     )
 
 
-def getFileMetaData(file: str, colors: dict) -> str:
+def getFileMetaData(file: str, colors: list) -> str:
     """
     Takes a file and returns a string representation
     containing file size, creation/modified/accessed time.
     On Windows OS also return the file attributes.
+    colors: [RESET_ALL, ATTRIB, +ATTRIB, -ATTRIB]
     """
     try:
         stats = stat(file)
         
-        metaData = colors[C_KW.ATTRIB] + file + '\n'
+        metaData = colors[1] + file + colors[0] + '\n'
         
-        metaData += f'{"Size:" : <16}{_convert_size(stats.st_size)}\n'
-        metaData += f'{"ATime:": <16}{datetime.fromtimestamp(stats.st_atime)}\n'
-        metaData += f'{"MTime:": <16}{datetime.fromtimestamp(stats.st_mtime)}\n'
-        metaData += f'{"CTime:": <16}{datetime.fromtimestamp(stats.st_ctime)}\n'
-
-        metaData += colors[C_KW.RESET_ALL]
+        metaData += f'{colors[1]}{"Size:" : <16}{_convert_size(stats.st_size)}{colors[0]}\n'
+        metaData += f'{colors[1]}{"ATime:": <16}{datetime.fromtimestamp(stats.st_atime)}{colors[0]}\n'
+        metaData += f'{colors[1]}{"MTime:": <16}{datetime.fromtimestamp(stats.st_mtime)}{colors[0]}\n'
+        metaData += f'{colors[1]}{"CTime:": <16}{datetime.fromtimestamp(stats.st_ctime)}{colors[0]}\n'
         
         if system() != "Windows":
             metaData += '\n'
             return metaData
         
         attribs = read_attribs(file)
-        metaData += colors[C_KW.ATTRIB_POSITIVE]
+        metaData += colors[2]
         metaData += "+" + ", ".join([x for x, y in attribs if y])
-        metaData += colors[C_KW.RESET_ALL] + '\n'
-        metaData += colors[C_KW.ATTRIB_NEGATIVE]
+        metaData += colors[0] + '\n'
+        metaData += colors[3]
         metaData += "-" + ", ".join([x for x, y in attribs if not y])
-        metaData += colors[C_KW.RESET_ALL] + '\n'
+        metaData += colors[0] + '\n'
         return metaData
     except OSError:
         pass
