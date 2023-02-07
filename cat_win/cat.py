@@ -107,10 +107,10 @@ def _showDebug(args: list, known_files: list, unknown_files: list) -> None:
 
 
 def _printMeta(file: str) -> None:
-    metaData = getFileMetaData(file, {C_KW.RESET_ALL: color_dic[C_KW.RESET_ALL],
-                                      C_KW.ATTRIB: color_dic[C_KW.ATTRIB],
-                                      C_KW.ATTRIB_POSITIVE: color_dic[C_KW.ATTRIB_POSITIVE],
-                                      C_KW.ATTRIB_NEGATIVE: color_dic[C_KW.ATTRIB_NEGATIVE]})
+    metaData = getFileMetaData(file, [color_dic[C_KW.RESET_ALL],
+                                      color_dic[C_KW.ATTRIB],
+                                      color_dic[C_KW.ATTRIB_POSITIVE],
+                                      color_dic[C_KW.ATTRIB_NEGATIVE]])
     print(metaData)
 
 
@@ -132,13 +132,13 @@ def _printMetaAndChecksum(showMeta: bool, showChecksum: bool) -> None:
 @lru_cache(maxsize=None)
 def _CalculateLinePrefixSpacing(lineCharLength: int,
                                 includeFilePrefix: bool = False, fileCharLength: int = None) -> str:
-    line_prefix = (" " * (holder.fileLineNumberPlaceHolder - lineCharLength)) + "%i) "
+    line_prefix = (" " * (holder.fileLineNumberPlaceHolder - lineCharLength)) + "%i)"
 
     if includeFilePrefix:
         file_prefix = (" " * (holder.fileNumberPlaceHolder - fileCharLength)) + "%i."
-        return color_dic[C_KW.NUMBER] + file_prefix + line_prefix + color_dic[C_KW.RESET_ALL]
+        return color_dic[C_KW.NUMBER] + file_prefix + line_prefix + color_dic[C_KW.RESET_ALL] + ' '
 
-    return color_dic[C_KW.NUMBER] + line_prefix + color_dic[C_KW.RESET_ALL]
+    return color_dic[C_KW.NUMBER] + line_prefix + color_dic[C_KW.RESET_ALL] + ' '
 
 
 def _getLinePrefix(line_num: int, index: int) -> str:
@@ -152,8 +152,8 @@ def _getLinePrefix(line_num: int, index: int) -> str:
 
 @lru_cache(maxsize=None)
 def _CalculateLineLengthPrefixSpacing(lineCharLength: int) -> str:
-    lengthPrefix = '[' + ' ' * (holder.fileLineLengthPlaceHolder - lineCharLength) + '%i] '
-    return '%s' + color_dic[C_KW.LINE_LENGTH] + lengthPrefix + color_dic[C_KW.RESET_ALL]
+    lengthPrefix = '[' + ' ' * (holder.fileLineLengthPlaceHolder - lineCharLength) + '%i]'
+    return '%s' + color_dic[C_KW.LINE_LENGTH] + lengthPrefix + color_dic[C_KW.RESET_ALL] + ' '
 
 
 def _getLineLengthPrefix(prefix: str, line) -> str:
