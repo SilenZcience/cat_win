@@ -59,6 +59,9 @@
 
 ## About The Project
 
+![Unittests](https://github.com/SilenZcience/cat_win/actions/workflows/unit_test.yml/badge.svg)
+![Build and Check](https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml/badge.svg)
+
 This project copies the fundamental framework of the cat command-line tool from linux and translates its features to an OS Independent file.
 
 Additionally it includes the feature to strip and reverse the content of any given file, make use of the standard-input, which enables cat piping into each other, generating the checksum of any file, and even convert decimal, hexadecimal and binary numbers within any text.
