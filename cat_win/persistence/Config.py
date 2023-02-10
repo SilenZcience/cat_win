@@ -42,9 +42,10 @@ class Config:
                     type, color = configColors[element].split(".")
                     self.color_dic[element] = (
                         ColoramaOptions.C_Fore[color] if type == 'Fore' else ColoramaOptions.C_Back[color])
-                except:
+                except KeyError:
                     self.color_dic[element] = self.default_dic[element]
-        except:
+        except KeyError:
+            self.configParser['COLORS'] = {}
             # If an error occures we simplfy use the default colors
             self.color_dic = self.default_dic
 

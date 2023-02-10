@@ -8,8 +8,7 @@ from unittest import TestCase
 class TestArgParser(TestCase):
     maxDiff = None
     
-    @staticmethod
-    def tearDown():
+    def tearDown(self):
         ArgParser.FILE_ENCODING = 'utf-8'
         ArgParser.FILE_MATCH = []
         ArgParser.FILE_SEARCH = []
