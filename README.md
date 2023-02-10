@@ -1,7 +1,7 @@
 <div id="top"></div>
 
 <p>
-   <a href="https://pypi.org/project/cat-win/" alt="Downloads">
+   <a href="https://pepy.tech/project/cat-win" alt="Downloads">
       <img src="https://static.pepy.tech/personalized-badge/cat-win?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Downloads" align="right">
    </a>
    <a href="https://pypi.org/project/cat-win/" alt="Visitors">
@@ -59,15 +59,15 @@
 
 ## About The Project
 
-![Unittests](https://github.com/SilenZcience/cat_win/actions/workflows/unit_test.yml/badge.svg)
-![Build and Check](https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml/badge.svg)
+[![Unittests]](https://github.com/SilenZcience/cat_win/actions/workflows/unit_test.yml)
+[![Build-and-Check]](https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml)
 
-This project copies the fundamental framework of the cat command-line tool from linux and translates its features to an OS Independent file.
+This project copies the fundamental framework of the cat command-line tool from Linux and translates its features to an OS Independent program using Python.
 
-Additionally it includes the feature to strip and reverse the content of any given file, make use of the standard-input, which enables cat piping into each other, generating the checksum of any file, and even convert decimal, hexadecimal and binary numbers within any text.
+Additionally it includes the feature to strip and reverse the content of any given file, make use of the standard-input, which enables cat piping into each other, generating the checksum of any file, converting decimal, hexadecimal and binary numbers within any text, and much <a href="#usage">more</a> ...
 
 ### Made With
-[![Python][MadeWith-Python]](https://www.python.org/)
+[![MadeWith-Python]](https://www.python.org/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -116,19 +116,19 @@ python3 -m cat_win --help
 | Argument               | Description                                       |
 |------------------------|---------------------------------------------------|
 | -n, --number           | number all output lines                           |
-| -x, --linelength       | display the length of each line                   |
+| -l, --linelength       | display the length of each line                   |
 | -e, --ends             | display $ at the end of each line                 |
 | -t, --tabs             | display TAB characters as ^I                      |
 | --eof, --eof           | display EOF characters as ^EOF                    |
-| -s, --squeeze          | suppress repeated output lines                    |
+| -u, --unique           | suppress repeated output lines                    |
 | -r, --reverse          | reverse output                                    |
-| -c, --count            | show sum of lines                                 |
+| -s, --sum              | show sum of lines                                 |
 | -b, --blank            | hide empty lines                                  |
 | -f, --files            | list applied files                                |
 | -i, --interactive      | use stdin                                         |
 | -o, --oneline          | take only the first stdin-line                    |
 | -p, --peek             | only print the first and last lines               |
-| -l, --clip             | copy output to clipboard                          |
+| -c, --clip             | copy output to clipboard                          |
 | -m, --checksum         | show the checksums of all files                   |
 | -a, --attributes       | show meta-information about the files             |
 
@@ -141,7 +141,7 @@ python3 -m cat_win --help
 | -hex, --hex            | convert hexadecimal numbers to decimal and binary |
 | -bin, --bin            | convert binary numbers to decimal and hexadecimal |
 |                        |                                                   |
-| -col, --nocolor        | disable colored output                            |
+| --nc, --nocolor        | disable colored output                            |
 | --config, --config     | change color configuration                        |
 |                        |                                                   |
 | --b64e, --b64e         | encode the input to base64                        |
@@ -187,6 +187,9 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 [OS-Windows]: https://svgshare.com/i/ZhY.svg
 [OS-Linux]: https://svgshare.com/i/Zhy.svg
 [OS-MacOS]: https://svgshare.com/i/ZjP.svg
+
+[Unittests]: https://github.com/SilenZcience/cat_win/actions/workflows/unit_test.yml/badge.svg
+[Build-and-Check]: https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml/badge.svg
 
 [MadeWith-Python]: https://img.shields.io/badge/Made%20with-Python-brightgreen
 
