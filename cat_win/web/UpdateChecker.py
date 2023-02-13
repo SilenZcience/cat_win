@@ -1,5 +1,5 @@
 from requests import get as getRequest
-from cat_win.const.ColorConstants import ColoramaOptions
+from cat_win.const.ColorConstants import ColorOptions
 
 
 def getLastestPackageVersion(package: str) -> str:
@@ -19,8 +19,8 @@ def newVersionAvailable(currentVersion: str, latestVersion: str) -> bool:
 def printUpdateInformation(package: str, currentVersion: str):
     latestVersion = getLastestPackageVersion(package)
     if newVersionAvailable(currentVersion, latestVersion):
-        print(ColoramaOptions.C_Fore['YELLOW'])
+        print(ColorOptions.Fore['YELLOW'])
         print(f"A new release of {package} is available: {latestVersion}")
         print("To update, run:")
         print(f"python -m pip install --upgrade {package}")
-        print(ColoramaOptions.C_Style_Reset)
+        print(ColorOptions.Style['RESET'])

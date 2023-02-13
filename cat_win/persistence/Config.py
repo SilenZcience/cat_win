@@ -1,23 +1,23 @@
 from configparser import ConfigParser
-from cat_win.const.ColorConstants import ColoramaOptions, C_KW
+from cat_win.const.ColorConstants import ColorOptions, C_KW
 
 
 class Config:
-    default_dic = {C_KW.NUMBER: ColoramaOptions.C_Fore['GREEN'],
-                   C_KW.LINE_LENGTH: ColoramaOptions.C_Fore['LIGHTBLUE_EX'],
-                   C_KW.ENDS: ColoramaOptions.C_Back['YELLOW'],
-                   C_KW.TABS: ColoramaOptions.C_Back['YELLOW'],
-                   C_KW.CONVERSION: ColoramaOptions.C_Fore['CYAN'],
-                   C_KW.REPLACE: ColoramaOptions.C_Fore['YELLOW'],
-                   C_KW.FOUND: ColoramaOptions.C_Fore['RED'],
-                   C_KW.FOUND_MESSAGE: ColoramaOptions.C_Fore['MAGENTA'],
-                   C_KW.MATCHED: ColoramaOptions.C_Back['CYAN'],
-                   C_KW.MATCHED_MESSAGE: ColoramaOptions.C_Fore['LIGHTCYAN_EX'],
-                   C_KW.CHECKSUM: ColoramaOptions.C_Fore['CYAN'],
-                   C_KW.COUNT_AND_FILES: ColoramaOptions.C_Fore['CYAN'],
-                   C_KW.ATTRIB_POSITIVE: ColoramaOptions.C_Fore['LIGHTGREEN_EX'],
-                   C_KW.ATTRIB_NEGATIVE: ColoramaOptions.C_Fore['LIGHTRED_EX'],
-                   C_KW.ATTRIB: ColoramaOptions.C_Fore['CYAN']}
+    default_dic = {C_KW.NUMBER: ColorOptions.Fore['GREEN'],
+                   C_KW.LINE_LENGTH: ColorOptions.Fore['LIGHTBLUE'],
+                   C_KW.ENDS: ColorOptions.Back['YELLOW'],
+                   C_KW.TABS: ColorOptions.Back['YELLOW'],
+                   C_KW.CONVERSION: ColorOptions.Fore['CYAN'],
+                   C_KW.REPLACE: ColorOptions.Fore['YELLOW'],
+                   C_KW.FOUND: ColorOptions.Fore['RED'],
+                   C_KW.FOUND_MESSAGE: ColorOptions.Fore['MAGENTA'],
+                   C_KW.MATCHED: ColorOptions.Back['CYAN'],
+                   C_KW.MATCHED_MESSAGE: ColorOptions.Fore['LIGHTCYAN'],
+                   C_KW.CHECKSUM: ColorOptions.Fore['CYAN'],
+                   C_KW.COUNT_AND_FILES: ColorOptions.Fore['CYAN'],
+                   C_KW.ATTRIB_POSITIVE: ColorOptions.Fore['LIGHTGREEN'],
+                   C_KW.ATTRIB_NEGATIVE: ColorOptions.Fore['LIGHTRED'],
+                   C_KW.ATTRIB: ColorOptions.Fore['CYAN']}
     elements = list(default_dic.keys())
 
     def __init__(self, workingDir) -> None:
@@ -41,7 +41,7 @@ class Config:
                 try:
                     type, color = configColors[element].split(".")
                     self.color_dic[element] = (
-                        ColoramaOptions.C_Fore[color] if type == 'Fore' else ColoramaOptions.C_Back[color])
+                        ColorOptions.Fore[color] if type == 'Fore' else ColorOptions.Back[color])
                 except KeyError:
                     self.color_dic[element] = self.default_dic[element]
         except KeyError:
@@ -50,35 +50,39 @@ class Config:
             self.color_dic = self.default_dic
 
         # The Reset Codes should always be the same
-        self.color_dic[C_KW.RESET_ALL] = ColoramaOptions.C_Style_Reset
-        self.color_dic[C_KW.RESET_FOUND] = ColoramaOptions.C_Fore_Reset
-        self.color_dic[C_KW.RESET_MATCHED] = ColoramaOptions.C_Back_Reset
+        self.color_dic[C_KW.RESET_ALL] = ColorOptions.Style['RESET']
+        self.color_dic[C_KW.RESET_FOUND] = ColorOptions.Fore['RESET']
+        self.color_dic[C_KW.RESET_MATCHED] = ColorOptions.Back['RESET']
 
         return self.color_dic
 
     def _printGetAllAvailableColors(self) -> list:
         options = []
-        index = 0
+        index = 1
         print("Here is a list of all available color options you may choose:")
-        for key, value in ColoramaOptions.C_Fore.items():
+        for key, value in ColorOptions.Fore.items():
+            if key == 'RESET':
+                continue
             option = "Fore." + key
             print(f"{index: <2}: ", value, option,
-                  ColoramaOptions.C_Fore_Reset, sep="")
+                  ColorOptions.Fore['RESET'], sep="")
             options.append(option)
             index += 1
-        for key, value in ColoramaOptions.C_Back.items():
+        for key, value in ColorOptions.Back.items():
+            if key == 'RESET':
+                continue
             option = "Back." + key
             print(f"{index: <2}: ", value, option,
-                  ColoramaOptions.C_Back_Reset, sep="")
+                  ColorOptions.Back['RESET'], sep="")
             options.append(option)
             index += 1
         return options
 
     def _printAllAvailableElements(self) -> None:
         print("Here is a list of all available elements you may change:")
-        for index, element in enumerate(self.elements):
+        for index, element in enumerate(self.elements, start=1):
             print(f"{index: <2}: ", self.color_dic[element], element,
-                  ColoramaOptions.C_Style_Reset, sep="")
+                  ColorOptions.Style['RESET'], sep="")
 
     def saveConfig(self) -> None:
         """
@@ -92,8 +96,8 @@ class Config:
                 print(f"Something went wrong. Unknown keyword '{keyword}'")
             keyword = input("Input name of keyword to change: ")
             if keyword.isdigit():
-                keyword = self.elements[int(keyword)] if (
-                    0 <= int(keyword) < len(self.elements)) else keyword
+                keyword = self.elements[int(keyword)-1] if (
+                    0 < int(keyword) <= len(self.elements)) else keyword
         print(f"Successfully selected element '{keyword}'.")
 
         color_options = self._printGetAllAvailableColors()
@@ -103,8 +107,8 @@ class Config:
                 print(f"Something went wrong. Unknown option '{color}'.")
             color = input("Input color: ")
             if color.isdigit():
-                color = color_options[int(color)] if (
-                    0 <= int(color) < len(color_options)) else color
+                color = color_options[int(color)-1] if (
+                    0 < int(color) <= len(color_options)) else color
 
         if keyword in self.exclusive_definitions['Fore'] and color.startswith('Back'):
             print(f"An Error occured: '{keyword}' can only be of style 'Fore'")
