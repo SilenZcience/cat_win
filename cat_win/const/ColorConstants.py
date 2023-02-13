@@ -1,45 +1,61 @@
-from colorama import Fore, Back, Style
+
+def idToCode(code):
+    return "\x1b[" + str(code) + 'm'
 
 
-class ColoramaOptions:
-    C_Fore = {"BLACK": Fore.BLACK,
-              "RED": Fore.RED,
-              "GREEN": Fore.GREEN,
-              "YELLOW": Fore.YELLOW,
-              "BLUE": Fore.BLUE,
-              "MAGENTA": Fore.MAGENTA,
-              "CYAN": Fore.CYAN,
-              "WHITE": Fore.WHITE,
-              "LIGHTBLACK_EX": Fore.LIGHTBLACK_EX,
-              "LIGHTRED_EX": Fore.LIGHTRED_EX,
-              "LIGHTGREEN_EX": Fore.LIGHTGREEN_EX,
-              "LIGHTYELLOW_EX": Fore.LIGHTYELLOW_EX,
-              "LIGHTBLUE_EX": Fore.LIGHTBLUE_EX,
-              "LIGHTMAGENTA_EX": Fore.LIGHTMAGENTA_EX,
-              "LIGHTCYAN_EX": Fore.LIGHTCYAN_EX,
-              "LIGHTWHITE_EX": Fore.LIGHTWHITE_EX
-              }
-    C_Back = {"BLACK": Back.BLACK,
-              "RED": Back.RED,
-              "GREEN": Back.GREEN,
-              "YELLOW": Back.YELLOW,
-              "BLUE": Back.BLUE,
-              "MAGENTA": Back.MAGENTA,
-              "CYAN": Back.CYAN,
-              "WHITE": Back.WHITE,
-              "LIGHTBLACK_EX": Back.LIGHTBLACK_EX,
-              "LIGHTRED_EX": Back.LIGHTRED_EX,
-              "LIGHTGREEN_EX": Back.LIGHTGREEN_EX,
-              "LIGHTYELLOW_EX": Back.LIGHTYELLOW_EX,
-              "LIGHTBLUE_EX": Back.LIGHTBLUE_EX,
-              "LIGHTMAGENTA_EX": Back.LIGHTMAGENTA_EX,
-              "LIGHTCYAN_EX": Back.LIGHTCYAN_EX,
-              "LIGHTWHITE_EX": Back.LIGHTWHITE_EX
-              }
+class ColorOptions():
+    Fore = {
+        "RESET": 39,
+            
+        "BLACK":   30,
+        "RED":     31,
+        "GREEN":   32,
+        "YELLOW":  33,
+        "BLUE":    34,
+        "MAGENTA": 35,
+        "CYAN":    36,
+        "WHITE":   37,
+        
+        "LIGHTBLACK":   90,
+        "LIGHTRED":     91,
+        "LIGHTGREEN":   92,
+        "LIGHTYELLOW":  93,
+        "LIGHTBLUE":    94,
+        "LIGHTMAGENTA": 95,
+        "LIGHTCYAN":    96,
+        "LIGHTWHITE":   97
+        }
+    Back = {
+        "RESET": 49,
+            
+        "BLACK":   40,
+        "RED":     41,
+        "GREEN":   42,
+        "YELLOW":  43,
+        "BLUE":    44,
+        "MAGENTA": 45,
+        "CYAN":    46,
+        "WHITE":   47,
+          
+        "LIGHTBLACK":   100,
+        "LIGHTRED":     101,
+        "LIGHTGREEN":   102,
+        "LIGHTYELLOW":  103,
+        "LIGHTBLUE":    104,
+        "LIGHTMAGENTA": 105,
+        "LIGHTCYAN":    106,
+        "LIGHTWHITE":   107
+        }
+    Style = {
+        "RESET": 0
+        }
 
-    C_Fore_Reset = Fore.RESET
-    C_Back_Reset = Back.RESET
-    C_Style_Reset = Style.RESET_ALL
+    for key in Fore:
+        Fore[key] = idToCode(Fore[key])
+    for key in Back:
+        Back[key] = idToCode(Back[key])
+    for key in Style:
+        Style[key] = idToCode(Style[key])
 
 
 class C_KW:
