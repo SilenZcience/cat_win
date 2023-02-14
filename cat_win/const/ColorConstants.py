@@ -1,6 +1,6 @@
 
-def idToCode(code):
-    return "\x1b[" + str(code) + 'm'
+def idToCode(code: int) -> str:
+    return f'\x1b[{code}m'
 
 
 class ColorOptions():
