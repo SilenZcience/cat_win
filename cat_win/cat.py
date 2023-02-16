@@ -292,13 +292,13 @@ def editFile(fileIndex: int = 1) -> None:
             elif arg == ARGS_BLANK:
                 content = [c for c in content if c[1]]
             elif arg == ARGS_DEC:
-                content = [(prefix, line + color_dic[C_KW.CONVERSION] + converter._fromDEC(int(line), (param == "-dec")) +
+                content = [(prefix, line + color_dic[C_KW.CONVERSION] + converter._fromDEC(int(line), (param == "--dec")) +
                             color_dic[C_KW.RESET_ALL]) for prefix, line in content if converter.is_dec(line)]
             elif arg == ARGS_HEX:
-                content = [(prefix, line + color_dic[C_KW.CONVERSION] + converter._fromHEX(line, (param == "-hex")) +
+                content = [(prefix, line + color_dic[C_KW.CONVERSION] + converter._fromHEX(line, (param == "--hex")) +
                             color_dic[C_KW.RESET_ALL]) for prefix, line in content if converter.is_hex(line)]
             elif arg == ARGS_BIN:
-                content = [(prefix, line + color_dic[C_KW.CONVERSION] + converter._fromBIN(line, (param == "-bin")) +
+                content = [(prefix, line + color_dic[C_KW.CONVERSION] + converter._fromBIN(line, (param == "--bin")) +
                             color_dic[C_KW.RESET_ALL]) for prefix, line in content if converter.is_bin(line)]
             elif arg == ARGS_REPLACE:
                 replace_values = param[1:-1].split(",")
