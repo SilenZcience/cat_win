@@ -32,7 +32,7 @@ dynamic = [
 exclude = 	["cat_win/build", "**/**.spec", "**/**.txt"]
 
 [project.scripts]
-cat = "cat_win.__main__:entry_point"
+catw = "cat_win.__main__:entry_point"
 
 [project.urls]
 Github = "https://github.com/SilenZcience/cat_win"

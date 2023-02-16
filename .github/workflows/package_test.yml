@@ -38,3 +38,5 @@ jobs:
           python -m build
       - name: Install Local Package
         run: python ./tests/dist.py
+      - name: Test Entrypoint
+        run: catw -v

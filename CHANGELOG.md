@@ -10,10 +10,12 @@ This release fully focuses on cleaning up, patching as many Bugs as possible, an
 
 ### Major changes
 
-- changed -``x``, --linelength parameter to -``l``, --linelength
-- changed -``s``, --``squeeze`` parameter to -``u``, --``unique``
-- changed -``c``, --``count`` parameter to -``s``, --``sum``
-- changed -``col``, --nocolor parameter to --``nc``, --nocolor
+- changed the entrypoint `cat` to `catw`. This change was made to resolve the conflict on various platforms using `cat` natively.
+
+- changed -`x`, --linelength parameter to -`l`, --linelength
+- changed -`s`, --`squeeze` parameter to -`u`, --`unique`
+- changed -`c`, --`count` parameter to -`s`, --`sum`
+- changed -`col`, --nocolor parameter to --`nc`, --nocolor
 
 ### Minor Changes
 

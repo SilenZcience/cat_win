@@ -67,6 +67,8 @@ This project copies the fundamental framework of the cat command-line tool from 
 
 Additionally it includes the feature to strip and reverse the content of any given file, make use of the standard-input, which enables cat piping into each other, generating the checksum of any file, converting decimal, hexadecimal and binary numbers within any text, and much <a href="#usage">more</a> ...
 
+Contrary to the name of the project it is of course possible to use cat_win on Linux or MacOS!
+
 ### Made With
 [![MadeWith-Python]](https://www.python.org/)
 
@@ -76,7 +78,7 @@ Additionally it includes the feature to strip and reverse the content of any giv
 
 ### Prerequisites
 
-No Prerequisites are neccessary; The stand-alone executable `cat.exe` is sufficient.
+No Prerequisites are neccessary; The stand-alone executable `catw.exe` is sufficient.
 
 > ⚠️ **You should never trust any executable file!**
 
@@ -98,17 +100,12 @@ pip install cat-win
 ## Usage
 
 ```console
-cat [FILE]... [OPTION]...
-
-cat --help
+catw [FILE]... [OPTION]...
+catw --help
 ```
 
-⚠️ *on linux or macOS systems you might need to define an alias or use:*
-```console
-python3 -m cat_win [FILE]... [OPTION]...
+⚠️ *from v1.0.33 to v1.1.0 the entrypoint changes from ``cat`` to ``catw``. If you wish to keep the old command, you will have to define an alias yourself.*
 
-python3 -m cat_win --help
-```
 
 | Argument               | Description                                       |
 |------------------------|---------------------------------------------------|
