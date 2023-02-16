@@ -47,7 +47,7 @@ def _showHelp() -> None:
     """
     Show the Help message and exit.
     """
-    helpMessage = 'Usage: cat [FILE]... [OPTION]...\n'
+    helpMessage = 'Usage: catw [FILE]... [OPTION]...\n'
     helpMessage += 'Concatenate FILE(s) to standard output.\n\n'
     for x in ALL_ARGS:
         helpMessage += f'\t{f"{x.shortForm}, {x.longForm}": <25}{x.help}\n'
@@ -72,7 +72,7 @@ def _showVersion() -> None:
     """
     Show the Version message and exit.
     """
-    catVersion = f'Cat {__version__} - from {workingDir}\n'
+    catVersion = f'Catw {__version__} - from {workingDir}\n'
     versionMessage = '\n'
     versionMessage += '-' * len(catVersion) + '\n'
     versionMessage += catVersion
@@ -413,4 +413,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-# pyinstaller cat.py --onefile --clean --dist ../bin --version-file ../exeVersionFile
+# pyinstaller cat.py --onefile --clean --dist ../bin --version-file ../exeVersionFile -n catw

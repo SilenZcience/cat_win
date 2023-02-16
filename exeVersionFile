@@ -19,7 +19,7 @@ VSVersionInfo(
         StringStruct(u'FileVersion', u'0.1.0.32'),
         StringStruct(u'InternalName', u'cat_win'),
         StringStruct(u'LegalCopyright', u''),
-        StringStruct(u'OriginalFilename', u'cat.exe'),
+        StringStruct(u'OriginalFilename', u'catw.exe'),
         StringStruct(u'ProductName', u'cat'),
         StringStruct(u'ProductVersion', u'0.1.0.32')])
       ]), 
