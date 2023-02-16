@@ -129,6 +129,16 @@ def _printMetaAndChecksum(showMeta: bool, showChecksum: bool) -> None:
             _printChecksum(file)
 
 
+def removeAnsiCodesFromLine(line: str) -> str:
+    for key in color_dic.keys():
+        line = line.replace(color_dic[key], '')
+    return line
+
+
+def removeAnsiCodes(content: list) -> list:
+    return [(removeAnsiCodesFromLine(prefix), removeAnsiCodesFromLine(line)) for prefix, line in content]
+
+
 @lru_cache(maxsize=None)
 def _CalculateLinePrefixSpacing(lineCharLength: int,
                                 includeFilePrefix: bool = False, fileCharLength: int = None) -> str:
@@ -163,8 +173,7 @@ def _getLineLengthPrefix(prefix: str, line) -> str:
     returns the new line prefix including the line length.
     """
     if not holder.args_id[ARGS_NOCOL] and type(line) == str:
-        for key in color_dic.keys():
-            line = line.replace(color_dic[key], '')
+        line = removeAnsiCodesFromLine(line)
     return _CalculateLineLengthPrefixSpacing(len(str(len(line)))) % (prefix, len(line))
 
 
@@ -321,7 +330,7 @@ def editFile(fileIndex: int = 1) -> None:
 
     if not show_bytecode:
         if holder.args_id[ARGS_CLIP]:
-            holder.clipBoard += "\n".join([prefix + line for prefix, line in content])
+            holder.clipBoard += "\n".join([prefix + line for prefix, line in removeAnsiCodes(content)])
 
 
 def editFiles() -> None:

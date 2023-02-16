@@ -35,8 +35,8 @@ class Holder():
             # prefix will be deleted anyway
             self.args_id[ARGS_LLENGTH] = False
             self.args_id[ARGS_NUMBER] = False
-        if self.args_id[ARGS_CLIP]:
-            self.args_id[ARGS_NOCOL] = True
+        # if self.args_id[ARGS_CLIP]:
+        #     self.args_id[ARGS_NOCOL] = True
         self.reversed = self.args_id[ARGS_REVERSE]
 
     def setTempFile(self, file: str) -> None:

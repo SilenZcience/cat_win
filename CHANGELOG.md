@@ -19,7 +19,6 @@ This release fully focuses on cleaning up, patching as many Bugs as possible, an
 
 ### Minor Changes
 
-- disabled the combination of using colorized output and the --clip parameter simultaneously. This fixes the Bug where the clipboard would include the ANSI-color codes.
 - --config changes are now enumerated from 1 upwards, instead of 0 upwards.
 - when using the --help or --version parameter and a new version is available, you will now be informed in case major changes have been made. This works by sticking to the versioning conventions.
 
@@ -30,3 +29,4 @@ This release fully focuses on cleaning up, patching as many Bugs as possible, an
 - fix Bug where --linelength and --number prefix using background colors would incorrectly colorize whitespaces.
 - fix Bug where --config change would crash.
 - fix Bug where the Updatechecker would not recognize a new release.
+- fix Bug where --clip parameter copied AnsiColor Codes resulting in a bizarre looking content.
