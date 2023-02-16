@@ -164,7 +164,7 @@ python3 -m cat_win --help
 
 ## Changelog
 
-Take a look at the Changelog [here](https://github.com/SilenZcience/cat_win/blob/main/ChANGELOG.md).
+Take a look at the Changelog [here](https://github.com/SilenZcience/cat_win/blob/main/CHANGELOG.md).
 
 ## License
 
