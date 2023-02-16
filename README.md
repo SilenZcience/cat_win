@@ -52,6 +52,7 @@
          <li><a href="#examples">Examples</a></li>
          </ul>
       </li>
+	  <li><a href="#changelog">Changelog</a></li>
       <li><a href="#license">License</a></li>
       <li><a href="#contact">Contact</a></li>
    </ol>
@@ -160,6 +161,10 @@ python3 -m cat_win --help
 ![Example4](https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example4.png "example4")
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+
+## Changelog
+
+Take a look at the Changelog [here](https://github.com/SilenZcience/cat_win/blob/main/ChANGELOG.md).
 
 ## License
 
