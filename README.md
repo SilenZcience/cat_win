@@ -109,59 +109,45 @@ python3 -m cat_win [FILE]... [OPTION]...
 python3 -m cat_win --help
 ```
 
-<table>
-   <!-- <tr><th> </th><th> </th></tr> -->
-   <tr><td>
-
 | Argument               | Description                                       |
 |------------------------|---------------------------------------------------|
-| -n, --number           | number all output lines                           |
-| -l, --linelength       | display the length of each line                   |
-| -e, --ends             | display $ at the end of each line                 |
-| -t, --tabs             | display TAB characters as ^I                      |
-| --eof, --eof           | display EOF characters as ^EOF                    |
-| -u, --unique           | suppress repeated output lines                    |
-| -r, --reverse          | reverse output                                    |
-| -s, --sum              | show sum of lines                                 |
-| -b, --blank            | hide empty lines                                  |
-| -f, --files            | list applied files                                |
-| -i, --interactive      | use stdin                                         |
-| -o, --oneline          | take only the first stdin-line                    |
-| -p, --peek             | only print the first and last lines               |
-| -c, --clip             | copy output to clipboard                          |
-| -m, --checksum         | show the checksums of all files                   |
-| -a, --attributes       | show meta-information about the files             |
-
-   </td>
-   <td>
-
-| Argument               | Description                                       |
-|------------------------|---------------------------------------------------|
-| -dec, --dec            | convert decimal numbers to hexadecimal and binary |
-| -hex, --hex            | convert hexadecimal numbers to decimal and binary |
-| -bin, --bin            | convert binary numbers to decimal and hexadecimal |
+| *-h, --help*           | show help message and exit                        |
+| *-v, --version*        | output version information                        |
+| *-d, --debug*          | show debug information                            |
 |                        |                                                   |
-| --nc, --nocolor        | disable colored output                            |
-| --config, --config     | change color configuration                        |
+| *-n, --number*         | number all output lines                           |
+| *-l, --linelength*     | display the length of each line                   |
+| *-e, --ends*           | display $ at the end of each line                 |
+| *-t, --tabs*           | display TAB characters as ^I                      |
+| *--eof, --eof*         | display EOF characters as ^EOF                    |
+| *-u, --unique*         | suppress repeated output lines                    |
+| *-b, --blank*          | hide empty lines                                  |
+| *-r, --reverse*        | reverse output                                    |
+| *-s, --sum*            | show sum of lines                                 |
+| *-f, --files*          | list applied files                                |
+| *-i, --interactive*    | use stdin                                         |
+| *-o, --oneline*        | take only the first stdin-line                    |
+| *-p, --peek*           | only print the first and last lines               |
+| *-c, --clip*           | copy output to clipboard                          |
+| *-m, --checksum*       | show the checksums of all files                   |
+| *-a, --attributes*     | show meta-information about the files             |
 |                        |                                                   |
-| --b64e, --b64e         | encode the input to base64                        |
-| --b64d, --b64d         | decode the input from base64                      |
+| *--dec, --DEC*         | convert decimal numbers to hexadecimal and binary |
+| *--hex, --HEX*         | convert hexadecimal numbers to decimal and binary |
+| *--bin, --BIN*         | convert binary numbers to decimal and hexadecimal |
+| *--b64e, --b64e*       | encode the input to base64                        |
+| *--b64d, --b64d*       | decode the input from base64                      |
 |                        |                                                   |
-| enc=X                  | set file enconding to X (default is utf-8)        |
-| find=X                 | find substring X in the given files               |
-| match=X                | find pattern X in the given files                 |
-| trunc=X:Y              | truncate file to lines X and Y (python-like)      |
+| *--nc, --nocolor*      | disable colored output                            |
+| *--config, --config*   | change color configuration                        |
 |                        |                                                   |
-| [a,b]                  | replace a with b in every line                    |
-| [a:b]                  | python-like string manipulation syntax            |
+| *enc=X*                | set file enconding to X (default is utf-8)        |
+| *find=X*               | find substring X in the given files               |
+| *match=X*              | find pattern X in the given files                 |
+| *trunc=X:Y*            | truncate file to lines X and Y (python-like)      |
 |                        |                                                   |
-| -h, --help             | show help message and exit                        |
-| -v, --version          | output version information                        |
-| -d, --debug            | show debug information                            |
-
-   </td>
-   </tr>
-</table>
+| *[a,b]*                | replace a with b in every line                    |
+| *[a:b:c]*              | python-like string indexing syntax                |
 
 ### Examples
 
