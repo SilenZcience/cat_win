@@ -147,7 +147,7 @@ python3 -m cat_win --help
 | *trunc=X:Y*            | truncate file to lines X and Y (python-like)      |
 |                        |                                                   |
 | *[a,b]*                | replace a with b in every line                    |
-| *[a:b:c]*              | python-like string indexing syntax                |
+| *[a:​b:c]*              | python-like string indexing syntax                |
 
 ### Examples
 
