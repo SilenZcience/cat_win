@@ -58,7 +58,7 @@ def _showHelp() -> None:
     helpMessage += f'\t{"trunc=X:Y, trunc:X:Y": <25}truncate file to lines x and y (python-like)\n'
     helpMessage += '\n'
     helpMessage += f'\t{"[a,b]": <25}replace a with b in every line\n'
-    helpMessage += f'\t{"[a:b]": <25}python-like string manipulation syntax\n'
+    helpMessage += f'\t{"[a:b:c]": <25}python-like string indexing syntax\n'
     helpMessage += '\n'
     helpMessage += 'Examples:\n'
     helpMessage += f"\t{'cat f g -r' : <25}Output g's contents in reverse order, then f's content in reverse order\n"
