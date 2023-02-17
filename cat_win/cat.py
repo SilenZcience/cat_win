@@ -1,6 +1,7 @@
 import pyperclip3 as pc
 import sys
 import os
+from re import sub as resub
 from datetime import datetime
 from functools import lru_cache
 from itertools import groupby
@@ -17,7 +18,7 @@ import cat_win.util.TmpFileHelper as TmpFileHelper
 from cat_win.util.Base64 import decodeBase64, encodeBase64
 from cat_win.util.FileAttributes import getFileMetaData
 from cat_win.const.ArgConstants import *
-from cat_win.const.ColorConstants import C_KW
+from cat_win.const.ColorConstants import C_KW, ESC_CODE
 from cat_win.web.UpdateChecker import printUpdateInformation
 
 from cat_win import __version__, __author__, __sysversion__
@@ -130,9 +131,17 @@ def _printMetaAndChecksum(showMeta: bool, showChecksum: bool) -> None:
 
 
 def removeAnsiCodesFromLine(line: str) -> str:
-    for key in color_dic.keys():
-        line = line.replace(color_dic[key], '')
-    return line
+    # version 1: efficiency is about the same, and does not have any dependency
+    # however it is not as safe in case of unusual/broken escape sequences.
+    # while (codePosStart := line.find(ESC_CODE)) != -1:
+    #     codePosEnd = line[codePosStart:].find('m')
+    #     # here should be checks like 'codePosEnd' != -1 and
+    #     # 'codePosEnd' <= 5 to make sure we found a valid EscapeSequence
+    #     # for a better performance let's assume all EscapeSequences are valid...
+    #     line = line[:codePosStart] + line[codePosStart+codePosEnd+1:]
+    # return line
+    # version 2:
+    return resub(r'\x1b\[[0-9\;]*m', '', line)
 
 
 def removeAnsiCodes(content: list) -> list:
