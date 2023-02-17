@@ -33,6 +33,9 @@ def writeFiles(file_list: list, content: str, file_encoding: str) -> None:
     file in the given list if there is a
     valid content.
     """
+    if len(file_list) == 0:
+        return
+    
     if content == "":
         abort_command = "" 
         try:
