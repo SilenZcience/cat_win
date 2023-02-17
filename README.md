@@ -104,7 +104,7 @@ catw [FILE]... [OPTION]...
 catw --help
 ```
 
-⚠️ *from v1.0.33 to v1.1.0 the entrypoint changes from ``cat`` to ``catw``. If you wish to keep the old command, you will have to define an alias yourself.*
+> ⚠️ *from v1.0.33 to v1.1.0 the entrypoint changes from ``cat`` to ``catw``. If you wish to keep the old command, you will have to define an alias yourself.*
 
 
 | Argument               | Description                                       |
