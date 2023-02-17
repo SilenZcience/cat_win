@@ -1,6 +1,9 @@
 
+ESC_CODE = '\x1b'
+
+
 def idToCode(code: int) -> str:
-    return f'\x1b[{code}m'
+    return f'{ESC_CODE}[{code}m'
 
 
 class ColorOptions():
