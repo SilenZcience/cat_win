@@ -30,3 +30,4 @@ This release fully focuses on cleaning up, patching as many Bugs as possible, an
 - fix Bug where --config change would crash.
 - fix Bug where the Updatechecker would not recognize a new release.
 - fix Bug where --clip parameter copied AnsiColor Codes resulting in a bizarre looking content.
+- fix Bug where the User had to approve the creation of a temp file.
