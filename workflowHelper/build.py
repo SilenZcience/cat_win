@@ -1,4 +1,5 @@
 import os
+import subprocess
 from sys import exit
 from shutil import rmtree
 from glob import iglob
@@ -28,11 +29,15 @@ for path in iglob(package_dir + '/*/__init__.py', recursive=True):
         print("Error: %s - %s." % (e.filename, e.strerror))
 
 status = 1
+command = 'pyinstaller ./cat_win/cat.py --onefile --clean --dist ./bin --version-file ./exeVersionFile -n catw'.split(' ')
 # try pyinstaller 3 times at most...
 for _ in range(3):
-    status = os.system('pyinstaller cat.py --onefile --clean --dist ../bin --version-file ../exeVersionFile -n catw')
-    if status == 0:
-        break
+    try:
+        status = subprocess.run(command, check=True).returncode
+        if status == 0:
+            break
+    except:
+        pass
 
 
 for _init in _initFiles:
