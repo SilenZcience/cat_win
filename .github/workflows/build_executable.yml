@@ -1,0 +1,35 @@
+name: Compile and Push
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v3
+      - name: Install Python 3.10
+        id: python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - name: Setup Compile Dependencies
+        run: |
+          python -m pip install --upgrade pyinstaller
+      - name: Setup Code Dependencies
+        run: |
+          python -m pip install --upgrade -r ./cat_win/requirements.txt
+      - name: Compile Package
+        run: |
+          python ./workflowHelper/build.py
+      - name: Show and Push
+        run: |
+          git status
+          git config --local user.name 'github-actions[bot]'
+          git config --local user.email 'github-actions[bot]@users.noreply.github.com'
+          git add ./bin/catw.exe
+          git commit -m "🤖Compiled Binary."
+          git push origin main

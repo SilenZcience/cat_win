@@ -6,8 +6,8 @@ error_code = 1
 
 script_dir = os.path.dirname(__file__)
 dist_dir = os.path.join(script_dir, "../dist/" )
-print(script_dir)
-print(dist_dir)
+print('script directory:', script_dir)
+print('dist directory:', dist_dir)
 
 target_package = os.listdir(dist_dir)
 print("Found packages:", target_package)
