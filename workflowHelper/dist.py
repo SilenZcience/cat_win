@@ -18,18 +18,13 @@ if len(target_package) > 0:
     print(target_package_whl)
     target_package_tar = [package for package in target_package if package[-7:] == ".tar.gz"]
     print(target_package_tar)
-    for package in target_package_whl:
-        print("Package:", dist_dir + package)
+    for package in target_package_whl + target_package_tar:
+        package_file = os.path.join(dist_dir, package)
+        print("Package:", package_file)
         try:
-            error_code = subprocess.run(['pip', 'install', '--upgrade', dist_dir + package],
-                                        check=True).returncode
-        except:
-            exit(error_code)
-    for package in target_package_tar:
-        print("Package:", dist_dir + package)
-        try:
-            error_code = subprocess.run(['pip', 'install', '--upgrade', dist_dir + package],
-                                        check=True).returncode
+            sub = subprocess.run(['pip', 'install', '--upgrade', package_file], check=True)
+            print(sub)
+            error_code = sub.returncode
         except:
             exit(error_code)
 

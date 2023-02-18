@@ -33,7 +33,9 @@ command = 'pyinstaller ./cat_win/cat.py --onefile --clean --dist ./bin --version
 # try pyinstaller 3 times at most...
 for _ in range(3):
     try:
-        status = subprocess.run(command, check=True).returncode
+        sub = subprocess.run(command, check=True)
+        print(sub)
+        status = sub.returncode
         if status == 0:
             break
     except:
