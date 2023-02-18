@@ -82,8 +82,8 @@ def _showVersion() -> None:
     versionMessage += f'Python: \t{__sysversion__}\n'  # sys.version
     try:
         versionMessage += f'Install time: \t{datetime.fromtimestamp(os.path.getctime(os.path.realpath(__file__)))} CET\n'
-    except OSError:
-        versionMessage += f'Install time: \t{datetime.fromtimestamp(os.path.getctime(os.path.realpath(sys.argv[0])))} CET\n'
+    except OSError: # fails on pyinstaller executable
+        versionMessage += f'Install time: \t-\n'
     versionMessage += f'Author: \t{__author__}\n'
     print(versionMessage)
     printUpdateInformation('cat_win', __version__)
