@@ -80,7 +80,10 @@ def _showVersion() -> None:
     versionMessage += '-' * len(catVersion) + '\n'
     versionMessage += '\n'
     versionMessage += f'Python: \t{__sysversion__}\n'  # sys.version
-    versionMessage += f'Build time: \t{datetime.fromtimestamp(os.path.getctime(os.path.realpath(__file__)))} CET\n'
+    try:
+        versionMessage += f'Install time: \t{datetime.fromtimestamp(os.path.getctime(os.path.realpath(__file__)))} CET\n'
+    except OSError:
+        versionMessage += f'Install time: \t{datetime.fromtimestamp(os.path.getctime(os.path.realpath(sys.argv[0])))} CET\n'
     versionMessage += f'Author: \t{__author__}\n'
     print(versionMessage)
     printUpdateInformation('cat_win', __version__)
@@ -431,4 +434,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-# pyinstaller cat.py --onefile --clean --dist ../bin --version-file ../exeVersionFile -n catw
