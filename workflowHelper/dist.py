@@ -1,11 +1,12 @@
 #!/usr/bin/python
 import os
+import subprocess
 from sys import exit
 
 error_code = 1
 
 script_dir = os.path.dirname(__file__)
-dist_dir = os.path.join(script_dir, "../dist/" )
+dist_dir = os.path.abspath(os.path.join(script_dir, "../dist/" ))
 print('script directory:', script_dir)
 print('dist directory:', dist_dir)
 
@@ -19,9 +20,17 @@ if len(target_package) > 0:
     print(target_package_tar)
     for package in target_package_whl:
         print("Package:", dist_dir + package)
-        error_code = os.system('pip install --upgrade ' + dist_dir + package)
+        try:
+            error_code = subprocess.run(['pip', 'install', '--upgrade', dist_dir + package],
+                                        check=True).returncode
+        except:
+            exit(error_code)
     for package in target_package_tar:
         print("Package:", dist_dir + package)
-        error_code = os.system('pip install --upgrade ' + dist_dir + package)
+        try:
+            error_code = subprocess.run(['pip', 'install', '--upgrade', dist_dir + package],
+                                        check=True).returncode
+        except:
+            exit(error_code)
 
 exit(error_code)

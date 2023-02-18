@@ -5,7 +5,7 @@ from shutil import rmtree
 from glob import iglob
 
 script_dir = os.path.dirname(__file__)
-package_dir = os.path.join(script_dir, "../cat_win/" )
+package_dir = os.path.abspath(os.path.join(script_dir, "../cat_win/" ))
 print('script directory:', script_dir)
 print('package directory:', package_dir)
 
