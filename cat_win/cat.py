@@ -359,15 +359,16 @@ def editFiles() -> None:
 
     for i in range(start, end, -1 if holder.reversed else 1):
         editFile(i+1)
-    print(color_dic[C_KW.COUNT_AND_FILES], end="")
     if holder.args_id[ARGS_COUNT]:
         print()
-        print("Lines: " + str(holder.allFilesLinesSum))
+        print(f"{color_dic[C_KW.COUNT_AND_FILES]}Lines: {holder.allFilesLinesSum}{color_dic[C_KW.RESET_ALL]}")
     if holder.args_id[ARGS_FILES]:
         print()
+        print(color_dic[C_KW.COUNT_AND_FILES], end="")
         print("applied FILE(s):", end="")
-        print("", *holder.getAppliedFiles(), sep="\n\t")
-    print(color_dic[C_KW.RESET_ALL], end="")
+        print(color_dic[C_KW.RESET_ALL])
+        for file in holder.getAppliedFiles():
+            print(f'\t{color_dic[C_KW.COUNT_AND_FILES]}{file}{color_dic[C_KW.RESET_ALL]}')
     if holder.args_id[ARGS_CLIP]:
         pc.copy(removeAnsiCodesFromLine(holder.clipBoard))
 
