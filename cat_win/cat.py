@@ -129,10 +129,8 @@ def _printMeta(file: str) -> None:
 
 
 def _printChecksum(file: str) -> None:
-    print(color_dic[C_KW.CHECKSUM], end="")
-    print("Checksum of '" + file + "':")
-    print(checksum.getChecksumFromFile(file))
-    print(color_dic[C_KW.RESET_ALL], end="")
+    print(f"{color_dic[C_KW.CHECKSUM]}Checksum of '{file}':{color_dic[C_KW.RESET_ALL]}")
+    print(checksum.getChecksumFromFile(file, [color_dic[C_KW.CHECKSUM], color_dic[C_KW.RESET_ALL]]))
 
 
 def _printMetaAndChecksum(showMeta: bool, showChecksum: bool) -> None:
