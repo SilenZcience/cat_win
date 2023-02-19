@@ -381,6 +381,10 @@ def main():
     sys.stdout.reconfigure(encoding=ArgParser.FILE_ENCODING)
     sys.stdin.reconfigure(encoding=ArgParser.FILE_ENCODING)
     
+    if holder.args_id[ARGS_NOCOL]:
+        global color_dic
+        color_dic = dict.fromkeys(color_dic, "")
+    
     # check for special cases
     if holder.args_id[ARGS_DEBUG]:
         _showDebug(args, unknown_args, known_files, unknown_files)
@@ -408,10 +412,6 @@ def main():
 
     if (len(known_files) + len(unknown_files) == 0):
         return
-    
-    if holder.args_id[ARGS_NOCOL]:
-        global color_dic
-        color_dic = dict.fromkeys(color_dic, "")
 
     # fill holder object with neccessary values
     holder.setFiles([*known_files, *unknown_files])
