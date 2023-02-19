@@ -89,13 +89,15 @@ def _showVersion() -> None:
     printUpdateInformation('cat_win', __version__, color_dic)
 
 
-def _showDebug(args: list, known_files: list, unknown_files: list) -> None:
+def _showDebug(args: list, unknown_args: list, known_files: list, unknown_files: list) -> None:
     """
     Print all neccassary debug information
     """
     print("Debug Information:")
     print("args: ", end="")
     print([(arg[0], arg[1], holder.args_id[arg[0]]) for arg in args])
+    print("unknown_args: ", end="")
+    print(unknown_args)
     print("known_files: ", end="")
     print(known_files)
     print("unknown_files: ", end="")
@@ -368,7 +370,7 @@ def main():
     piped_input = temp_file = ""
 
     # read parameter-args
-    args, known_files, unknown_files = ArgParser.getArguments(sys.argv)
+    args, unknown_args, known_files, unknown_files = ArgParser.getArguments(sys.argv)
 
     holder.setArgs(args)
 
@@ -377,7 +379,7 @@ def main():
     
     # check for special cases
     if holder.args_id[ARGS_DEBUG]:
-        _showDebug(args, known_files, unknown_files)
+        _showDebug(args, unknown_args, known_files, unknown_files)
     if (len(known_files) + len(unknown_files) + len(holder.args) == 0) or holder.args_id[ARGS_HELP]:
         _showHelp()
         return

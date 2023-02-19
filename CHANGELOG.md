@@ -12,6 +12,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - added `message_information`, `message_important` and `message_warning` as customizable colors to the --config menu.
+- added unrecognized parameters to --debug menu.
 
 
 ## [1.1.0] - 2023-02-18
