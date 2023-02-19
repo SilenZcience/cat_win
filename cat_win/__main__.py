@@ -8,6 +8,9 @@ except:
     print("an error occured while loading the module")
     exit(1)
 
+def deprecated_entry_point():
+    cat.deprecated_main()
+
 def entry_point():
     cat.main()
 
