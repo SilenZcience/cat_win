@@ -46,7 +46,7 @@ class Converter():
         returns a String representation of a Decimal Int including the corresponding
         Hexadecimal and Binary number.
         """
-        return " {Hexadecimal: " + self.__dec_to_hex__(value, leading) + "; Binary: " + self.__dec_to_bin__(value, leading) + "}"
+        return "{Hexadecimal: " + self.__dec_to_hex__(value, leading) + "; Binary: " + self.__dec_to_bin__(value, leading) + "}"
 
     def __hex_to_dec__(self, value: str) -> str:
         return str(int(value, 16))
@@ -59,7 +59,7 @@ class Converter():
         returns a String representation of a Hexadecimal String including the corresponding
         Decimal and Binary number.
         """
-        return " {Decimal: " + self.__hex_to_dec__(value) + "; Binary: " + self.__hex_to_bin__(value, leading) + "}"
+        return "{Decimal: " + self.__hex_to_dec__(value) + "; Binary: " + self.__hex_to_bin__(value, leading) + "}"
 
     def __bin_to_dec__(self, value: str) -> str:
         return str(int(value, 2))
@@ -72,4 +72,4 @@ class Converter():
         returns a String representation of a Binary String including the corresponding
         Decimal and Hexadecimal number.
         """
-        return " {Decimal: " + self.__bin_to_dec__(value) + "; Hexadecimal: " + self.__bin_to_hex__(value, leading) + "}"
+        return "{Decimal: " + self.__bin_to_dec__(value) + "; Hexadecimal: " + self.__bin_to_hex__(value, leading) + "}"
