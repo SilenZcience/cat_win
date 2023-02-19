@@ -11,7 +11,7 @@ ARGS_REVERSE, ARGS_COUNT, ARGS_BLANK, ARGS_FILES, ARGS_INTERACTIVE = range(5, 10
 ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN = range(10, 15)
 ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA = range(15, 20)
 ARGS_CONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK, ARGS_NOCOL = range(20, 25)
-ARGS_EOF, ARGS_B64E, ARGS_B64D = range(25, 28)
+ARGS_EOF, ARGS_B64E, ARGS_B64D, ARGS_FFILES = range(25, 29)
 
 ALL_ARGS = [[["-h", "--help"], "show this help message and exit", ARGS_HELP],
             [["-v", "--version"], "output version information and exit", ARGS_VERSION],
@@ -26,6 +26,7 @@ ALL_ARGS = [[["-h", "--help"], "show this help message and exit", ARGS_HELP],
             [["-r", "--reverse"], "reverse output", ARGS_REVERSE],
             [["-s", "--sum"], "show sum of lines", ARGS_COUNT],
             [["-f", "--files"], "list applied files", ARGS_FILES],
+            [["-F", "--FILES"], "list ONLY applied files", ARGS_FFILES],
             [["-i", "--interactive"], "use stdin", ARGS_INTERACTIVE],
             [["-o", "--oneline"], "take only the first stdin-line", ARGS_ONELINE],
             [["-p", "--peek"], "only print the first and last lines", ARGS_PEEK],
