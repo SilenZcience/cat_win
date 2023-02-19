@@ -1,6 +1,7 @@
 name: Compile and Push
 
-on: [push]
+on:
+  workflow_dispatch:
 
 jobs:
   build:

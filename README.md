@@ -62,7 +62,7 @@
 
 [![Unittests]](https://github.com/SilenZcience/cat_win/actions/workflows/unit_test.yml)
 [![Build-and-Check]](https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml)
-[![Compile-and-Push]](https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml/badge.svg)
+<!-- [![Compile-and-Push]](https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml/badge.svg) -->
 
 This project copies the fundamental framework of the cat command-line tool from Linux and translates its features to an OS Independent program using Python.
 
