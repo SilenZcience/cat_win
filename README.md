@@ -150,6 +150,9 @@ catw --help
 
 ### Examples
 
+<details>
+	<summary>Images</summary>
+
 ![Example1](https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example1.png "example1")
 
 ![Example2](https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example2.png "example2")
@@ -158,11 +161,20 @@ catw --help
 
 ![Example4](https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example4.png "example4")
 
+![Example5](https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example5.png "example5")
+
+</details>
+
+```console
+$ echo "Hello World :)" | catw -i [6:] | catw -i [::-1] -ln
+> 1) [ 8] ): dlroW
+```
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Changelog
 
-Take a look at the Changelog [here](https://github.com/SilenZcience/cat_win/blob/main/CHANGELOG.md).
+Take a look at the [Changelog](https://github.com/SilenZcience/cat_win/blob/main/CHANGELOG.md) file.
 
 ## License
 
