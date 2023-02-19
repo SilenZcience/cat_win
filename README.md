@@ -124,6 +124,7 @@ catw --help
 | *-r, --reverse*        | reverse output                                    |
 | *-s, --sum*            | show sum of lines                                 |
 | *-f, --files*          | list applied files                                |
+| *-F, --FILES*          | ONLY list applied files                           |
 | *-i, --interactive*    | use stdin                                         |
 | *-o, --oneline*        | take only the first stdin-line                    |
 | *-p, --peek*           | only print the first and last lines               |
