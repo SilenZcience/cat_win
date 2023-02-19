@@ -83,8 +83,10 @@ def printUpdateInformation(package: str, currentVersion: str, color_dic: dict):
     warning = f""
     if abs(status) == STATUS_STABLE_RELEASE_AVAILABLE:
         message += f"{color_dic[C_KW.MESSAGE_IMPORTANT]}"
-        message += f"A new stable release of {package} is available: v{latestVersion}\n"
-        message += f"To update, run:\n"
+        message += f"A new stable release of {package} is available: v{latestVersion}"
+        message += f"{color_dic[C_KW.RESET_ALL]}\n{color_dic[C_KW.MESSAGE_IMPORTANT]}"
+        message += f"To update, run:"
+        message += f"{color_dic[C_KW.RESET_ALL]}\n{color_dic[C_KW.MESSAGE_IMPORTANT]}"
         message += f"python -m pip install --upgrade {package}"
     elif abs(status) == STATUS_PRE_RELEASE_AVAILABLE:
         message += f"{color_dic[C_KW.MESSAGE_INFORMATION]}"
@@ -92,7 +94,8 @@ def printUpdateInformation(package: str, currentVersion: str, color_dic: dict):
     message += f"{color_dic[C_KW.RESET_ALL]}"
     if status < 0:
         warning += f"{color_dic[C_KW.MESSAGE_WARNING]}"
-        warning += f"Warning: Due to the drastic version increase, backwards compatibility is no longer guaranteed!\n"
+        warning += f"Warning: Due to the drastic version increase, backwards compatibility is no longer guaranteed!"
+        warning += f"{color_dic[C_KW.RESET_ALL]}\n{color_dic[C_KW.MESSAGE_WARNING]}"
         warning += f"You may experience fundamental differences."
         warning += f"{color_dic[C_KW.RESET_ALL]}\n"
     print(message)

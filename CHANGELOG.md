@@ -15,6 +15,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added unrecognized parameters to --debug menu.
 - added -`F`, --`FILES` parameter which ONLY shows the found files. (useful when searching files with pattern like "\*\*/\*.txt")
 
+### Bugfixes
+
+- fix Bug where background colors would colorize linebreaks and unnecessary whitespaces.
+
 
 ## [1.1.0] - 2023-02-18
 
