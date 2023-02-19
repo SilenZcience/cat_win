@@ -18,6 +18,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Bugfixes
 
 - fix Bug where background colors would colorize linebreaks and unnecessary whitespaces.
+- fix Bug where parameters including `-`-characters (like "test-file.txt") would not be recognized as an unknown file to write.
 
 
 ## [1.1.0] - 2023-02-18
