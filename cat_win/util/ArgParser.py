@@ -10,7 +10,7 @@ FILE_MATCH = []
 FILE_TRUNCATE = [None, None, None]
 
 
-def __addArgument__(args: list, known_files: list, unknown_files: list, param: str) -> None:
+def __addArgument__(args: list, unknown_args: list, known_files: list, unknown_files: list, param: str) -> None:
     # 'enc' + ('=' or ':') + FILE_ENCODING
     if match(r"\Aenc[\=\:].+\Z", param):
         global FILE_ENCODING
@@ -64,9 +64,11 @@ def __addArgument__(args: list, known_files: list, unknown_files: list, param: s
         known_files.append(possible_path)
     elif len(param) > 2 and param[0] == "-" and param[1] != "-":
         for i in range(1, len(param)):
-            __addArgument__(args, known_files, unknown_files, "-" + param[i])
-    elif match(r"\A[^-]+\Z", param):
+            __addArgument__(args, unknown_args, known_files, unknown_files, "-" + param[i])
+    elif match(r"\A[^-]+.*\Z", param):
         unknown_files.append(realpath(param))
+    else:
+        unknown_args.append(param)
 
 
 def getArguments(argv: list) -> tuple:
@@ -77,10 +79,11 @@ def getArguments(argv: list) -> tuple:
     """
     inputArgs = argv[1:]
     args = []
+    unknown_args = []
     known_files = []
     unknown_files = []
 
     for arg in inputArgs:
-        __addArgument__(args, known_files, unknown_files, arg)
+        __addArgument__(args, unknown_args, known_files, unknown_files, arg)
 
-    return (args, known_files, unknown_files)
+    return (args, unknown_args, known_files, unknown_files)
