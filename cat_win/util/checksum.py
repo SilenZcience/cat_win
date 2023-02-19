@@ -2,12 +2,14 @@ import hashlib
 from zlib import crc32 as crc32_hash
 
 
-def getChecksumFromFile(file: str) -> str:
+def getChecksumFromFile(file: str, colors: list = ['', '']) -> str:
     """
     Takes a filepath of type String and
     returns a String representation of the
     CRC32, MD5, SHA1, SHA256, SHA512
     hashes corresponding to the given file.
+    Takes a colors-list containing 2 elements:
+    colors = [COLOR_CHECKSUM, COLOR_RESET]
     """
     BUF_SIZE = 65536  # 64kb
     md5 = hashlib.md5()
@@ -29,9 +31,9 @@ def getChecksumFromFile(file: str) -> str:
 
     crc32 = "%08X" % (crc32 & 0xFFFFFFFF)
     
-    checksum =  f'\t{"CRC32:" : <9}{str(crc32)}\n'
-    checksum += f'\t{"MD5:"   : <9}{str(md5.hexdigest())}\n'
-    checksum += f'\t{"SHA1:"  : <9}{str(sha1.hexdigest())}\n'
-    checksum += f'\t{"SHA256:": <9}{str(sha256.hexdigest())}\n'
-    checksum += f'\t{"SHA512:": <9}{str(sha512.hexdigest())}\n'
+    checksum =  f'\t{colors[0]}{"CRC32:" : <9}{str(crc32)}{colors[1]}\n'
+    checksum += f'\t{colors[0]}{"MD5:"   : <9}{str(md5.hexdigest())}{colors[1]}\n'
+    checksum += f'\t{colors[0]}{"SHA1:"  : <9}{str(sha1.hexdigest())}{colors[1]}\n'
+    checksum += f'\t{colors[0]}{"SHA256:": <9}{str(sha256.hexdigest())}{colors[1]}\n'
+    checksum += f'\t{colors[0]}{"SHA512:": <9}{str(sha512.hexdigest())}{colors[1]}\n'
     return checksum
