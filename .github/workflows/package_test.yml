@@ -1,6 +1,13 @@
 name: Build and Check
 
-on: [push]
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/**
+      - cat_win/**
+      - tests/**
+      - workflowHelper/**
 
 jobs:
   build:
