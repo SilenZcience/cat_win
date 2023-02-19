@@ -221,13 +221,13 @@ def printFile(content: list, bytecode: bool) -> None:
         found_sth = False
         if fKeyWords:
             print(color_dic[C_KW.FOUND_MESSAGE], end="")
-            print("--------------- Found", fKeyWords, "---------------")
-            print(color_dic[C_KW.RESET_ALL], end="")
+            print("--------------- Found", fKeyWords, "---------------", end="")
+            print(color_dic[C_KW.RESET_ALL])
             found_sth = True
         if mKeywords:
             print(color_dic[C_KW.MATCHED_MESSAGE], end="")
-            print("--------------- Matched", mKeywords, "---------------")
-            print(color_dic[C_KW.RESET_ALL], end="")
+            print("--------------- Matched", mKeywords, "---------------", end="")
+            print(color_dic[C_KW.RESET_ALL])
             found_sth = True
 
         if found_sth:
