@@ -136,11 +136,11 @@ class TestCat(TestCase):
         expected_output = 'abcdefghijklmnopqr'
         self.assertEqual(cat.removeAnsiCodesFromLine(random_string), expected_output)
 
-    def test_removeAnsiCodes(self):
-        red_bold_underlined = '\x1b[31;1;4m'
-        reset = '\x1b[0m'
-        random_list = [(f'12{red_bold_underlined}34{reset}5', f'abc{red_bold_underlined}defghij{reset}klmnopq{red_bold_underlined}r{reset}')]
-        expected_output = [('12345', 'abcdefghijklmnopqr')]
-        self.assertEqual(cat.removeAnsiCodes(random_list), expected_output)
+    # def test_removeAnsiCodes(self):
+    #     red_bold_underlined = '\x1b[31;1;4m'
+    #     reset = '\x1b[0m'
+    #     random_list = [(f'12{red_bold_underlined}34{reset}5', f'abc{red_bold_underlined}defghij{reset}klmnopq{red_bold_underlined}r{reset}')]
+    #     expected_output = [('12345', 'abcdefghijklmnopqr')]
+    #     self.assertEqual(cat.removeAnsiCodes(random_list), expected_output)
 
 # python -m unittest discover -s tests -p test*.py

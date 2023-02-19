@@ -112,6 +112,14 @@ def _showDebug(args: list, unknown_args: list, known_files: list, unknown_files:
     print(ArgParser.FILE_TRUNCATE)
 
 
+def _showFiles(files: list) -> None:
+    print(color_dic[C_KW.COUNT_AND_FILES], end="")
+    print("found FILE(s):", end="")
+    print(color_dic[C_KW.RESET_ALL])
+    for file in files:
+        print(f'\t{color_dic[C_KW.COUNT_AND_FILES]}{file}{color_dic[C_KW.RESET_ALL]}')
+
+
 def _printMeta(file: str) -> None:
     metaData = getFileMetaData(file, [color_dic[C_KW.RESET_ALL],
                                       color_dic[C_KW.ATTRIB],
@@ -149,8 +157,8 @@ def removeAnsiCodesFromLine(line: str) -> str:
     return resub(r'\x1b\[[0-9\;]*m', '', line)
 
 
-def removeAnsiCodes(content: list) -> list:
-    return [(removeAnsiCodesFromLine(prefix), removeAnsiCodesFromLine(line)) for prefix, line in content]
+# def removeAnsiCodes(content: list) -> list:
+#     return [(removeAnsiCodesFromLine(prefix), removeAnsiCodesFromLine(line)) for prefix, line in content]
 
 
 @lru_cache(maxsize=None)
@@ -344,7 +352,7 @@ def editFile(fileIndex: int = 1) -> None:
 
     if not show_bytecode:
         if holder.args_id[ARGS_CLIP]:
-            holder.clipBoard += "\n".join([prefix + line for prefix, line in removeAnsiCodes(content)])
+            holder.clipBoard += "\n".join([prefix + line for prefix, line in content])
 
 
 def editFiles() -> None:
@@ -363,7 +371,7 @@ def editFiles() -> None:
         print("", *holder.getAppliedFiles(), sep="\n\t")
     print(color_dic[C_KW.RESET_ALL], end="")
     if holder.args_id[ARGS_CLIP]:
-        pc.copy(holder.clipBoard)
+        pc.copy(removeAnsiCodesFromLine(holder.clipBoard))
 
 
 def main():
@@ -388,6 +396,9 @@ def main():
         return
     if holder.args_id[ARGS_CONFIG]:
         config.saveConfig()
+        return
+    if holder.args_id[ARGS_FFILES]:
+        _showFiles(known_files)
         return
     if holder.args_id[ARGS_INTERACTIVE]:
         piped_input = StdInHelper.getStdInContent(holder.args_id[ARGS_ONELINE])
