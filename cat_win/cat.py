@@ -113,8 +113,9 @@ def _showDebug(args: list, unknown_args: list, known_files: list, unknown_files:
 
 
 def _showFiles(files: list) -> None:
+    msg = 'applied' * holder.args_id[ARGS_FILES] + 'found' * holder.args_id[ARGS_FFILES]
     print(color_dic[C_KW.COUNT_AND_FILES], end="")
-    print("found FILE(s):", end="")
+    print(f"{msg} FILE(s):", end="")
     print(color_dic[C_KW.RESET_ALL])
     for file in files:
         print(f'\t{color_dic[C_KW.COUNT_AND_FILES]}{file}{color_dic[C_KW.RESET_ALL]}')
@@ -364,11 +365,7 @@ def editFiles() -> None:
         print(f"{color_dic[C_KW.COUNT_AND_FILES]}Lines: {holder.allFilesLinesSum}{color_dic[C_KW.RESET_ALL]}")
     if holder.args_id[ARGS_FILES]:
         print()
-        print(color_dic[C_KW.COUNT_AND_FILES], end="")
-        print("applied FILE(s):", end="")
-        print(color_dic[C_KW.RESET_ALL])
-        for file in holder.getAppliedFiles():
-            print(f'\t{color_dic[C_KW.COUNT_AND_FILES]}{file}{color_dic[C_KW.RESET_ALL]}')
+        _showFiles(holder.getAppliedFiles())
     if holder.args_id[ARGS_CLIP]:
         pc.copy(removeAnsiCodesFromLine(holder.clipBoard))
 
