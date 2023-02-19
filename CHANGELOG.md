@@ -3,8 +3,18 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.1.1] - TBA
 
-## [1.1.0] - TBA
+### Major Changes
+
+- included `cat` and `catw` as entrypoint. Using `cat` will show a deprecation warning.
+
+### Minor Changes
+
+- added `message_information`, `message_important` and `message_warning` as customizable colors to the --config menu.
+
+
+## [1.1.0] - 2023-02-18
 
 This release fully focuses on cleaning up, patching as many Bugs as possible, and renaming commands to a more logical name.
 

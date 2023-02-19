@@ -81,3 +81,7 @@ class C_KW:
     ATTRIB = "file_attribute_message"
     ATTRIB_POSITIVE = "active_file_attributes"
     ATTRIB_NEGATIVE = "missing_file_attributes"
+    
+    MESSAGE_INFORMATION = "message_information"
+    MESSAGE_IMPORTANT = "message_important"
+    MESSAGE_WARNING = "message_warning"

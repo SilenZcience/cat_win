@@ -40,3 +40,4 @@ jobs:
       - name: Test Entrypoint
         run: |
           catw -v
+          cat -v

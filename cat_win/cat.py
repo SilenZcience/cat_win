@@ -18,7 +18,7 @@ import cat_win.util.TmpFileHelper as TmpFileHelper
 from cat_win.util.Base64 import decodeBase64, encodeBase64
 from cat_win.util.FileAttributes import getFileMetaData
 from cat_win.const.ArgConstants import *
-from cat_win.const.ColorConstants import C_KW, ESC_CODE
+from cat_win.const.ColorConstants import C_KW
 from cat_win.web.UpdateChecker import printUpdateInformation
 
 from cat_win import __version__, __author__, __sysversion__
@@ -66,7 +66,7 @@ def _showHelp() -> None:
     helpMessage += f"\t{'cat f g -ne': <25}Output f's, then g's content, while numerating and showing the end of lines\n"
     helpMessage += f"\t{'cat f trunc=a:b:c': <25}Output f's content starting at line a, ending at line b, stepping c\n"
     print(helpMessage)
-    printUpdateInformation('cat_win', __version__)
+    printUpdateInformation('cat_win', __version__, color_dic)
 
 
 def _showVersion() -> None:
@@ -86,7 +86,7 @@ def _showVersion() -> None:
         versionMessage += f'Install time: \t-\n'
     versionMessage += f'Author: \t{__author__}\n'
     print(versionMessage)
-    printUpdateInformation('cat_win', __version__)
+    printUpdateInformation('cat_win', __version__, color_dic)
 
 
 def _showDebug(args: list, known_files: list, unknown_files: list) -> None:
@@ -431,6 +431,12 @@ def main():
             if holder.args_id[ARGS_DEBUG]:
                 print('FileNotFoundError', tmp_file)
 
+
+def deprecated_main():
+    print(color_dic[C_KW.MESSAGE_IMPORTANT], end="")
+    print("'cat'-command is soon to be deprecated. Please consider using 'catw'.", end="")
+    print(color_dic[C_KW.RESET_ALL], end="\n\n")
+    main()
 
 if __name__ == "__main__":
     main()

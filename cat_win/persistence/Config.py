@@ -17,7 +17,10 @@ class Config:
                    C_KW.COUNT_AND_FILES: ColorOptions.Fore['CYAN'],
                    C_KW.ATTRIB_POSITIVE: ColorOptions.Fore['LIGHTGREEN'],
                    C_KW.ATTRIB_NEGATIVE: ColorOptions.Fore['LIGHTRED'],
-                   C_KW.ATTRIB: ColorOptions.Fore['CYAN']}
+                   C_KW.ATTRIB: ColorOptions.Fore['CYAN'],
+                   C_KW.MESSAGE_INFORMATION: ColorOptions.Fore['LIGHTBLACK'],
+                   C_KW.MESSAGE_IMPORTANT: ColorOptions.Fore['YELLOW'],
+                   C_KW.MESSAGE_WARNING: ColorOptions.Fore['RED']}
     elements = list(default_dic.keys())
 
     def __init__(self, workingDir) -> None:

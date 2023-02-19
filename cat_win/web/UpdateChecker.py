@@ -1,5 +1,5 @@
 from requests import get as getRequest
-from cat_win.const.ColorConstants import ColorOptions
+from cat_win.const.ColorConstants import C_KW
 
 
 # UNSAFE:
@@ -74,7 +74,7 @@ def newVersionAvailable(currentVersion: str, latestVersion: str) -> int:
     return status
 
 
-def printUpdateInformation(package: str, currentVersion: str):
+def printUpdateInformation(package: str, currentVersion: str, color_dic: dict):
     latestVersion = getLastestPackageVersion(package)
     status = newVersionAvailable(currentVersion, latestVersion)
     if status == STATUS_UP_TO_DATE:
@@ -82,18 +82,18 @@ def printUpdateInformation(package: str, currentVersion: str):
     message = f""
     warning = f""
     if abs(status) == STATUS_STABLE_RELEASE_AVAILABLE:
-        message += f"{ColorOptions.Fore['YELLOW']}"
+        message += f"{color_dic[C_KW.MESSAGE_IMPORTANT]}"
         message += f"A new stable release of {package} is available: v{latestVersion}\n"
         message += f"To update, run:\n"
         message += f"python -m pip install --upgrade {package}"
     elif abs(status) == STATUS_PRE_RELEASE_AVAILABLE:
-        message += f"{ColorOptions.Fore['LIGHTBLACK']}"
+        message += f"{color_dic[C_KW.MESSAGE_INFORMATION]}"
         message += f"A new pre-release of {package} is available: v{latestVersion}"
-    message += f"{ColorOptions.Style['RESET']}"
+    message += f"{color_dic[C_KW.RESET_ALL]}"
     if status < 0:
-        warning += f"{ColorOptions.Fore['RED']}"
+        warning += f"{color_dic[C_KW.MESSAGE_WARNING]}"
         warning += f"Warning: Due to the drastic version increase, backwards compatibility is no longer guaranteed!\n"
         warning += f"You may experience fundamental differences."
-        warning += f"{ColorOptions.Style['RESET']}\n"
+        warning += f"{color_dic[C_KW.RESET_ALL]}\n"
     print(message)
     print(warning)
