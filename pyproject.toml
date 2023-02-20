@@ -9,6 +9,7 @@ authors = [{name = "Silas A. Kraume", email = "silas.kraume1552@gmail.com"}]
 readme = "README.md"
 license = {file = "LICENSE"}
 keywords = [
+	"cat",
     "python",
     "cli"
 ]
