@@ -449,7 +449,7 @@ def main():
 
 def deprecated_main():
     print(color_dic[C_KW.MESSAGE_IMPORTANT], end="")
-    print("'cat'-command is soon to be deprecated. Please consider using 'catw'.", end="")
+    print("The 'cat'-command is soon to be deprecated. Please consider using 'catw'.", end="")
     print(color_dic[C_KW.RESET_ALL], end="\n\n")
     main()
 
