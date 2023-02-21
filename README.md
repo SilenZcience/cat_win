@@ -125,6 +125,7 @@ catw --help
 | *-s, --sum*            | show sum of lines                                 |
 | *-f, --files*          | list applied files                                |
 | *-F, --FILES*          | ONLY list applied files                           |
+| *-k, --keyword*        | only show lines containing queried keywords       |
 | *-i, --interactive*    | use stdin                                         |
 | *-o, --oneline*        | take only the first stdin-line                    |
 | *-p, --peek*           | only print the first and last lines               |
@@ -139,6 +140,7 @@ catw --help
 | *--b64d, --b64d*       | decode the input from base64                      |
 |                        |                                                   |
 | *--nc, --nocolor*      | disable colored output                            |
+| *--nb, --nobreak*      | do not interrupt the output on queried keywords   |
 | *--config, --config*   | change color configuration                        |
 |                        |                                                   |
 | *enc=X*                | set file enconding to X (default is utf-8)        |

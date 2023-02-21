@@ -5,6 +5,11 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ## [1.1.2] - TBA
 
+### Minor Changes
+
+- added -`k`, --`keyword` parameter to only show lines containing queried keywords using `find` or `match`.
+- added --`nb`, --`nobreak` parameter to not interrupt the output on queried keywords using `find` or `match` with a message in regard to the position of the keyword.
+
 ### Bugfixes
 
 - fix Bug where --nocolor would not apply to --FILES output or the update information.

@@ -210,13 +210,19 @@ def printFile(content: list, bytecode: bool) -> None:
 
     for line_prefix, line in content:
         intervals, fKeyWords, mKeywords = stringFinder.findKeywords(line)
-
+        
+        if holder.args_id[ARGS_KEYWORD] and len(fKeyWords + mKeywords) == 0:
+            continue
+        
         if not holder.args_id[ARGS_NOCOL]:
             for kw_pos, kw_code in intervals:
                 line = line[:kw_pos] + color_dic[kw_code] + line[kw_pos:]
 
         print(line_prefix + line)
 
+        if holder.args_id[ARGS_KEYWORD] or holder.args_id[ARGS_NOBREAK]:
+            continue
+        
         found_sth = False
         if fKeyWords:
             print(color_dic[C_KW.FOUND_MESSAGE], end="")

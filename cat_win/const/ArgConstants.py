@@ -11,7 +11,8 @@ ARGS_REVERSE, ARGS_COUNT, ARGS_BLANK, ARGS_FILES, ARGS_INTERACTIVE = range(5, 10
 ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN = range(10, 15)
 ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA = range(15, 20)
 ARGS_CONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK, ARGS_NOCOL = range(20, 25)
-ARGS_EOF, ARGS_B64E, ARGS_B64D, ARGS_FFILES = range(25, 29)
+ARGS_EOF, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_KEYWORD = range(25, 30)
+ARGS_NOBREAK, _ = range(30, 32)
 
 ALL_ARGS = [[["-h", "--help"], "show this help message and exit", ARGS_HELP],
             [["-v", "--version"], "output version information and exit", ARGS_VERSION],
@@ -27,6 +28,7 @@ ALL_ARGS = [[["-h", "--help"], "show this help message and exit", ARGS_HELP],
             [["-s", "--sum"], "show sum of lines", ARGS_COUNT],
             [["-f", "--files"], "list applied files", ARGS_FILES],
             [["-F", "--FILES"], "ONLY list applied files", ARGS_FFILES],
+            [["-k", "--keyword"], "only show lines containing queried keywords", ARGS_KEYWORD],
             [["-i", "--interactive"], "use stdin", ARGS_INTERACTIVE],
             [["-o", "--oneline"], "take only the first stdin-line", ARGS_ONELINE],
             [["-p", "--peek"], "only print the first and last lines", ARGS_PEEK],
@@ -39,6 +41,7 @@ ALL_ARGS = [[["-h", "--help"], "show this help message and exit", ARGS_HELP],
             [["--b64e", "--b64e"], "encode the input to base64", ARGS_B64E],
             [["--b64d", "--b64d"], "decode the input from base64", ARGS_B64D],
             [["--nc", "--nocolor"], "disable colored output", ARGS_NOCOL],
+            [["--nb", "--nobreak"], "do not interrupt the output on queried keywords", ARGS_NOBREAK],
             [["--config", "--config"], "change color configuration", ARGS_CONFIG]]
 
 ALL_ARGS = [ArgConstant(x[0][0], x[0][1], x[1], x[2]) for x in ALL_ARGS]
