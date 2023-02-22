@@ -79,25 +79,26 @@ Contrary to the name of the project it is of course possible to use cat_win on L
 
 ### Prerequisites
 
-No Prerequisites are neccessary; The stand-alone executable `catw.exe` is sufficient.
-
-> ⚠️ **You should never trust any executable file!**
+- Installing via PyPI demands a Python-Installation (>= 3.7) aswell as the PIP-Package.
+- Installing via GitClone demands no prerequisites, hereby the stand-alone executable `catw.exe` is sufficient.
 
 ### Installation
 
-Simply install the python package ([PyPI-cat_win](https://pypi.org/project/cat-win/)):
+(via PyPI:) Simply install the python package ([PyPI-cat_win](https://pypi.org/project/cat-win/)):
 ```console
 pip install cat-win
 ```
 
-**OR** alternatively:
+**OR** alternatively (via GitClone):
 
 1. Clone the repository and move into the root\bin directory with:
 ```console
 git clone git@github.com:SilenZcience/cat_win.git
-cd cat_win\bin
+cd ./cat_win/bin
 ```
 2. Add the directory to your system-environment `PATH`-variables.
+
+> ⚠️ **You should never trust any executable file!** Feel free to compile the package itself (e.g. using PyInstaller).
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
