@@ -85,6 +85,13 @@ No Prerequisites are neccessary; The stand-alone executable `catw.exe` is suffic
 
 ### Installation
 
+Simply install the python package ([PyPI-cat_win](https://pypi.org/project/cat-win/)):
+```console
+pip install cat-win
+```
+
+**OR** alternatively:
+
 1. Clone the repository and move into the root\bin directory with:
 ```console
 git clone git@github.com:SilenZcience/cat_win.git
@@ -92,10 +99,6 @@ cd cat_win\bin
 ```
 2. Add the directory to your system-environment `PATH`-variables.
 
-or simply install the python package ([PyPI-cat_win](https://pypi.org/project/cat-win/)):
-```console
-pip install cat-win
-```
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Usage
@@ -105,10 +108,9 @@ catw [FILE]... [OPTION]...
 catw --help
 ```
 
-> ⚠️ *from v1.0.33 to v1.1.0 the entrypoint changes from ``cat`` to ``catw``. If you wish to keep the old command, you will have to define an alias yourself.*
+> ⚠️ *from v1.0.33 to v1.1.0 the entrypoint changes from `cat` to `catw`. If you wish to keep the old command, you will have to define an alias yourself.*
 
-
-| Argument               | Description                                       |
+| Argument / Option      | Description                                       |
 |------------------------|---------------------------------------------------|
 | *-h, --help*           | show help message and exit                        |
 | *-v, --version*        | output version information                        |
@@ -144,8 +146,8 @@ catw --help
 | *--config, --config*   | change color configuration                        |
 |                        |                                                   |
 | *enc=X*                | set file enconding to X (default is utf-8)        |
-| *find=X*               | find substring X in the given files               |
-| *match=X*              | find pattern X in the given files                 |
+| *find=X*               | find/query a substring X in the given files       |
+| *match=X*              | find/query a pattern X in the given files         |
 | *trunc=X:Y*            | truncate file to lines X and Y (python-like)      |
 |                        |                                                   |
 | *[a,b]*                | replace a with b in every line                    |
