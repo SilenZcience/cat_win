@@ -72,8 +72,8 @@ class Holder():
         heap = nlargest(1, lines, len)
         if len(heap) == 0:
             return 0
-        longest_line_len = len(heap[0][:-1].rstrip())
-        last_line_len = len(lines[-1].rstrip())
+        longest_line_len = len(heap[0][:-1].rstrip(b'\n').rstrip(b'\r'))
+        last_line_len = len(lines[-1].rstrip(b'\n').rstrip(b'\r'))
         
         return len(str(max(longest_line_len, last_line_len)))
 
