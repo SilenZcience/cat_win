@@ -14,6 +14,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - fix Bug where --nocolor would not apply to --FILES output or the update information.
 - fix Bug where --FILES would have unwanted behaviour when no files have been found.
+- fix Bug where -l, --linelength would have the wrong offset when using files with only one line.
 
 
 ## [1.1.1] - 2023-02-19

@@ -68,14 +68,14 @@ class Holder():
         lines = []
         with open(file, "rb") as fp:
             lines = fp.readlines()
+        
         heap = nlargest(1, lines, len)
         if len(heap) == 0:
             return 0
-        longest_line = heap[0][:-1]
-
-        if longest_line.endswith(b'\r'):
-            longest_line = longest_line[:-1]
-        return len(str(max(len(longest_line), len(lines[-1]))))
+        longest_line_len = len(heap[0][:-1].rstrip())
+        last_line_len = len(lines[-1].rstrip())
+        
+        return len(str(max(longest_line_len, last_line_len)))
 
     def __calcfileLineLengthPlaceHolder__(self) -> None:
         self.fileLineLengthPlaceHolder = max(self.__calcMaxLine__(file)
