@@ -9,6 +9,7 @@ test_file_path = test_file_dir + "test.txt"
 test_file_edge_case_1 = test_file_dir + "test_holderEdgeCase_1.txt"
 test_file_edge_case_2 = test_file_dir + "test_holderEdgeCase_2.txt"
 test_file_edge_case_3 = test_file_dir + "test_holderEdgeCase_3.txt"
+test_file_edge_case_4 = test_file_dir + "test_holderEdgeCase_4.txt"
 holder = Holder()
 
 
@@ -24,6 +25,14 @@ class TestConverter(TestCase):
         self.assertEqual(holder.fileLineLengthPlaceHolder, 1)
 
         holder.setFiles([test_file_edge_case_2])
+        holder.__calcfileLineLengthPlaceHolder__()
+        self.assertEqual(holder.fileLineLengthPlaceHolder, 2)
+        
+        holder.setFiles([test_file_edge_case_3, test_file_edge_case_4])
+        holder.__calcfileLineLengthPlaceHolder__()
+        self.assertEqual(holder.fileLineLengthPlaceHolder, 1)
+        
+        holder.setFiles([test_file_edge_case_2, test_file_edge_case_4])
         holder.__calcfileLineLengthPlaceHolder__()
         self.assertEqual(holder.fileLineLengthPlaceHolder, 2)
 
