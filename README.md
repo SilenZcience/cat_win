@@ -80,7 +80,7 @@ Contrary to the name of the project it is of course possible to use cat_win on L
 ### Prerequisites
 
 - Installing via PyPI demands a Python-Installation (>= 3.7) aswell as the PIP-Package.
-- Installing via GitClone demands no prerequisites, hereby the stand-alone executable `catw.exe` is sufficient.
+- Installing via GitClone demands no prerequisites, hereby the stand-alone executable `catw.exe` (Windows only!) is sufficient.
 
 ### Installation
 
@@ -91,7 +91,7 @@ pip install cat-win
 
 **OR** alternatively (via GitClone):
 
-1. Clone the repository and move into the root\bin directory with:
+1. Clone the repository and move into the root/bin directory with:
 ```console
 git clone git@github.com:SilenZcience/cat_win.git
 cd ./cat_win/bin
