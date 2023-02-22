@@ -79,26 +79,22 @@ Contrary to the name of the project it is of course possible to use cat_win on L
 
 ### Prerequisites
 
-- Installing via PyPI demands a Python-Installation (>= 3.7) aswell as the PIP-Package.
-- Installing via GitClone demands no prerequisites, hereby the stand-alone executable `catw.exe` (Windows only!) is sufficient.
+- Using cat_win as a Python-Package demands a Python-Interpreter (>= 3.7).
+- Using cat_win as an Executable (Windows only!) demands no prerequisites, hereby the stand-alone executable `catw.exe`  is sufficient.
 
 ### Installation
 
-(via PyPI:) Simply install the python package ([PyPI-cat_win](https://pypi.org/project/cat-win/)):
+Simply install the python package (via [PyPI-cat_win](https://pypi.org/project/cat-win/)):
 ```console
-pip install cat-win
+python -m pip install --upgrade cat_win
 ```
 
-**OR** alternatively (via GitClone):
+**OR alternatively** you can use the compiled version (Windows only!):
 
-1. Clone the repository and move into the root/bin directory with:
-```console
-git clone git@github.com:SilenZcience/cat_win.git
-cd ./cat_win/bin
-```
-2. Add the directory to your system-environment `PATH`-variables.
+1. Simply download the [catw.exe](https://github.com/SilenZcience/cat_win/blob/main/bin/catw.exe?raw=true) file.
+2. Add the file path to your system-environment `PATH`-variables.
 
-> ⚠️ **You should never trust any executable file!** Feel free to compile the package itself (e.g. using PyInstaller).
+> ⚠️ **You should never trust any executable file!** Feel free to compile the package itself (e.g. using [PyInstaller](https://pyinstaller.org/en/stable/)).
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
