@@ -172,7 +172,7 @@ catw --help
 
 ```console
 $ echo "Hello World :)" | catw -i [6:] | catw -i [::-1] -ln
-> 1) [ 8] ): dlroW
+> 1) [8] ): dlroW
 ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
