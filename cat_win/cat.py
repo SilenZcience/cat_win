@@ -113,6 +113,8 @@ def _showDebug(args: list, unknown_args: list, known_files: list, unknown_files:
 
 
 def _showFiles(files: list) -> None:
+    if len(files) == 0:
+        return
     msg = 'applied' * holder.args_id[ARGS_FILES] + 'found' * holder.args_id[ARGS_FFILES]
     print(color_dic[C_KW.COUNT_AND_FILES], end="")
     print(f"{msg} FILE(s):", end="")
