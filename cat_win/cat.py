@@ -372,11 +372,16 @@ def editFile(fileIndex: int = 1) -> None:
             holder.clipBoard += '\n'.join([prefix + line for prefix, line in content])
 
 
-def copyToClipboard(content: str, dependency: int = 3) -> None:
+def copyToClipboard(content: str, dependency: int = 3, clipBoardError: bool = False) -> None:
     if dependency == 0:
-        errorMsg = '\n'
-        errorMsg += "ImportError: You need either 'pyperclip3', 'pyperclip', or 'pyclip' in order to use the '--clip' parameter.\n"
-        errorMsg += "Should you have any problem with either module, try to install a different one using 'python -m pip install ...'"
+        if clipBoardError:
+            errorMsg = '\n'
+            errorMsg += "ClipBoardError: You can use either 'pyperclip3', 'pyperclip', or 'pyclip' in order to use the '--clip' parameter.\n"
+            errorMsg += "Try to install a different one using 'python -m pip install ...'"
+        else:
+            errorMsg = '\n'
+            errorMsg += "ImportError: You need either 'pyperclip3', 'pyperclip', or 'pyclip' in order to use the '--clip' parameter.\n"
+            errorMsg += "Should you have any problem with either module, try to install a different one using 'python -m pip install ...'"
         print(errorMsg)
         return
     try:
@@ -388,7 +393,9 @@ def copyToClipboard(content: str, dependency: int = 3) -> None:
             import pyperclip as pc
         pc.copy(content)
     except ImportError:
-        copyToClipboard(content, dependency-1)
+        copyToClipboard(content, dependency-1, False or clipBoardError)
+    except Exception:
+        copyToClipboard(content, dependency-1, True or clipBoardError)
     
 
 def editFiles() -> None:
