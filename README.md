@@ -165,7 +165,7 @@ catw --help
 ### Examples
 
 <details>
-	<summary>Images</summary>
+	<summary><b>📂 Images 📂</b></summary>
 
 ![Example1](https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example1.png "example1")
 
