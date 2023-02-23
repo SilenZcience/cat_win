@@ -8,8 +8,7 @@ import os
 # sys.path.append("../cat_win")
 
 
-test_file_dir = os.path.dirname(__file__) + '/texts/'
-test_file_path = test_file_dir + "test.txt"
+test_file_path = os.path.join(os.path.dirname(__file__), "texts", "test.txt")
 test_file_content = []
 with open(test_file_path, 'r', encoding='utf-8') as f:
     test_file_content = f.read().split('\n')

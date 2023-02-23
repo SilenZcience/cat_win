@@ -4,8 +4,6 @@ from unittest import TestCase
 # sys.path.append("../cat_win")
 
 
-expected_output = ""
-
 converter = Converter()
 
 

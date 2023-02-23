@@ -1,3 +1,4 @@
+import os
 from sys import stdin
 
 
@@ -27,14 +28,55 @@ def getStdInContent(oneLine: bool = False) -> str:
     return input
 
 
-def writeFiles(file_list: list, content: str, file_encoding: str) -> None:
+def path_parts(path: str) -> list:
+    p, f = os.path.split(path)
+    return path_parts(p) + [f] if f and p else [p] if p else []
+
+
+def createFile(file: str, content: str, file_encoding: str) -> bool:
     """
-    Simply writes the content into every
-    file in the given list if there is a
-    valid content.
+    create the directory path to a file, and the file itself.
+    on error: cleanup all created subdirectories in the process
+    return True if the operation was successful.
+    """
+    file_dir = os.path.dirname(file)
+    splitted_path = path_parts(file_dir)
+    subpaths = [os.path.join(*splitted_path[:i]) for i in range(2, len(splitted_path)+1)]
+    unknown_subpaths = [s for s in subpaths[::-1] if not os.path.exists(s)]
+    try:
+        os.makedirs(file_dir, exist_ok=True)
+    except OSError:
+        print(f"Error: The path '{file_dir}' could not be created.")
+        # cleanup (delete the folders that have been created)
+        for subpath in unknown_subpaths:
+            try:
+                os.rmdir(subpath)
+            except OSError:
+                continue
+        return False
+    try:
+        with open(file, 'w', encoding=file_encoding) as f:
+            f.write(content)
+    except OSError:
+        print(f"Error: The file '{file}' could not be written.")
+        # cleanup (delete the folders that have been created)
+        for subpath in unknown_subpaths:
+            try:
+                os.rmdir(subpath)
+            except OSError:
+                continue
+        return False
+    return True
+
+
+def writeFiles(file_list: list, content: str, file_encoding: str) -> list:
+    """
+    Simply writes the content into every file in the given list
+    if there is a valid content,
+    returns a list of all files, that could succesfully be written.
     """
     if len(file_list) == 0:
-        return
+        return file_list
     
     if content == "":
         abort_command = "" 
@@ -52,19 +94,31 @@ def writeFiles(file_list: list, content: str, file_encoding: str) -> None:
             if abort_command and abort_command.upper() != 'Y':
                 print("Aborting...")
                 file_list.clear()
-        
+    
+    success_file_list = []
+    
     for file in file_list:
-        with open(file, 'w', encoding=file_encoding) as f:
-            f.write(content)
+        try:
+            with open(file, 'w', encoding=file_encoding) as f:
+                f.write(content)
+            success_file_list.append(file)
+        except FileNotFoundError: # the os.pardir path to the file does not exist
+            if createFile(file, content, file_encoding):
+                success_file_list.append(file)
+        except OSError:
+            print(f"Error: The file '{file}' could not be written.")
+            
+    return success_file_list
 
 
-def readWriteFilesFromStdIn(file_list: list, file_encoding: str, oneLine: bool = False) -> None:
+def readWriteFilesFromStdIn(file_list: list, file_encoding: str, oneLine: bool = False) -> list:
     """
     Takes a list of files, waits for a String from
     the standard input and writes it into every file.
+    returns a list of all files, that could succesfully be written.
     """
     if len(file_list) == 0:
-        return
+        return file_list
 
     print("The given FILE(s)", end="")
     print("", *file_list, sep="\n\t")
@@ -72,4 +126,4 @@ def readWriteFilesFromStdIn(file_list: list, file_encoding: str, oneLine: bool =
 
     input = getStdInContent(oneLine)
 
-    writeFiles(file_list, input, file_encoding)
+    return writeFiles(file_list, input, file_encoding)

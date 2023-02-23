@@ -5,8 +5,7 @@ import os
 # sys.path.append("../cat_win")
 
 
-test_file_dir = os.path.dirname(__file__) + '/texts/'
-test_file_path = test_file_dir + "test.txt"
+test_file_path = os.path.join(os.path.dirname(__file__), "texts", "test.txt")
 
 
 class TestChecksum(TestCase):
