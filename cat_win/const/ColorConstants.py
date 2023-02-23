@@ -6,7 +6,7 @@ def idToCode(code: int) -> str:
     return f'{ESC_CODE}[{code}m'
 
 
-class ColorOptions():
+class ColorOptions:
     Fore = {
         "RESET": 39,
             

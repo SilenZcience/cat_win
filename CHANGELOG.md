@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.1.3] - TBA
+
+### Minor Changes
+
+- added appeal to raise official github issue when encountering an exception.
+
+
 ## [1.1.2] - 2023-02-22
 
 ### Minor Changes
