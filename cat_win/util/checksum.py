@@ -29,11 +29,11 @@ def getChecksumFromFile(file: str, colors: list = ['', '']) -> str:
             sha512.update(data)
             crc32 = crc32_hash(data, crc32)
 
-    crc32 = "%08X" % (crc32 & 0xFFFFFFFF)
+    crc32 = f"{(crc32 & 0xFFFFFFFF):08X}"
     
-    checksum =  f'\t{colors[0]}{"CRC32:" : <9}{str(crc32)}{colors[1]}\n'
-    checksum += f'\t{colors[0]}{"MD5:"   : <9}{str(md5.hexdigest())}{colors[1]}\n'
-    checksum += f'\t{colors[0]}{"SHA1:"  : <9}{str(sha1.hexdigest())}{colors[1]}\n'
-    checksum += f'\t{colors[0]}{"SHA256:": <9}{str(sha256.hexdigest())}{colors[1]}\n'
-    checksum += f'\t{colors[0]}{"SHA512:": <9}{str(sha512.hexdigest())}{colors[1]}\n'
+    checksum =  f"\t{colors[0]}{'CRC32:' : <9}{str(crc32)}{colors[1]}\n"
+    checksum += f"\t{colors[0]}{'MD5:'   : <9}{str(md5.hexdigest())}{colors[1]}\n"
+    checksum += f"\t{colors[0]}{'SHA1:'  : <9}{str(sha1.hexdigest())}{colors[1]}\n"
+    checksum += f"\t{colors[0]}{'SHA256:': <9}{str(sha256.hexdigest())}{colors[1]}\n"
+    checksum += f"\t{colors[0]}{'SHA512:': <9}{str(sha512.hexdigest())}{colors[1]}\n"
     return checksum

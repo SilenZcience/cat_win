@@ -29,10 +29,10 @@ class StringFinder:
             yield list(match.span())
 
     def _optimizeIntervals(self, intervals: list) -> list:
-        """\
-            Merge overlapping intervalls for partially
-            color encoded lines. Needed when multiple
-            search-keywords apply to the same line.
+        """
+        Merge overlapping intervalls for partially
+        color encoded lines. Needed when multiple
+        search-keywords apply to the same line.
         """
         if not intervals:
             return []

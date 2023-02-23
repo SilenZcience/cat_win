@@ -5,10 +5,10 @@ from unittest import TestCase
 from io import StringIO
 import os
 # import sys
-# sys.path.append("../cat_win")
+# sys.path.append('../cat_win')
 
 
-test_file_path = os.path.join(os.path.dirname(__file__), "texts", "test.txt")
+test_file_path = os.path.join(os.path.dirname(__file__), 'texts', 'test.txt')
 test_file_content = []
 with open(test_file_path, 'r', encoding='utf-8') as f:
     test_file_content = f.read().split('\n')
@@ -17,7 +17,7 @@ with open(test_file_path, 'r', encoding='utf-8') as f:
 holder = Holder()
 
 @patch('cat_win.cat.holder', holder)
-@patch('cat_win.cat.color_dic', dict.fromkeys(cat.color_dic, ""))
+@patch('cat_win.cat.color_dic', dict.fromkeys(cat.color_dic, ''))
 class TestCat(TestCase):
     maxDiff = None
 
@@ -29,7 +29,7 @@ class TestCat(TestCase):
         holder.setFiles([test_file_path])
         holder.setArgs([])
         
-        check_against = "\n".join(test_file_content) + "\n"
+        check_against = '\n'.join(test_file_content) + '\n'
 
         with patch('sys.stdout', new=StringIO()) as fake_out:
             cat.editFiles()
@@ -39,7 +39,7 @@ class TestCat(TestCase):
         holder.setFiles([test_file_path, test_file_path, test_file_path])
         holder.setArgs([])
 
-        check_against = "\n".join(test_file_content * 3) + '\n'
+        check_against = '\n'.join(test_file_content * 3) + '\n'
 
         with patch('sys.stdout', new=StringIO()) as fake_out:
             cat.editFiles()
@@ -51,7 +51,7 @@ class TestCat(TestCase):
 
         check_against = test_file_content
         check_against.reverse()
-        check_against = "\n".join(check_against) + "\n"
+        check_against = '\n'.join(check_against) + '\n'
 
         with patch('sys.stdout', new=StringIO()) as fake_out:
             cat.editFiles()
@@ -61,8 +61,8 @@ class TestCat(TestCase):
         holder.setFiles([test_file_path])
         holder.setArgs([[2, ''], [3, '']]) #ends & tabs
 
-        check_against = ("\n".join([c.replace("\t", "^I") + "$" for c in test_file_content]) +
-                         "\n")
+        check_against = ('\n'.join([c.replace('\t', '^I') + '$' for c in test_file_content]) +
+                         '\n')
 
         with patch('sys.stdout', new=StringIO()) as fake_out:
             cat.editFiles()
@@ -131,14 +131,14 @@ class TestCat(TestCase):
     def test_removeAnsiCodesFromLine(self):
         red = '\x1b[31m'
         reset = '\x1b[0m'
-        random_string = f'abc{red}defghij{reset}klmnopq{red}r{reset}'
+        random_string = f"abc{red}defghij{reset}klmnopq{red}r{reset}"
         expected_output = 'abcdefghijklmnopqr'
         self.assertEqual(cat.removeAnsiCodesFromLine(random_string), expected_output)
 
     # def test_removeAnsiCodes(self):
     #     red_bold_underlined = '\x1b[31;1;4m'
     #     reset = '\x1b[0m'
-    #     random_list = [(f'12{red_bold_underlined}34{reset}5', f'abc{red_bold_underlined}defghij{reset}klmnopq{red_bold_underlined}r{reset}')]
+    #     random_list = [(f"12{red_bold_underlined}34{reset}5', f'abc{red_bold_underlined}defghij{reset}klmnopq{red_bold_underlined}r{reset}")]
     #     expected_output = [('12345', 'abcdefghijklmnopqr')]
     #     self.assertEqual(cat.removeAnsiCodes(random_list), expected_output)
 

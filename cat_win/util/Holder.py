@@ -20,7 +20,7 @@ class Holder():
         # the amount of chars neccessary to display the longest line within all files (breaks on base64 decoding)
         self.fileLineLengthPlaceHolder = 0
 
-        self.clipBoard = ""
+        self.clipBoard = ''
     
     def setFiles(self, files: list) -> None:
         self.files = files[:]
@@ -41,7 +41,7 @@ class Holder():
         self.temp_file = file
 
     def getAppliedFiles(self) -> list:
-        return ["<STDIN>" if f == self.temp_file else f for f in self.files]
+        return ['<STDIN>' if f == self.temp_file else f for f in self.files]
     
     def __calcFileNumberPlaceHolder__(self) -> None:
         self.fileNumberPlaceHolder = len(str(len(self.files)))
@@ -66,7 +66,7 @@ class Holder():
     def __calcMaxLine__(self, file: str) -> int:
         heap = []
         lines = []
-        with open(file, "rb") as fp:
+        with open(file, 'rb') as fp:
             lines = fp.readlines()
         
         heap = nlargest(1, lines, len)

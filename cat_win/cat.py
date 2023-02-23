@@ -38,9 +38,9 @@ def exception_handler(exception_type: type, exception, traceback, debug_hook=sys
     if holder.args_id[ARGS_DEBUG]:
         debug_hook(exception_type, exception, traceback)
         return
-    print("\nError: {} {}".format(exception_type.__name__, exception))
+    print(f"\nError: {exception_type.__name__} {exception}")
     if exception_type != KeyboardInterrupt:
-        print("If this Exception is unexpected, please raise an Issue at:\n{}/issues".format(__url__))
+        print(f"If this Exception is unexpected, please raise an Issue at:\n{__url__}/issues")
 
 
 sys.excepthook = exception_handler
@@ -53,15 +53,15 @@ def _showHelp() -> None:
     helpMessage = 'Usage: catw [FILE]... [OPTION]...\n'
     helpMessage += 'Concatenate FILE(s) to standard output.\n\n'
     for x in ALL_ARGS:
-        helpMessage += f'\t{f"{x.shortForm}, {x.longForm}": <25}{x.help}\n'
+        helpMessage += f"\t{f'{x.shortForm}, {x.longForm}': <25}{x.help}\n"
     helpMessage += '\n'
-    helpMessage += f'\t{"enc=X, enc:X"    : <25}set file encoding to X (default is utf-8)\n'
-    helpMessage += f'\t{"find=X, find:X"  : <25}find/query a substring X in the given files\n'
-    helpMessage += f'\t{"match=X, match:X": <25}find/query a pattern X in the given files\n'
-    helpMessage += f'\t{"trunc=X:Y, trunc:X:Y": <25}truncate file to lines x and y (python-like)\n'
+    helpMessage += f"\t{'enc=X, enc:X'    : <25}set file encoding to X (default is utf-8)\n"
+    helpMessage += f"\t{'find=X, find:X'  : <25}find/query a substring X in the given files\n"
+    helpMessage += f"\t{'match=X, match:X': <25}find/query a pattern X in the given files\n"
+    helpMessage += f"\t{'trunc=X:Y, trunc:X:Y': <25}truncate file to lines x and y (python-like)\n"
     helpMessage += '\n'
-    helpMessage += f'\t{"[a,b]": <25}replace a with b in every line\n'
-    helpMessage += f'\t{"[a:b:c]": <25}python-like string indexing syntax (line by line)\n'
+    helpMessage += f"\t{'[a,b]': <25}replace a with b in every line\n"
+    helpMessage += f"\t{'[a:b:c]': <25}python-like string indexing syntax (line by line)\n"
     helpMessage += '\n'
     helpMessage += 'Examples:\n'
     helpMessage += f"\t{'cat f g -r' : <25}Output g's contents in reverse order, then f's content in reverse order\n"
@@ -75,18 +75,18 @@ def _showVersion() -> None:
     """
     Show the Version message and exit.
     """
-    catVersion = f'Catw {__version__} - from {workingDir}\n'
+    catVersion = f"Catw {__version__} - from {workingDir}\n"
     versionMessage = '\n'
     versionMessage += '-' * len(catVersion) + '\n'
     versionMessage += catVersion
     versionMessage += '-' * len(catVersion) + '\n'
     versionMessage += '\n'
-    versionMessage += f'Built with: \tPython {__sysversion__}\n'  # sys.version
+    versionMessage += f"Built with: \tPython {__sysversion__}\n"  # sys.version
     try:
-        versionMessage += f'Install time: \t{datetime.fromtimestamp(os.path.getctime(os.path.realpath(__file__)))}\n'
+        versionMessage += f"Install time: \t{datetime.fromtimestamp(os.path.getctime(os.path.realpath(__file__)))}\n"
     except OSError: # fails on pyinstaller executable
-        versionMessage += f'Install time: \t-\n'
-    versionMessage += f'Author: \t{__author__}\n'
+        versionMessage += f"Install time: \t-\n"
+    versionMessage += f"Author: \t{__author__}\n"
     print(versionMessage)
     printUpdateInformation('cat_win', __version__, color_dic)
 
@@ -95,22 +95,22 @@ def _showDebug(args: list, unknown_args: list, known_files: list, unknown_files:
     """
     Print all neccassary debug information
     """
-    print("Debug Information:")
-    print("args: ", end="")
+    print('Debug Information:')
+    print('args: ', end='')
     print([(arg[0], arg[1], holder.args_id[arg[0]]) for arg in args])
-    print("unknown_args: ", end="")
+    print('unknown_args: ', end='')
     print(unknown_args)
-    print("known_files: ", end="")
+    print('known_files: ', end='')
     print(known_files)
-    print("unknown_files: ", end="")
+    print('unknown_files: ', end='')
     print(unknown_files)
-    print("file encoding: ", end="")
+    print('file encoding: ', end='')
     print(ArgParser.FILE_ENCODING)
-    print("search keyword(s): ", end="")
+    print('search keyword(s): ', end='')
     print(ArgParser.FILE_SEARCH)
-    print("search match(es): ", end="")
+    print('search match(es): ', end='')
     print(ArgParser.FILE_MATCH)
-    print("truncate file: ", end="")
+    print('truncate file: ', end='')
     print(ArgParser.FILE_TRUNCATE)
 
 
@@ -118,11 +118,11 @@ def _showFiles(files: list) -> None:
     if len(files) == 0:
         return
     msg = 'applied' * holder.args_id[ARGS_FILES] + 'found' * holder.args_id[ARGS_FFILES]
-    print(color_dic[C_KW.COUNT_AND_FILES], end="")
-    print(f"{msg} FILE(s):", end="")
+    print(color_dic[C_KW.COUNT_AND_FILES], end='')
+    print(f"{msg} FILE(s):", end='')
     print(color_dic[C_KW.RESET_ALL])
     for file in files:
-        print(f'\t{color_dic[C_KW.COUNT_AND_FILES]}{file}{color_dic[C_KW.RESET_ALL]}')
+        print(f"\t{color_dic[C_KW.COUNT_AND_FILES]}{file}{color_dic[C_KW.RESET_ALL]}")
 
 
 def _printMeta(file: str) -> None:
@@ -167,10 +167,10 @@ def removeAnsiCodesFromLine(line: str) -> str:
 @lru_cache(maxsize=None)
 def _CalculateLinePrefixSpacing(lineCharLength: int,
                                 includeFilePrefix: bool = False, fileCharLength: int = None) -> str:
-    line_prefix = (' ' * (holder.fileLineNumberPlaceHolder - lineCharLength)) + "%i)"
+    line_prefix = (' ' * (holder.fileLineNumberPlaceHolder - lineCharLength)) + '%i)'
 
     if includeFilePrefix:
-        file_prefix = (' ' * (holder.fileNumberPlaceHolder - fileCharLength)) + "%i."
+        file_prefix = (' ' * (holder.fileNumberPlaceHolder - fileCharLength)) + '%i.'
         return color_dic[C_KW.NUMBER] + file_prefix + line_prefix + color_dic[C_KW.RESET_ALL] + ' '
 
     return color_dic[C_KW.NUMBER] + line_prefix + color_dic[C_KW.RESET_ALL] + ' '
@@ -206,7 +206,7 @@ def printFile(content: list, bytecode: bool) -> None:
     if not content:
         return
     if not (ArgParser.FILE_SEARCH or ArgParser.FILE_MATCH) or bytecode:
-        print(*[prefix + line for prefix, line in content], sep="\n")
+        print(*[prefix + line for prefix, line in content], sep='\n')
         return
 
     stringFinder = StringFinder.StringFinder(
@@ -229,13 +229,13 @@ def printFile(content: list, bytecode: bool) -> None:
         
         found_sth = False
         if fKeyWords:
-            print(color_dic[C_KW.FOUND_MESSAGE], end="")
-            print("--------------- Found", fKeyWords, "---------------", end="")
+            print(color_dic[C_KW.FOUND_MESSAGE], end='')
+            print('--------------- Found', fKeyWords, '---------------', end='')
             print(color_dic[C_KW.RESET_ALL])
             found_sth = True
         if mKeywords:
-            print(color_dic[C_KW.MATCHED_MESSAGE], end="")
-            print("--------------- Matched", mKeywords, "---------------", end="")
+            print(color_dic[C_KW.MATCHED_MESSAGE], end='')
+            print('--------------- Matched', mKeywords, '---------------', end='')
             print(color_dic[C_KW.RESET_ALL])
             found_sth = True
 
@@ -257,10 +257,10 @@ def printExcludedByPeek(content: list, excludedByPeek: int) -> None:
     excludedByPeekLength = (len(str(excludedByPeek))-1)//2
     excludedByPeekIndent = ' ' * (len(prefix) - excludedByPeekLength + 10)
     excludedByPeekIndentAdd = ' ' * excludedByPeekLength
-    print(color_dic[C_KW.NUMBER], end="")
-    print(excludedByPeekIndent, excludedByPeekIndentAdd, " •", sep="")
-    print(excludedByPeekIndent, "(", excludedByPeek, ")", sep="")
-    print(excludedByPeekIndent, excludedByPeekIndentAdd, " •", sep="", end="")
+    print(color_dic[C_KW.NUMBER], end='')
+    print(excludedByPeekIndent, excludedByPeekIndentAdd, ' •', sep='')
+    print(excludedByPeekIndent, '(', excludedByPeek, ')', sep='')
+    print(excludedByPeekIndent, excludedByPeekIndentAdd, ' •', sep='', end='')
     print(color_dic[C_KW.RESET_ALL])
 
 
@@ -275,7 +275,7 @@ def editFile(fileIndex: int = 1) -> None:
             # time cat touches a file.
             content = [('', line) for line in f.read().splitlines()]
     except:
-        print("Failed to open:", holder.files[fileIndex-1])
+        print('Failed to open:', holder.files[fileIndex-1])
         try:
             enterChar = '⏎'
             try:
@@ -284,7 +284,7 @@ def editFile(fileIndex: int = 1) -> None:
                 enterChar = 'ENTER'
             inp = input(f"Do you want to open the file as a binary, without parameters? [Y/{enterChar}]:")
             if not 'Y' in inp.upper() and inp:
-                print("Aborting...")
+                print('Aborting...')
                 return
         except EOFError:
             pass
@@ -294,7 +294,7 @@ def editFile(fileIndex: int = 1) -> None:
                 content = [('', line) for line in f.read().splitlines()]
             show_bytecode = True
         except:
-            print("Operation failed! Try using the enc=X parameter.")
+            print('Operation failed! Try using the enc=X parameter.')
             return
     
     if not show_bytecode and holder.args_id[ARGS_B64D]:
@@ -315,15 +315,15 @@ def editFile(fileIndex: int = 1) -> None:
                     content = [(prefix, eval(repr(line) + param))
                                 for prefix, line in content]
                 except:
-                    print("Error at operation: ", param)
+                    print('Error at operation: ', param)
                     return
         
         for arg, param in holder.args:
             if arg == ARGS_ENDS:
-                content = [(prefix, line + color_dic[C_KW.ENDS] + "$" + color_dic[C_KW.RESET_ALL])
+                content = [(prefix, line + color_dic[C_KW.ENDS] + '$' + color_dic[C_KW.RESET_ALL])
                            for prefix, line in content]
             elif arg == ARGS_TABS:
-                content = [(prefix, line.replace("\t", color_dic[C_KW.TABS] + "^I" + color_dic[C_KW.RESET_ALL]))
+                content = [(prefix, line.replace('\t', color_dic[C_KW.TABS] + '^I' + color_dic[C_KW.RESET_ALL]))
                            for prefix, line in content]
             elif arg == ARGS_SQUEEZE:
                 content = [list(group)[0] for _, group in groupby(content, lambda x: x[1])]
@@ -332,13 +332,13 @@ def editFile(fileIndex: int = 1) -> None:
             elif arg == ARGS_BLANK:
                 content = [c for c in content if c[1]]
             elif arg == ARGS_DEC:
-                content = [(prefix, line + ' ' + color_dic[C_KW.CONVERSION] + converter._fromDEC(int(line), (param == "--dec")) +
+                content = [(prefix, line + ' ' + color_dic[C_KW.CONVERSION] + converter._fromDEC(int(line), (param == '--dec')) +
                             color_dic[C_KW.RESET_ALL]) for prefix, line in content if converter.is_dec(line)]
             elif arg == ARGS_HEX:
-                content = [(prefix, line + ' ' + color_dic[C_KW.CONVERSION] + converter._fromHEX(line, (param == "--hex")) +
+                content = [(prefix, line + ' ' + color_dic[C_KW.CONVERSION] + converter._fromHEX(line, (param == '--hex')) +
                             color_dic[C_KW.RESET_ALL]) for prefix, line in content if converter.is_hex(line)]
             elif arg == ARGS_BIN:
-                content = [(prefix, line + ' ' + color_dic[C_KW.CONVERSION] + converter._fromBIN(line, (param == "--bin")) +
+                content = [(prefix, line + ' ' + color_dic[C_KW.CONVERSION] + converter._fromBIN(line, (param == '--bin')) +
                             color_dic[C_KW.RESET_ALL]) for prefix, line in content if converter.is_bin(line)]
             elif arg == ARGS_REPLACE:
                 replace_values = param[1:-1].split(",")
@@ -361,7 +361,7 @@ def editFile(fileIndex: int = 1) -> None:
 
     if not show_bytecode:
         if holder.args_id[ARGS_CLIP]:
-            holder.clipBoard += "\n".join([prefix + line for prefix, line in content])
+            holder.clipBoard += '\n'.join([prefix + line for prefix, line in content])
 
 
 def editFiles() -> None:
@@ -381,7 +381,7 @@ def editFiles() -> None:
 
 
 def main():
-    piped_input = temp_file = ""
+    piped_input = temp_file = ''
 
     # read parameter-args
     args, unknown_args, known_files, unknown_files = ArgParser.getArguments(sys.argv)
@@ -393,7 +393,7 @@ def main():
     
     if holder.args_id[ARGS_NOCOL]:
         global color_dic
-        color_dic = dict.fromkeys(color_dic, "")
+        color_dic = dict.fromkeys(color_dic,'')
     
     # check for special cases
     if holder.args_id[ARGS_DEBUG]:
@@ -452,10 +452,10 @@ def main():
 
 
 def deprecated_main():
-    print(color_dic[C_KW.MESSAGE_IMPORTANT], end="")
-    print("The 'cat'-command is soon to be deprecated. Please consider using 'catw'.", end="")
-    print(color_dic[C_KW.RESET_ALL], end="\n\n")
+    print(color_dic[C_KW.MESSAGE_IMPORTANT], end='')
+    print("The 'cat'-command is soon to be deprecated. Please consider using 'catw'.", end='')
+    print(color_dic[C_KW.RESET_ALL], end='\n\n')
     main()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

@@ -1,49 +1,49 @@
 from cat_win.util.StringFinder import StringFinder
 from unittest import TestCase
 # import sys
-# sys.path.append("../cat_win")
+# sys.path.append('../cat_win')
 
 
 class TestConverter(TestCase):
     def test_findliterals_True(self):
         stringFinder = StringFinder([], [])
-        x = [x for x in stringFinder._findliterals("test", "abctestdef")]
+        x = [x for x in stringFinder._findliterals('test', 'abctestdef')]
         self.assertEqual(x, [[3, 7]])
         
-        x = [x for x in stringFinder._findliterals("test", "testabctestdetestf")]
+        x = [x for x in stringFinder._findliterals('test', 'testabctestdetestf')]
         self.assertEqual(x, [[0, 4], [7, 11], [13, 17]])
         
-        x = [x for x in stringFinder._findliterals("", "")]
+        x = [x for x in stringFinder._findliterals('', '')]
         self.assertEqual(x, [[0, 0]])
         
-        x = [x for x in stringFinder._findliterals("", "x")]
+        x = [x for x in stringFinder._findliterals('', 'x')]
         self.assertEqual(x, [[0, 0], [1, 1]])
         
     def test_findLiterals_False(self):
         stringFinder = StringFinder([], [])
-        x = [x for x in stringFinder._findliterals("a", "")]
+        x = [x for x in stringFinder._findliterals('a', '')]
         self.assertEqual(x, [])
         
-        x = [x for x in stringFinder._findliterals("test", "tsetabctesdeestf")]
+        x = [x for x in stringFinder._findliterals('test', 'tsetabctesdeestf')]
         self.assertEqual(x, [])
         
     def test_findRegex_True(self):
         stringFinder = StringFinder([], [])
-        x = [x for x in stringFinder._findregex(r"[0-9]{2}", "123")]
+        x = [x for x in stringFinder._findregex(r"[0-9]{2}", '123')]
         self.assertEqual(x, [[0, 2]])
         
-        x = [x for x in stringFinder._findregex(r"[0-9]{2}", "1234")]
+        x = [x for x in stringFinder._findregex(r"[0-9]{2}", '1234')]
         self.assertEqual(x, [[0, 2], [2, 4]])
         
-        x = [x for x in stringFinder._findregex(r"[A-Z]{1}[a-z]*\s?.*\.+\s", "Silas A. Kraume")]
+        x = [x for x in stringFinder._findregex(r"[A-Z]{1}[a-z]*\s?.*\.+\s", 'Silas A. Kraume')]
         self.assertEqual(x, [[0, 9]])
         
-        x = [x for x in stringFinder._findregex(r"[A-Z]{1}[a-z]*\s?.*\.+\s", "silas A. Kraume")]
+        x = [x for x in stringFinder._findregex(r"[A-Z]{1}[a-z]*\s?.*\.+\s", 'silas A. Kraume')]
         self.assertEqual(x, [[6, 9]])
         
     def test_findRegex_False(self):
         stringFinder = StringFinder([], [])
-        x = [x for x in stringFinder._findregex(r"[A-Z]{1}[a-z]+\s?.*\.+\s", "silas A. Kraume")]
+        x = [x for x in stringFinder._findregex(r"[A-Z]{1}[a-z]+\s?.*\.+\s", 'silas A. Kraume')]
         self.assertEqual(x, [])
         
     def test_optimizeIntervals(self):

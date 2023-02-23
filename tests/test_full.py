@@ -6,11 +6,11 @@ from io import StringIO
 from _pytest.capture import DontReadFromInput
 import os
 # import sys
-# sys.path.append("../cat_win")
+# sys.path.append('../cat_win')
 
 
 test_file_dir = os.path.dirname(__file__) + '/texts/'
-test_file_path = test_file_dir + "test.txt"
+test_file_path = test_file_dir + 'test.txt'
 
 
 class StdOutMock(StringIO):

@@ -2,7 +2,7 @@ from cat_win.util.FileAttributes import _convert_size
 from unittest import TestCase
 import os
 # import sys
-# sys.path.append("../cat_win")
+# sys.path.append('../cat_win')
 
 
 class TestConverter(TestCase):

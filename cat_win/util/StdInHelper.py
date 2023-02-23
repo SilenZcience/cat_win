@@ -19,7 +19,7 @@ def getStdInContent(oneLine: bool = False) -> str:
     if oneLine:
         first_line = stdin.readline()
         return first_line.rstrip('\n')
-    input = ""
+    input = ''
     for line in stdin:
         if line[-2:] == chr(26) + '\n':
             input += line[:-2]
@@ -78,10 +78,10 @@ def writeFiles(file_list: list, content: str, file_encoding: str) -> list:
     if len(file_list) == 0:
         return file_list
     
-    if content == "":
-        abort_command = "" 
+    if content == '':
+        abort_command = '' 
         try:
-            print("You are about to create an empty file. Do you want to continue?")
+            print('You are about to create an empty file. Do you want to continue?')
             enterChar = '⏎'
             try:
                 enterChar.encode(file_encoding)
@@ -92,7 +92,7 @@ def writeFiles(file_list: list, content: str, file_encoding: str) -> list:
             pass
         finally:
             if abort_command and abort_command.upper() != 'Y':
-                print("Aborting...")
+                print('Aborting...')
                 file_list.clear()
     
     success_file_list = []
@@ -120,8 +120,8 @@ def readWriteFilesFromStdIn(file_list: list, file_encoding: str, oneLine: bool =
     if len(file_list) == 0:
         return file_list
 
-    print("The given FILE(s)", end="")
-    print("", *file_list, sep="\n\t")
+    print('The given FILE(s)', end='')
+    print('', *file_list, sep='\n\t')
     print("do/does not exist. Write the FILE(s) and finish with the '^Z'-suffix ((Ctrl + Z) + Enter):")
 
     input = getStdInContent(oneLine)
