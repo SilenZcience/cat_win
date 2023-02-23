@@ -47,6 +47,10 @@ jobs:
       - name: Test Entrypoint
         run: |
           catw -v
+      - name: Setup Clipboard Dependency
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get install xclip
       - name: Test Clipboard Ability
         run: |
-          catw -pn **/r*.txt --clip
+          catw -pn **/r*.txt --clip -d
