@@ -22,7 +22,7 @@ if len(target_package) > 0:
         package_file = os.path.join(dist_dir, package)
         print('Package:', package_file)
         try:
-            sub = subprocess.run(['pip', 'install', '--upgrade', package_file], check=True)
+            sub = subprocess.run(['pip', 'install', '--upgrade', package_file + '[clip]'], check=True)
             print(sub)
             error_code = sub.returncode
         except:
