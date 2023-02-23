@@ -26,12 +26,15 @@ class Config:
 
     def __init__(self, workingDir) -> None:
         self.workingDir = workingDir
-        self.configFile = path_join(self.workingDir + "cat.config")
+        self.configFile = path_join(self.workingDir, "cat.config")
         
         self.exclusive_definitions = {'Fore': [C_KW.FOUND],  # can only be Foreground
                                       'Back': [C_KW.MATCHED]}  # can only be Background
         self.configParser = ConfigParser()
         self.color_dic = {}
+        
+        self.longestCharCount = 30
+        self.ROWS = 3
 
     def loadConfig(self) -> dict:
         """
@@ -61,32 +64,52 @@ class Config:
         return self.color_dic
 
     def _printGetAllAvailableColors(self) -> list:
-        options = []
-        index = 1
         print("Here is a list of all available color options you may choose:")
-        for key, value in ColorOptions.Fore.items():
-            if key == 'RESET':
-                continue
-            option = "Fore." + key
-            print(f"{index: <2}: ", value, option,
-                  ColorOptions.Fore['RESET'], sep="")
-            options.append(option)
-            index += 1
-        for key, value in ColorOptions.Back.items():
-            if key == 'RESET':
-                continue
-            option = "Back." + key
-            print(f"{index: <2}: ", value, option,
-                  ColorOptions.Back['RESET'], sep="")
-            options.append(option)
-            index += 1
+        
+        ForeOptions = list(ColorOptions.Fore.items())
+        ForeOptions = [(k, v) for k, v in ForeOptions if k != 'RESET']
+        BackOptions = list(ColorOptions.Back.items())
+        BackOptions = [(k, v) for k, v in BackOptions if k != 'RESET']
+        indexOffset = len(str(len(ForeOptions) + len(BackOptions) + 1))
+        
+        configMenu = ''
+        options = []
+        
+        for index in range(len(ForeOptions)):
+            key, value = ForeOptions[index]
+            coloredOption = f"{value}Fore.{key}{ColorOptions.Style['RESET']}"
+            configMenu += f"{index+1: <{indexOffset}}: {coloredOption: <{self.longestCharCount+len(value)}}"
+            if index % self.ROWS == self.ROWS-1:
+                configMenu += '\n'
+            options.append("Fore." + key)
+        configMenu += '\n'
+        for index in range(len(BackOptions)):
+            key, value = BackOptions[index]
+            coloredOption = f"{value}Back.{key}{ColorOptions.Style['RESET']}"
+            configMenu += f"{len(ForeOptions)+index+1: <{indexOffset}}: {coloredOption: <{self.longestCharCount+len(value)}}"
+            if index % self.ROWS == self.ROWS-1:
+                configMenu += '\n'
+            options.append("Back." + key)
+        configMenu += '\n'
+        
+        print(configMenu)
         return options
 
     def _printAllAvailableElements(self) -> None:
         print("Here is a list of all available elements you may change:")
-        for index, element in enumerate(self.elements, start=1):
-            print(f"{index: <2}: ", self.color_dic[element], element,
-                  ColorOptions.Style['RESET'], sep="")
+        
+        self.longestCharCount = max(map(len, self.elements)) + 12
+        indexOffset = len(str(len(self.elements) + 1))
+
+        configMenu = ''
+        for index in range(len(self.elements)):
+            element = self.elements[index]
+            coloredElement = f"{self.color_dic[element]}{element}{ColorOptions.Style['RESET']}"
+            configMenu += f"{index+1: <{indexOffset}}: {coloredElement: <{self.longestCharCount+len(self.color_dic[element])}}"
+            if index % self.ROWS == self.ROWS-1:
+                configMenu += '\n'
+        
+        print(configMenu)
 
     def saveConfig(self) -> None:
         """

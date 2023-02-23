@@ -9,6 +9,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - added appeal to raise official github issue when encountering an exception.
 - added ability to create files in subdirectories that do not yet exist. The path will be created in the process, on error it will be cleaned up again.
+- redesigned --config menu
 
 
 ## [1.1.2] - 2023-02-22
