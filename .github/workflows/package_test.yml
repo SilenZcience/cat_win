@@ -51,6 +51,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get install xclip
+          sudo apt install wl-clipboard
       - name: Test Clipboard Ability
         run: |
           catw -pn **/r*.txt --clip -d
