@@ -97,7 +97,9 @@ python -m pip install --upgrade cat_win
 1. Simply download the [catw.exe](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/catw.exe) file.
 2. Add the file path to your system-environment `PATH`-variables.
 
-> ⚠️ **You should never trust any executable file!** Feel free to compile the package itself (e.g. using [PyInstaller](https://pyinstaller.org/en/stable/)).
+> ⚠️ **You should never trust any executable file!** Feel free to compile the package yourself (e.g. using [PyInstaller](https://pyinstaller.org/en/stable/)).
+
+> You can verify the creation of catw.exe yourself by reading the [source code](https://github.com/SilenZcience/cat_win/blob/main/cat_win/cat.py), checking the [origin](https://github.com/SilenZcience/cat_win/tree/main/bin) of the file and validating the corresponding [workflow](https://github.com/SilenZcience/cat_win/blob/main/.github/workflows/build_executable.yml) used.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
