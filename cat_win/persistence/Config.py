@@ -26,7 +26,7 @@ class Config:
 
     def __init__(self, workingDir) -> None:
         self.workingDir = workingDir
-        self.configFile = path_join(self.workingDir, "cat.config")
+        self.configFile = path_join(self.workingDir, 'cat.config')
         
         self.exclusive_definitions = {'Fore': [C_KW.FOUND],  # can only be Foreground
                                       'Back': [C_KW.MATCHED]}  # can only be Background
@@ -46,7 +46,7 @@ class Config:
             configColors = self.configParser['COLORS']
             for element in self.elements:
                 try:
-                    type, color = configColors[element].split(".")
+                    type, color = configColors[element].split('.')
                     self.color_dic[element] = (
                         ColorOptions.Fore[color] if type == 'Fore' else ColorOptions.Back[color])
                 except KeyError:
@@ -64,7 +64,7 @@ class Config:
         return self.color_dic
 
     def _printGetAllAvailableColors(self) -> list:
-        print("Here is a list of all available color options you may choose:")
+        print('Here is a list of all available color options you may choose:')
         
         ForeOptions = list(ColorOptions.Fore.items())
         ForeOptions = [(k, v) for k, v in ForeOptions if k != 'RESET']
@@ -81,7 +81,7 @@ class Config:
             configMenu += f"{index+1: <{indexOffset}}: {coloredOption: <{self.longestCharCount+len(value)}}"
             if index % self.ROWS == self.ROWS-1:
                 configMenu += '\n'
-            options.append("Fore." + key)
+            options.append('Fore.' + key)
         configMenu += '\n'
         for index in range(len(BackOptions)):
             key, value = BackOptions[index]
@@ -89,14 +89,14 @@ class Config:
             configMenu += f"{len(ForeOptions)+index+1: <{indexOffset}}: {coloredOption: <{self.longestCharCount+len(value)}}"
             if index % self.ROWS == self.ROWS-1:
                 configMenu += '\n'
-            options.append("Back." + key)
+            options.append('Back.' + key)
         configMenu += '\n'
         
         print(configMenu)
         return options
 
     def _printAllAvailableElements(self) -> None:
-        print("Here is a list of all available elements you may change:")
+        print('Here is a list of all available elements you may change:')
         
         self.longestCharCount = max(map(len, self.elements)) + 12
         indexOffset = len(str(len(self.elements) + 1))
@@ -121,7 +121,7 @@ class Config:
         while (not keyword in self.elements):
             if keyword != '':
                 print(f"Something went wrong. Unknown keyword '{keyword}'")
-            keyword = input("Input name of keyword to change: ")
+            keyword = input('Input name of keyword to change: ')
             if keyword.isdigit():
                 keyword = self.elements[int(keyword)-1] if (
                     0 < int(keyword) <= len(self.elements)) else keyword
@@ -132,7 +132,7 @@ class Config:
         while (not color in color_options):
             if color != '':
                 print(f"Something went wrong. Unknown option '{color}'.")
-            color = input("Input color: ")
+            color = input('Input color: ')
             if color.isdigit():
                 color = color_options[int(color)-1] if (
                     0 < int(color) <= len(color_options)) else color

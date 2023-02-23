@@ -1,7 +1,7 @@
 from cat_win.const.ArgConstants import *
 from unittest import TestCase
 # import sys
-# sys.path.append("../cat_win")
+# sys.path.append('../cat_win')
 
 
 class TestConverter(TestCase):

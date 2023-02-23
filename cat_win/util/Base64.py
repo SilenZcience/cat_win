@@ -22,7 +22,7 @@ def encodeBase64(content: list, encoding: str = 'utf-8') -> list:
 
 def _decodeBase64(content: str, encoding: str) -> str:
     # encode the string to bytes and decode with base64
-    base64_bytes = content.encode(encoding="ascii")
+    base64_bytes = content.encode(encoding='ascii')
     decoded_content = b64decode(base64_bytes)
     decoded_content = decoded_content.decode(encoding=encoding)
     # return as a single line

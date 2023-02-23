@@ -28,7 +28,7 @@ def __addArgument__(args: list, unknown_args: list, known_files: list, unknown_f
         return
     # 'trunc' + ('=' or ':') + FILE_TRUNCATE[0] + ':' + FILE_TRUNCATE[1] + ':' + FILE_TRUNCATE[2]
     elif match(r"\Atrunc[\=\:][0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\Z", param):
-        param = param[6:].split(":")
+        param = param[6:].split(':')
         global FILE_TRUNCATE
         FILE_TRUNCATE[0] = None if param[0] == '' else (
             0 if param[0] == '0' else int(eval(param[0]))-1)
@@ -62,9 +62,9 @@ def __addArgument__(args: list, unknown_args: list, known_files: list, unknown_f
                 known_files.append(realpath(filename))
     elif isfile(possible_path):
         known_files.append(possible_path)
-    elif len(param) > 2 and param[0] == "-" and param[1] != "-":
+    elif len(param) > 2 and param[0] == '-' and param[1] != '-':
         for i in range(1, len(param)):
-            __addArgument__(args, unknown_args, known_files, unknown_files, "-" + param[i])
+            __addArgument__(args, unknown_args, known_files, unknown_files, '-' + param[i])
     elif match(r"\A[^-]+.*\Z", param):
         unknown_files.append(realpath(param))
     else:

@@ -18,10 +18,10 @@ STATUS_UNSAFE_PRE_RELEASE_AVAILABLE = -2
 
 def getLastestPackageVersion(package: str) -> str:
     try:
-        response = getRequest(f'https://pypi.org/pypi/{package}/json', timeout=2)
+        response = getRequest(f"https://pypi.org/pypi/{package}/json", timeout=2)
         return response.json()['info']['version']
     except:
-        return "0.0.0"
+        return '0.0.0'
 
 
 def onlyNumeric(s: str) -> int:
@@ -30,7 +30,7 @@ def onlyNumeric(s: str) -> int:
 
 def genVersionTuples(v: str, w: str) -> tuple:
     """
-    "1.0.33.0", "1.1.0a"
+    '1.0.33.0', '1.1.0a'
     v
     (('01', '00', '33', '00'), ('01', '01', '0a', '00'))
     """

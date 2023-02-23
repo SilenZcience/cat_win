@@ -2,14 +2,14 @@ from cat_win.util.Holder import Holder
 from unittest import TestCase
 import os
 # import sys
-# sys.path.append("../cat_win")
+# sys.path.append('../cat_win')
 
 test_file_dir = os.path.join(os.path.dirname(__file__), 'texts')
-test_file_path =        os.path.join(test_file_dir, "test.txt")
-test_file_edge_case_1 = os.path.join(test_file_dir, "test_holderEdgeCase_1.txt")
-test_file_edge_case_2 = os.path.join(test_file_dir, "test_holderEdgeCase_2.txt")
-test_file_edge_case_3 = os.path.join(test_file_dir, "test_holderEdgeCase_3.txt")
-test_file_edge_case_4 = os.path.join(test_file_dir, "test_holderEdgeCase_4.txt")
+test_file_path =        os.path.join(test_file_dir, 'test.txt')
+test_file_edge_case_1 = os.path.join(test_file_dir, 'test_holderEdgeCase_1.txt')
+test_file_edge_case_2 = os.path.join(test_file_dir, 'test_holderEdgeCase_2.txt')
+test_file_edge_case_3 = os.path.join(test_file_dir, 'test_holderEdgeCase_3.txt')
+test_file_edge_case_4 = os.path.join(test_file_dir, 'test_holderEdgeCase_4.txt')
 holder = Holder()
 
 

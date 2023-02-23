@@ -5,7 +5,7 @@ try:
 except KeyboardInterrupt:
     exit(1)
 except:
-    print("an error occured while loading the module")
+    print('an error occured while loading the module')
     exit(1)
 
 def deprecated_entry_point():

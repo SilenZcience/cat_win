@@ -20,12 +20,12 @@ def _convert_size(size_bytes: int) -> str:
     appropriate Suffix.
     """
     if size_bytes == 0:
-        return "0 B"
-    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+        return '0 B'
+    size_name = ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
     i = int(floor(log(size_bytes, 1024)))
     p = pow(1024, i)
     s = round(size_bytes / p, 2)
-    return "%s %s" % (s, size_name[i] if i < 9 else '?')
+    return f"{s} {size_name[i] if i < 9 else '?'}"
 
 
 def read_attribs(file: str) -> list:
@@ -36,14 +36,14 @@ def read_attribs(file: str) -> list:
     attrs = stat(file, follow_symlinks=False).st_file_attributes
 
     return (
-        [["Archive", bool(attrs & A)],
-         ["System", bool(attrs & S)],
-         ["Hidden", bool(attrs & H)],
-         ["Readonly", bool(attrs & R)],
+        [['Archive', bool(attrs & A)],
+         ['System', bool(attrs & S)],
+         ['Hidden', bool(attrs & H)],
+         ['Readonly', bool(attrs & R)],
          # Because this attribute is true when the file is _not_ indexed
-         ["Indexed", not bool(attrs & I)],
-         ["Compressed", bool(attrs & C)],
-         ["Encrypted", bool(attrs & E)]]
+         ['Indexed', not bool(attrs & I)],
+         ['Compressed', bool(attrs & C)],
+         ['Encrypted', bool(attrs & E)]]
     )
 
 
@@ -59,21 +59,21 @@ def getFileMetaData(file: str, colors: list) -> str:
         
         metaData = colors[1] + file + colors[0] + '\n'
         
-        metaData += f'{colors[1]}{"Size:" : <16}{_convert_size(stats.st_size)}{colors[0]}\n'
-        metaData += f'{colors[1]}{"ATime:": <16}{datetime.fromtimestamp(stats.st_atime)}{colors[0]}\n'
-        metaData += f'{colors[1]}{"MTime:": <16}{datetime.fromtimestamp(stats.st_mtime)}{colors[0]}\n'
-        metaData += f'{colors[1]}{"CTime:": <16}{datetime.fromtimestamp(stats.st_ctime)}{colors[0]}\n'
+        metaData += f"{colors[1]}{'Size:' : <16}{_convert_size(stats.st_size)}{colors[0]}\n"
+        metaData += f"{colors[1]}{'ATime:': <16}{datetime.fromtimestamp(stats.st_atime)}{colors[0]}\n"
+        metaData += f"{colors[1]}{'MTime:': <16}{datetime.fromtimestamp(stats.st_mtime)}{colors[0]}\n"
+        metaData += f"{colors[1]}{'CTime:': <16}{datetime.fromtimestamp(stats.st_ctime)}{colors[0]}\n"
         
-        if system() != "Windows":
+        if system() != 'Windows':
             metaData += '\n'
             return metaData
         
         attribs = read_attribs(file)
         metaData += colors[2]
-        metaData += "+" + ", ".join([x for x, y in attribs if y])
+        metaData += '+' + ", ".join([x for x, y in attribs if y])
         metaData += colors[0] + '\n'
         metaData += colors[3]
-        metaData += "-" + ", ".join([x for x, y in attribs if not y])
+        metaData += '-' + ", ".join([x for x, y in attribs if not y])
         metaData += colors[0] + '\n'
         return metaData
     except OSError:
