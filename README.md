@@ -7,6 +7,9 @@
    <a href="https://pypi.org/project/cat-win/" alt="Visitors">
       <img src="https://visitor-badge.laobi.icu/badge?page_id=SilenZcience.cat_win" align="right">
    </a>
+   <a href="https://github.com/SilenZcience/cat_win/tree/main/cat_win" alt="CodeSize">
+      <img src="https://img.shields.io/github/languages/code-size/SilenZcience/cat_win?color=purple" align="right">
+   </a>
 </p>
 
 [![OS-Windows]][OS-Windows]
