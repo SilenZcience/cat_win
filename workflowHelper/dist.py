@@ -6,7 +6,7 @@ from sys import exit
 error_code = 1
 
 script_dir = os.path.dirname(__file__)
-dist_dir = os.path.abspath(os.path.join(script_dir, "../dist/" ))
+dist_dir = os.path.abspath(os.path.join(script_dir, "../dist/"))
 print('script directory:', script_dir)
 print('dist directory:', dist_dir)
 
