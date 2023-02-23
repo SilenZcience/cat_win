@@ -5,9 +5,23 @@ from shutil import rmtree
 from glob import iglob
 
 script_dir = os.path.dirname(__file__)
-package_dir = os.path.abspath(os.path.join(script_dir, '../cat_win/'))
+package_dir = os.path.abspath(os.path.join(script_dir, '..', 'cat_win'))
+entry_dir = os.path.join(package_dir, 'cat.py')
 print('script directory:', script_dir)
 print('package directory:', package_dir)
+print('entry directory:', entry_dir)
+
+# add the pyclip import to the cat.py main file, since pyinstaller will not
+# detect the import statement hidden in the middle of the file
+cat = ''
+with open(entry_dir, 'r', encoding='utf-8') as f:
+    cat = f.read()
+
+if cat == '':
+    exit(1)
+
+with open(entry_dir, 'w', encoding='utf-8') as f:
+    f.write('import pyclip as pc\n' + cat)
 
 # clear pycache
 for path in iglob(package_dir + '/**/__pycache__', recursive=True):
@@ -43,6 +57,7 @@ for _ in range(3):
 
 
 for _init in _initFiles:
+    print('creating: ', _init)
     f = open(_init, 'x', encoding='utf-8')
     f.close()
     
