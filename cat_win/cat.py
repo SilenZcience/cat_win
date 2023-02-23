@@ -381,9 +381,9 @@ def copyToClipboard(content: str, dependency: int = 3) -> None:
         return
     try:
         if dependency == 3:
-            import pyperclip3 as pc
-        elif dependency == 2:
             import pyclip as pc
+        elif dependency == 2:
+            import pyperclip3 as pc
         elif dependency == 1:
             import pyperclip as pc
         pc.copy(content)
