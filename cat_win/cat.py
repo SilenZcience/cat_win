@@ -219,8 +219,7 @@ def printFile(content: list, bytecode: bool) -> None:
         print(*[prefix + line for prefix, line in content], sep='\n')
         return
 
-    stringFinder = StringFinder.StringFinder(
-        ArgParser.FILE_SEARCH, ArgParser.FILE_MATCH)
+    stringFinder = StringFinder.StringFinder(ArgParser.FILE_SEARCH, ArgParser.FILE_MATCH)
 
     for line_prefix, line in content:
         intervals, fKeyWords, mKeywords = stringFinder.findKeywords(line)
