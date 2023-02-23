@@ -1,4 +1,3 @@
-import pyclip as pc
 import sys
 import os
 from re import sub as resub
@@ -373,6 +372,25 @@ def editFile(fileIndex: int = 1) -> None:
             holder.clipBoard += '\n'.join([prefix + line for prefix, line in content])
 
 
+def copyToClipboard(content: str, dependency: int = 3) -> None:
+    if dependency == 0:
+        errorMsg = '\n'
+        errorMsg += "ImportError: You need either 'pyperclip3', 'pyperclip', or 'pyclip' in order to use the '--clip' parameter.\n"
+        errorMsg += "Should you have any problem with either module, try to install a different one using 'python -m pip install ...'"
+        print(errorMsg)
+        return
+    try:
+        if dependency == 3:
+            import pyperclip3 as pc
+        elif dependency == 2:
+            import pyclip as pc
+        elif dependency == 1:
+            import pyperclip as pc
+        pc.copy(content)
+    except ImportError:
+        copyToClipboard(content, dependency-1)
+    
+
 def editFiles() -> None:
     start = len(holder.files)-1 if holder.reversed else 0
     end = -1 if holder.reversed else len(holder.files)
@@ -386,7 +404,7 @@ def editFiles() -> None:
         print()
         _showFiles(holder.getAppliedFiles())
     if holder.args_id[ARGS_CLIP]:
-        pc.copy(removeAnsiCodesFromLine(holder.clipBoard))
+        copyToClipboard(removeAnsiCodesFromLine(holder.clipBoard))
 
 
 def main():

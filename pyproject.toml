@@ -19,14 +19,18 @@ classifiers = [
     "Environment :: Console",
     "Operating System :: OS Independent"
 ]
-dependencies = [
-    "pyclip>=0.5.4",
-    "colorama>=0.4.5",
-    "requests>=2.26.0"
-]
 dynamic = [
     "version",
     "description"
+]
+dependencies = [
+    "colorama>=0.4.5",
+    "requests>=2.26.0"
+]
+
+[project.optional-dependencies]
+clip = [
+    "pyclip>=0.5.4"
 ]
 
 [tool.flit.sdist]

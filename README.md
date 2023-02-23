@@ -89,8 +89,15 @@ Contrary to the name of the project it is of course possible to use cat_win on L
 
 Simply install the python package (via [PyPI-cat_win](https://pypi.org/project/cat-win/)):
 ```console
+python -m pip install --upgrade cat_win[clip]
+```
+cat_win uses the [pyclip](https://pypi.org/project/pyclip/) module by default. Should any problems occur, you can also use
+the [pyperclip3](https://pypi.org/project/pyperclip3/) or [pyperclip](https://pypi.org/project/pyperclip/) module.
+In this case simply run:
+```console
 python -m pip install --upgrade cat_win
 ```
+and manually install the desired module yourself.
 
 **OR alternatively** you can use the compiled version (*`Windows only`*):
 
