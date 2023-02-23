@@ -55,8 +55,10 @@ class ColorOptions:
 
     for key in Fore:
         Fore[key] = idToCode(Fore[key])
+    Fore['NONE'] = ''
     for key in Back:
         Back[key] = idToCode(Back[key])
+    Back['NONE'] = ''
     for key in Style:
         Style[key] = idToCode(Style[key])
 
