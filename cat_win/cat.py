@@ -1,4 +1,4 @@
-import pyperclip3 as pc
+import pyclip as pc
 import sys
 import os
 from re import sub as resub

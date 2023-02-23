@@ -20,7 +20,7 @@ classifiers = [
     "Operating System :: OS Independent"
 ]
 dependencies = [
-    "pyperclip3>=0.4.1",
+    "pyclip>=0.5.4",
     "colorama>=0.4.5",
     "requests>=2.26.0"
 ]

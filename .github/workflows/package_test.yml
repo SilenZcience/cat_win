@@ -47,3 +47,6 @@ jobs:
       - name: Test Entrypoint
         run: |
           catw -v
+      - name: Test Clipboard Ability
+        run: |
+          catw -pn **/r*.txt --clip
