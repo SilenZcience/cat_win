@@ -47,6 +47,15 @@ def read_attribs(file: str) -> list:
     )
 
 
+def getFileSize(file: str) -> int:
+    try:
+        stats = stat(file)
+        fileSize = stats.st_size
+    except OSError:
+        return 0
+    return fileSize
+
+
 def getFileMetaData(file: str, colors: list) -> str:
     """
     Takes a file and returns a string representation

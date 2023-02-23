@@ -16,7 +16,7 @@ import cat_win.util.StdInHelper as StdInHelper
 import cat_win.util.StringFinder as StringFinder
 import cat_win.util.TmpFileHelper as TmpFileHelper
 from cat_win.util.Base64 import decodeBase64, encodeBase64
-from cat_win.util.FileAttributes import getFileMetaData
+from cat_win.util.FileAttributes import getFileMetaData, getFileSize, _convert_size
 from cat_win.const.ArgConstants import *
 from cat_win.const.ColorConstants import C_KW
 from cat_win.web.UpdateChecker import printUpdateInformation
@@ -117,12 +117,22 @@ def _showDebug(args: list, unknown_args: list, known_files: list, unknown_files:
 def _showFiles(files: list) -> None:
     if len(files) == 0:
         return
-    msg = 'applied' * holder.args_id[ARGS_FILES] + 'found' * holder.args_id[ARGS_FFILES]
+    file_sizes = []
+    msg = 'found' if holder.args_id[ARGS_FFILES] else 'applied'
     print(color_dic[C_KW.COUNT_AND_FILES], end='')
     print(f"{msg} FILE(s):", end='')
     print(color_dic[C_KW.RESET_ALL])
     for file in files:
-        print(f"\t{color_dic[C_KW.COUNT_AND_FILES]}{file}{color_dic[C_KW.RESET_ALL]}")
+        sizeString = ''
+        if holder.args_id[ARGS_FFILES]:
+            size = getFileSize(file)
+            file_sizes.append(size)
+            sizeString = f"{_convert_size(size): <10}"
+        print(f"\t{color_dic[C_KW.COUNT_AND_FILES]}{sizeString}{file}{color_dic[C_KW.RESET_ALL]}")
+    if holder.args_id[ARGS_FFILES]:
+        print(color_dic[C_KW.COUNT_AND_FILES], end='')
+        print(f"Sum:\t{_convert_size(sum(file_sizes))}", end='')
+        print(color_dic[C_KW.RESET_ALL])
 
 
 def _printMeta(file: str) -> None:
