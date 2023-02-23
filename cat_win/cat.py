@@ -21,7 +21,7 @@ from cat_win.const.ArgConstants import *
 from cat_win.const.ColorConstants import C_KW
 from cat_win.web.UpdateChecker import printUpdateInformation
 
-from cat_win import *
+from cat_win import __version__, __sysversion__, __author__, __url__
 workingDir = os.path.dirname(os.path.realpath(__file__))
 
 coloramaInit()
@@ -83,7 +83,7 @@ def _showVersion() -> None:
     versionMessage += '\n'
     versionMessage += f'Python: \t{__sysversion__}\n'  # sys.version
     try:
-        versionMessage += f'Install time: \t{datetime.fromtimestamp(os.path.getctime(os.path.realpath(__file__)))} CET\n'
+        versionMessage += f'Install time: \t{datetime.fromtimestamp(os.path.getctime(os.path.realpath(__file__)))}\n'
     except OSError: # fails on pyinstaller executable
         versionMessage += f'Install time: \t-\n'
     versionMessage += f'Author: \t{__author__}\n'
