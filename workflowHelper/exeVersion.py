@@ -7,7 +7,7 @@ print('Current Version:', cat_winVersion, cat_winVersionSeperated)
 
 
 script_dir = os.path.dirname(__file__)
-root_dir = os.path.abspath(os.path.join(script_dir, "../"))
+root_dir = os.path.abspath(os.path.join(script_dir, os.pardir))
 versionFile = os.path.abspath(os.path.join(root_dir, "./exeVersionFile"))
 print('VersionFile Path:', versionFile)
 

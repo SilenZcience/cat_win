@@ -1,3 +1,4 @@
+from os.path import join as path_join
 from configparser import ConfigParser
 from cat_win.const.ColorConstants import ColorOptions, C_KW
 
@@ -25,7 +26,7 @@ class Config:
 
     def __init__(self, workingDir) -> None:
         self.workingDir = workingDir
-        self.configFile = self.workingDir + "/cat.config"
+        self.configFile = path_join(self.workingDir + "cat.config")
         
         self.exclusive_definitions = {'Fore': [C_KW.FOUND],  # can only be Foreground
                                       'Back': [C_KW.MATCHED]}  # can only be Background
@@ -127,5 +128,5 @@ class Config:
             with open(self.configFile, 'w') as conf:
                 self.configParser.write(conf)
             print(f"Successfully updated config file:\n\t{self.configFile}")
-        except:
+        except OSError:
             print(f"Could not write to config file:\n\t{self.configFile}")

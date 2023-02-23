@@ -414,10 +414,10 @@ def main():
         piped_input = StdInHelper.getStdInContent(holder.args_id[ARGS_ONELINE])
         temp_file = StdInHelper.writeTemp(piped_input, tmpFileHelper.generateTempFileName(), ArgParser.FILE_ENCODING)
         known_files.append(temp_file)
-        StdInHelper.writeFiles(unknown_files, piped_input, ArgParser.FILE_ENCODING)
+        unknown_files = StdInHelper.writeFiles(unknown_files, piped_input, ArgParser.FILE_ENCODING)
         holder.setTempFile(temp_file)
     else:
-        StdInHelper.readWriteFilesFromStdIn(
+        unknown_files = StdInHelper.readWriteFilesFromStdIn(
             unknown_files, ArgParser.FILE_ENCODING, holder.args_id[ARGS_ONELINE])
 
     if (len(known_files) + len(unknown_files) == 0):
