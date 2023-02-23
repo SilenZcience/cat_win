@@ -81,7 +81,7 @@ def _showVersion() -> None:
     versionMessage += catVersion
     versionMessage += '-' * len(catVersion) + '\n'
     versionMessage += '\n'
-    versionMessage += f'Python: \t{__sysversion__}\n'  # sys.version
+    versionMessage += f'Built with: \tPython {__sysversion__}\n'  # sys.version
     try:
         versionMessage += f'Install time: \t{datetime.fromtimestamp(os.path.getctime(os.path.realpath(__file__)))}\n'
     except OSError: # fails on pyinstaller executable
