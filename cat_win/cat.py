@@ -21,7 +21,7 @@ from cat_win.const.ArgConstants import *
 from cat_win.const.ColorConstants import C_KW
 from cat_win.web.UpdateChecker import printUpdateInformation
 
-from cat_win import __version__, __author__, __sysversion__
+from cat_win import *
 workingDir = os.path.dirname(os.path.realpath(__file__))
 
 coloramaInit()
@@ -39,6 +39,8 @@ def exception_handler(exception_type: type, exception, traceback, debug_hook=sys
         debug_hook(exception_type, exception, traceback)
         return
     print("\nError: {} {}".format(exception_type.__name__, exception))
+    if exception_type != KeyboardInterrupt:
+        print("If this Exception is unexpected, please raise an Issue at:\n{}/issues".format(__url__))
 
 
 sys.excepthook = exception_handler
@@ -165,10 +167,10 @@ def removeAnsiCodesFromLine(line: str) -> str:
 @lru_cache(maxsize=None)
 def _CalculateLinePrefixSpacing(lineCharLength: int,
                                 includeFilePrefix: bool = False, fileCharLength: int = None) -> str:
-    line_prefix = (" " * (holder.fileLineNumberPlaceHolder - lineCharLength)) + "%i)"
+    line_prefix = (' ' * (holder.fileLineNumberPlaceHolder - lineCharLength)) + "%i)"
 
     if includeFilePrefix:
-        file_prefix = (" " * (holder.fileNumberPlaceHolder - fileCharLength)) + "%i."
+        file_prefix = (' ' * (holder.fileNumberPlaceHolder - fileCharLength)) + "%i."
         return color_dic[C_KW.NUMBER] + file_prefix + line_prefix + color_dic[C_KW.RESET_ALL] + ' '
 
     return color_dic[C_KW.NUMBER] + line_prefix + color_dic[C_KW.RESET_ALL] + ' '
@@ -253,8 +255,8 @@ def printExcludedByPeek(content: list, excludedByPeek: int) -> None:
     prefix = prefix.replace(color_dic[C_KW.LINE_LENGTH], '')
     prefix = prefix.replace(color_dic[C_KW.RESET_ALL], '')
     excludedByPeekLength = (len(str(excludedByPeek))-1)//2
-    excludedByPeekIndent = " " * (len(prefix) - excludedByPeekLength + 10)
-    excludedByPeekIndentAdd = " " * excludedByPeekLength
+    excludedByPeekIndent = ' ' * (len(prefix) - excludedByPeekLength + 10)
+    excludedByPeekIndentAdd = ' ' * excludedByPeekLength
     print(color_dic[C_KW.NUMBER], end="")
     print(excludedByPeekIndent, excludedByPeekIndentAdd, " •", sep="")
     print(excludedByPeekIndent, "(", excludedByPeek, ")", sep="")
