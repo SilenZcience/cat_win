@@ -5,13 +5,18 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ## [1.1.3] - TBA
 
+### Major Changes
+
+- it is now possible to use either the '`pyclip`', '`pyperclip3`', or '`pyperclip`' module in order to use the --`clip` parameter. If none of these options are installed, the --clip parameter will not work yet the programm won't crash. This change was made due to some problems using the --clip parameter on macOS.
+- the `default` clipboard module was changed from '`pyperclip3`' to '`pyclip`'. This module however is not included in the necessary dependencies. It can be added to the installation dependencies by using 'pip install cat_win<b>[clip]</b>'.
+
 ### Minor Changes
 
 - added appeal to raise official github issue when encountering an exception.
 - added ability to create files in subdirectories that do not yet exist. The path will be created in the process, on error it will be cleaned up again.
 - redesigned --config menu
-- added file sizes to -F, --FILES
-- added "NONE" - option to color --config, in order to disable highlighting for specific elements.
+- added file sizes to -`F`, --`FILES`
+- added "`NONE`" - option to color --`config`, in order to disable highlighting for specific elements.
 
 ### Bugfixes
 

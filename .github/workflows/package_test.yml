@@ -51,6 +51,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           python -m pip install --upgrade pyperclip3
+          python -m pip install --upgrade pyperclip
           sudo apt-get install xclip
           sudo apt install wl-clipboard
       - name: Test Clipboard Ability
