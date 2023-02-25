@@ -9,9 +9,17 @@ class StringFinder:
 
     def _findliterals(self, sub: str, s: str) -> list:
         """
-        Generate lists containing the start and end index
-        of all found positions of substring 'sub'
-        within string 's'.
+        Generate lists containing the position of sub in s.
+        
+        Parameters:
+        sub (str):
+            the substring to search for
+        s (str):
+            the string to search in
+        
+        Yields:
+        (list):
+            containing the start and end indeces like [start, end]
         """
         l = len(sub)
         i = s.find(sub)
@@ -19,20 +27,36 @@ class StringFinder:
             yield [i, i+l]
             i = s.find(sub, i+1)
 
-    def _findregex(self, pattern, s) -> list:
+    def _findregex(self, pattern: str, s: str) -> list:
         """
-        Generate lists containing the start and end index
-        of all found positions of regex-match 'pattern'
-        within string 's'.
+        Generate lists containing the position of pattern in s.
+        
+        Parameters:
+        pattern (str):
+            the regex pattern to search for
+        s (str):
+            the string to search in
+        
+        Yields:
+        (list):
+            containing the start and end indeces like [start, end]
         """
         for match in finditer(fr'{pattern}', s):
             yield list(match.span())
 
     def _optimizeIntervals(self, intervals: list) -> list:
         """
-        Merge overlapping intervalls for partially
+        optimize/shorten/merge overlapping intervalls for partially
         color encoded lines. Needed when multiple
         search-keywords apply to the same line.
+        
+        Parameters:
+        intervals (list):
+            the intervals to optimize like [[start, end], ...]
+            
+        Returns:
+        stack (list)
+            the optimized intervals
         """
         if not intervals:
             return []
@@ -61,11 +85,19 @@ class StringFinder:
 
     def findKeywords(self, line: str) -> tuple:
         """
-        Takes a string and searches for all occurrences
-        of self.kw_literals and self.kw_regex.
-        Merges the Intervals to optimized/shortened Intervals.
-        Returns a tuple containing the index positions of all intervals,
-        and thee lists containing which elements have been found
+        calculate the positions for ANSI-ColorCodes.
+        
+        Parameters:
+        line (str):
+            the string in which to search for all occurences of
+            self.kw_literals and self.kw_regex
+            
+        Returns:
+        (tuple):
+            containing three lists:
+                the index positions of all intervals
+                the found substrings
+                the matched patterns
         """
         found_list = []
         found_position = []

@@ -114,6 +114,14 @@ def _showDebug(args: list, unknown_args: list, known_files: list, unknown_files:
 
 
 def _showFiles(files: list) -> None:
+    """
+    displays files including their size and calculates
+    their size sum.
+    
+    Parameters:
+    files (list):
+        all files to display
+    """
     if len(files) == 0:
         return
     file_sizes = []
@@ -135,6 +143,13 @@ def _showFiles(files: list) -> None:
 
 
 def _printMeta(file: str) -> None:
+    """
+    print the information retrieved by getFileMetaData()
+    
+    Parameters:
+    file (str):
+        a string representation of a file (-path)
+    """
     metaData = getFileMetaData(file, [color_dic[C_KW.RESET_ALL],
                                       color_dic[C_KW.ATTRIB],
                                       color_dic[C_KW.ATTRIB_POSITIVE],
@@ -143,11 +158,27 @@ def _printMeta(file: str) -> None:
 
 
 def _printChecksum(file: str) -> None:
+    """
+    print the information retrieved by getChecksumFromFile()
+    
+    Parameters:
+    file (str):
+        a string representation of a file (-path)
+    """
     print(f"{color_dic[C_KW.CHECKSUM]}Checksum of '{file}':{color_dic[C_KW.RESET_ALL]}")
     print(checksum.getChecksumFromFile(file, [color_dic[C_KW.CHECKSUM], color_dic[C_KW.RESET_ALL]]))
 
 
 def _printMetaAndChecksum(showMeta: bool, showChecksum: bool) -> None:
+    """
+    calls _printMeta() and _printChecksum() on every file.
+    
+    Parameters:
+    showMeta (bool):
+        decides if the metadata of the files should be displayed
+    showChecksum (bool):
+        decides if the checksum of the files should be displayed
+    """
     for file in holder.files:
         if showMeta:
             _printMeta(file)
@@ -156,6 +187,15 @@ def _printMetaAndChecksum(showMeta: bool, showChecksum: bool) -> None:
 
 
 def removeAnsiCodesFromLine(line: str) -> str:
+    """
+    Parameters:
+    line (str):
+        the string to clean ANSI-Colorcodes from
+        
+    Returns
+    (str):
+        the cleaned string
+    """
     # version 1: efficiency is about the same, and does not have any dependency
     # however it is not as safe in case of unusual/broken escape sequences.
     # while (codePosStart := line.find(ESC_CODE)) != -1:
@@ -176,6 +216,22 @@ def removeAnsiCodesFromLine(line: str) -> str:
 @lru_cache(maxsize=None)
 def _CalculateLinePrefixSpacing(lineCharLength: int,
                                 includeFilePrefix: bool = False, fileCharLength: int = None) -> str:
+    """
+    calculate a string template for the line prefix.
+    
+    Parameters:
+    lineCharLength (int):
+        the length of the line number
+    includeFilePrefix (bool):
+        should the file be included in the prefix
+    fileCharLength (int):
+        the length of the file number
+    
+    Returns:
+    (str):
+        a non-finished but correctly formatted string template to insert line number
+        and file index into
+    """
     line_prefix = (' ' * (holder.fileLineNumberPlaceHolder - lineCharLength)) + '%i)'
 
     if includeFilePrefix:
@@ -187,7 +243,17 @@ def _CalculateLinePrefixSpacing(lineCharLength: int,
 
 def _getLinePrefix(line_num: int, index: int) -> str:
     """
-    returns the new line prefix including the line number.
+    calculates the line prefix in regard to the line number and file count.
+    
+    Parameters:
+    line_num (int):
+        the current number identifying the line
+    index (int):
+        the current number identifying the file
+    
+    Returns:
+    (str):
+        the new line prefix including the line number.
     """
     if len(holder.files) > 1:
         return _CalculateLinePrefixSpacing(len(str(line_num)), True, len(str(index))) % (index, line_num)
@@ -196,15 +262,34 @@ def _getLinePrefix(line_num: int, index: int) -> str:
 
 @lru_cache(maxsize=None)
 def _CalculateLineLengthPrefixSpacing(lineCharLength: int) -> str:
+    """
+    calculate a string template for the line prefix.
+    
+    Parameters:
+    lineCharLength (int):
+        the length of the line
+    
+    Returns:
+    (str):
+        a non-finished but correctly formatted string template to insert line length into
+    """
     lengthPrefix = '[' + ' ' * (holder.fileLineLengthPlaceHolder - lineCharLength) + '%i]'
     return '%s' + color_dic[C_KW.LINE_LENGTH] + lengthPrefix + color_dic[C_KW.RESET_ALL] + ' '
 
 
 def _getLineLengthPrefix(prefix: str, line) -> str:
     """
-    prefix is the current prefix.
-    line is of type string or bytes.
-    returns the new line prefix including the line length.
+    calculates the line prefix in regard to the line length.
+    
+    Parameters:
+    prefix (str):
+        the current prefix to append to
+    line (str|byte):
+        a representation of the current line
+    
+    Returns:
+    (str):
+        the new line prefix including the line length.
     """
     if not holder.args_id[ARGS_NOCOL] and type(line) == str:
         line = removeAnsiCodesFromLine(line)
@@ -212,6 +297,15 @@ def _getLineLengthPrefix(prefix: str, line) -> str:
 
 
 def printFile(content: list, bytecode: bool) -> None:
+    """
+    print a file and possibly include the substrings and patterns to search for.
+    
+    Parameters:
+    content (list):
+        the content of a file like [(prefix, line), ...]
+    bytecode (bool):
+        if the lines are in bytes the value is True
+    """
     if not content:
         return
     if not (ArgParser.FILE_SEARCH or ArgParser.FILE_MATCH) or bytecode:
@@ -255,6 +349,15 @@ def printFile(content: list, bytecode: bool) -> None:
 
 
 def printExcludedByPeek(content: list, excludedByPeek: int) -> None:
+    """
+    print a paragraph about how many lines have been excluded.
+    
+    Parameters:
+    content (list):
+        the content of a file like [(prefix, line), ...]
+    excludedByPeek (int):
+        the amount of lines that have been excluded
+    """
     if not excludedByPeek or len(content) <= 5:
         return
     excludedByPeek = excludedByPeek + 10 - len(content)
@@ -273,6 +376,13 @@ def printExcludedByPeek(content: list, excludedByPeek: int) -> None:
 
 
 def editFile(fileIndex: int = 1) -> None:
+    """
+    apply all parameters to a file.
+    
+    Parameters:
+    fileIndex (int):
+        the index regarding which file is currently being edited
+    """
     show_bytecode = False
     excludedByPeek = 0
     content = [('', '')]
@@ -372,9 +482,21 @@ def editFile(fileIndex: int = 1) -> None:
             holder.clipBoard += '\n'.join([prefix + line for prefix, line in content])
 
 
-def copyToClipboard(content: str, dependency: int = 3, clipBoardError: bool = False) -> None:
-    if dependency == 0:
-        if clipBoardError:
+def _copyToClipboard(content: str, __dependency: int = 3, __clipBoardError: bool = False) -> None:
+    """
+    copy a string to the clipboard, by recursively checking which module exists and could
+    be used, this function should only be called by copyToClipboard()
+    
+    Parameters:
+    content (str):
+        the string to copy
+    __dependency (int):
+        do not change!
+    __clipBoardError (bool):
+        do not change!
+    """
+    if __dependency == 0:
+        if __clipBoardError:
             errorMsg = '\n'
             errorMsg += "ClipBoardError: You can use either 'pyperclip3', 'pyperclip', or 'pyclip' in order to use the '--clip' parameter.\n"
             errorMsg += "Try to install a different one using 'python -m pip install ...'"
@@ -385,20 +507,34 @@ def copyToClipboard(content: str, dependency: int = 3, clipBoardError: bool = Fa
         print(errorMsg)
         return
     try:
-        if dependency == 3:
+        if __dependency == 3:
             import pyclip as pc
-        elif dependency == 2:
+        elif __dependency == 2:
             import pyperclip3 as pc
-        elif dependency == 1:
+        elif __dependency == 1:
             import pyperclip as pc
         pc.copy(content)
     except ImportError:
-        copyToClipboard(content, dependency-1, False or clipBoardError)
+        _copyToClipboard(content, __dependency-1, False or __clipBoardError)
     except Exception:
-        copyToClipboard(content, dependency-1, True or clipBoardError)
+        _copyToClipboard(content, __dependency-1, True or __clipBoardError)
     
 
+def copyToClipboard(content: str) -> None:
+    """
+    entry point to recursive function _copyToClipboard()
+    
+    Parameters:
+    content (str):
+        the string to copy
+    """
+    _copyToClipboard(content)
+
+
 def editFiles() -> None:
+    """
+    manage the calls to editFile() for each file.
+    """
     start = len(holder.files)-1 if holder.reversed else 0
     end = -1 if holder.reversed else len(holder.files)
 

@@ -17,6 +17,19 @@ STATUS_UNSAFE_PRE_RELEASE_AVAILABLE = -2
 
 
 def getLastestPackageVersion(package: str) -> str:
+    """
+    retrieve the official PythonPackageIndex information regarding
+    a package.
+    
+    Parameters:
+    package (str):
+        the package name to check
+        
+    Returns:
+    (str):
+        a version representation
+        on Error: a zero version '0.0.0
+    """
     try:
         response = getRequest(f"https://pypi.org/pypi/{package}/json", timeout=2)
         return response.json()['info']['version']
@@ -25,14 +38,35 @@ def getLastestPackageVersion(package: str) -> str:
 
 
 def onlyNumeric(s: str) -> int:
+    """
+    strips every non-numeric character of a string.
+    
+    Parameters:
+    s (str):
+        the string to filter.
+        
+    Returns:
+    (int):
+        the resulting number of the string containing
+        only numeric values
+    """
     return int('0' + ''.join(filter(str.isdigit, s)))
 
 
 def genVersionTuples(v: str, w: str) -> tuple:
     """
-    '1.0.33.0', '1.1.0a'
-    v
-    (('01', '00', '33', '00'), ('01', '01', '0a', '00'))
+    create comparable version tuples.
+    
+    Parameters:
+    v (str):
+        a version representation like '1.0.33.0'
+    w (str):
+        a version representation like '1.1.0a'
+    
+    Returns:
+    (tuple(tuple, tuple)):
+        the version tuples of both inputs like
+        (('01', '00', '33', '00'), ('01', '01', '0a', '00'))
     """
     vSplit, wSplit = v.split('.'), w.split('.')
     maxSplitLen = max(map(len, vSplit + wSplit))
@@ -45,9 +79,17 @@ def genVersionTuples(v: str, w: str) -> tuple:
 
 def newVersionAvailable(currentVersion: str, latestVersion: str) -> int:
     """
-    Checks whether or not a new version is available by comapring
-    two version strings. returns a numeric value identifying
-    the case.
+    Checks whether or not a new version is available.
+    
+    Parameters:
+    currentVersion (str):
+        a version representation as string
+    latestVersion (str):
+        a version representation as string
+    
+    Returns:
+    (int):
+        a global status code describing the situation
     """
     if currentVersion.startswith('v'):
         currentVersion = currentVersion[1:]
@@ -74,7 +116,18 @@ def newVersionAvailable(currentVersion: str, latestVersion: str) -> int:
     return status
 
 
-def printUpdateInformation(package: str, currentVersion: str, color_dic: dict):
+def printUpdateInformation(package: str, currentVersion: str, color_dic: dict) -> None:
+    """
+    prints update information if there are any.
+    
+    Parameters:
+    package (str):
+        the package name to check
+    currentVersion (str):
+        a version representation as string of the current version
+    color_dic (dict):
+        a dictionary translating the color-keywords to ANSI-Colorcodes
+    """
     latestVersion = getLastestPackageVersion(package)
     status = newVersionAvailable(currentVersion, latestVersion)
     if status == STATUS_UP_TO_DATE:

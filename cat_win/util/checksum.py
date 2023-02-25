@@ -2,15 +2,24 @@ import hashlib
 from zlib import crc32 as crc32_hash
 
 
-def getChecksumFromFile(file: str, colors: list = ['', '']) -> str:
+def getChecksumFromFile(file: str, colors: list = None) -> str:
     """
-    Takes a filepath of type String and
-    returns a String representation of the
-    CRC32, MD5, SHA1, SHA256, SHA512
-    hashes corresponding to the given file.
-    Takes a colors-list containing 2 elements:
-    colors = [COLOR_CHECKSUM, COLOR_RESET]
+    Calculates and returns the CRC32, MD5, SHA1, SHA256, SHA512
+    hashes of a file.
+    
+    Parameters:
+    file (str):
+        a string representation of a file (-path)
+    colors (list):
+        a list with 2 elements like [COLOR_CHECKSUM, COLOR_RESET]
+        containing the ANSI-Colorcodes used in the returned string.
+    
+    Returns:
+    checksum (str):
+        a formatted string representation of all checksums calculated
     """
+    if colors == None or len(colors) < 2:
+        colors = ['', '']
     BUF_SIZE = 65536  # 64kb
     md5 = hashlib.md5()
     sha1 = hashlib.sha1()

@@ -15,9 +15,15 @@ from stat import (
 
 def _convert_size(size_bytes: int) -> str:
     """
-    Takes an integer representing a file size in bytes.
-    Returns a string representation containing the
-    appropriate Suffix.
+    convert a size value to a more compact representation
+    
+    Parameters_
+    size_bytes (int):
+        a size value in bytes
+        
+    Returns:
+    (str):
+        a string representation with a size value suffix
     """
     if size_bytes == 0:
         return '0 B'
@@ -30,8 +36,17 @@ def _convert_size(size_bytes: int) -> str:
 
 def read_attribs(file: str) -> list:
     """
-    Read the Windows file attributes and return them
-    in a list of lists.
+    check which attributes a file has set.
+    
+    Parameters:
+    file (str):
+        a string representation of a file (-path)
+        
+    Returns:
+    (list):
+        a list of lists containing attributes and a
+        boolean value describing if it is set
+        [[ATTRIBUTE, True/False], ...]
     """
     attrs = stat(file, follow_symlinks=False).st_file_attributes
 
@@ -48,19 +63,41 @@ def read_attribs(file: str) -> list:
 
 
 def getFileSize(file: str) -> int:
+    """
+    calculate the size of a file
+    
+    Parameters:
+    file (str):
+        a string representation of a file (-path)
+        
+    Returns:
+    (int):
+        the size in bytes or 0 if an (OS-)error occurs
+    """
     try:
         return stat(file).st_size
     except OSError:
         return 0
 
 
-def getFileMetaData(file: str, colors: list) -> str:
+def getFileMetaData(file: str, colors: list = None) -> str:
     """
-    Takes a file and returns a string representation
-    containing file size, creation/modified/accessed time.
-    On Windows OS also return the file attributes.
-    colors: [RESET_ALL, ATTRIB, +ATTRIB, -ATTRIB]
+    calculate file metadata information.
+    
+    Parameters:
+    file (str):
+        a string representation of a file (-path)
+    colors (list):
+        a list containing the ANSI-Colorcodes to display
+        the attributes like [RESET_ALL, ATTRIB, +ATTRIB, -ATTRIB]
+    
+    Returns:
+    metaData (str):
+        representation containing file size, creation/modified/accessed time.
+        on windows: also contains file attribute information
     """
+    if colors == None or len(colors) < 4:
+        colors = ['', '', '', '']
     try:
         stats = stat(file)
         
