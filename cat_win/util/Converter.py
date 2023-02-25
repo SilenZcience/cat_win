@@ -4,8 +4,13 @@ import string
 class Converter():
     def is_dec(self, v: str) -> bool:
         """
-        returns True if given String is a Decimal number.
-        return False if it is not.
+        Parameters:
+        v (str):
+            the string to check
+            
+        Returns:
+            True if v is a Decimal number.
+            False if it is not.
         """
         if v[:1] == '-':
             v = v[1:]
@@ -13,8 +18,13 @@ class Converter():
 
     def is_hex(self, v: str) -> bool:
         """
-        returns True if a String is a Hexadecimal number.
-        returns False if it is not.
+        Parameters:
+        v (str):
+            the string to check
+            
+        Returns:
+            True if v is a Hexadecimal number.
+            False if it is not.
         """
         if v[:1] == '-':
             v = v[1:]
@@ -25,8 +35,13 @@ class Converter():
 
     def is_bin(self, v: str) -> bool:
         """
-        returns True if a String is a Binary number.
-        returns False if it is not.
+        Parameters:
+        v (str):
+            the string to check
+            
+        Returns:
+            True if v is a Binary number.
+            False if it is not.
         """
         if v[:1] == '-':
             v = v[1:]

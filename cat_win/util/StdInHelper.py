@@ -4,8 +4,19 @@ from sys import stdin
 
 def writeTemp(content: str, tmp_file: str, file_encoding: str) -> str:
     """
-    Writes content into a generated temp-file and
-    returns the path in type String.
+    Writes content into a generated temp-file.
+    
+    Parameters:
+    content (str):
+        the content to write in a file
+    tmp_file (str):
+        a string representation of a file (-path)
+    file_encoding (str):
+        an encoding the open the file with
+    
+    Returns:
+    tmp_file (str):
+        the path to the temporary file written
     """
     with open(tmp_file, 'w', encoding=file_encoding) as f:
         f.write(content)
@@ -14,7 +25,16 @@ def writeTemp(content: str, tmp_file: str, file_encoding: str) -> str:
 
 def getStdInContent(oneLine: bool = False) -> str:
     """
-    returns a String delivered by the standard input.
+    read the stdin.
+    
+    Parameters:
+    oneLine (bool):
+        determines if only the first stdin line should be read
+        
+    Returns:
+    input (str):
+        the input delivered by stdin
+        until the first EOF (Chr(26)) character
     """
     if oneLine:
         first_line = stdin.readline()
@@ -29,6 +49,18 @@ def getStdInContent(oneLine: bool = False) -> str:
 
 
 def path_parts(path: str) -> list:
+    """
+    split a path recursively into its parts.
+    
+    Parameters:
+    path (str):
+        a file/dir path
+        
+    Returns:
+    (list):
+        contains each drive/directory/file in the path seperated
+        "C:/a/b/c/d.txt" -> ['C:/', 'a', 'b', 'c', 'd.txt']
+    """
     p, f = os.path.split(path)
     return path_parts(p) + [f] if f and p else [p] if p else []
 
@@ -36,8 +68,19 @@ def path_parts(path: str) -> list:
 def createFile(file: str, content: str, file_encoding: str) -> bool:
     """
     create the directory path to a file, and the file itself.
-    on error: cleanup all created subdirectories in the process
-    return True if the operation was successful.
+    on error: cleanup all created subdirectories
+    
+    Parameters:
+    file (str):
+        a string representation of a file (-path)
+    content (str):
+        the content to write into the files
+    file_encoding (str):
+        the encoding to open the files with
+    
+    Returns:
+    (bool):
+        True if the operation was successful.
     """
     file_dir = os.path.dirname(file)
     splitted_path = path_parts(file_dir)
@@ -71,9 +114,23 @@ def createFile(file: str, content: str, file_encoding: str) -> bool:
 
 def writeFiles(file_list: list, content: str, file_encoding: str) -> list:
     """
-    Simply writes the content into every file in the given list
-    if there is a valid content,
-    returns a list of all files, that could succesfully be written.
+    write to multiple files. ask if an empty file should be created
+    when there is nothing to write.
+    try to create the path to the files if it does not yet exist.
+    delete the created path again (cleanup) if the file still could
+    not be written.
+    
+    Parameters:
+    file_list (list):
+        all files that should be written
+    content (str):
+        the content to write into the files
+    file_encoding (str):
+        the encoding to open the files with
+    
+    Returns:
+    (list):
+        containing all files, that could succesfully be written.
     """
     if len(file_list) == 0:
         return file_list
@@ -113,9 +170,19 @@ def writeFiles(file_list: list, content: str, file_encoding: str) -> list:
 
 def readWriteFilesFromStdIn(file_list: list, file_encoding: str, oneLine: bool = False) -> list:
     """
-    Takes a list of files, waits for a String from
-    the standard input and writes it into every file.
-    returns a list of all files, that could succesfully be written.
+    Write stdin input to multiple files.
+    
+    Parameters:
+    file_list (list):
+        all files that should be written
+    file_encoding (str):
+        the encoding to use for writing the files
+    oneLine (bool):
+        determines if only the first stdin line should be read
+        
+    Returns:
+    (list):
+        containing all files, that could succesfully be written.
     """
     if len(file_list) == 0:
         return file_list

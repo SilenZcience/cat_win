@@ -64,6 +64,17 @@ class Holder():
         self.fileLineNumberPlaceHolder = len(str(max(fileLines)))
 
     def __calcMaxLine__(self, file: str) -> int:
+        """
+        Calculate the length of the longest line in a file.
+        
+        Parameters:
+        file (str):
+            a string representation of a file (-path)
+            
+        Returns:
+        (int):
+            the length of the longest line within the file
+        """
         heap = []
         lines = []
         with open(file, 'rb') as fp:
@@ -72,6 +83,8 @@ class Holder():
         heap = nlargest(1, lines, len)
         if len(heap) == 0:
             return 0
+        # also check the longest line against the last line because
+        # the lines still contain (\r)\n, except the last line does not
         longest_line_len = len(heap[0][:-1].rstrip(b'\n').rstrip(b'\r'))
         last_line_len = len(lines[-1].rstrip(b'\n').rstrip(b'\r'))
         

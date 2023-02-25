@@ -24,7 +24,15 @@ class Config:
                    C_KW.MESSAGE_WARNING: ColorOptions.Fore['RED']}
     elements = list(default_dic.keys())
 
-    def __init__(self, workingDir) -> None:
+    def __init__(self, workingDir: str) -> None:
+        """
+        Initialise the Config() object to load and save
+        the color configs.
+        
+        Parameters:
+        workingDir (str):
+            the working directory path of the package
+        """
         self.workingDir = workingDir
         self.configFile = path_join(self.workingDir, 'cat.config')
         
@@ -38,8 +46,12 @@ class Config:
 
     def loadConfig(self) -> dict:
         """
-        Load the Color Configuration from the config file and return it.
-        On Error: Return the default color config.
+        Load the Color Configuration from the config file.
+        
+        Returns:
+        color_dic (dict):
+            a dictionary translating from C_KW-keywords to ANSI-Colorcodes
+        On Error: Return the default color config
         """
         try:
             self.configParser.read(self.configFile)
@@ -48,7 +60,8 @@ class Config:
                 try:
                     type, color = configColors[element].split('.')
                     self.color_dic[element] = (
-                        ColorOptions.Fore[color] if type == 'Fore' else ColorOptions.Back[color])
+                        ColorOptions.Fore[color] if type == 'Fore' else ColorOptions.Back[color]
+                        )
                 except KeyError:
                     self.color_dic[element] = self.default_dic[element]
         except KeyError:
@@ -64,6 +77,13 @@ class Config:
         return self.color_dic
 
     def _printGetAllAvailableColors(self) -> list:
+        """
+        prints all available color options to choose from.
+        
+        Returns:
+        options (list):
+            the same list containing all available colors.
+        """
         print('Here is a list of all available color options you may choose:')
         
         ForeOptions = list(ColorOptions.Fore.items())
@@ -96,6 +116,9 @@ class Config:
         return options
 
     def _printAllAvailableElements(self) -> None:
+        """
+        print all available elements which color can be changed.
+        """
         print('Here is a list of all available elements you may change:')
         
         self.longestCharCount = max(map(len, self.elements)) + 12

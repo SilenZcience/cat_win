@@ -11,6 +11,21 @@ FILE_TRUNCATE = [None, None, None]
 
 
 def __addArgument__(args: list, unknown_args: list, known_files: list, unknown_files: list, param: str) -> None:
+    """
+    sorts an argument to either list option, by appending to it.
+    
+    Parameters:
+    args (list):
+        all known parameters
+    unknown_args (list):
+        all unknown parameters
+    known_files (list):
+        all known files
+    unknown_files (list)
+        all unknown files
+    param (str):
+        the current parameter
+    """
     # 'enc' + ('=' or ':') + FILE_ENCODING
     if match(r"\Aenc[\=\:].+\Z", param):
         global FILE_ENCODING
@@ -75,7 +90,14 @@ def getArguments(argv: list) -> tuple:
     """
     Read all args to either a valid parameter,
     a known file or an unknown file.
-    Return a tuple containing these three lists.
+    
+    Parameters:
+    argv (list):
+        the entire sys.argv list
+    
+    Returns:
+    (args, unknown_args, known_files, unknown_files) (tuple):
+        contains the paramater in a sorted manner
     """
     inputArgs = argv[1:]
     args = []
