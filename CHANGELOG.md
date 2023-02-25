@@ -9,6 +9,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - it is now possible to use either the '`pyclip`', '`pyperclip3`', or '`pyperclip`' module in order to use the --`clip` parameter. If none of these options are installed, the --clip parameter will not work yet the programm won't crash. This change was made due to some problems using the --clip parameter on macOS.
 - the `default` clipboard module was changed from '`pyperclip3`' to '`pyclip`'. This module however is not included in the necessary dependencies. It can be added to the installation dependencies by using 'pip install cat_win<b>[clip]</b>'.
+- elevated dependency `colorama` from >=0.4.5 to >=0.4.6 (also switched from init() to just_fix_windows_console())
 
 ### Minor Changes
 
