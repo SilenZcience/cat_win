@@ -1,10 +1,10 @@
 <div id="top"></div>
 
 <p>
-   <a href="https://pepy.tech/project/cat-win" alt="Downloads">
+   <a href="https://pypi.org/project/cat-win/" alt="Downloads">
       <img src="https://static.pepy.tech/personalized-badge/cat-win?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Downloads" align="right">
    </a>
-   <a href="https://pypi.org/project/cat-win/" alt="Visitors">
+   <a href="https://pepy.tech/project/cat-win/" alt="Visitors">
       <img src="https://visitor-badge.laobi.icu/badge?page_id=SilenZcience.cat_win" align="right">
    </a>
    <a href="https://github.com/SilenZcience/cat_win/tree/main/cat_win" alt="CodeSize">
@@ -75,6 +75,7 @@ Contrary to the name of the project it is of course possible to use cat_win on L
 
 ### Made With
 [![MadeWith-Python]](https://www.python.org/)
+[![Python][Python-Version]](https://www.python.org/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -86,6 +87,7 @@ Contrary to the name of the project it is of course possible to use cat_win on L
 - Using cat_win as an Executable (Windows only!) demands no prerequisites, hereby the stand-alone executable `catw.exe`  is sufficient.
 
 ### Installation
+[![Version][CurrentVersion]](https://pypi.org/project/cmdtrix/)
 
 Simply install the python package (via [PyPI-cat_win](https://pypi.org/project/cat-win/)):
 ```console
@@ -208,5 +210,8 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 [Compile-and-Push]: https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml/badge.svg
 
 [MadeWith-Python]: https://img.shields.io/badge/Made%20with-Python-brightgreen
+[Python-Version]: https://img.shields.io/badge/python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue
+
+[CurrentVersion]: https://img.shields.io/pypi/v/cat_win.svg
 
 [GitHub-SilenZcience]: https://img.shields.io/badge/GitHub-SilenZcience-orange
