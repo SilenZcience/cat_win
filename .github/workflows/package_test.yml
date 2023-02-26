@@ -25,20 +25,18 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          # cache: 'pip'
+          cache: 'pip'
       - name: Setup Build Dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install --upgrade build
-      # - name: Setup Code Dependencies
-      #   run: |
-      #     python -m pip install --upgrade -r ./cat_win/requirements.txt
       - name: Check and Build Package
         run: |
           python -m build
       - name: Install Local Package
+        # this should also install the code dependency in requirements.txt
         run: |
-          python ./workflowHelper/dist.py
+          python ./workflowHelper/dist.py 
       - name: Test Code Execution
         run: |
           python -m cat_win.cat -h
