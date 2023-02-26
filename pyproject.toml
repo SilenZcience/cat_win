@@ -10,31 +10,44 @@ readme = "README.md"
 license = {file = "LICENSE"}
 keywords = [
 	"cat",
+    "cli",
+    "console",
+    "crossplatform",
     "python",
-    "cli"
+    "terminal",
 ]
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Environment :: Console",
-    "Operating System :: OS Independent"
+    "Operating System :: OS Independent",
+    "Topic :: Terminals",
 ]
 dynamic = [
     "version",
-    "description"
+    "description",
 ]
 dependencies = [
     "colorama>=0.4.6",
-    "requests>=2.26.0"
+    "requests>=2.26.0",
 ]
 
 [project.optional-dependencies]
 clip = [
-    "pyclip>=0.5.4"
+    "pyclip>=0.5.4",
 ]
 
 [tool.flit.sdist]
-exclude = 	["cat_win/build", "**/**.spec", "**/**.txt"]
+exclude = 	[
+    "cat_win/build",
+    "**/**.spec",
+    "**/**.txt",
+]
 
 [project.scripts]
 cat = "cat_win.__main__:deprecated_entry_point"
