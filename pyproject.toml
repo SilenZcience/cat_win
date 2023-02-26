@@ -39,7 +39,7 @@ dependencies = [
 
 [project.optional-dependencies]
 clip = [
-    "pyclip>=0.5.4",
+    "pyperclip~=1.8.0",
 ]
 
 [tool.flit.sdist]

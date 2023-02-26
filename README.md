@@ -93,8 +93,8 @@ Simply install the python package (via [PyPI-cat_win](https://pypi.org/project/c
 ```console
 python -m pip install --upgrade cat_win[clip]
 ```
-cat_win uses the [pyclip](https://pypi.org/project/pyclip/) module by default. Should any problems occur, you can also use
-the [pyperclip3](https://pypi.org/project/pyperclip3/) or [pyperclip](https://pypi.org/project/pyperclip/) module.
+cat_win uses the [pyperclip](https://pypi.org/project/pyperclip/) module by default. Should any problems occur, you can also use
+the [pyperclip3](https://pypi.org/project/pyperclip3/) or [pyclip](https://pypi.org/project/pyclip/) module.
 In this case simply run:
 ```console
 python -m pip install --upgrade cat_win
@@ -210,7 +210,7 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 [Compile-and-Push]: https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml/badge.svg
 
 [MadeWith-Python]: https://img.shields.io/badge/Made%20with-Python-brightgreen
-[Python-Version]: https://img.shields.io/badge/python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue
+[Python-Version]: https://img.shields.io/badge/python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%20pypy--3.8%20%7C%20pypy--3.9-blue
 
 [CurrentVersion]: https://img.shields.io/pypi/v/cat_win.svg
 
