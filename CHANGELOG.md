@@ -12,6 +12,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - -`F`, --`FILES` now also shows the size of the stdin content using -`i`.
+- added -`E`, --`ECHO` parameter to ignore every following parameter and handle them like stdin.
 
 
 ## [1.1.3] - 2023-02-26

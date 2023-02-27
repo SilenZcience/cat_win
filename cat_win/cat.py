@@ -90,7 +90,7 @@ def _showVersion() -> None:
     printUpdateInformation('cat_win', __version__, color_dic)
 
 
-def _showDebug(args: list, unknown_args: list, known_files: list, unknown_files: list) -> None:
+def _showDebug(args: list, unknown_args: list, known_files: list, unknown_files: list, echo_args: list) -> None:
     """
     Print all neccassary debug information
     """
@@ -103,6 +103,8 @@ def _showDebug(args: list, unknown_args: list, known_files: list, unknown_files:
     print(known_files)
     print('unknown_files: ', end='')
     print(unknown_files)
+    print('echo_args: ', end='')
+    print(echo_args)
     print('file encoding: ', end='')
     print(ArgParser.FILE_ENCODING)
     print('search keyword(s): ', end='')
@@ -554,7 +556,7 @@ def main():
     piped_input = temp_file = ''
 
     # read parameter-args
-    args, unknown_args, known_files, unknown_files = ArgParser.getArguments(sys.argv)
+    args, unknown_args, known_files, unknown_files, echo_args = ArgParser.getArguments(sys.argv)
 
     holder.setArgs(args)
 
@@ -567,7 +569,7 @@ def main():
     
     # check for special cases
     if holder.args_id[ARGS_DEBUG]:
-        _showDebug(args, unknown_args, known_files, unknown_files)
+        _showDebug(args, unknown_args, known_files, unknown_files, echo_args)
     if (len(known_files) + len(unknown_files) + len(holder.args) == 0) or holder.args_id[ARGS_HELP]:
         _showHelp()
         return
@@ -577,6 +579,10 @@ def main():
     if holder.args_id[ARGS_CONFIG]:
         config.saveConfig()
         return
+    if holder.args_id[ARGS_ECHO]:
+        temp_file = StdInHelper.writeTemp(' '.join(echo_args), tmpFileHelper.generateTempFileName(), ArgParser.FILE_ENCODING)
+        known_files.append(temp_file)
+        holder.setTempFileEcho(temp_file)
     if holder.args_id[ARGS_INTERACTIVE]:
         piped_input = StdInHelper.getStdInContent(holder.args_id[ARGS_ONELINE])
         temp_file = StdInHelper.writeTemp(piped_input, tmpFileHelper.generateTempFileName(), ArgParser.FILE_ENCODING)

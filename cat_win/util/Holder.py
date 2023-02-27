@@ -9,6 +9,7 @@ class Holder():
         self.args = []  # list of all used parameters: format [[id, param]]
         self.args_id = [False] * (HIGHEST_ARG_ID + 1)
         self.temp_file_stdin = None  # if stdin is used, this temp_file will contain the stdin-input
+        self.temp_file_echo = None  # if ARGS_ECHO is used, this temp_file will contain the following parameters
         self.reversed = False
         
         # the amount of chars neccessary to display the last file
@@ -39,12 +40,17 @@ class Holder():
 
     def setTempFileStdIn(self, file: str) -> None:
         self.temp_file_stdin = file
+        
+    def setTempFileEcho(self, file: str) -> None:
+        self.temp_file_echo = file
 
     def getAppliedFiles(self) -> list:
         displayList = []
         for file in self.files:
             if file == self.temp_file_stdin:
                 displayList.append((file, '<STDIN>'))
+            elif file == self.temp_file_echo:
+                displayList.append((file, '<ECHO>'))
             else:
                 displayList.append((file, file))
         return displayList
