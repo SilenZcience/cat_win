@@ -129,13 +129,13 @@ def _showFiles(files: list) -> None:
     print(color_dic[C_KW.COUNT_AND_FILES], end='')
     print(f"{msg} FILE(s):", end='')
     print(color_dic[C_KW.RESET_ALL])
-    for file in files:
+    for file, displayName in files:
         sizeString = ''
         if holder.args_id[ARGS_FFILES]:
             size = getFileSize(file)
             file_sizes.append(size)
             sizeString = f"{_convert_size(size): <10}"
-        print(f"\t{color_dic[C_KW.COUNT_AND_FILES]}{sizeString}{file}{color_dic[C_KW.RESET_ALL]}")
+        print(f"\t{color_dic[C_KW.COUNT_AND_FILES]}{sizeString}{displayName}{color_dic[C_KW.RESET_ALL]}")
     if holder.args_id[ARGS_FFILES]:
         print(color_dic[C_KW.COUNT_AND_FILES], end='')
         print(f"Sum:\t{_convert_size(sum(file_sizes))}", end='')
@@ -577,15 +577,12 @@ def main():
     if holder.args_id[ARGS_CONFIG]:
         config.saveConfig()
         return
-    if holder.args_id[ARGS_FFILES]:
-        _showFiles(known_files)
-        return
     if holder.args_id[ARGS_INTERACTIVE]:
         piped_input = StdInHelper.getStdInContent(holder.args_id[ARGS_ONELINE])
         temp_file = StdInHelper.writeTemp(piped_input, tmpFileHelper.generateTempFileName(), ArgParser.FILE_ENCODING)
         known_files.append(temp_file)
         unknown_files = StdInHelper.writeFiles(unknown_files, piped_input, ArgParser.FILE_ENCODING)
-        holder.setTempFile(temp_file)
+        holder.setTempFileStdIn(temp_file)
     else:
         unknown_files = StdInHelper.readWriteFilesFromStdIn(
             unknown_files, ArgParser.FILE_ENCODING, holder.args_id[ARGS_ONELINE])
@@ -595,7 +592,10 @@ def main():
 
     # fill holder object with neccessary values
     holder.setFiles([*known_files, *unknown_files])
-
+    if holder.args_id[ARGS_FFILES]:
+        _showFiles(holder.getAppliedFiles())
+        return
+    
     if holder.args_id[ARGS_DATA] or holder.args_id[ARGS_CHECKSUM]:
         _printMetaAndChecksum(holder.args_id[ARGS_DATA], holder.args_id[ARGS_CHECKSUM])
     else:

@@ -8,7 +8,7 @@ class Holder():
         self._inner_files = []
         self.args = []  # list of all used parameters: format [[id, param]]
         self.args_id = [False] * (HIGHEST_ARG_ID + 1)
-        self.temp_file = None  # if stdin is used, this temp_file will contain the stdin-input
+        self.temp_file_stdin = None  # if stdin is used, this temp_file will contain the stdin-input
         self.reversed = False
         
         # the amount of chars neccessary to display the last file
@@ -37,11 +37,17 @@ class Holder():
             self.args_id[ARGS_NUMBER] = False
         self.reversed = self.args_id[ARGS_REVERSE]
 
-    def setTempFile(self, file: str) -> None:
-        self.temp_file = file
+    def setTempFileStdIn(self, file: str) -> None:
+        self.temp_file_stdin = file
 
     def getAppliedFiles(self) -> list:
-        return ['<STDIN>' if f == self.temp_file else f for f in self.files]
+        displayList = []
+        for file in self.files:
+            if file == self.temp_file_stdin:
+                displayList.append((file, '<STDIN>'))
+            else:
+                displayList.append((file, file))
+        return displayList
     
     def __calcFileNumberPlaceHolder__(self) -> None:
         self.fileNumberPlaceHolder = len(str(len(self.files)))
