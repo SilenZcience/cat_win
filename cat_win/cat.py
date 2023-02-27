@@ -4,7 +4,7 @@ from re import sub as resub
 from datetime import datetime
 from functools import lru_cache
 from itertools import groupby
-from colorama import just_fix_windows_console
+from colorama import init as coloramaInit
 
 import cat_win.persistence.Config as Config
 import cat_win.util.ArgParser as ArgParser
@@ -23,7 +23,7 @@ from cat_win.web.UpdateChecker import printUpdateInformation
 from cat_win import __version__, __sysversion__, __author__, __url__
 workingDir = os.path.dirname(os.path.realpath(__file__))
 
-just_fix_windows_console()
+coloramaInit()
 config = Config.Config(workingDir)
 
 color_dic = config.loadConfig()
