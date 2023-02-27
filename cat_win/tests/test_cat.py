@@ -142,4 +142,4 @@ class TestCat(TestCase):
     #     expected_output = [('12345', 'abcdefghijklmnopqr')]
     #     self.assertEqual(cat.removeAnsiCodes(random_list), expected_output)
 
-# python -m unittest discover -s tests -p test*.py
+# python -m unittest discover -s cat_win.tests -p test*.py

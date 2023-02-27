@@ -21,7 +21,7 @@ if cat == '':
     exit(1)
 
 with open(entry_dir, 'w', encoding='utf-8') as f:
-    f.write('import pyclip as pc\n' + cat)
+    f.write('import pyperclip as pc\n' + cat)
 
 # clear pycache
 for path in iglob(package_dir + '/**/__pycache__', recursive=True):
