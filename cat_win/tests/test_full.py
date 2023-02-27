@@ -3,14 +3,15 @@ import cat_win.util.ArgParser as ArgParser
 from unittest.mock import patch
 from unittest import TestCase
 from io import StringIO
-from _pytest.capture import DontReadFromInput
 import os
 # import sys
 # sys.path.append('../cat_win')
 
-
-test_file_dir = os.path.dirname(__file__) + '/texts/'
-test_file_path = test_file_dir + 'test.txt'
+test_file_dir = os.path.join(os.path.dirname(__file__), 'texts')
+test_file_path = os.path.join(test_file_dir, 'test.txt')
+test_result_B = os.path.join(test_file_dir, 'full_test_result_B.txt')
+test_result_C = os.path.join(test_file_dir, 'full_test_result_C.txt')
+test_result_D = os.path.join(test_file_dir, 'full_test_result_D.txt')
 
 
 class StdOutMock(StringIO):
@@ -20,7 +21,8 @@ class StdOutMock(StringIO):
     def fileno(self):
         return 0
     
-class StdInMock(DontReadFromInput):
+# class StdInMock(DontReadFromInput):
+class StdInMock:
     def reconfigure(self, encoding = None):
         return
 
@@ -48,7 +50,7 @@ class TestCatFull(TestCase):
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, '-ln', '--nc', '[::-2]', 'enc=utf8'])
     def test_cat_output_full_B(self):
         expected_output = ''
-        with open(test_file_dir + 'full_test_result_B.txt', 'r', encoding='utf-8') as output:
+        with open(test_result_B, 'r', encoding='utf-8') as output:
             expected_output = output.read()
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
@@ -57,7 +59,7 @@ class TestCatFull(TestCase):
     @patch('cat_win.cat.sys.argv', ['<CAT>', 'enc:UTF-8', test_file_path, '-ub', '[Sample,TEST]', '--nc', '-le'])
     def test_cat_output_full_C(self):
         expected_output = ''
-        with open(test_file_dir + 'full_test_result_C.txt', 'r', encoding='utf-8') as output:
+        with open(test_result_C, 'r', encoding='utf-8') as output:
             expected_output = output.read()
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
@@ -66,7 +68,7 @@ class TestCatFull(TestCase):
     @patch('cat_win.cat.sys.argv', ['<CAT>', 'enc=utf-8', test_file_path, 'trunc=2:6', '-n', '--reverse', '--nc', '-t'])
     def test_cat_output_full_D(self):
         expected_output = ''
-        with open(test_file_dir + 'full_test_result_D.txt', 'r', encoding='utf-8') as output:
+        with open(test_result_D, 'r', encoding='utf-8') as output:
             expected_output = output.read()
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()

@@ -1,8 +1,13 @@
 import cat_win.util.ArgParser as ArgParser
 from cat_win.const.ArgConstants import *
 from unittest import TestCase
+import os
 # import sys
 # sys.path.append('../cat_win')
+
+
+test_file_dir = os.path.join(os.path.dirname(__file__), 'texts')
+
 
 
 class TestArgParser(TestCase):
@@ -96,22 +101,15 @@ class TestArgParser(TestCase):
         self.assertCountEqual(args, [(ARGS_REPLACE, '[test,404]')])
         
     def test_getArguments_dir(self):
-        args, unknown_args, known_files, unknown_files = ArgParser.getArguments(['CAT', './tests/texts/'])
-        self.assertCountEqual(args, [])
-        self.assertCountEqual(unknown_args, [])
-        self.assertGreaterEqual(len(known_files), 7)
-        self.assertCountEqual(unknown_files, [])
-        
-    def test_getArguments_files(self):
-        args, unknown_args, known_files, unknown_files = ArgParser.getArguments(['CAT', '**/tests/texts/**.txt'])
+        args, unknown_args, known_files, unknown_files = ArgParser.getArguments(['CAT', test_file_dir])
         self.assertCountEqual(args, [])
         self.assertCountEqual(unknown_args, [])
         self.assertGreaterEqual(len(known_files), 7)
         self.assertCountEqual(unknown_files, [])
         
     def test_getArguments_files_equal_dir(self):
-        _, _, known_files_dir, _ = ArgParser.getArguments(['CAT', './tests/texts/'])
-        _, _, known_files_files, _ = ArgParser.getArguments(['CAT', '**/tests/texts/**.txt'])
+        _, _, known_files_dir, _ = ArgParser.getArguments(['CAT', test_file_dir])
+        _, _, known_files_files, _ = ArgParser.getArguments(['CAT', test_file_dir + '/**.txt'])
         self.assertCountEqual(known_files_dir, known_files_files)
         
     def test_getArguments_unknown_file(self):

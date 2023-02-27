@@ -508,11 +508,11 @@ def _copyToClipboard(content: str, __dependency: int = 3, __clipBoardError: bool
         return
     try:
         if __dependency == 3:
-            import pyclip as pc
-        elif __dependency == 2:
-            import pyperclip3 as pc
-        elif __dependency == 1:
             import pyperclip as pc
+        elif __dependency == 2:
+            import pyclip as pc
+        elif __dependency == 1:
+            import pyperclip3 as pc
         pc.copy(content)
     except ImportError:
         _copyToClipboard(content, __dependency-1, False or __clipBoardError)
