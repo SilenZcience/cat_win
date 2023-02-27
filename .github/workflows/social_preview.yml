@@ -32,4 +32,4 @@ jobs:
           git config --local user.email 'github-actions[bot]@users.noreply.github.com'
           git add ./img/socialPreview.png
           git commit -m "🤖Generated Social Preview."
-          git push origin main
+          git push origin HEAD:main
