@@ -135,13 +135,14 @@ catw --help
 | *-u, --unique*         | suppress repeated output lines                    |
 | *-b, --blank*          | hide empty lines                                  |
 | *-r, --reverse*        | reverse output                                    |
+| *-p, --peek*           | only print the first and last lines               |
 | *-s, --sum*            | show sum of lines                                 |
 | *-f, --files*          | list applied files                                |
 | *-F, --FILES*          | ONLY list applied files and file sizes            |
 | *-k, --keyword*        | only show lines containing queried keywords       |
 | *-i, --interactive*    | use stdin                                         |
 | *-o, --oneline*        | take only the first stdin-line                    |
-| *-p, --peek*           | only print the first and last lines               |
+| *-E, --ECHO*           | handle every following parameter as stdin         |
 | *-c, --clip*           | copy output to clipboard                          |
 | *-m, --checksum*       | show the checksums of all files                   |
 | *-a, --attributes*     | show meta-information about the files             |

@@ -20,43 +20,48 @@ class TestArgParser(TestCase):
         ArgParser.FILE_TRUNCATE = [None, None, None]
         
     def test_getArguments_empty(self):
-        args, unknown_args, known_files, unknown_files = ArgParser.getArguments(['CAT'])
+        args, unknown_args, known_files, unknown_files, echo_args = ArgParser.getArguments(['CAT'])
         self.assertCountEqual(args, [])
         self.assertCountEqual(unknown_args, [])
         self.assertCountEqual(known_files, [])
         self.assertCountEqual(unknown_files, [])
+        self.assertCountEqual(echo_args, [])
         
     def test_getArguments_duplicate(self):
-        args, unknown_args, known_files, unknown_files = ArgParser.getArguments(['CAT', '-n', '-n', '-c'])
+        args, unknown_args, known_files, unknown_files, echo_args = ArgParser.getArguments(['CAT', '-n', '-n', '-c'])
         args = list(map(lambda x: x[1], args))
         self.assertCountEqual(args, ['-n', '-c', '-n'])
         self.assertCountEqual(unknown_args, [])
         self.assertCountEqual(known_files, [])
         self.assertCountEqual(unknown_files, [])
+        self.assertCountEqual(echo_args, [])
         
     def test_getArguments_concatenated(self):
-        args, unknown_args, known_files, unknown_files = ArgParser.getArguments(['CAT', '-abcdef'])
+        args, unknown_args, known_files, unknown_files, echo_args = ArgParser.getArguments(['CAT', '-abcdef'])
         args = list(map(lambda x: x[1], args))
         self.assertCountEqual(args, ['-a', '-b', '-c', '-d', '-e', '-f'])
         self.assertCountEqual(unknown_args, [])
         self.assertCountEqual(known_files, [])
         self.assertCountEqual(unknown_files, [])
+        self.assertCountEqual(echo_args, [])
         
     def test_getArguments_concatenated_unknown(self):
-        args, unknown_args, known_files, unknown_files = ArgParser.getArguments(['CAT', '-+abcde?fg'])
+        args, unknown_args, known_files, unknown_files, echo_args = ArgParser.getArguments(['CAT', '-+abcde?fg'])
         args = list(map(lambda x: x[1], args))
         self.assertCountEqual(args, ['-a', '-b', '-c', '-d', '-e', '-f'])
         self.assertCountEqual(unknown_args, ['-+', '-?', '-g'])
         self.assertCountEqual(known_files, [])
         self.assertCountEqual(unknown_files, [])
+        self.assertCountEqual(echo_args, [])
         
     def test_getArguments_concatenated_invalid(self):
-        args, unknown_args, known_files, unknown_files = ArgParser.getArguments(['CAT', '--abcde?fg'])
+        args, unknown_args, known_files, unknown_files, echo_args = ArgParser.getArguments(['CAT', '--abcde?fg'])
         args = list(map(lambda x: x[1], args))
         self.assertCountEqual(args, [])
         self.assertCountEqual(unknown_args, ['--abcde?fg'])
         self.assertCountEqual(known_files, [])
         self.assertCountEqual(unknown_files, [])
+        self.assertCountEqual(echo_args, [])
         
     def test_getArguments_encoding(self):
         ArgParser.getArguments(['CAT', 'enc:ascii'])
@@ -93,34 +98,45 @@ class TestArgParser(TestCase):
         self.assertListEqual(ArgParser.FILE_TRUNCATE, [None, 5, None])
         
     def test_getArguments_cut(self):
-        args, _, _, _ = ArgParser.getArguments(['CAT', '[2*5:20]'])
+        args, _, _, _, _ = ArgParser.getArguments(['CAT', '[2*5:20]'])
         self.assertCountEqual(args, [(ARGS_CUT, '[2*5:20]')])
         
     def test_getArguments_replace(self):
-        args, _, _, _ = ArgParser.getArguments(['CAT', '[test,404]'])
+        args, _, _, _, _ = ArgParser.getArguments(['CAT', '[test,404]'])
         self.assertCountEqual(args, [(ARGS_REPLACE, '[test,404]')])
         
     def test_getArguments_dir(self):
-        args, unknown_args, known_files, unknown_files = ArgParser.getArguments(['CAT', test_file_dir])
+        args, unknown_args, known_files, unknown_files, echo_args = ArgParser.getArguments(['CAT', test_file_dir])
         self.assertCountEqual(args, [])
         self.assertCountEqual(unknown_args, [])
         self.assertGreaterEqual(len(known_files), 7)
         self.assertCountEqual(unknown_files, [])
+        self.assertCountEqual(echo_args, [])
         
     def test_getArguments_files_equal_dir(self):
-        _, _, known_files_dir, _ = ArgParser.getArguments(['CAT', test_file_dir])
-        _, _, known_files_files, _ = ArgParser.getArguments(['CAT', test_file_dir + '/**.txt'])
+        _, _, known_files_dir, _, _ = ArgParser.getArguments(['CAT', test_file_dir])
+        _, _, known_files_files, _, _ = ArgParser.getArguments(['CAT', test_file_dir + '/**.txt'])
         self.assertCountEqual(known_files_dir, known_files_files)
         
     def test_getArguments_unknown_file(self):
-        args, unknown_args, known_files, unknown_files = ArgParser.getArguments(['CAT', 'testTesttest', 'test-file.txt'])
+        args, unknown_args, known_files, unknown_files, echo_args = ArgParser.getArguments(['CAT', 'testTesttest', 'test-file.txt'])
         self.assertCountEqual(args, [])
         self.assertCountEqual(unknown_args, [])
         self.assertCountEqual(known_files, [])
+        self.assertCountEqual(echo_args, [])
         self.assertEqual(len(unknown_files), 2)
         self.assertIn('testTesttest', ''.join(unknown_files))
         self.assertIn('test-file.txt', ''.join(unknown_files))
         
     def test_getArguments_unknown_args(self):
-        _, unknown_args, _, _ = ArgParser.getArguments(['CAT', '--test-file.txt'])
+        _, unknown_args, _, _, _ = ArgParser.getArguments(['CAT', '--test-file.txt'])
         self.assertCountEqual(unknown_args, ['--test-file.txt'])
+        
+    def test_getArguments_echo_args(self):
+        args, unknown_args, known_files, unknown_files, echo_args = ArgParser.getArguments(['CAT', '-n', '-E', '-n', 'random', test_file_dir])
+        args = list(map(lambda x: x[1], args))
+        self.assertCountEqual(args, ['-n', '-E'])
+        self.assertCountEqual(unknown_args, [])
+        self.assertCountEqual(known_files, [])
+        self.assertCountEqual(unknown_files, [])
+        self.assertCountEqual(echo_args, ['-n', 'random', test_file_dir])

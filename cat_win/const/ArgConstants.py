@@ -12,7 +12,7 @@ ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN = range(10, 15)
 ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA = range(15, 20)
 ARGS_CONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK, ARGS_NOCOL = range(20, 25)
 ARGS_EOF, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_KEYWORD = range(25, 30)
-ARGS_NOBREAK, _ = range(30, 32)
+ARGS_NOBREAK, ARGS_ECHO = range(30, 32)
 
 ALL_ARGS = [[['-h', '--help'], 'show this help message and exit', ARGS_HELP],
             [['-v', '--version'], 'output version information and exit', ARGS_VERSION],
@@ -25,13 +25,14 @@ ALL_ARGS = [[['-h', '--help'], 'show this help message and exit', ARGS_HELP],
             [['-u', '--unique'], 'suppress repeated output lines', ARGS_SQUEEZE],
             [['-b', '--blank'], 'hide empty lines', ARGS_BLANK],
             [['-r', '--reverse'], 'reverse output', ARGS_REVERSE],
+            [['-p', '--peek'], 'only print the first and last lines', ARGS_PEEK],
             [['-s', '--sum'], 'show sum of lines', ARGS_COUNT],
             [['-f', '--files'], 'list applied files', ARGS_FILES],
             [['-F', '--FILES'], 'ONLY list applied files and file sizes', ARGS_FFILES],
             [['-k', '--keyword'], 'only show lines containing queried keywords', ARGS_KEYWORD],
             [['-i', '--interactive'], 'use stdin', ARGS_INTERACTIVE],
             [['-o', '--oneline'], 'take only the first stdin-line', ARGS_ONELINE],
-            [['-p', '--peek'], 'only print the first and last lines', ARGS_PEEK],
+            [['-E', '--ECHO'], 'handle every following parameter as stdin', ARGS_ECHO],
             [['-c', '--clip'], 'copy output to clipboard', ARGS_CLIP],
             [['-m', '--checksum'], 'show the checksums of all files', ARGS_CHECKSUM],
             [['-a', '--attributes'], 'show meta-information about the files', ARGS_DATA],

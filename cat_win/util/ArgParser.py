@@ -10,7 +10,7 @@ FILE_MATCH = []
 FILE_TRUNCATE = [None, None, None]
 
 
-def __addArgument__(args: list, unknown_args: list, known_files: list, unknown_files: list, param: str) -> None:
+def __addArgument__(args: list, unknown_args: list, known_files: list, unknown_files: list, param: str) -> bool:
     """
     sorts an argument to either list option, by appending to it.
     
@@ -25,22 +25,27 @@ def __addArgument__(args: list, unknown_args: list, known_files: list, unknown_f
         all unknown files
     param (str):
         the current parameter
+        
+    Returns:
+    (bool):
+        True if -E has been called, meaning every following parameter
+        should simply be printed to stdout.
     """
     # 'enc' + ('=' or ':') + FILE_ENCODING
     if match(r"\Aenc[\=\:].+\Z", param):
         global FILE_ENCODING
         FILE_ENCODING = param[4:]
-        return
+        return False
     # 'match' + ('=' or ':') + FILE_MATCH
     elif match(r"\Amatch[\=\:].+\Z", param):
         global FILE_MATCH
         FILE_MATCH.append(fr'{param[6:]}')
-        return
+        return False
     # 'find' + ('=' or ':') + FILE_SEARCH
     elif match(r"\Afind[\=\:].+\Z", param):
         global FILE_SEARCH
         FILE_SEARCH.append(param[5:])
-        return
+        return False
     # 'trunc' + ('=' or ':') + FILE_TRUNCATE[0] + ':' + FILE_TRUNCATE[1] + ':' + FILE_TRUNCATE[2]
     elif match(r"\Atrunc[\=\:][0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\Z", param):
         param = param[6:].split(':')
@@ -50,21 +55,23 @@ def __addArgument__(args: list, unknown_args: list, known_files: list, unknown_f
         FILE_TRUNCATE[1] = None if param[1] == '' else int(eval(param[1]))
         if len(param) == 3:
             FILE_TRUNCATE[2] = None if param[2] == '' else int(eval(param[2]))
-        return
+        return False
     # '[' + ARGS_CUT + ']'
     elif match(r"\A\[[0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\]\Z", param):
         args.append((ARGS_CUT, param))
-        return
+        return False
     # '[' + ARGS_REPLACE + ']'
     elif match(r"\A\[.+\,.+\]\Z", param):
         args.append((ARGS_REPLACE, param))
-        return
+        return False
 
     # default parameters
     for x in ALL_ARGS:
         if x.shortForm == param or x.longForm == param:
             args.append((x.id, param))
-            return
+            if x.id == ARGS_ECHO:
+                return True
+            return False
 
     possible_path = realpath(param)
     if match(r".*\*+.*", param):
@@ -79,24 +86,26 @@ def __addArgument__(args: list, unknown_args: list, known_files: list, unknown_f
         known_files.append(possible_path)
     elif len(param) > 2 and param[0] == '-' and param[1] != '-':
         for i in range(1, len(param)):
-            __addArgument__(args, unknown_args, known_files, unknown_files, '-' + param[i])
+            if __addArgument__(args, unknown_args, known_files, unknown_files, '-' + param[i]):
+                return True
     elif match(r"\A[^-]+.*\Z", param):
         unknown_files.append(realpath(param))
     else:
         unknown_args.append(param)
+    return False
 
 
 def getArguments(argv: list) -> tuple:
     """
-    Read all args to either a valid parameter,
-    a known file or an unknown file.
+    Read all args to either a valid parameter, an invalid parameter,
+    a known file, an unknown file, or an echo parameter to print out.
     
     Parameters:
     argv (list):
         the entire sys.argv list
     
     Returns:
-    (args, unknown_args, known_files, unknown_files) (tuple):
+    (args, unknown_args, known_files, unknown_files, echo_args) (tuple):
         contains the paramater in a sorted manner
     """
     inputArgs = argv[1:]
@@ -104,8 +113,15 @@ def getArguments(argv: list) -> tuple:
     unknown_args = []
     known_files = []
     unknown_files = []
+    echo_args = []
+
+    echoCall = False
+    
 
     for arg in inputArgs:
-        __addArgument__(args, unknown_args, known_files, unknown_files, arg)
+        if echoCall:
+            echo_args.append(arg)
+            continue
+        echoCall = __addArgument__(args, unknown_args, known_files, unknown_files, arg)
 
-    return (args, unknown_args, known_files, unknown_files)
+    return (args, unknown_args, known_files, unknown_files, echo_args)
