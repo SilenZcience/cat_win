@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.1.4] - TBA
+
+### Major Changes
+
+- reverted from colorama just_fix_windows_console() to init(), such that stripping ANSI-Codes (e.g. on piping) can be enabled.
+
+
 ## [1.1.3] - 2023-02-26
 
 ### Major Changes
