@@ -1,6 +1,6 @@
 from cat_win.const.ArgConstants import *
 from heapq import nlargest
-
+from functools import lru_cache
 
 class Holder():
     def __init__(self) -> None:
@@ -64,6 +64,7 @@ class Holder():
             yield b
             b = reader(1024 * 1024)
 
+    @lru_cache(maxsize=10)
     def __getFileLinesSum__(self, file: str) -> int:
         with open(file, 'rb') as fp:
             c_generator = self.__count_generator__(fp.raw.read)
@@ -75,6 +76,7 @@ class Holder():
         self.allFilesLinesSum = sum(fileLines)
         self.fileLineNumberPlaceHolder = len(str(max(fileLines)))
 
+    @lru_cache(maxsize=10)
     def __calcMaxLine__(self, file: str) -> int:
         """
         Calculate the length of the longest line in a file.
