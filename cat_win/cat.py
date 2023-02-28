@@ -563,7 +563,8 @@ def main():
     sys.stdout.reconfigure(encoding=ArgParser.FILE_ENCODING)
     sys.stdin.reconfigure(encoding=ArgParser.FILE_ENCODING)
     
-    if holder.args_id[ARGS_NOCOL]:
+    # do not use colors if requested, or output will be piped anyways
+    if holder.args_id[ARGS_NOCOL] or (not sys.stdout.isatty() or sys.stdout.closed):
         global color_dic
         color_dic = dict.fromkeys(color_dic,'')
     
