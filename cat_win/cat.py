@@ -317,16 +317,19 @@ def printFile(content: list, bytecode: bool) -> None:
     stringFinder = StringFinder.StringFinder(ArgParser.FILE_SEARCH, ArgParser.FILE_MATCH)
 
     for line_prefix, line in content:
-        intervals, fKeyWords, mKeywords = stringFinder.findKeywords(line)
+        cleanedLine = removeAnsiCodesFromLine(line)
+        intervals, fKeyWords, mKeywords = stringFinder.findKeywords(cleanedLine)
         
-        if holder.args_id[ARGS_KEYWORD] and len(fKeyWords + mKeywords) == 0:
+        if len(fKeyWords + mKeywords) == 0:
+            if not holder.args_id[ARGS_KEYWORD]:
+                print(line_prefix + line)
             continue
         
         if not holder.args_id[ARGS_NOCOL]:
             for kw_pos, kw_code in intervals:
-                line = line[:kw_pos] + color_dic[kw_code] + line[kw_pos:]
+                cleanedLine = cleanedLine[:kw_pos] + color_dic[kw_code] + cleanedLine[kw_pos:]
 
-        print(line_prefix + line)
+        print(line_prefix + cleanedLine)
 
         if holder.args_id[ARGS_KEYWORD] or holder.args_id[ARGS_NOBREAK]:
             continue

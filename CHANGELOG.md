@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.1.5] - TBA
+
+### Minor Changes
+
+- the `match` and `find` parameters now ignore previously set ANSI-Colorcodes, and therefor gain color priority. This solves the issue, that these parameters sometimes would not find a substring because of invisible escape codes within the line string.
+- added some caches which should speed up the process a little, when passing the same file as parameter multiple times.
+
+
 ## [1.1.4] - 2023-02-27
 
 ### Major Changes

@@ -45,6 +45,16 @@ class Holder():
         self.temp_file_echo = file
 
     def getAppliedFiles(self) -> list:
+        """
+        generate a list containing all files and their display names
+        stdin and echo will be considered special cases and show
+        a different displayname to their (temp) path.
+        
+        Returns:
+        displayList (list):
+            a list of tuples. each tuple contains a file path
+            and a display name.
+        """
         displayList = []
         for file in self.files:
             if file == self.temp_file_stdin:
