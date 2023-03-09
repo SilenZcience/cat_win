@@ -115,7 +115,7 @@ def _showDebug(args: list, unknown_args: list, known_files: list, unknown_files:
     print(ArgParser.FILE_TRUNCATE)
 
 
-def _showFiles(files: list) -> None:
+def _showFiles(files: list = None) -> None:
     """
     displays files including their size and calculates
     their size sum.
@@ -124,6 +124,8 @@ def _showFiles(files: list) -> None:
     files (list):
         all files to display
     """
+    if files == None:
+        files = holder.getAppliedFiles()
     if len(files) == 0:
         return
     file_sizes = []
@@ -550,7 +552,7 @@ def editFiles() -> None:
         print(f"{color_dic[C_KW.COUNT_AND_FILES]}Lines: {holder.allFilesLinesSum}{color_dic[C_KW.RESET_ALL]}")
     if holder.args_id[ARGS_FILES]:
         print()
-        _showFiles(holder.getAppliedFiles())
+        _showFiles()
     if holder.args_id[ARGS_CLIP]:
         copyToClipboard(removeAnsiCodesFromLine(holder.clipBoard))
 
@@ -603,7 +605,7 @@ def main():
     # fill holder object with neccessary values
     holder.setFiles([*known_files, *unknown_files])
     if holder.args_id[ARGS_FFILES]:
-        _showFiles(holder.getAppliedFiles())
+        _showFiles()
         return
     
     if holder.args_id[ARGS_DATA] or holder.args_id[ARGS_CHECKSUM]:
