@@ -39,7 +39,7 @@ def exception_handler(exception_type: type, exception, traceback, debug_hook=sys
         return
     print(f"\nError: {exception_type.__name__} {exception}")
     if exception_type != KeyboardInterrupt:
-        print(f"If this Exception is unexpected, please raise an Issue at:\n{__url__}/issues")
+        print(f"If this Exception is unexpected, please raise an official Issue at:\n{__url__}/issues")
 
 
 sys.excepthook = exception_handler
@@ -115,6 +115,21 @@ def _showDebug(args: list, unknown_args: list, known_files: list, unknown_files:
     print(ArgParser.FILE_TRUNCATE)
 
 
+def _showCount() -> None:
+    """
+    display the line sum of each file individually if
+    ARGS_CCOUNT is specified.
+    display the line sum of all files
+    """
+    if holder.args_id[ARGS_CCOUNT]:
+        longestFileName = max(map(len, holder.allFilesLines.keys())) + 1
+        print(f"{color_dic[C_KW.COUNT_AND_FILES]}{'File': <{longestFileName}}LineCount{color_dic[C_KW.RESET_ALL]}")
+        for file in holder.allFilesLines.keys():
+            print(f"{color_dic[C_KW.COUNT_AND_FILES]}{file: <{longestFileName}}{holder.allFilesLines[file]: >{holder.fileLineNumberPlaceHolder}}{color_dic[C_KW.RESET_ALL]}")
+        print()
+    print(f"{color_dic[C_KW.COUNT_AND_FILES]}Lines (Sum): {holder.allFilesLinesSum}{color_dic[C_KW.RESET_ALL]}")
+
+
 def _showFiles(files: list = None) -> None:
     """
     displays files including their size and calculates
@@ -122,7 +137,8 @@ def _showFiles(files: list = None) -> None:
     
     Parameters:
     files (list):
-        all files to display
+        all files to display, the files inside the holder
+        object if None
     """
     if files == None:
         files = holder.getAppliedFiles()
@@ -545,7 +561,7 @@ def editFiles() -> None:
         editFile(i+1)
     if holder.args_id[ARGS_COUNT]:
         print()
-        print(f"{color_dic[C_KW.COUNT_AND_FILES]}Lines: {holder.allFilesLinesSum}{color_dic[C_KW.RESET_ALL]}")
+        _showCount()
     if holder.args_id[ARGS_FILES]:
         print()
         _showFiles()
@@ -600,23 +616,28 @@ def main():
 
     # fill holder object with neccessary values
     holder.setFiles([*known_files, *unknown_files])
+    
     if holder.args_id[ARGS_FFILES]:
         _showFiles()
         return
-    
     if holder.args_id[ARGS_DATA] or holder.args_id[ARGS_CHECKSUM]:
         _printMetaAndChecksum(holder.args_id[ARGS_DATA], holder.args_id[ARGS_CHECKSUM])
-    else:
-        if holder.args_id[ARGS_B64D]:
-            holder.setDecodingTempFiles([tmpFileHelper.generateTempFileName() for _ in holder.files])
-        holder.generateValues(ArgParser.FILE_ENCODING)
+        return
+    
+    if holder.args_id[ARGS_B64D]:
+        holder.setDecodingTempFiles([tmpFileHelper.generateTempFileName() for _ in holder.files])
+    holder.generateValues(ArgParser.FILE_ENCODING)
 
-        try:
-            editFiles()  # print the cat-output
-        except IOError: # catch broken-pipe error
-            devnull = os.open(os.devnull, os.O_WRONLY)
-            os.dup2(devnull, sys.stdout.fileno())
-            sys.exit(1)  # Python exits with error code 1 on EPIPE
+    if holder.args_id[ARGS_CCOUNT]:
+        _showCount()
+        return
+
+    try:
+        editFiles()  # print the cat-output
+    except IOError: # catch broken-pipe error
+        devnull = os.open(os.devnull, os.O_WRONLY)
+        os.dup2(devnull, sys.stdout.fileno())
+        sys.exit(1)  # Python exits with error code 1 on EPIPE
 
     # clean-up
     for tmp_file in tmpFileHelper.getGeneratedTempFiles():

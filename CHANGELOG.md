@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - show file sizes on -`f`, --`files` parameter.
+- added -`S`, --`SUM` parameter to only show the sum of lines of all files.
 
 
 ## [1.1.5] - 2023-03-01
