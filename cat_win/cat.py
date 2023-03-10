@@ -134,16 +134,12 @@ def _showFiles(files: list = None) -> None:
     print(f"{msg} FILE(s):", end='')
     print(color_dic[C_KW.RESET_ALL])
     for file, displayName in files:
-        sizeString = ''
-        if holder.args_id[ARGS_FFILES]:
-            size = getFileSize(file)
-            file_sizes.append(size)
-            sizeString = f"{_convert_size(size): <10}"
-        print(f"\t{color_dic[C_KW.COUNT_AND_FILES]}{sizeString}{displayName}{color_dic[C_KW.RESET_ALL]}")
-    if holder.args_id[ARGS_FFILES]:
-        print(color_dic[C_KW.COUNT_AND_FILES], end='')
-        print(f"Sum:\t{_convert_size(sum(file_sizes))}", end='')
-        print(color_dic[C_KW.RESET_ALL])
+        size = getFileSize(file)
+        file_sizes.append(size)
+        print(f"\t{color_dic[C_KW.COUNT_AND_FILES]}{_convert_size(size): <10}{displayName}{color_dic[C_KW.RESET_ALL]}")
+    print(color_dic[C_KW.COUNT_AND_FILES], end='')
+    print(f"Sum:\t{_convert_size(sum(file_sizes))}", end='')
+    print(color_dic[C_KW.RESET_ALL])
 
 
 def _printMeta(file: str) -> None:
