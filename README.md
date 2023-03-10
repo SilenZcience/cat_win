@@ -137,6 +137,7 @@ catw --help
 | *-r, --reverse*        | reverse output                                    |
 | *-p, --peek*           | only print the first and last lines               |
 | *-s, --sum*            | show sum of lines                                 |
+| *-S, --SUM*            | ONLY show sum of lines                            |
 | *-f, --files*          | list applied files                                |
 | *-F, --FILES*          | ONLY list applied files and file sizes            |
 | *-k, --keyword*        | only show lines containing queried keywords       |

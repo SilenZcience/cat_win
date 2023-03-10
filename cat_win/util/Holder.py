@@ -16,6 +16,8 @@ class Holder():
         self.fileNumberPlaceHolder = 0
         # the sum of all lines of all files
         self.allFilesLinesSum = 0
+        # the sum of lines for each file individually
+        self.allFilesLines = {}
         # the amount of chars neccessary to display the last line (breaks on base64 decoding)
         self.fileLineNumberPlaceHolder = 0
         # the amount of chars neccessary to display the longest line within all files (breaks on base64 decoding)
@@ -82,7 +84,11 @@ class Holder():
         return linesSum
 
     def __calcPlaceHolder__(self) -> None:
-        fileLines = [self.__getFileLinesSum__(file) for file in self._inner_files]
+        fileLines = []
+        for file in self._inner_files:
+            fileLineSum = self.__getFileLinesSum__(file)
+            fileLines.append(fileLineSum)
+            self.allFilesLines[file] = fileLineSum
         self.allFilesLinesSum = sum(fileLines)
         self.fileLineNumberPlaceHolder = len(str(max(fileLines)))
 
