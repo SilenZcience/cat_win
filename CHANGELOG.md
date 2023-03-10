@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.1.6] - TBA
+
+### Minor Changes
+
+- show file sizes on -`f`, --`files` parameter.
+
+
 ## [1.1.5] - 2023-03-01
 
 ### Minor Changes
