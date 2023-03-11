@@ -87,7 +87,7 @@ Contrary to the name of the project it is of course possible to use cat_win on L
 - Using cat_win as an Executable (Windows only!) demands no prerequisites, hereby the stand-alone executable `catw.exe`  is sufficient.
 
 ### Installation
-[![Version][CurrentVersion]](https://pypi.org/project/cmdtrix/)
+[![Version][CurrentVersion]](https://pypi.org/project/cat-win/)
 
 Simply install the python package (via [PyPI-cat_win](https://pypi.org/project/cat-win/)):
 ```console
