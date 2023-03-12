@@ -87,3 +87,5 @@ class C_KW:
     MESSAGE_INFORMATION = 'message_information'
     MESSAGE_IMPORTANT = 'message_important'
     MESSAGE_WARNING = 'message_warning'
+    
+    HEXVIEWER = 'hexviewer'
