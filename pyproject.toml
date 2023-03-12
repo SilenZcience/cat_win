@@ -46,6 +46,7 @@ clip = [
 exclude = 	[
     "cat_win/build",
     "**/**.spec",
+    "**/**.config"
 ]
 
 [project.scripts]
