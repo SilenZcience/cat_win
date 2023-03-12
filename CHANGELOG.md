@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.1.7] - TBA
+
+### Minor Changes
+
+- added --`hexview`, --`hexview` parameter to display the raw byte representation of any given file.
+
+
 ## [1.1.6] - 2023-03-10
 
 ### Minor Changes

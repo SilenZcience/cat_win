@@ -154,6 +154,8 @@ catw --help
 | *--b64e, --b64e*       | encode the input to base64                        |
 | *--b64d, --b64d*       | decode the input from base64                      |
 |                        |                                                   |
+| *--hexview, --hexview* | display the raw byte representation               |
+|                        |                                                   |
 | *--nc, --nocolor*      | disable colored output                            |
 | *--nb, --nobreak*      | do not interrupt the output on queried keywords   |
 | *--config, --config*   | change color configuration                        |

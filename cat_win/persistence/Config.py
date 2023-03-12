@@ -21,7 +21,8 @@ class Config:
                    C_KW.ATTRIB: ColorOptions.Fore['CYAN'],
                    C_KW.MESSAGE_INFORMATION: ColorOptions.Fore['LIGHTBLACK'],
                    C_KW.MESSAGE_IMPORTANT: ColorOptions.Fore['YELLOW'],
-                   C_KW.MESSAGE_WARNING: ColorOptions.Fore['RED']}
+                   C_KW.MESSAGE_WARNING: ColorOptions.Fore['RED'],
+                   C_KW.HEXVIEWER: ColorOptions.Fore['LIGHTBLACK']}
     elements = list(default_dic.keys())
 
     def __init__(self, workingDir: str) -> None:

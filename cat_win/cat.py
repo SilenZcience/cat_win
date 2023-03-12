@@ -126,7 +126,7 @@ def _showCount() -> None:
         print(f"{color_dic[C_KW.COUNT_AND_FILES]}{'File': <{longestFileName}}LineCount{color_dic[C_KW.RESET_ALL]}")
         for file in holder.allFilesLines.keys():
             print(f"{color_dic[C_KW.COUNT_AND_FILES]}{file: <{longestFileName}}{holder.allFilesLines[file]: >{holder.fileLineNumberPlaceHolder}}{color_dic[C_KW.RESET_ALL]}")
-        print()
+        print('')
     print(f"{color_dic[C_KW.COUNT_AND_FILES]}Lines (Sum): {holder.allFilesLinesSum}{color_dic[C_KW.RESET_ALL]}")
 
 
@@ -550,6 +550,41 @@ def copyToClipboard(content: str) -> None:
     _copyToClipboard(content)
 
 
+def printHexView(fileIndex: int = 1) -> None:
+    """
+    print the byte representation of a file in hexadecimal
+    
+    Parameters:
+    fileIndex (int):
+        the index regarding which file is currently being edited
+    """
+    rawFile = open(holder.files[fileIndex-1], 'rb')
+    rawFileContent = rawFile.read()
+    rawFileContentLength = len(rawFileContent)
+    rawFile.close()
+    
+    print(holder.files[fileIndex-1], ':', sep='')
+    print(color_dic[C_KW.HEXVIEWER], end='')
+    print('Address  ', end='')
+    for i in range(16):
+        print(f"{i:0{2}X}", end=' ')
+    print(f"# Decoded Text                   {color_dic[C_KW.RESET_ALL]}")
+    print(f"{color_dic[C_KW.HEXVIEWER]}{0:0{8}X}{color_dic[C_KW.RESET_ALL]} ", end='')
+    line = []
+    for i, byte in enumerate(rawFileContent, start=1):
+        line.append(byte)
+        if not (i % 16):
+            print(' '.join([f"{b:0{2}X}" for b in line]), f"{color_dic[C_KW.HEXVIEWER]}#{color_dic[C_KW.RESET_ALL]}",
+                  ' '.join([chr(b) if 32 <= b <= 126 else '·' for b in line ]))
+            if i < rawFileContentLength:
+                print(f"{color_dic[C_KW.HEXVIEWER]}{i:0{8}X}{color_dic[C_KW.RESET_ALL]} ", end='')
+            line = []
+    if line:
+        print(' '.join([f"{b:0{2}X}" for b in line]), ' ' * (3 * (16-len(line)) - 1), f"{color_dic[C_KW.HEXVIEWER]}#{color_dic[C_KW.RESET_ALL]}",
+              ' '.join([chr(b) if 32 <= b <= 126 else '·' for b in line ]))
+    print('')
+
+
 def editFiles() -> None:
     """
     manage the calls to editFile() for each file.
@@ -558,12 +593,15 @@ def editFiles() -> None:
     end = -1 if holder.reversed else len(holder.files)
 
     for i in range(start, end, -1 if holder.reversed else 1):
+        if holder.args_id[ARGS_HEXVIEW]:
+            printHexView(i+1)
+            continue
         editFile(i+1)
     if holder.args_id[ARGS_COUNT]:
-        print()
+        print('')
         _showCount()
     if holder.args_id[ARGS_FILES]:
-        print()
+        print('')
         _showFiles()
     if holder.args_id[ARGS_CLIP]:
         copyToClipboard(removeAnsiCodesFromLine(holder.clipBoard))
