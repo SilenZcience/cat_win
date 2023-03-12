@@ -183,6 +183,8 @@ catw --help
 
 ![Example5](https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example5.png "example5")
 
+![Example6](https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example6.png "example6")
+
 </details>
 
 ```console

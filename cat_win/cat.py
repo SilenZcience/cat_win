@@ -574,6 +574,7 @@ def printHexView(fileIndex: int = 1) -> None:
     for i, byte in enumerate(rawFileContent, start=1):
         line.append(byte)
         if not (i % 16):
+            # 32 - 126 => ' ' - '~' (ASCII)
             print(' '.join([f"{b:0{2}X}" for b in line]), f"{color_dic[C_KW.HEXVIEWER]}#{color_dic[C_KW.RESET_ALL]}",
                   ' '.join([chr(b) if 32 <= b <= 126 else '·' for b in line ]))
             if i < rawFileContentLength:
