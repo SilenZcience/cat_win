@@ -12,7 +12,7 @@ ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN = range(10, 15)
 ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA = range(15, 20)
 ARGS_CONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK, ARGS_NOCOL = range(20, 25)
 ARGS_EOF, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_KEYWORD = range(25, 30)
-ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW = range(30, 34)
+ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW, ARGS_BINVIEW = range(30, 35)
 
 ALL_ARGS = [[['-h', '--help'], 'show this help message and exit', ARGS_HELP],
             [['-v', '--version'], 'output version information and exit', ARGS_VERSION],
@@ -42,7 +42,8 @@ ALL_ARGS = [[['-h', '--help'], 'show this help message and exit', ARGS_HELP],
             [['--bin', '--BIN'], 'convert binary numbers to decimal and hexadecimal', ARGS_BIN],
             [['--b64e', '--b64e'], 'encode the input to base64', ARGS_B64E],
             [['--b64d', '--b64d'], 'decode the input from base64', ARGS_B64D],
-            [['--hexview', '--hexview'], 'display the raw byte representation', ARGS_HEXVIEW],
+            [['--hexview', '--HEXVIEW'], 'display the raw byte representation in hexadecimal', ARGS_HEXVIEW],
+            [['--binview', '--binview'], 'display the raw byte representation in binary', ARGS_BINVIEW],
             [['--nc', '--nocolor'], 'disable colored output', ARGS_NOCOL],
             [['--nb', '--nobreak'], 'do not interrupt the output on queried keywords', ARGS_NOBREAK],
             [['--config', '--config'], 'change color configuration', ARGS_CONFIG]]

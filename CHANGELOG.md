@@ -3,11 +3,22 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.2.0] - 2023-03-14
+
+### Major Changes
+
+- removed `cat` entrypoint.
+
+### Minor Changes
+
+- added --`binview`, --`binview` parameter to display the raw byte representation of any given file in binary.
+
+
 ## [1.1.7] - 2023-03-12
 
 ### Minor Changes
 
-- added --`hexview`, --`hexview` parameter to display the raw byte representation of any given file.
+- added --`hexview`, --`hexview` parameter to display the raw byte representation of any given file in hexadecimal.
 
 
 ## [1.1.6] - 2023-03-10

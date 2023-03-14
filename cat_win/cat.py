@@ -394,7 +394,7 @@ def printExcludedByPeek(content: list, excludedByPeek: int) -> None:
     print(color_dic[C_KW.RESET_ALL])
 
 
-def editFile(fileIndex: int = 1) -> None:
+def editFile(fileIndex: int = 0) -> None:
     """
     apply all parameters to a file.
     
@@ -406,13 +406,13 @@ def editFile(fileIndex: int = 1) -> None:
     excludedByPeek = 0
     content = [('', '')]
     try:
-        with open(holder.files[fileIndex-1], 'r', encoding=ArgParser.FILE_ENCODING) as f:
+        with open(holder.files[fileIndex], 'r', encoding=ArgParser.FILE_ENCODING) as f:
             # splitlines() gives a slight inaccuracy, in case the last line is empty.
             # the alternative would be worse: split('\n') would increase the linecount each
             # time cat touches a file.
             content = [('', line) for line in f.read().splitlines()]
     except:
-        print('Failed to open:', holder.files[fileIndex-1])
+        print('Failed to open:', holder.files[fileIndex])
         try:
             enterChar = '⏎'
             try:
@@ -426,7 +426,7 @@ def editFile(fileIndex: int = 1) -> None:
         except EOFError:
             pass
         try:
-            with open(holder.files[fileIndex-1], 'rb') as f:
+            with open(holder.files[fileIndex], 'rb') as f:
                 # in binary splitlines() is our only option
                 content = [('', line) for line in f.read().splitlines()]
             show_bytecode = True
@@ -438,7 +438,7 @@ def editFile(fileIndex: int = 1) -> None:
         content = decodeBase64(content, ArgParser.FILE_ENCODING)
     
     if holder.args_id[ARGS_NUMBER]:
-        content = [(_getLinePrefix(j, fileIndex), c[1])
+        content = [(_getLinePrefix(j, fileIndex+1), c[1])
                    for j, c in enumerate(content, start=1)]
     content = content[ArgParser.FILE_TRUNCATE[0]:ArgParser.FILE_TRUNCATE[1]:ArgParser.FILE_TRUNCATE[2]]
     if holder.args_id[ARGS_PEEK] and len(content) > 10:
@@ -469,13 +469,13 @@ def editFile(fileIndex: int = 1) -> None:
             elif arg == ARGS_BLANK:
                 content = [c for c in content if c[1]]
             elif arg == ARGS_DEC:
-                content = [(prefix, line + ' ' + color_dic[C_KW.CONVERSION] + converter._fromDEC(int(line), (param == '--dec')) +
+                content = [(prefix, line + ' ' + color_dic[C_KW.CONVERSION] + converter._fromDEC(int(line), (param == param.lower())) +
                             color_dic[C_KW.RESET_ALL]) for prefix, line in content if converter.is_dec(line)]
             elif arg == ARGS_HEX:
-                content = [(prefix, line + ' ' + color_dic[C_KW.CONVERSION] + converter._fromHEX(line, (param == '--hex')) +
+                content = [(prefix, line + ' ' + color_dic[C_KW.CONVERSION] + converter._fromHEX(line, (param == param.lower())) +
                             color_dic[C_KW.RESET_ALL]) for prefix, line in content if converter.is_hex(line)]
             elif arg == ARGS_BIN:
-                content = [(prefix, line + ' ' + color_dic[C_KW.CONVERSION] + converter._fromBIN(line, (param == '--bin')) +
+                content = [(prefix, line + ' ' + color_dic[C_KW.CONVERSION] + converter._fromBIN(line, (param == param.lower())) +
                             color_dic[C_KW.RESET_ALL]) for prefix, line in content if converter.is_bin(line)]
             elif arg == ARGS_REPLACE:
                 replace_values = param[1:-1].split(",")
@@ -550,38 +550,43 @@ def copyToClipboard(content: str) -> None:
     _copyToClipboard(content)
 
 
-def printHexView(fileIndex: int = 1) -> None:
+def printRawView(fileIndex: int = 0, mode: str = 'X') -> None:
     """
-    print the byte representation of a file in hexadecimal
+    print the raw byte representation of a file in hexadecimal or binary
     
     Parameters:
     fileIndex (int):
         the index regarding which file is currently being edited
+    mode (str):
+        either 'x', 'X' for hexadecimal (lower- or upper case letters),
+        or 'b' for binary
     """
-    rawFile = open(holder.files[fileIndex-1], 'rb')
+    rawFile = open(holder.files[fileIndex], 'rb')
     rawFileContent = rawFile.read()
     rawFileContentLength = len(rawFileContent)
     rawFile.close()
     
-    print(holder.files[fileIndex-1], ':', sep='')
-    print(color_dic[C_KW.HEXVIEWER], end='')
+    reprLength = 2 * (mode.upper() == 'X') + 8 * (mode == 'b')
+    
+    print(holder.files[fileIndex], ':', sep='')
+    print(color_dic[C_KW.RAWVIEWER], end='')
     print('Address  ', end='')
     for i in range(16):
-        print(f"{i:0{2}X}", end=' ')
+        print(f"{i:0{2}X}", end=' ' + '      ' * (mode == 'b'))
     print(f"# Decoded Text                   {color_dic[C_KW.RESET_ALL]}")
-    print(f"{color_dic[C_KW.HEXVIEWER]}{0:0{8}X}{color_dic[C_KW.RESET_ALL]} ", end='')
+    print(f"{color_dic[C_KW.RAWVIEWER]}{0:0{8}X}{color_dic[C_KW.RESET_ALL]} ", end='')
     line = []
     for i, byte in enumerate(rawFileContent, start=1):
         line.append(byte)
         if not (i % 16):
             # 32 - 126 => ' ' - '~' (ASCII)
-            print(' '.join([f"{b:0{2}X}" for b in line]), f"{color_dic[C_KW.HEXVIEWER]}#{color_dic[C_KW.RESET_ALL]}",
+            print(' '.join([f"{b:0{reprLength}{mode}}" for b in line]), f"{color_dic[C_KW.RAWVIEWER]}#{color_dic[C_KW.RESET_ALL]}",
                   ' '.join([chr(b) if 32 <= b <= 126 else '·' for b in line ]))
             if i < rawFileContentLength:
-                print(f"{color_dic[C_KW.HEXVIEWER]}{i:0{8}X}{color_dic[C_KW.RESET_ALL]} ", end='')
+                print(f"{color_dic[C_KW.RAWVIEWER]}{i:0{8}X}{color_dic[C_KW.RESET_ALL]} ", end='')
             line = []
     if line:
-        print(' '.join([f"{b:0{2}X}" for b in line]), ' ' * (3 * (16-len(line)) - 1), f"{color_dic[C_KW.HEXVIEWER]}#{color_dic[C_KW.RESET_ALL]}",
+        print(' '.join([f"{b:0{reprLength}{mode}}" for b in line]), ' ' * ((reprLength + 1) * (16-len(line)) - 1), f"{color_dic[C_KW.RAWVIEWER]}#{color_dic[C_KW.RESET_ALL]}",
               ' '.join([chr(b) if 32 <= b <= 126 else '·' for b in line ]))
     print('')
 
@@ -593,11 +598,21 @@ def editFiles() -> None:
     start = len(holder.files)-1 if holder.reversed else 0
     end = -1 if holder.reversed else len(holder.files)
 
+    rawViewMode = None
+    if holder.args_id[ARGS_HEXVIEW] or holder.args_id[ARGS_BINVIEW]:
+        for arg, param in holder.args:
+            if arg == ARGS_HEXVIEW:
+                rawViewMode = 'X' if param == param.upper() else 'x'
+                break
+            elif arg == ARGS_BINVIEW:
+                rawViewMode = 'b'
+                break
+    
     for i in range(start, end, -1 if holder.reversed else 1):
-        if holder.args_id[ARGS_HEXVIEW]:
-            printHexView(i+1)
-            continue
-        editFile(i+1)
+        if rawViewMode:
+            printRawView(i, rawViewMode)
+        else:
+            editFile(i)
     if holder.args_id[ARGS_COUNT]:
         print('')
         _showCount()
