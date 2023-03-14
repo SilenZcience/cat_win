@@ -50,7 +50,6 @@ exclude = 	[
 ]
 
 [project.scripts]
-cat = "cat_win.__main__:deprecated_entry_point"
 catw = "cat_win.__main__:entry_point"
 
 [project.urls]

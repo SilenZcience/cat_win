@@ -88,4 +88,4 @@ class C_KW:
     MESSAGE_IMPORTANT = 'message_important'
     MESSAGE_WARNING = 'message_warning'
     
-    HEXVIEWER = 'hexviewer'
+    RAWVIEWER = 'raw_viewer'
