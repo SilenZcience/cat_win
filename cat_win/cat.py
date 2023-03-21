@@ -156,6 +156,9 @@ def _showFiles(files: list = None) -> None:
     print(color_dic[C_KW.COUNT_AND_FILES], end='')
     print(f"Sum:\t{_convert_size(sum(file_sizes))}", end='')
     print(color_dic[C_KW.RESET_ALL])
+    print(color_dic[C_KW.COUNT_AND_FILES], end='')
+    print(f"Amount:\t{len(files)}", end='')
+    print(color_dic[C_KW.RESET_ALL])
 
 
 def _printMeta(file: str) -> None:
