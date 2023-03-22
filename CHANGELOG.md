@@ -5,6 +5,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ## [TBA] - TBA
 
+### Major Changes
+
+- renamed -`k`, --`keyword` to -`g`, --`grep`
+
 ### Minor Changes
 
 - -`F` and -`f` will now show `Amount` displaying the amount of files found.
