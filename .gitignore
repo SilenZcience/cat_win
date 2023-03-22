@@ -54,3 +54,6 @@ MANIFEST
 *.spec
 
 *.config
+
+.dev
+.coverage

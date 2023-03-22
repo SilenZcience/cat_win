@@ -338,7 +338,7 @@ def printFile(content: list, bytecode: bool) -> None:
         intervals, fKeyWords, mKeywords = stringFinder.findKeywords(cleanedLine)
         
         if len(fKeyWords + mKeywords) == 0:
-            if not holder.args_id[ARGS_KEYWORD]:
+            if not holder.args_id[ARGS_GREP]:
                 print(line_prefix + line)
             continue
         
@@ -348,7 +348,7 @@ def printFile(content: list, bytecode: bool) -> None:
 
         print(line_prefix + cleanedLine)
 
-        if holder.args_id[ARGS_KEYWORD] or holder.args_id[ARGS_NOBREAK]:
+        if holder.args_id[ARGS_GREP] or holder.args_id[ARGS_NOBREAK]:
             continue
         
         found_sth = False

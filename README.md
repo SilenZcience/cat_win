@@ -140,7 +140,7 @@ catw --help
 | *-S, --SUM*            | ONLY show sum of lines                            |
 | *-f, --files*          | list applied files                                |
 | *-F, --FILES*          | ONLY list applied files and file sizes            |
-| *-k, --keyword*        | only show lines containing queried keywords       |
+| *-g, --grep*           | only show lines containing queried keywords       |
 | *-i, --interactive*    | use stdin                                         |
 | *-o, --oneline*        | take only the first stdin-line                    |
 | *-E, --ECHO*           | handle every following parameter as stdin         |

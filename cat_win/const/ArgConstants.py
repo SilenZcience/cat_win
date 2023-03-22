@@ -11,7 +11,7 @@ ARGS_REVERSE, ARGS_COUNT, ARGS_BLANK, ARGS_FILES, ARGS_INTERACTIVE = range(5, 10
 ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN = range(10, 15)
 ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA = range(15, 20)
 ARGS_CONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK, ARGS_NOCOL = range(20, 25)
-ARGS_EOF, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_KEYWORD = range(25, 30)
+ARGS_EOF, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP = range(25, 30)
 ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW, ARGS_BINVIEW = range(30, 35)
 
 ALL_ARGS = [[['-h', '--help'], 'show this help message and exit', ARGS_HELP],
@@ -30,7 +30,7 @@ ALL_ARGS = [[['-h', '--help'], 'show this help message and exit', ARGS_HELP],
             [['-S', '--SUM'], 'ONLY show sum of lines', ARGS_CCOUNT],
             [['-f', '--files'], 'list applied files', ARGS_FILES],
             [['-F', '--FILES'], 'ONLY list applied files and file sizes', ARGS_FFILES],
-            [['-k', '--keyword'], 'only show lines containing queried keywords', ARGS_KEYWORD],
+            [['-g', '--grep'], 'only show lines containing queried keywords', ARGS_GREP],
             [['-i', '--interactive'], 'use stdin', ARGS_INTERACTIVE],
             [['-o', '--oneline'], 'take only the first stdin-line', ARGS_ONELINE],
             [['-E', '--ECHO'], 'handle every following parameter as stdin', ARGS_ECHO],
