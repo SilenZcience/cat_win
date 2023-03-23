@@ -342,6 +342,9 @@ def printFile(content: list, bytecode: bool) -> None:
                 print(line_prefix + line)
             continue
         
+        if holder.args_id[ARGS_NOKEYWORD]:
+            continue
+        
         if not holder.args_id[ARGS_NOCOL]:
             for kw_pos, kw_code in intervals:
                 cleanedLine = cleanedLine[:kw_pos] + color_dic[kw_code] + cleanedLine[kw_pos:]

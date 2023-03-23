@@ -159,6 +159,7 @@ catw --help
 |                        |                                                   |
 | *--nc, --nocolor*      | disable colored output                            |
 | *--nb, --nobreak*      | do not interrupt the output on queried keywords   |
+| *--nk, --nokeyword*    | inverse the grep output                           |
 | *--config, --config*   | change color configuration                        |
 |                        |                                                   |
 | *enc=X*                | set file enconding to X (default is utf-8)        |
