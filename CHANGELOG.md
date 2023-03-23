@@ -12,6 +12,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - -`F` and -`f` will now show `Amount` displaying the amount of files found.
+- added --`nk`, --`nokeyword` parameter to reverse the --`grep` output, essentially showing only lines that do not match any queried keyword.
 
 
 ## [1.2.0] - 2023-03-14
