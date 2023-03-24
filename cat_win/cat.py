@@ -4,7 +4,10 @@ from re import sub as resub
 from datetime import datetime
 from functools import lru_cache
 from itertools import groupby
-from colorama import init as coloramaInit
+try:
+    from colorama import init as coloramaInit
+except ImportError:
+    nop = lambda *_, **__: None; coloramaInit = nop
 
 import cat_win.persistence.Config as Config
 import cat_win.util.ArgParser as ArgParser
