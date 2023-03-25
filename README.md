@@ -67,7 +67,7 @@
 [![Build-and-Check]](https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml)
 <!-- [![Compile-and-Push]](https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml/badge.svg) -->
 
-This project copies the fundamental framework of the cat command-line tool from Linux and translates its features to an OS Independent program using Python.
+This project copies the fundamental framework of the cat command-line tool from Linux and translates its features to an OS Independent program using Python. </br> Over time the project evolved in subject areas of other tools like 'echo', 'grep', 'ls', 'base64'.
 
 Additionally it includes the feature to strip and reverse the content of any given file, make use of the standard-input, which enables cat piping into each other, generating the checksum of any file, converting decimal, hexadecimal and binary numbers within any text, and much <a href="#usage">more</a> ...
 
