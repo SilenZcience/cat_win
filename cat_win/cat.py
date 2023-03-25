@@ -19,6 +19,7 @@ import cat_win.util.StringFinder as StringFinder
 import cat_win.util.TmpFileHelper as TmpFileHelper
 from cat_win.util.Base64 import decodeBase64, encodeBase64
 from cat_win.util.FileAttributes import getFileMetaData, getFileSize, _convert_size
+from cat_win.util.RawViewer import getRawViewLinesGen
 from cat_win.const.ArgConstants import *
 from cat_win.const.ColorConstants import C_KW
 from cat_win.web.UpdateChecker import printUpdateInformation
@@ -570,33 +571,9 @@ def printRawView(fileIndex: int = 0, mode: str = 'X') -> None:
         either 'x', 'X' for hexadecimal (lower- or upper case letters),
         or 'b' for binary
     """
-    rawFile = open(holder.files[fileIndex], 'rb')
-    rawFileContent = rawFile.read()
-    rawFileContentLength = len(rawFileContent)
-    rawFile.close()
-    
-    reprLength = 2 * (mode.upper() == 'X') + 8 * (mode == 'b')
-    
     print(holder.files[fileIndex], ':', sep='')
-    print(color_dic[C_KW.RAWVIEWER], end='')
-    print('Address  ', end='')
-    for i in range(16):
-        print(f"{i:0{2}X}", end=' ' + '      ' * (mode == 'b'))
-    print(f"# Decoded Text                   {color_dic[C_KW.RESET_ALL]}")
-    print(f"{color_dic[C_KW.RAWVIEWER]}{0:0{8}X}{color_dic[C_KW.RESET_ALL]} ", end='')
-    line = []
-    for i, byte in enumerate(rawFileContent, start=1):
-        line.append(byte)
-        if not (i % 16):
-            # 32 - 126 => ' ' - '~' (ASCII)
-            print(' '.join([f"{b:0{reprLength}{mode}}" for b in line]), f"{color_dic[C_KW.RAWVIEWER]}#{color_dic[C_KW.RESET_ALL]}",
-                  ' '.join([chr(b) if 32 <= b <= 126 else '·' for b in line ]))
-            if i < rawFileContentLength:
-                print(f"{color_dic[C_KW.RAWVIEWER]}{i:0{8}X}{color_dic[C_KW.RESET_ALL]} ", end='')
-            line = []
-    if line:
-        print(' '.join([f"{b:0{reprLength}{mode}}" for b in line]), ' ' * ((reprLength + 1) * (16-len(line)) - 1), f"{color_dic[C_KW.RAWVIEWER]}#{color_dic[C_KW.RESET_ALL]}",
-              ' '.join([chr(b) if 32 <= b <= 126 else '·' for b in line ]))
+    for line in getRawViewLinesGen(holder.files[fileIndex], mode, [color_dic[C_KW.RAWVIEWER], color_dic[C_KW.RESET_ALL]]):
+        print(line)
     print('')
 
 
