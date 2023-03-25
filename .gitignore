@@ -53,7 +53,10 @@ MANIFEST
 *.manifest
 *.spec
 
+# Package Configuration
 *.config
 
+# Package test (-coverage) metadata
 .dev
 .coverage
+reports/
