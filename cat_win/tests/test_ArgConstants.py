@@ -4,7 +4,7 @@ from unittest import TestCase
 # sys.path.append('../cat_win')
 
 
-class TestConverter(TestCase):
+class TestArgConstants(TestCase):
     def test_unique_parameters(self):
         parameters_shortForm = [x.shortForm for x in ALL_ARGS]
         parameters_longForm = [x.longForm for x in ALL_ARGS]

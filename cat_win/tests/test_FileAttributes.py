@@ -5,7 +5,7 @@ import os
 # sys.path.append('../cat_win')
 
 
-class TestConverter(TestCase):
+class TestFileAttributes(TestCase):
     def test__convert_size_zero(self):
         self.assertEqual(_convert_size(0), '0 B')
         
