@@ -13,7 +13,7 @@ test_file_edge_case_4 = os.path.join(test_file_dir, 'test_holderEdgeCase_4.txt')
 holder = Holder()
 
 
-class TestConverter(TestCase):
+class TestHolder(TestCase):
     def test__calcfileLineLengthPlaceHolder__(self):
         holder.setFiles([test_file_path])
         holder.__calcfileLineLengthPlaceHolder__()

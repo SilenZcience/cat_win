@@ -4,7 +4,7 @@ from unittest import TestCase
 # sys.path.append('../cat_win')
 
 
-class TestConverter(TestCase):
+class TestStringFinder(TestCase):
     def test_findliterals_True(self):
         stringFinder = StringFinder([], [])
         x = [x for x in stringFinder._findliterals('test', 'abctestdef')]
