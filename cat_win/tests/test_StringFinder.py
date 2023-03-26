@@ -60,3 +60,16 @@ class TestConverter(TestCase):
         x = stringFinder._optimizeIntervals([[1, 3], [-5, 0], [0, 2]])
         self.assertEqual(x, [[-5, 3]])
         
+    def test_optimizeIntervals_empty(self):
+        stringFinder = StringFinder([], [])
+        x = stringFinder._optimizeIntervals([])
+        self.assertEqual(x, [])
+        
+    def test_findKeywords(self):
+        stringFinder = StringFinder(['Is', 'Test', 'Not'], [r"[0-9]\!"])
+        line = 'ThisIsATest!1!'
+        intervals, fKeyWords, mKeywords = stringFinder.findKeywords(line)
+        
+        self.assertCountEqual(intervals, [[14, 'reset_matched'], [12, 'matched_pattern'], [11, 'reset_found'], [7, 'found_keyword'], [6, 'reset_found'], [4, 'found_keyword']])
+        self.assertEqual(fKeyWords, [('Is', [4, 6]), ('Test', [7, 11])])
+        self.assertEqual(mKeywords, [(r"[0-9]\!", [12, 14])])
