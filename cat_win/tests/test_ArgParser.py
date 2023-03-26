@@ -140,3 +140,10 @@ class TestArgParser(TestCase):
         self.assertCountEqual(known_files, [])
         self.assertCountEqual(unknown_files, [])
         self.assertCountEqual(echo_args, ['-n', 'random', test_file_dir])
+        
+    def test_getArguments_echo_args_recursive(self):
+        args = []
+        echo = ArgParser.__addArgument__(args, [], [], [], '-nEn')
+        args = list(map(lambda x: x[1], args))
+        self.assertCountEqual(args, ['-n', '-E'])
+        self.assertEqual(echo, True)
