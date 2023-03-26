@@ -65,6 +65,8 @@
 
 [![Unittests]](https://github.com/SilenZcience/cat_win/actions/workflows/unit_test.yml)
 [![Build-and-Check]](https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml)
+[![Coverage]]()
+[![Tests]]()
 <!-- [![Compile-and-Push]](https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml/badge.svg) -->
 
 This project copies the fundamental framework of the cat command-line tool from Linux and translates its features to an OS Independent program using Python. </br> Over time the project evolved in subject areas of other tools like 'echo', 'grep', 'ls', 'base64'.
@@ -216,6 +218,9 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 [Unittests]: https://github.com/SilenZcience/cat_win/actions/workflows/unit_test.yml/badge.svg
 [Build-and-Check]: https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml/badge.svg
 [Compile-and-Push]: https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml/badge.svg
+
+[Coverage]: https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/badge-coverage.svg
+[Tests]: https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/badge-tests.svg
 
 [MadeWith-Python]: https://img.shields.io/badge/Made%20with-Python-brightgreen
 [Python-Version]: https://img.shields.io/badge/Python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%20pypy--3.8%20%7C%20pypy--3.9-blue
