@@ -1,4 +1,5 @@
-from requests import get as getRequest
+from urllib.request import urlopen
+from json import loads as loadJSON
 from cat_win.const.ColorConstants import C_KW
 
 
@@ -31,8 +32,9 @@ def getLastestPackageVersion(package: str) -> str:
         on Error: a zero version '0.0.0
     """
     try:
-        response = getRequest(f"https://pypi.org/pypi/{package}/json", timeout=2)
-        return response.json()['info']['version']
+        with urlopen(f"https://pypi.org/pypi/{package}/json", timeout=2) as _response:
+            response = _response.read()
+        return loadJSON(response)['info']['version']
     except:
         return '0.0.0'
 
