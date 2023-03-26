@@ -34,7 +34,6 @@ dynamic = [
 ]
 dependencies = [
     "colorama~=0.4.6",
-    "requests>=2.26.0",
 ]
 
 [project.optional-dependencies]

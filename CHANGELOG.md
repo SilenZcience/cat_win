@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Major Changes
 
 - renamed -`k`, --`keyword` to -`g`, --`grep`
+- removed `requests` dependency
 
 ### Minor Changes
 
