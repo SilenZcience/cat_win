@@ -12,7 +12,7 @@ class TestConverter(TestCase):
     def test__convert_size_EdgeKB(self):
         self.assertEqual(_convert_size(1023), '1023.0 B')
     
-    def test__convert_size_KB(self):
+    def test__convert_size_KB_exact(self):
         self.assertEqual(_convert_size(1024), '1.0 KB')
         
     def test__convert_size_KB(self):
