@@ -18,7 +18,8 @@ jobs:
         python-version: [3.7, '3.10', 'pypy-3.8']
     steps:
       - name: Set Windows Line Ending
-        run: git config --global core.autocrlf true
+        run: |
+          git config --global core.autocrlf true
       - name: Git Checkout
         uses: actions/checkout@v3
       - name: Install Python ${{ matrix.python-version }}
@@ -32,4 +33,5 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install --upgrade -r ./workflowHelper/requirements.txt
       - name: Start UnitTests
-        run: python -m unittest discover -s cat_win.tests -p test*.py
+        run: |
+          python -m unittest discover -s cat_win.tests -p test*.py
