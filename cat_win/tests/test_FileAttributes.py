@@ -1,6 +1,6 @@
-from cat_win.util.FileAttributes import _convert_size
 from unittest import TestCase
-import os
+
+from cat_win.util.FileAttributes import _convert_size
 # import sys
 # sys.path.append('../cat_win')
 

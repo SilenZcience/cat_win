@@ -1,6 +1,7 @@
-from cat_win.util.checksum import getChecksumFromFile
 from unittest import TestCase
 import os
+
+from cat_win.util.checksum import getChecksumFromFile
 # import sys
 # sys.path.append('../cat_win')
 

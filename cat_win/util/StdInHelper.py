@@ -1,5 +1,5 @@
-import os
 from sys import stdin
+import os
 
 
 def writeTemp(content: str, tmp_file: str, file_encoding: str) -> str:

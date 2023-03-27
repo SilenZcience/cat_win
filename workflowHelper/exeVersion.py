@@ -1,6 +1,8 @@
+#!/usr/bin/python
 import os
 import sys
 sys.path.append('../cat_win')
+
 from cat_win import __version__
 
 cat_winVersion = '0.' + __version__

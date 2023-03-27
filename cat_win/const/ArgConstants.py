@@ -1,3 +1,4 @@
+
 class ArgConstant():
     def __init__(self, shortForm, longForm, help, id):
         self.shortForm = shortForm
