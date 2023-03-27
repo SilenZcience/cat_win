@@ -23,7 +23,7 @@ jobs:
       - name: Setup Code Dependencies
         run: |
           python -m pip install --upgrade -r ./workflowHelper/requirements.txt
-      - name: Setup version File
+      - name: Setup Version File
         run: |
           python ./workflowHelper/exeVersion.py
       - name: Compile Package

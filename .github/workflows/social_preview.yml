@@ -22,7 +22,7 @@ jobs:
       - name: Setup Image Dependencies
         run: |
           python -m pip install --upgrade Pillow
-      - name: Generate image
+      - name: Generate Social Preview
         run: |
           python ./workflowHelper/preview.py
       - name: Show and Push
