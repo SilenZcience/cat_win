@@ -1,9 +1,10 @@
+from io import StringIO
+from unittest import TestCase
+from unittest.mock import patch
+import os
+
 from cat_win.util.Holder import Holder
 import cat_win.cat as cat
-from unittest.mock import patch
-from unittest import TestCase
-from io import StringIO
-import os
 # import sys
 # sys.path.append('../cat_win')
 

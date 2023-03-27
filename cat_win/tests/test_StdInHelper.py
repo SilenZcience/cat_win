@@ -1,5 +1,6 @@
-from cat_win.util.StdInHelper import path_parts
 from unittest import TestCase
+
+from cat_win.util.StdInHelper import path_parts
 
 
 class TestStdInHelper(TestCase):

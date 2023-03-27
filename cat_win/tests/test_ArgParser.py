@@ -1,7 +1,8 @@
-import cat_win.util.ArgParser as ArgParser
-from cat_win.const.ArgConstants import *
 from unittest import TestCase
 import os
+
+from cat_win.const.ArgConstants import *
+import cat_win.util.ArgParser as ArgParser
 # import sys
 # sys.path.append('../cat_win')
 

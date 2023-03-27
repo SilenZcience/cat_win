@@ -1,6 +1,7 @@
 from unittest import TestCase
-from cat_win.util.RawViewer import getRawViewLinesGen
 import os
+
+from cat_win.util.RawViewer import getRawViewLinesGen
 
 
 test_file_path = os.path.join(os.path.dirname(__file__), 'texts', 'test.txt')

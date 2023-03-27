@@ -1,7 +1,8 @@
-from cat_win.util.Holder import Holder
-from cat_win.const.ArgConstants import *
 from unittest import TestCase
 import os
+
+from cat_win.const.ArgConstants import *
+from cat_win.util.Holder import Holder
 # import sys
 # sys.path.append('../cat_win')
 

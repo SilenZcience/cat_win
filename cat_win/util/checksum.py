@@ -1,5 +1,5 @@
-import hashlib
 from zlib import crc32 as crc32_hash
+import hashlib
 
 
 def getChecksumFromFile(file: str, colors: list = None) -> str:

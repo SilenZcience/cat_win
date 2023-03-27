@@ -1,5 +1,6 @@
-from urllib.request import urlopen
 from json import loads as loadJSON
+from urllib.request import urlopen
+
 from cat_win.const.ColorConstants import C_KW
 
 

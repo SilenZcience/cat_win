@@ -1,7 +1,7 @@
 #!/usr/bin/python
+from sys import exit
 import os
 import subprocess
-from sys import exit
 
 error_code = 1
 

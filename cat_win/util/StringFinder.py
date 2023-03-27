@@ -1,4 +1,5 @@
 from re import finditer
+
 from cat_win.const.ColorConstants import C_KW
 
 

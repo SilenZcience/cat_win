@@ -1,5 +1,6 @@
-from cat_win.util.Base64 import encodeBase64, decodeBase64
 from unittest import TestCase
+
+from cat_win.util.Base64 import encodeBase64, decodeBase64
 # import sys
 # sys.path.append('../cat_win')
 

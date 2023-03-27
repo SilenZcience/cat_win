@@ -1,5 +1,6 @@
-import cat_win.web.UpdateChecker as UpdateChecker
 from unittest import TestCase
+
+import cat_win.web.UpdateChecker as UpdateChecker
 # import sys
 # sys.path.append('../cat_win')
 

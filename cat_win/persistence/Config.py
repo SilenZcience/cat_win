@@ -1,5 +1,6 @@
-from os.path import join as path_join
 from configparser import ConfigParser
+from os.path import join as path_join
+
 from cat_win.const.ColorConstants import ColorOptions, C_KW
 
 

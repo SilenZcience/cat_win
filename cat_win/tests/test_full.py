@@ -1,9 +1,11 @@
-import cat_win.cat as cat
-import cat_win.util.ArgParser as ArgParser
+from io import StringIO
 from unittest.mock import patch
 from unittest import TestCase
-from io import StringIO
 import os
+
+import cat_win.cat as cat
+import cat_win.util.ArgParser as ArgParser
+
 # import sys
 # sys.path.append('../cat_win')
 

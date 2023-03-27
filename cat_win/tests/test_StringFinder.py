@@ -1,5 +1,6 @@
-from cat_win.util.StringFinder import StringFinder
 from unittest import TestCase
+
+from cat_win.util.StringFinder import StringFinder
 # import sys
 # sys.path.append('../cat_win')
 

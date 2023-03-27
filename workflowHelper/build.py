@@ -1,8 +1,9 @@
+#!/usr/bin/python
+from glob import iglob
+from shutil import rmtree
+from sys import exit
 import os
 import subprocess
-from sys import exit
-from shutil import rmtree
-from glob import iglob
 
 script_dir = os.path.dirname(__file__)
 package_dir = os.path.abspath(os.path.join(script_dir, '..', 'cat_win'))

@@ -1,6 +1,7 @@
 from glob import iglob
-from re import match
 from os.path import isfile, realpath, isdir
+from re import match
+
 from cat_win.const.ArgConstants import *
 
 

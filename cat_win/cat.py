@@ -1,14 +1,20 @@
-import sys
-import os
-from re import sub as resub
-from datetime import datetime
-from functools import lru_cache
-from itertools import groupby
 try:
     from colorama import init as coloramaInit
 except ImportError:
     nop = lambda *_, **__: None; coloramaInit = nop
+from datetime import datetime
+from functools import lru_cache
+from itertools import groupby
+from re import sub as resub
+import os
+import sys
 
+from cat_win.const.ArgConstants import *
+from cat_win.const.ColorConstants import C_KW
+from cat_win.util.Base64 import decodeBase64, encodeBase64
+from cat_win.util.FileAttributes import getFileMetaData, getFileSize, _convert_size
+from cat_win.util.RawViewer import getRawViewLinesGen
+from cat_win.web.UpdateChecker import printUpdateInformation
 import cat_win.persistence.Config as Config
 import cat_win.util.ArgParser as ArgParser
 import cat_win.util.checksum as checksum
@@ -17,12 +23,6 @@ import cat_win.util.Holder as Holder
 import cat_win.util.StdInHelper as StdInHelper
 import cat_win.util.StringFinder as StringFinder
 import cat_win.util.TmpFileHelper as TmpFileHelper
-from cat_win.util.Base64 import decodeBase64, encodeBase64
-from cat_win.util.FileAttributes import getFileMetaData, getFileSize, _convert_size
-from cat_win.util.RawViewer import getRawViewLinesGen
-from cat_win.const.ArgConstants import *
-from cat_win.const.ColorConstants import C_KW
-from cat_win.web.UpdateChecker import printUpdateInformation
 
 from cat_win import __version__, __sysversion__, __author__, __url__
 workingDir = os.path.dirname(os.path.realpath(__file__))
