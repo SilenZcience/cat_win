@@ -3,6 +3,8 @@ from urllib.request import urlopen
 
 from cat_win.const.ColorConstants import C_KW
 
+from cat_win import __url__
+
 
 # UNSAFE:
 # UPDATE MAY INCLUDE FUNDAMENTAL CHANGES
@@ -137,6 +139,7 @@ def printUpdateInformation(package: str, currentVersion: str, color_dic: dict) -
         return
     message = f""
     warning = f""
+    info    = f""
     if abs(status) == STATUS_STABLE_RELEASE_AVAILABLE:
         message += f"{color_dic[C_KW.MESSAGE_IMPORTANT]}"
         message += f"A new stable release of {package} is available: v{latestVersion}"
@@ -148,11 +151,15 @@ def printUpdateInformation(package: str, currentVersion: str, color_dic: dict) -
         message += f"{color_dic[C_KW.MESSAGE_INFORMATION]}"
         message += f"A new pre-release of {package} is available: v{latestVersion}"
     message += f"{color_dic[C_KW.RESET_ALL]}"
-    if status < 0:
+    if status < STATUS_UP_TO_DATE:
         warning += f"{color_dic[C_KW.MESSAGE_WARNING]}"
         warning += f"Warning: Due to the drastic version increase, backwards compatibility is no longer guaranteed!"
         warning += f"{color_dic[C_KW.RESET_ALL]}\n{color_dic[C_KW.MESSAGE_WARNING]}"
         warning += f"You may experience fundamental differences."
-        warning += f"{color_dic[C_KW.RESET_ALL]}\n"
+        warning += f"{color_dic[C_KW.RESET_ALL]}"
+    info += f"{color_dic[C_KW.MESSAGE_INFORMATION]}Take a look at the changelog here:"
+    info += f"{color_dic[C_KW.RESET_ALL]}\n{color_dic[C_KW.MESSAGE_INFORMATION]}"
+    info += f"{__url__}/blob/main/CHANGELOG.md{color_dic[C_KW.RESET_ALL]}"
     print(message)
     print(warning)
+    print(info)
