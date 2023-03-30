@@ -6,6 +6,8 @@ on:
     paths:
       - .github/workflows/coverage.yml
       - cat_win/**
+    tags-ignore:
+      - 'v*' # exclude release tags (starting with "v")
 
 jobs:
   build:
