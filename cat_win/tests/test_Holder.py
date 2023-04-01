@@ -17,30 +17,30 @@ holder = Holder()
 
 
 class TestHolder(TestCase):
-    def test__calcfileLineLengthPlaceHolder__(self):
+    def test__calcFileLineLengthPlaceHolder__(self):
         holder.setFiles([test_file_path])
-        holder.__calcfileLineLengthPlaceHolder__()
+        holder.__calcFileLineLengthPlaceHolder__()
         self.assertEqual(holder.fileLineLengthPlaceHolder, 2)
 
-    def test__calcfileLineLengthPlaceHolder__Edge(self):
+    def test__calcFileLineLengthPlaceHolder__Edge(self):
         holder.setFiles([test_file_edge_case_1])
-        holder.__calcfileLineLengthPlaceHolder__()
+        holder.__calcFileLineLengthPlaceHolder__()
         self.assertEqual(holder.fileLineLengthPlaceHolder, 1)
 
         holder.setFiles([test_file_edge_case_2])
-        holder.__calcfileLineLengthPlaceHolder__()
+        holder.__calcFileLineLengthPlaceHolder__()
         self.assertEqual(holder.fileLineLengthPlaceHolder, 2)
         
         holder.setFiles([test_file_edge_case_3, test_file_edge_case_4])
-        holder.__calcfileLineLengthPlaceHolder__()
+        holder.__calcFileLineLengthPlaceHolder__()
         self.assertEqual(holder.fileLineLengthPlaceHolder, 1)
         
         holder.setFiles([test_file_edge_case_2, test_file_edge_case_4])
-        holder.__calcfileLineLengthPlaceHolder__()
+        holder.__calcFileLineLengthPlaceHolder__()
         self.assertEqual(holder.fileLineLengthPlaceHolder, 2)
         
-    def test___calcMaxLine___empty(self):
-        self.assertEqual(holder.__calcMaxLine__(test_file_empty), 0)
+    def test___calcMaxLineLength___empty(self):
+        self.assertEqual(holder.__calcMaxLineLength__(test_file_empty), 0)
 
     def test_allFilesLinesSum(self):
         holder.setFiles([test_file_path, test_file_edge_case_1])
