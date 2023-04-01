@@ -95,9 +95,9 @@ class Holder():
         self.fileLineNumberPlaceHolder = len(str(max(fileLines)))
 
     @lru_cache(maxsize=10)
-    def __calcMaxLine__(self, file: str) -> int:
+    def __calcMaxLineLength__(self, file: str) -> int:
         """
-        Calculate the length of the longest line in a file.
+        Calculate self.fileLineLengthPlaceHolder for a single file.
         
         Parameters:
         file (str):
@@ -105,7 +105,8 @@ class Holder():
             
         Returns:
         (int):
-            the length of the longest line within the file
+            the length of the placeholder to represent
+            the longest line within the file
         """
         heap = []
         lines = []
@@ -122,8 +123,8 @@ class Holder():
         
         return len(str(max(longest_line_len, last_line_len)))
 
-    def __calcfileLineLengthPlaceHolder__(self) -> None:
-        self.fileLineLengthPlaceHolder = max(self.__calcMaxLine__(file)
+    def __calcFileLineLengthPlaceHolder__(self) -> None:
+        self.fileLineLengthPlaceHolder = max(self.__calcMaxLineLength__(file)
                                              for file in self._inner_files)
         
     def setDecodingTempFiles(self, temp_files: list) -> None:
@@ -138,4 +139,4 @@ class Holder():
                     with open(self._inner_files[i], 'w', encoding='ascii') as f:
                         f.write(_decodeBase64(fp.read(), encoding))
         self.__calcPlaceHolder__()
-        self.__calcfileLineLengthPlaceHolder__()
+        self.__calcFileLineLengthPlaceHolder__()
