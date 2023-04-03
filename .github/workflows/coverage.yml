@@ -6,8 +6,10 @@ on:
     paths:
       - .github/workflows/coverage.yml
       - cat_win/**
-    tags-ignore:
-      - 'v*' # exclude release tags (starting with "v")
+    # specify (all) branches such that the workflow will
+    # not trigger on tag/release-creation
+    branches:
+      - '**'
 
 jobs:
   build:
