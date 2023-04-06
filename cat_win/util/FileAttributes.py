@@ -31,7 +31,7 @@ def _convert_size(size_bytes: int) -> str:
     i = int(floor(log(size_bytes, 1024)))
     p = pow(1024, i)
     s = round(size_bytes / p, 2)
-    return f"{s} {size_name[i] if i < 9 else '?'}"
+    return f"{s} {size_name[i] if i < len(size_name) else '?'}"
 
 
 def read_attribs(file: str) -> list:
