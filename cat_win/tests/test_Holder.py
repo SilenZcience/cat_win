@@ -88,13 +88,12 @@ class TestHolder(TestCase):
         self.assertEqual(holder.args_id[ARGS_LLENGTH], False)
         self.assertEqual(holder.args_id[ARGS_NUMBER], False)
 
-    def test_getAppliedFiles(self):
-        expexted_output = [(test_file_edge_case_3, test_file_edge_case_3),
-                           ('STDINFILE', '<STDIN>'),
-                           (test_file_edge_case_4, test_file_edge_case_4),
-                           ('TEMPFILEECHO', '<ECHO>')]
-        holder.setFiles([test_file_edge_case_3, 'STDINFILE', test_file_edge_case_4, 'TEMPFILEECHO'])
+    def test__getFileDisplayName(self):
         holder.setTempFileStdIn('STDINFILE')
         holder.setTempFileEcho('TEMPFILEECHO')
+        holder.setFiles([test_file_edge_case_3, 'STDINFILE', test_file_edge_case_4, 'TEMPFILEECHO'])
         
-        self.assertListEqual(holder.getAppliedFiles(), expexted_output)
+        self.assertEqual(holder._getFileDisplayName('STDINFILE'), '<STDIN>')
+        self.assertEqual(holder._getFileDisplayName('TEMPFILEECHO'), '<ECHO>')
+        self.assertEqual(holder._getFileDisplayName(test_file_edge_case_3), test_file_edge_case_3)
+        self.assertEqual(holder._getFileDisplayName(test_file_edge_case_4), test_file_edge_case_4)
