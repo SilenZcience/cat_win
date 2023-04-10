@@ -141,11 +141,11 @@ def _showFiles(files: list = None) -> None:
     
     Parameters:
     files (list):
-        all files to display, the files inside the holder
-        object if None
+        all files to display, a list containing File objects,
+        the files inside the holder object if None
     """
     if files == None:
-        files = holder.getAppliedFiles()
+        files = holder.files
     if len(files) == 0:
         return
     file_sizes = []
@@ -153,10 +153,10 @@ def _showFiles(files: list = None) -> None:
     print(color_dic[C_KW.COUNT_AND_FILES], end='')
     print(f"{msg} FILE(s):", end='')
     print(color_dic[C_KW.RESET_ALL])
-    for file, displayName in files:
-        size = getFileSize(file)
+    for file in files:
+        size = getFileSize(file.path)
         file_sizes.append(size)
-        print(f"\t{color_dic[C_KW.COUNT_AND_FILES]}{_convert_size(size): <10}{displayName}{color_dic[C_KW.RESET_ALL]}")
+        print(f"\t{color_dic[C_KW.COUNT_AND_FILES]}{_convert_size(size): <10}{'*' if file.containsQueried else ' '}{file.displayname}{color_dic[C_KW.RESET_ALL]}")
     print(color_dic[C_KW.COUNT_AND_FILES], end='')
     print(f"Sum:\t{_convert_size(sum(file_sizes))}", end='')
     print(color_dic[C_KW.RESET_ALL])
@@ -204,9 +204,9 @@ def _printMetaAndChecksum(showMeta: bool, showChecksum: bool) -> None:
     """
     for file in holder.files:
         if showMeta:
-            _printMeta(file)
+            _printMeta(file.path)
         if showChecksum:
-            _printChecksum(file)
+            _printChecksum(file.path)
 
 
 def removeAnsiCodesFromLine(line: str) -> str:
@@ -319,7 +319,7 @@ def _getLineLengthPrefix(prefix: str, line) -> str:
     return _CalculateLineLengthPrefixSpacing(len(str(len(line)))) % (prefix, len(line))
 
 
-def printFile(content: list, bytecode: bool) -> None:
+def printFile(content: list, bytecode: bool) -> bool:
     """
     print a file and possibly include the substrings and patterns to search for.
     
@@ -328,13 +328,19 @@ def printFile(content: list, bytecode: bool) -> None:
         the content of a file like [(prefix, line), ...]
     bytecode (bool):
         if the lines are in bytes the value is True
+        
+    Returns
+    (bool):
+        identifies if the given content parameter contained any
+        queried keyword/pattern.
     """
     if not content:
-        return
+        return False
     if not (ArgParser.FILE_SEARCH or ArgParser.FILE_MATCH) or bytecode:
         print(*[prefix + line for prefix, line in content], sep='\n')
-        return
+        return False
 
+    containsQueried = False
     stringFinder = StringFinder.StringFinder(ArgParser.FILE_SEARCH, ArgParser.FILE_MATCH)
 
     for line_prefix, line in content:
@@ -346,6 +352,7 @@ def printFile(content: list, bytecode: bool) -> None:
                 print(line_prefix + line)
             continue
         
+        containsQueried = True
         if holder.args_id[ARGS_NOKEYWORD]:
             continue
         
@@ -375,6 +382,8 @@ def printFile(content: list, bytecode: bool) -> None:
                 input()
             except EOFError:
                 pass
+            
+    return containsQueried
 
 
 def printExcludedByPeek(content: list, excludedByPeek: int) -> None:
@@ -416,13 +425,13 @@ def editFile(fileIndex: int = 0) -> None:
     excludedByPeek = 0
     content = [('', '')]
     try:
-        with open(holder.files[fileIndex], 'r', encoding=ArgParser.FILE_ENCODING) as f:
+        with open(holder.files[fileIndex].path, 'r', encoding=ArgParser.FILE_ENCODING) as f:
             # splitlines() gives a slight inaccuracy, in case the last line is empty.
             # the alternative would be worse: split('\n') would increase the linecount each
             # time cat touches a file.
             content = [('', line) for line in f.read().splitlines()]
     except:
-        print('Failed to open:', holder.files[fileIndex])
+        print('Failed to open:', holder.files[fileIndex].displayname)
         try:
             enterChar = '⏎'
             try:
@@ -436,7 +445,7 @@ def editFile(fileIndex: int = 0) -> None:
         except EOFError:
             pass
         try:
-            with open(holder.files[fileIndex], 'rb') as f:
+            with open(holder.files[fileIndex].path, 'rb') as f:
                 # in binary splitlines() is our only option
                 content = [('', line) for line in f.read().splitlines()]
             show_bytecode = True
@@ -502,9 +511,9 @@ def editFile(fileIndex: int = 0) -> None:
     if holder.args_id[ARGS_B64E]:
         content = encodeBase64(content, ArgParser.FILE_ENCODING)
 
-    printFile(content[:len(content)//2], show_bytecode)
+    holder.files[fileIndex].setContainsQueried(printFile(content[:len(content)//2], show_bytecode))
     printExcludedByPeek(content, excludedByPeek)
-    printFile(content[len(content)//2:], show_bytecode)
+    holder.files[fileIndex].setContainsQueried(printFile(content[len(content)//2:], show_bytecode))
 
     if not show_bytecode:
         if holder.args_id[ARGS_CLIP]:
@@ -571,8 +580,8 @@ def printRawView(fileIndex: int = 0, mode: str = 'X') -> None:
         either 'x', 'X' for hexadecimal (lower- or upper case letters),
         or 'b' for binary
     """
-    print(holder.files[fileIndex], ':', sep='')
-    for line in getRawViewLinesGen(holder.files[fileIndex], mode, [color_dic[C_KW.RAWVIEWER], color_dic[C_KW.RESET_ALL]]):
+    print(holder.files[fileIndex].displayname, ':', sep='')
+    for line in getRawViewLinesGen(holder.files[fileIndex].path, mode, [color_dic[C_KW.RAWVIEWER], color_dic[C_KW.RESET_ALL]]):
         print(line)
     print('')
 

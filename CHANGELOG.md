@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.3.1] - TBA
+
+### Minor Changes
+
+- -`f`, --`files` now shows a `*` symbol on specific files, indicating the file contains a keyword or pattern that has been searched for using `find=` or `match=`.
+
+
 ## [1.3.0] - 2023-03-29
 
 ### Major Changes

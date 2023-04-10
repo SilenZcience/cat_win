@@ -2,6 +2,7 @@ from functools import lru_cache
 from heapq import nlargest
 
 from cat_win.const.ArgConstants import *
+from cat_win.util.File import File
 
 
 class Holder():
@@ -27,8 +28,28 @@ class Holder():
 
         self.clipBoard = ''
     
+    def _getFileDisplayName(self, file: str) -> str:
+        """
+        return the display name of a file. Expects self.temp_file_stdin
+        and self.temp_file_echo to be set already.
+        
+        Parameters_
+        file (str):
+            a path of a file
+            
+        Returns:
+        (str):
+            the display name for the file. Either the path itself
+            or a special identifier von stdin or echo inputs
+        """
+        if file == self.temp_file_stdin:
+            return '<STDIN>'
+        elif file == self.temp_file_echo:
+            return '<ECHO>'
+        return file
+    
     def setFiles(self, files: list) -> None:
-        self.files = files[:]
+        self.files = [File(path, self._getFileDisplayName(path)) for path in files]
         self._inner_files = files[:]
 
     def setArgs(self, args: list) -> None:
@@ -47,27 +68,6 @@ class Holder():
         
     def setTempFileEcho(self, file: str) -> None:
         self.temp_file_echo = file
-
-    def getAppliedFiles(self) -> list:
-        """
-        generate a list containing all files and their display names
-        stdin and echo will be considered special cases and show
-        a different displayname to their (temp) path.
-        
-        Returns:
-        displayList (list):
-            a list of tuples. each tuple contains a file path
-            and a display name.
-        """
-        displayList = []
-        for file in self.files:
-            if file == self.temp_file_stdin:
-                displayList.append((file, '<STDIN>'))
-            elif file == self.temp_file_echo:
-                displayList.append((file, '<ECHO>'))
-            else:
-                displayList.append((file, file))
-        return displayList
     
     def __calcFileNumberPlaceHolder__(self) -> None:
         self.fileNumberPlaceHolder = len(str(len(self.files)))
@@ -135,7 +135,7 @@ class Holder():
         if self.args_id[ARGS_B64D]:
             from cat_win.util.Base64 import _decodeBase64
             for i, file in enumerate(self.files):
-                with open(file, 'r', encoding=encoding) as fp:
+                with open(file.path, 'r', encoding=encoding) as fp:
                     with open(self._inner_files[i], 'w', encoding='ascii') as f:
                         f.write(_decodeBase64(fp.read(), encoding))
         self.__calcPlaceHolder__()
