@@ -31,5 +31,6 @@ jobs:
           git config --local user.name 'github-actions[bot]'
           git config --local user.email 'github-actions[bot]@users.noreply.github.com'
           git add ./img/socialPreview.png
-          git diff --quiet && git diff --staged --quiet || git commit -m "🤖Generated Social Preview."
+          git commit -m "🤖Generated Social Preview."
           git push origin HEAD:main
+        continue-on-error: true

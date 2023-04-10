@@ -29,6 +29,11 @@ jobs:
       - name: Compile Package
         run: |
           python ./workflowHelper/build.py
+      - name: Test Executable
+        run: |
+          ./bin/catw.exe -h
+          ./bin/catw.exe -v
+          ./bin/catw.exe -p ./bin/catw.exe
       - name: Show and Push
         run: |
           git status
@@ -36,5 +41,6 @@ jobs:
           git config --local user.email 'github-actions[bot]@users.noreply.github.com'
           git add ./bin/exeVersionFile
           git add ./bin/catw.exe
-          git diff --quiet && git diff --staged --quiet || git commit -m "🤖Compiled Binary."
+          git commit -m "🤖Compiled Binary."
           git push origin HEAD:main
+        continue-on-error: true
