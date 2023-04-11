@@ -319,15 +319,13 @@ def _getLineLengthPrefix(prefix: str, line) -> str:
     return _CalculateLineLengthPrefixSpacing(len(str(len(line)))) % (prefix, len(line))
 
 
-def printFile(content: list, bytecode: bool) -> bool:
+def printFile(content: list) -> bool:
     """
     print a file and possibly include the substrings and patterns to search for.
     
     Parameters:
     content (list):
         the content of a file like [(prefix, line), ...]
-    bytecode (bool):
-        if the lines are in bytes the value is True
         
     Returns
     (bool):
@@ -336,7 +334,7 @@ def printFile(content: list, bytecode: bool) -> bool:
     """
     if not content:
         return False
-    if not (ArgParser.FILE_SEARCH or ArgParser.FILE_MATCH) or bytecode:
+    if not (ArgParser.FILE_SEARCH or ArgParser.FILE_MATCH):
         print(*[prefix + line for prefix, line in content], sep='\n')
         return False
 
@@ -511,9 +509,9 @@ def editFile(fileIndex: int = 0) -> None:
     if holder.args_id[ARGS_B64E]:
         content = encodeBase64(content, ArgParser.FILE_ENCODING)
 
-    holder.files[fileIndex].setContainsQueried(printFile(content[:len(content)//2], show_bytecode))
+    holder.files[fileIndex].setContainsQueried(printFile(content[:len(content)//2]))
     printExcludedByPeek(content, excludedByPeek)
-    holder.files[fileIndex].setContainsQueried(printFile(content[len(content)//2:], show_bytecode))
+    holder.files[fileIndex].setContainsQueried(printFile(content[len(content)//2:]))
 
     if not show_bytecode:
         if holder.args_id[ARGS_CLIP]:
