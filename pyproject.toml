@@ -50,6 +50,7 @@ exclude = 	[
 
 [project.scripts]
 catw = "cat_win.__main__:entry_point"
+cats = "cat_win.__main__:shell_entry_point"
 
 [project.urls]
 Github = "https://github.com/SilenZcience/cat_win"

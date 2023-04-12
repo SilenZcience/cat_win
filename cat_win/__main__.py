@@ -9,8 +9,8 @@ except Exception as e:
     print(e)
     exit(1)
 
-def deprecated_entry_point():
-    cat.deprecated_main()
+def shell_entry_point():
+    cat.shell_main()
 
 def entry_point():
     cat.main()
