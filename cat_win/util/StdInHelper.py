@@ -38,14 +38,13 @@ def getStdInContent(oneLine: bool = False) -> str:
     """
     if oneLine:
         first_line = stdin.readline()
-        return first_line.rstrip('\n')
-    input = ''
-    for line in stdin:
-        if line[-2:] == chr(26) + '\n':
-            input += line[:-2]
-            break
-        input += line
-    return input
+        yield first_line.rstrip('\n')
+    else:
+        for line in stdin:
+            if line[-2:] == chr(26) + '\n':
+                yield line[:-2]
+                break
+            yield line
 
 
 def path_parts(path: str) -> list:
@@ -191,6 +190,6 @@ def readWriteFilesFromStdIn(file_list: list, file_encoding: str, oneLine: bool =
     print('', *file_list, sep='\n\t')
     print("do/does not exist. Write the FILE(s) and finish with the '^Z'-suffix ((Ctrl + Z) + Enter):")
 
-    input = getStdInContent(oneLine)
+    input = ''.join(getStdInContent(oneLine))
 
     return writeFiles(file_list, input, file_encoding)

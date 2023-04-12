@@ -134,7 +134,7 @@ def _showCount() -> None:
     print(f"{color_dic[C_KW.COUNT_AND_FILES]}Lines (Sum): {holder.allFilesLinesSum}{color_dic[C_KW.RESET_ALL]}")
 
 
-def _showFiles(files: list = None) -> None:
+def _showFiles(files: list = []) -> None:
     """
     displays files including their size and calculates
     their size sum.
@@ -144,7 +144,7 @@ def _showFiles(files: list = None) -> None:
         all files to display, a list containing File objects,
         the files inside the holder object if None
     """
-    if files == None:
+    if len(files) == 0:
         files = holder.files
     if len(files) == 0:
         return
@@ -238,7 +238,7 @@ def removeAnsiCodesFromLine(line: str) -> str:
 
 @lru_cache(maxsize=None)
 def _CalculateLinePrefixSpacing(lineCharLength: int,
-                                includeFilePrefix: bool = False, fileCharLength: int = None) -> str:
+                                includeFilePrefix: bool = False, fileCharLength: int = 0) -> str:
     """
     calculate a string template for the line prefix.
     
@@ -411,51 +411,27 @@ def printExcludedByPeek(content: list, excludedByPeek: int) -> None:
     print(color_dic[C_KW.RESET_ALL])
 
 
-def editFile(fileIndex: int = 0) -> None:
+def editContent(content: list, show_bytecode: bool, fileIndex: int = 0, lineOffset: int = 0) -> None:
     """
-    apply all parameters to a file.
+    apply all parameters to a string (file Content).
     
     Parameters:
+    content (list):
+        the content of a file like [(prefix, line), ...]
+    show_bytecode (bool).
+        indicates if the content lines are string or bytes
     fileIndex (int):
-        the index regarding which file is currently being edited
+        the index of the holder.files list, pointing to the file that
+        is currently being processed. a negative value can be used for
+        the shell mode
     """
-    show_bytecode = False
     excludedByPeek = 0
-    content = [('', '')]
-    try:
-        with open(holder.files[fileIndex].path, 'r', encoding=ArgParser.FILE_ENCODING) as f:
-            # splitlines() gives a slight inaccuracy, in case the last line is empty.
-            # the alternative would be worse: split('\n') would increase the linecount each
-            # time cat touches a file.
-            content = [('', line) for line in f.read().splitlines()]
-    except:
-        print('Failed to open:', holder.files[fileIndex].displayname)
-        try:
-            enterChar = '⏎'
-            try:
-                enterChar.encode(ArgParser.FILE_ENCODING)
-            except UnicodeError:
-                enterChar = 'ENTER'
-            inp = input(f"Do you want to open the file as a binary, without parameters? [Y/{enterChar}]:")
-            if not 'Y' in inp.upper() and inp:
-                print('Aborting...')
-                return
-        except EOFError:
-            pass
-        try:
-            with open(holder.files[fileIndex].path, 'rb') as f:
-                # in binary splitlines() is our only option
-                content = [('', line) for line in f.read().splitlines()]
-            show_bytecode = True
-        except:
-            print('Operation failed! Try using the enc=X parameter.')
-            return
     
     if not show_bytecode and holder.args_id[ARGS_B64D]:
         content = decodeBase64(content, ArgParser.FILE_ENCODING)
     
     if holder.args_id[ARGS_NUMBER]:
-        content = [(_getLinePrefix(j, fileIndex+1), c[1])
+        content = [(_getLinePrefix(j+lineOffset, fileIndex+1), c[1])
                    for j, c in enumerate(content, start=1)]
     content = content[ArgParser.FILE_TRUNCATE[0]:ArgParser.FILE_TRUNCATE[1]:ArgParser.FILE_TRUNCATE[2]]
     if holder.args_id[ARGS_PEEK] and len(content) > 10:
@@ -509,13 +485,60 @@ def editFile(fileIndex: int = 0) -> None:
     if holder.args_id[ARGS_B64E]:
         content = encodeBase64(content, ArgParser.FILE_ENCODING)
 
-    holder.files[fileIndex].setContainsQueried(printFile(content[:len(content)//2]))
+    foundQueried = printFile(content[:len(content)//2])
+    if fileIndex >= 0:
+        holder.files[fileIndex].setContainsQueried(foundQueried)
     printExcludedByPeek(content, excludedByPeek)
-    holder.files[fileIndex].setContainsQueried(printFile(content[len(content)//2:]))
-
+    foundQueried = printFile(content[len(content)//2:])
+    if fileIndex >= 0:
+        holder.files[fileIndex].setContainsQueried(foundQueried)
+    
     if not show_bytecode:
         if holder.args_id[ARGS_CLIP]:
             holder.clipBoard += '\n'.join([prefix + line for prefix, line in content])
+
+
+def editFile(fileIndex: int = 0) -> None:
+    """
+    apply all parameters to a file.
+    
+    Parameters:
+    fileIndex (int):
+        the index regarding which file is currently being edited
+    """
+    show_bytecode = False
+    
+    content = [('', '')]
+    try:
+        with open(holder.files[fileIndex].path, 'r', encoding=ArgParser.FILE_ENCODING) as f:
+            # splitlines() gives a slight inaccuracy, in case the last line is empty.
+            # the alternative would be worse: split('\n') would increase the linecount each
+            # time catw touches a file.
+            content = [('', line) for line in f.read().splitlines()]
+    except:
+        print('Failed to open:', holder.files[fileIndex].displayname)
+        try:
+            enterChar = '⏎'
+            try:
+                enterChar.encode(ArgParser.FILE_ENCODING)
+            except UnicodeError:
+                enterChar = 'ENTER'
+            inp = input(f"Do you want to open the file as a binary, without parameters? [Y/{enterChar}]:")
+            if not 'Y' in inp.upper() and inp:
+                print('Aborting...')
+                return
+        except EOFError:
+            pass
+        try:
+            with open(holder.files[fileIndex].path, 'rb') as f:
+                # in binary splitlines() is our only option
+                content = [('', line) for line in f.read().splitlines()]
+            show_bytecode = True
+        except:
+            print('Operation failed! Try using the enc=X parameter.')
+            return
+    
+    editContent(content, show_bytecode, fileIndex)
 
 
 def _copyToClipboard(content: str, __dependency: int = 3, __clipBoardError: bool = False) -> None:
@@ -616,9 +639,20 @@ def editFiles() -> None:
         copyToClipboard(removeAnsiCodesFromLine(holder.clipBoard))
 
 
-def main():
-    piped_input = temp_file = ''
-
+def init(shell: bool = False) -> tuple:
+    """
+    initiate the code by calling the argparser and handling the default
+    parameters: -h, -v, -d, --config.
+    
+    Parameters:
+    contenshellt (bool):
+        indicates if the shell entry point was used, and the stdin will therefor
+        be used by default
+        
+    Returns
+    (tuple):
+        contains (known_files, unknown_files, echo_args) from the argparser
+    """
     # read parameter-args
     args, unknown_args, known_files, unknown_files, echo_args = ArgParser.getArguments(sys.argv)
 
@@ -635,21 +669,29 @@ def main():
     # check for special cases
     if holder.args_id[ARGS_DEBUG]:
         _showDebug(args, unknown_args, known_files, unknown_files, echo_args)
-    if (len(known_files) + len(unknown_files) + len(holder.args) == 0) or holder.args_id[ARGS_HELP]:
+    if (len(known_files) + len(unknown_files) + len(holder.args) == 0 and not shell) or holder.args_id[ARGS_HELP]:
         _showHelp()
-        return
+        sys.exit(0)
     if holder.args_id[ARGS_VERSION]:
         _showVersion()
-        return
+        sys.exit(0)
     if holder.args_id[ARGS_CONFIG]:
         config.saveConfig()
-        return
+        sys.exit(0)
+    
+    return (known_files, unknown_files, echo_args)
+
+
+def main():
+    piped_input = temp_file = ''
+    known_files, unknown_files, echo_args = init(False)
+    
     if holder.args_id[ARGS_ECHO]:
         temp_file = StdInHelper.writeTemp(' '.join(echo_args), tmpFileHelper.generateTempFileName(), ArgParser.FILE_ENCODING)
         known_files.append(temp_file)
         holder.setTempFileEcho(temp_file)
     if holder.args_id[ARGS_INTERACTIVE]:
-        piped_input = StdInHelper.getStdInContent(holder.args_id[ARGS_ONELINE])
+        piped_input = ''.join(StdInHelper.getStdInContent(holder.args_id[ARGS_ONELINE]))
         temp_file = StdInHelper.writeTemp(piped_input, tmpFileHelper.generateTempFileName(), ArgParser.FILE_ENCODING)
         known_files.append(temp_file)
         unknown_files = StdInHelper.writeFiles(unknown_files, piped_input, ArgParser.FILE_ENCODING)
@@ -697,11 +739,16 @@ def main():
                 print('FileNotFoundError', tmp_file)
 
 
-def deprecated_main():
-    print(color_dic[C_KW.MESSAGE_IMPORTANT], end='')
-    print("The 'cat'-command is soon to be deprecated. Please consider using 'catw'.", end='')
-    print(color_dic[C_KW.RESET_ALL], end='\n\n')
-    main()
+def shell_main():
+    init(True)
+    
+    shellPrefix = '>>> '
+    
+    print(shellPrefix, end='', flush=True)
+    for i, line in enumerate(StdInHelper.getStdInContent(holder.args_id[ARGS_ONELINE])):
+        editContent([('', line.rstrip('\n'))], False, -1, i)
+        print(shellPrefix, end='', flush=True)
+
 
 if __name__ == '__main__':
     main()

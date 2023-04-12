@@ -3,7 +3,11 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
-## [TBA]   - TBA
+## [1.4.0]   - TBA
+
+### Major Changes
+
+- added `cats` entry point, for a shell version of the programm. This way you can enter and edit custom input line by line, instead of restarting the programm every time. Useful for the number conversion feature or a line by line base64 encoding/decoding (note that some parameters will not work with this entry-point since they will not make any sense in the context).
 
 ### Minor Changes
 
