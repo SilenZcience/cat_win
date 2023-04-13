@@ -7,7 +7,7 @@ def idToCode(code: int) -> str:
 
 
 class ColorOptions:
-    Fore = {
+    __Fore = {
         'RESET': 39,
             
         'BLACK':   30,
@@ -28,7 +28,7 @@ class ColorOptions:
         'LIGHTCYAN':    96,
         'LIGHTWHITE':   97
         }
-    Back = {
+    __Back = {
         'RESET': 49,
             
         'BLACK':   40,
@@ -49,18 +49,20 @@ class ColorOptions:
         'LIGHTCYAN':    106,
         'LIGHTWHITE':   107
         }
-    Style = {
+    __Style = {
         'RESET': 0
         }
 
-    for key in Fore:
-        Fore[key] = idToCode(Fore[key])
-    Fore['NONE'] = ''
-    for key in Back:
-        Back[key] = idToCode(Back[key])
-    Back['NONE'] = ''
-    for key in Style:
-        Style[key] = idToCode(Style[key])
+    Fore  = {'NONE': ''}
+    Back  = {'NONE': ''}
+    Style = {'NONE': ''}
+    
+    for key in __Fore:
+        Fore[key]  = idToCode(__Fore[key])
+    for key in __Back:
+        Back[key]  = idToCode(__Back[key])
+    for key in __Style:
+        Style[key] = idToCode(__Style[key])
 
 
 class C_KW:

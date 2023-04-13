@@ -23,7 +23,7 @@ def writeTemp(content: str, tmp_file: str, file_encoding: str) -> str:
     return tmp_file
 
 
-def getStdInContent(oneLine: bool = False) -> str:
+def getStdInContent(oneLine: bool = False):
     """
     read the stdin.
     
@@ -31,7 +31,7 @@ def getStdInContent(oneLine: bool = False) -> str:
     oneLine (bool):
         determines if only the first stdin line should be read
         
-    Returns:
+    Yields:
     input (str):
         the input delivered by stdin
         until the first EOF (Chr(26)) character

@@ -1,5 +1,5 @@
 
-def getRawViewLinesGen(file: str = None, mode: str = 'X', colors: list = None) -> str:
+def getRawViewLinesGen(file: str = '', mode: str = 'X', colors = None):
     """
     return the raw byte representation of a file in hexadecimal or binary
     line by line
@@ -13,8 +13,14 @@ def getRawViewLinesGen(file: str = None, mode: str = 'X', colors: list = None) -
     colors (list):
         a list of two elements. Index 0 holds the color C_KW.RAWVIEWER,
         Index 1 holds the color C_KW.RESET_ALL
+        
+    Yields:
+    currentLine (str):
+        a string representation that, when put together, forms the hexviewer
+        output containing the header and line information aswell
+        as the bytes themselves
     """
-    if colors == None:
+    if colors == None or len(colors) < 2:
         colors = ['', '']
     
     rawFile = open(file, 'rb')

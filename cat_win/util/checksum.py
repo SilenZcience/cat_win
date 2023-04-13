@@ -2,7 +2,7 @@ from zlib import crc32 as crc32_hash
 import hashlib
 
 
-def getChecksumFromFile(file: str, colors: list = None) -> str:
+def getChecksumFromFile(file: str, colors = None) -> str:
     """
     Calculates and returns the CRC32, MD5, SHA1, SHA256, SHA512
     hashes of a file.
