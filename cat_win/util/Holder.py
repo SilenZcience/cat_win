@@ -72,7 +72,16 @@ class Holder():
     def __calcFileNumberPlaceHolder__(self) -> None:
         self.fileNumberPlaceHolder = len(str(len(self.files)))
 
-    def __count_generator__(self, reader) -> bytes:
+    def __count_generator__(self, reader):
+        """
+        Parameters:
+        reader (method):
+            the method to read from
+        
+        Yields:
+        b (bytes):
+            the bytes in chunks read from the reader
+        """
         b = reader(1024 * 1024)
         while b:
             yield b

@@ -8,7 +8,7 @@ class StringFinder:
         self.kw_literals = literals
         self.kw_regex = regex
 
-    def _findliterals(self, sub: str, s: str) -> list:
+    def _findliterals(self, sub: str, s: str):
         """
         Generate lists containing the position of sub in s.
         
@@ -28,7 +28,7 @@ class StringFinder:
             yield [i, i+l]
             i = s.find(sub, i+1)
 
-    def _findregex(self, pattern: str, s: str) -> list:
+    def _findregex(self, pattern: str, s: str):
         """
         Generate lists containing the position of pattern in s.
         

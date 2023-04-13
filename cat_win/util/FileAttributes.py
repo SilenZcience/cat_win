@@ -80,7 +80,7 @@ def getFileSize(file: str) -> int:
         return 0
 
 
-def getFileMetaData(file: str, colors: list = None) -> str:
+def getFileMetaData(file: str, colors = None) -> str:
     """
     calculate file metadata information.
     
@@ -121,4 +121,4 @@ def getFileMetaData(file: str, colors: list = None) -> str:
         metaData += colors[0] + '\n'
         return metaData
     except OSError:
-        pass
+        return ''

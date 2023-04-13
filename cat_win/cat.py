@@ -134,26 +134,19 @@ def _showCount() -> None:
     print(f"{color_dic[C_KW.COUNT_AND_FILES]}Lines (Sum): {holder.allFilesLinesSum}{color_dic[C_KW.RESET_ALL]}")
 
 
-def _showFiles(files: list = []) -> None:
+def _showFiles() -> None:
     """
-    displays files including their size and calculates
+    displays holder.files including their size and calculates
     their size sum.
-    
-    Parameters:
-    files (list):
-        all files to display, a list containing File objects,
-        the files inside the holder object if None
     """
-    if len(files) == 0:
-        files = holder.files
-    if len(files) == 0:
+    if len(holder.files) == 0:
         return
     file_sizes = []
     msg = 'found' if holder.args_id[ARGS_FFILES] else 'applied'
     print(color_dic[C_KW.COUNT_AND_FILES], end='')
     print(f"{msg} FILE(s):", end='')
     print(color_dic[C_KW.RESET_ALL])
-    for file in files:
+    for file in holder.files:
         size = getFileSize(file.path)
         file_sizes.append(size)
         print(f"\t{color_dic[C_KW.COUNT_AND_FILES]}{_convert_size(size): <10}{'*' if file.containsQueried else ' '}{file.displayname}{color_dic[C_KW.RESET_ALL]}")
@@ -161,7 +154,7 @@ def _showFiles(files: list = []) -> None:
     print(f"Sum:\t{_convert_size(sum(file_sizes))}", end='')
     print(color_dic[C_KW.RESET_ALL])
     print(color_dic[C_KW.COUNT_AND_FILES], end='')
-    print(f"Amount:\t{len(files)}", end='')
+    print(f"Amount:\t{len(holder.files)}", end='')
     print(color_dic[C_KW.RESET_ALL])
 
 
@@ -658,6 +651,7 @@ def init(shell: bool = False) -> tuple:
 
     holder.setArgs(args)
 
+    # maybe this is unnecessary:
     sys.stdout.reconfigure(encoding=ArgParser.FILE_ENCODING)
     sys.stdin.reconfigure(encoding=ArgParser.FILE_ENCODING)
     

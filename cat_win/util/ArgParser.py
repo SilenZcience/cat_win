@@ -5,7 +5,7 @@ from re import match
 from cat_win.const.ArgConstants import *
 
 
-FILE_ENCODING = 'utf-8'
+FILE_ENCODING: str = 'utf-8'
 FILE_SEARCH = []
 FILE_MATCH = []
 FILE_TRUNCATE = [None, None, None]
@@ -49,13 +49,13 @@ def __addArgument__(args: list, unknown_args: list, known_files: list, unknown_f
         return False
     # 'trunc' + ('=' or ':') + FILE_TRUNCATE[0] + ':' + FILE_TRUNCATE[1] + ':' + FILE_TRUNCATE[2]
     elif match(r"\Atrunc[\=\:][0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\Z", param):
-        param = param[6:].split(':')
+        paramSplit = param[6:].split(':')
         global FILE_TRUNCATE
-        FILE_TRUNCATE[0] = None if param[0] == '' else (
-            0 if param[0] == '0' else int(eval(param[0]))-1)
-        FILE_TRUNCATE[1] = None if param[1] == '' else int(eval(param[1]))
-        if len(param) == 3:
-            FILE_TRUNCATE[2] = None if param[2] == '' else int(eval(param[2]))
+        FILE_TRUNCATE[0] = None if paramSplit[0] == '' else (
+            0 if paramSplit[0] == '0' else int(eval(paramSplit[0]))-1)
+        FILE_TRUNCATE[1] = None if paramSplit[1] == '' else int(eval(paramSplit[1]))
+        if len(paramSplit) == 3:
+            FILE_TRUNCATE[2] = None if paramSplit[2] == '' else int(eval(paramSplit[2]))
         return False
     # '[' + ARGS_CUT + ']'
     elif match(r"\A\[[0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\]\Z", param):
