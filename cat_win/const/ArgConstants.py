@@ -14,7 +14,7 @@ ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA = range(15, 20)
 ARGS_CONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK, ARGS_NOCOL = range(20, 25)
 ARGS_EOF, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP = range(25, 30)
 ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW, ARGS_BINVIEW = range(30, 35)
-ARGS_NOKEYWORD, = range(35, 36)
+ARGS_NOKEYWORD, ARGS_RECONFIGURE = range(35, 37)
 
 ALL_ARGS = [[['-h', '--help'], 'show this help message and exit', ARGS_HELP],
             [['-v', '--version'], 'output version information and exit', ARGS_VERSION],
@@ -49,6 +49,7 @@ ALL_ARGS = [[['-h', '--help'], 'show this help message and exit', ARGS_HELP],
             [['--nc', '--nocolor'], 'disable colored output', ARGS_NOCOL],
             [['--nb', '--nobreak'], 'do not interrupt the output on queried keywords', ARGS_NOBREAK],
             [['--nk', '--nokeyword'], 'inverse the grep output', ARGS_NOKEYWORD],
+            [['-R', '--reconfigure'], 'reconfigure the stdin and stdout with the parsed encoding', ARGS_RECONFIGURE],
             [['--config', '--config'], 'change color configuration', ARGS_CONFIG]]
 
 ALL_ARGS = [ArgConstant(x[0][0], x[0][1], x[1], x[2]) for x in ALL_ARGS]
