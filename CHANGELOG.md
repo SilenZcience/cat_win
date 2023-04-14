@@ -14,6 +14,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - searching for patterns or literals within a file now also works for files that have been opened in binary mode (beware that some keywords might be overlooked).
 - --`hexview` and --`binview` will now, dependant on the installed font, also show specific symbols for carriage return and line feed.
+- creating a file with an specific text encoding set will now result in an actually encoded file.
 
 
 ## [1.3.1] - 2023-04-10
