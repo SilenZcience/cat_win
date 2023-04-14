@@ -23,6 +23,16 @@ def getRawViewLinesGen(file: str = '', mode: str = 'X', colors = None):
     if colors == None or len(colors) < 2:
         colors = ['', '']
     
+    CRLF = {10: '␤', 13: '␍'}
+    
+    def getDisplayChar(byte: int) -> str:
+        # 32 - 126 => ' ' - '~' (ASCII)
+        if 32 <= byte <= 126:
+            return chr(byte)
+        elif byte in [10, 13]:
+            return CRLF[byte]
+        return '·'
+    
     rawFile = open(file, 'rb')
     rawFileContent = rawFile.read()
     rawFileContentLength = len(rawFileContent)
@@ -41,10 +51,9 @@ def getRawViewLinesGen(file: str = '', mode: str = 'X', colors = None):
     for i, byte in enumerate(rawFileContent, start=1):
         line.append(byte)
         if not (i % 16):
-            # 32 - 126 => ' ' - '~' (ASCII)
             currentLine +=  ' '.join([f"{b:0{reprLength}{mode}}" for b in line]) + \
                             f" {colors[0]}#{colors[1]} " + \
-                            ' '.join([chr(b) if 32 <= b <= 126 else '·' for b in line])
+                            ' '.join(map(getDisplayChar, line))
             yield currentLine
             if i < rawFileContentLength:
                 currentLine = f"{colors[0]}{i:0{8}X}{colors[1]} "
@@ -53,5 +62,5 @@ def getRawViewLinesGen(file: str = '', mode: str = 'X', colors = None):
         currentLine +=  ' '.join([f"{b:0{reprLength}{mode}}" for b in line]) + ' ' + \
                         ' ' * ((reprLength + 1) * (16-len(line)) - 1) + \
                         f" {colors[0]}#{colors[1]} " + \
-                        ' '.join([chr(b) if 32 <= b <= 126 else '·' for b in line])
+                        ' '.join(map(getDisplayChar, line))
         yield currentLine
