@@ -18,8 +18,8 @@ def writeTemp(content: str, tmp_file: str, file_encoding: str) -> str:
     tmp_file (str):
         the path to the temporary file written
     """
-    with open(tmp_file, 'w', encoding=file_encoding) as f:
-        f.write(content)
+    with open(tmp_file, 'wb') as f:
+        f.write(content.encode(file_encoding))
     return tmp_file
 
 
@@ -97,8 +97,8 @@ def createFile(file: str, content: str, file_encoding: str) -> bool:
                 continue
         return False
     try:
-        with open(file, 'w', encoding=file_encoding) as f:
-            f.write(content)
+        with open(file, 'wb') as f:
+            f.write(content.encode(file_encoding))
     except OSError:
         print(f"Error: The file '{file}' could not be written.")
         # cleanup (delete the folders that have been created)
@@ -155,8 +155,8 @@ def writeFiles(file_list: list, content: str, file_encoding: str) -> list:
     
     for file in file_list:
         try:
-            with open(file, 'w', encoding=file_encoding) as f:
-                f.write(content)
+            with open(file, 'wb') as f:
+                f.write(content.encode(file_encoding))
             success_file_list.append(file)
         except FileNotFoundError: # the os.pardir path to the file does not exist
             if createFile(file, content, file_encoding):

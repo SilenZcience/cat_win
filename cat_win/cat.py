@@ -651,7 +651,6 @@ def init(shell: bool = False) -> tuple:
 
     holder.setArgs(args)
 
-    # maybe this is unnecessary:
     sys.stdout.reconfigure(encoding=ArgParser.FILE_ENCODING)
     sys.stdin.reconfigure(encoding=ArgParser.FILE_ENCODING)
     
