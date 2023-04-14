@@ -651,8 +651,9 @@ def init(shell: bool = False) -> tuple:
 
     holder.setArgs(args)
 
-    sys.stdout.reconfigure(encoding=ArgParser.FILE_ENCODING)
-    sys.stdin.reconfigure(encoding=ArgParser.FILE_ENCODING)
+    if holder.args_id[ARGS_RECONFIGURE]:
+        sys.stdout.reconfigure(encoding=ArgParser.FILE_ENCODING)
+        sys.stdin.reconfigure(encoding=ArgParser.FILE_ENCODING)
     
     # do not use colors if requested, or output will be piped anyways
     if holder.args_id[ARGS_NOCOL] or (not sys.stdout.isatty() or sys.stdout.closed):
