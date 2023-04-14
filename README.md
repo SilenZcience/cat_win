@@ -196,6 +196,15 @@ $ echo "Hello World :)" | catw -i [6:] | catw -i [::-1] -ln
 > 1) [8] ): dlroW
 ```
 
+```c
+$ cats --dec -nl
+> >>> 12345
+> 1) [53] 12345 {Hexadecimal: 0x3039; Binary: 0b11000000111001}
+> >>> 54321
+> 2) [55] 54321 {Hexadecimal: 0xd431; Binary: 0b1101010000110001}
+> ...
+```
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Changelog
