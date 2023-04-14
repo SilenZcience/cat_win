@@ -1,7 +1,7 @@
 from base64 import b64encode, b64decode
 
 
-def _encodeBase64(content: str, encoding: str) -> str:
+def _encodeBase64(content: str, encoding: str) -> bytes:
     """
     Encode a string to base64.
     
@@ -12,13 +12,13 @@ def _encodeBase64(content: str, encoding: str) -> str:
         the encoding the string is using
         
     Returns:
-    encoded_content (str):
+    encoded_content (bytes):
         the base64 encoded string
     """
     # encode the string to bytes and encode with base64
     contentBytes = content.encode(encoding=encoding)
-    base64_bytes = b64encode(contentBytes)
-    encoded_content = base64_bytes.decode(encoding='ascii')
+    encoded_content = b64encode(contentBytes)
+    
     # return as a single line
     return encoded_content
 
@@ -42,28 +42,27 @@ def encodeBase64(content: list, encoding: str = 'utf-8') -> list:
     contentLine = '\n'.join(contentLines)
     
     encoded_content = _encodeBase64(contentLine, encoding)
+    encoded_content = encoded_content.decode(encoding='ascii')
     # return as a list containing a single line
     return [('', encoded_content)]
 
 
-def _decodeBase64(content: str, encoding: str) -> str:
+def _decodeBase64(content: str) -> bytes:
     """
     Decode a string from base64.
     
     Parameters:
     content (str):
         the string to decode
-    encoding (str):
-        the encoding the string is using
         
     Returns:
-    decoded_content (str):
+    decoded_content (bytes):
         the base64 decoded string
     """
     # encode the string to bytes and decode with base64
     base64_bytes = content.encode(encoding='ascii')
     decoded_content = b64decode(base64_bytes)
-    decoded_content = decoded_content.decode(encoding=encoding)
+    
     # return as a single line
     return decoded_content
 
@@ -86,7 +85,8 @@ def decodeBase64(content: list, encoding: str = 'utf-8') -> list:
     contentLines = list(map(lambda x: x[1], content))
     contentLine = ''.join(contentLines)
     
-    decoded_content = _decodeBase64(contentLine, encoding)
+    decoded_content = _decodeBase64(contentLine)
+    decoded_content = decoded_content.decode(encoding=encoding)
     
     # return as content list, split at line breaks
     decoded_content = decoded_content.split('\n')

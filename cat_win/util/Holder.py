@@ -144,8 +144,8 @@ class Holder():
         if self.args_id[ARGS_B64D]:
             from cat_win.util.Base64 import _decodeBase64
             for i, file in enumerate(self.files):
-                with open(file.path, 'r', encoding=encoding) as fp:
-                    with open(self._inner_files[i], 'w', encoding='ascii') as f:
-                        f.write(_decodeBase64(fp.read(), encoding))
+                with open(file.path, 'rb') as fp:
+                    with open(self._inner_files[i], 'wb') as f:
+                        f.write(_decodeBase64(fp.read().decode(encoding)))
         self.__calcPlaceHolder__()
         self.__calcFileLineLengthPlaceHolder__()
