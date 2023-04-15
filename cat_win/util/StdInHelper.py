@@ -32,19 +32,19 @@ def getStdInContent(oneLine: bool = False):
         determines if only the first stdin line should be read
         
     Yields:
-    input (str):
-        the input delivered by stdin
+    line (str):
+        the input (line by line) delivered by stdin
         until the first EOF (Chr(26)) character
     """
     if oneLine:
         first_line = stdin.readline()
         yield first_line.rstrip('\n')
-    else:
-        for line in stdin:
-            if line[-2:] == chr(26) + '\n':
-                yield line[:-2]
-                break
-            yield line
+        return
+    for line in stdin:
+        if line[-2:-1] == chr(26):
+            yield line[:-2]
+            break
+        yield line
 
 
 def path_parts(path: str) -> list:
