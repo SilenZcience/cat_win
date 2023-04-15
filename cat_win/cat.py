@@ -24,7 +24,7 @@ import cat_win.util.StdInHelper as StdInHelper
 import cat_win.util.StringFinder as StringFinder
 import cat_win.util.TmpFileHelper as TmpFileHelper
 
-from cat_win import __version__, __sysversion__, __author__, __url__
+from cat_win import __project__, __version__, __sysversion__, __author__, __url__
 workingDir = os.path.dirname(os.path.realpath(__file__))
 
 coloramaInit()
@@ -71,7 +71,7 @@ def _showHelp() -> None:
     helpMessage += f"\t{'cat f g -ne': <25}Output f's, then g's content, while numerating and showing the end of lines\n"
     helpMessage += f"\t{'cat f trunc=a:b:c': <25}Output f's content starting at line a, ending at line b, stepping c\n"
     print(helpMessage)
-    printUpdateInformation('cat_win', __version__, color_dic)
+    printUpdateInformation(__project__, __version__, color_dic)
 
 
 def _showVersion() -> None:
@@ -91,7 +91,7 @@ def _showVersion() -> None:
         versionMessage += f"Install time: \t-\n"
     versionMessage += f"Author: \t{__author__}\n"
     print(versionMessage)
-    printUpdateInformation('cat_win', __version__, color_dic)
+    printUpdateInformation(__project__, __version__, color_dic)
 
 
 def _showDebug(args: list, unknown_args: list, known_files: list, unknown_files: list, echo_args: list) -> None:
@@ -743,10 +743,14 @@ def shell_main():
     
     shellPrefix = '>>> '
     
+    print(__project__, 'v' + __version__, 'shell', '(' + __url__ + ')')
+    print('Use "catw" to handle files. Type ^EOF to exit.')
+    
     print(shellPrefix, end='', flush=True)
     for i, line in enumerate(StdInHelper.getStdInContent(holder.args_id[ARGS_ONELINE])):
         editContent([('', line.rstrip('\n'))], False, -1, i)
-        print(shellPrefix, end='', flush=True)
+        if not holder.args_id[ARGS_ONELINE]:
+            print(shellPrefix, end='', flush=True)
 
 
 if __name__ == '__main__':
