@@ -37,8 +37,10 @@ def getStdInContent(oneLine: bool = False):
         until the first EOF (Chr(26)) character
     """
     if oneLine:
-        first_line = stdin.readline()
-        yield first_line.rstrip('\n')
+        first_line = stdin.readline().rstrip('\n')
+        if first_line[-1:] == chr(26):
+            first_line = first_line[:-1]
+        yield first_line
         return
     for line in stdin:
         if line[-2:-1] == chr(26):
