@@ -371,7 +371,7 @@ def printFile(content: list) -> bool:
         if found_sth:
             try:  # fails when using -i mode, because the stdin will send en EOF char to input without prompting the user
                 input()
-            except EOFError:
+            except (EOFError, UnicodeDecodeError):
                 pass
             
     return containsQueried
@@ -516,12 +516,17 @@ def editFile(fileIndex: int = 0) -> None:
                 enterChar.encode(ArgParser.FILE_ENCODING)
             except UnicodeError:
                 enterChar = 'ENTER'
-            inp = input(f"Do you want to open the file as a binary, without parameters? [Y/{enterChar}]:")
+            print(f"Do you want to open the file as a binary, without parameters? [Y/{enterChar}]:", end='')
+            inp = input()
             if not 'Y' in inp.upper() and inp:
                 print('Aborting...')
                 return
         except EOFError:
             pass
+        except UnicodeDecodeError:
+            print(f"Input is not recognized in the given encoding: {ArgParser.FILE_ENCODING}")
+            print('Aborting...')
+            return
         try:
             with open(holder.files[fileIndex].path, 'rb') as f:
                 # in binary splitlines() is our only option

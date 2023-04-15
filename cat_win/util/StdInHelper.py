@@ -143,9 +143,13 @@ def writeFiles(file_list: list, content: str, file_encoding: str) -> list:
                 enterChar.encode(file_encoding)
             except UnicodeError:
                 enterChar = 'ENTER'
-            abort_command = input(f"[Y/{enterChar}] Yes, Continue       [N] No, Abort :")
+            print(f"[Y/{enterChar}] Yes, Continue       [N] No, Abort :", end='')
+            abort_command = input()
         except EOFError:
             pass
+        except UnicodeDecodeError:
+            print(f"Input is not recognized in the given encoding: {file_encoding}")
+            abort_command = 'n'
         finally:
             if abort_command and abort_command.upper() != 'Y':
                 print('Aborting...')
