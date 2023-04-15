@@ -41,7 +41,7 @@ def exception_handler(exception_type: type, exception, traceback, debug_hook=sys
     if holder.args_id[ARGS_DEBUG]:
         debug_hook(exception_type, exception, traceback)
         return
-    print(f"\nError: {exception_type.__name__} {exception}")
+    print(f"\n{exception_type.__name__}: {exception}")
     if exception_type != KeyboardInterrupt:
         print(f"If this Exception is unexpected, please raise an official Issue at:\n{__url__}/issues")
 
