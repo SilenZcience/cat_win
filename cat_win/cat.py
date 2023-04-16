@@ -41,7 +41,7 @@ def exception_handler(exception_type: type, exception, traceback, debug_hook=sys
     if holder.args_id[ARGS_DEBUG]:
         debug_hook(exception_type, exception, traceback)
         return
-    print(f"\n{exception_type.__name__}: {exception}")
+    print(f"\n{exception_type.__name__}{':' * bool(str(exception))} {exception}")
     if exception_type != KeyboardInterrupt:
         print(f"If this Exception is unexpected, please raise an official Issue at:\n{__url__}/issues")
 
@@ -473,8 +473,6 @@ def editContent(content: list, show_bytecode: bool, fileIndex: int = 0, lineOffs
             
     if holder.args_id[ARGS_LLENGTH]:
         content = [(_getLineLengthPrefix(c[0], c[1]), c[1]) for c in content]
-    if show_bytecode:
-        content = [(prefix, str(line)) for prefix, line in content]
     if holder.args_id[ARGS_B64E]:
         content = encodeBase64(content, ArgParser.FILE_ENCODING)
 
@@ -530,7 +528,7 @@ def editFile(fileIndex: int = 0) -> None:
         try:
             with open(holder.files[fileIndex].path, 'rb') as f:
                 # in binary splitlines() is our only option
-                content = [('', line) for line in f.read().splitlines()]
+                content = [('', repr(line)[2:-1]) for line in f.read().splitlines()]
             show_bytecode = True
         except:
             print('Operation failed! Try using the enc=X parameter.')
