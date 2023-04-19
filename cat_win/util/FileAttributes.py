@@ -80,13 +80,16 @@ def getFileSize(file: str) -> int:
         return 0
 
 
-def getFileMetaData(file: str, colors = None) -> str:
+def getFileMetaData(file: str, on_windows_os: bool, colors = None) -> str:
     """
     calculate file metadata information.
     
     Parameters:
     file (str):
         a string representation of a file (-path)
+    on_windows_os (bool):
+        indicates if the user is on windows os using
+        platform.system() == 'Windows'
     colors (list):
         a list containing the ANSI-Colorcodes to display
         the attributes like [RESET_ALL, ATTRIB, +ATTRIB, -ATTRIB]
@@ -108,7 +111,7 @@ def getFileMetaData(file: str, colors = None) -> str:
         metaData += f"{colors[1]}{'MTime:': <16}{datetime.fromtimestamp(stats.st_mtime)}{colors[0]}\n"
         metaData += f"{colors[1]}{'CTime:': <16}{datetime.fromtimestamp(stats.st_ctime)}{colors[0]}\n"
         
-        if system() != 'Windows':
+        if not on_windows_os:
             metaData += '\n'
             return metaData
         
