@@ -5,6 +5,7 @@ except ImportError:
 from datetime import datetime
 from functools import lru_cache
 from itertools import groupby
+from platform import system
 from re import sub as resub
 import os
 import sys
@@ -35,6 +36,8 @@ color_dic = config.loadConfig()
 converter = Converter.Converter()
 holder = Holder.Holder()
 tmpFileHelper = TmpFileHelper.TmpFileHelper()
+
+on_windows_os = (system() == 'Windows')
 
 def exception_handler(exception_type: type, exception, traceback, debug_hook=sys.excepthook) -> None:
     print(color_dic[C_KW.RESET_ALL])
@@ -166,10 +169,11 @@ def _printMeta(file: str) -> None:
     file (str):
         a string representation of a file (-path)
     """
-    metaData = getFileMetaData(file, [color_dic[C_KW.RESET_ALL],
-                                      color_dic[C_KW.ATTRIB],
-                                      color_dic[C_KW.ATTRIB_POSITIVE],
-                                      color_dic[C_KW.ATTRIB_NEGATIVE]])
+    metaData = getFileMetaData(file, on_windows_os,
+                               [color_dic[C_KW.RESET_ALL],
+                               color_dic[C_KW.ATTRIB],
+                               color_dic[C_KW.ATTRIB_POSITIVE],
+                               color_dic[C_KW.ATTRIB_NEGATIVE]])
     print(metaData)
 
 
@@ -695,7 +699,7 @@ def main():
         holder.setTempFileStdIn(temp_file)
     else:
         unknown_files = StdInHelper.readWriteFilesFromStdIn(
-            unknown_files, ArgParser.FILE_ENCODING, holder.args_id[ARGS_ONELINE])
+            unknown_files, ArgParser.FILE_ENCODING, on_windows_os, holder.args_id[ARGS_ONELINE])
 
     if (len(known_files) + len(unknown_files) == 0):
         return
@@ -740,9 +744,10 @@ def shell_main():
     init(True)
     
     shellPrefix = '>>> '
+    EOFControlChar = 'Z' if on_windows_os else 'D'
     
     print(__project__, 'v' + __version__, 'shell', '(' + __url__ + ')')
-    print('Use "catw" to handle files. Type ^EOF to exit.')
+    print(f"Use 'catw' to handle files. Type ^{EOFControlChar} (Ctrl + {EOFControlChar}) to exit.")
     
     print(shellPrefix, end='', flush=True)
     for i, line in enumerate(StdInHelper.getStdInContent(holder.args_id[ARGS_ONELINE])):

@@ -173,7 +173,7 @@ def writeFiles(file_list: list, content: str, file_encoding: str) -> list:
     return success_file_list
 
 
-def readWriteFilesFromStdIn(file_list: list, file_encoding: str, oneLine: bool = False) -> list:
+def readWriteFilesFromStdIn(file_list: list, file_encoding: str, on_windows_os: bool, oneLine: bool = False) -> list:
     """
     Write stdin input to multiple files.
     
@@ -182,6 +182,9 @@ def readWriteFilesFromStdIn(file_list: list, file_encoding: str, oneLine: bool =
         all files that should be written
     file_encoding (str):
         the encoding to use for writing the files
+    on_windows_os (bool):
+        indicates if the user is on windows os using
+        platform.system() == 'Windows'
     oneLine (bool):
         determines if only the first stdin line should be read
         
@@ -194,7 +197,8 @@ def readWriteFilesFromStdIn(file_list: list, file_encoding: str, oneLine: bool =
 
     print('The given FILE(s)', end='')
     print('', *file_list, sep='\n\t')
-    print("do/does not exist. Write the FILE(s) and finish with the '^Z'-suffix ((Ctrl + Z) + Enter):")
+    EOFControlChar = 'Z' if on_windows_os else 'D'
+    print(f"do/does not exist. Write the FILE(s) and finish with the ^{EOFControlChar}-suffix (Ctrl + {EOFControlChar}):")
 
     input = ''.join(getStdInContent(oneLine))
 
