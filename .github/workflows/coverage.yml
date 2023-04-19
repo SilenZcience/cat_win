@@ -10,6 +10,7 @@ on:
     # not trigger on tag/release-creation
     branches:
       - '**'
+      - '!badges'
 
 jobs:
   build:
@@ -22,6 +23,8 @@ jobs:
           git config --global core.autocrlf true
       - name: Git Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # otherwise, it will fail to push refs to dest repo
       - name: Install Python 3.10
         id: python
         uses: actions/setup-python@v4
@@ -42,17 +45,21 @@ jobs:
       - name: Show Missing Coverage
         run: |
           python -m coverage report --show-missing
+      - name: Create / Move To Badge-Branch
+        run: |
+          git checkout badges 2> /dev/null || git checkout -b badges
+          mkdir -p .github/badges
       - name: Generate Badges
         run: |
-          python -m genbadge.main tests -i ./reports/pytest.xml -o ./img/badge-tests.svg
-          python -m genbadge.main coverage -i ./reports/coverage.xml -o ./img/badge-coverage.svg
+          python -m genbadge.main tests -i ./reports/pytest.xml -o ./.github/badges/badge-tests.svg
+          python -m genbadge.main coverage -i ./reports/coverage.xml -o ./.github/badges/badge-coverage.svg
       - name: Show and Push
         run: |
           git status
           git config --local user.name 'github-actions[bot]'
           git config --local user.email 'github-actions[bot]@users.noreply.github.com'
-          git add ./img/badge-coverage.svg
-          git add ./img/badge-tests.svg
+          git add ./.github/badges/badge-coverage.svg
+          git add ./.github/badges/badge-tests.svg
           git commit -m "🤖Generated Coverage Badges."
-          git push origin HEAD:main
+          git push origin HEAD:badges
         continue-on-error: true

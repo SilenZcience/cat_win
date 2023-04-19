@@ -229,8 +229,8 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 [Build-and-Check]: https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml/badge.svg
 [Compile-and-Push]: https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml/badge.svg
 
-[Coverage]: https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/badge-coverage.svg
-[Tests]: https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/badge-tests.svg
+[Coverage]: https://raw.githubusercontent.com/SilenZcience/cat_win/badges/.github/badges/badge-coverage.svg
+[Tests]: https://raw.githubusercontent.com/SilenZcience/cat_win/badges/.github/badges/badge-tests.svg
 
 [MadeWith-Python]: https://img.shields.io/badge/Made%20with-Python-brightgreen
 [Python-Version]: https://img.shields.io/badge/Python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%20pypy--3.8%20%7C%20pypy--3.9-blue
