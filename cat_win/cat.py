@@ -515,8 +515,9 @@ def editFile(fileIndex: int = 0) -> None:
         try:
             enterChar = '⏎'
             try:
-                enterChar.encode(ArgParser.FILE_ENCODING)
-            except UnicodeError:
+                if len(enterChar.encode(ArgParser.FILE_ENCODING)) != 3:
+                    raise UnicodeEncodeError('', '', -1, -1, '')
+            except UnicodeEncodeError:
                 enterChar = 'ENTER'
             print(f"Do you want to open the file as a binary, without parameters? [Y/{enterChar}]:", end='')
             inp = input()
@@ -602,7 +603,7 @@ def printRawView(fileIndex: int = 0, mode: str = 'X') -> None:
         or 'b' for binary
     """
     print(holder.files[fileIndex].displayname, ':', sep='')
-    for line in getRawViewLinesGen(holder.files[fileIndex].path, mode, [color_dic[C_KW.RAWVIEWER], color_dic[C_KW.RESET_ALL]]):
+    for line in getRawViewLinesGen(holder.files[fileIndex].path, mode, [color_dic[C_KW.RAWVIEWER], color_dic[C_KW.RESET_ALL]], ArgParser.FILE_ENCODING):
         print(line)
     print('')
 

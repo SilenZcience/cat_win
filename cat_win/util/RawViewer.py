@@ -1,5 +1,5 @@
 
-def getRawViewLinesGen(file: str = '', mode: str = 'X', colors = None):
+def getRawViewLinesGen(file: str = '', mode: str = 'X', colors = None, file_encoding: str = 'utf-8'):
     """
     return the raw byte representation of a file in hexadecimal or binary
     line by line
@@ -13,6 +13,8 @@ def getRawViewLinesGen(file: str = '', mode: str = 'X', colors = None):
     colors (list):
         a list of two elements. Index 0 holds the color C_KW.RAWVIEWER,
         Index 1 holds the color C_KW.RESET_ALL
+    file_encoding (str):
+        the encoding used (possibly for stdout)
         
     Yields:
     currentLine (str):
@@ -24,6 +26,12 @@ def getRawViewLinesGen(file: str = '', mode: str = 'X', colors = None):
         colors = ['', '']
     
     CRLF = {10: '␤', 13: '␍'}
+
+    try:
+        if len(CRLF[10].encode(file_encoding)) != 3:
+            raise UnicodeEncodeError('', '', -1, -1, '')
+    except UnicodeEncodeError:
+        CRLF = {10: '·', 13: '·'}
     
     def getDisplayChar(byte: int) -> str:
         # 32 - 126 => ' ' - '~' (ASCII)
