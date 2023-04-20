@@ -141,9 +141,11 @@ def writeFiles(file_list: list, content: str, file_encoding: str) -> list:
         try:
             print('You are about to create an empty file. Do you want to continue?')
             enterChar = '⏎'
+
             try:
-                enterChar.encode(file_encoding)
-            except UnicodeError:
+                if len(enterChar.encode(file_encoding)) != 3:
+                    raise UnicodeEncodeError('', '', -1, -1, '')
+            except UnicodeEncodeError:
                 enterChar = 'ENTER'
             print(f"[Y/{enterChar}] Yes, Continue       [N] No, Abort :", end='')
             abort_command = input()
