@@ -526,7 +526,7 @@ def editFile(fileIndex: int = 0) -> None:
                 return
         except EOFError:
             pass
-        except UnicodeDecodeError:
+        except UnicodeError:
             print(f"Input is not recognized in the given encoding: {ArgParser.FILE_ENCODING}")
             print('Aborting...')
             return
