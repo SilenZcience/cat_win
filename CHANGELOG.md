@@ -8,7 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Major Changes
 
 - added `cats` entry point, for a shell version of the programm. This way you can enter and edit custom input line by line, instead of restarting the programm every time. Useful for the number conversion feature or a line by line base64 encoding/decoding (note that some parameters will not work with this entry-point since they will not make any sense in the context).
-- added -`R`, --`reconfigure` parameter to decide if the standard-input (stdin) and standard-output (stdout) should be reconfigured to the parsed encoding parameter. Some shells handle text encoding different than others, so there is no uniform output when using uncommon encoding formats. Using this parameter the users can decide for themselves if the stdout should be encoded. Some users may experience readable console output when using he parameter while others may experience it when not using the argument.
+- added -`R`, --`reconfigure` parameter to decide if the standard-input (stdin) and standard-output (stdout) should be reconfigured to the parsed encoding parameter. Some shells handle text encoding different than others, so there is no uniform output when using uncommon encoding formats. Using this parameter the users can decide for themselves if the stdout should be encoded. Some users may experience readable console output when using the parameter while others may experience it when not using the argument.
 
 ### Minor Changes
 
@@ -16,6 +16,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 - --`hexview` and --`binview` will now, dependant on the installed font, also show specific symbols for carriage return and line feed.
 - creating a file with an specific text encoding set will now result in an actually encoded file.
 - opening a file in binary will no longer display the `b''` wrapper.
+
+### Bugfixes
+
+- fix Bug where the ENTER-char '⏎' would be displayed incorrectly when using different encodings.
 
 
 ## [1.3.1] - 2023-04-10
