@@ -33,7 +33,7 @@ jobs:
         run: |
           ./bin/catw.exe -h
           ./bin/catw.exe -v
-          ./bin/catw.exe -p ./bin/catw.exe
+          ./bin/catw.exe -p ./bin/catw.exe -d
       - name: Show and Push
         run: |
           git status
