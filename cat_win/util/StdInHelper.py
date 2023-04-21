@@ -151,7 +151,7 @@ def writeFiles(file_list: list, content: str, file_encoding: str) -> list:
             abort_command = input()
         except EOFError:
             pass
-        except UnicodeDecodeError:
+        except UnicodeError:
             print(f"Input is not recognized in the given encoding: {file_encoding}")
             abort_command = 'n'
         finally:
