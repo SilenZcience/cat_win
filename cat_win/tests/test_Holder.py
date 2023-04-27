@@ -17,6 +17,11 @@ holder = Holder()
 
 
 class TestHolder(TestCase):
+    def tearDown(self):
+        holder.args = []
+        for i in range(len(holder.args_id)):
+            holder.args_id[i] = False
+    
     def test__calcFileLineLengthPlaceHolder__(self):
         holder.setFiles([test_file_path])
         holder.__calcFileLineLengthPlaceHolder__()
@@ -97,3 +102,31 @@ class TestHolder(TestCase):
         self.assertEqual(holder._getFileDisplayName('TEMPFILEECHO'), '<ECHO>')
         self.assertEqual(holder._getFileDisplayName(test_file_edge_case_3), test_file_edge_case_3)
         self.assertEqual(holder._getFileDisplayName(test_file_edge_case_4), test_file_edge_case_4)
+        
+    def test_setDecodingTempFiles(self):
+        holder.setFiles([test_file_path] * 3)
+        self.assertListEqual(holder._inner_files, [test_file_path] * 3)
+        
+        holder.setDecodingTempFiles([test_file_empty] * 4)
+        self.assertListEqual(holder._inner_files, [test_file_empty] * 4)
+        
+    def test_addArgs(self):
+        holder.setArgs([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
+        holder.addArgs([(ARGS_NUMBER, 'x'), (ARGS_LLENGTH, 'b')])
+        self.assertListEqual(holder.args, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
+        self.assertEqual(holder.args_id.count(True), 2)
+        
+        holder.addArgs([(ARGS_TABS, 'c')])
+        self.assertListEqual(holder.args, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_TABS, 'c')])
+        self.assertEqual(holder.args_id.count(True), 3)
+        
+    def test_deleteArgs(self):
+        holder.setArgs([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
+        holder.deleteArgs([(ARGS_ENDS, 'a'), (ARGS_NUMBER, 'x')])
+        self.assertListEqual(holder.args, [(ARGS_LLENGTH, 'b')])
+        self.assertEqual(holder.args_id.count(True), 1)
+        
+        holder.deleteArgs([(ARGS_NUMBER, 'x'), (ARGS_LLENGTH, 'b')])
+        self.assertListEqual(holder.args, [])
+        self.assertEqual(holder.args_id.count(True), 0)
+        
