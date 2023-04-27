@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from cat_win.util.FileAttributes import _convert_size
+from cat_win.util.FileAttributes import _convert_size, getFileMetaData, getFileSize
 # import sys
 # sys.path.append('../cat_win')
 
@@ -35,3 +35,17 @@ class TestFileAttributes(TestCase):
         
     def test__convert_size_OutOfRange(self):
         self.assertEqual(_convert_size(1024*1024*1024*1024*1024*1024*1024*1024*1024), '1.0 ?')
+        
+    def test_getFileMetaData(self):
+        metaData = getFileMetaData(__file__, False)
+        self.assertIn('Size:', metaData)
+        self.assertIn('ATime:', metaData)
+        self.assertIn('MTime:', metaData)
+        self.assertIn('CTime:', metaData)
+        
+        metaData = getFileMetaData('randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|', False)
+        self.assertEqual(metaData, '')
+        
+    def test_getFileSize(self):
+        self.assertGreater(getFileSize(__file__), 0)
+        self.assertEqual(getFileSize('randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|'), 0)
