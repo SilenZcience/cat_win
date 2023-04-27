@@ -31,7 +31,8 @@ workingDir = os.path.dirname(os.path.realpath(__file__))
 coloramaInit()
 config = Config.Config(workingDir)
 
-color_dic = config.loadConfig()
+default_color_dic = config.loadConfig()
+color_dic = default_color_dic.copy()
 
 converter = Converter.Converter()
 holder = Holder.Holder()
@@ -640,13 +641,26 @@ def editFiles() -> None:
         copyToClipboard(removeAnsiCodesFromLine(holder.clipBoard))
 
 
+def initColors() -> None:
+    """
+    set the color dictionary to be used. either empty for no colors
+    or the default color dictionary.
+    """
+    # do not use colors if requested, or output will be piped anyways
+    global color_dic
+    if holder.args_id[ARGS_NOCOL] or (not sys.stdout.isatty() or sys.stdout.closed):
+        color_dic = dict.fromkeys(color_dic, '')
+    else:
+        color_dic = default_color_dic.copy()
+
+
 def init(shell: bool = False) -> tuple:
     """
     initiate the code by calling the argparser and handling the default
     parameters: -h, -v, -d, --config.
     
     Parameters:
-    contenshellt (bool):
+    shell (bool):
         indicates if the shell entry point was used, and the stdin will therefor
         be used by default
         
@@ -663,10 +677,7 @@ def init(shell: bool = False) -> tuple:
         sys.stdout.reconfigure(encoding=ArgParser.FILE_ENCODING)
         sys.stdin.reconfigure(encoding=ArgParser.FILE_ENCODING)
     
-    # do not use colors if requested, or output will be piped anyways
-    if holder.args_id[ARGS_NOCOL] or (not sys.stdout.isatty() or sys.stdout.closed):
-        global color_dic
-        color_dic = dict.fromkeys(color_dic,'')
+    initColors()   
     
     # check for special cases
     if holder.args_id[ARGS_DEBUG]:
@@ -747,12 +758,30 @@ def shell_main():
     shellPrefix = '>>> '
     EOFControlChar = 'Z' if on_windows_os else 'D'
     
-    print(__project__, 'v' + __version__, 'shell', '(' + __url__ + ')')
+    print(__project__, 'v' + __version__, 'shell', '(' + __url__ + ')', end='')
     print(f"Use 'catw' to handle files. Type ^{EOFControlChar} (Ctrl + {EOFControlChar}) to exit.")
+    print("Type '!add <OPTION>', '!del <OPTION>', '!see' to change/see the active parameters.")
     
     print(shellPrefix, end='', flush=True)
     for i, line in enumerate(StdInHelper.getStdInContent(holder.args_id[ARGS_ONELINE])):
-        editContent([('', line.rstrip('\n'))], False, -1, i)
+        strippedLine = line.rstrip('\n')
+        addCommand = strippedLine.startswith('!add ')
+        if addCommand or strippedLine.startswith('!del '):
+            args, _, _, _, _ = ArgParser.getArguments([''] + strippedLine[5:].split(' '))
+            if addCommand:
+                holder.addArgs(args)
+            else:
+                holder.deleteArgs(args)
+            initColors()
+            if holder.args_id[ARGS_DEBUG]:
+                print(f"successfully {'added' if addCommand else 'removed'} {[arg for _, arg in args]}")
+            _CalculateLinePrefixSpacing.cache_clear()
+            _CalculateLineLengthPrefixSpacing.cache_clear()
+        elif strippedLine == '!see':
+            print('currently active args:')
+            print([arg for _, arg in holder.args])
+        else:
+            editContent([('', strippedLine)], False, -1, i)
         if not holder.args_id[ARGS_ONELINE]:
             print(shellPrefix, end='', flush=True)
 

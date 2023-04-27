@@ -62,6 +62,18 @@ class Holder():
             self.args_id[ARGS_LLENGTH] = False
             self.args_id[ARGS_NUMBER] = False
         self.reversed = self.args_id[ARGS_REVERSE]
+        
+    def addArgs(self, args: list) -> None:
+        for arg in args:
+            if arg in self.args:
+                continue
+            self.args.append(arg)
+            self.args_id[arg[0]] = True
+        
+    def deleteArgs(self, args: list) -> None:
+        for arg in args:
+            self.args = [a for a in self.args if a[0] != arg[0]]
+            self.args_id[arg[0]] = False
 
     def setTempFileStdIn(self, file: str) -> None:
         self.temp_file_stdin = file
