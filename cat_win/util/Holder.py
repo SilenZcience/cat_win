@@ -65,7 +65,7 @@ class Holder():
         
     def addArgs(self, args: list) -> None:
         for arg in args:
-            if arg in self.args:
+            if self.args_id[arg[0]]:
                 continue
             self.args.append(arg)
             self.args_id[arg[0]] = True
