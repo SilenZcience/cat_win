@@ -1,11 +1,11 @@
 <div id="top"></div>
 
 <p>
-   <a href="https://pypi.org/project/cat-win/" alt="Downloads">
-      <img src="https://static.pepy.tech/personalized-badge/cat-win?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Downloads" align="right">
+   <a href="https://pepy.tech/project/cat-win/" alt="Downloads">
+      <img src="https://static.pepy.tech/personalized-badge/cat-win?period=total&units=international_system&left_color=grey&right_color=blue&left_text=Downloads" align="right">
    </a>
-   <a href="https://pepy.tech/project/cat-win/" alt="Visitors">
-      <img src="https://visitor-badge.laobi.icu/badge?page_id=SilenZcience.cat_win" align="right">
+   <a href="https://pypi.org/project/cat-win/" alt="Visitors">
+      <img src="https://visitor-badge.laobi.icu/badge?page_id=SilenZcience.cat_win&right_color=orange" align="right">
    </a>
    <a href="https://github.com/SilenZcience/cat_win/tree/main/cat_win" alt="CodeSize">
       <img src="https://img.shields.io/github/languages/code-size/SilenZcience/cat_win?color=purple" align="right">
