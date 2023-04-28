@@ -41,13 +41,16 @@ tmpFileHelper = TmpFileHelper.TmpFileHelper()
 on_windows_os = (system() == 'Windows')
 
 def exception_handler(exception_type: type, exception, traceback, debug_hook=sys.excepthook) -> None:
-    print(color_dic[C_KW.RESET_ALL])
-    if holder.args_id[ARGS_DEBUG]:
+    try:
+        print(color_dic[C_KW.RESET_ALL])
+        if holder.args_id[ARGS_DEBUG]:
+            debug_hook(exception_type, exception, traceback)
+            return
+        print(f"\n{exception_type.__name__}{':' * bool(str(exception))} {exception}")
+        if exception_type != KeyboardInterrupt:
+            print(f"If this Exception is unexpected, please raise an official Issue at:\n{__url__}/issues")
+    except:
         debug_hook(exception_type, exception, traceback)
-        return
-    print(f"\n{exception_type.__name__}{':' * bool(str(exception))} {exception}")
-    if exception_type != KeyboardInterrupt:
-        print(f"If this Exception is unexpected, please raise an official Issue at:\n{__url__}/issues")
 
 
 sys.excepthook = exception_handler
