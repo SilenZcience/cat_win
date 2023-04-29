@@ -1,8 +1,8 @@
-from io import StringIO
 from unittest.mock import patch
 from unittest import TestCase
 import os
 
+from cat_win.tests.mocks.std import *
 import cat_win.cat as cat
 import cat_win.util.ArgParser as ArgParser
 
@@ -18,20 +18,7 @@ test_result_C   = os.path.join(test_file_dir, 'full_test_result_C.txt')
 test_result_D   = os.path.join(test_file_dir, 'full_test_result_D.txt')
 
 
-class StdOutMock(StringIO):
-    def reconfigure(self, encoding = None) -> None:
-        return
 
-    def fileno(self) -> int:
-        return 0
-    
-# class StdInMock(DontReadFromInput):
-class StdInMock:
-    def reconfigure(self, encoding = None) -> None:
-        return
-    
-    def readline(self) -> str:
-        return ''
 
 
 @patch('cat_win.cat.sys.stdin', StdInMock())
