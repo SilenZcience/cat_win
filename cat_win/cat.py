@@ -777,10 +777,11 @@ def shell_main():
         strippedLine = line.rstrip('\n')
         addCommand = strippedLine.startswith('!add ')
         if addCommand or strippedLine.startswith('!del '):
-            args, _, _, _, _ = ArgParser.getArguments([''] + strippedLine[5:].split(' '))
             if addCommand:
+                args, _, _, _, _ = ArgParser.getArguments([''] + strippedLine[5:].split(' '))
                 holder.addArgs(args)
             else:
+                args, _, _, _, _ = ArgParser.getArguments([''] + strippedLine[5:].split(' '), True)
                 holder.deleteArgs(args)
             initColors()
             if holder.args_id[ARGS_DEBUG]:
@@ -788,8 +789,11 @@ def shell_main():
             _CalculateLinePrefixSpacing.cache_clear()
             _CalculateLineLengthPrefixSpacing.cache_clear()
         elif strippedLine == '!see':
-            print('currently active args:')
-            print([arg for _, arg in holder.args])
+            print(f"{'Active Args:':<12} {[arg for _, arg in holder.args]}")
+            if ArgParser.FILE_SEARCH:
+                print(f"{'Literals:':<12} {ArgParser.FILE_SEARCH}")
+            if ArgParser.FILE_MATCH:
+                print(f"{'Matches:':<12} {ArgParser.FILE_MATCH}")
         else:
             editContent([('', strippedLine)], False, -1, i)
         if not holder.args_id[ARGS_ONELINE]:

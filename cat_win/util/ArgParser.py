@@ -11,7 +11,7 @@ FILE_MATCH = []
 FILE_TRUNCATE = [None, None, None]
 
 
-def __addArgument__(args: list, unknown_args: list, known_files: list, unknown_files: list, param: str) -> bool:
+def __addArgument__(args: list, unknown_args: list, known_files: list, unknown_files: list, param: str, delete: bool = False) -> bool:
     """
     sorts an argument to either list option, by appending to it.
     
@@ -26,6 +26,9 @@ def __addArgument__(args: list, unknown_args: list, known_files: list, unknown_f
         all unknown files
     param (str):
         the current parameter
+    delete (bool):
+        indicates if a parameter should be deleted or added. Needed for
+        the shell when changing FILE_SEARCH, FILE_MATCH
         
     Returns:
     (bool):
@@ -40,11 +43,17 @@ def __addArgument__(args: list, unknown_args: list, known_files: list, unknown_f
     # 'match' + ('=' or ':') + FILE_MATCH
     elif match(r"\Amatch[\=\:].+\Z", param):
         global FILE_MATCH
+        if delete:
+            FILE_MATCH = [match for match in FILE_MATCH if match != param[6:]]
+            return False
         FILE_MATCH.append(fr'{param[6:]}')
         return False
     # 'find' + ('=' or ':') + FILE_SEARCH
     elif match(r"\Afind[\=\:].+\Z", param):
         global FILE_SEARCH
+        if delete:
+            FILE_SEARCH = [search for search in FILE_SEARCH if search != param[5:]]
+            return False
         FILE_SEARCH.append(param[5:])
         return False
     # 'trunc' + ('=' or ':') + FILE_TRUNCATE[0] + ':' + FILE_TRUNCATE[1] + ':' + FILE_TRUNCATE[2]
@@ -96,7 +105,7 @@ def __addArgument__(args: list, unknown_args: list, known_files: list, unknown_f
     return False
 
 
-def getArguments(argv: list) -> tuple:
+def getArguments(argv: list, delete: bool = False) -> tuple:
     """
     Read all args to either a valid parameter, an invalid parameter,
     a known file, an unknown file, or an echo parameter to print out.
@@ -104,6 +113,9 @@ def getArguments(argv: list) -> tuple:
     Parameters:
     argv (list):
         the entire sys.argv list
+    delete (bool):
+        indicates if a parameter should be deleted or added. Needed for
+        the shell when changing FILE_SEARCH, FILE_MATCH
     
     Returns:
     (args, unknown_args, known_files, unknown_files, echo_args) (tuple):
@@ -123,6 +135,6 @@ def getArguments(argv: list) -> tuple:
         if echoCall:
             echo_args.append(arg)
             continue
-        echoCall = __addArgument__(args, unknown_args, known_files, unknown_files, arg)
+        echoCall = __addArgument__(args, unknown_args, known_files, unknown_files, arg, delete)
 
     return (args, unknown_args, known_files, unknown_files, echo_args)
