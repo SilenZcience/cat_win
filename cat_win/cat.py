@@ -66,8 +66,8 @@ def _showHelp() -> None:
         if arg.showArg:
             helpMessage += f"\t{f'{arg.shortForm}, {arg.longForm}': <25}{arg.help}\n"
     helpMessage += '\n'
-    helpMessage += f"\t{'-R, --R<stream>': <25}reconfigure the stream(s) with the parsed encoding\n"
-    helpMessage += "\t<stream> == 'in'/'out'/'err'\n"
+    helpMessage += f"\t{'-R, --R<stream>': <25}reconfigure the std-stream(s) with the parsed encoding\n"
+    helpMessage += "\t<stream> == 'in'/'out'/'err' (default is stdin & stdout)\n"
     helpMessage += '\n'
     helpMessage += f"\t{'enc=X, enc:X'    : <25}set file encoding to X (default is utf-8)\n"
     helpMessage += f"\t{'find=X, find:X'  : <25}find/query a substring X in the given files\n"
