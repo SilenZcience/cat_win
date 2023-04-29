@@ -164,7 +164,7 @@ catw --help
 | *--nk, --nokeyword*    | inverse the grep output                                   |
 | *--config, --config*   | change color configuration                                |
 |                        |                                                           |
-| *-R, --R\<stream\>*    | reconfigure the stream(s) with the parsed encoding </br> \<stream\> = 'in'/'out'/'err'         |
+| *-R, --R\<stream\>*    | reconfigure the std-stream(s) with the parsed encoding </br> \<stream\> = 'in'/'out'/'err' (default is stdin & stdout)|
 |                        |                                                           |
 | *enc=X*                | set file enconding to X (default is utf-8)                |
 | *find=X*               | find/query a substring X in the given files               |
