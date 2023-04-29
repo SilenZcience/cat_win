@@ -62,8 +62,12 @@ def _showHelp() -> None:
     """
     helpMessage = 'Usage: catw [FILE]... [OPTION]...\n'
     helpMessage += 'Concatenate FILE(s) to standard output.\n\n'
-    for x in ALL_ARGS:
-        helpMessage += f"\t{f'{x.shortForm}, {x.longForm}': <25}{x.help}\n"
+    for arg in ALL_ARGS:
+        if arg.showArg:
+            helpMessage += f"\t{f'{arg.shortForm}, {arg.longForm}': <25}{arg.help}\n"
+    helpMessage += '\n'
+    helpMessage += f"\t{'-R, --R<stream>': <25}reconfigure the stream(s) with the parsed encoding\n"
+    helpMessage += "\t<stream> == 'in'/'out'/'err'\n"
     helpMessage += '\n'
     helpMessage += f"\t{'enc=X, enc:X'    : <25}set file encoding to X (default is utf-8)\n"
     helpMessage += f"\t{'find=X, find:X'  : <25}find/query a substring X in the given files\n"
@@ -676,9 +680,12 @@ def init(shell: bool = False) -> tuple:
 
     holder.setArgs(args)
 
-    if holder.args_id[ARGS_RECONFIGURE]:
-        sys.stdout.reconfigure(encoding=ArgParser.FILE_ENCODING)
+    if holder.args_id[ARGS_RECONFIGURE] or holder.args_id[ARGS_RECONFIGURE_IN]:
         sys.stdin.reconfigure(encoding=ArgParser.FILE_ENCODING)
+    if holder.args_id[ARGS_RECONFIGURE] or holder.args_id[ARGS_RECONFIGURE_OUT]:
+        sys.stdout.reconfigure(encoding=ArgParser.FILE_ENCODING)
+    if holder.args_id[ARGS_RECONFIGURE_ERR]:
+        sys.stderr.reconfigure(encoding=ArgParser.FILE_ENCODING)
     
     initColors()   
     

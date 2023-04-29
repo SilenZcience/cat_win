@@ -7,6 +7,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ### Minor Changes
 
+- renamed -`R`, --`reconfigure` to -`R`, --`R`
+- added --`Rin`, --`Rout`, --`Rerr` parameters to specificly reconfigure the stdin, stdout or stderr stream to the given encoding.
 - added `!see` command to the cat-shell (cats) in order to see the currently active parameters within one shell session.
 - added `!add <OPTION>` and `!del <OPTION>` command to the cat-shell (cats) in order to change the parameters within one shell session.
 

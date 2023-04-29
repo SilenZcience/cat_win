@@ -162,8 +162,9 @@ catw --help
 | *--nc, --nocolor*      | disable colored output                                    |
 | *--nb, --nobreak*      | do not interrupt the output on queried keywords           |
 | *--nk, --nokeyword*    | inverse the grep output                                   |
-| *-R, --reconfigure*    | reconfigure the stdin and stdout with the parsed encoding |
 | *--config, --config*   | change color configuration                                |
+|                        |                                                           |
+| *-R, --R\<stream\>*    | reconfigure the stream(s) with the parsed encoding </br> \<stream\> = 'in'/'out'/'err'         |
 |                        |                                                           |
 | *enc=X*                | set file enconding to X (default is utf-8)                |
 | *find=X*               | find/query a substring X in the given files               |
