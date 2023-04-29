@@ -19,7 +19,7 @@ ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN, ARGS_RECONFIGURE_OUT, ARG
 
 ALL_ARGS = [ArgConstant('-h', '--help', 'show this help message and exit', ARGS_HELP),
             ArgConstant('-v', '--version', 'output version information and exit', ARGS_VERSION),
-            ArgConstant('-d', '--debug', 'show debug information', ARGS_DEBUG),
+            ArgConstant('--debug', '--debug', 'show debug information', ARGS_DEBUG, False),
             ArgConstant('-n', '--number', 'number all output lines', ARGS_NUMBER),
             ArgConstant('-l', '--linelength', 'display the length of each line', ARGS_LLENGTH),
             ArgConstant('-e', '--ends', 'display $ at the end of each line', ARGS_ENDS),
