@@ -767,13 +767,14 @@ def shell_main():
     
     shellPrefix = '>>> '
     EOFControlChar = 'Z' if on_windows_os else 'D'
+    oneline = holder.args_id[ARGS_ONELINE]
     
     print(__project__, 'v' + __version__, 'shell', '(' + __url__ + ')', end='')
     print(f"Use 'catw' to handle files. Type ^{EOFControlChar} (Ctrl + {EOFControlChar}) to exit.")
     print("Type '!add <OPTION>', '!del <OPTION>', '!see' to change/see the active parameters.")
     
     print(shellPrefix, end='', flush=True)
-    for i, line in enumerate(StdInHelper.getStdInContent(holder.args_id[ARGS_ONELINE])):
+    for i, line in enumerate(StdInHelper.getStdInContent(oneline)):
         strippedLine = line.rstrip('\n')
         addCommand = strippedLine.startswith('!add ')
         if addCommand or strippedLine.startswith('!del '):
@@ -796,7 +797,7 @@ def shell_main():
                 print(f"{'Matches:':<12} {ArgParser.FILE_MATCH}")
         else:
             editContent([('', strippedLine)], False, -1, i)
-        if not holder.args_id[ARGS_ONELINE]:
+        if not oneline:
             print(shellPrefix, end='', flush=True)
 
 
