@@ -13,6 +13,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added `!see` command to the cat-shell (cats) in order to see the currently active parameters within one shell session.
 - added `!add <OPTION>` and `!del <OPTION>` command to the cat-shell (cats) in order to change the parameters within one shell session.
 
+### Bugfixes
+
+- fix Bug where `match=` and `find=` would display the wrong indices.
+
 
 ## [1.4.0] - 2023-04-21
 

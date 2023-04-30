@@ -107,12 +107,12 @@ class StringFinder:
 
         for keyword in self.kw_literals:
             for f in self._findliterals(keyword, line):
-                found_position.append(f)
+                found_position.append(f[:])
                 found_list.append((keyword, f))
 
         for keyword in self.kw_regex:
             for m in self._findregex(keyword, line):
-                matched_position.append(m)
+                matched_position.append(m[:])
                 matched_list.append((keyword, m))
 
         return (self._mergeKeywordIntervals(found_position, matched_position), found_list, matched_list)
