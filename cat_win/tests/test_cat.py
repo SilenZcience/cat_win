@@ -48,7 +48,7 @@ class TestCat(TestCase):
 
     def test_cat_output_reverse(self):
         holder.setFiles([test_file_path])
-        holder.setArgs([[5, '']]) #reverse
+        holder.setArgs([(5, '')]) #reverse
 
         check_against = test_file_content
         check_against.reverse()
@@ -60,7 +60,7 @@ class TestCat(TestCase):
 
     def test_cat_output_ends_and_tabs(self):
         holder.setFiles([test_file_path])
-        holder.setArgs([[2, ''], [3, '']]) #ends & tabs
+        holder.setArgs([(2, ''), (3, '')]) #ends & tabs
 
         check_against = ('\n'.join([c.replace('\t', '^I') + '$' for c in test_file_content]) +
                          '\n')
