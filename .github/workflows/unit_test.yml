@@ -34,7 +34,6 @@ jobs:
           cache: 'pip'
       - name: Setup Test Dependencies
         run: |
-          python -m pip install --upgrade pip
           python -m pip install --upgrade -r ./workflowHelper/requirements.txt
       - name: Start UnitTests
         run: |
