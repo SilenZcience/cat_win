@@ -134,7 +134,7 @@ def _showCount() -> None:
     """
     display the line sum of each file individually if
     ARGS_CCOUNT is specified.
-    display the line sum of all files
+    display the line sum of all files.
     """
     if holder.args_id[ARGS_CCOUNT]:
         longestFileName = max(map(len, holder.allFilesLines.keys())) + 1
@@ -794,34 +794,34 @@ def shell_main():
             if cmd[:1] != '!':
                 return False
             lineSplit = cmd[1:].split(' ')
-            method = getattr(self, '_command_' + lineSplit[0], lambda: False)
+            method = getattr(self, '_command_' + lineSplit[0], lambda _: False)
             method(lineSplit[1:])
             return True
         
-        def _command_help(self, cmd: str) -> None:
+        def _command_help(self, cmd: list) -> None:
             print(f"Type ^{EOFControlChar} (Ctrl + {EOFControlChar}) or '!exit' to exit.")
             print("Type '!add <OPTION>', '!del <OPTION>', '!see' to change/see the active parameters.")
             
-        def _command_add(self, cmd: str) -> None:
+        def _command_add(self, cmd: list) -> None:
             args, _, _, _, _ = ArgParser.getArguments([''] + cmd)
             holder.addArgs(args)
             self.execColors()
             print(f"successfully added {[arg for _, arg in args]}")
             
-        def _command_del(self, cmd: str) -> None:
+        def _command_del(self, cmd: list) -> None:
             args, _, _, _, _ = ArgParser.getArguments([''] + cmd, True)
             holder.deleteArgs(args)
             self.execColors()
             print(f"successfully removed {[arg for _, arg in args]}")
             
-        def _command_see(self, cmd: str) -> None:
+        def _command_see(self, cmd: list) -> None:
             print(f"{'Active Args:': <12} {[arg for _, arg in holder.args]}")
             if ArgParser.FILE_SEARCH:
                 print(f"{'Literals:':<12} {ArgParser.FILE_SEARCH}")
             if ArgParser.FILE_MATCH:
                 print(f"{'Matches:': <12} {ArgParser.FILE_MATCH}")
                 
-        def _command_exit(self, cmd: str) -> None:
+        def _command_exit(self, cmd: list) -> None:
             self.exitShell = True
     
     
