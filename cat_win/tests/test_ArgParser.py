@@ -148,3 +148,16 @@ class TestArgParser(TestCase):
         args = list(map(lambda x: x[1], args))
         self.assertCountEqual(args, ['-n', '-E'])
         self.assertEqual(echo, True)
+        
+    def test_deleteQueried(self):
+        ArgParser.__addArgument__([], [], [], [], 'find=hello')
+        ArgParser.__addArgument__([], [], [], [], 'find=world')
+        self.assertListEqual(ArgParser.FILE_SEARCH, ['hello', 'world'])
+        ArgParser.__addArgument__([], [], [], [], 'find=hello', True)
+        self.assertListEqual(ArgParser.FILE_SEARCH, ['world'])
+        
+        ArgParser.__addArgument__([], [], [], [], 'match=[a-z]')
+        ArgParser.__addArgument__([], [], [], [], 'match=[0-9]')
+        self.assertListEqual(ArgParser.FILE_MATCH, ['[a-z]', '[0-9]'])
+        ArgParser.__addArgument__([], [], [], [], 'match=[0-9]', True)
+        self.assertListEqual(ArgParser.FILE_MATCH, ['[a-z]'])
