@@ -57,4 +57,4 @@ jobs:
           sudo apt install wl-clipboard
       - name: Test Clipboard Ability
         run: |
-          catw -pn **/r*.txt --clip -d
+          catw -pn **/r*.txt --clip --debug
