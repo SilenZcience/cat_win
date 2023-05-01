@@ -220,7 +220,7 @@ def removeAnsiCodesFromLine(line: str) -> str:
     line (str):
         the string to clean ANSI-Colorcodes from
         
-    Returns
+    Returns:
     (str):
         the cleaned string
     """
@@ -332,7 +332,7 @@ def printFile(content: list) -> bool:
     content (list):
         the content of a file like [(prefix, line), ...]
         
-    Returns
+    Returns:
     (bool):
         identifies if the given content parameter contained any
         queried keyword/pattern.
@@ -671,7 +671,7 @@ def init(shell: bool = False) -> tuple:
         indicates if the shell entry point was used, and the stdin will therefor
         be used by default
         
-    Returns
+    Returns:
     (tuple):
         contains (known_files, unknown_files, echo_args) from the argparser
     """
@@ -769,38 +769,74 @@ def shell_main():
     EOFControlChar = 'Z' if on_windows_os else 'D'
     oneline = holder.args_id[ARGS_ONELINE]
     
-    print(__project__, 'v' + __version__, 'shell', '(' + __url__ + ')', end=' - ')
-    print(f"Use 'catw' to handle files.")
-    print("Type '!help' for more information.")
-    
-    
-    print(shellPrefix, end='', flush=True)
-    for i, line in enumerate(StdInHelper.getStdInContent(oneline)):
-        strippedLine = line.rstrip('\n')
-        addCommand = strippedLine.startswith('!add ')
-        if addCommand or strippedLine.startswith('!del '):
-            if addCommand:
-                args, _, _, _, _ = ArgParser.getArguments([''] + strippedLine[5:].split(' '))
-                holder.addArgs(args)
-            else:
-                args, _, _, _, _ = ArgParser.getArguments([''] + strippedLine[5:].split(' '), True)
-                holder.deleteArgs(args)
+    class CmdExec:
+        exitShell = False
+        
+        def execColors(self) -> None:
             initColors()
-            if holder.args_id[ARGS_DEBUG]:
-                print(f"successfully {'added' if addCommand else 'removed'} {[arg for _, arg in args]}")
             _CalculateLinePrefixSpacing.cache_clear()
             _CalculateLineLengthPrefixSpacing.cache_clear()
-        elif strippedLine == '!see':
+        
+        def exec(self, cmd: str) -> bool:
+            """
+            check if a shell line is an executable command,
+            executes it if it is.
+            
+            Parameters:
+            cmd (str):
+                the line entered in the cat shell
+                
+            Returns:
+            (bool):
+                indicates if a valid command has been found
+                and executed
+            """
+            if cmd[:1] != '!':
+                return False
+            lineSplit = cmd[1:].split(' ')
+            method = getattr(self, '_command_' + lineSplit[0], lambda: False)
+            method(lineSplit[1:])
+            return True
+        
+        def _command_help(self, cmd: str) -> None:
+            print(f"Type ^{EOFControlChar} (Ctrl + {EOFControlChar}) or '!exit' to exit.")
+            print("Type '!add <OPTION>', '!del <OPTION>', '!see' to change/see the active parameters.")
+            
+        def _command_add(self, cmd: str) -> None:
+            args, _, _, _, _ = ArgParser.getArguments([''] + cmd)
+            holder.addArgs(args)
+            self.execColors()
+            print(f"successfully added {[arg for _, arg in args]}")
+            
+        def _command_del(self, cmd: str) -> None:
+            args, _, _, _, _ = ArgParser.getArguments([''] + cmd, True)
+            holder.deleteArgs(args)
+            self.execColors()
+            print(f"successfully removed {[arg for _, arg in args]}")
+            
+        def _command_see(self, cmd: str) -> None:
             print(f"{'Active Args:': <12} {[arg for _, arg in holder.args]}")
             if ArgParser.FILE_SEARCH:
                 print(f"{'Literals:':<12} {ArgParser.FILE_SEARCH}")
             if ArgParser.FILE_MATCH:
                 print(f"{'Matches:': <12} {ArgParser.FILE_MATCH}")
-        elif strippedLine == '!exit':
-            break
-        elif strippedLine == '!help':
-            print(f"Type ^{EOFControlChar} (Ctrl + {EOFControlChar}) or '!exit' to exit.")
-            print("Type '!add <OPTION>', '!del <OPTION>', '!see' to change/see the active parameters.")
+                
+        def _command_exit(self, cmd: str) -> None:
+            self.exitShell = True
+    
+    
+    cmd = CmdExec()
+    
+    print(__project__, 'v' + __version__, 'shell', '(' + __url__ + ')', end=' - ')
+    print(f"Use 'catw' to handle files.")
+    print("Type '!help' for more information.")
+    
+    print(shellPrefix, end='', flush=True)
+    for i, line in enumerate(StdInHelper.getStdInContent(oneline)):
+        strippedLine = line.rstrip('\n')
+        if cmd.exec(strippedLine):
+            if cmd.exitShell:
+                break
         else:
             editContent([('', strippedLine)], False, -1, i)
         if not oneline:
