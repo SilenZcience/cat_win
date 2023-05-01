@@ -691,7 +691,7 @@ def init(shell: bool = False) -> tuple:
     
     # check for special cases
     if holder.args_id[ARGS_DEBUG]:
-        _showDebug(args, unknown_args, known_files, unknown_files, echo_args)
+        _showDebug(holder.args, unknown_args, known_files, unknown_files, echo_args)
     if (len(known_files) + len(unknown_files) + len(holder.args) == 0 and not shell) or holder.args_id[ARGS_HELP]:
         _showHelp()
         sys.exit(0)
@@ -769,9 +769,10 @@ def shell_main():
     EOFControlChar = 'Z' if on_windows_os else 'D'
     oneline = holder.args_id[ARGS_ONELINE]
     
-    print(__project__, 'v' + __version__, 'shell', '(' + __url__ + ')', end='')
-    print(f"Use 'catw' to handle files. Type ^{EOFControlChar} (Ctrl + {EOFControlChar}) to exit.")
-    print("Type '!add <OPTION>', '!del <OPTION>', '!see' to change/see the active parameters.")
+    print(__project__, 'v' + __version__, 'shell', '(' + __url__ + ')', end=' - ')
+    print(f"Use 'catw' to handle files.")
+    print("Type '!help' for more information.")
+    
     
     print(shellPrefix, end='', flush=True)
     for i, line in enumerate(StdInHelper.getStdInContent(oneline)):
@@ -790,11 +791,16 @@ def shell_main():
             _CalculateLinePrefixSpacing.cache_clear()
             _CalculateLineLengthPrefixSpacing.cache_clear()
         elif strippedLine == '!see':
-            print(f"{'Active Args:':<12} {[arg for _, arg in holder.args]}")
+            print(f"{'Active Args:': <12} {[arg for _, arg in holder.args]}")
             if ArgParser.FILE_SEARCH:
                 print(f"{'Literals:':<12} {ArgParser.FILE_SEARCH}")
             if ArgParser.FILE_MATCH:
-                print(f"{'Matches:':<12} {ArgParser.FILE_MATCH}")
+                print(f"{'Matches:': <12} {ArgParser.FILE_MATCH}")
+        elif strippedLine == '!exit':
+            break
+        elif strippedLine == '!help':
+            print(f"Type ^{EOFControlChar} (Ctrl + {EOFControlChar}) or '!exit' to exit.")
+            print("Type '!add <OPTION>', '!del <OPTION>', '!see' to change/see the active parameters.")
         else:
             editContent([('', strippedLine)], False, -1, i)
         if not oneline:
