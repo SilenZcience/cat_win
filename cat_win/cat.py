@@ -806,13 +806,13 @@ def shell_main():
             args, _, _, _, _ = ArgParser.getArguments([''] + cmd)
             holder.addArgs(args)
             self.execColors()
-            print(f"successfully added {[arg for _, arg in args]}")
+            print(f"successfully added {[arg for _, arg in args] if args else 'parameters'}.")
             
         def _command_del(self, cmd: list) -> None:
             args, _, _, _, _ = ArgParser.getArguments([''] + cmd, True)
             holder.deleteArgs(args)
             self.execColors()
-            print(f"successfully removed {[arg for _, arg in args]}")
+            print(f"successfully removed {[arg for _, arg in args] if args else 'parameters'}.")
             
         def _command_see(self, cmd: list) -> None:
             print(f"{'Active Args:': <12} {[arg for _, arg in holder.args]}")
@@ -838,6 +838,7 @@ def shell_main():
             if cmd.exitShell:
                 break
         else:
+            strippedLine = strippedLine[:1].replace('\\', '') + strippedLine[1:]
             editContent([('', strippedLine)], False, -1, i)
         if not oneline:
             print(shellPrefix, end='', flush=True)
