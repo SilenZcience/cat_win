@@ -6,8 +6,8 @@ from cat_win.const.ArgConstants import *
 
 
 FILE_ENCODING: str = 'utf-8'
-FILE_SEARCH = []
-FILE_MATCH = []
+FILE_SEARCH = set()
+FILE_MATCH  = set()
 FILE_TRUNCATE = [None, None, None]
 
 
@@ -44,17 +44,17 @@ def __addArgument__(args: list, unknown_args: list, known_files: list, unknown_f
     elif match(r"\Amatch[\=\:].+\Z", param):
         global FILE_MATCH
         if delete:
-            FILE_MATCH = [match for match in FILE_MATCH if match != param[6:]]
+            FILE_MATCH.discard(param[6:])
             return False
-        FILE_MATCH.append(fr'{param[6:]}')
+        FILE_MATCH.add(fr'{param[6:]}')
         return False
     # 'find' + ('=' or ':') + FILE_SEARCH
     elif match(r"\Afind[\=\:].+\Z", param):
         global FILE_SEARCH
         if delete:
-            FILE_SEARCH = [search for search in FILE_SEARCH if search != param[5:]]
+            FILE_SEARCH.discard(param[5:])
             return False
-        FILE_SEARCH.append(param[5:])
+        FILE_SEARCH.add(param[5:])
         return False
     # 'trunc' + ('=' or ':') + FILE_TRUNCATE[0] + ':' + FILE_TRUNCATE[1] + ':' + FILE_TRUNCATE[2]
     elif match(r"\Atrunc[\=\:][0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\Z", param):

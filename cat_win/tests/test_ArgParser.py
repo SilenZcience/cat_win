@@ -16,8 +16,8 @@ class TestArgParser(TestCase):
     
     def tearDown(self):
         ArgParser.FILE_ENCODING = 'utf-8'
-        ArgParser.FILE_MATCH = []
-        ArgParser.FILE_SEARCH = []
+        ArgParser.FILE_MATCH  = set()
+        ArgParser.FILE_SEARCH = set()
         ArgParser.FILE_TRUNCATE = [None, None, None]
         
     def test_getArguments_empty(self):
@@ -72,15 +72,15 @@ class TestArgParser(TestCase):
         
     def test_getArguments_match(self):
         ArgParser.getArguments(['CAT', 'match:\\Atest\\Z'])
-        self.assertCountEqual(ArgParser.FILE_MATCH, ['\\Atest\\Z'])
+        self.assertCountEqual(ArgParser.FILE_MATCH, set(['\\Atest\\Z']))
         ArgParser.getArguments(['CAT', 'match=\\Atest\\Z'])
-        self.assertCountEqual(ArgParser.FILE_MATCH, ['\\Atest\\Z'] * 2)
+        self.assertCountEqual(ArgParser.FILE_MATCH, set(['\\Atest\\Z']))
         
     def test_getArguments_find(self):
         ArgParser.getArguments(['CAT', 'find=Test123'])
-        self.assertCountEqual(ArgParser.FILE_SEARCH, ['Test123'])
+        self.assertCountEqual(ArgParser.FILE_SEARCH, set(['Test123']))
         ArgParser.getArguments(['CAT', 'find:Test123'])
-        self.assertCountEqual(ArgParser.FILE_SEARCH, ['Test123'] * 2)
+        self.assertCountEqual(ArgParser.FILE_SEARCH, set(['Test123']))
         
     def test_getArguments_trunc(self):
         ArgParser.getArguments(['CAT', 'trunc=0:'])
@@ -152,12 +152,12 @@ class TestArgParser(TestCase):
     def test_deleteQueried(self):
         ArgParser.__addArgument__([], [], [], [], 'find=hello')
         ArgParser.__addArgument__([], [], [], [], 'find=world')
-        self.assertListEqual(ArgParser.FILE_SEARCH, ['hello', 'world'])
+        self.assertSetEqual(ArgParser.FILE_SEARCH, set(['hello', 'world']))
         ArgParser.__addArgument__([], [], [], [], 'find=hello', True)
-        self.assertListEqual(ArgParser.FILE_SEARCH, ['world'])
+        self.assertSetEqual(ArgParser.FILE_SEARCH, set(['world']))
         
         ArgParser.__addArgument__([], [], [], [], 'match=[a-z]')
         ArgParser.__addArgument__([], [], [], [], 'match=[0-9]')
-        self.assertListEqual(ArgParser.FILE_MATCH, ['[a-z]', '[0-9]'])
+        self.assertSetEqual(ArgParser.FILE_MATCH, set(['[a-z]', '[0-9]']))
         ArgParser.__addArgument__([], [], [], [], 'match=[0-9]', True)
-        self.assertListEqual(ArgParser.FILE_MATCH, ['[a-z]'])
+        self.assertSetEqual(ArgParser.FILE_MATCH, set(['[a-z]']))
