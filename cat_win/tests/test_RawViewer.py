@@ -77,3 +77,10 @@ class TestRawViewer(TestCase):
 *000000B0! 20 61 20 44 75 70 6C 69 63 61 74 65 21          *#!   a   D u p l i c a t e !"""
     
         self.assertEqual('\n'.join(getRawViewLinesGen(test_file_path, 'X', ['*', '!'])), expected_result)
+        
+    def testEncodingError(self):
+        result = '\n'.join(getRawViewLinesGen(test_file_path, 'X', None, 'utf-16'))
+        
+        self.assertNotIn('␍', result)
+        self.assertNotIn('␤', result)
+        self.assertIn('·', result)
