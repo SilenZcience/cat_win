@@ -10,6 +10,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 - renamed -`d`, --`debug` to --`debug`, --`debug` and hid it from the help menu.
 - renamed -`R`, --`reconfigure` to -`R`, --`R`
 - added --`Rin`, --`Rout`, --`Rerr` parameters to specificly reconfigure the stdin, stdout or stderr stream to the given encoding.
+- added `!help` command to the cat-shell (cats) in order to see a short help display explaining all other parameters
+- added `!exit` command to the cat-shell (cats) in order to exit shell
 - added `!see` command to the cat-shell (cats) in order to see the currently active parameters within one shell session.
 - added `!add <OPTION>` and `!del <OPTION>` command to the cat-shell (cats) in order to change the parameters within one shell session.
 
