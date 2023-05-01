@@ -29,8 +29,8 @@ class TestCatFull(TestCase):
         cat._CalculateLinePrefixSpacing.cache_clear()
         cat._CalculateLineLengthPrefixSpacing.cache_clear()
         ArgParser.FILE_ENCODING = 'utf-8'
-        ArgParser.FILE_SEARCH = []
-        ArgParser.FILE_MATCH = []
+        ArgParser.FILE_SEARCH = set()
+        ArgParser.FILE_MATCH  = set()
         ArgParser.FILE_TRUNCATE = [None, None, None]
         for i in range(len(cat.holder.args_id)):
             cat.holder.args_id[i] = False
