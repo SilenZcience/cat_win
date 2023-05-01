@@ -1,8 +1,8 @@
-from io import StringIO
 from unittest import TestCase
 from unittest.mock import patch
 import os
 
+from cat_win.tests.mocks.std import StdOutMock
 from cat_win.util.Holder import Holder
 import cat_win.cat as cat
 # import sys
@@ -32,7 +32,7 @@ class TestCat(TestCase):
         
         check_against = '\n'.join(test_file_content) + '\n'
 
-        with patch('sys.stdout', new=StringIO()) as fake_out:
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.editFiles()
             self.assertEqual(fake_out.getvalue(), check_against)
 
@@ -42,7 +42,7 @@ class TestCat(TestCase):
 
         check_against = '\n'.join(test_file_content * 3) + '\n'
 
-        with patch('sys.stdout', new=StringIO()) as fake_out:
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.editFiles()
             self.assertEqual(fake_out.getvalue(), check_against)
 
@@ -54,7 +54,7 @@ class TestCat(TestCase):
         check_against.reverse()
         check_against = '\n'.join(check_against) + '\n'
 
-        with patch('sys.stdout', new=StringIO()) as fake_out:
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.editFiles()
             self.assertEqual(fake_out.getvalue(), check_against)
 
@@ -65,7 +65,7 @@ class TestCat(TestCase):
         check_against = ('\n'.join([c.replace('\t', '^I') + '$' for c in test_file_content]) +
                          '\n')
 
-        with patch('sys.stdout', new=StringIO()) as fake_out:
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.editFiles()
             self.assertEqual(fake_out.getvalue(), check_against)
             
@@ -136,11 +136,31 @@ class TestCat(TestCase):
         expected_output = 'abcdefghijklmnopqr'
         self.assertEqual(cat.removeAnsiCodesFromLine(random_string), expected_output)
 
-    # def test_removeAnsiCodes(self):
-    #     red_bold_underlined = '\x1b[31;1;4m'
-    #     reset = '\x1b[0m'
-    #     random_list = [(f"12{red_bold_underlined}34{reset}5', f'abc{red_bold_underlined}defghij{reset}klmnopq{red_bold_underlined}r{reset}")]
-    #     expected_output = [('12345', 'abcdefghijklmnopqr')]
-    #     self.assertEqual(cat.removeAnsiCodes(random_list), expected_output)
+    @patch('cat_win.cat.printUpdateInformation', new=lambda *_: '')
+    def test__showHelp(self):
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+            cat._showHelp()
+            for arg in cat.ALL_ARGS:
+                if arg.showArg:
+                    self.assertIn(arg.shortForm, fake_out.getvalue())
+                    self.assertIn(arg.longForm, fake_out.getvalue())
+                    self.assertIn(arg.help, fake_out.getvalue())
+                    
+    @patch('cat_win.cat.printUpdateInformation', new=lambda *_: '')
+    def test__showVersion(self):
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+            cat._showVersion()
+            self.assertIn('Catw', fake_out.getvalue())
+            self.assertIn('Author', fake_out.getvalue())
+    
+    @patch('cat_win.cat.ArgParser.FILE_SEARCH', new=['hello', 'world'])
+    def test__showDebug(self):
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+            cat._showDebug([], ['test'], [], [], [])
+            self.assertIn('test', fake_out.getvalue())
+            self.assertIn('Debug Information:', fake_out.getvalue())
+            self.assertIn('hello', fake_out.getvalue())
+            self.assertIn('world', fake_out.getvalue())
+            
 
 # python -m unittest discover -s cat_win.tests -p test*.py
