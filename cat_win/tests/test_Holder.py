@@ -19,8 +19,7 @@ holder = Holder()
 class TestHolder(TestCase):
     def tearDown(self):
         holder.args = []
-        for i in range(len(holder.args_id)):
-            holder.args_id[i] = False
+        holder.args_id = [False] * (HIGHEST_ARG_ID + 1)
     
     def test__calcFileLineLengthPlaceHolder__(self):
         holder.setFiles([test_file_path])
@@ -113,20 +112,20 @@ class TestHolder(TestCase):
     def test_addArgs(self):
         holder.setArgs([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
         holder.addArgs([(ARGS_NUMBER, 'x'), (ARGS_LLENGTH, 'b')])
-        self.assertListEqual(holder.args, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
+        self.assertListEqual(holder.args, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_NUMBER, 'x')])
         self.assertEqual(holder.args_id.count(True), 2)
         
         holder.addArgs([(ARGS_TABS, 'c')])
-        self.assertListEqual(holder.args, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_TABS, 'c')])
+        self.assertListEqual(holder.args, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_NUMBER, 'x'), (ARGS_TABS, 'c')])
         self.assertEqual(holder.args_id.count(True), 3)
         
     def test_deleteArgs(self):
         holder.setArgs([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
         holder.deleteArgs([(ARGS_ENDS, 'a'), (ARGS_NUMBER, 'x')])
-        self.assertListEqual(holder.args, [(ARGS_LLENGTH, 'b')])
-        self.assertEqual(holder.args_id.count(True), 1)
+        self.assertListEqual(holder.args, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
+        self.assertEqual(holder.args_id.count(True), 2)
         
         holder.deleteArgs([(ARGS_NUMBER, 'x'), (ARGS_LLENGTH, 'b')])
-        self.assertListEqual(holder.args, [])
-        self.assertEqual(holder.args_id.count(True), 0)
+        self.assertListEqual(holder.args, [(ARGS_NUMBER, 'a')])
+        self.assertEqual(holder.args_id.count(True), 1)
         

@@ -1,4 +1,4 @@
-from functools import lru_cache
+from functools import lru_cache, reduce
 from heapq import nlargest
 
 from cat_win.const.ArgConstants import *
@@ -7,10 +7,10 @@ from cat_win.util.File import File
 
 class Holder():
     def __init__(self) -> None:
-        self.files = []  # all files, including tmp-file from stdin
-        self._inner_files = []
-        self.args = []  # list of all used parameters: format [[id, param]]
-        self.args_id = [False] * (HIGHEST_ARG_ID + 1)
+        self.files: list = []  # all files, including tmp-file from stdin
+        self._inner_files: list = []
+        self.args: list = []  # list of all used parameters: format [[id, param]]
+        self.args_id: list = [False] * (HIGHEST_ARG_ID + 1)
         self.temp_file_stdin = None  # if stdin is used, this temp_file will contain the stdin-input
         self.temp_file_echo = None  # if ARGS_ECHO is used, this temp_file will contain the following parameters
         self.reversed = False
@@ -53,7 +53,7 @@ class Holder():
         self._inner_files = files[:]
 
     def setArgs(self, args: list) -> None:
-        self.args = args
+        self.args = reduce(lambda l, x: l + [x] if x not in l else l, args, [])
         for id, _ in self.args:
             self.args_id[id] = True
         if self.args_id[ARGS_B64E]:
@@ -64,16 +64,12 @@ class Holder():
         self.reversed = self.args_id[ARGS_REVERSE]
         
     def addArgs(self, args: list) -> None:
-        for arg in args:
-            if self.args_id[arg[0]]:
-                continue
-            self.args.append(arg)
-            self.args_id[arg[0]] = True
+        self.args_id = [False] * (HIGHEST_ARG_ID + 1)
+        self.setArgs(self.args + args)
         
     def deleteArgs(self, args: list) -> None:
-        for arg in args:
-            self.args = [a for a in self.args if a[0] != arg[0]]
-            self.args_id[arg[0]] = False
+        self.args_id = [False] * (HIGHEST_ARG_ID + 1)
+        self.setArgs([arg for arg in self.args if not arg in args])
 
     def setTempFileStdIn(self, file: str) -> None:
         self.temp_file_stdin = file
