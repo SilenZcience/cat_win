@@ -839,6 +839,7 @@ def shell_main():
 
 
     cmd = CmdExec()
+    command_count = 0
 
     print(__project__, 'v' + __version__, 'shell', '(' + __url__ + ')', end=' - ')
     print("Use 'catw' to handle files.")
@@ -848,11 +849,12 @@ def shell_main():
     for i, line in enumerate(stdinhelper.get_stdin_content(oneline)):
         stripped_line = line.rstrip('\n')
         if cmd.exec(stripped_line):
+            command_count += 1
             if cmd.exit_shell:
                 break
         else:
             stripped_line = stripped_line[:1].replace('\\', '') + stripped_line[1:]
-            edit_content([('', stripped_line)], False, -1, i)
+            edit_content([('', stripped_line)], False, -1, i-command_count)
         if not oneline:
             print(shell_prefix, end='', flush=True)
 
