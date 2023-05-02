@@ -12,17 +12,17 @@ import sys
 
 from cat_win.const.argconstants import *
 from cat_win.const.colorconstants import CKW
-from cat_win.persistence import config
+from cat_win.persistence.config import Config
+from cat_win.util.argparser import ArgParser
 from cat_win.util.cbase64 import decode_base64, encode_base64
+from cat_win.util.checksum import get_checksum_from_file
+from cat_win.util.converter import Converter
 from cat_win.util.fileattributes import get_file_meta_data, get_file_size, _convert_size
+from cat_win.util.holder import Holder
 from cat_win.util.rawviewer import get_raw_view_lines_gen
-from cat_win.util import argparser
-from cat_win.util import checksum
-from cat_win.util import converter
-from cat_win.util import holder
+from cat_win.util.stringfinder import StringFinder
+from cat_win.util.tmpfilehelper import TmpFileHelper
 from cat_win.util import stdinhelper
-from cat_win.util import stringfinder
-from cat_win.util import tmpfilehelper
 from cat_win.web.updatechecker import print_update_information
 from cat_win import __project__, __version__, __sysversion__, __author__, __url__
 
@@ -30,14 +30,15 @@ from cat_win import __project__, __version__, __sysversion__, __author__, __url_
 working_dir = os.path.dirname(os.path.realpath(__file__))
 
 coloramaInit()
-config = config.Config(working_dir)
+config = Config(working_dir)
 
 default_color_dic = config.load_config()
 color_dic = default_color_dic.copy()
 
-converter = converter.Converter()
-holder = holder.Holder()
-tmpFileHelper = tmpfilehelper.TmpFileHelper()
+arg_parser = ArgParser()
+converter = Converter()
+holder = Holder()
+tmp_file_helper = TmpFileHelper()
 
 on_windows_os = system() == 'Windows'
 
@@ -124,13 +125,13 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     print('echo_args: ', end='')
     print(echo_args)
     print('file encoding: ', end='')
-    print(argparser.FILE_ENCODING)
+    print(arg_parser.file_encoding)
     print('search keyword(s): ', end='')
-    print(argparser.FILE_SEARCH)
+    print(arg_parser.file_search)
     print('search match(es): ', end='')
-    print(argparser.FILE_MATCH)
+    print(arg_parser.file_match)
     print('truncate file: ', end='')
-    print(argparser.FILE_TRUNCATE)
+    print(arg_parser.file_truncate)
 
 
 def _show_count() -> None:
@@ -198,7 +199,7 @@ def _print_checksum(file: str) -> None:
         a string representation of a file (-path)
     """
     print(f"{color_dic[CKW.CHECKSUM]}Checksum of '{file}':{color_dic[CKW.RESET_ALL]}")
-    print(checksum.get_checksum_from_file(file, [color_dic[CKW.CHECKSUM], color_dic[CKW.RESET_ALL]]))
+    print(get_checksum_from_file(file, [color_dic[CKW.CHECKSUM], color_dic[CKW.RESET_ALL]]))
 
 
 def _print_meta_and_checksum(show_meta: bool, show_checksum: bool) -> None:
@@ -343,12 +344,12 @@ def print_file(content: list) -> bool:
     """
     if not content:
         return False
-    if not (argparser.FILE_SEARCH or argparser.FILE_MATCH):
+    if not (arg_parser.file_search or arg_parser.file_match):
         print(*[prefix + line for prefix, line in content], sep='\n')
         return False
 
     contains_queried = False
-    string_finder = stringfinder.StringFinder(argparser.FILE_SEARCH, argparser.FILE_MATCH)
+    string_finder = StringFinder(arg_parser.file_search, arg_parser.file_match)
 
     for line_prefix, line in content:
         cleaned_line = remove_ansi_codes_from_line(line)
@@ -440,12 +441,12 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
     excluded_by_peek = 0
 
     if not show_bytecode and holder.args_id[ARGS_B64D]:
-        content = decode_base64(content, argparser.FILE_ENCODING)
+        content = decode_base64(content, arg_parser.file_encoding)
 
     if holder.args_id[ARGS_NUMBER]:
         content = [(_get_line_prefix(j+line_offset, file_index+1), c[1])
                    for j, c in enumerate(content, start=1)]
-    content = content[argparser.FILE_TRUNCATE[0]:argparser.FILE_TRUNCATE[1]:argparser.FILE_TRUNCATE[2]]
+    content = content[arg_parser.file_truncate[0]:arg_parser.file_truncate[1]:arg_parser.file_truncate[2]]
     if holder.args_id[ARGS_PEEK] and len(content) > 10:
         excluded_by_peek = len(content) - 10
         content = content[:5] + content[-5:]
@@ -493,7 +494,7 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
     if holder.args_id[ARGS_LLENGTH]:
         content = [(_get_line_length_prefix(c[0], c[1]), c[1]) for c in content]
     if holder.args_id[ARGS_B64E]:
-        content = encode_base64(content, argparser.FILE_ENCODING)
+        content = encode_base64(content, arg_parser.file_encoding)
 
     found_queried = print_file(content[:len(content)//2])
     if file_index >= 0:
@@ -520,7 +521,7 @@ def edit_file(file_index: int = 0) -> None:
 
     content = [('', '')]
     try:
-        with open(holder.files[file_index].path, 'r', encoding=argparser.FILE_ENCODING) as file:
+        with open(holder.files[file_index].path, 'r', encoding=arg_parser.file_encoding) as file:
             # splitlines() gives a slight inaccuracy, in case the last line is empty.
             # the alternative would be worse: split('\n') would increase the linecount each
             # time catw touches a file.
@@ -530,7 +531,7 @@ def edit_file(file_index: int = 0) -> None:
         try:
             enter_char = '⏎'
             try:
-                if len(enter_char.encode(argparser.FILE_ENCODING)) != 3:
+                if len(enter_char.encode(arg_parser.file_encoding)) != 3:
                     raise UnicodeEncodeError('', '', -1, -1, '') from exc
             except UnicodeEncodeError:
                 enter_char = 'ENTER'
@@ -542,7 +543,7 @@ def edit_file(file_index: int = 0) -> None:
         except EOFError:
             pass
         except UnicodeError:
-            print(f"Input is not recognized in the given encoding: {argparser.FILE_ENCODING}")
+            print(f"Input is not recognized in the given encoding: {arg_parser.file_encoding}")
             print('Aborting...')
             return
         try:
@@ -620,7 +621,7 @@ def print_raw_view(file_index: int = 0, mode: str = 'X') -> None:
     """
     print(holder.files[file_index].displayname, ':', sep='')
     for line in get_raw_view_lines_gen(holder.files[file_index].path, mode, \
-        [color_dic[CKW.RAWVIEWER], color_dic[CKW.RESET_ALL]], argparser.FILE_ENCODING):
+        [color_dic[CKW.RAWVIEWER], color_dic[CKW.RESET_ALL]], arg_parser.file_encoding):
         print(line)
     print('')
 
@@ -685,16 +686,16 @@ def init(shell: bool = False) -> tuple:
         contains (known_files, unknown_files, echo_args) from the argparser
     """
     # read parameter-args
-    args, unknown_args, known_files, unknown_files, echo_args = argparser.get_arguments(sys.argv)
+    args, unknown_args, known_files, unknown_files, echo_args = arg_parser.get_arguments(sys.argv)
 
     holder.set_args(args)
 
     if holder.args_id[ARGS_RECONFIGURE] or holder.args_id[ARGS_RECONFIGURE_IN]:
-        sys.stdin.reconfigure(encoding=argparser.FILE_ENCODING)
+        sys.stdin.reconfigure(encoding=arg_parser.file_encoding)
     if holder.args_id[ARGS_RECONFIGURE] or holder.args_id[ARGS_RECONFIGURE_OUT]:
-        sys.stdout.reconfigure(encoding=argparser.FILE_ENCODING)
+        sys.stdout.reconfigure(encoding=arg_parser.file_encoding)
     if holder.args_id[ARGS_RECONFIGURE_ERR]:
-        sys.stderr.reconfigure(encoding=argparser.FILE_ENCODING)
+        sys.stderr.reconfigure(encoding=arg_parser.file_encoding)
 
     init_colors()
 
@@ -721,19 +722,19 @@ def main():
 
     if holder.args_id[ARGS_ECHO]:
         temp_file = stdinhelper.write_temp(' '.join(echo_args), \
-            tmpFileHelper.generate_temp_file_name(), argparser.FILE_ENCODING)
+            tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding)
         known_files.append(temp_file)
         holder.set_temp_file_echo(temp_file)
     if holder.args_id[ARGS_INTERACTIVE]:
         piped_input = ''.join(stdinhelper.get_stdin_content(holder.args_id[ARGS_ONELINE]))
-        temp_file = stdinhelper.write_temp(piped_input, tmpFileHelper.generate_temp_file_name(), \
-            argparser.FILE_ENCODING)
+        temp_file = stdinhelper.write_temp(piped_input, tmp_file_helper.generate_temp_file_name(), \
+            arg_parser.file_encoding)
         known_files.append(temp_file)
-        unknown_files = stdinhelper.write_files(unknown_files, piped_input, argparser.FILE_ENCODING)
+        unknown_files = stdinhelper.write_files(unknown_files, piped_input, arg_parser.file_encoding)
         holder.set_temp_file_stdin(temp_file)
     else:
         unknown_files = stdinhelper.read_write_files_from_stdin(
-            unknown_files, argparser.FILE_ENCODING, on_windows_os, holder.args_id[ARGS_ONELINE])
+            unknown_files, arg_parser.file_encoding, on_windows_os, holder.args_id[ARGS_ONELINE])
 
     if len(known_files) + len(unknown_files) == 0:
         return
@@ -749,8 +750,8 @@ def main():
         return
 
     if holder.args_id[ARGS_B64D]:
-        holder.set_decoding_temp_files([tmpFileHelper.generate_temp_file_name() for _ in holder.files])
-    holder.generate_values(argparser.FILE_ENCODING)
+        holder.set_decoding_temp_files([tmp_file_helper.generate_temp_file_name() for _ in holder.files])
+    holder.generate_values(arg_parser.file_encoding)
 
     if holder.args_id[ARGS_CCOUNT]:
         _show_count()
@@ -764,7 +765,7 @@ def main():
         sys.exit(1)  # Python exits with error code 1 on EPIPE
 
     # clean-up
-    for tmp_file in tmpFileHelper.get_generated_temp_files():
+    for tmp_file in tmp_file_helper.get_generated_temp_files():
         if holder.args_id[ARGS_DEBUG]:
             print('Cleaning', tmp_file)
         try:
@@ -815,23 +816,23 @@ def shell_main():
             print("Type '!add <OPTION>', '!del <OPTION>', '!see' to change/see the active parameters.")
 
         def _command_add(self, cmd: list) -> None:
-            args, _, _, _, _ = argparser.get_arguments([''] + cmd)
-            holder.add_args(args)
+            arg_parser.gen_arguments([''] + cmd)
+            holder.add_args(arg_parser.args)
             self.exec_colors()
-            print(f"successfully added {[arg for _, arg in args] if args else 'parameters'}.")
+            print(f"successfully added {[arg for _, arg in arg_parser.args] if arg_parser.args else 'parameters'}.")
 
         def _command_del(self, cmd: list) -> None:
-            args, _, _, _, _ = argparser.get_arguments([''] + cmd, True)
-            holder.delete_args(args)
+            arg_parser.gen_arguments([''] + cmd, True)
+            holder.delete_args(arg_parser.args)
             self.exec_colors()
-            print(f"successfully removed {[arg for _, arg in args] if args else 'parameters'}.")
+            print(f"successfully removed {[arg for _, arg in arg_parser.args] if arg_parser.args else 'parameters'}.")
 
         def _command_see(self, _) -> None:
             print(f"{'Active Args:': <12} {[arg for _, arg in holder.args]}")
-            if argparser.FILE_SEARCH:
-                print(f"{'Literals:':<12} {argparser.FILE_SEARCH}")
-            if argparser.FILE_MATCH:
-                print(f"{'Matches:': <12} {argparser.FILE_MATCH}")
+            if arg_parser.file_search:
+                print(f"{'Literals:':<12} {arg_parser.file_search}")
+            if arg_parser.file_match:
+                print(f"{'Matches:': <12} {arg_parser.file_match}")
 
         def _command_exit(self, _) -> None:
             self.exit_shell = True
