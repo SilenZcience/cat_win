@@ -10,6 +10,7 @@ from cat_win.util.holder import Holder
 stdinhelpermock = StdInHelperMock()
 
 
+@patch('cat_win.cat.sys.argv', ['<CAT>'])
 @patch('cat_win.cat.stdinhelper.get_stdin_content', stdinhelpermock.get_stdin_content)
 class TestShell(TestCase):
     maxDiff = None
