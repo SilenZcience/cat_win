@@ -4,7 +4,7 @@ import os
 
 from cat_win import cat
 from cat_win.tests.mocks.std import StdInMock, StdOutMock
-from cat_win.util import  argparser
+from cat_win.util.argparser import ArgParser
 # import sys
 # sys.path.append('../cat_win')
 
@@ -25,10 +25,7 @@ class TestCatFull(TestCase):
     def tearDown(self):
         cat._calculate_line_prefix_spacing.cache_clear()
         cat._calculate_line_length_prefix_spacing.cache_clear()
-        argparser.FILE_ENCODING = 'utf-8'
-        argparser.FILE_SEARCH = set()
-        argparser.FILE_MATCH  = set()
-        argparser.FILE_TRUNCATE = [None, None, None]
+        cat.arg_parser = ArgParser()
         for i in range(len(cat.holder.args_id)):
             cat.holder.args_id[i] = False
 
