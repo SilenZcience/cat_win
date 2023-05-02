@@ -29,6 +29,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
+      - name: Update PIP
+        run: |
+          python -m pip install --upgrade pip
       - name: Setup Build Dependencies
         run: |
           python -m pip install --upgrade build
