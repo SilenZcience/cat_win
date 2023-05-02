@@ -2,7 +2,7 @@ from zlib import crc32 as crc32_hash
 import hashlib
 
 
-def getChecksumFromFile(file: str, colors = None) -> str:
+def get_checksum_from_file(file: str, colors = None) -> str:
     """
     Calculates and returns the CRC32, MD5, SHA1, SHA256, SHA512
     hashes of a file.
@@ -18,18 +18,18 @@ def getChecksumFromFile(file: str, colors = None) -> str:
     checksum (str):
         a formatted string representation of all checksums calculated
     """
-    if colors == None or len(colors) < 2:
+    if colors is None or len(colors) < 2:
         colors = ['', '']
-    BUF_SIZE = 65536  # 64kb
+    buf_size = 65536  # 64kb
     md5 = hashlib.md5()
     sha1 = hashlib.sha1()
     sha256 = hashlib.sha256()
     sha512 = hashlib.sha512()
     crc32 = 0
 
-    with open(file, 'rb') as f:
+    with open(file, 'rb') as raw_f:
         while True:
-            data = f.read(BUF_SIZE)
+            data = raw_f.read(buf_size)
             if not data:
                 break
             md5.update(data)
@@ -39,7 +39,7 @@ def getChecksumFromFile(file: str, colors = None) -> str:
             crc32 = crc32_hash(data, crc32)
 
     crc32 = f"{(crc32 & 0xFFFFFFFF):08X}"
-    
+
     checksum =  f"\t{colors[0]}{'CRC32:' : <9}{str(crc32)}{colors[1]}\n"
     checksum += f"\t{colors[0]}{'MD5:'   : <9}{str(md5.hexdigest())}{colors[1]}\n"
     checksum += f"\t{colors[0]}{'SHA1:'  : <9}{str(sha1.hexdigest())}{colors[1]}\n"

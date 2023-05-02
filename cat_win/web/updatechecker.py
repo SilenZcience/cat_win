@@ -1,8 +1,7 @@
 from json import loads as loadJSON
 from urllib.request import urlopen
 
-from cat_win.const.ColorConstants import C_KW
-
+from cat_win.const.colorconstants import CKW
 from cat_win import __url__
 
 
@@ -20,7 +19,7 @@ STATUS_PRE_RELEASE_AVAILABLE = 2
 STATUS_UNSAFE_PRE_RELEASE_AVAILABLE = -2
 
 
-def getLastestPackageVersion(package: str) -> str:
+def get_latest_package_version(package: str) -> str:
     """
     retrieve the official PythonPackageIndex information regarding
     a package.
@@ -38,11 +37,11 @@ def getLastestPackageVersion(package: str) -> str:
         with urlopen(f"https://pypi.org/pypi/{package}/json", timeout=2) as _response:
             response = _response.read()
         return loadJSON(response)['info']['version']
-    except:
+    except (ValueError, OSError):
         return '0.0.0'
 
 
-def onlyNumeric(s: str) -> int:
+def only_numeric(_s: str) -> int:
     """
     strips every non-numeric character of a string.
     
@@ -55,10 +54,10 @@ def onlyNumeric(s: str) -> int:
         the resulting number of the string containing
         only numeric values
     """
-    return int('0' + ''.join(filter(str.isdigit, s)))
+    return int('0' + ''.join(filter(str.isdigit, _s)))
 
 
-def genVersionTuples(v: str, w: str) -> tuple:
+def gen_version_tuples(_v: str, _w: str) -> tuple:
     """
     create comparable version tuples.
     
@@ -73,47 +72,47 @@ def genVersionTuples(v: str, w: str) -> tuple:
         the version tuples of both inputs like
         (('01', '00', '33', '00'), ('01', '01', '0a', '00'))
     """
-    vSplit, wSplit = v.split('.'), w.split('.')
-    maxSplitLen = max(map(len, vSplit + wSplit))
-    vList = [s.zfill(maxSplitLen) for s in vSplit]
-    wList = [s.zfill(maxSplitLen) for s in wSplit]
-    maxLength = max(len(vList), len(wList))
-    vList += [''.zfill(maxSplitLen)] * (maxLength - len(vList))
-    wList += [''.zfill(maxSplitLen)] * (maxLength - len(wList))
-    return (tuple(vList), tuple(wList))
+    v_split, w_split = _v.split('.'), _w.split('.')
+    max_split_length = max(map(len, v_split + w_split))
+    v_list = [s.zfill(max_split_length) for s in v_split]
+    w_list = [s.zfill(max_split_length) for s in w_split]
+    max_length = max(len(v_list), len(w_list))
+    v_list += [''.zfill(max_split_length)] * (max_length - len(v_list))
+    w_list += [''.zfill(max_split_length)] * (max_length - len(w_list))
+    return (tuple(v_list), tuple(w_list))
 
-def newVersionAvailable(currentVersion: str, latestVersion: str) -> int:
+def new_version_available(current_version: str, latest_version: str) -> int:
     """
     Checks whether or not a new version is available.
     
     Parameters:
-    currentVersion (str):
+    current_version (str):
         a version representation as string
-    latestVersion (str):
+    latest_version (str):
         a version representation as string
     
     Returns:
     (int):
         a global status code describing the situation
     """
-    if currentVersion.startswith('v'):
-        currentVersion = currentVersion[1:]
-    if latestVersion.startswith('v'):
-        latestVersion = latestVersion[1:]
+    if current_version.startswith('v'):
+        current_version = current_version[1:]
+    if latest_version.startswith('v'):
+        latest_version = latest_version[1:]
     status = STATUS_UP_TO_DATE
-    current, latest = genVersionTuples(currentVersion, latestVersion)
+    current, latest = gen_version_tuples(current_version, latest_version)
     i = 0
-    for c, l in zip(current, latest):
+    for _c, _l in zip(current, latest):
         i += 1
-        cNum, lNum = onlyNumeric(c), onlyNumeric(l)
-        if cNum > lNum:
+        c_num, l_num = only_numeric(_c), only_numeric(_l)
+        if c_num > l_num:
             break
-        if cNum < lNum:
+        if c_num < l_num:
             status = STATUS_STABLE_RELEASE_AVAILABLE
-            if not l.isdigit():
+            if not _l.isdigit():
                 status = STATUS_PRE_RELEASE_AVAILABLE
             break
-        if c < l:
+        if _c < _l:
             status = STATUS_PRE_RELEASE_AVAILABLE
             break
     if i < len(current):
@@ -121,45 +120,45 @@ def newVersionAvailable(currentVersion: str, latestVersion: str) -> int:
     return status
 
 
-def printUpdateInformation(package: str, currentVersion: str, color_dic: dict) -> None:
+def print_update_information(package: str, current_version: str, color_dic: dict) -> None:
     """
     prints update information if there are any.
     
     Parameters:
     package (str):
         the package name to check
-    currentVersion (str):
+    current_version (str):
         a version representation as string of the current version
     color_dic (dict):
         a dictionary translating the color-keywords to ANSI-Colorcodes
     """
-    latestVersion = getLastestPackageVersion(package)
-    status = newVersionAvailable(currentVersion, latestVersion)
+    latest_version = get_latest_package_version(package)
+    status = new_version_available(current_version, latest_version)
     if status == STATUS_UP_TO_DATE:
         return
-    message = f""
-    warning = f""
-    info    = f""
+    message = ''
+    warning = ''
+    info    = ''
     if abs(status) == STATUS_STABLE_RELEASE_AVAILABLE:
-        message += f"{color_dic[C_KW.MESSAGE_IMPORTANT]}"
-        message += f"A new stable release of {package} is available: v{latestVersion}"
-        message += f"{color_dic[C_KW.RESET_ALL]}\n{color_dic[C_KW.MESSAGE_IMPORTANT]}"
-        message += f"To update, run:"
-        message += f"{color_dic[C_KW.RESET_ALL]}\n{color_dic[C_KW.MESSAGE_IMPORTANT]}"
+        message += f"{color_dic[CKW.MESSAGE_IMPORTANT]}"
+        message += f"A new stable release of {package} is available: v{latest_version}"
+        message += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_IMPORTANT]}"
+        message += 'To update, run:'
+        message += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_IMPORTANT]}"
         message += f"python -m pip install --upgrade {package}"
     elif abs(status) == STATUS_PRE_RELEASE_AVAILABLE:
-        message += f"{color_dic[C_KW.MESSAGE_INFORMATION]}"
-        message += f"A new pre-release of {package} is available: v{latestVersion}"
-    message += f"{color_dic[C_KW.RESET_ALL]}"
+        message += f"{color_dic[CKW.MESSAGE_INFORMATION]}"
+        message += f"A new pre-release of {package} is available: v{latest_version}"
+    message += f"{color_dic[CKW.RESET_ALL]}"
     if status < STATUS_UP_TO_DATE:
-        warning += f"{color_dic[C_KW.MESSAGE_WARNING]}"
-        warning += f"Warning: Due to the drastic version increase, backwards compatibility is no longer guaranteed!"
-        warning += f"{color_dic[C_KW.RESET_ALL]}\n{color_dic[C_KW.MESSAGE_WARNING]}"
-        warning += f"You may experience fundamental differences."
-        warning += f"{color_dic[C_KW.RESET_ALL]}"
-    info += f"{color_dic[C_KW.MESSAGE_INFORMATION]}Take a look at the changelog here:"
-    info += f"{color_dic[C_KW.RESET_ALL]}\n{color_dic[C_KW.MESSAGE_INFORMATION]}"
-    info += f"{__url__}/blob/main/CHANGELOG.md{color_dic[C_KW.RESET_ALL]}"
+        warning += f"{color_dic[CKW.MESSAGE_WARNING]}"
+        warning += 'Warning: Due to the drastic version increase, backwards compatibility is no longer guaranteed!'
+        warning += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_WARNING]}"
+        warning += 'You may experience fundamental differences.'
+        warning += f"{color_dic[CKW.RESET_ALL]}"
+    info += f"{color_dic[CKW.MESSAGE_INFORMATION]}Take a look at the changelog here:"
+    info += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_INFORMATION]}"
+    info += f"{__url__}/blob/main/CHANGELOG.md{color_dic[CKW.RESET_ALL]}"
     print(message)
     print(warning)
     print(info)

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from sys import exit
+from sys import exit as sysexit
 import os
 import subprocess
 
@@ -25,7 +25,7 @@ if len(target_package) > 0:
             sub = subprocess.run(['python', '-m', 'pip', 'install', '--upgrade', package_file + '[clip]'], check=True)
             print(sub)
             error_code = sub.returncode
-        except:
-            exit(error_code)
+        except Exception:
+            sysexit(error_code)
 
-exit(error_code)
+sysexit(error_code)

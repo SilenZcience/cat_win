@@ -1,7 +1,6 @@
 from datetime import datetime
-from math import log, pow, floor
+from math import log, floor
 from os import stat
-from platform import system
 from stat import (
     FILE_ATTRIBUTE_ARCHIVE as A,
     FILE_ATTRIBUTE_SYSTEM as S,
@@ -29,9 +28,9 @@ def _convert_size(size_bytes: int) -> str:
         return '0 B'
     size_name = ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
     i = int(floor(log(size_bytes, 1024)))
-    p = pow(1024, i)
-    s = round(size_bytes / p, 2)
-    return f"{s} {size_name[i] if i < len(size_name) else '?'}"
+    power = pow(1024, i)
+    size = round(size_bytes / power, 2)
+    return f"{size} {size_name[i] if i < len(size_name) else '?'}"
 
 
 def read_attribs(file: str) -> list:
@@ -62,7 +61,7 @@ def read_attribs(file: str) -> list:
     )
 
 
-def getFileSize(file: str) -> int:
+def get_file_size(file: str) -> int:
     """
     calculate the size of a file
     
@@ -80,7 +79,7 @@ def getFileSize(file: str) -> int:
         return 0
 
 
-def getFileMetaData(file: str, on_windows_os: bool, colors = None) -> str:
+def get_file_meta_data(file: str, on_windows_os: bool, colors = None) -> str:
     """
     calculate file metadata information.
     
@@ -95,33 +94,33 @@ def getFileMetaData(file: str, on_windows_os: bool, colors = None) -> str:
         the attributes like [RESET_ALL, ATTRIB, +ATTRIB, -ATTRIB]
     
     Returns:
-    metaData (str):
+    meta_data (str):
         representation containing file size, creation/modified/accessed time.
         on windows: also contains file attribute information
     """
-    if colors == None or len(colors) < 4:
+    if colors is None or len(colors) < 4:
         colors = ['', '', '', '']
     try:
         stats = stat(file)
-        
-        metaData = colors[1] + file + colors[0] + '\n'
-        
-        metaData += f"{colors[1]}{'Size:' : <16}{_convert_size(stats.st_size)}{colors[0]}\n"
-        metaData += f"{colors[1]}{'ATime:': <16}{datetime.fromtimestamp(stats.st_atime)}{colors[0]}\n"
-        metaData += f"{colors[1]}{'MTime:': <16}{datetime.fromtimestamp(stats.st_mtime)}{colors[0]}\n"
-        metaData += f"{colors[1]}{'CTime:': <16}{datetime.fromtimestamp(stats.st_ctime)}{colors[0]}\n"
-        
+
+        meta_data = colors[1] + file + colors[0] + '\n'
+
+        meta_data += f"{colors[1]}{'Size:' : <16}{_convert_size(stats.st_size)}{colors[0]}\n"
+        meta_data += f"{colors[1]}{'ATime:': <16}{datetime.fromtimestamp(stats.st_atime)}{colors[0]}\n"
+        meta_data += f"{colors[1]}{'MTime:': <16}{datetime.fromtimestamp(stats.st_mtime)}{colors[0]}\n"
+        meta_data += f"{colors[1]}{'CTime:': <16}{datetime.fromtimestamp(stats.st_ctime)}{colors[0]}\n"
+
         if not on_windows_os:
-            metaData += '\n'
-            return metaData
-        
+            meta_data += '\n'
+            return meta_data
+
         attribs = read_attribs(file)
-        metaData += colors[2]
-        metaData += '+' + ", ".join([x for x, y in attribs if y])
-        metaData += colors[0] + '\n'
-        metaData += colors[3]
-        metaData += '-' + ", ".join([x for x, y in attribs if not y])
-        metaData += colors[0] + '\n'
-        return metaData
+        meta_data += colors[2]
+        meta_data += '+' + ", ".join([x for x, y in attribs if y])
+        meta_data += colors[0] + '\n'
+        meta_data += colors[3]
+        meta_data += '-' + ", ".join([x for x, y in attribs if not y])
+        meta_data += colors[0] + '\n'
+        return meta_data
     except OSError:
         return ''

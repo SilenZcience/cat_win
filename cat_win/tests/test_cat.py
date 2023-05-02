@@ -2,9 +2,10 @@ from unittest import TestCase
 from unittest.mock import patch
 import os
 
+from cat_win import cat
 from cat_win.tests.mocks.std import StdOutMock
-from cat_win.util.Holder import Holder
-import cat_win.cat as cat
+from cat_win.util.holder import Holder
+
 # import sys
 # sys.path.append('../cat_win')
 
@@ -23,144 +24,144 @@ class TestCat(TestCase):
     maxDiff = None
 
     def tearDown(self):
-        cat._CalculateLinePrefixSpacing.cache_clear()
-        cat._CalculateLineLengthPrefixSpacing.cache_clear()
-    
+        cat._calculate_line_prefix_spacing.cache_clear()
+        cat._calculate_line_length_prefix_spacing.cache_clear()
+
     def test_cat_output_default_file(self):
-        holder.setFiles([test_file_path])
-        holder.setArgs([])
-        
+        holder.set_files([test_file_path])
+        holder.set_args([])
+
         check_against = '\n'.join(test_file_content) + '\n'
 
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
-            cat.editFiles()
+            cat.edit_files()
             self.assertEqual(fake_out.getvalue(), check_against)
 
     def test_cat_output_multiple_files(self):
-        holder.setFiles([test_file_path, test_file_path, test_file_path])
-        holder.setArgs([])
+        holder.set_files([test_file_path, test_file_path, test_file_path])
+        holder.set_args([])
 
         check_against = '\n'.join(test_file_content * 3) + '\n'
 
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
-            cat.editFiles()
+            cat.edit_files()
             self.assertEqual(fake_out.getvalue(), check_against)
 
     def test_cat_output_reverse(self):
-        holder.setFiles([test_file_path])
-        holder.setArgs([(5, '')]) #reverse
+        holder.set_files([test_file_path])
+        holder.set_args([(5, '')]) #reverse
 
         check_against = test_file_content
         check_against.reverse()
         check_against = '\n'.join(check_against) + '\n'
 
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
-            cat.editFiles()
+            cat.edit_files()
             self.assertEqual(fake_out.getvalue(), check_against)
 
     def test_cat_output_ends_and_tabs(self):
-        holder.setFiles([test_file_path])
-        holder.setArgs([(2, ''), (3, '')]) #ends & tabs
+        holder.set_files([test_file_path])
+        holder.set_args([(2, ''), (3, '')]) #ends & tabs
 
         check_against = ('\n'.join([c.replace('\t', '^I') + '$' for c in test_file_content]) +
                          '\n')
 
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
-            cat.editFiles()
+            cat.edit_files()
             self.assertEqual(fake_out.getvalue(), check_against)
-            
-    def test_cat__getLinePrefix_file_excess(self):
-        holder.fileLineNumberPlaceHolder = 5
-        self.assertEqual(cat._getLinePrefix(9, 1), '    9) ')
-        
-    def test_cat__getLinePrefix_file_occupied(self):
-        holder.fileLineNumberPlaceHolder = 2
-        self.assertEqual(cat._getLinePrefix(10, 1), '10) ')
-    
-    def test_cat__getLinePrefix_file_excess_long(self):
-        holder.fileLineNumberPlaceHolder = 12
-        self.assertEqual(cat._getLinePrefix(34719, 1), '       34719) ')
-    
-    def test_cat__getLinePrefix_file_occupied_long(self):
-        holder.fileLineNumberPlaceHolder = 5
-        self.assertEqual(cat._getLinePrefix(34718, 1), '34718) ')
-        
-    def test_cat__getLinePrefix_files_excess(self):
-        holder.fileLineNumberPlaceHolder = 5
-        holder.fileNumberPlaceHolder = 4
+
+    def test_cat__get_line_prefix_file_excess(self):
+        holder.all_line_number_place_holder = 5
+        self.assertEqual(cat._get_line_prefix(9, 1), '    9) ')
+
+    def test_cat__get_line_prefix_file_occupied(self):
+        holder.all_line_number_place_holder = 2
+        self.assertEqual(cat._get_line_prefix(10, 1), '10) ')
+
+    def test_cat__get_line_prefix_file_excess_long(self):
+        holder.all_line_number_place_holder = 12
+        self.assertEqual(cat._get_line_prefix(34719, 1), '       34719) ')
+
+    def test_cat__get_line_prefix_file_occupied_long(self):
+        holder.all_line_number_place_holder = 5
+        self.assertEqual(cat._get_line_prefix(34718, 1), '34718) ')
+
+    def test_cat__get_line_prefix_files_excess(self):
+        holder.all_line_number_place_holder = 5
+        holder.file_number_place_holder = 4
         holder.files = [1,2]
-        self.assertEqual(cat._getLinePrefix(9, 1), '   1.    9) ')
-        
-    def test_cat__getLinePrefix_files_occupied(self):
-        holder.fileLineNumberPlaceHolder = 3
-        holder.fileNumberPlaceHolder = 2
+        self.assertEqual(cat._get_line_prefix(9, 1), '   1.    9) ')
+
+    def test_cat__get_line_prefix_files_occupied(self):
+        holder.all_line_number_place_holder = 3
+        holder.file_number_place_holder = 2
         holder.files = [1,2]
-        self.assertEqual(cat._getLinePrefix(987, 10), '10.987) ')
-        
-    def test_cat__getLinePrefix_files_excess_long(self):
-        holder.fileLineNumberPlaceHolder = 12
-        holder.fileNumberPlaceHolder = 10
+        self.assertEqual(cat._get_line_prefix(987, 10), '10.987) ')
+
+    def test_cat__get_line_prefix_files_excess_long(self):
+        holder.all_line_number_place_holder = 12
+        holder.file_number_place_holder = 10
         holder.files = [1,2]
-        self.assertEqual(cat._getLinePrefix(101, 404), '       404.         101) ')
-        
-    def test_cat__getLinePrefix_files_occupied_long(self):
-        holder.fileLineNumberPlaceHolder = 11
-        holder.fileNumberPlaceHolder = 9
+        self.assertEqual(cat._get_line_prefix(101, 404), '       404.         101) ')
+
+    def test_cat__get_line_prefix_files_occupied_long(self):
+        holder.all_line_number_place_holder = 11
+        holder.file_number_place_holder = 9
         holder.files = [1,2]
-        self.assertEqual(cat._getLinePrefix(12345123451, 123456789), '123456789.12345123451) ')
-    
-    def test_cat__getLineLengthPrefix_string_excess(self):
-        holder.fileLineLengthPlaceHolder = 5
-        holder.setArgs([])
-        self.assertEqual(cat._getLineLengthPrefix('testtest', 'abcdefghi'), 'testtest[    9] ')
-    
-    def test_cat__getLineLengthPrefix_string_occupied(self):
-        holder.fileLineLengthPlaceHolder = 2
-        holder.setArgs([])
-        self.assertEqual(cat._getLineLengthPrefix('prefix', 'abcdefghij'), 'prefix[10] ')
-        
-    def test_cat__getLineLengthPrefix_bytes_excess(self):
-        holder.fileLineLengthPlaceHolder = 5
-        holder.setArgs([])
-        self.assertEqual(cat._getLineLengthPrefix('testtest', b'abcdefghi'), 'testtest[    9] ')
-    
-    def test_cat__getLineLengthPrefix_bytes_occupied(self):
-        holder.fileLineLengthPlaceHolder = 2
-        holder.setArgs([])
-        self.assertEqual(cat._getLineLengthPrefix('prefix', b'abcdefghij'), 'prefix[10] ')
-        
-    def test_removeAnsiCodesFromLine(self):
+        self.assertEqual(cat._get_line_prefix(12345123451, 123456789), '123456789.12345123451) ')
+
+    def test_cat__get_line_length_prefix_string_excess(self):
+        holder.file_line_length_place_holder = 5
+        holder.set_args([])
+        self.assertEqual(cat._get_line_length_prefix('testtest', 'abcdefghi'), 'testtest[    9] ')
+
+    def test_cat__get_line_length_prefix_string_occupied(self):
+        holder.file_line_length_place_holder = 2
+        holder.set_args([])
+        self.assertEqual(cat._get_line_length_prefix('prefix', 'abcdefghij'), 'prefix[10] ')
+
+    def test_cat__get_line_length_prefix_bytes_excess(self):
+        holder.file_line_length_place_holder = 5
+        holder.set_args([])
+        self.assertEqual(cat._get_line_length_prefix('testtest', b'abcdefghi'), 'testtest[    9] ')
+
+    def test_cat__get_line_length_prefix_bytes_occupied(self):
+        holder.file_line_length_place_holder = 2
+        holder.set_args([])
+        self.assertEqual(cat._get_line_length_prefix('prefix', b'abcdefghij'), 'prefix[10] ')
+
+    def test_remove_ansi_codes_from_line(self):
         red = '\x1b[31m'
         reset = '\x1b[0m'
         random_string = f"abc{red}defghij{reset}klmnopq{red}r{reset}"
         expected_output = 'abcdefghijklmnopqr'
-        self.assertEqual(cat.removeAnsiCodesFromLine(random_string), expected_output)
+        self.assertEqual(cat.remove_ansi_codes_from_line(random_string), expected_output)
 
-    @patch('cat_win.cat.printUpdateInformation', new=lambda *_: '')
-    def test__showHelp(self):
+    @patch('cat_win.cat.print_update_information', new=lambda *_: '')
+    def test__show_help(self):
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
-            cat._showHelp()
+            cat._show_help()
             for arg in cat.ALL_ARGS:
-                if arg.showArg:
-                    self.assertIn(arg.shortForm, fake_out.getvalue())
-                    self.assertIn(arg.longForm, fake_out.getvalue())
-                    self.assertIn(arg.help, fake_out.getvalue())
-                    
-    @patch('cat_win.cat.printUpdateInformation', new=lambda *_: '')
-    def test__showVersion(self):
+                if arg.show_arg:
+                    self.assertIn(arg.short_form, fake_out.getvalue())
+                    self.assertIn(arg.long_form, fake_out.getvalue())
+                    self.assertIn(arg.arg_help, fake_out.getvalue())
+
+    @patch('cat_win.cat.print_update_information', new=lambda *_: '')
+    def test__show_version(self):
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
-            cat._showVersion()
+            cat._show_version()
             self.assertIn('Catw', fake_out.getvalue())
             self.assertIn('Author', fake_out.getvalue())
-    
-    @patch('cat_win.cat.ArgParser.FILE_SEARCH', new=set(['hello', 'world']))
-    def test__showDebug(self):
+
+    @patch('cat_win.cat.argparser.FILE_SEARCH', new=set(['hello', 'world']))
+    def test__show_debug(self):
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
-            cat._showDebug([], ['test'], [], [], [])
+            cat._show_debug([], ['test'], [], [], [])
             self.assertIn('test', fake_out.getvalue())
             self.assertIn('Debug Information:', fake_out.getvalue())
             self.assertIn('hello', fake_out.getvalue())
             self.assertIn('world', fake_out.getvalue())
-            
+
 
 # python -m unittest discover -s cat_win.tests -p test*.py

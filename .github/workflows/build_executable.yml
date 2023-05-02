@@ -25,7 +25,7 @@ jobs:
           python -m pip install --upgrade -r ./workflowHelper/requirements.txt
       - name: Setup Version File
         run: |
-          python ./workflowHelper/exeVersion.py
+          python ./workflowHelper/exeversion.py
       - name: Compile Package
         run: |
           python ./workflowHelper/build.py

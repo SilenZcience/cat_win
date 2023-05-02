@@ -2,7 +2,7 @@ from sys import stdin
 import os
 
 
-def writeTemp(content: str, tmp_file: str, file_encoding: str) -> str:
+def write_temp(content: str, tmp_file: str, file_encoding: str) -> str:
     """
     Writes content into a generated temp-file.
     
@@ -18,17 +18,17 @@ def writeTemp(content: str, tmp_file: str, file_encoding: str) -> str:
     tmp_file (str):
         the path to the temporary file written
     """
-    with open(tmp_file, 'wb') as f:
-        f.write(content.encode(file_encoding))
+    with open(tmp_file, 'wb') as raw_f:
+        raw_f.write(content.encode(file_encoding))
     return tmp_file
 
 
-def getStdInContent(oneLine: bool = False):
+def get_stdin_content(one_line: bool = False):
     """
     read the stdin.
     
     Parameters:
-    oneLine (bool):
+    one_line (bool):
         determines if only the first stdin line should be read
         
     Yields:
@@ -36,7 +36,7 @@ def getStdInContent(oneLine: bool = False):
         the input (line by line) delivered by stdin
         until the first EOF (Chr(26)) character
     """
-    if oneLine:
+    if one_line:
         first_line = stdin.readline().rstrip('\n')
         if first_line[-1:] == chr(26):
             first_line = first_line[:-1]
@@ -62,11 +62,11 @@ def path_parts(path: str) -> list:
         contains each drive/directory/file in the path seperated
         "C:/a/b/c/d.txt" -> ['C:/', 'a', 'b', 'c', 'd.txt']
     """
-    p, f = os.path.split(path)
-    return path_parts(p) + [f] if f and p else [p] if p else []
+    _p, _f = os.path.split(path)
+    return path_parts(_p) + [_f] if _f and _p else [_p] if _p else []
 
 
-def createFile(file: str, content: str, file_encoding: str) -> bool:
+def create_file(file: str, content: str, file_encoding: str) -> bool:
     """
     create the directory path to a file, and the file itself.
     on error: cleanup all created subdirectories
@@ -99,8 +99,8 @@ def createFile(file: str, content: str, file_encoding: str) -> bool:
                 continue
         return False
     try:
-        with open(file, 'wb') as f:
-            f.write(content.encode(file_encoding))
+        with open(file, 'wb') as raw_f:
+            raw_f.write(content.encode(file_encoding))
     except OSError:
         print(f"Error: The file '{file}' could not be written.")
         # cleanup (delete the folders that have been created)
@@ -113,7 +113,7 @@ def createFile(file: str, content: str, file_encoding: str) -> bool:
     return True
 
 
-def writeFiles(file_list: list, content: str, file_encoding: str) -> list:
+def write_files(file_list: list, content: str, file_encoding: str) -> list:
     """
     write to multiple files. ask if an empty file should be created
     when there is nothing to write.
@@ -135,19 +135,19 @@ def writeFiles(file_list: list, content: str, file_encoding: str) -> list:
     """
     if len(file_list) == 0:
         return file_list
-    
+
     if content == '':
-        abort_command = '' 
+        abort_command = ''
         try:
             print('You are about to create an empty file. Do you want to continue?')
-            enterChar = '⏎'
+            enter_char = '⏎'
 
             try:
-                if len(enterChar.encode(file_encoding)) != 3:
+                if len(enter_char.encode(file_encoding)) != 3:
                     raise UnicodeEncodeError('', '', -1, -1, '')
             except UnicodeEncodeError:
-                enterChar = 'ENTER'
-            print(f"[Y/{enterChar}] Yes, Continue       [N] No, Abort :", end='')
+                enter_char = 'ENTER'
+            print(f"[Y/{enter_char}] Yes, Continue       [N] No, Abort :", end='')
             abort_command = input()
         except EOFError:
             pass
@@ -158,24 +158,25 @@ def writeFiles(file_list: list, content: str, file_encoding: str) -> list:
             if abort_command and abort_command.upper() != 'Y':
                 print('Aborting...')
                 file_list.clear()
-    
+
     success_file_list = []
-    
+
     for file in file_list:
         try:
-            with open(file, 'wb') as f:
-                f.write(content.encode(file_encoding))
+            with open(file, 'wb') as raw_file:
+                raw_file.write(content.encode(file_encoding))
             success_file_list.append(file)
         except FileNotFoundError: # the os.pardir path to the file does not exist
-            if createFile(file, content, file_encoding):
+            if create_file(file, content, file_encoding):
                 success_file_list.append(file)
         except OSError:
             print(f"Error: The file '{file}' could not be written.")
-            
+
     return success_file_list
 
 
-def readWriteFilesFromStdIn(file_list: list, file_encoding: str, on_windows_os: bool, oneLine: bool = False) -> list:
+def read_write_files_from_stdin(file_list: list, file_encoding: str, on_windows_os: bool,
+                                one_line: bool = False) -> list:
     """
     Write stdin input to multiple files.
     
@@ -187,7 +188,7 @@ def readWriteFilesFromStdIn(file_list: list, file_encoding: str, on_windows_os: 
     on_windows_os (bool):
         indicates if the user is on windows os using
         platform.system() == 'Windows'
-    oneLine (bool):
+    one_line (bool):
         determines if only the first stdin line should be read
         
     Returns:
@@ -199,9 +200,10 @@ def readWriteFilesFromStdIn(file_list: list, file_encoding: str, on_windows_os: 
 
     print('The given FILE(s)', end='')
     print('', *file_list, sep='\n\t')
-    EOFControlChar = 'Z' if on_windows_os else 'D'
-    print(f"do/does not exist. Write the FILE(s) and finish with the ^{EOFControlChar}-suffix (Ctrl + {EOFControlChar}):")
+    eof_control_char = 'Z' if on_windows_os else 'D'
+    print('do/does not exist. Write the FILE(s) and finish with the ', end='')
+    print(f"^{eof_control_char}-suffix (Ctrl + {eof_control_char}):")
 
-    input = ''.join(getStdInContent(oneLine))
+    std_input = ''.join(get_stdin_content(one_line))
 
-    return writeFiles(file_list, input, file_encoding)
+    return write_files(file_list, std_input, file_encoding)
