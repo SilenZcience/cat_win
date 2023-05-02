@@ -2,12 +2,12 @@ from unittest.mock import patch
 from unittest import TestCase
 import os
 
-from cat_win.tests.mocks.std import *
-import cat_win.cat as cat
-import cat_win.util.ArgParser as ArgParser
-
+from cat_win import cat
+from cat_win.tests.mocks.std import StdInMock, StdOutMock
+from cat_win.util import  argparser
 # import sys
 # sys.path.append('../cat_win')
+
 
 test_file_dir = os.path.join(os.path.dirname(__file__), 'texts')
 test_file_path  = os.path.join(test_file_dir, 'test.txt')
@@ -18,90 +18,87 @@ test_result_C   = os.path.join(test_file_dir, 'full_test_result_C.txt')
 test_result_D   = os.path.join(test_file_dir, 'full_test_result_D.txt')
 
 
-
-
-
 @patch('cat_win.cat.sys.stdin', StdInMock())
 class TestCatFull(TestCase):
     maxDiff = None
 
     def tearDown(self):
-        cat._CalculateLinePrefixSpacing.cache_clear()
-        cat._CalculateLineLengthPrefixSpacing.cache_clear()
-        ArgParser.FILE_ENCODING = 'utf-8'
-        ArgParser.FILE_SEARCH = set()
-        ArgParser.FILE_MATCH  = set()
-        ArgParser.FILE_TRUNCATE = [None, None, None]
+        cat._calculate_line_prefix_spacing.cache_clear()
+        cat._calculate_line_length_prefix_spacing.cache_clear()
+        argparser.FILE_ENCODING = 'utf-8'
+        argparser.FILE_SEARCH = set()
+        argparser.FILE_MATCH  = set()
+        argparser.FILE_TRUNCATE = [None, None, None]
         for i in range(len(cat.holder.args_id)):
             cat.holder.args_id[i] = False
-    
+
     # no files parsed
     @patch('cat_win.cat.sys.argv', ['<CAT>', '-ln', '--nc', '[::-2]', 'enc=utf8'])
-    def test_cat_output_full_A(self):
+    def test_cat_output_full_a(self):
         expected_output = ''
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
-            
+
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, '-ln', '--nc', '[::-2]', 'enc=utf8'])
-    def test_cat_output_full_B(self):
+    def test_cat_output_full_b(self):
         expected_output = ''
         with open(test_result_B, 'r', encoding='utf-8') as output:
             expected_output = output.read()
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
-            
+
     @patch('cat_win.cat.sys.argv', ['<CAT>', 'enc:UTF-8', test_file_path, '-ub', '[Sample,TEST]', '--nc', '-le'])
-    def test_cat_output_full_C(self):
+    def test_cat_output_full_c(self):
         expected_output = ''
         with open(test_result_C, 'r', encoding='utf-8') as output:
             expected_output = output.read()
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
-            
+
     @patch('cat_win.cat.sys.argv', ['<CAT>', 'enc=utf-8', test_file_path, 'trunc=2:6', '-n', '--reverse', '--nc', '-t'])
-    def test_cat_output_full_D(self):
+    def test_cat_output_full_d(self):
         expected_output = ''
         with open(test_result_D, 'r', encoding='utf-8') as output:
             expected_output = output.read()
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
-            
+
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, 'trunc=0:0',])
     def test_cat_output_full_empty(self):
         expected_output = ''
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
-            
+
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, 'enc=cp1252', '--nc'])
-    def test_cat_output_full_Cp1252(self):
+    def test_cat_output_full_cp1252(self):
         expected_output = ''
         with open(test_file_path, 'r', encoding='cp1252') as output:
             expected_output = output.read() + '\n'
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
-            
+
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, 'enc=latin_1', '--nc'])
-    def test_cat_output_full_Latin1(self):
+    def test_cat_output_full_latin1(self):
         expected_output = ''
         with open(test_file_path, 'r', encoding='latin_1') as output:
             expected_output = output.read() + '\n'
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
-            
+
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, 'enc=utf-8', 'trunc=0:1', 'find=ple ', 'match=:', '--nc'])
     def test_cat_output_full_find_found(self):
         expected_output = "Sample Text:\n--------------- Found [('ple ', [3, 7])] ---------------\n--------------- Matched [(':', [11, 12])] ---------------\n"
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
-            
+
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, 'enc=utf-8', 'trunc=0:1', 'find=NOTINLINE', '--nc'])
     def test_cat_output_full_find_not_found(self):
         expected_output = 'Sample Text:\n'
@@ -115,14 +112,14 @@ class TestCatFull(TestCase):
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
-            
+
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, 'enc=utf-8', 'find=Text', '--nc', '--grep'])
     def test_cat_output_full_find_found_grep(self):
         expected_output = 'Sample Text:\n'
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
-            
+
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_peek, 'enc=utf-8', '--peek'])
     def test_cat_output_full_peek(self):
         expected_output = """1
@@ -142,6 +139,6 @@ class TestCatFull(TestCase):
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
-            
+
 
 # python -m unittest discover -s tests -p test*.py

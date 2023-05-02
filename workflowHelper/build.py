@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from glob import iglob
 from shutil import rmtree
-from sys import exit
+from sys import exit as sysexit
 import os
 import subprocess
 
@@ -19,7 +19,7 @@ with open(entry_dir, 'r', encoding='utf-8') as f:
     cat = f.read()
 
 if cat == '':
-    exit(1)
+    sysexit(1)
 
 with open(entry_dir, 'w', encoding='utf-8') as f:
     f.write('import pyperclip as pc\n' + cat)
@@ -53,7 +53,7 @@ for _ in range(3):
         status = sub.returncode
         if status == 0:
             break
-    except:
+    except Exception:
         pass
 
 
@@ -62,4 +62,4 @@ for _init in _initFiles:
     f = open(_init, 'x', encoding='utf-8')
     f.close()
     
-exit(status)
+sysexit(status)
