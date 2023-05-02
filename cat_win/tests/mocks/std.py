@@ -38,3 +38,13 @@ class StdInMock:
 
     def __iter__(self) -> StdInMockIter:
         return StdInMockIter(self)
+
+class StdInHelperMock:
+    def __init__(self, content: str = '') -> None:
+        self.content = content
+        
+    def set_content(self, content: str) -> None:
+        self.content = content
+        
+    def get_stdin_content(self, one_line: bool = False):
+        yield from self.content.split('\n')
