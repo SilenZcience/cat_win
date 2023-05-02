@@ -44,7 +44,19 @@ for path in iglob(package_dir + '/*/__init__.py', recursive=True):
         print(f"Error: {e.filename} - {e.strerror}.")
 
 status = 1
-command = 'pyinstaller ./cat_win/cat.py --onefile --clean --dist ./bin --version-file ./bin/exeVersionFile -n catw'.split(' ')
+command = 'pyinstaller ./cat_win/__main__.py --onefile --clean --dist ./bin --version-file ./bin/catwversionfile -n catw'.split(' ')
+# try pyinstaller 3 times at most...
+for _ in range(3):
+    try:
+        sub = subprocess.run(command, check=True)
+        print(sub)
+        status = sub.returncode
+        if status == 0:
+            break
+    except Exception:
+        pass
+    
+command = 'pyinstaller ./cat_win/shell.py --onefile --clean --dist ./bin --version-file ./bin/catsversionfile -n cats'.split(' ')
 # try pyinstaller 3 times at most...
 for _ in range(3):
     try:
