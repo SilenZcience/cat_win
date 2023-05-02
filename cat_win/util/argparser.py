@@ -118,7 +118,7 @@ class ArgParser:
         return False
 
 
-    def gen_arguments(self, argv: list, delete: bool = False) -> tuple:
+    def gen_arguments(self, argv: list, delete: bool = False) -> None:
         """
         Read all args to either a valid parameter, an invalid parameter,
         a known file, an unknown file, or an echo parameter to print out.
