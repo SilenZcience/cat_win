@@ -867,6 +867,9 @@ def shell_main():
         else:
             stripped_line = stripped_line[:1].replace('\\', '') + stripped_line[1:]
             edit_content([('', stripped_line)], False, -1, i-command_count)
+            if holder.args_id[ARGS_CLIP]:
+                copy_to_clipboard(remove_ansi_codes_from_line(holder.clip_board))
+                holder.clip_board = ''
         if not oneline:
             print(shell_prefix, end='', flush=True)
 

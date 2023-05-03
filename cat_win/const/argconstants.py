@@ -43,7 +43,7 @@ ALL_ARGS = [
     ArgConstant('-i', '--interactive', 'use stdin', ARGS_INTERACTIVE, True, False),
     ArgConstant('-o', '--oneline', 'take only the first stdin-line', ARGS_ONELINE, True, False),
     ArgConstant('-E', '--ECHO', 'handle every following parameter as stdin', ARGS_ECHO, True, False),
-    ArgConstant('-c', '--clip', 'copy output to clipboard', ARGS_CLIP, True, False),
+    ArgConstant('-c', '--clip', 'copy output to clipboard', ARGS_CLIP),
     ArgConstant('-m', '--checksum', 'show the checksums of all files', ARGS_CHECKSUM, True, False),
     ArgConstant('-a', '--attributes', 'show meta-information about the files', ARGS_DATA, True, False),
     ArgConstant('--dec', '--DEC', 'convert decimal numbers to hexadecimal and binary', ARGS_DEC),
