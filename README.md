@@ -147,7 +147,7 @@ catw --help
 | *-i, --interactive*    | use stdin                                                 | ❌             |
 | *-o, --oneline*        | take only the first stdin-line                            | ❌             |
 | *-E, --ECHO*           | handle every following parameter as stdin                 | ❌             |
-| *-c, --clip*           | copy output to clipboard                                  | ❌             |
+| *-c, --clip*           | copy output to clipboard                                  | ✔              |
 | *-m, --checksum*       | show the checksums of all files                           | ❌             |
 | *-a, --attributes*     | show meta-information about the files                     | ❌             |
 |                        |                                                           |                |
