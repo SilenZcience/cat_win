@@ -5,9 +5,12 @@ from re import match
 from cat_win.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_ECHO
 
 
+DEFAULT_FILE_ENCODING = 'utf-8'
+
+
 class ArgParser:
     def __init__(self) -> None:
-        self.file_encoding: str = 'utf-8'
+        self.file_encoding: str = DEFAULT_FILE_ENCODING
         self.file_search = set()
         self.file_match = set()
         self.file_truncate = [None, None, None]
@@ -70,11 +73,10 @@ class ArgParser:
                 return False
             self.file_search.add(param[5:])
             return False
-        # 'trunc' + ('=' or ':') + file_truncate[0] + ':' + file_truncate[1] + ':' + file_truncate[2]
+        # 'trunc' + ('=' or ':') + file_truncate[0] + ':' + file_truncate[1] [+ ':' + file_truncate[2]]
         if match(r"\Atrunc[\=\:][0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\Z", param):
             param_split = param[6:].split(':')
-            self.file_truncate[0] = None if param_split[0] == '' else (
-                0 if param_split[0] == '0' else int(eval(param_split[0]))-1)
+            self.file_truncate[0] = None if param_split[0] == '' else max(0, int(eval(param_split[0]))-1)
             self.file_truncate[1] = None if param_split[1] == '' else int(eval(param_split[1]))
             if len(param_split) == 3:
                 self.file_truncate[2] = None if param_split[2] == '' else int(eval(param_split[2]))

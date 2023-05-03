@@ -27,5 +27,3 @@ class TestBase64(TestCase):
                            ('', '123404'),
                            ('', 'ÄÖÜ  TEST')]
         self.assertEqual(decode_base64(test_input), expected_output)
-
-# python -m unittest discover -s tests -p test*.py

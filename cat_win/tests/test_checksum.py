@@ -27,5 +27,3 @@ class TestChecksum(TestCase):
         expected_output += '\tXSHA256:  dfb46efd198ad4b1204308c2be1c5e0254effe0de3ed314dea394cafdfd1749fY\n'
         expected_output += '\tXSHA512:  bf35256e790288a6dbf93b7327e1f97840349e0490b48848273663d34ad493e73a325df6725d7b0d5eb680d751bfe3cc49bd82ce9e8527412ce2cc8355a391a1Y\n'
         self.assertEqual(get_checksum_from_file(test_file_path, ['X', 'Y']), expected_output)
-
-# python -m unittest discover -s tests -p test*.py
