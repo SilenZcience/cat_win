@@ -180,18 +180,18 @@ catw --help
 	<summary><b>📂 Images 📂</b></summary>
 
    <p float="left">
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example1.png" width="47%"/>
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example2.png" width="47%"/>
+      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example1.png" width="49%"/>
+      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example2.png" width="49%"/>
    </p>
 
    <p float="left">
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example3.png" width="47%"/>
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example4.png" width="47%"/>
+      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example3.png" width="49%"/>
+      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example4.png" width="49%"/>
    </p>
 
    <p float="left">
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example5.png" width="47%"/>
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example6.png" width="47%"/>
+      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example5.png" width="49%"/>
+      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example6.png" width="49%"/>
    </p>
 
 </details>
