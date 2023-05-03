@@ -124,6 +124,11 @@ catw --help
 
 > ⚠️ *from v1.0.33 to v1.1.0 the entrypoint changes from `cat` to `catw`. If you wish to keep the old command, you will have to define an alias yourself.*
 
+```console
+cats [OPTION]...
+cats --help
+```
+
 | Argument / Option      | Description                                               | works in shell |
 |------------------------|-----------------------------------------------------------|----------------|
 | *-h, --help*           | show help message and exit                                | ✔              |
@@ -195,6 +200,13 @@ catw --help
       <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example6.png" width="49%"/>
    </p>
 
+   - - - -
+
+   <p float="left">
+      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example7.png" width="49%"/>
+      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example8.png" width="49%"/>
+   </p>
+
 </details>
 
 ```console
@@ -202,10 +214,7 @@ $ echo "Hello World :)" | catw -i [6:] | catw -i [::-1] -ln
 > 1) [8] ): dlroW
 ```
 
-```console
-cats [OPTION]...
-cats --help
-```
+- - - -
 
 ```c
 $ cats --dec -nl
