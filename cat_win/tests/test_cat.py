@@ -148,6 +148,16 @@ class TestCat(TestCase):
                     self.assertIn(arg.arg_help, fake_out.getvalue())
 
     @patch('cat_win.cat.print_update_information', new=lambda *_: '')
+    def test__show_help_shell(self):
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+            cat._show_help(True)
+            for arg in cat.ALL_ARGS:
+                if arg.show_arg and arg.show_arg_on_shell:
+                    self.assertIn(arg.short_form, fake_out.getvalue())
+                    self.assertIn(arg.long_form, fake_out.getvalue())
+                    self.assertIn(arg.arg_help, fake_out.getvalue())
+
+    @patch('cat_win.cat.print_update_information', new=lambda *_: '')
     def test__show_version(self):
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat._show_version()
