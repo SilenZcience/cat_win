@@ -25,5 +25,3 @@ class TestFile(TestCase):
 
         file.set_contains_queried(False)
         self.assertEqual(file.contains_queried, True)
-
-# python -m unittest discover -s tests -p test*.py

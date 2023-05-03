@@ -80,5 +80,3 @@ class TestConverter(TestCase):
 
         self.assertEqual(converter.is_bin('2'), expected_output)
         self.assertEqual(converter.is_bin('0x1'), expected_output)
-
-# python -m unittest discover -s tests -p test*.py

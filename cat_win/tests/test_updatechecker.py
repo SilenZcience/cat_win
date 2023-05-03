@@ -61,5 +61,3 @@ class TestUpdateChecker(TestCase):
 
     def test_version_availability_current_is_newest(self):
         self.assertEqual(updatechecker.new_version_available('v1.1.9', '1.0.9a'), 0)
-
-# python -m unittest discover -s tests -p test*.py

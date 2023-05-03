@@ -137,5 +137,4 @@ class TestCatFull(TestCase):
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
 
-
-# python -m unittest discover -s tests -p test*.py
+# python -m unittest discover -s cat_win.tests -p test*.py
