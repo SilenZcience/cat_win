@@ -209,7 +209,7 @@ cats --help
 
 </details>
 
-```console
+```c
 $ echo "Hello World :)" | catw -i [6:] | catw -i [::-1] -ln
 > 1) [8] ): dlroW
 ```
@@ -220,15 +220,7 @@ $ echo "Hello World :)" | catw -i [6:] | catw -i [::-1] -ln
 $ cats --dec -nl
 > >>> 12345
 > 1) [53] 12345 {Hexadecimal: 0x3039; Binary: 0b11000000111001}
-> >>> !del --dec -l
-> successfully removed ['--dec', '-l'].
-> >>> 54321
-> 2) 54321
-> >>> !add --b64e
-> successfully added ['--b64e'].
-> >>> Test404
-> VGVzdDQwNA==
-> ...
+> >>> ...
 ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
