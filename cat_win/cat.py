@@ -59,14 +59,18 @@ def exception_handler(exception_type: type, exception, traceback, debug_hook=sys
 sys.excepthook = exception_handler
 
 
-def _show_help() -> None:
+def _show_help(shell: bool = False) -> None:
     """
     Show the Help message and exit.
     """
-    help_message = 'Usage: catw [FILE]... [OPTION]...\n'
-    help_message += 'Concatenate FILE(s) to standard output.\n\n'
+    if shell:
+        help_message = 'Usage: cats [OPTION]...\n'
+        help_message += 'Interactively manipulate standard input.\n\n'
+    else:
+        help_message = 'Usage: catw [FILE]... [OPTION]...\n'
+        help_message += 'Concatenate FILE(s) to standard output.\n\n'
     for arg in ALL_ARGS:
-        if arg.show_arg:
+        if arg.show_arg and (not shell or arg.show_arg_on_shell):
             help_message += f"\t{f'{arg.short_form}, {arg.long_form}': <25}{arg.arg_help}\n"
     help_message += '\n'
     help_message += f"\t{'-R, --R<stream>': <25}reconfigure the std-stream(s) with the parsed encoding\n"
@@ -75,15 +79,23 @@ def _show_help() -> None:
     help_message += f"\t{'enc=X, enc:X'    : <25}set file encoding to X (default is utf-8)\n"
     help_message += f"\t{'find=X, find:X'  : <25}find/query a substring X in the given files\n"
     help_message += f"\t{'match=X, match:X': <25}find/query a pattern X in the given files\n"
-    help_message += f"\t{'trunc=X:Y, trunc:X:Y': <25}truncate file to lines x and y (python-like)\n"
+    if not shell:
+        help_message += f"\t{'trunc=X:Y, trunc:X:Y': <25}truncate file to lines x and y (python-like)\n"
     help_message += '\n'
     help_message += f"\t{'[a,b]': <25}replace a with b in every line\n"
     help_message += f"\t{'[a:b:c]': <25}python-like string indexing syntax (line by line)\n"
     help_message += '\n'
     help_message += 'Examples:\n'
-    help_message += f"\t{'cat f g -r' : <25}Output g's contents in reverse order, then f's content in reverse order\n"
-    help_message += f"\t{'cat f g -ne': <25}Output f's, then g's content, while numerating and showing the end of lines\n"
-    help_message += f"\t{'cat f trunc=a:b:c': <25}Output f's content starting at line a, ending at line b, stepping c\n"
+    if shell:
+        help_message += '\tcats --ln --dec\n'
+        help_message += '\t> >>> 12345\n'
+        help_message += '\t1) [53] 12345 {Hexadecimal: 0x3039; Binary: 0b11000000111001}\n'
+        help_message += '\t> >>> !help\n'
+        help_message += '\t> ...\n'
+    else:
+        help_message += f"\t{'catw f g -r' : <25}Output g's contents in reverse order, then f's content in reverse order\n"
+        help_message += f"\t{'catw f g -ne': <25}Output f's, then g's content, while numerating and showing the end of lines\n"
+        help_message += f"\t{'catw f trunc=a:b:c': <25}Output f's content starting at line a, ending at line b, stepping c\n"
     print(help_message)
     print_update_information(__project__, __version__, color_dic)
 
@@ -704,7 +716,7 @@ def init(shell: bool = False) -> tuple:
         _show_debug(holder.args, unknown_args, known_files, unknown_files, echo_args)
     if (len(known_files) + len(unknown_files) + len(holder.args) == 0 and not shell) or \
         holder.args_id[ARGS_HELP]:
-        _show_help()
+        _show_help(shell)
         sys.exit(0)
     if holder.args_id[ARGS_VERSION]:
         _show_version()

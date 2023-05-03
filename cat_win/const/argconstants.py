@@ -4,12 +4,13 @@ class ArgConstant():
     defines an argument
     """
     def __init__(self, short_form: str, long_form: str, arg_help: str, arg_id: int,
-                 show_arg: bool = True):
+                 show_arg: bool = True, show_arg_on_shell: bool = True):
         self.short_form = short_form
         self.long_form = long_form
         self.arg_help = arg_help
         self.arg_id = arg_id
         self.show_arg = show_arg
+        self.show_arg_on_shell = show_arg_on_shell
 
 
 ARGS_HELP, ARGS_NUMBER, ARGS_ENDS, ARGS_TABS, ARGS_SQUEEZE = range(0, 5)
@@ -30,28 +31,28 @@ ALL_ARGS = [
     ArgConstant('-e', '--ends', 'display $ at the end of each line', ARGS_ENDS),
     ArgConstant('-t', '--tabs', 'display TAB characters as ^I', ARGS_TABS),
     ArgConstant('--eof', '--eof', 'display EOF characters as ^EOF', ARGS_EOF),
-    ArgConstant('-u', '--unique', 'suppress repeated output lines', ARGS_SQUEEZE),
+    ArgConstant('-u', '--unique', 'suppress repeated output lines', ARGS_SQUEEZE, True, False),
     ArgConstant('-b', '--blank', 'hide empty lines', ARGS_BLANK),
-    ArgConstant('-r', '--reverse', 'reverse output', ARGS_REVERSE),
-    ArgConstant('-p', '--peek', 'only print the first and last lines', ARGS_PEEK),
-    ArgConstant('-s', '--sum', 'show sum of lines', ARGS_COUNT),
-    ArgConstant('-S', '--SUM', 'ONLY show sum of lines', ARGS_CCOUNT),
-    ArgConstant('-f', '--files', 'list applied files', ARGS_FILES),
-    ArgConstant('-F', '--FILES', 'ONLY list applied files and file sizes', ARGS_FFILES),
+    ArgConstant('-r', '--reverse', 'reverse output', ARGS_REVERSE, True, False),
+    ArgConstant('-p', '--peek', 'only print the first and last lines', ARGS_PEEK, True, False),
+    ArgConstant('-s', '--sum', 'show sum of lines', ARGS_COUNT, True, False),
+    ArgConstant('-S', '--SUM', 'ONLY show sum of lines', ARGS_CCOUNT, True, False),
+    ArgConstant('-f', '--files', 'list applied files', ARGS_FILES, True, False),
+    ArgConstant('-F', '--FILES', 'ONLY list applied files and file sizes', ARGS_FFILES, True, False),
     ArgConstant('-g', '--grep', 'only show lines containing queried keywords', ARGS_GREP),
-    ArgConstant('-i', '--interactive', 'use stdin', ARGS_INTERACTIVE),
-    ArgConstant('-o', '--oneline', 'take only the first stdin-line', ARGS_ONELINE),
-    ArgConstant('-E', '--ECHO', 'handle every following parameter as stdin', ARGS_ECHO),
-    ArgConstant('-c', '--clip', 'copy output to clipboard', ARGS_CLIP),
-    ArgConstant('-m', '--checksum', 'show the checksums of all files', ARGS_CHECKSUM),
-    ArgConstant('-a', '--attributes', 'show meta-information about the files', ARGS_DATA),
+    ArgConstant('-i', '--interactive', 'use stdin', ARGS_INTERACTIVE, True, False),
+    ArgConstant('-o', '--oneline', 'take only the first stdin-line', ARGS_ONELINE, True, False),
+    ArgConstant('-E', '--ECHO', 'handle every following parameter as stdin', ARGS_ECHO, True, False),
+    ArgConstant('-c', '--clip', 'copy output to clipboard', ARGS_CLIP, True, False),
+    ArgConstant('-m', '--checksum', 'show the checksums of all files', ARGS_CHECKSUM, True, False),
+    ArgConstant('-a', '--attributes', 'show meta-information about the files', ARGS_DATA, True, False),
     ArgConstant('--dec', '--DEC', 'convert decimal numbers to hexadecimal and binary', ARGS_DEC),
     ArgConstant('--hex', '--HEX', 'convert hexadecimal numbers to decimal and binary', ARGS_HEX),
     ArgConstant('--bin', '--BIN', 'convert binary numbers to decimal and hexadecimal', ARGS_BIN),
     ArgConstant('--b64e', '--b64e', 'encode the input to base64', ARGS_B64E),
     ArgConstant('--b64d', '--b64d', 'decode the input from base64', ARGS_B64D),
-    ArgConstant('--hexview', '--HEXVIEW', 'display the raw byte representation in hexadecimal', ARGS_HEXVIEW),
-    ArgConstant('--binview', '--binview', 'display the raw byte representation in binary', ARGS_BINVIEW),
+    ArgConstant('--hexview', '--HEXVIEW', 'display the raw byte representation in hexadecimal', ARGS_HEXVIEW, True, False),
+    ArgConstant('--binview', '--binview', 'display the raw byte representation in binary', ARGS_BINVIEW, True, False),
     ArgConstant('--nc', '--nocolor', 'disable colored output', ARGS_NOCOL),
     ArgConstant('--nb', '--nobreak', 'do not interrupt the output on queried keywords', ARGS_NOBREAK),
     ArgConstant('--nk', '--nokeyword', 'inverse the grep output', ARGS_NOKEYWORD),
