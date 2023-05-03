@@ -105,8 +105,9 @@ and manually install the desired module yourself.
 
 **OR alternatively** you can use the compiled version (*`Windows only`*):
 
-1. Simply download the [catw.exe](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/catw.exe) file.
-2. Add the file path to your system-environment `PATH`-variables.
+1. Simply download the [catw.exe](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/catw.exe) file to handle filecontents.
+2. Download the [cats.exe](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/cats.exe) file to use the cat-shell (optional).
+3. Add the file path to your system-environment `PATH`-variables.
 
 > ⚠️ **You should never trust any executable file!** Feel free to compile the package yourself (e.g. using [PyInstaller](https://pyinstaller.org/en/stable/)).
 
@@ -201,12 +202,23 @@ $ echo "Hello World :)" | catw -i [6:] | catw -i [::-1] -ln
 > 1) [8] ): dlroW
 ```
 
+```console
+cats [OPTION]...
+cats --help
+```
+
 ```c
 $ cats --dec -nl
 > >>> 12345
 > 1) [53] 12345 {Hexadecimal: 0x3039; Binary: 0b11000000111001}
+> >>> !del --dec -l
+> successfully removed ['--dec', '-l'].
 > >>> 54321
-> 2) [55] 54321 {Hexadecimal: 0xd431; Binary: 0b1101010000110001}
+> 2) 54321
+> >>> !add --b64e
+> successfully added ['--b64e'].
+> >>> Test404
+> VGVzdDQwNA==
 > ...
 ```
 
