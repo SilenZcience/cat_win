@@ -124,56 +124,56 @@ catw --help
 
 > ⚠️ *from v1.0.33 to v1.1.0 the entrypoint changes from `cat` to `catw`. If you wish to keep the old command, you will have to define an alias yourself.*
 
-| Argument / Option      | Description                                               |
-|------------------------|-----------------------------------------------------------|
-| *-h, --help*           | show help message and exit                                |
-| *-v, --version*        | output version information                                |
-| *-d, --debug*          | show debug information                                    |
-|                        |                                                           |
-| *-n, --number*         | number all output lines                                   |
-| *-l, --linelength*     | display the length of each line                           |
-| *-e, --ends*           | display $ at the end of each line                         |
-| *-t, --tabs*           | display TAB characters as ^I                              |
-| *--eof, --eof*         | display EOF characters as ^EOF                            |
-| *-u, --unique*         | suppress repeated output lines                            |
-| *-b, --blank*          | hide empty lines                                          |
-| *-r, --reverse*        | reverse output                                            |
-| *-p, --peek*           | only print the first and last lines                       |
-| *-s, --sum*            | show sum of lines                                         |
-| *-S, --SUM*            | ONLY show sum of lines                                    |
-| *-f, --files*          | list applied files                                        |
-| *-F, --FILES*          | ONLY list applied files and file sizes                    |
-| *-g, --grep*           | only show lines containing queried keywords               |
-| *-i, --interactive*    | use stdin                                                 |
-| *-o, --oneline*        | take only the first stdin-line                            |
-| *-E, --ECHO*           | handle every following parameter as stdin                 |
-| *-c, --clip*           | copy output to clipboard                                  |
-| *-m, --checksum*       | show the checksums of all files                           |
-| *-a, --attributes*     | show meta-information about the files                     |
-|                        |                                                           |
-| *--dec, --DEC*         | convert decimal numbers to hexadecimal and binary         |
-| *--hex, --HEX*         | convert hexadecimal numbers to decimal and binary         |
-| *--bin, --BIN*         | convert binary numbers to decimal and hexadecimal         |
-| *--b64e, --b64e*       | encode the input to base64                                |
-| *--b64d, --b64d*       | decode the input from base64                              |
-|                        |                                                           |
-| *--hexview, --HEXVIEW* | display the raw byte representation in hexadecimal        |
-| *--binview, --binview* | display the raw byte representation in binary             |
-|                        |                                                           |
-| *--nc, --nocolor*      | disable colored output                                    |
-| *--nb, --nobreak*      | do not interrupt the output on queried keywords           |
-| *--nk, --nokeyword*    | inverse the grep output                                   |
-| *--config, --config*   | change color configuration                                |
-|                        |                                                           |
-| *-R, --R\<stream\>*    | reconfigure the std-stream(s) with the parsed encoding </br> \<stream\> = 'in'/'out'/'err' (default is stdin & stdout)|
-|                        |                                                           |
-| *enc=X*                | set file enconding to X (default is utf-8)                |
-| *find=X*               | find/query a substring X in the given files               |
-| *match=X*              | find/query a pattern X in the given files                 |
-| *trunc=X:Y*            | truncate file to lines X and Y (python-like)              |
-|                        |                                                           |
-| *[a,b]*                | replace a with b in every line                            |
-| *[a:​b:c]*              | python-like string indexing syntax (line by line)         |
+| Argument / Option      | Description                                               | works in shell |
+|------------------------|-----------------------------------------------------------|----------------|
+| *-h, --help*           | show help message and exit                                | ✔              |
+| *-v, --version*        | output version information                                | ✔              |
+| *-d, --debug*          | show debug information                                    | ✔              |
+|                        |                                                           |                |
+| *-n, --number*         | number all output lines                                   | ✔              |
+| *-l, --linelength*     | display the length of each line                           | ✔              |
+| *-e, --ends*           | display $ at the end of each line                         | ✔              |
+| *-t, --tabs*           | display TAB characters as ^I                              | ✔              |
+| *--eof, --eof*         | display EOF characters as ^EOF                            | ✔              |
+| *-u, --unique*         | suppress repeated output lines                            | ❌             |
+| *-b, --blank*          | hide empty lines                                          | ✔              |
+| *-r, --reverse*        | reverse output                                            | ❌             |
+| *-p, --peek*           | only print the first and last lines                       | ❌             |
+| *-s, --sum*            | show sum of lines                                         | ❌             |
+| *-S, --SUM*            | ONLY show sum of lines                                    | ❌             |
+| *-f, --files*          | list applied files                                        | ❌             |
+| *-F, --FILES*          | ONLY list applied files and file sizes                    | ❌             |
+| *-g, --grep*           | only show lines containing queried keywords               | ✔              |
+| *-i, --interactive*    | use stdin                                                 | ❌             |
+| *-o, --oneline*        | take only the first stdin-line                            | ❌             |
+| *-E, --ECHO*           | handle every following parameter as stdin                 | ❌             |
+| *-c, --clip*           | copy output to clipboard                                  | ❌             |
+| *-m, --checksum*       | show the checksums of all files                           | ❌             |
+| *-a, --attributes*     | show meta-information about the files                     | ❌             |
+|                        |                                                           |                |
+| *--dec, --DEC*         | convert decimal numbers to hexadecimal and binary         | ✔              |
+| *--hex, --HEX*         | convert hexadecimal numbers to decimal and binary         | ✔              |
+| *--bin, --BIN*         | convert binary numbers to decimal and hexadecimal         | ✔              |
+| *--b64e, --b64e*       | encode the input to base64                                | ✔              |
+| *--b64d, --b64d*       | decode the input from base64                              | ✔              |
+|                        |                                                           |                |
+| *--hexview, --HEXVIEW* | display the raw byte representation in hexadecimal        | ❌             |
+| *--binview, --binview* | display the raw byte representation in binary             | ❌             |
+|                        |                                                           |                |
+| *--nc, --nocolor*      | disable colored output                                    | ✔              |
+| *--nb, --nobreak*      | do not interrupt the output on queried keywords           | ✔              |
+| *--nk, --nokeyword*    | inverse the grep output                                   | ✔              |
+| *--config, --config*   | change color configuration                                | ✔              |
+|                        |                                                           |                |
+| *-R, --R\<stream\>*    | reconfigure the std-stream(s) with the parsed encoding </br> \<stream\> = 'in'/'out'/'err' (default is stdin & stdout)| ✔ |
+|                        |                                                           |                |
+| *enc=X*                | set file enconding to X (default is utf-8)                | ✔              |
+| *find=X*               | find/query a substring X in the given files               | ✔              |
+| *match=X*              | find/query a pattern X in the given files                 | ✔              |
+| *trunc=X:Y*            | truncate file to lines X and Y (python-like)              | ❌             |
+|                        |                                                           |                |
+| *[a,b]*                | replace a with b in every line                            | ✔              |
+| *[a:​b:c]*              | python-like string indexing syntax (line by line)         | ✔              |
 
 ### Examples
 
