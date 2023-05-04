@@ -25,6 +25,8 @@ def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors = None,
     """
     if colors is None or len(colors) < 2:
         colors = ['', '']
+    if mode not in ['x', 'X', 'b']:
+        mode = 'X'
 
     CRLF = {10: '␤', 13: '␍'}
 
