@@ -30,6 +30,9 @@ class StdInMock:
     def __init__(self, input_value: str = '') -> None:
         self.input_value = input_value
 
+    def set_content(self, input_value: str) -> None:
+        self.input_value = input_value
+
     # def reconfigure(self, encoding = None) -> None:
     #     return
 
