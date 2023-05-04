@@ -823,6 +823,11 @@ def shell_main():
             method(line_split[1:])
             return True
 
+        def _command_cat(self, _) -> None:
+            cat = " ,_     _\n |\\\\_,-~/\n / _  _ |    ,--.\n(  @  @ )   / ,-'\n \  _T_/"
+            cat += "-._( (\n /         `. \\\n|         _  \ |\n \ \ ,  /      |\n  || |-_\__   /\n ((_/`(____,-'\n"
+            print('\n'.join(['\t\t\t' + c for c in cat.split('\n')]))
+
         def _command_help(self, _) -> None:
             print(f"Type ^{eof_control_char} (Ctrl + {eof_control_char}) or '!exit' to exit.")
             print("Type '!add <OPTION>', '!del <OPTION>', '!see' to change/see the active parameters.")
@@ -866,10 +871,11 @@ def shell_main():
                 break
         else:
             stripped_line = stripped_line[:1].replace('\\', '') + stripped_line[1:]
-            edit_content([('', stripped_line)], False, -1, i-command_count)
-            if holder.args_id[ARGS_CLIP]:
-                copy_to_clipboard(remove_ansi_codes_from_line(holder.clip_board))
-                holder.clip_board = ''
+            if stripped_line:
+                edit_content([('', stripped_line)], False, -1, i-command_count)
+                if holder.args_id[ARGS_CLIP]:
+                    copy_to_clipboard(remove_ansi_codes_from_line(holder.clip_board))
+                    holder.clip_board = ''
         if not oneline:
             print(shell_prefix, end='', flush=True)
 
