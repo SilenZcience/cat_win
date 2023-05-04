@@ -71,7 +71,7 @@ class Holder():
 
     def delete_args(self, args: list) -> None:
         self.args_id = [False] * (HIGHEST_ARG_ID + 1)
-        self.set_args([arg for arg in self.args if not arg in args])
+        self.set_args([arg for arg in self.args if arg not in args])
 
     def set_temp_file_stdin(self, file: str) -> None:
         self.temp_file_stdin = file

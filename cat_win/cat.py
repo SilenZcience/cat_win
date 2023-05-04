@@ -549,7 +549,7 @@ def edit_file(file_index: int = 0) -> None:
                 enter_char = 'ENTER'
             print(f"Do you want to open the file as a binary, without parameters? [Y/{enter_char}]:", end='')
             inp = input()
-            if not 'Y' in inp.upper() and inp:
+            if inp and 'Y' not in inp.upper():
                 print('Aborting...')
                 return
         except EOFError:
@@ -649,7 +649,7 @@ def edit_files() -> None:
     if holder.args_id[ARGS_HEXVIEW] or holder.args_id[ARGS_BINVIEW]:
         for arg, param in holder.args:
             if arg == ARGS_HEXVIEW:
-                raw_view_mode = 'X' if param == param.upper() else 'x'
+                raw_view_mode = 'X' if param.isupper() else 'x'
                 break
             if arg == ARGS_BINVIEW:
                 raw_view_mode = 'b'
@@ -824,8 +824,8 @@ def shell_main():
             return True
 
         def _command_cat(self, _) -> None:
-            cat = " ,_     _\n |\\\\_,-~/\n / _  _ |    ,--.\n(  @  @ )   / ,-'\n \  _T_/"
-            cat += "-._( (\n /         `. \\\n|         _  \ |\n \ \ ,  /      |\n  || |-_\__   /\n ((_/`(____,-'\n"
+            cat = " ,_     _\n |\\\\_,-~/\n / _  _ |    ,--.\n(  @  @ )   / ,-'\n \\  _T_/"
+            cat += "-._( (\n /         `. \\\n|         _  \\ |\n \\ \\ ,  /      |\n  || |-_\\__   /\n ((_/`(____,-'\n"
             print('\n'.join(['\t\t\t' + c for c in cat.split('\n')]))
 
         def _command_help(self, _) -> None:
