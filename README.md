@@ -86,7 +86,7 @@ Contrary to the name of the project it is of course possible to use cat_win on L
 ### Prerequisites
 
 - Using cat_win as a Python-Package demands a Python-Interpreter (>= 3.7).
-- Using cat_win as an Executable (Windows only!) demands no prerequisites, hereby the stand-alone executable `catw.exe`  is sufficient.
+- Using cat_win as an Executable (Windows only!) demands no prerequisites, hereby the stand-alone executables `catw.exe` (& `cats.exe`) are sufficient.
 
 ### Installation
 [![Version][CurrentVersion]](https://pypi.org/project/cat-win/)
@@ -133,7 +133,7 @@ cats --help
 |------------------------|-----------------------------------------------------------|----------------|
 | *-h, --help*           | show help message and exit                                | ✔              |
 | *-v, --version*        | output version information                                | ✔              |
-| *-d, --debug*          | show debug information                                    | ✔              |
+| *--debug, --debug*     | show debug information                                    | ✔              |
 |                        |                                                           |                |
 | *-n, --number*         | number all output lines                                   | ✔              |
 | *-l, --linelength*     | display the length of each line                           | ✔              |
