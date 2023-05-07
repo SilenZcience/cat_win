@@ -6,8 +6,11 @@ class File:
     def __init__(self, path: str, display_name: str) -> None:
         self.path = path
         self.displayname = display_name
-
+        self.file_size = -1
         self.contains_queried = False
 
-    def set_contains_queried(self, contains_queried) -> None:
+    def set_contains_queried(self, contains_queried: bool) -> None:
         self.contains_queried = self.contains_queried or contains_queried
+        
+    def set_file_size(self, file_size: int) -> None:
+        self.file_size = file_size

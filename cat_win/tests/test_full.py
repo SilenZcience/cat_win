@@ -5,6 +5,7 @@ import os
 from cat_win import cat
 from cat_win.tests.mocks.std import StdInMock, StdOutMock
 from cat_win.util.argparser import ArgParser
+from cat_win.util.holder import Holder
 # import sys
 # sys.path.append('../cat_win')
 
@@ -26,8 +27,7 @@ class TestCatFull(TestCase):
         cat._calculate_line_prefix_spacing.cache_clear()
         cat._calculate_line_length_prefix_spacing.cache_clear()
         cat.arg_parser = ArgParser()
-        for i in range(len(cat.holder.args_id)):
-            cat.holder.args_id[i] = False
+        cat.holder = Holder()
 
     # no files parsed
     @patch('cat_win.cat.sys.argv', ['<CAT>', '-ln', '--nc', '[::-2]', 'enc=utf8'])

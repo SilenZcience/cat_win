@@ -14,20 +14,17 @@ test_file_edge_case_2 = os.path.join(test_file_dir, 'test_holderEdgeCase_2.txt')
 test_file_edge_case_3 = os.path.join(test_file_dir, 'test_holderEdgeCase_3.txt')
 test_file_edge_case_4 = os.path.join(test_file_dir, 'test_holderEdgeCase_4.txt')
 test_file_empty       = os.path.join(test_file_dir, 'test_empty.txt')
-holder = Holder()
 
 
 class TestHolder(TestCase):
-    def tearDown(self):
-        holder.args = []
-        holder.args_id = [False] * (HIGHEST_ARG_ID + 1)
-
     def test__calc_file_line_length_place_holder__(self):
+        holder = Holder()
         holder.set_files([test_file_path])
         holder.__calc_file_line_length_place_holder__()
         self.assertEqual(holder.file_line_length_place_holder, 2)
 
     def test__calc_file_line_length_place_holder__edge(self):
+        holder = Holder()
         holder.set_files([test_file_edge_case_1])
         holder.__calc_file_line_length_place_holder__()
         self.assertEqual(holder.file_line_length_place_holder, 1)
@@ -45,9 +42,11 @@ class TestHolder(TestCase):
         self.assertEqual(holder.file_line_length_place_holder, 2)
 
     def test___calc_max_line_length___empty(self):
+        holder = Holder()
         self.assertEqual(holder.__calc_max_line_length__(test_file_empty), 0)
 
     def test_all_files_lines_sum(self):
+        holder = Holder()
         holder.set_files([test_file_path, test_file_edge_case_1])
         holder.__calc_place_holder__()
         self.assertEqual(holder.all_files_lines_sum, 10)
@@ -57,6 +56,7 @@ class TestHolder(TestCase):
         self.assertEqual(holder.all_files_lines_sum, 104)
 
     def test_all_line_number_place_holder(self):
+        holder = Holder()
         holder.set_files([test_file_path])
         holder.__calc_place_holder__()
         self.assertEqual(holder.all_line_number_place_holder, 1)
@@ -70,6 +70,7 @@ class TestHolder(TestCase):
         self.assertEqual(holder.all_line_number_place_holder, 2)
 
     def test_file_number_place_holder(self):
+        holder = Holder()
         holder.set_files([test_file_edge_case_1] * 9)
         holder.__calc_file_number_place_holder__()
         self.assertEqual(holder.file_number_place_holder, 1)
@@ -87,6 +88,7 @@ class TestHolder(TestCase):
         self.assertEqual(holder.file_number_place_holder, 3)
 
     def test_setargbase64(self):
+        holder = Holder()
         holder.set_args([(ARGS_B64E, '--b64e')])
         self.assertEqual(holder.args_id[ARGS_B64E], True)
         self.assertEqual(holder.args_id[ARGS_NOCOL], True)
@@ -94,6 +96,7 @@ class TestHolder(TestCase):
         self.assertEqual(holder.args_id[ARGS_NUMBER], False)
 
     def test__get_file_display_name(self):
+        holder = Holder()
         holder.set_temp_file_stdin('STDINFILE')
         holder.set_temp_file_echo('TEMPFILEECHO')
         holder.set_files([test_file_edge_case_3, 'STDINFILE', test_file_edge_case_4, 'TEMPFILEECHO'])
@@ -104,6 +107,7 @@ class TestHolder(TestCase):
         self.assertEqual(holder._get_file_display_name(test_file_edge_case_4), test_file_edge_case_4)
 
     def test_set_decoding_temp_files(self):
+        holder = Holder()
         holder.set_files([test_file_path] * 3)
         self.assertListEqual(holder._inner_files, [test_file_path] * 3)
 
@@ -111,6 +115,7 @@ class TestHolder(TestCase):
         self.assertListEqual(holder._inner_files, [test_file_empty] * 4)
 
     def test_add_args(self):
+        holder = Holder()
         holder.set_args([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
         holder.add_args([(ARGS_NUMBER, 'x'), (ARGS_LLENGTH, 'b')])
         self.assertListEqual(holder.args, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_NUMBER, 'x')])
@@ -121,6 +126,7 @@ class TestHolder(TestCase):
         self.assertEqual(holder.args_id.count(True), 3)
 
     def test_delete_args(self):
+        holder = Holder()
         holder.set_args([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
         holder.delete_args([(ARGS_ENDS, 'a'), (ARGS_NUMBER, 'x')])
         self.assertListEqual(holder.args, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])

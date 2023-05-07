@@ -3,7 +3,6 @@ from unittest import TestCase
 
 from cat_win import cat
 from cat_win.tests.mocks.std import StdInHelperMock, StdOutMock
-from cat_win.util.argparser import ArgParser
 from cat_win.util.holder import Holder
 # import sys
 # sys.path.append('../cat_win')
@@ -18,7 +17,6 @@ class TestShell(TestCase):
     def tearDown(self):
         cat._calculate_line_prefix_spacing.cache_clear()
         cat._calculate_line_length_prefix_spacing.cache_clear()
-        cat.arg_parser = ArgParser()
         cat.holder = Holder()
 
     def test_cat_shell_output_unchanged(self):
@@ -26,7 +24,7 @@ class TestShell(TestCase):
         expected_output = ['abc', 'xyz']
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.shell_main()
-            fake_output = [line.lstrip('>>> ')for line in fake_out.getvalue().splitlines()[2:-1]]
+            fake_output = [line.lstrip('>>> ') for line in fake_out.getvalue().splitlines()[2:-1]]
             self.assertListEqual(fake_output, expected_output)
 
     def test_cat_shell_line_count(self):
@@ -69,7 +67,7 @@ class TestShell(TestCase):
             cat.shell_main()
             fake_output = [line.lstrip('>>> ') for line in fake_out.getvalue().splitlines()[2:-1]]
             self.assertListEqual(fake_output, expected_output)
-    
+
     def test_cat_shell_cmd_escape(self):
         stdinhelpermock.set_content('\\!exit\ntest')
         expected_output = ['!exit', 'test']
