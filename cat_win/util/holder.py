@@ -2,7 +2,7 @@ from functools import lru_cache, reduce
 from heapq import nlargest
 
 from cat_win.const.argconstants import HIGHEST_ARG_ID, ARGS_NOCOL, ARGS_LLENGTH, ARGS_NUMBER, \
-    ARGS_REVERSE, ARGS_B64D, ARGS_B64E
+    ARGS_REVERSE, ARGS_B64D, ARGS_B64E, ARGS_COUNT, ARGS_CCOUNT
 from cat_win.util.cbase64 import _decode_base64
 from cat_win.util.file import File
 
@@ -89,7 +89,7 @@ class Holder():
             the method to read from
         
         Yields:
-        b (bytes):
+        byt (bytes):
             the bytes in chunks read from the reader
         """
         byt = reader(1024 * 1024)
@@ -156,5 +156,7 @@ class Holder():
                 with open(file.path, 'rb') as raw_f_read:
                     with open(self._inner_files[i], 'wb') as raw_f_write:
                         raw_f_write.write(_decode_base64(raw_f_read.read().decode(encoding)))
-        self.__calc_place_holder__()
-        self.__calc_file_line_length_place_holder__()
+        if self.args_id[ARGS_COUNT] or self.args_id[ARGS_CCOUNT] or self.args_id[ARGS_NUMBER]:
+            self.__calc_place_holder__()
+        if self.args_id[ARGS_LLENGTH]:
+            self.__calc_file_line_length_place_holder__()

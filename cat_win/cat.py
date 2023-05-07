@@ -42,6 +42,9 @@ tmp_file_helper = TmpFileHelper()
 
 on_windows_os = system() == 'Windows'
 
+LARGE_FILE_SIZE = 1024 * 1024 * 100  # 100 Megabytes
+
+
 def exception_handler(exception_type: type, exception, traceback, debug_hook=sys.excepthook) -> None:
     try:
         print(color_dic[CKW.RESET_ALL])
@@ -174,9 +177,10 @@ def _show_files() -> None:
     print(f"{msg} FILE(s):", end='')
     print(color_dic[CKW.RESET_ALL])
     for file in holder.files:
-        size = get_file_size(file.path)
-        file_sizes.append(size)
-        print(f"\t{color_dic[CKW.COUNT_AND_FILES]}{_convert_size(size): <10}", end='')
+        if file.file_size == -1:
+            file.set_file_size(get_file_size(file.path))
+        file_sizes.append(file.file_size)
+        print(f"\t{color_dic[CKW.COUNT_AND_FILES]}{_convert_size(file.file_size): <10}", end='')
         print(f"{'*' if file.contains_queried else ' '}{file.displayname}{color_dic[CKW.RESET_ALL]}")
     print(color_dic[CKW.COUNT_AND_FILES], end='')
     print(f"Sum:\t{_convert_size(sum(file_sizes))}", end='')
@@ -761,6 +765,15 @@ def main():
         _print_meta_and_checksum(holder.args_id[ARGS_DATA], holder.args_id[ARGS_CHECKSUM])
         return
 
+    for file in holder.files:
+        file.set_file_size(get_file_size(file.path))
+        if file.file_size >= LARGE_FILE_SIZE:
+            if (sys.stdout.isatty() and not sys.stdout.closed):
+                print(color_dic[CKW.MESSAGE_IMPORTANT], end='')
+                print('Some files are exceedingly large and may require a lot of time and resources.', end='')
+                print(color_dic[CKW.RESET_ALL])
+            break
+
     if holder.args_id[ARGS_B64D]:
         holder.set_decoding_temp_files([tmp_file_helper.generate_temp_file_name() for _ in holder.files])
     holder.generate_values(arg_parser.file_encoding)
@@ -790,6 +803,7 @@ def main():
 def shell_main():
     init(True)
 
+    command_prefix = '!'
     shell_prefix = '>>> '
     eof_control_char = 'Z' if on_windows_os else 'D'
     oneline = holder.args_id[ARGS_ONELINE]
@@ -816,7 +830,7 @@ def shell_main():
                 indicates if a valid command has been found
                 and executed
             """
-            if cmd[:1] != '!':
+            if cmd[:1] != command_prefix:
                 return False
             line_split = cmd[1:].split(' ')
             method = getattr(self, '_command_' + line_split[0], lambda _: False)
