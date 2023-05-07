@@ -5,8 +5,13 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ## [1.4.2] - TBA
 
+### Minor Changes
+
+- display a warning about resources when opening a large file.
+
 ### Bugfixes
 
+- some efficiency improvements
 - fix DeprecationWarning
 
 
