@@ -1,10 +1,34 @@
-from functools import lru_cache, reduce
+from functools import lru_cache
 from heapq import nlargest
 
 from cat_win.const.argconstants import HIGHEST_ARG_ID, ARGS_NOCOL, ARGS_LLENGTH, ARGS_NUMBER, \
     ARGS_REVERSE, ARGS_B64D, ARGS_B64E, ARGS_COUNT, ARGS_CCOUNT
 from cat_win.util.cbase64 import _decode_base64
 from cat_win.util.file import File
+
+
+def reduce_list(args: list) -> list:
+    """
+    remove duplicate args regardless if shortform or
+    longform has been used.
+    
+    Parameters:
+    args (list):
+        the entire list of args, containing possible duplicates
+        
+    Returns:
+    new_args (list):
+        the args-list without duplicates
+    """
+    new_args = []
+    temp_args_id = []
+    
+    for arg in args:
+        id, _ = arg
+        if id not in temp_args_id:
+            temp_args_id.append(id)
+            new_args.append(arg)
+    return new_args
 
 
 class Holder():
@@ -55,7 +79,7 @@ class Holder():
         self._inner_files = files[:]
 
     def set_args(self, args: list) -> None:
-        self.args = reduce(lambda l, x: l + [x] if x not in l else l, args, [])
+        self.args = reduce_list(args)
         for arg_id, _ in self.args:
             self.args_id[arg_id] = True
         if self.args_id[ARGS_B64E]:
