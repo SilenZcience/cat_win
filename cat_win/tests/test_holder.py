@@ -118,11 +118,11 @@ class TestHolder(TestCase):
         holder = Holder()
         holder.set_args([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
         holder.add_args([(ARGS_NUMBER, 'x'), (ARGS_LLENGTH, 'b')])
-        self.assertListEqual(holder.args, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_NUMBER, 'x')])
+        self.assertListEqual(holder.args, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
         self.assertEqual(holder.args_id.count(True), 2)
 
         holder.add_args([(ARGS_TABS, 'c')])
-        self.assertListEqual(holder.args, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_NUMBER, 'x'), (ARGS_TABS, 'c')])
+        self.assertListEqual(holder.args, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_TABS, 'c')])
         self.assertEqual(holder.args_id.count(True), 3)
 
     def test_delete_args(self):
