@@ -1,8 +1,8 @@
 from unittest import TestCase
 import os
 
-from cat_win.const.argconstants import HIGHEST_ARG_ID, ARGS_B64E, ARGS_NOCOL, ARGS_LLENGTH, ARGS_NUMBER, ARGS_TABS, ARGS_ENDS
-from cat_win.util.holder import Holder
+from cat_win.const.argconstants import ARGS_B64E, ARGS_NOCOL, ARGS_LLENGTH, ARGS_NUMBER, ARGS_TABS, ARGS_ENDS
+from cat_win.util.holder import Holder, reduce_list
 # import sys
 # sys.path.append('../cat_win')
 
@@ -135,4 +135,16 @@ class TestHolder(TestCase):
         holder.delete_args([(ARGS_NUMBER, 'x'), (ARGS_LLENGTH, 'b')])
         self.assertListEqual(holder.args, [(ARGS_NUMBER, 'a')])
         self.assertEqual(holder.args_id.count(True), 1)
+
+    def test_reduce_list(self):
+        test_list = [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')]
+        reduced_list = reduce_list(test_list)
+        self.assertListEqual(reduced_list, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
         
+        test_list += [(ARGS_NUMBER, 'c'), (ARGS_ENDS, 'd')]
+        reduced_list = reduce_list(test_list)
+        self.assertListEqual(reduced_list, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_ENDS, 'd')])
+        
+        test_list += [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_NUMBER, 'c'), (ARGS_ENDS, 'd')]
+        reduced_list = reduce_list(test_list)
+        self.assertListEqual(reduced_list, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_ENDS, 'd')])
