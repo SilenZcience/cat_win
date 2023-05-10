@@ -87,7 +87,7 @@ def get_file_meta_data(file: str, on_windows_os: bool, colors = None) -> str:
     file (str):
         a string representation of a file (-path)
     on_windows_os (bool):
-        indicates if the user is on windows os using
+        indicates if the user is on windows OS using
         platform.system() == 'Windows'
     colors (list):
         a list containing the ANSI-Colorcodes to display
