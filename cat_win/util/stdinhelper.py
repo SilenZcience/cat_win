@@ -186,7 +186,7 @@ def read_write_files_from_stdin(file_list: list, file_encoding: str, on_windows_
     file_encoding (str):
         the encoding to use for writing the files
     on_windows_os (bool):
-        indicates if the user is on windows os using
+        indicates if the user is on windows OS using
         platform.system() == 'Windows'
     one_line (bool):
         determines if only the first stdin line should be read
