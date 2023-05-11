@@ -765,9 +765,11 @@ def main():
         _print_meta_and_checksum(holder.args_id[ARGS_DATA], holder.args_id[ARGS_CHECKSUM])
         return
 
+    file_size_sum = 0
     for file in holder.files:
         file.set_file_size(get_file_size(file.path))
-        if file.file_size >= LARGE_FILE_SIZE:
+        file_size_sum += file.file_size
+        if file_size_sum >= LARGE_FILE_SIZE:
             if (sys.stdout.isatty() and not sys.stdout.closed):
                 print(color_dic[CKW.MESSAGE_IMPORTANT], end='')
                 print('Some files are exceedingly large and may require a lot of time and resources.', end='')
