@@ -73,7 +73,7 @@ This project copies the fundamental framework of the cat command-line tool from 
 
 Additionally it includes the feature to strip and reverse the content of any given file, make use of the standard-input, which enables cat piping into each other, generating the checksum of any file, converting decimal, hexadecimal and binary numbers within any text, and much <a href="#usage">more</a> ...
 
-Contrary to the name of the project it is of course possible to use cat_win on Linux or MacOS!
+It is of course possible to use cat_win on Linux or MacOS, aswell as Windows!
 
 ### Made With
 [![MadeWith-Python]](https://www.python.org/)
@@ -238,9 +238,9 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 > **SilenZcience** <br/>
 [![GitHub-SilenZcience][GitHub-SilenZcience]](https://github.com/SilenZcience)
 
-[OS-Windows]: https://svgshare.com/i/ZhY.svg
-[OS-Linux]: https://svgshare.com/i/Zhy.svg
-[OS-MacOS]: https://svgshare.com/i/ZjP.svg
+[OS-Windows]: https://img.shields.io/badge/os-windows-green
+[OS-Linux]: https://img.shields.io/badge/os-linux-green
+[OS-MacOS]: https://img.shields.io/badge/os-macOS-green
 
 [Unittests]: https://github.com/SilenZcience/cat_win/actions/workflows/unit_test.yml/badge.svg
 [Build-and-Check]: https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml/badge.svg
