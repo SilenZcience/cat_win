@@ -60,6 +60,16 @@ class TestShell(TestCase):
             fake_output = [line.lstrip('>>> ') for line in fake_out.getvalue().splitlines()[2:-1]]
             self.assertListEqual(fake_output, expected_output)
 
+    def test_cat_shell_clear_param(self):
+        stdinhelpermock.set_content('!add -ln find=test match=[0-9]\n!see\n!clear\n!see')
+        expected_output = ["successfully added ['-l', '-n'].", "Active Args: ['-l', '-n']",
+                           "Literals:    {'test'}", "Matches:     {'[0-9]'}",
+                           "successfully removed ['-l', '-n'].", 'Active Args: []']
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+            cat.shell_main()
+            fake_output = [line.lstrip('>>> ') for line in fake_out.getvalue().splitlines()[2:-1]]
+            self.assertListEqual(fake_output, expected_output)
+
     def test_cat_shell_exit(self):
         stdinhelpermock.set_content('abc\n!exit\nabc')
         expected_output = ['abc']

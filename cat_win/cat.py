@@ -850,15 +850,19 @@ def shell_main():
 
         def _command_add(self, cmd: list) -> None:
             arg_parser.gen_arguments([''] + cmd)
-            holder.add_args(arg_parser.args)
+            holder.add_args(arg_parser._args)
             self.exec_colors()
-            print(f"successfully added {[arg for _, arg in arg_parser.args] if arg_parser.args else 'parameters'}.")
+            print(f"successfully added {[arg for _, arg in arg_parser._args] if arg_parser._args else 'parameters'}.")
 
         def _command_del(self, cmd: list) -> None:
             arg_parser.gen_arguments([''] + cmd, True)
-            holder.delete_args(arg_parser.args)
+            holder.delete_args(arg_parser._args)
             self.exec_colors()
-            print(f"successfully removed {[arg for _, arg in arg_parser.args] if arg_parser.args else 'parameters'}.")
+            print(f"successfully removed {[arg for _, arg in arg_parser._args] if arg_parser._args else 'parameters'}.")
+            
+        def _command_clear(self, _) -> None:
+            arg_parser.reset_values()
+            self._command_del([arg for _, arg in holder.args])
 
         def _command_see(self, _) -> None:
             print(f"{'Active Args:': <12} {[arg for _, arg in holder.args]}")

@@ -10,15 +10,22 @@ DEFAULT_FILE_ENCODING = 'utf-8'
 
 class ArgParser:
     def __init__(self) -> None:
+        self._args = []
+        self._unknown_args = []
+        self._known_files = []
+        self._unknown_files = []
+        self._echo_args = []
+        
+        self.reset_values()
+        
+    def reset_values(self) -> None:
+        """
+        The here defined variables may be accessed from the outside.
+        """
         self.file_encoding: str = DEFAULT_FILE_ENCODING
         self.file_search = set()
         self.file_match = set()
         self.file_truncate = [None, None, None]
-        self.args = []
-        self.unknown_args = []
-        self.known_files = []
-        self.unknown_files = []
-        self.echo_args = []
 
     def get_arguments(self, argv: list, delete: bool = False) -> tuple:
         """
@@ -37,7 +44,7 @@ class ArgParser:
             contains the paramater in a sorted manner
         """
         self.gen_arguments(argv, delete)
-        return (self.args, self.unknown_args, self.known_files, self.unknown_files, self.echo_args)
+        return (self._args, self._unknown_args, self._known_files, self._unknown_files, self._echo_args)
 
     def _add_argument(self, param: str, delete: bool = False) -> bool:
         """
@@ -83,17 +90,17 @@ class ArgParser:
             return False
         # '[' + ARGS_CUT + ']'
         if match(r"\A\[[0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\]\Z", param):
-            self.args.append((ARGS_CUT, param))
+            self._args.append((ARGS_CUT, param))
             return False
         # '[' + ARGS_REPLACE + ']'
         if match(r"\A\[.+\,.+\]\Z", param):
-            self.args.append((ARGS_REPLACE, param))
+            self._args.append((ARGS_REPLACE, param))
             return False
 
         # default parameters
         for arg in ALL_ARGS:
             if param in (arg.short_form, arg.long_form):
-                self.args.append((arg.arg_id, param))
+                self._args.append((arg.arg_id, param))
                 if arg.arg_id == ARGS_ECHO:
                     return True
                 return False
@@ -102,21 +109,21 @@ class ArgParser:
         if match(r".*\*+.*", param):
             for filename in iglob(param, recursive=True):
                 if isfile(filename):
-                    self.known_files.append(realpath(filename))
+                    self._known_files.append(realpath(filename))
         elif isdir(possible_path):
             for filename in iglob(possible_path + '**/**', recursive=True):
                 if isfile(filename):
-                    self.known_files.append(realpath(filename))
+                    self._known_files.append(realpath(filename))
         elif isfile(possible_path):
-            self.known_files.append(possible_path)
+            self._known_files.append(possible_path)
         elif len(param) > 2 and param[0] == '-' and param[1] != '-':
             for i in range(1, len(param)):
                 if self._add_argument('-' + param[i], delete):
                     return True
         elif match(r"\A[^-]+.*\Z", param):
-            self.unknown_files.append(realpath(param))
+            self._unknown_files.append(realpath(param))
         else:
-            self.unknown_args.append(param)
+            self._unknown_args.append(param)
         return False
 
 
@@ -137,16 +144,16 @@ class ArgParser:
             contains the paramater in a sorted manner
         """
         input_args = argv[1:]
-        self.args = []
-        self.unknown_args = []
-        self.known_files = []
-        self.unknown_files = []
-        self.echo_args = []
+        self._args = []
+        self._unknown_args = []
+        self._known_files = []
+        self._unknown_files = []
+        self._echo_args = []
 
         echo_call = False
 
         for arg in input_args:
             if echo_call:
-                self.echo_args.append(arg)
+                self._echo_args.append(arg)
                 continue
             echo_call = self._add_argument(arg, delete)
