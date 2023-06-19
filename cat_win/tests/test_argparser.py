@@ -103,7 +103,7 @@ class TestArgParser(TestCase):
     def test_get_arguments_cut(self):
         arg_parser = ArgParser()
         arg_parser.gen_arguments(['CAT', '[2*5:20]'])
-        self.assertCountEqual(arg_parser.args, [(ARGS_CUT, '[2*5:20]')])
+        self.assertCountEqual(arg_parser._args, [(ARGS_CUT, '[2*5:20]')])
 
     def test_get_arguments_replace(self):
         arg_parser = ArgParser()
@@ -139,7 +139,7 @@ class TestArgParser(TestCase):
     def test_get_arguments_unknown_args(self):
         arg_parser = ArgParser()
         arg_parser.gen_arguments(['CAT', '--test-file.txt'])
-        self.assertCountEqual(arg_parser.unknown_args, ['--test-file.txt'])
+        self.assertCountEqual(arg_parser._unknown_args, ['--test-file.txt'])
 
     def test_get_arguments_echo_args(self):
         arg_parser = ArgParser()
@@ -154,7 +154,7 @@ class TestArgParser(TestCase):
     def test_get_arguments_echo_args_recursive(self):
         arg_parser = ArgParser()
         echo = arg_parser._add_argument('-nEn')
-        args = list(map(lambda x: x[1], arg_parser.args))
+        args = list(map(lambda x: x[1], arg_parser._args))
         self.assertCountEqual(args, ['-n', '-E'])
         self.assertEqual(echo, True)
 
