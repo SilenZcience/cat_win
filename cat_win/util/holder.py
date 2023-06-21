@@ -22,14 +22,39 @@ def reduce_list(args: list) -> list:
     """
     new_args = []
     temp_args_id = []
-    
+
     for arg in args:
         id, _ = arg
         if id not in temp_args_id:
             temp_args_id.append(id)
             new_args.append(arg)
+
     return new_args
 
+def diff_list(args: list, to_remove: list) -> list:
+    """
+    subtract args in to_remove from args in args regardless
+    if shortform or longform has been used.
+    
+    Parameters:
+    args (list):
+        the entire list of args
+    to_remove (list):
+        the list of args to subtract from the args list
+        
+    Returns:
+    new_args (list):
+        the args-list without duplicates
+    """
+    new_args = []
+    temp_args_id = [id for id, _ in to_remove]
+
+    for arg in args:
+        id, _ = arg
+        if id not in temp_args_id:
+            new_args.append(arg)
+
+    return new_args
 
 class Holder():
     def __init__(self) -> None:
@@ -95,7 +120,7 @@ class Holder():
 
     def delete_args(self, args: list) -> None:
         self.args_id = [False] * (HIGHEST_ARG_ID + 1)
-        self.set_args([arg for arg in self.args if arg not in args])
+        self.set_args(diff_list(self.args, args))
 
     def set_temp_file_stdin(self, file: str) -> None:
         self.temp_file_stdin = file
