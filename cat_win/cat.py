@@ -846,7 +846,9 @@ def shell_main():
 
         def _command_help(self, _) -> None:
             print(f"Type ^{eof_control_char} (Ctrl + {eof_control_char}) or '!exit' to exit.")
-            print("Type '!add <OPTION>', '!del <OPTION>', '!see' to change/see the active parameters.")
+            print("Type '!add <OPTION>', '!del <OPTION>' to add/remove a specific parameter.")
+            print("Type '!see', '!clear' to see/remove all active parameters.")
+            print("Put a '\\' before a leading '!' to escape the command-input.")
 
         def _command_add(self, cmd: list) -> None:
             arg_parser.gen_arguments([''] + cmd)
