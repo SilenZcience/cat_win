@@ -21,6 +21,7 @@ ARGS_CONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK, ARGS_NOCOL = range(20, 25)
 ARGS_EOF, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP = range(25, 30)
 ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW, ARGS_BINVIEW = range(30, 35)
 ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN, ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(35, 40)
+ARGS_EVAL, = range(40, 41)
 
 ALL_ARGS = [
     ArgConstant('-h', '--help', 'show this help message and exit', ARGS_HELP),
@@ -49,6 +50,7 @@ ALL_ARGS = [
     ArgConstant('--dec', '--DEC', 'convert decimal numbers to hexadecimal and binary', ARGS_DEC),
     ArgConstant('--hex', '--HEX', 'convert hexadecimal numbers to decimal and binary', ARGS_HEX),
     ArgConstant('--bin', '--BIN', 'convert binary numbers to decimal and hexadecimal', ARGS_BIN),
+    ArgConstant('--eval', '--EVAL', 'evaluate simple mathematical equations', ARGS_EVAL),
     ArgConstant('--b64e', '--b64e', 'encode the input to base64', ARGS_B64E),
     ArgConstant('--b64d', '--b64d', 'decode the input from base64', ARGS_B64D),
     ArgConstant('--hexview', '--HEXVIEW', 'display the raw byte representation in hexadecimal', ARGS_HEXVIEW, True, False),
