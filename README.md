@@ -159,6 +159,7 @@ cats --help
 | *--dec, --DEC*         | convert decimal numbers to hexadecimal and binary         | ✔              |
 | *--hex, --HEX*         | convert hexadecimal numbers to decimal and binary         | ✔              |
 | *--bin, --BIN*         | convert binary numbers to decimal and hexadecimal         | ✔              |
+| *--eval, --EVAL*       | evaluate simple mathematical equations                    | ✔              |
 | *--b64e, --b64e*       | encode the input to base64                                | ✔              |
 | *--b64d, --b64d*       | decode the input from base64                              | ✔              |
 |                        |                                                           |                |
@@ -217,9 +218,9 @@ $ echo "Hello World :)" | catw -i [6:] | catw -i [::-1] -ln
 - - - -
 
 ```c
-$ cats --dec -nl
-> >>> 12345
-> 1) [53] 12345 {Hexadecimal: 0x3039; Binary: 0b11000000111001}
+$ cats --eval --dec -nl
+> >>> 0xF * 5
+> 1) [41] 75 {Hexadecimal: 0x4b; Binary: 0b1001011}
 > >>> ...
 ```
 
