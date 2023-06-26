@@ -84,6 +84,7 @@ class CKW:
     ENDS = 'line_ends'
     TABS = 'tab_characters'
     CONVERSION = 'number_conversion'
+    EVALUATION = 'number_evaluation'
     REPLACE = 'substring_replacement'
     FOUND = 'found_keyword'
     FOUND_MESSAGE = 'found_keyword_message'

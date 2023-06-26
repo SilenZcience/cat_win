@@ -14,6 +14,7 @@ class Config:
                    CKW.ENDS: ColorOptions.Back['YELLOW'],
                    CKW.TABS: ColorOptions.Back['YELLOW'],
                    CKW.CONVERSION: ColorOptions.Fore['CYAN'],
+                   CKW.EVALUATION: ColorOptions.Fore['BLUE'],
                    CKW.REPLACE: ColorOptions.Fore['YELLOW'],
                    CKW.FOUND: ColorOptions.Fore['RED'],
                    CKW.FOUND_MESSAGE: ColorOptions.Fore['MAGENTA'],

@@ -1,11 +1,46 @@
-import string
+from re import compile as re_compile, search as re_search
+from string import hexdigits
 
 
 class Converter():
     """
     converts a decimal, hex, binary number
-    to the two corresponding others.
+    to the two corresponding others, or
+    evaluate an expression.
     """
+    _eval_regex = re_compile(r'((0((x[0-9a-fA-F]+)|b[01]+)|([0-9]*\.?[0-9]+))\s*[-/\+\*][/\*]?\s*)+(0((x[0-9a-fA-F]+)|b[01]+)|([0-9]*\.?[0-9]+))')
+
+    def evaluate(self, _l: str, integrated: bool, colors = None) -> str:
+        """
+        evaluate simple mathematical expression within any text
+        
+        Parameters:
+        _l (str):
+            the line of content to work with
+        integrated (bool):
+            indicates whether or not solely the not-matched
+            parts should stay within the line
+        colors (list):
+            a list with 2 elements like [COLOR_EVALUATE, COLOR_RESET]
+            containing the ANSI-Colorcodes used in the returned string.
+            
+        Returns:
+        (str):
+            the new content line with the evaluated expression
+        """
+        if colors is None or len(colors) < 2:
+            colors = ['', '']
+
+        res = re_search(self._eval_regex, _l)
+        if not res:
+            return _l if integrated else None
+
+        result = eval(res.group())
+        if isinstance(result, float) and result.is_integer():
+            result = int(result)
+
+        return _l[:res.start()] * integrated + colors[0] + str(result) + colors[1] + _l[res.end():] * integrated
+
     def is_dec(self, _v: str) -> bool:
         """
         Parameters:
@@ -32,7 +67,7 @@ class Converter():
         """
         if _v[:1] == '-':
             _v = _v[1:]
-        hex_digits = set(string.hexdigits)
+        hex_digits = set(hexdigits)
         if _v[:2] == '0x':
             _v = _v[2:]
         return all(c in hex_digits for c in _v) and _v != ""

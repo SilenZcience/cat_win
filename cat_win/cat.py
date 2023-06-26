@@ -234,7 +234,7 @@ def _print_meta_and_checksum(show_meta: bool, show_checksum: bool) -> None:
         if show_checksum:
             _print_checksum(file.path)
 
-
+@lru_cache(maxsize=250)
 def remove_ansi_codes_from_line(line: str) -> str:
     """
     Parameters:
@@ -490,15 +490,18 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
                 content.reverse()
             elif arg == ARGS_BLANK:
                 content = [c for c in content if c[1]]
+            elif arg == ARGS_EVAL:
+                content = [(prefix, evaluated) for prefix, line in content if
+                           (evaluated := converter.evaluate(line, (param == param.lower()), [color_dic[CKW.EVALUATION], color_dic[CKW.RESET_ALL]])) is not None]
             elif arg == ARGS_DEC:
-                content = [(prefix, line + ' ' + color_dic[CKW.CONVERSION] + converter.c_from_dec(int(line), (param == param.lower())) +
-                            color_dic[CKW.RESET_ALL]) for prefix, line in content if converter.is_dec(line)]
+                content = [(prefix, f"{line} {color_dic[CKW.CONVERSION]}{converter.c_from_dec(int(cleaned), (param == param.lower()))}{color_dic[CKW.RESET_ALL]}")
+                           for prefix, line in content if (cleaned := remove_ansi_codes_from_line(line)) and converter.is_dec(cleaned)]
             elif arg == ARGS_HEX:
-                content = [(prefix, line + ' ' + color_dic[CKW.CONVERSION] + converter.c_from_hex(line, (param == param.lower())) +
-                            color_dic[CKW.RESET_ALL]) for prefix, line in content if converter.is_hex(line)]
+                content = [(prefix, f"{line} {color_dic[CKW.CONVERSION]}{converter.c_from_hex(cleaned, (param == param.lower()))}{color_dic[CKW.RESET_ALL]}")
+                           for prefix, line in content if (cleaned := remove_ansi_codes_from_line(line)) and converter.is_hex(cleaned)]
             elif arg == ARGS_BIN:
-                content = [(prefix, line + ' ' + color_dic[CKW.CONVERSION] + converter.c_from_bin(line, (param == param.lower())) +
-                            color_dic[CKW.RESET_ALL]) for prefix, line in content if converter.is_bin(line)]
+                content = [(prefix, f"{line} {color_dic[CKW.CONVERSION]}{converter.c_from_bin(cleaned, (param == param.lower()))}{color_dic[CKW.RESET_ALL]}")
+                           for prefix, line in content if (cleaned := remove_ansi_codes_from_line(line)) and converter.is_bin(cleaned)]
             elif arg == ARGS_REPLACE:
                 replace_values = param[1:-1].split(",")
                 content = [(prefix, line.replace(replace_values[0], color_dic[CKW.REPLACE] + replace_values[1] + color_dic[CKW.RESET_ALL]))
