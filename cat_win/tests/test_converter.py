@@ -11,10 +11,10 @@ converter = Converter()
 class TestConverter(TestCase):
     def test_converter_dec(self):
         expected_output = '{Hexadecimal: 0x3039; Binary: 0b11000000111001}'
-        self.assertEqual(converter.c_from_dec(12345, True), expected_output)
+        self.assertEqual(converter.c_from_dec('12345', True), expected_output)
 
         expected_output = '{Hexadecimal: 3039; Binary: 11000000111001}'
-        self.assertEqual(converter.c_from_dec(12345, False), expected_output)
+        self.assertEqual(converter.c_from_dec('12345', False), expected_output)
 
     def test_converter_hex(self):
         expected_output = '{Decimal: 12345; Binary: 0b11000000111001}'

@@ -17,6 +17,10 @@ from cat_win.util.argparser import ArgParser
 from cat_win.util.cbase64 import decode_base64, encode_base64
 from cat_win.util.checksum import get_checksum_from_file
 from cat_win.util.converter import Converter
+try:
+    from cat_win.util.convertercomp import comp_eval, comp_conv
+except SyntaxError: # in case of Python 3.7
+    from cat_win.util.convertercompold import comp_eval, comp_conv
 from cat_win.util.fileattributes import get_file_meta_data, get_file_size, _convert_size
 from cat_win.util.holder import Holder
 from cat_win.util.rawviewer import get_raw_view_lines_gen
@@ -491,17 +495,13 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
             elif arg == ARGS_BLANK:
                 content = [c for c in content if c[1]]
             elif arg == ARGS_EVAL:
-                content = [(prefix, evaluated) for prefix, line in content if
-                           (evaluated := converter.evaluate(line, (param == param.lower()), [color_dic[CKW.EVALUATION], color_dic[CKW.RESET_ALL]])) is not None]
+                content = comp_eval(converter, content, param, [color_dic[CKW.EVALUATION], color_dic[CKW.RESET_ALL]])
             elif arg == ARGS_DEC:
-                content = [(prefix, f"{line} {color_dic[CKW.CONVERSION]}{converter.c_from_dec(int(cleaned), (param == param.lower()))}{color_dic[CKW.RESET_ALL]}")
-                           for prefix, line in content if (cleaned := remove_ansi_codes_from_line(line)) and converter.is_dec(cleaned)]
+                content = comp_conv(converter, content, param, 'dec', remove_ansi_codes_from_line, [color_dic[CKW.CONVERSION], color_dic[CKW.RESET_ALL]])
             elif arg == ARGS_HEX:
-                content = [(prefix, f"{line} {color_dic[CKW.CONVERSION]}{converter.c_from_hex(cleaned, (param == param.lower()))}{color_dic[CKW.RESET_ALL]}")
-                           for prefix, line in content if (cleaned := remove_ansi_codes_from_line(line)) and converter.is_hex(cleaned)]
+                content = comp_conv(converter, content, param, 'hex', remove_ansi_codes_from_line, [color_dic[CKW.CONVERSION], color_dic[CKW.RESET_ALL]])
             elif arg == ARGS_BIN:
-                content = [(prefix, f"{line} {color_dic[CKW.CONVERSION]}{converter.c_from_bin(cleaned, (param == param.lower()))}{color_dic[CKW.RESET_ALL]}")
-                           for prefix, line in content if (cleaned := remove_ansi_codes_from_line(line)) and converter.is_bin(cleaned)]
+                content = comp_conv(converter, content, param, 'bin', remove_ansi_codes_from_line, [color_dic[CKW.CONVERSION], color_dic[CKW.RESET_ALL]])
             elif arg == ARGS_REPLACE:
                 replace_values = param[1:-1].split(",")
                 content = [(prefix, line.replace(replace_values[0], color_dic[CKW.REPLACE] + replace_values[1] + color_dic[CKW.RESET_ALL]))
@@ -803,6 +803,9 @@ def main():
         except FileNotFoundError:
             if holder.args_id[ARGS_DEBUG]:
                 print('FileNotFoundError', tmp_file)
+        except PermissionError:
+            if holder.args_id[ARGS_DEBUG]:
+                print('PermissionError', tmp_file)
 
 
 def shell_main():
