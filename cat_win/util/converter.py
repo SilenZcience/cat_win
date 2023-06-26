@@ -95,11 +95,12 @@ class Converter():
     def __dec_to_bin__(self, value: int, leading: bool = False) -> str:
         return f"{value:#b}" if leading else f"{value:b}"
 
-    def c_from_dec(self, value: int, leading: bool = False) -> str:
+    def c_from_dec(self, value: str, leading: bool = False) -> str:
         """
         returns a String representation of a Decimal Int including the corresponding
         Hexadecimal and Binary number.
         """
+        value = int(value)
         return '{Hexadecimal: ' + self.__dec_to_hex__(value, leading) + '; Binary: ' + \
             self.__dec_to_bin__(value, leading) + '}'
 
