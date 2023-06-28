@@ -8,7 +8,7 @@ class Converter():
     to the two corresponding others, or
     evaluate an expression.
     """
-    _eval_regex = re_compile(r'((0((x[0-9a-fA-F]+)|b[01]+)|([0-9]*\.?[0-9]+))\s*[-/\+\*][/\*]?\s*)+(0((x[0-9a-fA-F]+)|b[01]+)|([0-9]*\.?[0-9]+))')
+    _eval_regex = re_compile(r'((0((x[0-9a-fA-F]+)|b[01]+)|(-?[0-9]*\.?[0-9]+))\s*[-/\+\*][/\*]?\s*)+(0((x[0-9a-fA-F]+)|b[01]+)|(-?[0-9]*\.?[0-9]+))')
 
     def evaluate(self, _l: str, integrated: bool, colors = None) -> str:
         """
