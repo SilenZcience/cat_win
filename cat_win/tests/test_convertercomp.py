@@ -30,6 +30,8 @@ class TestConverterComp(TestCase):
             ('2*2', '7//2 xyz'),
             ('5+5', 'abc'),
             ('', 'abc-9   /2'),
+            ('', 'hello 5+5 world 5-5 test'),
+            ('', ' 8%  3 4'),
         ]
         test_content_out = [
             ('', '30'),
@@ -38,6 +40,8 @@ class TestConverterComp(TestCase):
             ('2*2', '3 xyz'),
             ('5+5', 'abc'),
             ('', 'abc-4.5'),
+            ('', 'hello 10 world 0 test'),
+            ('', ' 2 4'),
         ]
         new_content = comp_eval(converter, test_content_in, param_lowercase)
         self.assertListEqual(new_content, test_content_out)
@@ -50,6 +54,8 @@ class TestConverterComp(TestCase):
             ('2*2', '7//2 xyz'),
             ('5+5', 'abc'),
             ('', 'abc-9   /2'),
+            ('', 'hello 5+5 world 5-5 test'),
+            ('', ' 8%  3 4'),
         ]
         test_content_out = [
             ('', '30'),
@@ -57,6 +63,8 @@ class TestConverterComp(TestCase):
             ('', '4'),
             ('2*2', '3'),
             ('', '-4.5'),
+            ('', '10,0'),
+            ('', '2'),
         ]
         new_content = comp_eval(converter, test_content_in, param_uppercase)
         self.assertListEqual(new_content, test_content_out)
