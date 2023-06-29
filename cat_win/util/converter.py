@@ -8,7 +8,7 @@ class Converter():
     to the two corresponding others, or
     evaluate an expression.
     """
-    _eval_regex = re_compile(r'((0((x[0-9a-fA-F]+)|b[01]+)|(-?[0-9]*\.?[0-9]+))\s*[-/\+\*][/\*]?\s*)+(0((x[0-9a-fA-F]+)|b[01]+)|(-?[0-9]*\.?[0-9]+))')
+    _eval_regex = re_compile(r'((0((x[0-9a-fA-F]+)|b[01]+)|(-?[0-9]*\.?[0-9]+))\s*[%-/\+\*][/\*]?\s*)+(0((x[0-9a-fA-F]+)|b[01]+)|(-?[0-9]*\.?[0-9]+))')
 
     def evaluate(self, _l: str, integrated: bool, colors = None) -> str:
         """
@@ -31,15 +31,22 @@ class Converter():
         if colors is None or len(colors) < 2:
             colors = ['', '']
 
+        new_l_tokens = []
         res = re_search(self._eval_regex, _l)
-        if not res:
-            return _l if integrated else None
 
-        result = eval(res.group())
-        if isinstance(result, float) and result.is_integer():
-            result = int(result)
+        while (res):
+            if integrated:
+                new_l_tokens.append(_l[:res.start()])
+            new_l_tokens.append(colors[0] + str(eval(res.group())) + colors[1])
+            _l = _l[res.end():]
+            res = re_search(self._eval_regex, _l)
 
-        return _l[:res.start()] * integrated + colors[0] + str(result) + colors[1] + _l[res.end():] * integrated
+        if integrated:
+            new_l_tokens.append(_l)
+
+        if not new_l_tokens:
+            return '' if integrated else None
+        return (',' * (not integrated)).join(new_l_tokens)
 
     def is_dec(self, _v: str) -> bool:
         """
