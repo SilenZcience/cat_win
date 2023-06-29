@@ -497,11 +497,11 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
             elif arg == ARGS_EVAL:
                 content = comp_eval(converter, content, param, [color_dic[CKW.EVALUATION], color_dic[CKW.RESET_ALL]])
             elif arg == ARGS_DEC:
-                content = comp_conv(converter, content, param, 'dec', remove_ansi_codes_from_line, [color_dic[CKW.CONVERSION], color_dic[CKW.RESET_ALL]])
+                content = comp_conv(converter, content, param, remove_ansi_codes_from_line, [color_dic[CKW.CONVERSION], color_dic[CKW.RESET_ALL]])
             elif arg == ARGS_HEX:
-                content = comp_conv(converter, content, param, 'hex', remove_ansi_codes_from_line, [color_dic[CKW.CONVERSION], color_dic[CKW.RESET_ALL]])
+                content = comp_conv(converter, content, param, remove_ansi_codes_from_line, [color_dic[CKW.CONVERSION], color_dic[CKW.RESET_ALL]])
             elif arg == ARGS_BIN:
-                content = comp_conv(converter, content, param, 'bin', remove_ansi_codes_from_line, [color_dic[CKW.CONVERSION], color_dic[CKW.RESET_ALL]])
+                content = comp_conv(converter, content, param, remove_ansi_codes_from_line, [color_dic[CKW.CONVERSION], color_dic[CKW.RESET_ALL]])
             elif arg == ARGS_REPLACE:
                 replace_values = param[1:-1].split(",")
                 content = [(prefix, line.replace(replace_values[0], color_dic[CKW.REPLACE] + replace_values[1] + color_dic[CKW.RESET_ALL]))
@@ -817,7 +817,9 @@ def shell_main():
     oneline = holder.args_id[ARGS_ONELINE]
 
     class CmdExec:
-        exit_shell = False
+        def __init__(self) -> None:
+            self.exit_shell = False
+            self.last_cmd = ''
 
         def exec_colors(self) -> None:
             init_colors()
@@ -841,9 +843,14 @@ def shell_main():
             if cmd[:1] != command_prefix:
                 return False
             line_split = cmd[1:].split(' ')
-            method = getattr(self, '_command_' + line_split[0], lambda _: False)
+            self.last_cmd = line_split[0]
+            method = getattr(self, '_command_' + self.last_cmd, self._command_unknown)
             method(line_split[1:])
             return True
+
+        def _command_unknown(self, _) -> None:
+            print("Command '!", self.last_cmd, "' is unknown.", sep='')
+            print("If you want to escape the command input, type: '\\!", self.last_cmd, "'.", sep='')
 
         def _command_cat(self, _) -> None:
             cat = " ,_     _\n |\\\\_,-~/\n / _  _ |    ,--.\n(  @  @ )   / ,-'\n \\  _T_/"

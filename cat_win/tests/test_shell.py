@@ -35,6 +35,21 @@ class TestShell(TestCase):
             fake_output = [line.lstrip('>>> ') for line in fake_out.getvalue().splitlines()[-2:-1]]
             self.assertListEqual(fake_output, expected_output)
 
+    def test_cat_shell_unknown_param(self):
+        wrong_cmd = '!xyz'
+        stdinhelpermock.set_content(wrong_cmd)
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+            cat.shell_main()
+            self.assertIn(wrong_cmd, fake_out.getvalue())
+
+    def test_cat_shell_help_param(self):
+        stdinhelpermock.set_content('!help')
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+            cat.shell_main()
+            self.assertIn('!add', fake_out.getvalue())
+            self.assertIn('!del', fake_out.getvalue())
+            self.assertIn('!see', fake_out.getvalue())
+
     def test_cat_shell_add_param(self):
         stdinhelpermock.set_content('abc\n!add -ln\nabc')
         expected_output = ['abc', "successfully added ['-l', '-n'].", '2) [3] abc']

@@ -28,7 +28,7 @@ def comp_eval(converter: Converter, content: list, param: str, colors = None) ->
     return [(prefix, evaluated) for prefix, line in content if
             (evaluated := converter.evaluate(line, (param == param.lower()), colors)) is not None]
 
-def comp_conv(converter: Converter, content: list, param: str, base: str, cleaner: object, colors = None):
+def comp_conv(converter: Converter, content: list, param: str, cleaner: object, colors = None):
     """
     comprehend the content list for the dec/hex/bin parameters
     
@@ -51,6 +51,7 @@ def comp_conv(converter: Converter, content: list, param: str, base: str, cleane
     (list):
         the new comprehended content list with all numbers converted
     """
+    base = param.lstrip('-').lower()
     method_is_convertable = getattr(converter, 'is_' + base, lambda _: False)
     method_convert = getattr(converter, 'c_from_' + base, lambda x: x)
 
