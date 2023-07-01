@@ -144,4 +144,20 @@ class TestCatFull(TestCase):
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
 
+    @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, test_empty_path, test_peek, '-F'])
+    def test_cat_output_full_show_files(self):
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+            cat.main()
+            self.assertIn(test_file_path, fake_out.getvalue())
+            self.assertIn(test_empty_path, fake_out.getvalue())
+            self.assertIn(test_peek, fake_out.getvalue())
+
+    @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, test_empty_path, test_peek, '-S'])
+    def test_cat_output_full_show_count(self):
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+            cat.main()
+            self.assertIn(test_file_path, fake_out.getvalue())
+            self.assertIn(test_empty_path, fake_out.getvalue())
+            self.assertIn(test_peek, fake_out.getvalue())
+
 # python -m unittest discover -s cat_win.tests -p test*.py
