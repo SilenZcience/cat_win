@@ -32,6 +32,10 @@ class TestConverterComp(TestCase):
             ('', 'abc-9   /2'),
             ('', 'hello 5+5 world 5-5 test'),
             ('', ' 8%  3 4'),
+            ('', 'xyz 1) + (1 + 1 xyz 7+7'),
+            ('', 'xyz (1 + (1)) + (1) xyz'),
+            ('', 'xyz (((1 + (1)) + (1) xyz'),
+            ('', 'xyz (1 + (1)) + (1))) xyz'),
         ]
         test_content_out = [
             ('', '30'),
@@ -42,6 +46,10 @@ class TestConverterComp(TestCase):
             ('', 'abc-4.5'),
             ('', 'hello 10 world 0 test'),
             ('', ' 2 4'),
+            ('', 'xyz ??????????? xyz 14'),
+            ('', 'xyz 3 xyz'),
+            ('', 'xyz ((3 xyz'),
+            ('', 'xyz 3)) xyz'),
         ]
         new_content = comp_eval(converter, test_content_in, param_lowercase)
         self.assertListEqual(new_content, test_content_out)
@@ -56,6 +64,10 @@ class TestConverterComp(TestCase):
             ('', 'abc-9   /2'),
             ('', 'hello 5+5 world 5-5 test'),
             ('', ' 8%  3 4'),
+            ('', 'xyz 1) + (1 + 1 xyz 7+7'),
+            ('', 'xyz (1 + (1)) + (1) xyz'),
+            ('', 'xyz (((1 + (1)) + (1) xyz'),
+            ('', 'xyz (1 + (1)) + (1))) xyz'),
         ]
         test_content_out = [
             ('', '30'),
@@ -65,6 +77,10 @@ class TestConverterComp(TestCase):
             ('', '-4.5'),
             ('', '10,0'),
             ('', '2'),
+            ('', '?,14'),
+            ('', '3'),
+            ('', '3'),
+            ('', '3'),
         ]
         new_content = comp_eval(converter, test_content_in, param_uppercase)
         self.assertListEqual(new_content, test_content_out)
