@@ -8,7 +8,12 @@ class Converter():
     to the two corresponding others, or
     evaluate an expression.
     """
-    _eval_regex = re_compile(r'((0((x[0-9a-fA-F]+)|b[01]+)|(-?[0-9]*\.?[0-9]+))\s*[%-/\+\*][/\*]?\s*)+(0((x[0-9a-fA-F]+)|b[01]+)|(-?[0-9]*\.?[0-9]+))')
+    # matches a mathematical expression consisting of either hex-numbers = (0x...), binary-numbers (0b...) or
+    # default decimal numbers (these are not allowed to have a leading zero before the decimal point, yet something like "-.06" is allowed).
+    # between every number has to be a valid operator (*,/,+,-,%,**,//)
+    # before every number there may be opening parenthesis, after every number there may be closing parenthesis
+    # (it is not validated that all parenthesis match each other to a valid expression ...)
+    _eval_regex = re_compile(r'(?:\(\s*)*(?:(?:0(?:(?:x[0-9a-fA-F]+)|b[01]+)|(?:\-?(?:(?:0|[1-9][0-9]*)?\.[0-9]*|0|[1-9][0-9]*)))[\)\s]*[%\-\/\+\*][\/\*]?[\(\s]*)+(?:0(?:(?:x[0-9a-fA-F]+)|b[01]+)|(?:\-?(?:(?:0|[1-9][0-9]*)?\.[0-9]*|0|[1-9][0-9]*)))(?:\s*\))*')
 
     def evaluate(self, _l: str, integrated: bool, colors = None) -> str:
         """
@@ -37,7 +42,22 @@ class Converter():
         while (res):
             if integrated:
                 new_l_tokens.append(_l[:res.start()])
-            new_l_tokens.append(colors[0] + str(eval(res.group())) + colors[1])
+            try:
+                new_l_tokens.append(colors[0] + str(eval(res.group())) + colors[1])
+            except SyntaxError:
+                p_diff = res.group().count('(') - res.group().count(')')
+                try:
+                    if p_diff > 0 and res.group()[:p_diff] == '(' * p_diff:
+                        new_l_tokens.append(colors[0] + str(eval(res.group()[p_diff:])) + colors[1])
+                        if integrated:
+                            new_l_tokens.insert(len(new_l_tokens)-1, '(' * p_diff)
+                    elif p_diff < 0 and res.group()[p_diff:] == ')' * (-1 * p_diff):
+                        new_l_tokens.append(colors[0] + str(eval(res.group()[:p_diff])) + colors[1])
+                        _l = ')' * (-1 * p_diff) + _l
+                    else:
+                        raise SyntaxError()
+                except SyntaxError:
+                    new_l_tokens.append(colors[0] + ('?' * len(res.group()) if integrated else '?') + colors[1])
             _l = _l[res.end():]
             res = re_search(self._eval_regex, _l)
 
