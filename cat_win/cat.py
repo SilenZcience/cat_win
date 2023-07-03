@@ -492,6 +492,8 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
                 content = [list(group)[0] for _, group in groupby(content, lambda x: x[1])]
             elif arg == ARGS_REVERSE:
                 content.reverse()
+            elif arg == ARGS_SORT:
+                content.sort(key = lambda l: l[1])
             elif arg == ARGS_BLANK:
                 content = [c for c in content if c[1]]
             elif arg == ARGS_EVAL:

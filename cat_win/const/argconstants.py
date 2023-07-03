@@ -21,7 +21,7 @@ ARGS_CONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK, ARGS_NOCOL = range(20, 25)
 ARGS_EOF, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP = range(25, 30)
 ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW, ARGS_BINVIEW = range(30, 35)
 ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN, ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(35, 40)
-ARGS_EVAL, = range(40, 41)
+ARGS_EVAL, ARGS_SORT = range(40, 42)
 
 ALL_ARGS = [
     ArgConstant('-h', '--help', 'show this help message and exit', ARGS_HELP),
@@ -35,6 +35,7 @@ ALL_ARGS = [
     ArgConstant('-u', '--unique', 'suppress repeated output lines', ARGS_SQUEEZE, True, False),
     ArgConstant('-b', '--blank', 'hide empty lines', ARGS_BLANK),
     ArgConstant('-r', '--reverse', 'reverse output', ARGS_REVERSE, True, False),
+    ArgConstant('--sort', '--sort', 'sort all lines alphabetically', ARGS_SORT, True, False),
     ArgConstant('-p', '--peek', 'only print the first and last lines', ARGS_PEEK, True, False),
     ArgConstant('-s', '--sum', 'show sum of lines', ARGS_COUNT, True, False),
     ArgConstant('-S', '--SUM', 'ONLY show sum of lines', ARGS_CCOUNT, True, False),

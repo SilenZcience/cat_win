@@ -143,6 +143,7 @@ cats --help
 | *-u, --unique*         | suppress repeated output lines                            | ❌             |
 | *-b, --blank*          | hide empty lines                                          | ✔              |
 | *-r, --reverse*        | reverse output                                            | ❌             |
+| *--sort, --sort*       | sort all lines alphabetically                             | ❌             |
 | *-p, --peek*           | only print the first and last lines                       | ❌             |
 | *-s, --sum*            | show sum of lines                                         | ❌             |
 | *-S, --SUM*            | ONLY show sum of lines                                    | ❌             |
