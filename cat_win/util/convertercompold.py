@@ -6,7 +6,7 @@ for Python < 3.8 (not using the Walrus operator).
 from cat_win.util.converter import Converter
 
 
-def comp_eval(converter: Converter, content: list, param: str, colors = None) -> list:
+def comp_eval(converter: Converter, content: list, param: str) -> list:
     """
     comprehend the content list for the eval parameter
     
@@ -17,9 +17,6 @@ def comp_eval(converter: Converter, content: list, param: str, colors = None) ->
         the file content to comprehend
     param (str):
         the parameter used
-    colors (list):
-        a list with 2 elements like [COLOR_EVALUATION, COLOR_RESET]
-        containing the ANSI-Colorcodes used in the returned string.
         
     Returns:
     (list):
@@ -27,12 +24,12 @@ def comp_eval(converter: Converter, content: list, param: str, colors = None) ->
     """
     new_content = []
     for prefix, line in content:
-        evaluated = converter.evaluate(line, (param == param.lower()), colors)
+        evaluated = converter.evaluate(line, (param == param.lower()))
         if evaluated is not None:
             new_content.append((prefix, evaluated))
     return new_content
 
-def comp_conv(converter: Converter, content: list, param: str, cleaner: object, colors = None):
+def comp_conv(converter: Converter, content: list, param: str, cleaner: object):
     """
     comprehend the content list for the dec/hex/bin parameters
     
@@ -47,9 +44,6 @@ def comp_conv(converter: Converter, content: list, param: str, cleaner: object, 
         the number base to work with, options are 'dec', 'hex' or 'bin'
     cleaner (function):
         the method to call on each line in order to strip ansi color codes
-    colors (list):
-        a list with 2 elements like [COLOR_EVALUATION, COLOR_RESET]
-        containing the ANSI-Colorcodes used in the returned string.
         
     Returns:
     (list):
@@ -63,5 +57,5 @@ def comp_conv(converter: Converter, content: list, param: str, cleaner: object, 
     for prefix, line in content:
         cleaned = cleaner(line)
         if cleaned and method_is_convertable(cleaned):
-            new_content.append((prefix, f"{line} {colors[0]}{method_convert(cleaned, (param == param.lower()))}{colors[1]}"))
+            new_content.append((prefix, f"{line} {method_convert(cleaned, (param == param.lower()))}"))
     return new_content

@@ -497,13 +497,13 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
             elif arg == ARGS_BLANK:
                 content = [c for c in content if c[1]]
             elif arg == ARGS_EVAL:
-                content = comp_eval(converter, content, param, [color_dic[CKW.EVALUATION], color_dic[CKW.RESET_ALL]])
+                content = comp_eval(converter, content, param)
             elif arg == ARGS_DEC:
-                content = comp_conv(converter, content, param, remove_ansi_codes_from_line, [color_dic[CKW.CONVERSION], color_dic[CKW.RESET_ALL]])
+                content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
             elif arg == ARGS_HEX:
-                content = comp_conv(converter, content, param, remove_ansi_codes_from_line, [color_dic[CKW.CONVERSION], color_dic[CKW.RESET_ALL]])
+                content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
             elif arg == ARGS_BIN:
-                content = comp_conv(converter, content, param, remove_ansi_codes_from_line, [color_dic[CKW.CONVERSION], color_dic[CKW.RESET_ALL]])
+                content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
             elif arg == ARGS_REPLACE:
                 replace_values = param[1:-1].split(",")
                 content = [(prefix, line.replace(replace_values[0], color_dic[CKW.REPLACE] + replace_values[1] + color_dic[CKW.RESET_ALL]))
@@ -690,6 +690,9 @@ def init_colors() -> None:
         color_dic = dict.fromkeys(color_dic, '')
     else:
         color_dic = default_color_dic.copy()
+
+    converter.set_params(holder.args_id[ARGS_DEBUG],
+                         [color_dic[CKW.EVALUATION], color_dic[CKW.CONVERSION], color_dic[CKW.RESET_ALL]])
 
 
 def init(shell: bool = False) -> tuple:

@@ -102,7 +102,7 @@ class TestConverterComp(TestCase):
             ('', '48 {Hexadecimal: 0x30; Binary: 0b110000}'),
             ('', '1001 {Hexadecimal: 0x3e9; Binary: 0b1111101001}'),
         ]
-        new_content = comp_conv(converter, test_content_in, '--dec', cleaner, ['', ''])
+        new_content = comp_conv(converter, test_content_in, '--dec', cleaner)
         self.assertListEqual(new_content, test_content_out)
 
     def test_comp_conv_hex(self):
@@ -125,7 +125,7 @@ class TestConverterComp(TestCase):
             ('', '0b1001 {Decimal: 724993; Binary: 0b10110001000000000001}'),
             ('', '0x1001 {Decimal: 4097; Binary: 0b1000000000001}'),
         ]
-        new_content = comp_conv(converter, test_content_in, '--hex', cleaner, ['', ''])
+        new_content = comp_conv(converter, test_content_in, '--hex', cleaner)
         self.assertListEqual(new_content, test_content_out)
 
     def test_comp_conv_bin(self):
@@ -144,7 +144,7 @@ class TestConverterComp(TestCase):
             ('', '1001 {Decimal: 9; Hexadecimal: 0x9}'),
             ('', '0b1001 {Decimal: 9; Hexadecimal: 0x9}'),
         ]
-        new_content = comp_conv(converter, test_content_in, '--bin', cleaner, ['', ''])
+        new_content = comp_conv(converter, test_content_in, '--bin', cleaner)
         self.assertListEqual(new_content, test_content_out)
 
 # python -m unittest discover -s cat_win.tests -p test*.py
