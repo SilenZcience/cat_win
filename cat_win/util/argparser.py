@@ -82,11 +82,11 @@ class ArgParser:
             return False
         # 'trunc' + ('=' or ':') + file_truncate[0] + ':' + file_truncate[1] [+ ':' + file_truncate[2]]
         if match(r"\Atrunc[\=\:][0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\Z", param, IGNORECASE):
-            param_split = param[6:].split(':')
-            self.file_truncate[0] = None if param_split[0] == '' else max(0, int(eval(param_split[0]))-1)
-            self.file_truncate[1] = None if param_split[1] == '' else int(eval(param_split[1]))
-            if len(param_split) == 3:
-                self.file_truncate[2] = None if param_split[2] == '' else int(eval(param_split[2]))
+            for i, p_split in enumerate(param[6:].split(':')):
+                try:
+                    self.file_truncate[i] = int(eval(p_split))
+                except:
+                    self.file_truncate[i] = None
             return False
         # '[' + ARGS_CUT + ']'
         if match(r"\A\[[0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\]\Z", param):

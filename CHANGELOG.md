@@ -14,6 +14,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Bugfixes
 
 - fix Bug where the shell command `!del` would not properly work when using a different command form.
+- fix Bug where the `trunc` parameter would crash on not evaluable inputs
 
 
 ## [1.4.2] - 2023-05-13
