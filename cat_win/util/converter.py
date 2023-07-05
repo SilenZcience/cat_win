@@ -15,7 +15,40 @@ class Converter():
     # (it is not validated that all parenthesis match each other to a valid expression ...)
     _eval_regex = re_compile(r'(?:\(\s*)*(?:(?:0(?:(?:x[0-9a-fA-F]+)|b[01]+)|(?:\-?(?:(?:0|[1-9][0-9]*)?\.[0-9]*|0|[1-9][0-9]*)))[\)\s]*[%\-\/\+\*][\/\*]?[\(\s]*)+(?:0(?:(?:x[0-9a-fA-F]+)|b[01]+)|(?:\-?(?:(?:0|[1-9][0-9]*)?\.[0-9]*|0|[1-9][0-9]*)))(?:\s*\))*')
 
-    def evaluate(self, _l: str, integrated: bool, colors = None) -> str:
+    def __init__(self) -> None:
+        self.colors = ['', '', '']
+        self.debug = False
+
+    def set_params(self, debug: bool, colors = None) -> None:
+        """
+        set the colors to use.
+        
+        Parameters:
+        colors (list[str]):
+            the colors to use, 3 elements needed:
+            Index 0 -> EVALULATION
+            Index 1 -> CONVERSION
+            INDEX 2 -> RESET
+        """
+        if colors is None or len(colors) < 3:
+            colors = ['', '', '']
+
+        self.colors = colors
+        self.debug = debug
+
+    def _evaluate_exception_handler(self, exc: Exception, _group: str, new_l_tokens: list) -> None:
+        debug_token = ''
+        if self.debug:
+            debug_token = f"({type(exc).__name__}: {exc} in {repr(_group)})"
+        new_token = f"{self.colors[0]}???{debug_token if self.debug else ''}{self.colors[2]}"
+        new_l_tokens.append(new_token)
+
+        expected_errors = [ValueError, ArithmeticError]
+         # anything else should be raised again, since it is not expected here
+        if not any([isinstance(exc, error) for error in expected_errors]):
+            raise exc
+
+    def evaluate(self, _l: str, integrated: bool) -> str:
         """
         evaluate simple mathematical expression within any text
         
@@ -25,17 +58,11 @@ class Converter():
         integrated (bool):
             indicates whether or not solely the not-matched
             parts should stay within the line
-        colors (list):
-            a list with 2 elements like [COLOR_EVALUATE, COLOR_RESET]
-            containing the ANSI-Colorcodes used in the returned string.
             
         Returns:
         (str):
             the new content line with the evaluated expression
         """
-        if colors is None or len(colors) < 2:
-            colors = ['', '']
-
         new_l_tokens = []
         res = re_search(self._eval_regex, _l)
 
@@ -43,21 +70,25 @@ class Converter():
             if integrated:
                 new_l_tokens.append(_l[:res.start()])
             try:
-                new_l_tokens.append(colors[0] + str(eval(res.group())) + colors[1])
+                new_l_tokens.append(f"{self.colors[0]}{eval(res.group())}{self.colors[2]}")
             except SyntaxError:
                 p_diff = res.group().count('(') - res.group().count(')')
                 try:
                     if p_diff > 0 and res.group()[:p_diff] == '(' * p_diff:
-                        new_l_tokens.append(colors[0] + str(eval(res.group()[p_diff:])) + colors[1])
+                        new_l_tokens.append(f"{self.colors[0]}{eval(res.group()[p_diff:])}{self.colors[2]}")
                         if integrated:
                             new_l_tokens.insert(len(new_l_tokens)-1, '(' * p_diff)
                     elif p_diff < 0 and res.group()[p_diff:] == ')' * (-1 * p_diff):
-                        new_l_tokens.append(colors[0] + str(eval(res.group()[:p_diff])) + colors[1])
+                        new_l_tokens.append(f"{self.colors[0]}{eval(res.group()[:p_diff])}{self.colors[2]}")
                         _l = ')' * (-1 * p_diff) + _l
                     else:
                         raise SyntaxError()
                 except SyntaxError:
-                    new_l_tokens.append(colors[0] + ('?' * len(res.group()) if integrated else '?') + colors[1])
+                    new_l_tokens.append(f"{self.colors[0]}{('?' * len(res.group()) if integrated else '?')}{self.colors[2]}")
+                except Exception as e:
+                    self._evaluate_exception_handler(e, res.group(), new_l_tokens)
+            except Exception as e:
+                self._evaluate_exception_handler(e, res.group(), new_l_tokens)
             _l = _l[res.end():]
             res = re_search(self._eval_regex, _l)
 
@@ -128,8 +159,8 @@ class Converter():
         Hexadecimal and Binary number.
         """
         value = int(value)
-        return '{Hexadecimal: ' + self.__dec_to_hex__(value, leading) + '; Binary: ' + \
-            self.__dec_to_bin__(value, leading) + '}'
+        return self.colors[1] + '{Hexadecimal: ' + self.__dec_to_hex__(value, leading) + '; Binary: ' + \
+            self.__dec_to_bin__(value, leading) + '}' + self.colors[2]
 
     def __hex_to_dec__(self, value: str) -> str:
         return str(int(value, 16))
@@ -142,8 +173,8 @@ class Converter():
         returns a String representation of a Hexadecimal String including the corresponding
         Decimal and Binary number.
         """
-        return '{Decimal: ' + self.__hex_to_dec__(value) + '; Binary: ' + \
-            self.__hex_to_bin__(value, leading) + '}'
+        return self.colors[1] + '{Decimal: ' + self.__hex_to_dec__(value) + '; Binary: ' + \
+            self.__hex_to_bin__(value, leading) + '}' + self.colors[2]
 
     def __bin_to_dec__(self, value: str) -> str:
         return str(int(value, 2))
@@ -156,5 +187,5 @@ class Converter():
         returns a String representation of a Binary String including the corresponding
         Decimal and Hexadecimal number.
         """
-        return '{Decimal: ' + self.__bin_to_dec__(value) + '; Hexadecimal: ' + \
-            self.__bin_to_hex__(value, leading) + '}'
+        return self.colors[1] + '{Decimal: ' + self.__bin_to_dec__(value) + '; Hexadecimal: ' + \
+            self.__bin_to_hex__(value, leading) + '}' + self.colors[2]
