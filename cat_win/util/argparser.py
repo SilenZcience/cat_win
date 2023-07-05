@@ -1,6 +1,6 @@
 from glob import iglob
 from os.path import isfile, realpath, isdir
-from re import match
+from re import match, IGNORECASE
 
 from cat_win.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_ECHO
 
@@ -63,25 +63,25 @@ class ArgParser:
             should simply be printed to stdout.
         """
         # 'enc' + ('=' or ':') + file_encoding
-        if match(r"\Aenc[\=\:].+\Z", param):
+        if match(r"\Aenc[\=\:].+\Z", param, IGNORECASE):
             self.file_encoding = param[4:]
             return False
         # 'match' + ('=' or ':') + file_match
-        if match(r"\Amatch[\=\:].+\Z", param):
+        if match(r"\Amatch[\=\:].+\Z", param, IGNORECASE):
             if delete:
                 self.file_match.discard(param[6:])
                 return False
             self.file_match.add(fr'{param[6:]}')
             return False
         # 'find' + ('=' or ':') + file_search
-        if match(r"\Afind[\=\:].+\Z", param):
+        if match(r"\Afind[\=\:].+\Z", param, IGNORECASE):
             if delete:
                 self.file_search.discard(param[5:])
                 return False
             self.file_search.add(param[5:])
             return False
         # 'trunc' + ('=' or ':') + file_truncate[0] + ':' + file_truncate[1] [+ ':' + file_truncate[2]]
-        if match(r"\Atrunc[\=\:][0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\Z", param):
+        if match(r"\Atrunc[\=\:][0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\Z", param, IGNORECASE):
             param_split = param[6:].split(':')
             self.file_truncate[0] = None if param_split[0] == '' else max(0, int(eval(param_split[0]))-1)
             self.file_truncate[1] = None if param_split[1] == '' else int(eval(param_split[1]))
