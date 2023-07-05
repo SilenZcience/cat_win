@@ -580,7 +580,7 @@ def edit_file(file_index: int = 0) -> None:
 
 
 def _copy_to_clipboard(content: str, __dependency: int = 3,
-                       __clip_board_error: bool = False) -> None:
+                       __clip_board_error: bool = False) -> object:
     """
     copy a string to the clipboard, by recursively checking which module exists and could
     be used, this function should only be called by copy_to_clipboard()
@@ -592,6 +592,11 @@ def _copy_to_clipboard(content: str, __dependency: int = 3,
         do not change!
     __clip_board_error (bool):
         do not change!
+        
+    Returns:
+    (function):
+        the method used for copying to the clipboard
+        (in case we want to use this function again without another import)
     """
     if __dependency == 0:
         if __clip_board_error:
@@ -603,7 +608,7 @@ def _copy_to_clipboard(content: str, __dependency: int = 3,
             error_msg += "ImportError: You need either 'pyperclip3', 'pyperclip', or 'pyclip' in order to use the '--clip' parameter.\n"
             error_msg += "Should you have any problem with either module, try to install a different one using 'python -m pip install ...'"
         print(error_msg)
-        return
+        return None
     try:
         if __dependency == 3:
             import pyperclip as pc
@@ -612,21 +617,33 @@ def _copy_to_clipboard(content: str, __dependency: int = 3,
         elif __dependency == 1:
             import pyperclip3 as pc
         pc.copy(content)
+        return pc.copy
     except ImportError:
-        _copy_to_clipboard(content, __dependency-1, False or __clip_board_error)
+        return _copy_to_clipboard(content, __dependency-1, False or __clip_board_error)
     except Exception:
-        _copy_to_clipboard(content, __dependency-1, True or __clip_board_error)
+        return _copy_to_clipboard(content, __dependency-1, True or __clip_board_error)
 
 
-def copy_to_clipboard(content: str) -> None:
+def copy_to_clipboard(content: str, copy_function: object = None) -> object:
     """
     entry point to recursive function _copy_to_clipboard()
     
     Parameters:
     content (str):
         the string to copy
+    copy_function (function):
+        the method to use for copying to the clipboard
+        (in case such a method already exists we do not need to import any module (again))
+        
+    Returns:
+    (function):
+        the method used for copying to the clipboard
+        (in case we want to use this function again without another import)    
     """
-    _copy_to_clipboard(content)
+    if copy_function is not None:
+        copy_function(content)
+        return copy_function
+    return _copy_to_clipboard(content)
 
 
 def print_raw_view(file_index: int = 0, mode: str = 'X') -> None:
@@ -897,6 +914,7 @@ def shell_main():
 
     cmd = CmdExec()
     command_count = 0
+    copy_function = None
 
     print(__project__, 'v' + __version__, 'shell', '(' + __url__ + ')', end=' - ')
     print("Use 'catw' to handle files.")
@@ -914,7 +932,7 @@ def shell_main():
             if stripped_line:
                 edit_content([('', stripped_line)], False, -1, i-command_count)
                 if holder.args_id[ARGS_CLIP]:
-                    copy_to_clipboard(remove_ansi_codes_from_line(holder.clip_board))
+                    copy_function = copy_to_clipboard(remove_ansi_codes_from_line(holder.clip_board), copy_function)
                     holder.clip_board = ''
         if not oneline:
             print(shell_prefix, end='', flush=True)
