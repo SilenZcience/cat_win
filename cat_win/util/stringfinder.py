@@ -109,10 +109,14 @@ class StringFinder:
             for _f in self._findliterals(keyword, line):
                 found_position.append(_f[:])
                 found_list.append((keyword, _f))
-
+        # sort by start position (necessary for a deterministic output)
+        found_list.sort(key = lambda x: x[1][0])
+        
         for keyword in self.kw_regex:
             for _m in self._findregex(keyword, line):
                 matched_position.append(_m[:])
                 matched_list.append((keyword, _m))
+        # sort by start position (necessary for a deterministic output)
+        matched_list.sort(key = lambda x: x[1][0])
 
         return (self._merge_keyword_intervals(found_position, matched_position), found_list, matched_list)
