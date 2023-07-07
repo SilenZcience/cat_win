@@ -153,7 +153,10 @@ class Config:
         while keyword not in self.elements:
             if keyword != '':
                 print(f"Something went wrong. Unknown keyword '{keyword}'")
-            keyword = input('Input name of keyword to change: ')
+            try:
+                keyword = input('Input name of keyword to change: ')
+            except EOFError:
+                return
             if keyword.isdigit():
                 keyword = self.elements[int(keyword)-1] if (
                     0 < int(keyword) <= len(self.elements)) else keyword
