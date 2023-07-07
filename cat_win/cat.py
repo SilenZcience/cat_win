@@ -132,7 +132,7 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     """
     Print all neccassary debug information
     """
-    print('Debug Information:')
+    print('==================================== DEBUG ====================================')
     print('args: ', end='')
     print([(arg[0], arg[1], holder.args_id[arg[0]]) for arg in args])
     print('unknown_args: ', end='')
@@ -151,6 +151,7 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     print(arg_parser.file_match)
     print('truncate file: ', end='')
     print(arg_parser.file_truncate)
+    print('===============================================================================')
 
 
 def _show_count() -> None:
@@ -823,6 +824,8 @@ def main():
         sys.exit(1)  # Python exits with error code 1 on EPIPE
 
     # clean-up
+    if holder.args_id[ARGS_DEBUG] and tmp_file_helper.tmp_count:
+        print('==================================== DEBUG ====================================')
     for tmp_file in tmp_file_helper.get_generated_temp_files():
         if holder.args_id[ARGS_DEBUG]:
             print('Cleaning', tmp_file)
@@ -834,6 +837,8 @@ def main():
         except PermissionError:
             if holder.args_id[ARGS_DEBUG]:
                 print('PermissionError', tmp_file)
+    if holder.args_id[ARGS_DEBUG] and tmp_file_helper.tmp_count:
+        print('===============================================================================')
 
 
 def shell_main():

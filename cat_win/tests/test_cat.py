@@ -167,7 +167,7 @@ class TestCat(TestCase):
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat._show_debug([], ['test'], [], [], [])
             self.assertIn('test', fake_out.getvalue())
-            self.assertIn('Debug Information:', fake_out.getvalue())
+            self.assertIn('DEBUG', fake_out.getvalue())
             self.assertIn('hello', fake_out.getvalue())
             self.assertIn('world', fake_out.getvalue())
 
