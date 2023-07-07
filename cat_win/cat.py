@@ -375,6 +375,12 @@ def print_file(content: list) -> bool:
         cleaned_line = remove_ansi_codes_from_line(line)
         intervals, f_keywords, m_keywords = string_finder.find_keywords(cleaned_line)
 
+        if holder.args_id[ARGS_GREP_ONLY]:
+            if f_keywords or m_keywords:
+                fm_substrings = [line[pos[0]:pos[1]] for _, pos in f_keywords + m_keywords]
+                print(','.join(fm_substrings))
+            continue
+
         if len(f_keywords + m_keywords) == 0:
             if not holder.args_id[ARGS_GREP]:
                 print(line_prefix + line)

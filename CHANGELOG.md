@@ -10,6 +10,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added --`eval`, --`EVAL` parameter to evaluate simple mathematical equations within any text.
 - added --`sort`, --`sort` parameter to sort all lines alphabetically.
 - added `!clear` command to the cat shell, to reset/delete all previously defined parameters.
+- added -`G`, --`GREP` parameter to *only* show the substrings found or matching any queried pattern.
 
 ### Bugfixes
 

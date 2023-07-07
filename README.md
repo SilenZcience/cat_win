@@ -149,9 +149,10 @@ cats --help
 | *-S, --SUM*            | ONLY show sum of lines                                    | ❌             |
 | *-f, --files*          | list applied files                                        | ❌             |
 | *-F, --FILES*          | ONLY list applied files and file sizes                    | ❌             |
-| *-g, --grep*           | only show lines containing queried keywords               | ✔              |
+| *-g, --grep*           | only show lines containing queried keywords or patterns   | ✔              |
+| *-G, --GREP*           | only show found and matched substrings                    | ✔              |
 | *-i, --interactive*    | use stdin                                                 | ❌             |
-| *-o, --oneline*        | take only the first stdin-line                            | ❌             |
+| *-o, --oneline*        | take only the first stdin-line                            | ✔              |
 | *-E, --ECHO*           | handle every following parameter as stdin                 | ❌             |
 | *-c, --clip*           | copy output to clipboard                                  | ✔              |
 | *-m, --checksum*       | show the checksums of all files                           | ❌             |

@@ -21,7 +21,7 @@ ARGS_CONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK, ARGS_NOCOL = range(20, 25)
 ARGS_EOF, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP = range(25, 30)
 ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW, ARGS_BINVIEW = range(30, 35)
 ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN, ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(35, 40)
-ARGS_EVAL, ARGS_SORT = range(40, 42)
+ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY = range(40, 43)
 
 ALL_ARGS = [
     ArgConstant('-h', '--help', 'show this help message and exit', ARGS_HELP),
@@ -41,7 +41,8 @@ ALL_ARGS = [
     ArgConstant('-S', '--SUM', 'ONLY show sum of lines', ARGS_CCOUNT, True, False),
     ArgConstant('-f', '--files', 'list applied files', ARGS_FILES, True, False),
     ArgConstant('-F', '--FILES', 'ONLY list applied files and file sizes', ARGS_FFILES, True, False),
-    ArgConstant('-g', '--grep', 'only show lines containing queried keywords', ARGS_GREP),
+    ArgConstant('-g', '--grep', 'only show lines containing queried keywords or patterns', ARGS_GREP),
+    ArgConstant('-G', '--GREP', 'only show found and matched substrings', ARGS_GREP_ONLY),
     ArgConstant('-i', '--interactive', 'use stdin', ARGS_INTERACTIVE, True, False),
     ArgConstant('-o', '--oneline', 'take only the first stdin-line', ARGS_ONELINE, True, False),
     ArgConstant('-E', '--ECHO', 'handle every following parameter as stdin', ARGS_ECHO, True, False),
