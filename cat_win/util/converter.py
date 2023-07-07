@@ -40,7 +40,7 @@ class Converter():
         debug_token = ''
         if self.debug:
             debug_token = f"({type(exc).__name__}: {exc} in {repr(_group)})"
-        new_token = f"{self.colors[0]}???{debug_token if self.debug else ''}{self.colors[2]}"
+        new_token = f"{self.colors[0]}???{debug_token}{self.colors[2]}"
         new_l_tokens.append(new_token)
 
         expected_errors = [ValueError, ArithmeticError]
