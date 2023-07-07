@@ -156,18 +156,23 @@ class Config:
             try:
                 keyword = input('Input name of keyword to change: ')
             except EOFError:
+                print('\nAborting due to End-of-File character...')
                 return
             if keyword.isdigit():
                 keyword = self.elements[int(keyword)-1] if (
                     0 < int(keyword) <= len(self.elements)) else keyword
-        print(f"Successfully selected element '{keyword}'.")
+        print(f"Successfully selected element '{self.color_dic[keyword]}{keyword}{ColorOptions.Style['RESET']}'.")
 
         color_options = self._print_get_all_available_colors()
         color = ''
         while color not in color_options:
             if color != '':
                 print(f"Something went wrong. Unknown option '{color}'.")
-            color = input('Input color: ')
+            try:
+                color = input('Input color: ')
+            except EOFError:
+                print('\nAborting due to End-of-File character...')
+                return
             if color.isdigit():
                 color = color_options[int(color)-1] if (
                     0 < int(color) <= len(color_options)) else color
@@ -179,7 +184,8 @@ class Config:
             print(f"An Error occured: '{keyword}' can only be of style 'Back'")
             return
 
-        print(f"Successfully selected element '{color}'.")
+        color_split = color.split('.')
+        print(f"Successfully selected element '{getattr(ColorOptions, color_split[0])[color_split[1]]}{color}{ColorOptions.Style['RESET']}'.")
 
         self.config_parser['COLORS'][keyword] = color
         try:
