@@ -1,7 +1,7 @@
 from unittest import TestCase
 import os
 
-from cat_win.const.argconstants import ARGS_B64E, ARGS_NOCOL, ARGS_LLENGTH, ARGS_NUMBER, ARGS_TABS, ARGS_ENDS
+from cat_win.const.argconstants import ARGS_B64E, ARGS_NOCOL, ARGS_LLENGTH, ARGS_NUMBER, ARGS_TABS, ARGS_ENDS, ARGS_REPLACE
 from cat_win.util.holder import Holder, reduce_list, diff_list
 # import sys
 # sys.path.append('../cat_win')
@@ -140,11 +140,11 @@ class TestHolder(TestCase):
         test_list = [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')]
         reduced_list = reduce_list(test_list)
         self.assertListEqual(reduced_list, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
-        
+
         test_list += [(ARGS_NUMBER, 'c'), (ARGS_ENDS, 'd')]
         reduced_list = reduce_list(test_list)
         self.assertListEqual(reduced_list, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_ENDS, 'd')])
-        
+
         test_list += [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_NUMBER, 'c'), (ARGS_ENDS, 'd')]
         reduced_list = reduce_list(test_list)
         self.assertListEqual(reduced_list, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_ENDS, 'd')])
@@ -153,3 +153,12 @@ class TestHolder(TestCase):
         test_list = [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')]
         reduced_list = diff_list(test_list, [(ARGS_ENDS, 'a'), (ARGS_LLENGTH, 'c')])
         self.assertListEqual(reduced_list, [(ARGS_NUMBER, 'a')])
+
+    def test_diff_list_differentiable(self):
+        test_list = [(ARGS_REPLACE, '[a,b]'), (ARGS_REPLACE, '[c,a]'), (ARGS_REPLACE, '[a,b]')]
+        reduced_list = diff_list(test_list, [(ARGS_REPLACE, '[a,b]'), (ARGS_REPLACE, '[l,l]')])
+        self.assertListEqual(reduced_list, [(ARGS_REPLACE, '[c,a]'), (ARGS_REPLACE, '[a,b]')])
+
+        test_list = [(ARGS_REPLACE, '[a,b]'), (ARGS_REPLACE, '[c,a]'), (ARGS_REPLACE, '[a,b]')]
+        reduced_list = diff_list(test_list, [(ARGS_REPLACE, '[a,b]'), (ARGS_REPLACE, '[a,b]')])
+        self.assertListEqual(reduced_list, [(ARGS_REPLACE, '[c,a]')])              
