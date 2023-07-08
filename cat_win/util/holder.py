@@ -2,7 +2,7 @@ from functools import lru_cache
 from heapq import nlargest
 
 from cat_win.const.argconstants import HIGHEST_ARG_ID, ARGS_NOCOL, ARGS_LLENGTH, ARGS_NUMBER, \
-    ARGS_REVERSE, ARGS_B64D, ARGS_B64E, ARGS_COUNT, ARGS_CCOUNT
+    ARGS_REVERSE, ARGS_B64D, ARGS_B64E, ARGS_COUNT, ARGS_CCOUNT, DIFFERENTIABLE_ARGS
 from cat_win.util.cbase64 import _decode_base64
 from cat_win.util.file import File
 
@@ -10,7 +10,8 @@ from cat_win.util.file import File
 def reduce_list(args: list) -> list:
     """
     remove duplicate args regardless if shortform or
-    longform has been used.
+    longform has been used, an exception exists for those
+    args that contain different information per parameter.
     
     Parameters:
     args (list):
@@ -25,7 +26,11 @@ def reduce_list(args: list) -> list:
 
     for arg in args:
         id, _ = arg
-        if id not in temp_args_id:
+        # it can make sense to have the exact same parameter twice, even if it does
+        # the same information, therefor we do not test for the param here.
+        if id in DIFFERENTIABLE_ARGS:
+            new_args.append(arg)
+        elif id not in temp_args_id:
             temp_args_id.append(id)
             new_args.append(arg)
 
@@ -34,7 +39,8 @@ def reduce_list(args: list) -> list:
 def diff_list(args: list, to_remove: list) -> list:
     """
     subtract args in to_remove from args in args regardless
-    if shortform or longform has been used.
+    if shortform or longform has been used, an exception exists for those
+    args that contain different information per parameter.
     
     Parameters:
     args (list):
@@ -48,11 +54,18 @@ def diff_list(args: list, to_remove: list) -> list:
     """
     new_args = []
     temp_args_id = [id for id, _ in to_remove]
+    temp_args = [arg for arg in to_remove if arg[0] in DIFFERENTIABLE_ARGS]
 
     for arg in args:
         id, _ = arg
-        if id not in temp_args_id:
+        if id not in temp_args_id or id in DIFFERENTIABLE_ARGS:
             new_args.append(arg)
+
+    for arg in temp_args:
+        try:
+            new_args.remove(arg)
+        except ValueError:
+            pass
 
     return new_args
 

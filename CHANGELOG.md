@@ -17,7 +17,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fix Bug where the shell command `!del` would not properly work when using a different command form.
 - fix Bug where the `trunc` parameter would crash on not-evaluable inputs.
 - fix Bug where the shell would unnecessarily import the clipboard module for each line again (when using the --`clip` parameter).
-- fix bug where the output of `find=` and `match=` was inconsistent and undeterministic.
+- fix Bug where the output of `find=` and `match=` was inconsistent and undeterministic.
+- fix Bug where the slice and replace operators could only be used once per command.
 
 
 ## [1.4.2] - 2023-05-13

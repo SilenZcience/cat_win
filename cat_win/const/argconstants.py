@@ -23,6 +23,8 @@ ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW, ARGS_BINVIEW = range(30, 35)
 ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN, ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(35, 40)
 ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY = range(40, 43)
 
+DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
+
 ALL_ARGS = [
     ArgConstant('-h', '--help', 'show this help message and exit', ARGS_HELP),
     ArgConstant('-v', '--version', 'output version information and exit', ARGS_VERSION),
