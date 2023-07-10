@@ -18,9 +18,9 @@ from cat_win.util.cbase64 import decode_base64, encode_base64
 from cat_win.util.checksum import get_checksum_from_file
 from cat_win.util.converter import Converter
 try:
-    from cat_win.util.convertercomp import comp_eval, comp_conv
+    from cat_win.util.utility import comp_eval, comp_conv, split_replace
 except SyntaxError: # in case of Python 3.7
-    from cat_win.util.convertercompold import comp_eval, comp_conv
+    from cat_win.util.utilityold import comp_eval, comp_conv, split_replace
 from cat_win.util.fileattributes import get_file_meta_data, get_file_size, _convert_size
 from cat_win.util.holder import Holder
 from cat_win.util.rawviewer import get_raw_view_lines_gen
@@ -89,7 +89,7 @@ def _show_help(shell: bool = False) -> None:
     if not shell:
         help_message += f"\t{'trunc=X:Y, trunc:X:Y': <25}truncate file to lines x and y (python-like)\n"
     help_message += '\n'
-    help_message += f"\t{'[a,b]': <25}replace a with b in every line\n"
+    help_message += f"\t{'[a,b]': <25}replace a with b in every line (escape chars with '\\')\n"
     help_message += f"\t{'[a:b:c]': <25}python-like string indexing syntax (line by line)\n"
     help_message += '\n'
     help_message += 'Examples:\n'
@@ -490,10 +490,10 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
 
         for arg, param in holder.args:
             if arg == ARGS_ENDS:
-                content = [(prefix, line + color_dic[CKW.ENDS] + '$' + color_dic[CKW.RESET_ALL])
+                content = [(prefix, f"{line}{color_dic[CKW.ENDS]}${color_dic[CKW.RESET_ALL]}")
                            for prefix, line in content]
             elif arg == ARGS_TABS:
-                content = [(prefix, line.replace('\t', color_dic[CKW.TABS] + '^I' + color_dic[CKW.RESET_ALL]))
+                content = [(prefix, line.replace('\t', f"{color_dic[CKW.TABS]}^I{color_dic[CKW.RESET_ALL]}"))
                            for prefix, line in content]
             elif arg == ARGS_SQUEEZE:
                 content = [list(group)[0] for _, group in groupby(content, lambda x: x[1])]
@@ -504,7 +504,7 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
             elif arg == ARGS_BLANK:
                 content = [c for c in content if c[1]]
             elif arg == ARGS_EVAL:
-                content = comp_eval(converter, content, param)
+                content = comp_eval(converter, content, param, remove_ansi_codes_from_line)
             elif arg == ARGS_DEC:
                 content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
             elif arg == ARGS_HEX:
@@ -512,11 +512,11 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
             elif arg == ARGS_BIN:
                 content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
             elif arg == ARGS_REPLACE:
-                replace_values = param[1:-1].split(",")
-                content = [(prefix, line.replace(replace_values[0], color_dic[CKW.REPLACE] + replace_values[1] + color_dic[CKW.RESET_ALL]))
+                replace_values = split_replace(param)
+                content = [(prefix, line.replace(replace_values[0], f"{color_dic[CKW.REPLACE]}{replace_values[1]}{color_dic[CKW.RESET_ALL]}"))
                            for prefix, line  in content]
             elif arg == ARGS_EOF:
-                content = [(prefix, line.replace(chr(26), color_dic[CKW.REPLACE] + '^EOF' + color_dic[CKW.RESET_ALL]))
+                content = [(prefix, line.replace(chr(26), f"{color_dic[CKW.REPLACE]}^EOF{color_dic[CKW.RESET_ALL]}"))
                            for prefix, line in content]
 
     if holder.args_id[ARGS_LLENGTH]:

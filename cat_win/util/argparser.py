@@ -81,7 +81,7 @@ class ArgParser:
             self.file_search.add(param[5:])
             return False
         # 'trunc' + ('=' or ':') + file_truncate[0] + ':' + file_truncate[1] [+ ':' + file_truncate[2]]
-        if match(r"\Atrunc[\=\:][0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\Z", param, IGNORECASE):
+        if match(r"\Atrunc[\=\:][0-9\(\)\+\-\*\/]*\:[0-9\(\)\+\-\*\/]*\:?[0-9\(\)\+\-\*\/]*\Z", param, IGNORECASE):
             for i, p_split in enumerate(param[6:].split(':')):
                 try:
                     self.file_truncate[i] = int(eval(p_split))
@@ -89,11 +89,11 @@ class ArgParser:
                     self.file_truncate[i] = None
             return False
         # '[' + ARGS_CUT + ']'
-        if match(r"\A\[[0-9()+\-*\/]*\:[0-9()+\-*\/]*\:?[0-9()+\-*\/]*\]\Z", param):
+        if match(r"\A\[[0-9\(\)\+\-\*\/]*\:[0-9\(\)\+\-\*\/]*\:?[0-9\(\)\+\-\*\/]*\]\Z", param):
             self._args.append((ARGS_CUT, param))
             return False
-        # '[' + ARGS_REPLACE + ']'
-        if match(r"\A\[.+\,.+\]\Z", param):
+        # '[' + ARGS_REPLACE_THIS + ',' + ARGS_REPLACE_WITH + ']' (escape chars with '\')
+        if match(r"\A\[(?:.*[^\\])?(?:\\\\)*,(?:.*[^\\])?(?:\\\\)*\]\Z", param):
             self._args.append((ARGS_REPLACE, param))
             return False
 
@@ -120,7 +120,7 @@ class ArgParser:
             for i in range(1, len(param)):
                 if self._add_argument('-' + param[i], delete):
                     return True
-        elif match(r"\A[^-]+.*\Z", param):
+        elif match(r"\A[^-].*\Z", param):
             self._unknown_files.append(realpath(param))
         else:
             self._unknown_args.append(param)

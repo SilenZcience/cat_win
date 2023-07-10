@@ -180,7 +180,7 @@ cats --help
 | *match=X*              | find/query a pattern X in the given files                 | ✔              |
 | *trunc=X:Y*            | truncate file to lines X and Y (python-like)              | ❌             |
 |                        |                                                           |                |
-| *[a,b]*                | replace a with b in every line                            | ✔              |
+| *[a,b]*                | replace a with b in every line (escape chars with '\\')   | ✔              |
 | *[a:​b:c]*              | python-like string indexing syntax (line by line)         | ✔              |
 
 ### Examples
