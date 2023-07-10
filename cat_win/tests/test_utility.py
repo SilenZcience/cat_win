@@ -4,9 +4,9 @@ from cat_win.const.argconstants import ARGS_EVAL, ALL_ARGS
 from cat_win.cat import remove_ansi_codes_from_line as cleaner
 from cat_win.util.converter import Converter
 try:
-    from cat_win.util.convertercomp import comp_eval, comp_conv
+    from cat_win.util.utility import comp_eval, comp_conv, split_replace
 except SyntaxError: # in case of Python 3.7
-    from cat_win.util.convertercompold import comp_eval, comp_conv
+    from cat_win.util.utilityold import comp_eval, comp_conv, split_replace
 
 # import sys
 # sys.path.append('../cat_win')
@@ -51,7 +51,7 @@ class TestConverterComp(TestCase):
             ('', 'xyz ((3 xyz'),
             ('', 'xyz 3)) xyz'),
         ]
-        new_content = comp_eval(converter, test_content_in, param_lowercase)
+        new_content = comp_eval(converter, test_content_in, param_lowercase, cleaner)
         self.assertListEqual(new_content, test_content_out)
 
     def test_comp_eval_uppercase(self):
@@ -82,7 +82,7 @@ class TestConverterComp(TestCase):
             ('', '3'),
             ('', '3'),
         ]
-        new_content = comp_eval(converter, test_content_in, param_uppercase)
+        new_content = comp_eval(converter, test_content_in, param_uppercase, cleaner)
         self.assertListEqual(new_content, test_content_out)
 
     def test_comp_conv_dec(self):
@@ -146,5 +146,10 @@ class TestConverterComp(TestCase):
         ]
         new_content = comp_conv(converter, test_content_in, '--bin', cleaner)
         self.assertListEqual(new_content, test_content_out)
+
+    def test_split_replace(self):
+        param = '[\\\\x\\,\\\\,wt\\f\\]]'
+        expected_result = ['\\x,\\', 'wtf]']
+        self.assertListEqual(split_replace(param), expected_result)
 
 # python -m unittest discover -s cat_win.tests -p test*.py

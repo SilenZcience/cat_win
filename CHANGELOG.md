@@ -19,6 +19,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fix Bug where the shell would unnecessarily import the clipboard module for each line again (when using the --`clip` parameter).
 - fix Bug where the output of `find=` and `match=` was inconsistent and undeterministic.
 - fix Bug where the slice and replace operators could only be used once per command.
+- fix Bug where you could not replace certain substrings (individual chars are now escapable with '\\')
 
 
 ## [1.4.2] - 2023-05-13
