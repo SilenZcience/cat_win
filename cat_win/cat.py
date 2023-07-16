@@ -565,6 +565,8 @@ def edit_file(file_index: int = 0) -> None:
                 enter_char = 'ENTER'
             print(f"Do you want to open the file as a binary, without parameters? [Y/{enter_char}]:", end='')
             inp = input()
+            if not os.isatty(sys.stdin.fileno()):
+                print('') # if the input is piped, we add the linefeed char manually
             if inp and 'Y' not in inp.upper():
                 print('Aborting...')
                 return
