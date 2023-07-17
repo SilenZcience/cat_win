@@ -17,6 +17,7 @@ test_peek       = os.path.join(test_file_dir, 'test_peek.txt')
 test_result_B   = os.path.join(test_file_dir, 'full_test_result_B.txt')
 test_result_C   = os.path.join(test_file_dir, 'full_test_result_C.txt')
 test_result_D   = os.path.join(test_file_dir, 'full_test_result_D.txt')
+test_eval       = os.path.join(test_file_dir, 'full_test_eval.txt')
 
 
 @patch('cat_win.cat.sys.stdin', StdInMock())
@@ -137,7 +138,7 @@ class TestCatFull(TestCase):
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
 
-    @patch('cat_win.cat.sys.argv', ['<CAT>', 'enc=utf-8', '--eval', '--dec', '-E', '5 + 5 * 5 // 2 - 3'])
+    @patch('cat_win.cat.sys.argv', ['<CAT>', 'enc=utf-8', '--eval', '--dec', test_eval])
     def test_cat_output_full_eval(self):
         expected_output = '14 {Hexadecimal: 0xe; Binary: 0b1110}\n'
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
