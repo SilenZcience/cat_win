@@ -2,6 +2,6 @@
 
 __project__ = 'cat_win'
 __version__ = '1.4.3'
-__sysversion__ = '3.11.2 (main, Feb  7 2023, 16:38:35) [MSC v.1934 64 bit (AMD64)]'
+__sysversion__ = '3.11.4 (main, Jun  7 2023, 05:45:37) [MSC v.1934 64 bit (AMD64)]'
 __author__ = 'Silas A. Kraume'
 __url__ = 'https://github.com/SilenZcience/cat_win'
