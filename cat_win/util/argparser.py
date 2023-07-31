@@ -8,7 +8,48 @@ from cat_win.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_EC
 DEFAULT_FILE_ENCODING = 'utf-8'
 
 
+def levenshtein(str_a: str, str_b: str) -> float:
+    """
+    Calculate the levenshtein distance (similarity) between 
+    two strings and return the result as a percentage value.
+    char case is ignored such that uppercase letters match their
+    lowercase counterparts perfectly.
+    
+    Parameters:
+    str_a (str):
+        the first string to compare
+    str_b (str):
+        the second string to compare
+        
+    Returns:
+    (float):
+        the similarity of the two strings as a percentage between 0.0 and 100.0
+    """
+    str_a, str_b = str_a.lstrip('-'), str_b.lstrip('-')
+    a, b = len(str_a), len(str_b)
+    max_len = max(a, b)
+    if a*b == 0:
+        return (100 if max_len == 0 else (1 - (a+b)/max_len) * 100)
+
+    d = [[i] + ([0] * b) for i in range(a+1)]
+    d[0] = list(range(b+1))
+    
+    for i in range(1, a+1):
+        str_a_i = str_a[i-1:i]
+
+        for j in range(1, b+1):
+            str_b_j = str_b[j-1:j]
+
+            d[i][j] = min(d[i-1][j]+1,
+                          d[i][j-1]+1,
+                          d[i-1][j-1]+int(str_a_i.lower() != str_b_j.lower()))
+
+    return (1 - d[a][b]/max_len) * 100
+
+
 class ArgParser:
+    SIMILARITY_LIMIT = 50.0
+
     def __init__(self) -> None:
         self._args = []
         self._unknown_args = []
@@ -26,6 +67,39 @@ class ArgParser:
         self.file_search = set()
         self.file_match = set()
         self.file_truncate = [None, None, None]
+
+    def check_unknown_args(self, shell_arg: bool = False) -> list:
+        """
+        Calculate the suggestions for each unknown argument passed in
+        using the levenshtein distance to all known/possible arguments
+        
+        Parameters:
+        shell_arg (bool):
+            indicates whether of not the shell has been used
+            
+        Returns:
+        possible_arg_replacements (list):
+            a list of the structure [(arg1, [suggestions]), (arg2, [suggestions]), ...]
+        """
+        possible_arg_replacements = []
+
+        for u_arg in self._unknown_args:
+            possible_arg_replacement = (u_arg, [])
+            for arg in ALL_ARGS:
+                if shell_arg and not arg.show_arg_on_shell:
+                    continue
+                leven_short = levenshtein(arg.short_form, u_arg)
+                leven_long = levenshtein(arg.long_form, u_arg)
+                # print(leven_short.__round__(3), leven_long.__round__(3),
+                #       max(leven_short, leven_long).__round__(3), u_arg, arg.long_form, sep="\t") # DEBUG
+                if max(leven_short, leven_long) >= self.SIMILARITY_LIMIT:
+                    if leven_short > leven_long:
+                        possible_arg_replacement[1].append(arg.short_form)
+                    else:
+                        possible_arg_replacement[1].append(arg.long_form)
+            possible_arg_replacements.append(possible_arg_replacement)
+
+        return possible_arg_replacements
 
     def get_arguments(self, argv: list, delete: bool = False) -> tuple:
         """
