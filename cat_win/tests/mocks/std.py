@@ -10,6 +10,13 @@ class StdOutMock(StringIO):
     #     return 0
 
 
+class StdOutMockIsAtty(StringIO):
+    closed: bool = False
+
+    def isatty(self) -> bool:
+        return True
+
+
 class StdInMockIter:
     def __init__(self, mock: object) -> None:
         self.input_value = mock.input_value
