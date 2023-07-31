@@ -3,7 +3,7 @@ from unittest import TestCase
 import os
 
 from cat_win import cat
-from cat_win.tests.mocks.std import StdInMock, StdOutMock
+from cat_win.tests.mocks.std import StdInMock, StdOutMock, StdOutMockIsAtty
 from cat_win.util.argparser import ArgParser
 from cat_win.util.holder import Holder
 # import sys
@@ -160,5 +160,15 @@ class TestCatFull(TestCase):
             self.assertIn(test_file_path, fake_out.getvalue())
             self.assertIn(test_empty_path, fake_out.getvalue())
             self.assertIn(test_peek, fake_out.getvalue())
+
+    @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, 'trunc=0:0', '--UNIQUE', '--b64', '-?'])
+    def test_cat_output_suggestions(self):
+        with patch('cat_win.cat.sys.stdout', new=StdOutMockIsAtty()) as fake_out:
+            cat.main()
+            self.assertIn("Unknown argument: '--UNIQUE'", fake_out.getvalue())
+            self.assertIn("Did you mean --unique", fake_out.getvalue())
+            self.assertIn("Unknown argument: '--b64'", fake_out.getvalue())
+            self.assertIn("Did you mean --b64e or --b64d", fake_out.getvalue())
+            self.assertIn("Unknown argument: '-?'", fake_out.getvalue())
 
 # python -m unittest discover -s cat_win.tests -p test*.py

@@ -2,7 +2,7 @@ from unittest import TestCase
 import os
 
 from cat_win.const.argconstants import ARGS_CUT, ARGS_REPLACE
-from cat_win.util.argparser import ArgParser
+from cat_win.util.argparser import ArgParser, levenshtein
 # import sys
 # sys.path.append('../cat_win')
 
@@ -171,3 +171,30 @@ class TestArgParser(TestCase):
         self.assertSetEqual(arg_parser.file_match, set(['[a-z]', '[0-9]']))
         arg_parser._add_argument('match=[0-9]', True)
         self.assertSetEqual(arg_parser.file_match, set(['[a-z]']))
+
+    def test_check_unknown_args(self):
+        arg_parser = ArgParser()
+        arg_parser._add_argument('--number')
+        arg_parser._add_argument('--sord')
+        arg_parser._add_argument('--b64')
+        arg_parser._add_argument('--confih')
+        arg_parser._add_argument('--UNIQUE')
+        result = [('--sord', ['--sort']),
+                  ('--b64', ['--b64e', '--b64d']),
+                  ('--confih', ['--config']),
+                  ('--UNIQUE', ['--unique'])]
+        self.assertListEqual(arg_parser.check_unknown_args(False), result)
+        result = [('--sord', []),
+                  ('--b64', ['--b64e', '--b64d']),
+                  ('--confih', ['--config']),
+                  ('--UNIQUE', [])]
+        self.assertListEqual(arg_parser.check_unknown_args(True), result)
+
+    def test_levenshtein(self):
+        self.assertEqual(levenshtein('-a', '-b'), 0.0)
+        self.assertEqual(levenshtein('', ''), 100.0)
+        self.assertEqual(levenshtein('', 'test'), 0.0)
+        self.assertEqual(levenshtein('abc', ''), 0.0)
+        self.assertAlmostEqual(levenshtein('The dog sat on the cat', 'The cat sat on the mat'), 81.8181, 3)
+        self.assertAlmostEqual(levenshtein('lower!', 'LOWER?'), 83.3333, 3)
+        self.assertAlmostEqual(levenshtein('--hecksview', '--hexview'), 66.6666, 3)
