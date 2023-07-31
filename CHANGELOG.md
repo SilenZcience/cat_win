@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.4.4] - TBA
+
+### Minor Changes
+
+- display unknown arguments in order to indicate an erroneous command call
+- display argument suggestions to help fix an erraneous command call
+
+
 ## [1.4.3] - 2023-07-11
 
 ### Minor Changes
