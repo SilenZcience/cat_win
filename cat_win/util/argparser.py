@@ -92,11 +92,11 @@ class ArgParser:
                 leven_long = levenshtein(arg.long_form, u_arg)
                 # print(leven_short.__round__(3), leven_long.__round__(3),
                 #       max(leven_short, leven_long).__round__(3), u_arg, arg.long_form, sep="\t") # DEBUG
-                if max(leven_short, leven_long) >= self.SIMILARITY_LIMIT:
+                if max(leven_short, leven_long) > self.SIMILARITY_LIMIT:
                     if leven_short > leven_long:
-                        possible_arg_replacement[1].append(arg.short_form)
+                        possible_arg_replacement[1].append((arg.short_form, leven_short))
                     else:
-                        possible_arg_replacement[1].append(arg.long_form)
+                        possible_arg_replacement[1].append((arg.long_form, leven_long))
             possible_arg_replacements.append(possible_arg_replacement)
 
         return possible_arg_replacements
