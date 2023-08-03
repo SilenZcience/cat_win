@@ -723,6 +723,7 @@ def show_unknown_args_suggestions(shell: bool = False) -> list:
         for u_arg, arg_replacement in arg_suggestions:
             print(f"{color_dic[CKW.MESSAGE_IMPORTANT]}Unknown argument: '{u_arg}'{color_dic[CKW.RESET_ALL]}")
             if arg_replacement:
+                arg_replacement = [arg_r[0] for arg_r in arg_replacement]
                 print(f"\t{color_dic[CKW.MESSAGE_IMPORTANT]}Did you mean {' or '.join(arg_replacement)}{color_dic[CKW.RESET_ALL]}")
     return arg_suggestions
 
