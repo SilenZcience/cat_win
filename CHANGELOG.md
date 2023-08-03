@@ -12,7 +12,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ### Bugfixes
 
-- fix Bug where --`sort` would not correctly sort uppercase inbetween lowercase characters, and have problems with special chars like 'ß', 'µ' ...
+- fix Bug where --`sort` would not correctly sort uppercase characters inbetween lowercase characters and have problems with special chars like 'ß', 'µ' ...
 
 
 ## [1.4.3] - 2023-07-11
