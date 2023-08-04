@@ -171,6 +171,7 @@ cats --help
 | *--nc, --nocolor*      | disable colored output                                    | ✔              |
 | *--nb, --nobreak*      | do not interrupt the output on queried keywords           | ✔              |
 | *--nk, --nokeyword*    | inverse the grep output                                   | ✔              |
+| *--plain, --plain-only*| ignore non-plaintext files automatically                  | ❌             |
 | *--config, --config*   | change color configuration                                | ✔              |
 |                        |                                                           |                |
 | *-R, --R\<stream\>*    | reconfigure the std-stream(s) with the parsed encoding </br> \<stream\> = 'in'/'out'/'err' (default is stdin & stdout)| ✔ |

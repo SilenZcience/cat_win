@@ -21,7 +21,7 @@ ARGS_CONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK, ARGS_NOCOL = range(20, 25)
 ARGS_EOF, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP = range(25, 30)
 ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW, ARGS_BINVIEW = range(30, 35)
 ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN, ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(35, 40)
-ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY = range(40, 43)
+ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY = range(40, 44)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -62,6 +62,7 @@ ALL_ARGS = [
     ArgConstant('--nc', '--nocolor', 'disable colored output', ARGS_NOCOL),
     ArgConstant('--nb', '--nobreak', 'do not interrupt the output on queried keywords', ARGS_NOBREAK),
     ArgConstant('--nk', '--nokeyword', 'inverse the grep output', ARGS_NOKEYWORD),
+    ArgConstant('--plain', '--plain-only', 'ignore non-plaintext files automatically', ARGS_PLAIN_ONLY, True, False),
     ArgConstant('--config', '--config', 'change color configuration', ARGS_CONFIG),
     ArgConstant('-R', '--R', 'reconfigure the stdin and stdout with the parsed encoding', ARGS_RECONFIGURE, False),
     ArgConstant('--Rin', '--Rin', 'reconfigure the stdin with the parsed encoding', ARGS_RECONFIGURE_IN, False),
