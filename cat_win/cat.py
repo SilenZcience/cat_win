@@ -76,10 +76,15 @@ def _show_help(shell: bool = False) -> None:
     else:
         help_message = 'Usage: catw [FILE]... [OPTION]...\n'
         help_message += 'Concatenate FILE(s) to standard output.\n\n'
-    for arg in ALL_ARGS:
-        if arg.show_arg and (not shell or arg.show_arg_on_shell):
-            help_message += f"\t{f'{arg.short_form}, {arg.long_form}': <25}{arg.arg_help}\n"
-    help_message += '\n'
+    for section_id, group in groupby(ALL_ARGS, lambda x: x.section):
+        if section_id < 0:
+            continue
+        relevant_section = False
+        for arg in group:
+            if arg.show_arg and (not shell or arg.show_arg_on_shell):
+                help_message += f"\t{f'{arg.short_form}, {arg.long_form}': <25}{arg.arg_help}\n"
+                relevant_section = True
+        help_message += '\n' * relevant_section
     help_message += f"\t{'-R, --R<stream>': <25}reconfigure the std-stream(s) with the parsed encoding\n"
     help_message += "\t<stream> == 'in'/'out'/'err' (default is stdin & stdout)\n"
     help_message += '\n'
@@ -883,7 +888,7 @@ def main():
                 print('FileNotFoundError', tmp_file)
         except PermissionError:
             if holder.args_id[ARGS_DEBUG]:
-                print('PermissionError', tmp_file)
+                print('PermissionError  ', tmp_file)
     if holder.args_id[ARGS_DEBUG] and tmp_file_helper.tmp_count:
         print('===============================================================================')
 
