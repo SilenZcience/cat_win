@@ -145,16 +145,21 @@ cats --help
 | *-r, --reverse*        | reverse output                                            | ❌             |
 | *--sort, --sort*       | sort all lines alphabetically                             | ❌             |
 | *-p, --peek*           | only print the first and last lines                       | ❌             |
+| *-c, --clip*           | copy output to clipboard                                  | ✔              |
+|                        |                                                           |                |
+| *-i, --interactive*    | use stdin                                                 | ❌             |
+| *-o, --oneline*        | take only the first stdin-line                            | ✔              |
+| *-E, --ECHO*           | handle every following parameter as stdin                 | ❌             |
+|                        |                                                           |                |
 | *-s, --sum*            | show sum of lines                                         | ❌             |
 | *-S, --SUM*            | ONLY show sum of lines                                    | ❌             |
 | *-f, --files*          | list applied files                                        | ❌             |
 | *-F, --FILES*          | ONLY list applied files and file sizes                    | ❌             |
+|                        |                                                           |                |
 | *-g, --grep*           | only show lines containing queried keywords or patterns   | ✔              |
 | *-G, --GREP*           | only show found and matched substrings                    | ✔              |
-| *-i, --interactive*    | use stdin                                                 | ❌             |
-| *-o, --oneline*        | take only the first stdin-line                            | ✔              |
-| *-E, --ECHO*           | handle every following parameter as stdin                 | ❌             |
-| *-c, --clip*           | copy output to clipboard                                  | ✔              |
+| *--nk, --nokeyword*    | inverse the grep output                                   | ✔              |
+|                        |                                                           |                |
 | *-m, --checksum*       | show the checksums of all files                           | ❌             |
 | *-a, --attributes*     | show meta-information about the files                     | ❌             |
 |                        |                                                           |                |
@@ -170,8 +175,8 @@ cats --help
 |                        |                                                           |                |
 | *--nc, --nocolor*      | disable colored output                                    | ✔              |
 | *--nb, --nobreak*      | do not interrupt the output on queried keywords           | ✔              |
-| *--nk, --nokeyword*    | inverse the grep output                                   | ✔              |
 | *--plain, --plain-only*| ignore non-plaintext files automatically                  | ❌             |
+|                        |                                                           |                |
 | *--config, --config*   | change color configuration                                | ✔              |
 |                        |                                                           |                |
 | *-R, --R\<stream\>*    | reconfigure the std-stream(s) with the parsed encoding </br> \<stream\> = 'in'/'out'/'err' (default is stdin & stdout)| ✔ |
