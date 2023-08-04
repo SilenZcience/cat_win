@@ -186,7 +186,8 @@ def _show_files() -> None:
             file.set_file_size(get_file_size(file.path))
         file_sizes.append(file.file_size)
         print(f"\t{color_dic[CKW.COUNT_AND_FILES]}{_convert_size(file.file_size): <10}", end='')
-        print(f"{'*' if file.contains_queried else ' '}{file.displayname}{color_dic[CKW.RESET_ALL]}")
+        prefix = '*' if file.contains_queried else ' ' if file.plaintext else '-'
+        print(f"{prefix}{file.displayname}{color_dic[CKW.RESET_ALL]}")
     print(color_dic[CKW.COUNT_AND_FILES], end='')
     print(f"Sum:\t{_convert_size(sum(file_sizes))}", end='')
     print(color_dic[CKW.RESET_ALL])
@@ -571,6 +572,9 @@ def edit_file(file_index: int = 0) -> None:
             # time catw touches a file.
             content = [('', line) for line in file.read().splitlines()]
     except Exception as exc:
+        if holder.args_id[ARGS_PLAIN_ONLY]:
+            holder.files[file_index].set_plaintext(plain=False)
+            return
         print('Failed to open:', holder.files[file_index].displayname)
         try:
             enter_char = '⏎'
