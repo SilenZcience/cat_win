@@ -365,7 +365,8 @@ def print_file(content: list) -> bool:
     """
     if not content:
         return False
-    if not (arg_parser.file_search or arg_parser.file_match):
+    if not any([arg_parser.file_search, arg_parser.file_match,
+                holder.args_id[ARGS_GREP], holder.args_id[ARGS_GREP_ONLY]]):
         print(*[prefix + line for prefix, line in content], sep='\n')
         return False
 
@@ -376,18 +377,33 @@ def print_file(content: list) -> bool:
         cleaned_line = remove_ansi_codes_from_line(line)
         intervals, f_keywords, m_keywords = string_finder.find_keywords(cleaned_line)
 
+        # used for marking the file when displaying applied files
+        contains_queried = not contains_queried and intervals
+
+        # this has priority over the other arguments
         if holder.args_id[ARGS_GREP_ONLY]:
-            if f_keywords or m_keywords:
-                fm_substrings = [line[pos[0]:pos[1]] for _, pos in f_keywords + m_keywords]
-                print(','.join(fm_substrings))
+            if intervals:
+                fm_substrings = [(pos[0], f"{color_dic[CKW.FOUND]}{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_FOUND]}") for _, pos in f_keywords] + \
+                    [(pos[0], f"{color_dic[CKW.MATCHED]}{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_MATCHED]}") for _, pos in m_keywords]
+                fm_substrings.sort(key=lambda x:x[0])
+                print(f"{line_prefix}{','.join([sub for _, sub in fm_substrings])}")
             continue
 
-        if len(f_keywords + m_keywords) == 0:
+        # when bool(intervals) == True -> found keyword or matched pattern!
+        # intervals | grep | nokeyword -> print?
+        #     0     |  0   |     0     ->   1
+        #     0     |  0   |     1     ->   1
+        #     0     |  1   |     0     ->   0
+        #     0     |  1   |     1     ->   0
+        #     1     |  0   |     0     ->   1
+        #     1     |  0   |     1     ->   0
+        #     1     |  1   |     0     ->   1
+        #     1     |  1   |     1     ->   0
+        if not intervals:
             if not holder.args_id[ARGS_GREP]:
                 print(line_prefix + line)
             continue
 
-        contains_queried = True
         if holder.args_id[ARGS_NOKEYWORD]:
             continue
 
