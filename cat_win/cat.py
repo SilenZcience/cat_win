@@ -584,18 +584,25 @@ def edit_file(file_index: int = 0) -> None:
         try:
             enter_char = '⏎'
             try:
+                # on e.g. utf-16 the encoded form would be 4 bytes and also
+                # raise an exception event, so the char could be displayed.
+                # but the stdout and terminal would need to be configured
+                # correctly ...
                 if len(enter_char.encode(arg_parser.file_encoding)) != 3:
                     raise UnicodeEncodeError('', '', -1, -1, '') from exc
             except UnicodeEncodeError:
                 enter_char = 'ENTER'
             print(f"Do you want to open the file as a binary, without parameters? [Y/{enter_char}]:", end='')
             inp = input()
-            if not os.isatty(sys.stdin.fileno()):
-                print('') # if the input is piped, we add the linefeed char manually
+            if not (os.isatty(sys.stdin.fileno()) and os.isatty(sys.stdout.fileno())):
+                print('') # if the input or output is piped, we add a newline manually
             if inp and 'Y' not in inp.upper():
                 print('Aborting...')
                 return
         except EOFError:
+            # on eoferror it is safe to assume that the user did not press
+            # enter, therefor we print a new line
+            print('')
             pass
         except UnicodeError:
             print(f"Input is not recognized in the given encoding: {arg_parser.file_encoding}")
