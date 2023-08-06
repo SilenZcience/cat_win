@@ -356,6 +356,30 @@ def _get_line_length_prefix(prefix: str, line) -> str:
     return _calculate_line_length_prefix_spacing(len(str(len(line)))) % (prefix, len(line))
 
 
+def _get_file_prefix(prefix: str, file_index: int, hyper: bool = False) -> str:
+    """
+    append the file to the line prefix.
+    
+    Parameters:
+    prefix (str):
+        the current prefix to append to
+    file_index (int):
+        the index of the current file
+    hyper (bool):
+        if True the filename will include the file-protocol prefix.
+        (this will make the file a link, which are clickable in some terminals)
+    
+    Returns:
+    (str):
+        the new line prefix including the file.
+    """
+    
+    file = 'file://' * hyper + holder.files[file_index].displayname
+    if hyper:
+        file = file.replace('\\', '/')
+    return f"{prefix}{color_dic[CKW.FILE_PREFIX]}{file}{color_dic[CKW.RESET_ALL]} "
+
+
 def print_file(content: list) -> bool:
     """
     print a file and possibly include the substrings and patterns to search for.
@@ -536,13 +560,17 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
             elif arg == ARGS_REPLACE:
                 replace_values = split_replace(param)
                 content = [(prefix, line.replace(replace_values[0], f"{color_dic[CKW.REPLACE]}{replace_values[1]}{color_dic[CKW.RESET_ALL]}"))
-                           for prefix, line  in content]
+                           for prefix, line in content]
             elif arg == ARGS_EOF:
                 content = [(prefix, line.replace(chr(26), f"{color_dic[CKW.REPLACE]}^EOF{color_dic[CKW.RESET_ALL]}"))
                            for prefix, line in content]
 
     if holder.args_id[ARGS_LLENGTH]:
-        content = [(_get_line_length_prefix(c[0], c[1]), c[1]) for c in content]
+        content = [(_get_line_length_prefix(prefix, line), line) for prefix, line in content]
+    if holder.args_id[ARGS_FILE_PREFIX]:
+        content = [(_get_file_prefix(prefix, file_index), line) for prefix, line in content]
+    elif holder.args_id[ARGS_FFILE_PREFIX]:
+        content = [(_get_file_prefix(prefix, file_index, hyper=True), line) for prefix, line in content]
     if holder.args_id[ARGS_B64E]:
         content = encode_base64(content, arg_parser.file_encoding)
 

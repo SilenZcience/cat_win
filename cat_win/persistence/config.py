@@ -11,6 +11,7 @@ class Config:
     """
     default_dic = {CKW.NUMBER: ColorOptions.Fore['GREEN'],
                    CKW.LINE_LENGTH: ColorOptions.Fore['LIGHTBLUE'],
+                   CKW.FILE_PREFIX: ColorOptions.Fore['LIGHTMAGENTA'],
                    CKW.ENDS: ColorOptions.Back['YELLOW'],
                    CKW.TABS: ColorOptions.Back['YELLOW'],
                    CKW.CONVERSION: ColorOptions.Fore['CYAN'],

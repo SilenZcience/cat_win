@@ -23,7 +23,8 @@ ARGS_CONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK, ARGS_NOCOL = range(20, 25)
 ARGS_EOF, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP = range(25, 30)
 ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW, ARGS_BINVIEW = range(30, 35)
 ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN, ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(35, 40)
-ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY = range(40, 44)
+ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY, ARGS_FILE_PREFIX = range(40, 45)
+ARGS_FFILE_PREFIX, = range(45, 46)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -31,6 +32,7 @@ ALL_ARGS = [
     ArgConstant('-h', '--help', 'show this help message and exit', ARGS_HELP, section=0),
     ArgConstant('-v', '--version', 'output version information and exit', ARGS_VERSION, section=0),
     ArgConstant('--debug', '--debug', 'show debug information', ARGS_DEBUG, show_arg=False, section=0),
+
     ArgConstant('-n', '--number', 'number all output lines', ARGS_NUMBER, section=1),
     ArgConstant('-l', '--linelength', 'display the length of each line', ARGS_LLENGTH, section=1),
     ArgConstant('-e', '--ends', 'display $ at the end of each line', ARGS_ENDS, section=1),
@@ -41,31 +43,42 @@ ALL_ARGS = [
     ArgConstant('-r', '--reverse', 'reverse output', ARGS_REVERSE, show_arg_on_shell=False, section=1),
     ArgConstant('--sort', '--sort', 'sort all lines alphabetically', ARGS_SORT, show_arg_on_shell=False, section=1),
     ArgConstant('-p', '--peek', 'only print the first and last lines', ARGS_PEEK, show_arg_on_shell=False, section=1),
+    ArgConstant('-c', '--clip', 'copy output to clipboard', ARGS_CLIP, section=1),
+
+    ArgConstant('-i', '--interactive', 'use stdin', ARGS_INTERACTIVE, show_arg_on_shell=False, section=2),
+    ArgConstant('-o', '--oneline', 'take only the first stdin-line', ARGS_ONELINE, section=2),
+    ArgConstant('-E', '--ECHO', 'handle every following parameter as stdin', ARGS_ECHO, show_arg_on_shell=False, section=2),
+
     ArgConstant('-s', '--sum', 'show sum of lines', ARGS_COUNT, show_arg_on_shell=False, section=3),
     ArgConstant('-S', '--SUM', 'ONLY show sum of lines', ARGS_CCOUNT, show_arg_on_shell=False, section=3),
     ArgConstant('-f', '--files', 'list applied files', ARGS_FILES, show_arg_on_shell=False, section=3),
     ArgConstant('-F', '--FILES', 'ONLY list applied files and file sizes', ARGS_FFILES, show_arg_on_shell=False, section=3),
+
     ArgConstant('-g', '--grep', 'only show lines containing queried keywords or patterns', ARGS_GREP, section=4),
     ArgConstant('-G', '--GREP', 'only show found and matched substrings', ARGS_GREP_ONLY, section=4),
-    ArgConstant('-i', '--interactive', 'use stdin', ARGS_INTERACTIVE, show_arg_on_shell=False, section=2),
-    ArgConstant('-o', '--oneline', 'take only the first stdin-line', ARGS_ONELINE, section=2),
-    ArgConstant('-E', '--ECHO', 'handle every following parameter as stdin', ARGS_ECHO, show_arg_on_shell=False, section=2),
-    ArgConstant('-c', '--clip', 'copy output to clipboard', ARGS_CLIP, section=1),
+    ArgConstant('--nk', '--nokeyword', 'inverse the grep output', ARGS_NOKEYWORD, section=4),
+    ArgConstant('--fp', '--file-prefix', 'include the file in every line prefix', ARGS_FILE_PREFIX, show_arg_on_shell=False, section=4),
+    ArgConstant('--FP', '--FILE-PREFIX', 'include the file protocol in every line prefix', ARGS_FFILE_PREFIX, show_arg=False, section=4),
+
     ArgConstant('-m', '--checksum', 'show the checksums of all files', ARGS_CHECKSUM, show_arg_on_shell=False, section=5),
     ArgConstant('-a', '--attributes', 'show meta-information about the files', ARGS_DATA, show_arg_on_shell=False, section=5),
+
     ArgConstant('--dec', '--DEC', 'convert decimal numbers to hexadecimal and binary', ARGS_DEC, section=6),
     ArgConstant('--hex', '--HEX', 'convert hexadecimal numbers to decimal and binary', ARGS_HEX, section=6),
     ArgConstant('--bin', '--BIN', 'convert binary numbers to decimal and hexadecimal', ARGS_BIN, section=6),
     ArgConstant('--eval', '--EVAL', 'evaluate simple mathematical equations', ARGS_EVAL, section=6),
     ArgConstant('--b64e', '--b64e', 'encode the input to base64', ARGS_B64E, section=6),
     ArgConstant('--b64d', '--b64d', 'decode the input from base64', ARGS_B64D, section=6),
+
     ArgConstant('--hexview', '--HEXVIEW', 'display the raw byte representation in hexadecimal', ARGS_HEXVIEW, show_arg_on_shell=False, section=7),
     ArgConstant('--binview', '--binview', 'display the raw byte representation in binary', ARGS_BINVIEW, show_arg_on_shell=False, section=7),
+
     ArgConstant('--nc', '--nocolor', 'disable colored output', ARGS_NOCOL, section=8),
     ArgConstant('--nb', '--nobreak', 'do not interrupt the output on queried keywords', ARGS_NOBREAK, section=8),
-    ArgConstant('--nk', '--nokeyword', 'inverse the grep output', ARGS_NOKEYWORD, section=4),
     ArgConstant('--plain', '--plain-only', 'ignore non-plaintext files automatically', ARGS_PLAIN_ONLY, show_arg_on_shell=False, section=8),
+
     ArgConstant('--config', '--config', 'change color configuration', ARGS_CONFIG, section=9),
+
     ArgConstant('-R', '--R', 'reconfigure the stdin and stdout with the parsed encoding', ARGS_RECONFIGURE, show_arg=False),
     ArgConstant('--Rin', '--Rin', 'reconfigure the stdin with the parsed encoding', ARGS_RECONFIGURE_IN, show_arg=False),
     ArgConstant('--Rout', '--Rout', 'reconfigure the stdout with the parsed encoding', ARGS_RECONFIGURE_OUT, show_arg=False),
