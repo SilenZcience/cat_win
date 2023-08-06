@@ -81,6 +81,7 @@ class CKW:
 
     NUMBER = 'line_numbers'
     LINE_LENGTH = 'line_length'
+    FILE_PREFIX = 'file_prefix'
     ENDS = 'line_ends'
     TABS = 'tab_characters'
     CONVERSION = 'number_conversion'
