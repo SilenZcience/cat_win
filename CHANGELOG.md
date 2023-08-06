@@ -10,6 +10,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - display unknown arguments in order to indicate an erroneous command call.
 - display argument suggestions to help fix an erraneous command call.
 - -`G`, --`GREP` now shows the found keywords and matched patterns in the order in which they were found.
+- included more special characters like '␉', '␀' in the rawviewer.
 
 ### Bugfixes
 
@@ -17,6 +18,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fix Bug where -`G`, --`GREP` would not show prefixes like line number or line length.
 - fix Bug where the asterisk symbol (`*`) would not display correctly when using -`f`, --`files` and a keyword has been found.
 - fix Bug where the behaviour was unexpected when using `-g`, --`grep` but not providing any literal or pattern.
+- fix Bug where the rawviewer would crash when using a different encoding.
 
 ## [1.4.3] - 2023-07-11
 
