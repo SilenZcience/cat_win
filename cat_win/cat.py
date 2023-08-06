@@ -7,6 +7,7 @@ from functools import lru_cache
 from itertools import groupby
 from platform import system
 from re import sub as resub
+from queue import Queue
 import os
 import sys
 
@@ -726,10 +727,29 @@ def print_raw_view(file_index: int = 0, mode: str = 'X') -> None:
         either 'x', 'X' for hexadecimal (lower- or upper case letters),
         or 'b' for binary
     """
+    queue = []
+    skipped = 0
+
     print(holder.files[file_index].displayname, ':', sep='')
-    for line in get_raw_view_lines_gen(holder.files[file_index].path, mode, \
-        [color_dic[CKW.RAWVIEWER], color_dic[CKW.RESET_ALL]], arg_parser.file_encoding):
+    raw_gen = get_raw_view_lines_gen(holder.files[file_index].path, mode, 
+                                     [color_dic[CKW.RAWVIEWER], color_dic[CKW.RESET_ALL]],
+                                     arg_parser.file_encoding)
+    for i, line in enumerate(raw_gen, start=1):
         print(line)
+        if i > 5:
+            break
+    for line in raw_gen:
+        if holder.args_id[ARGS_PEEK]:
+            if len(queue) >= 5:
+                queue = queue[1:]
+                skipped += 1
+            queue.append(line)
+            continue
+        print(line)
+    if queue:
+        if skipped:
+            print('-----', skipped, '-----')
+        print('\n'.join(queue))
     print('')
 
 
