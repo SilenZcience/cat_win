@@ -159,6 +159,7 @@ cats --help
 | *-g, --grep*           | only show lines containing queried keywords or patterns   | ✔              |
 | *-G, --GREP*           | only show found and matched substrings                    | ✔              |
 | *--nk, --nokeyword*    | inverse the grep output                                   | ✔              |
+| *--fp, --file-prefix*  | include the file in every line prefix                     | ❌             |
 |                        |                                                           |                |
 | *-m, --checksum*       | show the checksums of all files                           | ❌             |
 | *-a, --attributes*     | show meta-information about the files                     | ❌             |
