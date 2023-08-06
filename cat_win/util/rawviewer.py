@@ -28,21 +28,39 @@ def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors = None,
     if mode not in ['x', 'X', 'b']:
         mode = 'X'
 
-    CRLF = {10: '␤', 13: '␍'}
+    # \0 ASCII Null (NULL) 0 ␀
+    # \a ASCII Bell (BEL) 7 ␇
+    # \b ASCII Backspace (BS) 8 ␈
+    # \t ASCII Horizontal Tab (TAB) 9 ␉
+    # \n ASCII Linefeed (LF) 10 ␤
+    # \v ASCII Vertical Tab (VT) 11 ␋
+    # \f ASCII Formfeed (FF) 12 ␌
+    # \r ASCII Carriage Return (CR) 13 ␍
+    CRLF = {
+        -1: '·', # default fallback symbol
+         0: '␀',
+         7: '␇',
+         8: '␈',
+         9: '␉',
+        10: '␤',
+        11: '␋',
+        12: '␌',
+        13: '␍',
+        }
 
     try:
-        if len(CRLF[10].encode(file_encoding)) != 3:
+        if len(CRLF[0].encode(file_encoding)) != 3:
             raise UnicodeEncodeError('', '', -1, -1, '')
     except UnicodeEncodeError:
-        CRLF = {10: '·', 13: '·'}
+        CRLF = dict.fromkeys(CRLF, '.')
 
     def get_display_char(byte: int) -> str:
         # 32 - 126 => ' ' - '~' (ASCII)
         if 32 <= byte <= 126:
             return chr(byte)
-        if byte in [10, 13]:
+        if byte in CRLF.keys():
             return CRLF[byte]
-        return '·'
+        return CRLF[-1]
 
     with open(file, 'rb') as raw_file:
         raw_file_content = raw_file.read()
