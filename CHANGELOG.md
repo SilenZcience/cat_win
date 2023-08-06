@@ -11,6 +11,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - display argument suggestions to help fix an erraneous command call.
 - -`G`, --`GREP` now shows the found keywords and matched patterns in the order in which they were found.
 - included more special characters like '␉', '␀' in the rawviewer.
+- included --`fp`, --`file-prefix` parameter to include the file in every line prefix.
 
 ### Bugfixes
 
