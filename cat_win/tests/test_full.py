@@ -163,7 +163,7 @@ class TestCatFull(TestCase):
 
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, 'trunc=0:0', '--UNIQUE', '--b64', '-?'])
     def test_cat_output_suggestions(self):
-        with patch('cat_win.cat.sys.stdout', new=StdOutMockIsAtty()) as fake_out:
+        with patch('cat_win.cat.sys.stderr', new=StdOutMockIsAtty()) as fake_out:
             cat.main()
             self.assertIn("Unknown argument: '--UNIQUE'", fake_out.getvalue())
             self.assertIn("Did you mean --unique", fake_out.getvalue())

@@ -1,5 +1,6 @@
 from configparser import ConfigParser
 from os.path import join as path_join
+from sys import stderr
 
 from cat_win.const.colorconstants import ColorOptions, CKW
 
@@ -157,7 +158,7 @@ class Config:
             try:
                 keyword = input('Input name of keyword to change: ')
             except EOFError:
-                print('\nAborting due to End-of-File character...')
+                print('\nAborting due to End-of-File character...', file=stderr)
                 return
             if keyword.isdigit():
                 keyword = self.elements[int(keyword)-1] if (
@@ -172,17 +173,17 @@ class Config:
             try:
                 color = input('Input color: ')
             except EOFError:
-                print('\nAborting due to End-of-File character...')
+                print('\nAborting due to End-of-File character...', file=stderr)
                 return
             if color.isdigit():
                 color = color_options[int(color)-1] if (
                     0 < int(color) <= len(color_options)) else color
 
         if keyword in self.exclusive_definitions['Fore'] and color.startswith('Back'):
-            print(f"An Error occured: '{keyword}' can only be of style 'Fore'")
+            print(f"An Error occured: '{keyword}' can only be of style 'Fore'", file=stderr)
             return
         if keyword in self.exclusive_definitions['Back'] and color.startswith('Fore'):
-            print(f"An Error occured: '{keyword}' can only be of style 'Back'")
+            print(f"An Error occured: '{keyword}' can only be of style 'Back'", file=stderr)
             return
 
         color_split = color.split('.')
@@ -194,4 +195,4 @@ class Config:
                 self.config_parser.write(conf)
             print(f"Successfully updated config file:\n\t{self.config_file}")
         except OSError:
-            print(f"Could not write to config file:\n\t{self.config_file}")
+            print(f"Could not write to config file:\n\t{self.config_file}", file=stderr)

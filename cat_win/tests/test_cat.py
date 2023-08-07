@@ -165,7 +165,7 @@ class TestCat(TestCase):
 
     @patch('cat_win.cat.arg_parser.file_search', new=set(['hello', 'world']))
     def test__show_debug(self):
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('cat_win.cat.sys.stderr', new=StdOutMock()) as fake_out:
             cat._show_debug([], ['test'], [], [], [])
             self.assertIn('test', fake_out.getvalue())
             self.assertIn('DEBUG', fake_out.getvalue())

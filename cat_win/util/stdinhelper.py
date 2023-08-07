@@ -1,4 +1,4 @@
-from sys import stdin
+from sys import stdin, stderr
 import os
 
 
@@ -90,7 +90,7 @@ def create_file(file: str, content: str, file_encoding: str) -> bool:
     try:
         os.makedirs(file_dir, exist_ok=True)
     except OSError:
-        print(f"Error: The path '{file_dir}' could not be created.")
+        print(f"Error: The path '{file_dir}' could not be created.", file=stderr)
         # cleanup (delete the folders that have been created)
         for subpath in unknown_subpaths:
             try:
@@ -102,7 +102,7 @@ def create_file(file: str, content: str, file_encoding: str) -> bool:
         with open(file, 'wb') as raw_f:
             raw_f.write(content.encode(file_encoding))
     except OSError:
-        print(f"Error: The file '{file}' could not be written.")
+        print(f"Error: The file '{file}' could not be written.", file=stderr)
         # cleanup (delete the folders that have been created)
         for subpath in unknown_subpaths:
             try:
@@ -152,7 +152,7 @@ def write_files(file_list: list, content: str, file_encoding: str) -> list:
         except EOFError:
             pass
         except UnicodeError:
-            print(f"Input is not recognized in the given encoding: {file_encoding}")
+            print(f"Input is not recognized in the given encoding: {file_encoding}", file=stderr)
             abort_command = 'n'
         finally:
             if abort_command and abort_command.upper() != 'Y':
@@ -170,7 +170,7 @@ def write_files(file_list: list, content: str, file_encoding: str) -> list:
             if create_file(file, content, file_encoding):
                 success_file_list.append(file)
         except OSError:
-            print(f"Error: The file '{file}' could not be written.")
+            print(f"Error: The file '{file}' could not be written.", file=stderr)
 
     return success_file_list
 

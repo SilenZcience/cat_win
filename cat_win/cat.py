@@ -50,16 +50,20 @@ on_windows_os = system() == 'Windows'
 LARGE_FILE_SIZE = 1024 * 1024 * 100  # 100 Megabytes
 
 
+def err_print(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+
 def exception_handler(exception_type: type, exception, traceback, debug_hook=sys.excepthook) -> None:
     try:
-        print(color_dic[CKW.RESET_ALL])
+        err_print(color_dic[CKW.RESET_ALL])
         if holder.args_id[ARGS_DEBUG]:
             debug_hook(exception_type, exception, traceback)
             return
-        print(f"\n{exception_type.__name__}{':' * bool(str(exception))} {exception}")
+        err_print(f"\n{exception_type.__name__}{':' * bool(str(exception))} {exception}")
         if exception_type != KeyboardInterrupt:
-            print('If this Exception is unexpected, please raise an official Issue at:')
-            print(f"{__url__}/issues")
+            err_print('If this Exception is unexpected, please raise an official Issue at:')
+            err_print(f"{__url__}/issues")
     except Exception:
         debug_hook(exception_type, exception, traceback)
 
@@ -138,26 +142,26 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     """
     Print all neccassary debug information
     """
-    print('==================================== DEBUG ====================================')
-    print('args: ', end='')
-    print([(arg[0], arg[1], holder.args_id[arg[0]]) for arg in args])
-    print('unknown_args: ', end='')
-    print(unknown_args)
-    print('known_files: ', end='')
-    print(known_files)
-    print('unknown_files: ', end='')
-    print(unknown_files)
-    print('echo_args: ', end='')
-    print(echo_args)
-    print('file encoding: ', end='')
-    print(arg_parser.file_encoding)
-    print('search keyword(s): ', end='')
-    print(arg_parser.file_search)
-    print('search match(es): ', end='')
-    print(arg_parser.file_match)
-    print('truncate file: ', end='')
-    print(arg_parser.file_truncate)
-    print('===============================================================================')
+    err_print('==================================== DEBUG ====================================')
+    err_print('args: ', end='')
+    err_print([(arg[0], arg[1], holder.args_id[arg[0]]) for arg in args])
+    err_print('unknown_args: ', end='')
+    err_print(unknown_args)
+    err_print('known_files: ', end='')
+    err_print(known_files)
+    err_print('unknown_files: ', end='')
+    err_print(unknown_files)
+    err_print('echo_args: ', end='')
+    err_print(echo_args)
+    err_print('file encoding: ', end='')
+    err_print(arg_parser.file_encoding)
+    err_print('search keyword(s): ', end='')
+    err_print(arg_parser.file_search)
+    err_print('search match(es): ', end='')
+    err_print(arg_parser.file_match)
+    err_print('truncate file: ', end='')
+    err_print(arg_parser.file_truncate)
+    err_print('===============================================================================')
 
 
 def _show_count() -> None:
@@ -539,7 +543,7 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
                     content = [(prefix, eval(repr(line) + param))
                                 for prefix, line in content]
                 except Exception:
-                    print('Error at operation: ', param)
+                    err_print('Error at operation: ', param)
                     return
 
         for arg, param in holder.args:
@@ -616,7 +620,7 @@ def edit_file(file_index: int = 0) -> None:
         if holder.args_id[ARGS_PLAIN_ONLY]:
             holder.files[file_index].set_plaintext(plain=False)
             return
-        print('Failed to open:', holder.files[file_index].displayname)
+        err_print('Failed to open:', holder.files[file_index].displayname)
         try:
             enter_char = '⏎'
             try:
@@ -628,22 +632,22 @@ def edit_file(file_index: int = 0) -> None:
                     raise UnicodeEncodeError('', '', -1, -1, '') from exc
             except UnicodeEncodeError:
                 enter_char = 'ENTER'
-            print(f"Do you want to open the file as a binary, without parameters? [Y/{enter_char}]:", end='')
+            err_print(f"Do you want to open the file as a binary, without parameters? [Y/{enter_char}]:", end='')
             inp = input()
             if not (os.isatty(sys.stdin.fileno()) and os.isatty(sys.stdout.fileno())):
-                print('') # if the input or output is piped, we add a newline manually
+                err_print('') # if the input or output is piped, we add a newline manually
             if inp and 'Y' not in inp.upper():
-                print('Aborting...')
+                err_print('Aborting...')
                 return
         except EOFError:
             # on eoferror it is safe to assume that the user did not press
             # enter, therefor we print a new line
-            print('')
+            err_print('')
             pass
         except UnicodeError:
-            print('')
-            print(f"Input is not recognized in the given encoding: {arg_parser.file_encoding}")
-            print('Aborting...')
+            err_print('')
+            err_print(f"Input is not recognized in the given encoding: {arg_parser.file_encoding}")
+            err_print('Aborting...')
             return
         try:
             with open(holder.files[file_index].path, 'rb') as raw_f:
@@ -651,7 +655,7 @@ def edit_file(file_index: int = 0) -> None:
                 content = [('', repr(line)[2:-1]) for line in raw_f.read().splitlines()]
             show_bytecode = True
         except Exception:
-            print('Operation failed! Try using the enc=X parameter.')
+            err_print('Operation failed! Try using the enc=X parameter.')
             return
 
     edit_content(content, show_bytecode, file_index)
@@ -685,7 +689,7 @@ def _copy_to_clipboard(content: str, __dependency: int = 3,
             error_msg = '\n'
             error_msg += "ImportError: You need either 'pyperclip3', 'pyperclip', or 'pyclip' in order to use the '--clip' parameter.\n"
             error_msg += "Should you have any problem with either module, try to install a different one using 'python -m pip install ...'"
-        print(error_msg)
+        err_print(error_msg)
         return None
     try:
         if __dependency == 3:
@@ -807,12 +811,11 @@ def show_unknown_args_suggestions(shell: bool = False) -> list:
         the list generated by check_unknown_args()
     """
     arg_suggestions = arg_parser.check_unknown_args(shell)
-    if (sys.stdout.isatty() and not sys.stdout.closed):
-        for u_arg, arg_replacement in arg_suggestions:
-            print(f"{color_dic[CKW.MESSAGE_IMPORTANT]}Unknown argument: '{u_arg}'{color_dic[CKW.RESET_ALL]}")
-            if arg_replacement:
-                arg_replacement = [arg_r[0] for arg_r in arg_replacement]
-                print(f"\t{color_dic[CKW.MESSAGE_IMPORTANT]}Did you mean {' or '.join(arg_replacement)}{color_dic[CKW.RESET_ALL]}")
+    for u_arg, arg_replacement in arg_suggestions:
+        err_print(f"{color_dic[CKW.MESSAGE_IMPORTANT]}Unknown argument: '{u_arg}'{color_dic[CKW.RESET_ALL]}")
+        if arg_replacement:
+            arg_replacement = [arg_r[0] for arg_r in arg_replacement]
+            err_print(f"\t{color_dic[CKW.MESSAGE_IMPORTANT]}Did you mean {' or '.join(arg_replacement)}{color_dic[CKW.RESET_ALL]}")
     return arg_suggestions
 
 
@@ -917,10 +920,9 @@ def main():
         file.set_file_size(get_file_size(file.path))
         file_size_sum += file.file_size
         if file_size_sum >= LARGE_FILE_SIZE:
-            if (sys.stdout.isatty() and not sys.stdout.closed):
-                print(color_dic[CKW.MESSAGE_IMPORTANT], end='')
-                print('Some files are exceedingly large and may require a lot of time and resources.', end='')
-                print(color_dic[CKW.RESET_ALL])
+            err_print(color_dic[CKW.MESSAGE_IMPORTANT], end='')
+            err_print('Some files are exceedingly large and may require a lot of time and resources.', end='')
+            err_print(color_dic[CKW.RESET_ALL])
             break
 
     if holder.args_id[ARGS_B64D]:
@@ -940,20 +942,20 @@ def main():
 
     # clean-up
     if holder.args_id[ARGS_DEBUG] and tmp_file_helper.tmp_count:
-        print('==================================== DEBUG ====================================')
+        err_print('==================================== DEBUG ====================================')
     for tmp_file in tmp_file_helper.get_generated_temp_files():
         if holder.args_id[ARGS_DEBUG]:
-            print('Cleaning', tmp_file)
+            err_print('Cleaning', tmp_file)
         try:
             os.remove(tmp_file)
         except FileNotFoundError:
             if holder.args_id[ARGS_DEBUG]:
-                print('FileNotFoundError', tmp_file)
+                err_print('FileNotFoundError', tmp_file)
         except PermissionError:
             if holder.args_id[ARGS_DEBUG]:
-                print('PermissionError  ', tmp_file)
+                err_print('PermissionError  ', tmp_file)
     if holder.args_id[ARGS_DEBUG] and tmp_file_helper.tmp_count:
-        print('===============================================================================')
+        err_print('===============================================================================')
 
 
 def shell_main():
