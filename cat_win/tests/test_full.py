@@ -125,9 +125,9 @@ class TestCatFull(TestCase):
 3
 4
 5
-           •
+           :
           (11)
-           •
+           :
 6
 7
 8
