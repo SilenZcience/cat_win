@@ -1,4 +1,5 @@
 from json import loads as loadJSON
+from sys import stderr
 from urllib.request import urlopen
 
 from cat_win.const.colorconstants import CKW
@@ -163,5 +164,5 @@ def print_update_information(package: str, current_version: str, color_dic: dict
     info += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_INFORMATION]}"
     info += f"{__url__}/blob/main/CHANGELOG.md{color_dic[CKW.RESET_ALL]}"
     print(message)
-    print(warning)
+    print(warning, file=stderr)
     print(info)

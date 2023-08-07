@@ -1,4 +1,4 @@
-from sys import exit as sysexit
+from sys import exit as sysexit, stderr
 
 
 try:
@@ -6,8 +6,8 @@ try:
 except KeyboardInterrupt:
     sysexit(1)
 except Exception as e:
-    print('an error occured while loading the module:')
-    print(e)
+    print('an error occured while loading the module:', file=stderr)
+    print(e, file=stderr)
     sysexit(1)
 
 def entry_point():
