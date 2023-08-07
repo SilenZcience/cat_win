@@ -22,7 +22,7 @@ try:
     from cat_win.util.utility import comp_eval, comp_conv, split_replace
 except SyntaxError: # in case of Python 3.7
     from cat_win.util.utilityold import comp_eval, comp_conv, split_replace
-from cat_win.util.fileattributes import get_file_meta_data, get_file_size, _convert_size
+from cat_win.util.fileattributes import get_file_meta_data, get_file_size, get_file_mtime, _convert_size
 from cat_win.util.holder import Holder
 from cat_win.util.rawviewer import get_raw_view_lines_gen
 from cat_win.util.stringfinder import StringFinder
@@ -523,6 +523,16 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
         is currently being processed. a negative value can be used for
         the shell mode
     """
+    if not content:
+        # if the content of the file is empty, we check if maybe the file is its own pipe-target.
+        # an indicator would be if the file has just been modified to be empty (by the shell).
+        file_mtime = get_file_mtime(holder.files[file_index].path)
+        date_nowtime = datetime.timestamp(datetime.now())
+        if abs(date_nowtime - file_mtime) < 0.5:
+            err_print(f"{color_dic[CKW.MESSAGE_WARNING]}Warning: It looks like you are trying to pipe a file into itself.{color_dic[CKW.RESET_ALL]}")
+            err_print(f"{color_dic[CKW.MESSAGE_WARNING]}In this case you might have lost all data.{color_dic[CKW.RESET_ALL]}")
+        # in any case we have nothing to do and can return
+        return
     excluded_by_peek = 0
 
     if not show_bytecode and holder.args_id[ARGS_B64D]:
