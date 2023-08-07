@@ -1,6 +1,7 @@
-from glob import iglob
 from os.path import isfile, realpath, isdir
 from re import match, IGNORECASE
+import glob
+glob._ishidden = lambda _: False
 
 from cat_win.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_ECHO
 
@@ -181,11 +182,11 @@ class ArgParser:
 
         possible_path = realpath(param)
         if match(r".*\*+.*", param):
-            for filename in iglob(param, recursive=True):
+            for filename in glob.iglob(param, recursive=True):
                 if isfile(filename):
                     self._known_files.append(realpath(filename))
         elif isdir(possible_path):
-            for filename in iglob(possible_path + '**/**', recursive=True):
+            for filename in glob.iglob(possible_path + '/**', recursive=True):
                 if isfile(filename):
                     self._known_files.append(realpath(filename))
         elif isfile(possible_path):
