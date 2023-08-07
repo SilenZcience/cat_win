@@ -25,3 +25,10 @@ class TestFile(TestCase):
 
         file.set_contains_queried(False)
         self.assertEqual(file.contains_queried, True)
+
+    def test_file_plaintext(self):
+        file = File('testPath', 'testName')
+        self.assertEqual(file.plaintext, True)
+        
+        file.set_plaintext(False)
+        self.assertEqual(file.plaintext, False)

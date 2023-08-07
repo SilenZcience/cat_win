@@ -171,4 +171,48 @@ class TestCatFull(TestCase):
             self.assertIn("Did you mean --b64e or --b64d", fake_out.getvalue())
             self.assertIn("Unknown argument: '-?'", fake_out.getvalue())
 
+    @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, '--GREP', 'find=T'])
+    def test_cat_output_GREP(self):
+        expected_output = 'T\nT,T\nT\nT\nT\nT\n'
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+            cat.main()
+            self.assertEqual(expected_output, fake_out.getvalue())
+
+    @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, '--sort'])
+    def test_cat_output_sort(self):
+        expected_output = """
+N-Ary Summation: ∑
+Sample Text:
+The following Line is Empty:
+These are Special Chars: äöüÄÖÜ
+This is a Tab-Character: >\t<
+This Line is a Duplicate!
+This Line is a Duplicate!
+"""
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+            cat.main()
+            self.assertEqual(expected_output, fake_out.getvalue())
+
+    @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, '--peek', '--hexview'])
+    def test_cat_output_raw(self):
+        expected_output = """Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text                   
+00000000 53 61 6d 70 6c 65 20 54 65 78 74 3a 0d 0a 54 68 # S a m p l e   T e x t : ␍ ␤ T h
+00000010 69 73 20 69 73 20 61 20 54 61 62 2d 43 68 61 72 # i s   i s   a   T a b - C h a r
+00000020 61 63 74 65 72 3a 20 3e 09 3c 0d 0a 54 68 65 73 # a c t e r :   > ␉ < ␍ ␤ T h e s
+00000030 65 20 61 72 65 20 53 70 65 63 69 61 6c 20 43 68 # e   a r e   S p e c i a l   C h
+00000040 61 72 73 3a 20 c3 a4 c3 b6 c3 bc c3 84 c3 96 c3 # a r s :   · · · · · · · · · · ·
+                                :
+                               (2)
+                                :
+00000070 6c 6f 77 69 6e 67 20 4c 69 6e 65 20 69 73 20 45 # l o w i n g   L i n e   i s   E
+00000080 6d 70 74 79 3a 0d 0a 0d 0a 54 68 69 73 20 4c 69 # m p t y : ␍ ␤ ␍ ␤ T h i s   L i
+00000090 6e 65 20 69 73 20 61 20 44 75 70 6c 69 63 61 74 # n e   i s   a   D u p l i c a t
+000000A0 65 21 0d 0a 54 68 69 73 20 4c 69 6e 65 20 69 73 # e ! ␍ ␤ T h i s   L i n e   i s
+000000B0 20 61 20 44 75 70 6c 69 63 61 74 65 21          #   a   D u p l i c a t e !
+
+"""
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+            cat.main()
+            self.assertEqual(expected_output, '\n'.join(fake_out.getvalue().split('\n')[1:]))
+
 # python -m unittest discover -s cat_win.tests -p test*.py
