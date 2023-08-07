@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
-## [1.4.4] - TBA
+## [1.5.0] - TBA
 
 ### Minor Changes
 
@@ -15,6 +15,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - included --`fp`, --`file-prefix` parameter to include the file in every line prefix.
 - cat_win will now also find and display dotfiles.
 - warnings and errors will now be printed on the stderr-stream instead of stdout.
+- display warning when trying to pipe a file into itself.
 
 ### Bugfixes
 
