@@ -470,9 +470,28 @@ def print_file(content: list) -> bool:
     return contains_queried
 
 
-def print_excluded_by_peek(content: list, excluded_by_peek: int) -> None:
+def _print_excluded_by_peek(prefix_len: int, excluded_by_peek: int) -> None:
     """
     print a paragraph about how many lines have been excluded.
+    
+    Parameters:
+    prefix_len (int):
+        the approximate length of the prefix
+    excluded_by_peek (int):
+        the amount of lines that have been excluded
+    """
+    excluded_by_peek_length = (len(str(excluded_by_peek))-1)//2
+    excluded_by_peek_indent = ' ' * (prefix_len - excluded_by_peek_length + 10)
+    excluded_by_peek_indent_add = ' ' * excluded_by_peek_length
+    excluded_by_peek_parting = f"{excluded_by_peek_indent}{excluded_by_peek_indent_add} {color_dic[CKW.NUMBER]}:{color_dic[CKW.RESET_ALL]}"
+    print(excluded_by_peek_parting)
+    print(f"{excluded_by_peek_indent}{color_dic[CKW.NUMBER]}({excluded_by_peek}){color_dic[CKW.RESET_ALL]}")
+    print(excluded_by_peek_parting)
+
+def print_excluded_by_peek(content: list, excluded_by_peek: int) -> None:
+    """
+    print a paragraph about how many lines have been excluded,
+    using the method _print_excluded_by_peek().
     
     Parameters:
     content (list):
@@ -482,19 +501,7 @@ def print_excluded_by_peek(content: list, excluded_by_peek: int) -> None:
     """
     if not excluded_by_peek or len(content) <= 5:
         return
-    excluded_by_peek = excluded_by_peek + 10 - len(content)
-    prefix = content[0][0]
-    prefix = prefix.replace(color_dic[CKW.NUMBER], '')
-    prefix = prefix.replace(color_dic[CKW.LINE_LENGTH], '')
-    prefix = prefix.replace(color_dic[CKW.RESET_ALL], '')
-    excluded_by_peek_length = (len(str(excluded_by_peek))-1)//2
-    excluded_by_peek_indent = ' ' * (len(prefix) - excluded_by_peek_length + 10)
-    excluded_by_peek_indent_add = ' ' * excluded_by_peek_length
-    print(color_dic[CKW.NUMBER], end='')
-    print(excluded_by_peek_indent, excluded_by_peek_indent_add, ' •', sep='')
-    print(excluded_by_peek_indent, '(', excluded_by_peek, ')', sep='')
-    print(excluded_by_peek_indent, excluded_by_peek_indent_add, ' •', sep='', end='')
-    print(color_dic[CKW.RESET_ALL])
+    _print_excluded_by_peek(len(remove_ansi_codes_from_line(content[0][0])), excluded_by_peek + 10 - len(content))
 
 
 def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
@@ -634,6 +641,7 @@ def edit_file(file_index: int = 0) -> None:
             print('')
             pass
         except UnicodeError:
+            print('')
             print(f"Input is not recognized in the given encoding: {arg_parser.file_encoding}")
             print('Aborting...')
             return
@@ -748,7 +756,7 @@ def print_raw_view(file_index: int = 0, mode: str = 'X') -> None:
         print(line)
     if queue:
         if skipped:
-            print('-----', skipped, '-----')
+            _print_excluded_by_peek(21, skipped)
         print('\n'.join(queue))
     print('')
 
