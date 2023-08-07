@@ -79,6 +79,13 @@ def get_file_size(file: str) -> int:
         return 0
 
 
+def get_file_mtime(file: str) -> float:
+    try:
+        return stat(file).st_mtime
+    except OSError:
+        return 0.0
+
+
 def get_file_meta_data(file: str, on_windows_os: bool, colors = None) -> str:
     """
     calculate file metadata information.
