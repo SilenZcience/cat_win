@@ -4,6 +4,7 @@ import os
 
 from cat_win import cat
 from cat_win.tests.mocks.std import StdOutMock
+from cat_win.util.file import File
 from cat_win.util.holder import Holder
 
 # import sys
@@ -171,5 +172,9 @@ class TestCat(TestCase):
             self.assertIn('hello', fake_out.getvalue())
             self.assertIn('world', fake_out.getvalue())
 
+    def test__get_file_prefix(self):
+        cat.holder.files = [File('a', 'b/c.x')]
+        prefix = cat._get_file_prefix('pre ', 0, True)
+        self.assertEqual(prefix, 'pre file://b/c.x ')
 
 # python -m unittest discover -s cat_win.tests -p test*.py

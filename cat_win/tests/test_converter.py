@@ -6,7 +6,8 @@ from cat_win.util.converter import Converter
 
 
 converter = Converter()
-
+debug_converter = Converter()
+debug_converter.set_params(True)
 
 class TestConverter(TestCase):
     def test_converter_dec(self):
@@ -80,3 +81,28 @@ class TestConverter(TestCase):
 
         self.assertEqual(converter.is_bin('2'), expected_output)
         self.assertEqual(converter.is_bin('0x1'), expected_output)
+
+    def test_exception_handler(self):
+        exc = ZeroDivisionError()
+        group = '1/0'
+        l_tokens = []
+        converter._evaluate_exception_handler(exc, group, l_tokens)
+        
+        self.assertListEqual(l_tokens, ['???'])
+
+    def test_exception_handler_known_exc(self):
+        exc = ZeroDivisionError('TeSt')
+        group = '1/0'
+        l_tokens = ['5']
+        debug_converter._evaluate_exception_handler(exc, group, l_tokens)
+        
+        self.assertListEqual(l_tokens, ['5', "???(ZeroDivisionError: TeSt in '1/0')"])
+
+    def test_exception_handler_unknown_exc(self):
+        exc = IndexError('NotGood')
+        group = '1/0'
+        l_tokens = ['5']
+        with self.assertRaises(type(exc)) as context:
+            debug_converter._evaluate_exception_handler(exc, group, l_tokens)
+        self.assertIn('NotGood', context.exception.args)
+        self.assertListEqual(l_tokens, ['5', "???(IndexError: NotGood in '1/0')"])
