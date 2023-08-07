@@ -11,8 +11,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 - display argument suggestions to help fix an erraneous command call.
 - -`G`, --`GREP` now shows the found keywords and matched patterns in the order in which they were found.
 - included more special characters like '␉', '␀' in the rawviewer.
+- allow for --`peek` to be used with the rawviewer.
 - included --`fp`, --`file-prefix` parameter to include the file in every line prefix.
 - cat_win will now also find and display dotfiles.
+- warnings and errors will now be printed on the stderr-stream instead of stdout.
 
 ### Bugfixes
 
