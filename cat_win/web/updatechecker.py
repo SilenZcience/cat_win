@@ -121,7 +121,7 @@ def new_version_available(current_version: str, latest_version: str) -> int:
     return status
 
 
-def print_update_information(package: str, current_version: str, color_dic: dict, on_windows_os: bool) -> None:
+def print_update_information(package: str, current_version: str, color_dic: dict, py_executable: str) -> None:
     """
     prints update information if there are any.
     
@@ -132,9 +132,8 @@ def print_update_information(package: str, current_version: str, color_dic: dict
         a version representation as string of the current version
     color_dic (dict):
         a dictionary translating the color-keywords to ANSI-Colorcodes
-    on_windows_os (bool):
-        indicates if the user is on windows OS using
-        platform.system() == 'Windows'
+    py_executable (str):
+        the python executable (from sys.executable)
     """
     latest_version = get_latest_package_version(package)
     status = new_version_available(current_version, latest_version)
@@ -149,7 +148,7 @@ def print_update_information(package: str, current_version: str, color_dic: dict
         message += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_IMPORTANT]}"
         message += 'To update, run:'
         message += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_IMPORTANT]}"
-        message += f"python{'3' * (not on_windows_os)} -m pip install --upgrade {package}"
+        message += f"{py_executable} -m pip install --upgrade {package}"
     elif abs(status) == STATUS_PRE_RELEASE_AVAILABLE:
         message += f"{color_dic[CKW.MESSAGE_INFORMATION]}"
         message += f"A new pre-release of {package} is available: v{latest_version}"
