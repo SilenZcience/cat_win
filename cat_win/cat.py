@@ -114,7 +114,7 @@ def _show_help(shell: bool = False) -> None:
         help_message += f"\t{'catw f g -ne': <25}Output f's, then g's content, while numerating and showing the end of lines\n"
         help_message += f"\t{'catw f trunc=a:b:c': <25}Output f's content starting at line a, ending at line b, stepping c\n"
     print(help_message)
-    print_update_information(__project__, __version__, color_dic, on_windows_os)
+    print_update_information(__project__, __version__, color_dic, os.path.basename(sys.executable))
 
 
 def _show_version() -> None:
@@ -134,7 +134,7 @@ def _show_version() -> None:
         version_message += 'Install time: \t-\n'
     version_message += f"Author: \t{__author__}\n"
     print(version_message)
-    print_update_information(__project__, __version__, color_dic, on_windows_os)
+    print_update_information(__project__, __version__, color_dic, os.path.basename(sys.executable))
 
 
 def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files: list,
