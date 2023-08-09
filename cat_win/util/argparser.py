@@ -241,10 +241,6 @@ class ArgParser:
         delete (bool):
             indicates if a parameter should be deleted or added. Needed for
             the shell when changing file_search, file_match
-        
-        Returns:
-        (args, unknown_args, known_files, unknown_files, echo_args) (tuple):
-            contains the paramater in a sorted manner
         """
         input_args = argv[1:]
         self._clear_values()
