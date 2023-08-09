@@ -214,17 +214,20 @@ class ArgParser:
                 return False
 
         possible_path = realpath(param)
-        if '*' in param:
-            self._known_files_patterns.append(param)
+        if isfile(possible_path):
+            self._known_files.append(possible_path)
         elif isdir(possible_path):
             self._known_files_patterns.append(possible_path + '/**')
-        elif isfile(possible_path):
-            self._known_files.append(possible_path)
-        elif len(param) > 2 and param[0] == '-' and param[1] != '-':
+        elif '*' in param:
+            # matches file-patterns, not directories (e.g. *.txt)
+            self._known_files_patterns.append(param)
+        elif len(param) > 2 and param[0] == '-' != param[1]:
             for i in range(1, len(param)):
                 if self._add_argument('-' + param[i], delete):
                     return True
-        elif match(r"\A[^-].*\Z", param):
+        # out of bound is not possible, in case of length 0 param, possible_path would have
+        # become the working-path and therefor handled the param as a directory
+        elif param[0] != '-':
             self._unknown_files.append(realpath(param))
         else:
             self._unknown_args.append(param)
@@ -247,7 +250,6 @@ class ArgParser:
         self._clear_values()
 
         echo_call = False
-
         for arg in input_args:
             if echo_call:
                 self._echo_args.append(arg)
