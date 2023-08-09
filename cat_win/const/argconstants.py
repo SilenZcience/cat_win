@@ -24,7 +24,7 @@ ARGS_EOF, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP = range(25, 30)
 ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW, ARGS_BINVIEW = range(30, 35)
 ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN, ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(35, 40)
 ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY, ARGS_FILE_PREFIX = range(40, 45)
-ARGS_FFILE_PREFIX, = range(45, 46)
+ARGS_FFILE_PREFIX, ARGS_HIDDEN_FILES = range(45, 47)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -53,6 +53,7 @@ ALL_ARGS = [
     ArgConstant('-S', '--SUM', 'ONLY show sum of lines', ARGS_CCOUNT, show_arg_on_shell=False, section=3),
     ArgConstant('-f', '--files', 'list applied files', ARGS_FILES, show_arg_on_shell=False, section=3),
     ArgConstant('-F', '--FILES', 'ONLY list applied files and file sizes', ARGS_FFILES, show_arg_on_shell=False, section=3),
+    ArgConstant('--hidden', '--hidden', 'include hidden- and dotfiles', ARGS_HIDDEN_FILES, show_arg_on_shell=False, section=3),
 
     ArgConstant('-g', '--grep', 'only show lines containing queried keywords or patterns', ARGS_GREP, section=4),
     ArgConstant('-G', '--GREP', 'only show found and matched substrings', ARGS_GREP_ONLY, section=4),

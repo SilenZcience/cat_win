@@ -860,9 +860,11 @@ def init(shell: bool = False) -> tuple:
         contains (known_files, unknown_files, echo_args) from the argparser
     """
     # read parameter-args
-    args, _, known_files, unknown_files, echo_args = arg_parser.get_arguments(sys.argv)
+    args, _, unknown_files, echo_args = arg_parser.get_arguments(sys.argv)
 
     holder.set_args(args)
+    
+    known_files = arg_parser.get_files(holder.args_id[ARGS_HIDDEN_FILES])
 
     if holder.args_id[ARGS_RECONFIGURE] or holder.args_id[ARGS_RECONFIGURE_IN]:
         sys.stdin.reconfigure(encoding=arg_parser.file_encoding)
@@ -1025,16 +1027,16 @@ def shell_main():
 
         def _command_add(self, cmd: list) -> None:
             arg_parser.gen_arguments([''] + cmd)
-            holder.add_args(arg_parser._args)
+            holder.add_args(arg_parser.get_args())
             show_unknown_args_suggestions(shell=True)
             self.exec_colors()
-            print(f"successfully added {[arg for _, arg in arg_parser._args] if arg_parser._args else 'parameter(s)'}.")
+            print(f"successfully added {[arg for _, arg in arg_parser.get_args()] if arg_parser.get_args() else 'parameter(s)'}.")
 
         def _command_del(self, cmd: list) -> None:
             arg_parser.gen_arguments([''] + cmd, True)
-            holder.delete_args(arg_parser._args)
+            holder.delete_args(arg_parser.get_args())
             self.exec_colors()
-            print(f"successfully removed {[arg for _, arg in arg_parser._args] if arg_parser._args else 'parameter(s)'}.")
+            print(f"successfully removed {[arg for _, arg in arg_parser.get_args()] if arg_parser.get_args() else 'parameter(s)'}.")
             
         def _command_clear(self, _) -> None:
             arg_parser.reset_values()

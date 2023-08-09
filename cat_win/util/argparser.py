@@ -1,7 +1,6 @@
 from os.path import isfile, realpath, isdir
 from re import match, IGNORECASE
 import glob
-glob._ishidden = lambda _: False
 
 from cat_win.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_ECHO
 
@@ -52,14 +51,21 @@ class ArgParser:
     SIMILARITY_LIMIT = 50.0
 
     def __init__(self) -> None:
+        self._clear_values()
+        self.reset_values()
+
+    def _clear_values(self) -> None:
+        """
+        The here defined variables may NOT be accessed from the outside.
+        """
         self._args = []
         self._unknown_args = []
         self._known_files = []
         self._unknown_files = []
         self._echo_args = []
-        
-        self.reset_values()
-        
+
+        self._known_files_patterns = []       
+
     def reset_values(self) -> None:
         """
         The here defined variables may be accessed from the outside.
@@ -68,6 +74,9 @@ class ArgParser:
         self.file_search = set()
         self.file_match = set()
         self.file_truncate = [None, None, None]
+
+    def get_args(self) -> list:
+        return self._args
 
     def check_unknown_args(self, shell_arg: bool = False) -> list:
         """
@@ -115,11 +124,34 @@ class ArgParser:
             the shell when changing file_search, file_match
         
         Returns:
-        (args, unknown_args, known_files, unknown_files, echo_args) (tuple):
+        (args, unknown_args, unknown_files, echo_args) (tuple):
             contains the paramater in a sorted manner
         """
         self.gen_arguments(argv, delete)
-        return (self._args, self._unknown_args, self._known_files, self._unknown_files, self._echo_args)
+        return (self._args, self._unknown_args, self._unknown_files, self._echo_args)
+
+    def get_files(self, hidden: bool = False) -> list:
+        """
+        Collect all files from the given patterns or directories
+        provided as an argument.
+        
+        Parameters:
+        hidden (bool):
+            indicates if hidden files (and dotfiles) should
+            be included.
+        
+        Returns:
+        self._known_files (list):
+            a list containing all found files
+        """
+        if hidden:
+            glob._ishidden = lambda _: False
+        for pattern in self._known_files_patterns:
+            for filename in glob.iglob(pattern, recursive=True):
+                if isfile(filename):
+                    self._known_files.append(realpath(filename))
+
+        return self._known_files
 
     def _add_argument(self, param: str, delete: bool = False) -> bool:
         """
@@ -181,14 +213,10 @@ class ArgParser:
                 return False
 
         possible_path = realpath(param)
-        if match(r".*\*+.*", param):
-            for filename in glob.iglob(param, recursive=True):
-                if isfile(filename):
-                    self._known_files.append(realpath(filename))
+        if '*' in param:
+            self._known_files_patterns.append(param)
         elif isdir(possible_path):
-            for filename in glob.iglob(possible_path + '/**', recursive=True):
-                if isfile(filename):
-                    self._known_files.append(realpath(filename))
+            self._known_files_patterns.append(possible_path + '/**')
         elif isfile(possible_path):
             self._known_files.append(possible_path)
         elif len(param) > 2 and param[0] == '-' and param[1] != '-':
@@ -219,11 +247,7 @@ class ArgParser:
             contains the paramater in a sorted manner
         """
         input_args = argv[1:]
-        self._args = []
-        self._unknown_args = []
-        self._known_files = []
-        self._unknown_files = []
-        self._echo_args = []
+        self._clear_values()
 
         echo_call = False
 
