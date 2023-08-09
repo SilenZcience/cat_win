@@ -7,7 +7,6 @@ from functools import lru_cache
 from itertools import groupby
 from platform import system
 from re import sub as resub
-from queue import Queue
 import os
 import sys
 
