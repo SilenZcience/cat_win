@@ -523,9 +523,12 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
         is currently being processed. a negative value can be used for
         the shell mode
     """
-    if not content:
+    if not (content or os.isatty(sys.stdout.fileno())):
         # if the content of the file is empty, we check if maybe the file is its own pipe-target.
         # an indicator would be if the file has just been modified to be empty (by the shell).
+        # also the stdout cannot be atty.
+        # checking if the file is an _unknown_file is not valid, because by using '-i'
+        # the stdin will be used to write the file
         file_mtime = get_file_mtime(holder.files[file_index].path)
         date_nowtime = datetime.timestamp(datetime.now())
         if abs(date_nowtime - file_mtime) < 0.5:
