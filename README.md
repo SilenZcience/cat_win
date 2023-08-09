@@ -155,6 +155,7 @@ cats --help
 | *-S, --SUM*            | ONLY show sum of lines                                    | ❌             |
 | *-f, --files*          | list applied files                                        | ❌             |
 | *-F, --FILES*          | ONLY list applied files and file sizes                    | ❌             |
+| *--hidden, --hidden*   | include hidden- and dotfiles                              | ❌             |
 |                        |                                                           |                 |
 | *-g, --grep*           | only show lines containing queried keywords or patterns   | ✔              |
 | *-G, --GREP*           | only show found and matched substrings                    | ✔              |
