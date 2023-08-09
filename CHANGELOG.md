@@ -13,7 +13,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - included more special characters like '␉', '␀' in the rawviewer.
 - allow for --`peek` to be used with the rawviewer.
 - added --`fp`, --`file-prefix` parameter to include the file in every line prefix.
-- added --`hidden`, `--hidden` parameter to include hidden files and dotfiles.
+- added --`dot`, `--dotfiles` parameter to include dotfiles.
 - warnings and errors will now be printed on the stderr-stream instead of stdout.
 - display warning when trying to pipe a file into itself.
 

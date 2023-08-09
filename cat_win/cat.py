@@ -864,7 +864,7 @@ def init(shell: bool = False) -> tuple:
 
     holder.set_args(args)
     
-    known_files = arg_parser.get_files(holder.args_id[ARGS_HIDDEN_FILES])
+    known_files = arg_parser.get_files(holder.args_id[ARGS_DOTFILES])
 
     if holder.args_id[ARGS_RECONFIGURE] or holder.args_id[ARGS_RECONFIGURE_IN]:
         sys.stdin.reconfigure(encoding=arg_parser.file_encoding)
