@@ -130,21 +130,22 @@ class ArgParser:
         self.gen_arguments(argv, delete)
         return (self._args, self._unknown_args, self._unknown_files, self._echo_args)
 
-    def get_files(self, hidden: bool = False) -> list:
+    def get_files(self, dot_files: bool = False) -> list:
         """
         Collect all files from the given patterns or directories
         provided as an argument.
         
         Parameters:
-        hidden (bool):
-            indicates if hidden files (and dotfiles) should
-            be included.
+        dot_files (bool):
+            indicates if dotfiles should be included.
         
         Returns:
         self._known_files (list):
             a list containing all found files
         """
-        if hidden:
+        if dot_files:
+            # since py3.11 iglob supports queries for hidden,
+            # we want compatibility for more versions ...
             glob._ishidden = lambda _: False
         for pattern in self._known_files_patterns:
             for filename in glob.iglob(pattern, recursive=True):
