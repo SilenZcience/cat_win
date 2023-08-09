@@ -142,6 +142,7 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     Print all neccassary debug information
     """
     err_print('==================================== DEBUG ====================================')
+    err_print('sys_args:', sys.argv)
     err_print('args: ', end='')
     err_print([(arg[0], arg[1], holder.args_id[arg[0]]) for arg in args])
     err_print('unknown_args: ', end='')
@@ -641,11 +642,12 @@ def edit_file(file_index: int = 0) -> None:
                     raise UnicodeEncodeError('', '', -1, -1, '') from exc
             except UnicodeEncodeError:
                 enter_char = 'ENTER'
-            err_print(f"Do you want to open the file as a binary, without parameters? [Y/{enter_char}]:", end='')
+            err_print(f"Do you want to open the file as a binary, without parameters?")
+            err_print(f"[Y/{enter_char}] Yes, Continue       [N] No, Abort :", end='')
             inp = input()
             if not (os.isatty(sys.stdin.fileno()) and os.isatty(sys.stdout.fileno())):
                 err_print('') # if the input or output is piped, we add a newline manually
-            if inp and 'Y' not in inp.upper():
+            if inp and inp.upper() != 'Y':
                 err_print('Aborting...')
                 return
         except EOFError:
