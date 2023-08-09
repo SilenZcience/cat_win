@@ -933,7 +933,7 @@ def main():
         file_size_sum += file.file_size
         if file_size_sum >= LARGE_FILE_SIZE:
             err_print(color_dic[CKW.MESSAGE_IMPORTANT], end='')
-            err_print('Some files are exceedingly large and may require a lot of time and resources.', end='')
+            err_print('An exceedingly large amount of data is being loaded. This may require a lot of time and resources.', end='')
             err_print(color_dic[CKW.RESET_ALL])
             break
 
