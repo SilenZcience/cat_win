@@ -120,7 +120,8 @@ class TestCatFull(TestCase):
 
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_peek, 'enc=utf-8', '--peek'])
     def test_cat_output_full_peek(self):
-        expected_output = """1
+        expected_output = """\
+1
 2
 3
 4
@@ -180,7 +181,8 @@ class TestCatFull(TestCase):
 
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, '--sort'])
     def test_cat_output_sort(self):
-        expected_output = """
+        expected_output = """\
+
 N-Ary Summation: ∑
 Sample Text:
 The following Line is Empty:
@@ -195,7 +197,8 @@ This Line is a Duplicate!
 
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, '--peek', '--hexview'])
     def test_cat_output_raw(self):
-        expected_output = """Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text                   
+        expected_output = """\
+Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text                   
 00000000 53 61 6d 70 6c 65 20 54 65 78 74 3a 0d 0a 54 68 # S a m p l e   T e x t : ␍ ␤ T h
 00000010 69 73 20 69 73 20 61 20 54 61 62 2d 43 68 61 72 # i s   i s   a   T a b - C h a r
 00000020 61 63 74 65 72 3a 20 3e 09 3c 0d 0a 54 68 65 73 # a c t e r :   > ␉ < ␍ ␤ T h e s

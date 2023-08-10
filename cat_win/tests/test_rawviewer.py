@@ -11,7 +11,8 @@ class TestRawViewer(TestCase):
     maxDiff = None
 
     def test_mode_x_upper(self):
-        expected_result = """Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text                   
+        expected_result = """\
+Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text                   
 00000000 53 61 6D 70 6C 65 20 54 65 78 74 3A 0D 0A 54 68 # S a m p l e   T e x t : ␍ ␤ T h
 00000010 69 73 20 69 73 20 61 20 54 61 62 2D 43 68 61 72 # i s   i s   a   T a b - C h a r
 00000020 61 63 74 65 72 3A 20 3E 09 3C 0D 0A 54 68 65 73 # a c t e r :   > ␉ < ␍ ␤ T h e s
@@ -28,7 +29,8 @@ class TestRawViewer(TestCase):
         self.assertEqual('\n'.join(get_raw_view_lines_gen(test_file_path, 'X')), expected_result)
 
     def test_mode_x(self):
-        expected_result = """Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text                   
+        expected_result = """\
+Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text                   
 00000000 53 61 6d 70 6c 65 20 54 65 78 74 3a 0d 0a 54 68 # S a m p l e   T e x t : ␍ ␤ T h
 00000010 69 73 20 69 73 20 61 20 54 61 62 2d 43 68 61 72 # i s   i s   a   T a b - C h a r
 00000020 61 63 74 65 72 3a 20 3e 09 3c 0d 0a 54 68 65 73 # a c t e r :   > ␉ < ␍ ␤ T h e s
@@ -45,7 +47,8 @@ class TestRawViewer(TestCase):
         self.assertEqual('\n'.join(get_raw_view_lines_gen(test_file_path, 'x')), expected_result)
 
     def test_mode_b(self):
-        expected_result = """Address  00       01       02       03       04       05       06       07       08       09       0A       0B       0C       0D       0E       0F       # Decoded Text                   
+        expected_result = """\
+Address  00       01       02       03       04       05       06       07       08       09       0A       0B       0C       0D       0E       0F       # Decoded Text                   
 00000000 01010011 01100001 01101101 01110000 01101100 01100101 00100000 01010100 01100101 01111000 01110100 00111010 00001101 00001010 01010100 01101000 # S a m p l e   T e x t : ␍ ␤ T h
 00000010 01101001 01110011 00100000 01101001 01110011 00100000 01100001 00100000 01010100 01100001 01100010 00101101 01000011 01101000 01100001 01110010 # i s   i s   a   T a b - C h a r
 00000020 01100001 01100011 01110100 01100101 01110010 00111010 00100000 00111110 00001001 00111100 00001101 00001010 01010100 01101000 01100101 01110011 # a c t e r :   > ␉ < ␍ ␤ T h e s
@@ -62,7 +65,8 @@ class TestRawViewer(TestCase):
         self.assertEqual('\n'.join(get_raw_view_lines_gen(test_file_path, 'b')), expected_result)
 
     def test_mode_x_upper_colored(self):
-        expected_result = """*Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text                   !
+        expected_result = """\
+*Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text                   !
 *00000000! 53 61 6D 70 6C 65 20 54 65 78 74 3A 0D 0A 54 68 *#! S a m p l e   T e x t : ␍ ␤ T h
 *00000010! 69 73 20 69 73 20 61 20 54 61 62 2D 43 68 61 72 *#! i s   i s   a   T a b - C h a r
 *00000020! 61 63 74 65 72 3A 20 3E 09 3C 0D 0A 54 68 65 73 *#! a c t e r :   > ␉ < ␍ ␤ T h e s

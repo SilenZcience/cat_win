@@ -18,7 +18,8 @@ print('VersionFile Path:', CATWversionFile)
 print('VersionFile Path:', CATSversionFile)
 
 def get_version_file_content(cat_win_v_sep: str, cat_win_v: str, suffix: str) -> str:
-    return f"""VSVersionInfo(
+    return f"""\
+VSVersionInfo(
   ffi=FixedFileInfo(
     filevers=({cat_win_v_sep}),
     prodvers=({cat_win_v_sep}),
