@@ -35,13 +35,14 @@ dynamic = [
     "version",
     "description",
 ]
-dependencies = [
-    "colorama~=0.4.6",
-]
+dependencies = []
 
 [project.optional-dependencies]
 clip = [
     "pyperclip~=1.8.0",
+]
+cfix = [
+    "colorama~0.4.6; platform_system=='Windows'",
 ]
 
 [tool.flit.sdist]

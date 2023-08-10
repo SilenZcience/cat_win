@@ -103,11 +103,16 @@ python -m pip install --upgrade cat_win
 ```
 and manually install the desired module yourself.
 
+On older Windows systems colored output may not be displayed correctly.
+In this case you can try to fix the problem by installing the cat_win-package with the optional color-fix `[cfix]` dependency.
+This fix will use the [colorama](https://pypi.org/project/colorama/) module
+which you can also install after the fact yourself to patch the problem.
+
 **OR alternatively** you can use the compiled version (*`Windows only`*):
 
 1. Simply download the [catw.exe](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/catw.exe) file to handle filecontents.
 2. Download the [cats.exe](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/cats.exe) file to use the cat-shell (optional).
-3. Add the file path to your system-environment `PATH`-variables.
+3. Add the file path(s) to your system-environment `PATH`-variables.
 
 > ⚠️ **You should never trust any executable file!** Feel free to compile the package yourself (e.g. using [PyInstaller](https://pyinstaller.org/en/stable/)).
 
