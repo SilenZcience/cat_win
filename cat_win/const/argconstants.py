@@ -24,7 +24,7 @@ ARGS_EOF, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP = range(25, 30)
 ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW, ARGS_BINVIEW = range(30, 35)
 ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN, ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(35, 40)
 ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY, ARGS_FILE_PREFIX = range(40, 45)
-ARGS_FFILE_PREFIX, ARGS_DOTFILES = range(45, 47)
+ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT = range(45, 48)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -64,9 +64,10 @@ ALL_ARGS = [
     ArgConstant('-m', '--checksum', 'show the checksums of all files', ARGS_CHECKSUM, show_arg_on_shell=False, section=5),
     ArgConstant('-a', '--attributes', 'show meta-information about the files', ARGS_DATA, show_arg_on_shell=False, section=5),
 
-    ArgConstant('--dec', '--DEC', 'convert decimal numbers to hexadecimal and binary', ARGS_DEC, section=6),
-    ArgConstant('--hex', '--HEX', 'convert hexadecimal numbers to decimal and binary', ARGS_HEX, section=6),
-    ArgConstant('--bin', '--BIN', 'convert binary numbers to decimal and hexadecimal', ARGS_BIN, section=6),
+    ArgConstant('--hex', '--HEX', 'convert hexadecimal numbers to binary, octal and decimal', ARGS_HEX, section=6),
+    ArgConstant('--dec', '--DEC', 'convert decimal numbers to binary, octal and hexadecimal', ARGS_DEC, section=6),
+    ArgConstant('--oct', '--OCT', 'convert octal numbers to binary, decimal and hexadecimal', ARGS_OCT, section=6),
+    ArgConstant('--bin', '--BIN', 'convert binary numbers to octal, decimal and hexadecimal', ARGS_BIN, section=6),
     ArgConstant('--eval', '--EVAL', 'evaluate simple mathematical equations', ARGS_EVAL, section=6),
     ArgConstant('--b64e', '--b64e', 'encode the input to base64', ARGS_B64E, section=6),
     ArgConstant('--b64d', '--b64d', 'decode the input from base64', ARGS_B64D, section=6),

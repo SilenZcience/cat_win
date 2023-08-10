@@ -576,9 +576,11 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
                 content = [c for c in content if c[1]]
             elif arg == ARGS_EVAL:
                 content = comp_eval(converter, content, param, remove_ansi_codes_from_line)
+            elif arg == ARGS_HEX:
+                content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
             elif arg == ARGS_DEC:
                 content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
-            elif arg == ARGS_HEX:
+            elif arg == ARGS_OCT:
                 content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
             elif arg == ARGS_BIN:
                 content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
