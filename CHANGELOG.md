@@ -16,6 +16,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added --`dot`, `--dotfiles` parameter to include dotfiles.
 - warnings and errors will now be printed on the stderr-stream instead of stdout.
 - display warning when trying to pipe a file into itself.
+- added --`oct`, --`OCT` parameter to convert octal numbers.
 
 ### Bugfixes
 
@@ -25,6 +26,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fix Bug where the behaviour was unexpected when using `-g`, --`grep` but not providing any literal or pattern.
 - fix Bug where the rawviewer would crash when using a different encoding.
 - fix Bug where the -`p`, --`peek` parameter would crash when using a different encoding.
+- fix Bug where --`bin`, --`dec` and --`hex` would display wrong outputs on negative numbers.
 
 ## [1.4.3] - 2023-07-11
 
