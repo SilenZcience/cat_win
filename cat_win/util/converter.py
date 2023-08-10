@@ -1,12 +1,10 @@
 from re import compile as re_compile, search as re_search
-from string import hexdigits
 
 
 class Converter():
     """
-    converts a decimal, hex, binary number
-    to the two corresponding others, or
-    evaluate an expression.
+    converts a binary, octal, decimal or hex number
+    into the corresponding others, or evaluates an expression.
     """
     # matches a mathematical expression consisting of either hex-numbers = (0x...), binary-numbers (0b...) or
     # default decimal numbers (these are not allowed to have a leading zero before the decimal point, yet something like "-.06" is allowed).
@@ -14,6 +12,10 @@ class Converter():
     # before every number there may be opening parenthesis, after every number there may be closing parenthesis
     # (it is not validated that all parenthesis match each other to a valid expression ...)
     _eval_regex = re_compile(r'(?:\(\s*)*(?:(?:0(?:(?:x[0-9a-fA-F]+)|b[01]+)|(?:\-?(?:(?:0|[1-9][0-9]*)\.[0-9]*|\.[0-9]+|0|[1-9][0-9]*)))[\)\s]*[%\-\/\+\*][\/\*]?[\(\s]*)+(?:0(?:(?:x[0-9a-fA-F]+)|b[01]+)|(?:\-?(?:(?:0|[1-9][0-9]*)\.[0-9]*|\.[0-9]+|0|[1-9][0-9]*)))(?:\s*\))*')
+
+    bindigits = '01'
+    octdigits = '01234567'
+    hexdigits = '0123456789abcdefABCDEF'
 
     def __init__(self) -> None:
         self.colors = ['', '', '']
@@ -99,20 +101,6 @@ class Converter():
             return '' if integrated else None
         return (',' * (not integrated)).join(new_l_tokens)
 
-    def is_dec(self, _v: str) -> bool:
-        """
-        Parameters:
-        v (str):
-            the string to check
-            
-        Returns:
-            True if v is a Decimal number.
-            False if it is not.
-        """
-        if _v[:1] == '-':
-            _v = _v[1:]
-        return _v.isdecimal() and _v != ""
-
     def is_hex(self, _v: str) -> bool:
         """
         Parameters:
@@ -125,10 +113,39 @@ class Converter():
         """
         if _v[:1] == '-':
             _v = _v[1:]
-        hex_digits = set(hexdigits)
         if _v[:2] == '0x':
             _v = _v[2:]
-        return all(c in hex_digits for c in _v) and _v != ""
+        return all(c in self.hexdigits for c in _v) and _v != ''
+
+    def is_dec(self, _v: str) -> bool:
+        """
+        Parameters:
+        v (str):
+            the string to check
+            
+        Returns:
+            True if v is a Decimal number.
+            False if it is not.
+        """
+        if _v[:1] == '-':
+            _v = _v[1:]
+        return _v.isdecimal() and _v != ''
+
+    def is_oct(self, _v: str) -> bool:
+        """
+        Parameters:
+        v (str):
+            the string to check
+            
+        Returns:
+            True if v is a Octal number.
+            False if it is not.
+        """
+        if _v[:1] == '-':
+            _v = _v[1:]
+        if _v[:2] == '0o':
+            _v = _v[2:]
+        return all(c in self.octdigits for c in _v) and _v != ''
 
     def is_bin(self, _v: str) -> bool:
         """
@@ -144,11 +161,32 @@ class Converter():
             _v = _v[1:]
         if _v[:2] == '0b':
             _v = _v[2:]
-        v_set = set(_v)
-        return v_set in [{'0', '1'}, {'0'}, {'1'}] and _v != ""
+        return all(c in self.bindigits for c in set(_v)) and _v != ''
+
+
+    def __hex_to_dec__(self, value: str) -> str:
+        return str(int(value, 16))
+
+    def __hex_to_oct__(self, value: str, leading: bool = False) -> str:
+        return self.__dec_to_oct__(int(value, 16), leading)
+
+    def __hex_to_bin__(self, value: str, leading: bool = False) -> str:
+        return self.__dec_to_bin__(int(value, 16), leading)
+
+    def c_from_hex(self, value: str, leading: bool = False) -> str:
+        """
+        returns a String representation of a Hexadecimal String including the corresponding
+        Binary, Octal and Decimal number.
+        """
+        return f"{self.colors[1]}[Bin: {self.__hex_to_bin__(value, leading)}, Oct: " + \
+            f"{self.__hex_to_oct__(value, leading)}, Dec: {self.__hex_to_dec__(value)}]{self.colors[2]}"
+
 
     def __dec_to_hex__(self, value: int, leading: bool = False) -> str:
         return f"{value:#x}" if leading else f"{value:x}"
+
+    def __dec_to_oct__(self, value: int, leading: bool = False) -> str:
+        return f"{value:#o}" if leading else f"{value:o}"
 
     def __dec_to_bin__(self, value: int, leading: bool = False) -> str:
         return f"{value:#b}" if leading else f"{value:b}"
@@ -156,36 +194,44 @@ class Converter():
     def c_from_dec(self, value: str, leading: bool = False) -> str:
         """
         returns a String representation of a Decimal Int including the corresponding
-        Hexadecimal and Binary number.
+        Binary, Octal and Hexadecimal number.
         """
         value = int(value)
-        return self.colors[1] + '{Hexadecimal: ' + self.__dec_to_hex__(value, leading) + '; Binary: ' + \
-            self.__dec_to_bin__(value, leading) + '}' + self.colors[2]
+        return f"{self.colors[1]}[Bin: {self.__dec_to_bin__(value, leading)}, Oct: " + \
+            f"{self.__dec_to_oct__(value, leading)}, Hex: {self.__dec_to_hex__(value, leading)}]{self.colors[2]}"
 
-    def __hex_to_dec__(self, value: str) -> str:
-        return str(int(value, 16))
 
-    def __hex_to_bin__(self, value: str, leading: bool = False) -> str:
-        return bin(int(value, 16)) if leading else bin(int(value, 16))[2:]
+    def __oct_to_hex__(self, value: str, leading: bool = False) -> str:
+        return self.__dec_to_hex__(int(value, 8), leading)
 
-    def c_from_hex(self, value: str, leading: bool = False) -> str:
+    def __oct_to_dec__(self, value: str) -> str:
+        return str(int(value, 8))
+
+    def __oct_to_bin__(self, value: str, leading: bool = False) -> str:
+        return self.__dec_to_bin__(int(value, 8), leading)
+
+    def c_from_oct(self, value: str, leading: bool = False) -> str:
         """
-        returns a String representation of a Hexadecimal String including the corresponding
-        Decimal and Binary number.
+        returns a String representation of an Octal String including the corresponding
+        Binary, Decimal and Hexadecimal number.
         """
-        return self.colors[1] + '{Decimal: ' + self.__hex_to_dec__(value) + '; Binary: ' + \
-            self.__hex_to_bin__(value, leading) + '}' + self.colors[2]
+        return f"{self.colors[1]}[Bin: {self.__oct_to_bin__(value, leading)}, Dec: " + \
+            f"{self.__oct_to_dec__(value)}, Hex: {self.__oct_to_hex__(value, leading)}]{self.colors[2]}"
+
+
+    def __bin_to_hex__(self, value: str, leading: bool = False) -> str:
+        return self.__dec_to_hex__(int(value, 2), leading)
 
     def __bin_to_dec__(self, value: str) -> str:
         return str(int(value, 2))
 
-    def __bin_to_hex__(self, value: str, leading: bool = False) -> str:
-        return hex(int(value, 2)) if leading else hex(int(value, 2))[2:]
+    def __bin_to_oct__(self, value: str, leading: bool = False) -> str:
+        return self.__dec_to_oct__(int(value, 2), leading)
 
     def c_from_bin(self, value: str, leading: bool = False) -> str:
         """
         returns a String representation of a Binary String including the corresponding
-        Decimal and Hexadecimal number.
+        Octal, Decimal and Hexadecimal number.
         """
-        return self.colors[1] + '{Decimal: ' + self.__bin_to_dec__(value) + '; Hexadecimal: ' + \
-            self.__bin_to_hex__(value, leading) + '}' + self.colors[2]
+        return f"{self.colors[1]}[Oct: {self.__bin_to_oct__(value, leading)}, Dec: " + \
+            f"{self.__bin_to_dec__(value)}, Hex: {self.__bin_to_hex__(value, leading)}]{self.colors[2]}"

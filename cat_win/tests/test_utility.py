@@ -98,9 +98,9 @@ class TestConverterComp(TestCase):
             ('', '0x1001'),
         ]
         test_content_out = [
-            ('', '30 {Hexadecimal: 0x1e; Binary: 0b11110}'),
-            ('', '48 {Hexadecimal: 0x30; Binary: 0b110000}'),
-            ('', '1001 {Hexadecimal: 0x3e9; Binary: 0b1111101001}'),
+            ('', '30 [Bin: 0b11110, Oct: 0o36, Hex: 0x1e]'),
+            ('', '48 [Bin: 0b110000, Oct: 0o60, Hex: 0x30]'),
+            ('', '1001 [Bin: 0b1111101001, Oct: 0o1751, Hex: 0x3e9]'),
         ]
         new_content = comp_conv(converter, test_content_in, '--dec', cleaner)
         self.assertListEqual(new_content, test_content_out)
@@ -118,14 +118,33 @@ class TestConverterComp(TestCase):
             ('', '0x1001'),
         ]
         test_content_out = [
-            ('', '30 {Decimal: 48; Binary: 0b110000}'),
-            ('', '48 {Decimal: 72; Binary: 0b1001000}'),
-            ('5+5', 'abc {Decimal: 2748; Binary: 0b101010111100}'),
-            ('', '1001 {Decimal: 4097; Binary: 0b1000000000001}'),
-            ('', '0b1001 {Decimal: 724993; Binary: 0b10110001000000000001}'),
-            ('', '0x1001 {Decimal: 4097; Binary: 0b1000000000001}'),
+            ('', '30 [Bin: 0b110000, Oct: 0o60, Dec: 48]'),
+            ('', '48 [Bin: 0b1001000, Oct: 0o110, Dec: 72]'),
+            ('5+5', 'abc [Bin: 0b101010111100, Oct: 0o5274, Dec: 2748]'),
+            ('', '1001 [Bin: 0b1000000000001, Oct: 0o10001, Dec: 4097]'),
+            ('', '0b1001 [Bin: 0b10110001000000000001, Oct: 0o2610001, Dec: 724993]'),
+            ('', '0x1001 [Bin: 0b1000000000001, Oct: 0o10001, Dec: 4097]'),
         ]
         new_content = comp_conv(converter, test_content_in, '--hex', cleaner)
+        self.assertListEqual(new_content, test_content_out)
+
+    def test_comp_conv_oct(self):
+        test_content_in = [
+            ('', '30'),
+            ('', '48'),
+            ('', 'hello4world'),
+            ('2*2', '3 xyz'),
+            ('5+5', 'abc'),
+            ('', 'abc-4.5'),
+            ('', '1001'),
+            ('', '0b1001'),
+            ('', '0x1001'),
+        ]
+        test_content_out = [
+            ('', '30 [Bin: 0b11000, Dec: 24, Hex: 0x18]'),
+            ('', '1001 [Bin: 0b1000000001, Dec: 513, Hex: 0x201]'),
+        ]
+        new_content = comp_conv(converter, test_content_in, '--oct', cleaner)
         self.assertListEqual(new_content, test_content_out)
 
     def test_comp_conv_bin(self):
@@ -141,8 +160,8 @@ class TestConverterComp(TestCase):
             ('', '0x1001'),
         ]
         test_content_out = [
-            ('', '1001 {Decimal: 9; Hexadecimal: 0x9}'),
-            ('', '0b1001 {Decimal: 9; Hexadecimal: 0x9}'),
+            ('', '1001 [Oct: 0o11, Dec: 9, Hex: 0x9]'),
+            ('', '0b1001 [Oct: 0o11, Dec: 9, Hex: 0x9]'),
         ]
         new_content = comp_conv(converter, test_content_in, '--bin', cleaner)
         self.assertListEqual(new_content, test_content_out)
