@@ -756,27 +756,24 @@ def print_raw_view(file_index: int = 0, mode: str = 'X') -> None:
         or 'b' for binary
     """
     queue = []
-    skipped = 0
+    skipped = -1
 
     print(holder.files[file_index].displayname, ':', sep='')
     raw_gen = get_raw_view_lines_gen(holder.files[file_index].path, mode, 
                                      [color_dic[CKW.RAWVIEWER], color_dic[CKW.RESET_ALL]],
                                      arg_parser.file_encoding)
-    for i, line in enumerate(raw_gen, start=1):
-        print(line)
-        if i > 5:
-            break
+    print(next(raw_gen)) # the header will always be available
     for line in raw_gen:
-        if holder.args_id[ARGS_PEEK]:
-            if len(queue) >= 5:
-                queue = queue[1:]
-                skipped += 1
+        skipped += 1
+        if holder.args_id[ARGS_PEEK] and skipped > 4:
             queue.append(line)
+            if len(queue) > 5:
+                queue = queue[1:]
             continue
         print(line)
     if queue:
-        if skipped:
-            _print_excluded_by_peek(21, skipped)
+        if skipped > 9:
+            _print_excluded_by_peek(21, skipped-9)
         print('\n'.join(queue))
     print('')
 
