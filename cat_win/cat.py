@@ -1022,7 +1022,7 @@ def shell_main():
 
         def _command_cat(self, _) -> None:
             cat = " ,_     _\n |\\\\_,-~/\n / _  _ |    ,--.\n(  @  @ )   / ,-'\n \\  _T_/"
-            cat += "-._( (\n /         `. \\\n|         _  \\ |\n \\ \\ ,  /      |\n  || |-_\\__   /\n ((_/`(____,-'\n"
+            cat += "-._( (\n /         `. \\\n|         _  \\ |\n \\ \\ ,  /      |\n  || |-_\\__   /\n ((_/`(____,-'\a\n"
             print('\n'.join(['\t\t\t' + c for c in cat.split('\n')]))
 
         def _command_help(self, _) -> None:
