@@ -278,7 +278,7 @@ def remove_ansi_codes_from_line(line: str) -> str:
 #     return [(remove_ansi_codes_from_line(prefix), remove_ansi_codes_from_line(line)) for prefix, line in content]
 
 
-@lru_cache
+@lru_cache()
 def _calculate_line_prefix_spacing(line_char_length: int, include_file_prefix: bool = False,
                                    file_char_length: int = 0) -> str:
     """
@@ -325,7 +325,7 @@ def _get_line_prefix(line_num: int, index: int) -> str:
     return _calculate_line_prefix_spacing(len(str(line_num))) % (line_num)
 
 
-@lru_cache
+@lru_cache()
 def _calculate_line_length_prefix_spacing(line_char_length: int) -> str:
     """
     calculate a string template for the line prefix.
