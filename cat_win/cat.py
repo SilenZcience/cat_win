@@ -141,7 +141,7 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     """
     Print all neccassary debug information
     """
-    err_print('==================================== DEBUG ====================================')
+    err_print('================================================ DEBUG ================================================')
     err_print('sys_args:', sys.argv)
     err_print('args: ', end='')
     err_print([(arg[0], arg[1], holder.args_id[arg[0]]) for arg in args])
@@ -161,7 +161,7 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     err_print(arg_parser.file_match)
     err_print('truncate file: ', end='')
     err_print(arg_parser.file_truncate)
-    err_print('===============================================================================')
+    err_print('=======================================================================================================')
 
 
 def _show_count() -> None:
@@ -278,7 +278,7 @@ def remove_ansi_codes_from_line(line: str) -> str:
 #     return [(remove_ansi_codes_from_line(prefix), remove_ansi_codes_from_line(line)) for prefix, line in content]
 
 
-@lru_cache(maxsize=None)
+@lru_cache
 def _calculate_line_prefix_spacing(line_char_length: int, include_file_prefix: bool = False,
                                    file_char_length: int = 0) -> str:
     """
@@ -325,7 +325,7 @@ def _get_line_prefix(line_num: int, index: int) -> str:
     return _calculate_line_prefix_spacing(len(str(line_num))) % (line_num)
 
 
-@lru_cache(maxsize=None)
+@lru_cache
 def _calculate_line_length_prefix_spacing(line_char_length: int) -> str:
     """
     calculate a string template for the line prefix.
@@ -956,8 +956,25 @@ def main():
         sys.exit(1)  # Python exits with error code 1 on EPIPE
 
     # clean-up
-    if holder.args_id[ARGS_DEBUG] and tmp_file_helper.tmp_count:
-        err_print('==================================== DEBUG ====================================')
+    if holder.args_id[ARGS_DEBUG]:
+        err_print('================================================ DEBUG ================================================')
+        caches = [
+            remove_ansi_codes_from_line,
+            _calculate_line_prefix_spacing,
+            _calculate_line_length_prefix_spacing,
+            holder.__get_file_lines_sum__,
+            holder.__calc_max_line_length__,
+            ]
+        caches_info = [(cache.__name__,
+                        str(cache.cache_info().hits),
+                        str(cache.cache_info().misses),
+                        str(cache.cache_info().maxsize),
+                        str(cache.cache_info().currsize)) for cache in caches]
+        max_val = [max(map(lambda c: len(c[i]), caches_info))+1 for i in range(5)]
+        for name, hits, misses, maxsize, currsize in caches_info:
+            cache_info = f"def:{name.ljust(max_val[0])}hits:{hits.ljust(max_val[1])}misses:{misses.ljust(max_val[2])}"
+            cache_info+= f"maxsize:{maxsize.ljust(max_val[3])}currsize:{currsize.ljust(max_val[4])}full:{100*int(currsize)/int(maxsize):6.2f}%"
+            err_print(cache_info)
     for tmp_file in tmp_file_helper.get_generated_temp_files():
         if holder.args_id[ARGS_DEBUG]:
             err_print('Cleaning', tmp_file)
@@ -969,8 +986,8 @@ def main():
         except PermissionError:
             if holder.args_id[ARGS_DEBUG]:
                 err_print('PermissionError  ', tmp_file)
-    if holder.args_id[ARGS_DEBUG] and tmp_file_helper.tmp_count:
-        err_print('===============================================================================')
+    if holder.args_id[ARGS_DEBUG]:
+        err_print('=======================================================================================================')
 
 
 def shell_main():
