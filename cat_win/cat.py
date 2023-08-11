@@ -418,8 +418,8 @@ def print_file(content: list) -> bool:
         # this has priority over the other arguments
         if holder.args_id[ARGS_GREP_ONLY]:
             if intervals:
-                fm_substrings = [(pos[0], f"{color_dic[CKW.FOUND]}{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_FOUND]}") for _, pos in f_keywords] + \
-                    [(pos[0], f"{color_dic[CKW.MATCHED]}{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_MATCHED]}") for _, pos in m_keywords]
+                fm_substrings = [(pos[0], f"{color_dic[CKW.FOUND]}{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_FOUND]}")     for _, pos in f_keywords]
+                fm_substrings+= [(pos[0], f"{color_dic[CKW.MATCHED]}{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_MATCHED]}") for _, pos in m_keywords]
                 fm_substrings.sort(key=lambda x:x[0])
                 print(f"{line_prefix}{','.join([sub for _, sub in fm_substrings])}")
             continue
