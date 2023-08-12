@@ -44,7 +44,7 @@ converter = Converter()
 holder = Holder()
 tmp_file_helper = TmpFileHelper()
 
-on_windows_os = False#system() == 'Windows'
+on_windows_os = system() == 'Windows'
 file_uri_prefix = 'file://' + '/' * on_windows_os
 
 LARGE_FILE_SIZE = 1024 * 1024 * 100  # 100 Megabytes
