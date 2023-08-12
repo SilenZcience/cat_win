@@ -106,7 +106,7 @@ and manually install the desired module yourself.
 On older Windows systems colored output may not be displayed correctly.
 In this case you can try to fix the problem by installing the cat_win-package with the optional color-fix `[cfix]` dependency.
 This fix will use the [colorama](https://pypi.org/project/colorama/) module
-which you can also install after the fact yourself to patch the problem.
+which can also be installed after the fact to patch the problem.
 
 **OR alternatively** you can use the compiled version (*`Windows only`*):
 
