@@ -17,6 +17,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - warnings and errors will now be printed on the stderr-stream instead of stdout.
 - display warning when trying to pipe a file into itself.
 - added --`oct`, --`OCT` parameter to convert octal numbers.
+- added some new bugs to fix later.
 
 ### Bugfixes
 

@@ -174,7 +174,8 @@ class TestCat(TestCase):
 
     def test__get_file_prefix(self):
         cat.holder.files = [File('a', 'b/c.x')]
+        cat.file_uri_prefix = 'test_uri/'
         prefix = cat._get_file_prefix('pre ', 0, True)
-        self.assertEqual(prefix, 'pre file://b/c.x ')
+        self.assertEqual(prefix, 'pre test_uri/b/c.x ')
 
 # python -m unittest discover -s cat_win.tests -p test*.py
