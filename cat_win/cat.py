@@ -44,7 +44,8 @@ converter = Converter()
 holder = Holder()
 tmp_file_helper = TmpFileHelper()
 
-on_windows_os = system() == 'Windows'
+on_windows_os = False#system() == 'Windows'
+file_uri_prefix = 'file://' + '/' * on_windows_os
 
 LARGE_FILE_SIZE = 1024 * 1024 * 100  # 100 Megabytes
 
@@ -379,7 +380,7 @@ def _get_file_prefix(prefix: str, file_index: int, hyper: bool = False) -> str:
         the new line prefix including the file.
     """
     
-    file = 'file://' * hyper + holder.files[file_index].displayname
+    file = file_uri_prefix * hyper + holder.files[file_index].displayname
     if hyper:
         file = file.replace('\\', '/')
     return f"{prefix}{color_dic[CKW.FILE_PREFIX]}{file}{color_dic[CKW.RESET_ALL]} "
