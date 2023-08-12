@@ -27,16 +27,19 @@ def get_checksum_from_file(file: str, colors = None) -> str:
     sha512 = hashlib.sha512()
     crc32 = 0
 
-    with open(file, 'rb') as raw_f:
-        while True:
-            data = raw_f.read(buf_size)
-            if not data:
-                break
-            md5.update(data)
-            sha1.update(data)
-            sha256.update(data)
-            sha512.update(data)
-            crc32 = crc32_hash(data, crc32)
+    try:
+        with open(file, 'rb') as raw_f:
+            while True:
+                data = raw_f.read(buf_size)
+                if not data:
+                    break
+                md5.update(data)
+                sha1.update(data)
+                sha256.update(data)
+                sha512.update(data)
+                crc32 = crc32_hash(data, crc32)
+    except OSError as exc:
+        return type(exc).__name__
 
     crc32 = f"{(crc32 & 0xFFFFFFFF):08X}"
 
