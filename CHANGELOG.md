@@ -3,7 +3,14 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
-## [1.5.0] - TBA
+## [1.5.1] - 2023.08.12
+
+### Bugfixes
+
+- fix Bug where the OS would not be properly deteced.
+
+
+## [1.5.0] - /
 
 ### Minor Changes
 
