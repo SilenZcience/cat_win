@@ -161,10 +161,13 @@ class Holder():
 
     @lru_cache(maxsize=10)
     def __get_file_lines_sum__(self, file: str) -> int:
-        with open(file, 'rb') as raw_f:
-            c_generator = self.__count_generator__(raw_f.raw.read)
-            lines_sum = sum(buffer.count(b'\n') for buffer in c_generator) + 1
-        return lines_sum
+        try:
+            with open(file, 'rb') as raw_f:
+                c_generator = self.__count_generator__(raw_f.raw.read)
+                lines_sum = sum(buffer.count(b'\n') for buffer in c_generator) + 1
+            return lines_sum
+        except OSError:
+            return 0
 
     def __calc_place_holder__(self) -> None:
         file_lines = []
@@ -191,9 +194,11 @@ class Holder():
         """
         heap = []
         lines = []
-        with open(file, 'rb') as raw_f:
-            lines = raw_f.readlines()
-
+        try:
+            with open(file, 'rb') as raw_f:
+                lines = raw_f.readlines()
+        except OSError:
+            return 0
         heap = nlargest(1, lines, len)
         if len(heap) == 0:
             return 0
@@ -215,9 +220,12 @@ class Holder():
         self.__calc_file_number_place_holder__()
         if self.args_id[ARGS_B64D]:
             for i, file in enumerate(self.files):
-                with open(file.path, 'rb') as raw_f_read:
-                    with open(self._inner_files[i], 'wb') as raw_f_write:
-                        raw_f_write.write(_decode_base64(raw_f_read.read().decode(encoding)))
+                try:
+                    with open(file.path, 'rb') as raw_f_read:
+                        with open(self._inner_files[i], 'wb') as raw_f_write:
+                            raw_f_write.write(_decode_base64(raw_f_read.read().decode(encoding)))
+                except OSError:
+                    pass
         if self.args_id[ARGS_COUNT] or self.args_id[ARGS_CCOUNT] or self.args_id[ARGS_NUMBER]:
             self.__calc_place_holder__()
         if self.args_id[ARGS_LLENGTH]:

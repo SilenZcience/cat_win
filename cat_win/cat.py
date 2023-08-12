@@ -632,6 +632,12 @@ def edit_file(file_index: int = 0) -> None:
             # the alternative would be worse: split('\n') would increase the linecount each
             # time catw touches a file.
             content = [('', line) for line in file.read().splitlines()]
+    except PermissionError as exc:
+        err_print(f"Permission denied! Skipping {holder.files[file_index].displayname} ...")
+        return
+    except BlockingIOError as exc:
+        err_print(f"Resource blocked/unavailable! Skipping {holder.files[file_index].displayname} ...")
+        return
     except Exception as exc:
         if holder.args_id[ARGS_PLAIN_ONLY]:
             holder.files[file_index].set_plaintext(plain=False)

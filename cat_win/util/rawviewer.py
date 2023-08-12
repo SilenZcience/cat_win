@@ -62,9 +62,13 @@ def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors = None,
             return CRLF[byte]
         return CRLF[-1]
 
-    with open(file, 'rb') as raw_file:
-        raw_file_content = raw_file.read()
-        raw_file_content_length = len(raw_file_content)
+    try:
+        with open(file, 'rb') as raw_file:
+            raw_file_content = raw_file.read()
+            raw_file_content_length = len(raw_file_content)
+    except OSError as exc:
+        yield type(exc).__name__
+        return ''
 
     repr_length = 2 * (mode.upper() == 'X') + 8 * (mode == 'b')
 
