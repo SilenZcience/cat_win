@@ -3,11 +3,14 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
-## [1.5.1] - 2023.08.12
+## [1.5.2] - TBA
 
 ### Minor Changes
 
 - encoding the content in base64 with --`b64e` will now also include the lineprefix.
+
+
+## [1.5.1] - 2023.08.12
 
 ### Bugfixes
 
