@@ -38,7 +38,7 @@ def encode_base64(content: list, encoding: str = 'utf-8') -> list:
         the encoded base64 content as a single line without any prefix
     """
     # concatenate all lines and join them with line breaks
-    content_lines = list(map(lambda x: x[1], content))
+    content_lines = list(map(lambda x: ''.join(x), content))
     content_line = '\n'.join(content_lines)
 
     encoded_content = _encode_base64(content_line, encoding)

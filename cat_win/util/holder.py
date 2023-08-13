@@ -122,9 +122,6 @@ class Holder():
             self.args_id[arg_id] = True
         if self.args_id[ARGS_B64E]:
             self.args_id[ARGS_NOCOL] = True
-            # prefix will be deleted anyway
-            self.args_id[ARGS_LLENGTH] = False
-            self.args_id[ARGS_NUMBER] = False
         self.reversed = self.args_id[ARGS_REVERSE]
 
     def add_args(self, args: list) -> None:
