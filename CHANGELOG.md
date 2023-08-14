@@ -12,6 +12,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Bugfixes
 
 - implemented more exception handling.
+- fix Bug where files would not be processed in the order in which they were provided.
 
 
 ## [1.5.1] - 2023.08.12
