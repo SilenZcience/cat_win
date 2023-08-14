@@ -6,6 +6,7 @@ from cat_win.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_EC
 
 
 DEFAULT_FILE_ENCODING = 'utf-8'
+IS_FILE, IS_DIR, IS_PATTERN = range(0, 3)
 
 
 def levenshtein(str_a: str, str_b: str) -> float:
@@ -64,7 +65,7 @@ class ArgParser:
         self._unknown_files = []
         self._echo_args = []
 
-        self._known_files_patterns = []       
+        self._known_file_structures = []       
 
     def reset_values(self) -> None:
         """
@@ -147,8 +148,11 @@ class ArgParser:
             # since py3.11 iglob supports queries for hidden,
             # we want compatibility for more versions ...
             glob._ishidden = lambda _: False
-        for pattern in self._known_files_patterns:
-            for filename in glob.iglob(pattern, recursive=True):
+        for struct_type, structure in self._known_file_structures:
+            if struct_type == IS_FILE:
+                self._known_files.append(structure)
+                continue
+            for filename in glob.iglob(structure, recursive=True):
                 if isfile(filename):
                     self._known_files.append(realpath(filename))
 
@@ -215,12 +219,12 @@ class ArgParser:
 
         possible_path = realpath(param)
         if isfile(possible_path):
-            self._known_files.append(possible_path)
+            self._known_file_structures.append((IS_FILE, possible_path))
         elif isdir(possible_path):
-            self._known_files_patterns.append(possible_path + '/**')
+            self._known_file_structures.append((IS_DIR, possible_path + '/**'))
         elif '*' in param:
             # matches file-patterns, not directories (e.g. *.txt)
-            self._known_files_patterns.append(param)
+            self._known_file_structures.append((IS_PATTERN, param))
         elif len(param) > 2 and param[0] == '-' != param[1]:
             for i in range(1, len(param)):
                 if self._add_argument('-' + param[i], delete):
