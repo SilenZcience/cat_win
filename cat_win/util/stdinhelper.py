@@ -2,12 +2,12 @@ from sys import stdin, stderr
 import os
 
 
-def write_temp(content: str, tmp_file: str, file_encoding: str) -> str:
+def write_temp(content, tmp_file: str, file_encoding: str) -> str:
     """
     Writes content into a generated temp-file.
     
     Parameters:
-    content (str):
+    content (str|byte):
         the content to write in a file
     tmp_file (str):
         a string representation of a file (-path)
@@ -18,8 +18,10 @@ def write_temp(content: str, tmp_file: str, file_encoding: str) -> str:
     tmp_file (str):
         the path to the temporary file written
     """
+    if isinstance(content, str):
+        content = content.encode(file_encoding)
     with open(tmp_file, 'wb') as raw_f:
-        raw_f.write(content.encode(file_encoding))
+        raw_f.write(content)
     return tmp_file
 
 
@@ -162,6 +164,7 @@ def write_files(file_list: list, content: str, file_encoding: str) -> list:
     success_file_list = []
 
     for file in file_list:
+        file = os.path.realpath(file)
         try:
             with open(file, 'wb') as raw_file:
                 raw_file.write(content.encode(file_encoding))

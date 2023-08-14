@@ -8,12 +8,13 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - encoding the content in base64 with --`b64e` will now also include the lineprefix.
+- added -`U`, --`url` parameter to display the contents on any url passed in.
 
 ### Bugfixes
 
 - implemented more exception handling.
 - fix Bug where files would not be processed in the order in which they were provided.
-
+- fix Bug where the shell would crash in rare cases.
 
 ## [1.5.1] - 2023.08.12
 

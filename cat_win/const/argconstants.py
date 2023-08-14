@@ -24,7 +24,7 @@ ARGS_EOF, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP = range(25, 30)
 ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW, ARGS_BINVIEW = range(30, 35)
 ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN, ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(35, 40)
 ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY, ARGS_FILE_PREFIX = range(40, 45)
-ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT = range(45, 48)
+ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI = range(45, 49)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -48,6 +48,7 @@ ALL_ARGS = [
     ArgConstant('-i', '--interactive', 'use stdin', ARGS_INTERACTIVE, show_arg_on_shell=False, section=2),
     ArgConstant('-o', '--oneline', 'take only the first stdin-line', ARGS_ONELINE, section=2),
     ArgConstant('-E', '--ECHO', 'handle every following parameter as stdin', ARGS_ECHO, show_arg_on_shell=False, section=2),
+    ArgConstant('-U', '--url', 'display the contents of any provided url', ARGS_URI, show_arg_on_shell=False, section=2),
 
     ArgConstant('-s', '--sum', 'show sum of lines', ARGS_COUNT, show_arg_on_shell=False, section=3),
     ArgConstant('-S', '--SUM', 'ONLY show sum of lines', ARGS_CCOUNT, show_arg_on_shell=False, section=3),

@@ -232,7 +232,7 @@ class ArgParser:
         # out of bound is not possible, in case of length 0 param, possible_path would have
         # become the working-path and therefor handled the param as a directory
         elif param[0] != '-':
-            self._unknown_files.append(realpath(param))
+            self._unknown_files.append(param)
         else:
             self._unknown_args.append(param)
         return False
