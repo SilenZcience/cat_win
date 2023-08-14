@@ -26,6 +26,7 @@ from cat_win.util.holder import Holder
 from cat_win.util.rawviewer import get_raw_view_lines_gen
 from cat_win.util.stringfinder import StringFinder
 from cat_win.util.tmpfilehelper import TmpFileHelper
+from cat_win.util.urls import sep_valid_urls, read_url
 from cat_win.util import stdinhelper
 from cat_win.web.updatechecker import print_update_information
 from cat_win import __project__, __version__, __sysversion__, __author__, __url__
@@ -138,7 +139,7 @@ def _show_version() -> None:
 
 
 def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files: list,
-                echo_args: list) -> None:
+                echo_args: list, valid_urls: list) -> None:
     """
     Print all neccassary debug information
     """
@@ -154,6 +155,8 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     err_print(unknown_files)
     err_print('echo_args: ', end='')
     err_print(echo_args)
+    err_print('valid_urls: ', end='')
+    err_print(valid_urls)
     err_print('file encoding: ', end='')
     err_print(arg_parser.file_encoding)
     err_print('search keyword(s): ', end='')
@@ -379,7 +382,8 @@ def _get_file_prefix(prefix: str, file_index: int, hyper: bool = False) -> str:
     (str):
         the new line prefix including the file.
     """
-    
+    if file_index < 0:
+        return prefix
     file = file_uri_prefix * hyper + holder.files[file_index].displayname
     if hyper:
         file = file.replace('\\', '/')
@@ -523,8 +527,10 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
         the index of the holder.files list, pointing to the file that
         is currently being processed. a negative value can be used for
         the shell mode
+    line_offset (int):
+        the offset for counting the line numbers (used in the shell)
     """
-    if not (content or os.isatty(sys.stdout.fileno())):
+    if not (content or os.isatty(sys.stdout.fileno()) or file_index < 0):
         # if the content of the file is empty, we check if maybe the file is its own pipe-target.
         # an indicator would be if the file has just been modified to be empty (by the shell).
         # also the stdout cannot be atty.
@@ -867,7 +873,7 @@ def init(shell: bool = False) -> tuple:
         
     Returns:
     (tuple):
-        contains (known_files, unknown_files, echo_args) from the argparser
+        contains (known_files, unknown_files, echo_args, valid_urls) from the argparser
     """
     # read parameter-args
     args, _, unknown_files, echo_args = arg_parser.get_arguments(sys.argv)
@@ -875,6 +881,9 @@ def init(shell: bool = False) -> tuple:
     holder.set_args(args)
     
     known_files = arg_parser.get_files(holder.args_id[ARGS_DOTFILES])
+    valid_urls = []
+    if holder.args_id[ARGS_URI]:
+        valid_urls, unknown_files = sep_valid_urls(unknown_files)
 
     if holder.args_id[ARGS_RECONFIGURE] or holder.args_id[ARGS_RECONFIGURE_IN]:
         sys.stdin.reconfigure(encoding=arg_parser.file_encoding)
@@ -889,7 +898,7 @@ def init(shell: bool = False) -> tuple:
 
     # check for special cases
     if holder.args_id[ARGS_DEBUG]:
-        _show_debug(holder.args, arg_suggestions, known_files, unknown_files, echo_args)
+        _show_debug(holder.args, arg_suggestions, known_files, unknown_files, echo_args, valid_urls)
     if (len(known_files) + len(unknown_files) + len(holder.args) == 0 and not shell) or \
         holder.args_id[ARGS_HELP]:
         _show_help(shell)
@@ -901,18 +910,24 @@ def init(shell: bool = False) -> tuple:
         config.save_config()
         sys.exit(0)
 
-    return (known_files, unknown_files, echo_args)
+    return (known_files, unknown_files, echo_args, valid_urls)
 
 
 def main():
     piped_input = temp_file = ''
-    known_files, unknown_files, echo_args = init(shell=False)
+    known_files, unknown_files, echo_args, valid_urls = init(shell=False)
 
     if holder.args_id[ARGS_ECHO]:
         temp_file = stdinhelper.write_temp(' '.join(echo_args), \
             tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding)
         known_files.append(temp_file)
         holder.set_temp_file_echo(temp_file)
+    if holder.args_id[ARGS_URI]:
+        temp_files = [stdinhelper.write_temp(read_url(valid_url), \
+            tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding)
+                      for valid_url in valid_urls]
+        known_files.extend(temp_files)
+        holder.set_temp_files_url(temp_files)
     if holder.args_id[ARGS_INTERACTIVE]:
         piped_input = ''.join(stdinhelper.get_stdin_content(holder.args_id[ARGS_ONELINE]))
         temp_file = stdinhelper.write_temp(piped_input, tmp_file_helper.generate_temp_file_name(), \
