@@ -9,6 +9,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - encoding the content in base64 with --`b64e` will now also include the lineprefix.
 
+### Bugfixes
+
+- implemented more exception handling.
+
 
 ## [1.5.1] - 2023.08.12
 
