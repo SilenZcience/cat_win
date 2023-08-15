@@ -200,7 +200,8 @@ def _show_files() -> None:
             file.set_file_size(get_file_size(file.path))
         file_sizes.append(file.file_size)
         print(f"\t{color_dic[CKW.COUNT_AND_FILES]}{_convert_size(file.file_size): <10}", end='')
-        prefix = '*' if file.contains_queried else ' ' if file.plaintext else '-'
+        prefix = ' ' if file.plaintext        else '-'
+        prefix+= '*' if file.contains_queried else ' '
         print(f"{prefix}{file.displayname}{color_dic[CKW.RESET_ALL]}")
     print(color_dic[CKW.COUNT_AND_FILES], end='')
     print(f"Sum:\t{_convert_size(sum(file_sizes))}", end='')
@@ -418,7 +419,7 @@ def print_file(content: list) -> bool:
         intervals, f_keywords, m_keywords = string_finder.find_keywords(cleaned_line)
 
         # used for marking the file when displaying applied files
-        contains_queried = not contains_queried and intervals
+        contains_queried |= bool(intervals)
 
         # this has priority over the other arguments
         if holder.args_id[ARGS_GREP_ONLY]:
@@ -645,8 +646,8 @@ def edit_file(file_index: int = 0) -> None:
         err_print(f"Resource blocked/unavailable! Skipping {holder.files[file_index].displayname} ...")
         return
     except Exception as exc:
+        holder.files[file_index].set_plaintext(plain=False)
         if holder.args_id[ARGS_PLAIN_ONLY]:
-            holder.files[file_index].set_plaintext(plain=False)
             return
         err_print('Failed to open:', holder.files[file_index].displayname)
         try:

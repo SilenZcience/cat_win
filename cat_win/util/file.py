@@ -11,7 +11,7 @@ class File:
         self.plaintext = True
 
     def set_contains_queried(self, contains_queried: bool) -> None:
-        self.contains_queried = self.contains_queried or contains_queried
+        self.contains_queried |= contains_queried
 
     def set_plaintext(self, plain: bool = False) -> None:
         self.plaintext = plain
