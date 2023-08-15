@@ -1,16 +1,18 @@
 #!/usr/bin/python
 from glob import iglob
 from shutil import rmtree
-from sys import exit as sysexit
+from sys import version, exit as sysexit
 import os
 import subprocess
 
 script_dir = os.path.dirname(__file__)
 package_dir = os.path.abspath(os.path.join(script_dir, '..', 'cat_win'))
 entry_dir = os.path.join(package_dir, 'cat.py')
+init_dir = os.path.join(package_dir, '__init__.py')
 print('script directory:', script_dir)
 print('package directory:', package_dir)
 print('entry directory:', entry_dir)
+print('init directory:', init_dir)
 
 # add the pyclip import to the cat.py main file, since pyinstaller will not
 # detect the import statement hidden in the middle of the file
@@ -23,6 +25,23 @@ if cat == '':
 
 with open(entry_dir, 'w', encoding='utf-8') as f:
     f.write('import pyperclip as pc\n' + cat)
+
+
+# change the __sysversion__ to the current sys.version
+# to display the correct information in the executable
+init = ''
+with open(init_dir, 'r', encoding='utf-8') as f:
+    init = f.readlines()
+
+if init == '':
+    sysexit(2)
+
+with open(init_dir, 'w', encoding='utf-8') as f:
+    for line in init:
+        if line.startswith('__sysversion__'):
+            f.write(f"__sysversion__ = {version}\n")
+        else:
+            f.write(line)
 
 # clear pycache
 for path in iglob(package_dir + '/**/__pycache__', recursive=True):
