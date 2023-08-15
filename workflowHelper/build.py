@@ -39,7 +39,7 @@ if init == '':
 with open(init_dir, 'w', encoding='utf-8') as f:
     for line in init:
         if line.startswith('__sysversion__'):
-            f.write(f"__sysversion__ = {version}\n")
+            f.write(f"__sysversion__ = '{version}'\n")
         else:
             f.write(line)
 
