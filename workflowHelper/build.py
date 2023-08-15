@@ -74,7 +74,10 @@ for _ in range(3):
             break
     except Exception:
         pass
-    
+
+if status > 0:
+    sysexit(status)
+
 command = 'pyinstaller ./cat_win/shell.py --onefile --clean --dist ./bin --version-file ./bin/catsversionfile -n cats'.split(' ')
 # try pyinstaller 3 times at most...
 for _ in range(3):
