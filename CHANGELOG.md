@@ -15,6 +15,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 - implemented more exception handling.
 - fix Bug where files would not be processed in the order in which they were provided.
 - fix Bug where the shell would crash in rare cases.
+- fix Bug where the --`files` parameter would display incorrect results.
+
 
 ## [1.5.1] - 2023.08.12
 
