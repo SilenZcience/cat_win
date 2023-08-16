@@ -1,7 +1,7 @@
 #!/usr/bin/python
-from sys import exit as sysexit
 import os
 import subprocess
+import sys
 
 error_code = 1
 
@@ -26,6 +26,6 @@ if len(target_package) > 0:
             print(sub)
             error_code = sub.returncode
         except Exception:
-            sysexit(error_code)
+            sys.exit(error_code)
 
-sysexit(error_code)
+sys.exit(error_code)

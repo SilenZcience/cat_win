@@ -1,15 +1,15 @@
-from re import compile, IGNORECASE, match
-from urllib.parse import urlparse
-from urllib.request import urlopen
+import re
+import urllib.request
+import urllib.parse
 
 DEFAULT_SCHEME = 'https://'
-DJANGO_VALID_URL_PATTERN = compile(
+DJANGO_VALID_URL_PATTERN = re.compile(
     r'^(?:http|ftp)s?://' # http:// or https://
     r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
     r'localhost|' #localhost...
     r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
     r'(?::\d+)?' # optional port
-    r'(?:/?|[/?]\S+)$', IGNORECASE)
+    r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
 
 def is_valid_uri(s_url: str, _rec: bool = False) -> bool:
@@ -28,9 +28,9 @@ def is_valid_uri(s_url: str, _rec: bool = False) -> bool:
         indicates whether or not the url is valid
     """
     try:
-        parse_result = urlparse(s_url)
+        parse_result = urllib.parse.urlparse(s_url)
         p_result = all([parse_result.scheme, parse_result.netloc])
-        r_result = match(DJANGO_VALID_URL_PATTERN, s_url) is not None
+        r_result = re.match(DJANGO_VALID_URL_PATTERN, s_url) is not None
         valid = r_result and p_result
         if not (valid or _rec):
             return is_valid_uri(DEFAULT_SCHEME+s_url, True)
@@ -76,7 +76,7 @@ def read_url(url: str, _rec: bool = False):
         on error; a custom error message
     """
     try:
-        with urlopen(url, timeout=4) as _response:
+        with urllib.request.urlopen(url, timeout=4) as _response:
             response = _response.read()
         return response
     except ValueError:

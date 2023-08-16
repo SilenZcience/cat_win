@@ -5,9 +5,9 @@ except ImportError:
 from datetime import datetime
 from functools import lru_cache
 from itertools import groupby
-from platform import system
-from re import sub as resub
 import os
+import platform
+import re
 import sys
 
 from cat_win.const.argconstants import *
@@ -17,16 +17,16 @@ from cat_win.util.argparser import ArgParser
 from cat_win.util.cbase64 import decode_base64, encode_base64
 from cat_win.util.checksum import get_checksum_from_file
 from cat_win.util.converter import Converter
-try:
-    from cat_win.util.utility import comp_eval, comp_conv, split_replace
-except SyntaxError: # in case of Python 3.7
-    from cat_win.util.utilityold import comp_eval, comp_conv, split_replace
 from cat_win.util.fileattributes import get_file_meta_data, get_file_size, get_file_mtime, _convert_size
 from cat_win.util.holder import Holder
 from cat_win.util.rawviewer import get_raw_view_lines_gen
 from cat_win.util.stringfinder import StringFinder
 from cat_win.util.tmpfilehelper import TmpFileHelper
 from cat_win.util.urls import sep_valid_urls, read_url
+try:
+    from cat_win.util.utility import comp_eval, comp_conv, split_replace
+except SyntaxError: # in case of Python 3.7
+    from cat_win.util.utilityold import comp_eval, comp_conv, split_replace
 from cat_win.util import stdinhelper
 from cat_win.web.updatechecker import print_update_information
 from cat_win import __project__, __version__, __sysversion__, __author__, __url__
@@ -45,7 +45,7 @@ converter = Converter()
 holder = Holder()
 tmp_file_helper = TmpFileHelper()
 
-on_windows_os = system() == 'Windows'
+on_windows_os = platform.system() == 'Windows'
 file_uri_prefix = 'file://' + '/' * on_windows_os
 
 LARGE_FILE_SIZE = 1024 * 1024 * 100  # 100 Megabytes
@@ -276,7 +276,7 @@ def remove_ansi_codes_from_line(line: str) -> str:
     #     line = line[:codePosStart] + line[codePosStart+codePosEnd+1:]
     # return line
     # version 2:
-    return resub(r'\x1b\[[0-9\;]*m', '', line)
+    return re.sub(r'\x1b\[[0-9\;]*m', '', line)
 
 
 # def removeAnsiCodes(content: list) -> list:

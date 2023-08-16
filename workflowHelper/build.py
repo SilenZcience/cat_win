@@ -1,9 +1,9 @@
 #!/usr/bin/python
-from glob import iglob
-from shutil import rmtree
-from sys import version, exit as sysexit
+import glob
 import os
+import shutil
 import subprocess
+import sys
 
 script_dir = os.path.dirname(__file__)
 package_dir = os.path.abspath(os.path.join(script_dir, '..', 'cat_win'))
@@ -21,7 +21,7 @@ with open(entry_dir, 'r', encoding='utf-8') as f:
     cat = f.read()
 
 if cat == '':
-    sysexit(1)
+    sys.exit(1)
 
 with open(entry_dir, 'w', encoding='utf-8') as f:
     f.write('import pyperclip as pc\n' + cat)
@@ -34,27 +34,27 @@ with open(init_dir, 'r', encoding='utf-8') as f:
     init = f.readlines()
 
 if init == '':
-    sysexit(2)
+    sys.exit(2)
 
 with open(init_dir, 'w', encoding='utf-8') as f:
     for line in init:
         if line.startswith('__sysversion__'):
-            f.write(f"__sysversion__ = '{version}'\n")
+            f.write(f"__sysversion__ = '{sys.version}'\n")
         else:
             f.write(line)
 
 # clear pycache
-for path in iglob(package_dir + '/**/__pycache__', recursive=True):
+for path in glob.iglob(package_dir + '/**/__pycache__', recursive=True):
     try:
         print('deleting: ', path)
-        rmtree(path)
+        shutil.rmtree(path)
     except OSError as e:
         print(f"Error: {e.filename} - {e.strerror}.")
 
 # pyinstaller is more reliable without the __init__ files, they will be created again later.
 # temporarily delete all __init__ files except the main one containing information.
 _initFiles = []
-for path in iglob(package_dir + '/*/__init__.py', recursive=True):
+for path in glob.iglob(package_dir + '/*/__init__.py', recursive=True):
     _initFiles.append(path)
     try:
         print('deleting: ', path)
@@ -76,7 +76,7 @@ for _ in range(3):
         pass
 
 if status > 0:
-    sysexit(status)
+    sys.exit(status)
 
 command = 'pyinstaller ./cat_win/shell.py --onefile --clean --dist ./bin --version-file ./bin/catsversionfile -n cats'.split(' ')
 # try pyinstaller 3 times at most...
@@ -96,4 +96,4 @@ for _init in _initFiles:
     f = open(_init, 'x', encoding='utf-8')
     f.close()
     
-sysexit(status)
+sys.exit(status)

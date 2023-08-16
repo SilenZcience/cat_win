@@ -1,6 +1,4 @@
 from datetime import datetime
-from math import log, floor
-from os import stat
 from stat import (
     FILE_ATTRIBUTE_ARCHIVE as A,
     FILE_ATTRIBUTE_SYSTEM as S,
@@ -10,6 +8,8 @@ from stat import (
     FILE_ATTRIBUTE_COMPRESSED as C,
     FILE_ATTRIBUTE_ENCRYPTED as E
 )
+import math
+import os
 
 
 def _convert_size(size_bytes: int) -> str:
@@ -27,7 +27,7 @@ def _convert_size(size_bytes: int) -> str:
     if size_bytes == 0:
         return '0 B'
     size_name = ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
-    i = int(floor(log(size_bytes, 1024)))
+    i = int(math.floor(math.log(size_bytes, 1024)))
     power = pow(1024, i)
     size = round(size_bytes / power, 2)
     return f"{size} {size_name[i] if i < len(size_name) else '?'}"
@@ -47,7 +47,7 @@ def read_attribs(file: str) -> list:
         boolean value describing if it is set
         [[ATTRIBUTE, True/False], ...]
     """
-    attrs = stat(file, follow_symlinks=False).st_file_attributes
+    attrs = os.stat(file, follow_symlinks=False).st_file_attributes
 
     return (
         [['Archive', bool(attrs & A)],
@@ -74,14 +74,14 @@ def get_file_size(file: str) -> int:
         the size in bytes or 0 if an (OS-)error occurs
     """
     try:
-        return stat(file).st_size
+        return os.stat(file).st_size
     except OSError:
         return 0
 
 
 def get_file_mtime(file: str) -> float:
     try:
-        return stat(file).st_mtime
+        return os.stat(file).st_mtime
     except OSError:
         return 0.0
 
@@ -108,7 +108,7 @@ def get_file_meta_data(file: str, on_windows_os: bool, colors = None) -> str:
     if colors is None or len(colors) < 4:
         colors = ['', '', '', '']
     try:
-        stats = stat(file)
+        stats = os.stat(file)
 
         meta_data = colors[1] + file + colors[0] + '\n'
 

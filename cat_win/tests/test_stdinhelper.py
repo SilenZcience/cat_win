@@ -8,7 +8,7 @@ from cat_win.util.stdinhelper import path_parts, get_stdin_content
 stdin_mock = StdInMock()
 
 
-@patch('cat_win.util.stdinhelper.stdin', stdin_mock)
+@patch('cat_win.util.stdinhelper.sys.stdin', stdin_mock)
 class TestStdInHelper(TestCase):
     def test_path_parts(self):
         expected_output_win = ['C:/', 'a', 'b', 'c', 'd.txt']

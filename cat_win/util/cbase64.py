@@ -1,4 +1,4 @@
-from base64 import b64encode, b64decode
+import base64
 
 
 def _encode_base64(content: str, encoding: str) -> bytes:
@@ -17,7 +17,7 @@ def _encode_base64(content: str, encoding: str) -> bytes:
     """
     # encode the string to bytes and encode with base64
     content_bytes = content.encode(encoding=encoding)
-    encoded_content = b64encode(content_bytes)
+    encoded_content = base64.b64encode(content_bytes)
 
     # return as a single line
     return encoded_content
@@ -61,7 +61,7 @@ def _decode_base64(content: str) -> bytes:
     """
     # encode the string to bytes and decode with base64
     base64_bytes = content.encode(encoding='ascii')
-    decoded_content = b64decode(base64_bytes)
+    decoded_content = base64.b64decode(base64_bytes)
 
     # return as a single line
     return decoded_content
