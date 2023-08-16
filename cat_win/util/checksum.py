@@ -1,6 +1,5 @@
-from zlib import crc32 as crc32_hash
 import hashlib
-
+import zlib
 
 def get_checksum_from_file(file: str, colors = None) -> str:
     """
@@ -37,7 +36,7 @@ def get_checksum_from_file(file: str, colors = None) -> str:
                 sha1.update(data)
                 sha256.update(data)
                 sha512.update(data)
-                crc32 = crc32_hash(data, crc32)
+                crc32 = zlib.crc32(data, crc32)
     except OSError as exc:
         return type(exc).__name__
 

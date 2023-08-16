@@ -1,4 +1,4 @@
-from re import finditer
+import re
 
 from cat_win.const.colorconstants import CKW
 
@@ -42,7 +42,7 @@ class StringFinder:
         (list):
             containing the start and end indeces like [start, end]
         """
-        for match in finditer(fr'{pattern}', _s):
+        for match in re.finditer(fr'{pattern}', _s):
             yield list(match.span())
 
     def _optimize_intervals(self, intervals: list) -> list:

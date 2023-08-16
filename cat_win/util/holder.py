@@ -1,5 +1,5 @@
 from functools import lru_cache
-from heapq import nlargest
+import heapq
 
 from cat_win.const.argconstants import HIGHEST_ARG_ID, ARGS_NOCOL, ARGS_LLENGTH, ARGS_NUMBER, \
     ARGS_REVERSE, ARGS_B64D, ARGS_B64E, ARGS_COUNT, ARGS_CCOUNT, DIFFERENTIABLE_ARGS
@@ -202,7 +202,7 @@ class Holder():
                 lines = raw_f.readlines()
         except OSError:
             return 0
-        heap = nlargest(1, lines, len)
+        heap = heapq.nlargest(1, lines, len)
         if len(heap) == 0:
             return 0
         # also check the longest line against the last line because

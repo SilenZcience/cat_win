@@ -1,6 +1,6 @@
-from json import loads as loadJSON
-from sys import stderr
-from urllib.request import urlopen
+import json
+import sys
+import urllib.request
 
 from cat_win.const.colorconstants import CKW
 from cat_win import __url__
@@ -35,9 +35,9 @@ def get_latest_package_version(package: str) -> str:
         on Error: a zero version '0.0.0
     """
     try:
-        with urlopen(f"https://pypi.org/pypi/{package}/json", timeout=2) as _response:
+        with urllib.request.urlopen(f"https://pypi.org/pypi/{package}/json", timeout=2) as _response:
             response = _response.read()
-        return loadJSON(response)['info']['version']
+        return json.loads(response)['info']['version']
     except (ValueError, OSError):
         return '0.0.0'
 
@@ -163,5 +163,5 @@ def print_update_information(package: str, current_version: str, color_dic: dict
     info += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_INFORMATION]}"
     info += f"{__url__}/blob/main/CHANGELOG.md{color_dic[CKW.RESET_ALL]}"
     print(message)
-    print(warning, file=stderr)
+    print(warning, file=sys.stderr)
     print(info)

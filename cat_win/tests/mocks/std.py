@@ -1,7 +1,7 @@
-from io import StringIO
+import io
 
 
-class StdOutMock(StringIO):
+class StdOutMock(io.StringIO):
     pass
     # def reconfigure(self, encoding = None) -> None:
     #     return
@@ -10,7 +10,7 @@ class StdOutMock(StringIO):
     #     return 0
 
 
-class StdOutMockIsAtty(StringIO):
+class StdOutMockIsAtty(io.StringIO):
     closed: bool = False
 
     def isatty(self) -> bool:

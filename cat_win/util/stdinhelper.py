@@ -1,5 +1,5 @@
-from sys import stdin, stderr
 import os
+import sys
 
 
 def write_temp(content, tmp_file: str, file_encoding: str) -> str:
@@ -39,12 +39,12 @@ def get_stdin_content(one_line: bool = False):
         until the first EOF (Chr(26)) character
     """
     if one_line:
-        first_line = stdin.readline().rstrip('\n')
+        first_line = sys.stdin.readline().rstrip('\n')
         if first_line[-1:] == chr(26):
             first_line = first_line[:-1]
         yield first_line
         return
-    for line in stdin:
+    for line in sys.stdin:
         if line[-2:-1] == chr(26):
             yield line[:-2]
             break
@@ -92,7 +92,7 @@ def create_file(file: str, content: str, file_encoding: str) -> bool:
     try:
         os.makedirs(file_dir, exist_ok=True)
     except OSError:
-        print(f"Error: The path '{file_dir}' could not be created.", file=stderr)
+        print(f"Error: The path '{file_dir}' could not be created.", file=sys.stderr)
         # cleanup (delete the folders that have been created)
         for subpath in unknown_subpaths:
             try:
@@ -104,7 +104,7 @@ def create_file(file: str, content: str, file_encoding: str) -> bool:
         with open(file, 'wb') as raw_f:
             raw_f.write(content.encode(file_encoding))
     except OSError:
-        print(f"Error: The file '{file}' could not be written.", file=stderr)
+        print(f"Error: The file '{file}' could not be written.", file=sys.stderr)
         # cleanup (delete the folders that have been created)
         for subpath in unknown_subpaths:
             try:
@@ -154,7 +154,7 @@ def write_files(file_list: list, content: str, file_encoding: str) -> list:
         except EOFError:
             pass
         except UnicodeError:
-            print(f"Input is not recognized in the given encoding: {file_encoding}", file=stderr)
+            print(f"Input is not recognized in the given encoding: {file_encoding}", file=sys.stderr)
             abort_command = 'n'
         finally:
             if abort_command and abort_command.upper() != 'Y':
@@ -173,7 +173,7 @@ def write_files(file_list: list, content: str, file_encoding: str) -> list:
             if create_file(file, content, file_encoding):
                 success_file_list.append(file)
         except OSError:
-            print(f"Error: The file '{file}' could not be written.", file=stderr)
+            print(f"Error: The file '{file}' could not be written.", file=sys.stderr)
 
     return success_file_list
 

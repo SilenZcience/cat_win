@@ -1,6 +1,6 @@
-from os.path import isfile, realpath, isdir
-from re import match, IGNORECASE
 import glob
+import os
+import re
 
 from cat_win.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_ECHO
 
@@ -153,8 +153,8 @@ class ArgParser:
                 self._known_files.append(structure)
                 continue
             for filename in glob.iglob(structure, recursive=True):
-                if isfile(filename):
-                    self._known_files.append(realpath(filename))
+                if os.path.isfile(filename):
+                    self._known_files.append(os.path.realpath(filename))
 
         return self._known_files
 
@@ -175,25 +175,25 @@ class ArgParser:
             should simply be printed to stdout.
         """
         # 'enc' + ('=' or ':') + file_encoding
-        if match(r"\Aenc[\=\:].+\Z", param, IGNORECASE):
+        if re.match(r"\Aenc[\=\:].+\Z", param, re.IGNORECASE):
             self.file_encoding = param[4:]
             return False
         # 'match' + ('=' or ':') + file_match
-        if match(r"\Amatch[\=\:].+\Z", param, IGNORECASE):
+        if re.match(r"\Amatch[\=\:].+\Z", param, re.IGNORECASE):
             if delete:
                 self.file_match.discard(param[6:])
                 return False
             self.file_match.add(fr'{param[6:]}')
             return False
         # 'find' + ('=' or ':') + file_search
-        if match(r"\Afind[\=\:].+\Z", param, IGNORECASE):
+        if re.match(r"\Afind[\=\:].+\Z", param, re.IGNORECASE):
             if delete:
                 self.file_search.discard(param[5:])
                 return False
             self.file_search.add(param[5:])
             return False
         # 'trunc' + ('=' or ':') + file_truncate[0] + ':' + file_truncate[1] [+ ':' + file_truncate[2]]
-        if match(r"\Atrunc[\=\:][0-9\(\)\+\-\*\/]*\:[0-9\(\)\+\-\*\/]*\:?[0-9\(\)\+\-\*\/]*\Z", param, IGNORECASE):
+        if re.match(r"\Atrunc[\=\:][0-9\(\)\+\-\*\/]*\:[0-9\(\)\+\-\*\/]*\:?[0-9\(\)\+\-\*\/]*\Z", param, re.IGNORECASE):
             for i, p_split in enumerate(param[6:].split(':')):
                 try:
                     self.file_truncate[i] = int(eval(p_split))
@@ -201,11 +201,11 @@ class ArgParser:
                     self.file_truncate[i] = None
             return False
         # '[' + ARGS_CUT + ']'
-        if match(r"\A\[[0-9\(\)\+\-\*\/]*\:[0-9\(\)\+\-\*\/]*\:?[0-9\(\)\+\-\*\/]*\]\Z", param):
+        if re.match(r"\A\[[0-9\(\)\+\-\*\/]*\:[0-9\(\)\+\-\*\/]*\:?[0-9\(\)\+\-\*\/]*\]\Z", param):
             self._args.append((ARGS_CUT, param))
             return False
         # '[' + ARGS_REPLACE_THIS + ',' + ARGS_REPLACE_WITH + ']' (escape chars with '\')
-        if match(r"\A\[(?:.*[^\\])?(?:\\\\)*,(?:.*[^\\])?(?:\\\\)*\]\Z", param):
+        if re.match(r"\A\[(?:.*[^\\])?(?:\\\\)*,(?:.*[^\\])?(?:\\\\)*\]\Z", param):
             self._args.append((ARGS_REPLACE, param))
             return False
 
@@ -216,11 +216,10 @@ class ArgParser:
                 if arg.arg_id == ARGS_ECHO:
                     return True
                 return False
-
-        possible_path = realpath(param)
-        if isfile(possible_path):
+        possible_path = os.path.realpath(param)
+        if os.path.isfile(possible_path):
             self._known_file_structures.append((IS_FILE, possible_path))
-        elif isdir(possible_path):
+        elif os.path.isdir(possible_path):
             self._known_file_structures.append((IS_DIR, possible_path + '/**'))
         elif '*' in param:
             # matches file-patterns, not directories (e.g. *.txt)

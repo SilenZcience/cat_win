@@ -1,6 +1,6 @@
-from configparser import ConfigParser
-from os.path import join as path_join
-from sys import stderr
+import configparser
+import os
+import sys
 
 from cat_win.const.colorconstants import ColorOptions, CKW
 
@@ -43,11 +43,11 @@ class Config:
             the working directory path of the package
         """
         self.working_dir = working_dir
-        self.config_file = path_join(self.working_dir, 'cat.config')
+        self.config_file = os.path.join(self.working_dir, 'cat.config')
 
         self.exclusive_definitions = {'Fore': [CKW.FOUND],  # can only be Foreground
                                       'Back': [CKW.MATCHED]}  # can only be Background
-        self.config_parser = ConfigParser()
+        self.config_parser = configparser.ConfigParser()
         self.color_dic = {}
 
         self.longest_char_count = 30
@@ -158,7 +158,7 @@ class Config:
             try:
                 keyword = input('Input name of keyword to change: ')
             except EOFError:
-                print('\nAborting due to End-of-File character...', file=stderr)
+                print('\nAborting due to End-of-File character...', file=sys.stderr)
                 return
             if keyword.isdigit():
                 keyword = self.elements[int(keyword)-1] if (
@@ -173,17 +173,17 @@ class Config:
             try:
                 color = input('Input color: ')
             except EOFError:
-                print('\nAborting due to End-of-File character...', file=stderr)
+                print('\nAborting due to End-of-File character...', file=sys.stderr)
                 return
             if color.isdigit():
                 color = color_options[int(color)-1] if (
                     0 < int(color) <= len(color_options)) else color
 
         if keyword in self.exclusive_definitions['Fore'] and color.startswith('Back'):
-            print(f"An Error occured: '{keyword}' can only be of style 'Fore'", file=stderr)
+            print(f"An Error occured: '{keyword}' can only be of style 'Fore'", file=sys.stderr)
             return
         if keyword in self.exclusive_definitions['Back'] and color.startswith('Fore'):
-            print(f"An Error occured: '{keyword}' can only be of style 'Back'", file=stderr)
+            print(f"An Error occured: '{keyword}' can only be of style 'Back'", file=sys.stderr)
             return
 
         color_split = color.split('.')
@@ -195,4 +195,4 @@ class Config:
                 self.config_parser.write(conf)
             print(f"Successfully updated config file:\n\t{self.config_file}")
         except OSError:
-            print(f"Could not write to config file:\n\t{self.config_file}", file=stderr)
+            print(f"Could not write to config file:\n\t{self.config_file}", file=sys.stderr)

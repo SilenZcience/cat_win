@@ -1,5 +1,4 @@
-from re import compile as re_compile, search as re_search
-
+import re
 
 class Converter():
     """
@@ -11,7 +10,7 @@ class Converter():
     # between every number has to be a valid operator (*,/,+,-,%,**,//)
     # before every number there may be opening parenthesis, after every number there may be closing parenthesis
     # (it is not validated that all parenthesis match each other to a valid expression ...)
-    _eval_regex = re_compile(r'(?:\(\s*)*(?:(?:0(?:(?:x[0-9a-fA-F]+)|b[01]+)|(?:\-?(?:(?:0|[1-9][0-9]*)\.[0-9]*|\.[0-9]+|0|[1-9][0-9]*)))[\)\s]*[%\-\/\+\*][\/\*]?[\(\s]*)+(?:0(?:(?:x[0-9a-fA-F]+)|b[01]+)|(?:\-?(?:(?:0|[1-9][0-9]*)\.[0-9]*|\.[0-9]+|0|[1-9][0-9]*)))(?:\s*\))*')
+    _eval_regex = re.compile(r'(?:\(\s*)*(?:(?:0(?:(?:x[0-9a-fA-F]+)|b[01]+)|(?:\-?(?:(?:0|[1-9][0-9]*)\.[0-9]*|\.[0-9]+|0|[1-9][0-9]*)))[\)\s]*[%\-\/\+\*][\/\*]?[\(\s]*)+(?:0(?:(?:x[0-9a-fA-F]+)|b[01]+)|(?:\-?(?:(?:0|[1-9][0-9]*)\.[0-9]*|\.[0-9]+|0|[1-9][0-9]*)))(?:\s*\))*')
 
     bindigits = '01'
     octdigits = '01234567'
@@ -66,7 +65,7 @@ class Converter():
             the new content line with the evaluated expression
         """
         new_l_tokens = []
-        res = re_search(self._eval_regex, _l)
+        res = re.search(self._eval_regex, _l)
 
         while (res):
             if integrated:
@@ -92,7 +91,7 @@ class Converter():
             except Exception as e:
                 self._evaluate_exception_handler(e, res.group(), new_l_tokens)
             _l = _l[res.end():]
-            res = re_search(self._eval_regex, _l)
+            res = re.search(self._eval_regex, _l)
 
         if integrated:
             new_l_tokens.append(_l)
