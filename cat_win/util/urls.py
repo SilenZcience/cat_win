@@ -85,3 +85,5 @@ def read_url(url: str, _rec: bool = False):
         return read_url(DEFAULT_SCHEME+url, True)
     except OSError:
         return f"Error at opening the following url:\n{url}"
+    except:
+        return 'Fatal Error!\n'
