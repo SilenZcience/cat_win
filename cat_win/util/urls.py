@@ -60,7 +60,7 @@ def sep_valid_urls(to_check: list) -> tuple:
     
     return (valid_urls, not_valid_urls)
 
-def read_url(url: str, _rec: bool = False):
+def read_url(url: str, _rec: bool = False) -> bytes:
     """
     Simply reads the contents of an url.
     
@@ -71,19 +71,14 @@ def read_url(url: str, _rec: bool = False):
         
     Returns
     (bytes):
-        the contents of the url
-    (str):
-        on error; a custom error message
+        the contents of the url; on error: a custom error message
     """
+    return_msg = f"Error at opening the following url:\n{url}".encode()
     try:
         with urllib.request.urlopen(url, timeout=4) as _response:
-            response = _response.read()
-        return response
+            return_msg = _response.read()
     except ValueError:
-        if _rec:
-            return f"Error at opening the following url:\n{url}"
-        return read_url(DEFAULT_SCHEME+url, True)
-    except OSError:
-        return f"Error at opening the following url:\n{url}"
-    except:
-        return 'Fatal Error!\n'
+        if not _rec:
+            return_msg = read_url(DEFAULT_SCHEME+url, True)
+    finally:
+        return return_msg

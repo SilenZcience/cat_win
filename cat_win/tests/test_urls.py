@@ -29,10 +29,10 @@ class TestUrls(TestCase):
 
     @patch('urllib.request.urlopen', ErrorDefGen.get_def(ValueError()))
     def test_read_url_valueerror(self):
-        expected_output = 'Error at opening the following url:\nhttps://invalid uri'
+        expected_output = b'Error at opening the following url:\nhttps://invalid uri'
         self.assertEqual(read_url('invalid uri', False), expected_output)
 
     @patch('urllib.request.urlopen', ErrorDefGen.get_def(OSError()))
     def test_read_url_oserror(self):
-        expected_output = 'Error at opening the following url:\ninvalid uri'
+        expected_output = b'Error at opening the following url:\ninvalid uri'
         self.assertEqual(read_url('invalid uri', False), expected_output)
