@@ -924,10 +924,12 @@ def main():
         known_files.append(temp_file)
         holder.set_temp_file_echo(temp_file)
     if holder.args_id[ARGS_URI]:
-        temp_files = [stdinhelper.write_temp(read_url(valid_url), \
-            tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding)
-                      for valid_url in valid_urls]
-        known_files.extend(temp_files)
+        # the dictionary should contain an entry for each valid_url, since
+        # generated temp-files are unique
+        temp_files = dict([
+            (stdinhelper.write_temp(read_url(valid_url), tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding), valid_url)
+            for valid_url in valid_urls])
+        known_files.extend(list(temp_files.keys()))
         holder.set_temp_files_url(temp_files)
     if holder.args_id[ARGS_INTERACTIVE]:
         piped_input = ''.join(stdinhelper.get_stdin_content(holder.args_id[ARGS_ONELINE]))

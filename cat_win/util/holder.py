@@ -77,7 +77,7 @@ class Holder():
         self.args_id: list = [False] * (HIGHEST_ARG_ID + 1)
         self.temp_file_stdin = None  # if stdin is used, this temp_file will contain the stdin-input
         self.temp_file_echo = None  # if ARGS_ECHO is used, this temp_file will contain the following parameters
-        self.temp_file_urls = []
+        self.temp_file_urls = {}
         self.reversed = False
 
         # the amount of chars neccessary to display the last file
@@ -111,8 +111,11 @@ class Holder():
             return '<STDIN>'
         if file == self.temp_file_echo:
             return '<ECHO>'
-        if file in self.temp_file_urls:
-            return '<URL>'
+        if file in self.temp_file_urls.keys():
+            display_url = self.temp_file_urls[file]
+            if len(display_url) > 30:
+                display_url = f"{display_url[:20]}...{display_url[-10:]}"
+            return f"<URL {display_url}>"
         return file
 
     def set_files(self, files: list) -> None:
@@ -141,7 +144,7 @@ class Holder():
     def set_temp_file_echo(self, file: str) -> None:
         self.temp_file_echo = file
 
-    def set_temp_files_url(self, files: list) -> None:
+    def set_temp_files_url(self, files: dict) -> None:
         self.temp_file_urls = files
 
     def __calc_file_number_place_holder__(self) -> None:
