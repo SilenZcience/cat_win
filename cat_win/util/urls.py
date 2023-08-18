@@ -80,5 +80,7 @@ def read_url(url: str, _rec: bool = False) -> bytes:
     except ValueError:
         if not _rec:
             return_msg = read_url(DEFAULT_SCHEME+url, True)
+    except OSError:
+        pass
     finally:
         return return_msg
