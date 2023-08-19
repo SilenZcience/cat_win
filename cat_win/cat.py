@@ -507,9 +507,13 @@ def print_excluded_by_peek(content: list, excluded_by_peek: int) -> None:
     content (list):
         the content of a file like [(prefix, line), ...]
     excluded_by_peek (int):
-        the amount of lines that have been excluded
+        the amount of lines that have been originally excluded
     """
     if not excluded_by_peek or len(content) <= 5:
+        return
+    if any([holder.args_id[ARGS_GREP],
+            holder.args_id[ARGS_GREP_ONLY],
+            holder.args_id[ARGS_NOKEYWORD]]):
         return
     _print_excluded_by_peek(len(remove_ansi_codes_from_line(content[0][0])), excluded_by_peek + 10 - len(content))
 
