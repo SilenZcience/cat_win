@@ -52,7 +52,7 @@ LARGE_FILE_SIZE = 1024 * 1024 * 100  # 100 Megabytes
 
 
 def err_print(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
+    print(*args, file=sys.stderr, flush=True, **kwargs)
 
 
 def exception_handler(exception_type: type, exception, traceback, debug_hook=sys.excepthook) -> None:
@@ -667,8 +667,8 @@ def edit_file(file_index: int = 0) -> None:
                 enter_char = 'ENTER'
             err_print(f"Do you want to open the file as a binary, without parameters?")
             err_print(f"[Y/{enter_char}] Yes, Continue       [N] No, Abort :", end='')
-            inp = input()
-            if not (os.isatty(sys.stdin.fileno()) and os.isatty(sys.stdout.fileno())):
+            inp = 'Y' if holder.args_id[ARGS_NOBREAK] else input()
+            if not (os.isatty(sys.stdin.fileno()) and os.isatty(sys.stdout.fileno()) and not holder.args_id[ARGS_NOBREAK]):
                 err_print('') # if the input or output is piped, we add a newline manually
             if inp and inp.upper() != 'Y':
                 err_print('Aborting...')
