@@ -38,6 +38,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - allow for --`peek` to be used with the rawviewer.
 - added --`fp`, --`file-prefix` parameter to include the file in every line prefix.
 - added --`dot`, `--dotfiles` parameter to include dotfiles.
+- added --`plain`, --`plain-only` parameter to skip all non-plain files automatically.
 - warnings and errors will now be printed on the stderr-stream instead of stdout.
 - display warning when trying to pipe a file into itself.
 - added --`oct`, --`OCT` parameter to convert octal numbers.
