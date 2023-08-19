@@ -9,6 +9,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - encoding the content in base64 with --`b64e` will now also include the lineprefix.
 - added -`U`, --`url` parameter to display the contents on any url passed in.
+- the -`p`, --`peek` parameter will no longer display anything when searching for substrings or patterns.
 
 ### Bugfixes
 
