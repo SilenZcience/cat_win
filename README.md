@@ -141,6 +141,7 @@ Read about specific **Arguments & Options** [here](https://github.com/SilenZcien
 
 <details open>
 	<summary><b>📂 Images 📂</b></summary>
+   </br>
 
    <p float="left">
       <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example1.png" width="49%"/>
