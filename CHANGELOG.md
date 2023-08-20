@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
-## [1.5.2] - TBA
+## [1.6.0] - TBA
 
 ### Minor Changes
 
@@ -11,6 +11,9 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added -`U`, --`url` parameter to display the contents on any url passed in.
 - the -`p`, --`peek` parameter will no longer display anything when searching for substrings or patterns.
 - the --`nb`, --`nobreak` parameter will now also skip the 'open in binary mode' - dialogue.
+- removed -`t`, --`tabs` and --`eof`, --`eof`.
+- added --`chr`, --`chr` parameter to display most special characters as a readably tokens.
+- changed -`E`, --`ECHO` to -`E`, -`echo`.
 
 ### Bugfixes
 
