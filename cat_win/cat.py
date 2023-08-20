@@ -19,7 +19,7 @@ from cat_win.util.checksum import get_checksum_from_file
 from cat_win.util.converter import Converter
 from cat_win.util.fileattributes import get_file_meta_data, get_file_size, get_file_mtime, _convert_size
 from cat_win.util.holder import Holder
-from cat_win.util.rawviewer import get_raw_view_lines_gen
+from cat_win.util.rawviewer import SPECIAL_CHARS, get_raw_view_lines_gen
 from cat_win.util.stringfinder import StringFinder
 from cat_win.util.tmpfilehelper import TmpFileHelper
 from cat_win.util.urls import sep_valid_urls, read_url
@@ -600,9 +600,12 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
                 replace_values = split_replace(param)
                 content = [(prefix, line.replace(replace_values[0], f"{color_dic[CKW.REPLACE]}{replace_values[1]}{color_dic[CKW.RESET_ALL]}"))
                            for prefix, line in content]
-            elif arg == ARGS_EOF:
-                content = [(prefix, line.replace(chr(26), f"{color_dic[CKW.REPLACE]}^EOF{color_dic[CKW.RESET_ALL]}"))
-                           for prefix, line in content]
+            elif arg == ARGS_CHR:
+                for id, char, _, possible in SPECIAL_CHARS.values():
+                    if not possible:
+                        continue
+                    content = [(prefix, line.replace(chr(id), f"{color_dic[CKW.REPLACE]}^{char}{color_dic[CKW.RESET_ALL]}"))
+                                for prefix, line in content]
 
     if holder.args_id[ARGS_LLENGTH]:
         content = [(_get_line_length_prefix(prefix, line), line) for prefix, line in content]

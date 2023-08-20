@@ -1,4 +1,40 @@
 
+SPECIAL_CHARS = {
+     0: ( 0, 'NUL', '␀', True), # ^@ \0 null
+    #  1: ( 1, 'SOH', '␁', False), # ^A start of heading
+    #  2: ( 2, 'STX', '␂', False), # ^B start of text
+    #  3: ( 3, 'ETX', '␃', False), # ^C end of text
+     4: ( 4, 'EOT', '␄', True), # ^D end of transmission
+    #  5: ( 5, 'ENQ', '␅', False), # ^E enquiry
+    #  6: ( 6, 'ACK', '␆', False), # ^F acknowledge
+     7: ( 7, 'BEL', '␇', True), # ^G \a bell
+     8: ( 8, 'BS' , '␈', True), # ^H \b backspace
+     9: ( 9, 'TAB', '␉', True), # ^I \t horizontal tab
+    10: (10, 'LF' , '␤', False), # ^J \n line feed, new line
+    11: (11, 'VT' , '␋', False), # ^K \v vertical tab
+    12: (12, 'FF' , '␌', False), # ^L \f form feed, new page
+    13: (13, 'CR' , '␍', False), # ^M \r carriage return
+    # 14: (14, 'SO' , '␎', False), # ^N shift out
+    # 15: (15, 'SI' , '␏', False), # ^O shift in
+    # 16: (16, 'DLE', '␐', False), # ^P data link escape
+    # 17: (17, 'DC1', '␑', False), # ^Q device control 1
+    # 18: (18, 'DC2', '␒', False), # ^R device control 2
+    # 19: (19, 'DC3', '␓', False), # ^S device control 3
+    # 20: (20, 'DC4', '␔', False), # ^T device control 4
+    # 21: (21, 'NAK', '␕', False), # ^U negative acknowledge
+    # 22: (22, 'SYN', '␖', False), # ^V synchronous idle
+    # 23: (23, 'ETC', '␗', False), # ^W end of trans. block
+    # 24: (24, 'CAN', '␘', False), # ^X cancel
+    # 25: (25, 'EM' , '␙', False), # ^Y end of mediunm
+    26: (26, 'SUB', '␚', True), # ^Z substitute
+    # 27: (27, 'Esc', '␛', False), # ^[ escape # needed for colors
+    # 28: (28, 'FS' , '␜', False), # ^\ file seperator
+    # 29: (29, 'GS' , '␝', False), # ^] group seperator
+    # 30: (30, 'RS' , '␞', False), # ^^ record seperator
+    # 31: (31, 'US' , '␟', False), # ^_ unit seperator
+}
+
+
 def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors = None,
                            file_encoding: str = 'utf-8'):
     """
@@ -28,26 +64,8 @@ def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors = None,
     if mode not in ['x', 'X', 'b']:
         mode = 'X'
 
-    # \0 ASCII Null (NULL) 0 ␀
-    # \a ASCII Bell (BEL) 7 ␇
-    # \b ASCII Backspace (BS) 8 ␈
-    # \t ASCII Horizontal Tab (TAB) 9 ␉
-    # \n ASCII Linefeed (LF) 10 ␤
-    # \v ASCII Vertical Tab (VT) 11 ␋
-    # \f ASCII Formfeed (FF) 12 ␌
-    # \r ASCII Carriage Return (CR) 13 ␍
-    CRLF = {
-        -1: '·', # default fallback symbol
-         0: '␀',
-         7: '␇',
-         8: '␈',
-         9: '␉',
-        10: '␤',
-        11: '␋',
-        12: '␌',
-        13: '␍',
-        }
-
+    CRLF = dict(map(lambda x: (x[0], x[2]), SPECIAL_CHARS.values()))
+    CRLF[-1] = '·' # default fallback symbol
     try:
         if len(CRLF[0].encode(file_encoding)) != 3:
             raise UnicodeEncodeError('', '', -1, -1, '')

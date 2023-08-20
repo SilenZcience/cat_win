@@ -56,7 +56,7 @@ class TestCatFull(TestCase):
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
 
-    @patch('cat_win.cat.sys.argv', ['<CAT>', 'enc=utf-8', test_file_path, 'trunc=1:6', '-n', '--reverse', '-t'])
+    @patch('cat_win.cat.sys.argv', ['<CAT>', 'enc=utf-8', test_file_path, 'trunc=1:6', '-n', '--reverse', '--chr'])
     def test_cat_output_full_d(self):
         expected_output = ''
         with open(test_result_D, 'r', encoding='utf-8') as output:
@@ -169,7 +169,7 @@ class TestCatFull(TestCase):
             self.assertIn("Unknown argument: '--UNIQUE'", fake_out.getvalue())
             self.assertIn("Did you mean --unique", fake_out.getvalue())
             self.assertIn("Unknown argument: '--b64'", fake_out.getvalue())
-            self.assertIn("Did you mean --b64e or --b64d", fake_out.getvalue())
+            self.assertIn("Did you mean --b64d or --b64e", fake_out.getvalue())
             self.assertIn("Unknown argument: '-?'", fake_out.getvalue())
 
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, '--GREP', 'find=T'])

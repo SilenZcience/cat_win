@@ -2,4 +2,4 @@
 5) The following Line is Empty:
 4) N-Ary Summation: ∑
 3) These are Special Chars: äöüÄÖÜ
-2) This is a Tab-Character: >^I<
+2) This is a Tab-Character: >^TAB<
