@@ -34,8 +34,8 @@ ALL_ARGS = [
     ArgConstant('--debug', '--debug', 'show debug information', ARGS_DEBUG, show_arg=False, section=0),
 
     # prefix
-    ArgConstant('-n', '--number', 'number all output lines', ARGS_NUMBER, section=1),
     ArgConstant('-l', '--linelength', 'display the length of each line', ARGS_LLENGTH, section=1),
+    ArgConstant('-n', '--number', 'number all output lines', ARGS_NUMBER, section=1),
     ArgConstant('--fp', '--file-prefix', 'include the file in every line prefix', ARGS_FILE_PREFIX, show_arg_on_shell=False, section=1),
     ArgConstant('--FP', '--FILE-PREFIX', 'include the file protocol in every line prefix', ARGS_FFILE_PREFIX, show_arg=False, section=1),
 
@@ -58,13 +58,13 @@ ALL_ARGS = [
 
     # summary
     ArgConstant('-f', '--files', 'list applied files and file sizes', ARGS_FILES, show_arg_on_shell=False, section=5),
-    ArgConstant('-F', '--FILES', 'ONLY list applied files and file sizes', ARGS_FFILES, show_arg_on_shell=False, section=5),
+    ArgConstant('-F', '--FILES', 'ONLY list applied files and file sizes', ARGS_FFILES, show_arg=False, section=5),
     ArgConstant('-s', '--sum', 'show sum of lines', ARGS_COUNT, show_arg_on_shell=False, section=5),
-    ArgConstant('-S', '--SUM', 'ONLY show sum of lines', ARGS_CCOUNT, show_arg_on_shell=False, section=5),
+    ArgConstant('-S', '--SUM', 'ONLY show sum of lines', ARGS_CCOUNT, show_arg=False, section=5),
 
     # search and match
     ArgConstant('-g', '--grep', 'only show lines containing queried keywords or patterns', ARGS_GREP, section=6),
-    ArgConstant('-G', '--GREP', 'only show found and matched substrings', ARGS_GREP_ONLY, section=6),
+    ArgConstant('-G', '--GREP', 'only show found and matched substrings', ARGS_GREP_ONLY, show_arg=False, section=6),
     ArgConstant('--nk', '--nokeyword', 'inverse the grep output', ARGS_NOKEYWORD, section=6),
     ArgConstant('--nb', '--nobreak', 'do not interrupt the output', ARGS_NOBREAK, section=6),
 
@@ -85,10 +85,10 @@ ALL_ARGS = [
     ArgConstant('--binview', '--binview', 'display the raw byte representation in binary', ARGS_BINVIEW, show_arg_on_shell=False, section=9),
     ArgConstant('--hexview', '--HEXVIEW', 'display the raw byte representation in hexadecimal', ARGS_HEXVIEW, show_arg_on_shell=False, section=9),
 
-    ArgConstant('--plain', '--plain-only', 'ignore non-plaintext files automatically', ARGS_PLAIN_ONLY, show_arg_on_shell=False, section=10),
-    ArgConstant('--dot', '--dotfiles', 'additionally query and edit dotfiles', ARGS_DOTFILES, show_arg_on_shell=False, section=10),
-    ArgConstant('--nc', '--nocolor', 'disable colored output', ARGS_NOCOL, section=10),
     ArgConstant('-c', '--clip', 'copy output to clipboard', ARGS_CLIP, section=10),
+    ArgConstant('--dot', '--dotfiles', 'additionally query and edit dotfiles', ARGS_DOTFILES, show_arg_on_shell=False, section=10),
+    ArgConstant('--plain', '--plain-only', 'ignore non-plaintext files automatically', ARGS_PLAIN_ONLY, show_arg_on_shell=False, section=10),
+    ArgConstant('--nc', '--nocolor', 'disable colored output', ARGS_NOCOL, section=10),
 
     ArgConstant('--config', '--config', 'change color configuration', ARGS_CONFIG, section=11),
 
