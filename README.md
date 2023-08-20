@@ -176,7 +176,7 @@ $ echo "Hello World :)" | catw -i [6:] | catw -i [::-1] -ln
 ```py
 $ cats --eval --dec -nl
 > >>> 0xF * 5
-> 1) [41] 75 {Hexadecimal: 0x4b; Binary: 0b1001011}
+1) [42] 75 [Bin: 0b1001011, Oct: 0o113, Hex: 0x4b]
 > >>> ...
 ```
 
