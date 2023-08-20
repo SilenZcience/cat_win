@@ -141,7 +141,7 @@ def write_files(file_list: list, content: str, file_encoding: str) -> list:
     if content == '':
         abort_command = ''
         try:
-            print('You are about to create an empty file. Do you want to continue?')
+            print('You are about to create an empty file. Do you want to continue?', file=sys.stderr)
             enter_char = '⏎'
 
             try:
@@ -149,7 +149,7 @@ def write_files(file_list: list, content: str, file_encoding: str) -> list:
                     raise UnicodeEncodeError('', '', -1, -1, '')
             except UnicodeEncodeError:
                 enter_char = 'ENTER'
-            print(f"[Y/{enter_char}] Yes, Continue       [N] No, Abort :", end='')
+            print(f"[Y/{enter_char}] Yes, Continue       [N] No, Abort :", end='', file=sys.stderr)
             abort_command = input()
         except EOFError:
             pass
@@ -158,7 +158,7 @@ def write_files(file_list: list, content: str, file_encoding: str) -> list:
             abort_command = 'n'
         finally:
             if abort_command and abort_command.upper() != 'Y':
-                print('Aborting...')
+                print('Aborting...', file=sys.stderr)
                 file_list.clear()
 
     success_file_list = []
@@ -201,11 +201,11 @@ def read_write_files_from_stdin(file_list: list, file_encoding: str, on_windows_
     if len(file_list) == 0:
         return file_list
 
-    print('The given FILE(s)', end='')
-    print('', *file_list, sep='\n\t')
+    print('The given FILE(s)', end='', file=sys.stderr)
+    print('', *file_list, sep='\n\t', file=sys.stderr)
     eof_control_char = 'Z' if on_windows_os else 'D'
-    print('do/does not exist. Write the FILE(s) and finish with the ', end='')
-    print(f"^{eof_control_char}-suffix (Ctrl + {eof_control_char}):")
+    print('do/does not exist. Write the FILE(s) and finish with the ', end='', file=sys.stderr)
+    print(f"^{eof_control_char}-suffix (Ctrl + {eof_control_char}):", file=sys.stderr)
 
     std_input = ''.join(get_stdin_content(one_line))
 
