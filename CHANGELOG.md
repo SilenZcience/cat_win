@@ -11,10 +11,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added -`U`, --`url` parameter to display the contents on any url passed in.
 - the -`p`, --`peek` parameter will no longer display anything when searching for substrings or patterns.
 - the --`nb`, --`nobreak` parameter will now also skip the 'open in binary mode' - dialogue.
-- removed -`t`, --`tabs` and --`eof`, --`eof`.
-- added --`chr`, --`chr` parameter to display most special characters as a readably tokens.
+- removed -`t`, --`tabs` and --`eof`, --`eof` parameters.
+- added --`chr`, --`chr` parameter to display most special characters as readable tokens.
 - changed -`E`, --`ECHO` to -`E`, -`echo`.
-- addedd support for octal numbers when evaluating expressions using --`eval`.
+- added support for octal numbers when evaluating expressions using --`eval`.
 
 ### Bugfixes
 
@@ -25,7 +25,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fix Bug where negative hexadecimal and binary numbers would not be recognized using --`eval`.
 
 
-## [1.5.1] - 2023.08.12
+## [1.5.1] - 2023-08-12
 
 ### Bugfixes
 
