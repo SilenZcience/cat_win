@@ -9,7 +9,7 @@ authors = [{name = "Silas A. Kraume", email = "silas.kraume1552@gmail.com"}]
 readme = "README.md"
 license = {file = "LICENSE"}
 keywords = [
-	"cat",
+    "cat",
     "cli",
     "console",
     "crossplatform",
@@ -46,7 +46,7 @@ cfix = [
 ]
 
 [tool.flit.sdist]
-exclude = 	[
+exclude = [
     "cat_win/build",
     "**/**.spec",
     "**/**.config",

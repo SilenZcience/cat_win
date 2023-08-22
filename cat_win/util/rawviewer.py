@@ -27,7 +27,7 @@ SPECIAL_CHARS = {
     # 24: (24, 'CAN', '␘', False), # ^X cancel
     # 25: (25, 'EM' , '␙', False), # ^Y end of mediunm
     26: (26, 'SUB', '␚', True), # ^Z substitute
-    # 27: (27, 'Esc', '␛', False), # ^[ escape # needed for colors
+    27: (27, 'Esc', '␛', False), # ^[ escape # needed for colors
     # 28: (28, 'FS' , '␜', False), # ^\ file seperator
     # 29: (29, 'GS' , '␝', False), # ^] group seperator
     # 30: (30, 'RS' , '␞', False), # ^^ record seperator
