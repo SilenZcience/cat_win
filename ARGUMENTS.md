@@ -194,7 +194,7 @@ Displays the help Message.
 This Message is for the most part equivalent to the Table above.
 The Code execution will stop after showing this Message.
 This Argument has Priority over all other Arguments, hence the Order of passing this Argument in makes no Difference.
-If no Arguments or Files are provided, the help Parameter will be used by default.
+If no Arguments or Files are provided, the help Parameter will be used by Default.
 
 ### <a id="version">-v, --version</a>
 
@@ -255,8 +255,8 @@ This Argument will be used at the end such that other Arguments may influence th
 
 Shows the Path to the File in each Line prefix.
 This can be useful when querying for Substrings or Patterns such that only a few Lines are being displayed.
-Using this Argument in uppercase (--FP, --FILEPREFIX) will result in the Path being shown as the url file protocol.
-This can be useful in case the Terminal supports clicking on Links such that the File can be instantly opened.
+Using this Argument in uppercase (--FP, --FILEPREFIX) will result in the Path being shown as the url file Protocol.
+This can be useful in case the Terminal supports interacting with Links such that the File can be instantly opened.
 
 ```console
 > catw test.txt --fp
@@ -334,7 +334,7 @@ Line 20
 
 ### <a id="reverse">-r, --reverse</a>
 
-Simply reverses the content of all files as well as the ordering of all files themselves.
+Simply reverses the Content of all Files as well as the Ordering of all Files themselves.
 
 ```console
 > catw test1.txt test2.txt -p
@@ -415,7 +415,7 @@ Line 1
 When using this Parameter it is possible to provide URLs as Arguments.
 Should an URL not have a scheme (http(s):// or fttp(s):// ...) the default scheme (https://) is being used.
 Provided URLs are simply curl'd and handled as its own File.
-When not providing a raw Data URL the content will include the HTML Elements.
+When not providing a raw Data URL the Content will include the HTML Elements.
 
 ```console
 > catw -U https://github.com/SilenZcience/cat_win > cat.html
@@ -424,8 +424,8 @@ When not providing a raw Data URL the content will include the HTML Elements.
 <a id="summary"></a>
 ### <a id="files">-f, --files</a>
 
-Displays a small summary at the End of Code execution showing every file used and their file Size.
-Using this Argument in uppercase (-F, --FILES) will ONLY display the summary and stop Code execution. 
+Displays a small Summary at the End of Code execution showing every File used and their file Size.
+Using this Argument in uppercase (-F, --FILES) will ONLY display the Summary and stop Code execution. 
 
 ```console
 > catw test.txt -f
@@ -448,8 +448,8 @@ Amount: 1
 
 ### <a id="sum">-s, --sum</a>
 
-Displays a small message at the End of Code execution showing the Number of the Amount of all Lines received.
-Using this Argument in uppercase (-S, --SUM) will ONLY show this message as well as a small summary.
+Displays a small Message at the End of Code execution showing the Number of the Amount of all Lines received.
+Using this Argument in uppercase (-S, --SUM) will ONLY show this Message as well as a small Summary.
 This Summary will show the line Sum for each File.
 Duplicate Files will not be displayed multiple times within the Summary.
 The uppercase version of this Parameter will stop Code execution.
@@ -474,7 +474,7 @@ Lines (Sum): 4
 
 Skips every Line that does not contain any matched Patterns or queried Substrings.
 Literals or Patterns to look for can be set using the <a href="#find">find=X, find&#42889;X</a> and <a href="#match">match=X, match&#42889;X</a> Keywords.
-Using this Argument in uppercase (-G, --GREP) will ONLY display the parts of each line that matched any Pattern or Literal.
+Using this Argument in uppercase (-G, --GREP) will ONLY display the parts of each Line that matched any Pattern or Literal.
 Should multiple Queries be found in the same Line they will be seperated by comma.
 The uppercase Variant of this Parameter has priority (over the lowercase Variant as well as <a href="#nokeyword">--nk, --nokeyword</a>).
 
@@ -510,7 +510,7 @@ This Behaviour is included by Default when using <a href="#nokeyword">--nk, --no
 <a id="meta"></a>
 ### <a id="attributes">-a, --attributes</a>
 
-Shows meta information for each File provided and stops Code execution.
+Shows meta Information for each File provided and stops Code execution.
 The meta Information includes file Size, Time of Access, -Modified and -Created.
 On Windows OS Systems this Parameter will also display the classic file Attributes.
 
@@ -585,7 +585,7 @@ Calculate: 0 !
 If a Line only contains a hexadecimal Number this Parameter will append the equivalent Value in Binary, Octal and Decimal.
 Negative Numbers are allowed.
 Numbers are allowed to start with the Prefix 0x.
-When using the uppercase Variant (--HEX) the Numbers will not include their Prefixes like 0x, 0b or 0o.
+When using the uppercase Variant (--HEX) the Numbers will not include their Prefixes (like 0x, 0b or 0o).
 
 ```console
 > catw test.txt --hex
@@ -602,7 +602,7 @@ FF [Bin: 11111111, Oct: 377, Dec: 255]
 
 If a Line only contains a decimal Number this Parameter will append the equivalent Value in Binary, Octal and Hexadecimal.
 Negative Numbers are allowed.
-When using the uppercase Variant (--DEC) the Numbers will not include their Prefixes like 0x, 0b or 0o.
+When using the uppercase Variant (--DEC) the Numbers will not include their Prefixes (like 0x, 0b or 0o).
 
 ```console
 > catw test.txt --dec
@@ -620,7 +620,7 @@ When using the uppercase Variant (--DEC) the Numbers will not include their Pref
 If a Line only contains an octal Number this Parameter will append the equivalent Value in Binary, Decimal and Hexadecimal.
 Negative Numbers are allowed.
 Numbers are allowed to start with the Prefix 0o.
-When using the uppercase Variant (--OCT) the Numbers will not include their Prefixes like 0x, 0b or 0o.
+When using the uppercase Variant (--OCT) the Numbers will not include their Prefixes (like 0x, 0b or 0o).
 
 ```console
 > catw test.txt --oct
@@ -638,7 +638,7 @@ When using the uppercase Variant (--OCT) the Numbers will not include their Pref
 If a Line only contains a binary Number this Parameter will append the equivalent Value in Octal, Decimal and Hexadecimal.
 Negative Numbers are allowed.
 Numbers are allowed to start with the Prefix 0b.
-When using the uppercase Variant (--BIN) the Numbers will not include their Prefixes like 0x, 0b or 0o.
+When using the uppercase Variant (--BIN) the Numbers will not include their Prefixes (like 0x, 0b or 0o).
 
 ```console
 > catw test.txt --bin
@@ -702,24 +702,24 @@ Using this Parameter cat_win will also include Dotfiles.
 ```console
 > catw * -F
 found FILE(s):
-        12.35 KB   Z:\Github\cat_win\CHANGELOG.md
-        1.06 KB    Z:\Github\cat_win\LICENSE
-        15.07 KB   Z:\Github\cat_win\README.md
+        12.35 KB   <Path>/CHANGELOG.md
+        1.06 KB    <Path>/LICENSE
+        15.07 KB   <Path>/README.md
 ...
 ```
 ```console
 > catw * -F --dot
 found FILE(s):
-        969.0 B    Z:\Github\cat_win\.gitignore
-        12.35 KB   Z:\Github\cat_win\CHANGELOG.md
-        1.06 KB    Z:\Github\cat_win\LICENSE
-        15.07 KB   Z:\Github\cat_win\README.md
+        969.0 B    <Path>/.gitignore
+        12.35 KB   <Path>/CHANGELOG.md
+        1.06 KB    <Path>/LICENSE
+        15.07 KB   <Path>/README.md
 ...
 ```
 
 ### <a id="nocolor">--nc, --nocolor</a>
 
-By default different Colors will be used to better highlight specific parts of the Output or make original and changed Parts of a Line more distinguishable.
+By default different Colors will be used to better highlight specific Parts of the Output or make original and changed Parts of a Line more distinguishable.
 Using --nocolor will disable all Colors and only display the Output in plain monochrome Text.
 
 ### <a id="clip">-c, --clip</a>
@@ -732,7 +732,7 @@ Displays a user interactive config Menu allowing the User to change the Colors f
 Stops Code execution after finishing the Configuration.
 The config File will be saved to the installation Directory of cat_win which is by Default the Python directory.
 This means that uninstalling cat_win may result in the config File being left over.
-When using the Windows Executables this parameter will have no (long term) Effect.
+When using the Windows Executables this Parameter will have no (long term) Effect.
 
 <a id="encoding"></a>
 ### <a id="stream">-R, --R\<stream\></a>
@@ -742,7 +742,7 @@ On Windows OS the Encoding may even be Cp1252.
 The Encoding can be influenced externally by setting the environment Variable PYTHONIOENCODING to the desired Encoding,
 or setting the environment Variable PYTHONUTF8 to 1.
 In any case it is often useful to have the stream Encoding variable if a File for example is written in another Codepage like Utf-16.
- Using this Parameter allows for specific Stream Reconfiguration meaning setting the Encoding for interpreting the Streams.
+Using this Parameter allows for specific Stream Reconfiguration meaning setting the Encoding for interpreting the Streams.
 The Encoding used is defined by the <a href="#enc">enc=X, enc&#42889;X</a> Argument.
 By Default Stdout and Stderr are reconfigured.
 Valid Streams are Stdout (--Rout), Stdin (--Rin) and Stderr (--Rerr).
