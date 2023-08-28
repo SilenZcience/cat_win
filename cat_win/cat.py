@@ -59,8 +59,7 @@ def exception_handler(exception_type: type, exception, traceback, debug_hook=sys
     try:
         err_print(color_dic[CKW.RESET_ALL])
         if holder.args_id[ARGS_DEBUG]:
-            debug_hook(exception_type, exception, traceback)
-            return
+            return debug_hook(exception_type, exception, traceback)
         err_print(f"\n{exception_type.__name__}{':' * bool(str(exception))} {exception}")
         if exception_type != KeyboardInterrupt:
             err_print('If this Exception is unexpected, please raise an official Issue at:')
@@ -721,11 +720,11 @@ def _copy_to_clipboard(content: str, __dependency: int = 3,
         if __clip_board_error:
             error_msg = '\n'
             error_msg += "ClipBoardError: You can use either 'pyperclip3', 'pyperclip', or 'pyclip' in order to use the '--clip' parameter.\n"
-            error_msg += "Try to install a different one using 'python -m pip install ...'"
+            error_msg += f"Try to install a different one using '{os.path.basename(sys.executable)} -m pip install ...'"
         else:
             error_msg = '\n'
             error_msg += "ImportError: You need either 'pyperclip3', 'pyperclip', or 'pyclip' in order to use the '--clip' parameter.\n"
-            error_msg += "Should you have any problem with either module, try to install a different one using 'python -m pip install ...'"
+            error_msg += f"Should you have any problem with either module, try to install a different one using '{os.path.basename(sys.executable)} -m pip install ...'"
         err_print(error_msg)
         return None
     try:
@@ -940,8 +939,7 @@ def main():
         holder.set_temp_files_url(temp_files)
     if holder.args_id[ARGS_INTERACTIVE]:
         piped_input = ''.join(stdinhelper.get_stdin_content(holder.args_id[ARGS_ONELINE]))
-        temp_file = stdinhelper.write_temp(piped_input, tmp_file_helper.generate_temp_file_name(), \
-            arg_parser.file_encoding)
+        temp_file = stdinhelper.write_temp(piped_input, tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding)
         known_files.append(temp_file)
         unknown_files = stdinhelper.write_files(unknown_files, piped_input, arg_parser.file_encoding)
         holder.set_temp_file_stdin(temp_file)
