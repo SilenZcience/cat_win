@@ -36,7 +36,7 @@ dynamic = [
     "description",
 ]
 dependencies = [
-    "windows-curses~=2.3.0; platform_system=='Windows'",
+    "windows-curses~=2.3.0; platform_system=='Windows' and platform_python_implementation!='PyPy'",
 ]
 
 [project.optional-dependencies]
