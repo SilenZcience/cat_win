@@ -28,7 +28,7 @@ def _editor(curse_window, file: str, file_encoding: str, write_func) -> bool:
         with open(file, 'r', encoding=file_encoding) as f:
             for line in f.read().split('\n'):
                 window_content.append([ord(char) for char in line])
-    except OSError as e:
+    except (OSError, UnicodeDecodeError) as e:
         unsaved_progress = True
         status_bar_size = 2
         error_bar = str(e)
