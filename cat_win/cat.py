@@ -17,6 +17,7 @@ from cat_win.util.argparser import ArgParser
 from cat_win.util.cbase64 import decode_base64, encode_base64
 from cat_win.util.checksum import get_checksum_from_file
 from cat_win.util.converter import Converter
+from cat_win.util.editor import editor
 from cat_win.util.fileattributes import get_file_meta_data, get_file_size, get_file_mtime, _convert_size
 from cat_win.util.holder import Holder
 from cat_win.util.rawviewer import SPECIAL_CHARS, get_raw_view_lines_gen
@@ -925,27 +926,33 @@ def main():
     known_files, unknown_files, echo_args, valid_urls = init(shell=False)
 
     if holder.args_id[ARGS_ECHO]:
-        temp_file = stdinhelper.write_temp(' '.join(echo_args), \
-            tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding)
+        temp_file = stdinhelper.write_file(' '.join(echo_args), tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding)
         known_files.append(temp_file)
         holder.set_temp_file_echo(temp_file)
     if holder.args_id[ARGS_URI]:
         # the dictionary should contain an entry for each valid_url, since
         # generated temp-files are unique
         temp_files = dict([
-            (stdinhelper.write_temp(read_url(valid_url), tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding), valid_url)
+            (stdinhelper.write_file(read_url(valid_url), tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding), valid_url)
             for valid_url in valid_urls])
         known_files.extend(list(temp_files.keys()))
         holder.set_temp_files_url(temp_files)
     if holder.args_id[ARGS_INTERACTIVE]:
         piped_input = ''.join(stdinhelper.get_stdin_content(holder.args_id[ARGS_ONELINE]))
-        temp_file = stdinhelper.write_temp(piped_input, tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding)
+        temp_file = stdinhelper.write_file(piped_input, tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding)
         known_files.append(temp_file)
         unknown_files = stdinhelper.write_files(unknown_files, piped_input, arg_parser.file_encoding)
         holder.set_temp_file_stdin(temp_file)
     else:
-        unknown_files = stdinhelper.read_write_files_from_stdin(
-            unknown_files, arg_parser.file_encoding, on_windows_os, holder.args_id[ARGS_ONELINE])
+        if holder.args_id[ARGS_EDITOR]:
+            unknown_files = [file for file in unknown_files if editor(file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os)]
+        else:
+            unknown_files = stdinhelper.read_write_files_from_stdin(
+                unknown_files, arg_parser.file_encoding, on_windows_os, holder.args_id[ARGS_ONELINE])
+
+    if holder.args_id[ARGS_EDITOR]:
+        for file in known_files:
+            editor(file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os)
 
     if len(known_files) + len(unknown_files) == 0:
         return
