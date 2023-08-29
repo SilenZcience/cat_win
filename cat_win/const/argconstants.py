@@ -24,7 +24,7 @@ ARGS_CHR, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP = range(25, 30)
 ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW, ARGS_BINVIEW = range(30, 35)
 ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN, ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(35, 40)
 ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY, ARGS_FILE_PREFIX = range(40, 45)
-ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI = range(45, 49)
+ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI, ARGS_EDITOR = range(45, 50)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -85,6 +85,7 @@ ALL_ARGS = [
     ArgConstant('--binview', '--binview', 'display the raw byte representation in binary', ARGS_BINVIEW, show_arg_on_shell=False, section=9),
     ArgConstant('--hexview', '--HEXVIEW', 'display the raw byte representation in hexadecimal', ARGS_HEXVIEW, show_arg_on_shell=False, section=9),
 
+    ArgConstant('-!', '--edit', 'open each file in a simple editor', ARGS_EDITOR, section=10),
     ArgConstant('-c', '--clip', 'copy output to clipboard', ARGS_CLIP, section=10),
     ArgConstant('--dot', '--dotfiles', 'additionally query and edit dotfiles', ARGS_DOTFILES, show_arg_on_shell=False, section=10),
     ArgConstant('--plain', '--plain-only', 'ignore non-plaintext files automatically', ARGS_PLAIN_ONLY, show_arg_on_shell=False, section=10),

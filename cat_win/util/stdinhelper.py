@@ -2,27 +2,27 @@ import os
 import sys
 
 
-def write_temp(content, tmp_file: str, file_encoding: str) -> str:
+def write_file(content, src_file: str, file_encoding: str) -> str:
     """
     Writes content into a generated temp-file.
     
     Parameters:
     content (str|byte):
         the content to write in a file
-    tmp_file (str):
+    src_file (str):
         a string representation of a file (-path)
     file_encoding (str):
         an encoding the open the file with
     
     Returns:
-    tmp_file (str):
+    src_file (str):
         the path to the temporary file written
     """
     if isinstance(content, str):
         content = content.encode(file_encoding)
-    with open(tmp_file, 'wb') as raw_f:
+    with open(src_file, 'wb') as raw_f:
         raw_f.write(content)
-    return tmp_file
+    return src_file
 
 
 def get_stdin_content(one_line: bool = False):
@@ -101,8 +101,7 @@ def create_file(file: str, content: str, file_encoding: str) -> bool:
                 continue
         return False
     try:
-        with open(file, 'wb') as raw_f:
-            raw_f.write(content.encode(file_encoding))
+        write_file(content, file, file_encoding)
     except OSError:
         print(f"Error: The file '{file}' could not be written.", file=sys.stderr)
         # cleanup (delete the folders that have been created)
@@ -166,8 +165,7 @@ def write_files(file_list: list, content: str, file_encoding: str) -> list:
     for file in file_list:
         file = os.path.realpath(file)
         try:
-            with open(file, 'wb') as raw_file:
-                raw_file.write(content.encode(file_encoding))
+            write_file(content, file, file_encoding)
             success_file_list.append(file)
         except FileNotFoundError: # the os.pardir path to the file does not exist
             if create_file(file, content, file_encoding):
