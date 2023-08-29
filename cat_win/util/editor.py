@@ -70,7 +70,7 @@ def _editor(curse_window, file: str, file_encoding: str, write_func) -> bool:
 
             curse_window.attron(curses.color_pair(1))
 
-            status_bar = f"File: {file} | Exit: ^c | Save: ^s | Pos: {cur_col}, {cur_row} | {'NOT ' * unsaved_progress}Saved!"
+            status_bar = f"File: {file} | Exit: ^q | Save: ^s | Pos: {cur_col}, {cur_row} | {'NOT ' * unsaved_progress}Saved!"
             if len(status_bar) > max_x:
                 necc_space = max(0, max_x - (len(status_bar) - len(file) + 3))
                 status_bar = f"File: ...{file[-necc_space:] * bool(necc_space)} | Exit: ^q | Save: ^s | Pos: {cur_col}, {cur_row} | {'NOT ' * unsaved_progress}Saved!"
