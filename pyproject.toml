@@ -35,7 +35,9 @@ dynamic = [
     "version",
     "description",
 ]
-dependencies = []
+dependencies = [
+    "windows-curses~=2.3.0; platform_system=='Windows'",
+]
 
 [project.optional-dependencies]
 clip = [
