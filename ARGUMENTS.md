@@ -75,6 +75,7 @@
                   <li><a href="#plain">--plain, --plain-only</a></li>
                   <li><a href="#dot">--dot, --dotfiles</a></li>
                   <li><a href="#nocolor">--nc, --nocolor</a></li>
+                  <li><a href="#editor">-!, --edit</a></li>
                   <li><a href="#clip">-c, --clip</a></li>
                   <li><a href="#config">--config, --config</a></li>
                   <li><a href="#stream">-R, --R&ltstream&gt</a></li>
@@ -149,6 +150,7 @@
 | *<a href="#binview">--binview, --binview</a>* | display the raw byte representation in binary |❌|
 | *<a href="#hexview">--hexview, --HEXVIEW</a>* | display the raw byte representation in hexadecimal |❌|
 ||| |
+| *<a href="#editor">-!, --edit</a>* | open each file in a simple editor |❌|
 | *<a href="#clip">-c, --clip</a>* | copy output to clipboard |✔|
 | *<a href="#dot">--dot, --dotfiles</a>* | additionally query and edit dotfiles |❌|
 | *<a href="#plain">--plain, --plain-only</a>* | ignore non-plaintext files automatically |❌|
@@ -721,6 +723,15 @@ found FILE(s):
 
 By default different Colors will be used to better highlight specific Parts of the Output or make original and changed Parts of a Line more distinguishable.
 Using --nocolor will disable all Colors and only display the Output in plain monochrome Text.
+
+### <a id="editor">-!, --edit</a>
+
+Opens a simple Editor to write/edit the Content of any provided File one by one.
+Not-existing Files will be opened first and existing Ones will be able to be edited after that.
+The Editor can be closed using the Hotkey ^q (Ctrl-q).
+The Editor will not save changes automatically.
+To Save the Edits use the Hotkey ^s (Ctrl-s).
+Files will be saved with the text Encoding defined by <a href="#enc">enc=X, enc&#42889;X</a>.
 
 ### <a id="clip">-c, --clip</a>
 
