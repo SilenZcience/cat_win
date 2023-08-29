@@ -17,6 +17,7 @@ def _editor(curse_window, file: str, file_encoding: str, write_func) -> bool:
 
     window_content = []
     error_bar = ''
+    unsaved_progress = False
     status_bar_size = 1
     x, cur_col = 0, 0
     y, cur_row = 0, 0
@@ -68,10 +69,10 @@ def _editor(curse_window, file: str, file_encoding: str, write_func) -> bool:
 
             curse_window.attron(curses.color_pair(1))
 
-            status_bar = f"File: {file} | Exit: ^c | Save: ^s | Pos: {cur_col}, {cur_row}"
+            status_bar = f"File: {file} | Exit: ^c | Save: ^s | Pos: {cur_col}, {cur_row} | {'NOT ' * unsaved_progress}Saved!"
             if len(status_bar) > max_x:
                 necc_space = max(0, max_x - (len(status_bar) - len(file) + 3))
-                status_bar = f"File: ...{file[-necc_space:] * bool(necc_space)} | Exit: ^c | Save: ^s | Pos: {cur_col}, {cur_row}"
+                status_bar = f"File: ...{file[-necc_space:] * bool(necc_space)} | Exit: ^c | Save: ^s | Pos: {cur_col}, {cur_row} | {'NOT ' * unsaved_progress}Saved!"
             curse_window.addstr(max_y - 1, 0, status_bar)
             curse_window.addstr(max_y - 1, len(status_bar), " " * (max_x - len(status_bar) - 1))
 
@@ -90,16 +91,19 @@ def _editor(curse_window, file: str, file_encoding: str, write_func) -> bool:
 
         # default ascii char or TAB
         if char != ((char) & 0x1F) and char < 128 or char == 9:
+            unsaved_progress = True
             window_content[cur_row].insert(cur_col, char)
             cur_col += 1
         # essentially 'enter'
         elif chr(char) in '\n\r':
+            unsaved_progress = True
             new_line = window_content[cur_row][cur_col:]
             window_content[cur_row] = window_content[cur_row][:cur_col]
             cur_row += 1
             cur_col = 0
             window_content.insert(cur_row, [] + new_line)
         elif char in [8, 263]: # backspace
+            unsaved_progress = True
             if cur_col: # delete char
                 cur_col -= 1
                 del window_content[cur_row][cur_col]
@@ -136,9 +140,11 @@ def _editor(curse_window, file: str, file_encoding: str, write_func) -> bool:
             try:
                 write_func(content, file, file_encoding)
                 has_written = True
+                unsaved_progress = False
                 error_bar = ''
                 status_bar_size = 1
             except OSError as e:
+                unsaved_progress = True
                 error_bar = str(e)
                 status_bar_size = 2
                 print(error_bar, file=sys.stderr)
@@ -156,7 +162,7 @@ def editor(file: str, file_encoding: str, write_func, on_windows_os: bool) -> bo
     files will be written with the changed content.
     
     Parameters:
-    files (str):
+    file (str):
         a string representing a file(-path)
     file_encoding (str):
         an encoding the open the file with
@@ -172,7 +178,7 @@ def editor(file: str, file_encoding: str, write_func, on_windows_os: bool) -> bo
     if CURSES_MODULE_ERROR:
         print("The Editor could not be loaded. No Module 'curses' was found.", file=sys.stderr)
         if on_windows_os:
-            print("If you are on Windows OS, try pip-installing 'windows-curses'", file=sys.stderr)
+            print("If you are on Windows OS, try pip-installing 'windows-curses'.", file=sys.stderr)
         return False
 
     return curses.wrapper(_editor, file, file_encoding, write_func)
