@@ -46,7 +46,7 @@
                   <li><a href="#length">-l, --linelength</a></li>
                   <li><a href="#fileprefix">--fp, --file-prefix</a></li>
                   <li><a href="#ends">-e, --ends</a></li>
-                  <li><a href="#chr">--chr, --chr</a></li>
+                  <li><a href="#chr">--chr, --char</a></li>
                   <li><a href="#blank">-b, --blank</a></li>
                   <li><a href="#peek">-p, --peek</a></li>
                   <li><a href="#reverse">-r, --reverse</a></li>
@@ -116,7 +116,7 @@
 | *<a href="#fileprefix">--fp, --file-prefix</a>* | include the file in every line prefix |❌|
 ||| |
 | *<a href="#ends">-e, --ends</a>* | display $ at the end of each line |✔|
-| *<a href="#chr">--chr, --chr</a>* | display special characters |✔|
+| *<a href="#chr">--chr, --char</a>* | display special characters |✔|
 ||| |
 | *<a href="#blank">-b, --blank</a>* | hide empty lines |✔|
 | *<a href="#peek">-p, --peek</a>* | only print the first and last lines |❌|
@@ -283,7 +283,7 @@ Tab:    $
 line 2$
 ```
 
-### <a id="chr">--chr, --chr</a>
+### <a id="chr">--chr, --char</a>
 
 Replaces every special Character with a readable Token.
 Each Token starts with the '^' Character, followed by a short ASCII Descriptor.

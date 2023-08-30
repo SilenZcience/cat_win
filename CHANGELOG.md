@@ -8,7 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - added -`!`, --`edit` parameter to open a simple editor to write/edit any provided File. 
-
+- renamed --`chr`, --`chr` to --`chr`, --`char`.
 
 ## [1.6.0] - 2023-08-22
 
