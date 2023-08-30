@@ -41,7 +41,7 @@ ALL_ARGS = [
 
     # simple replacements
     ArgConstant('-e', '--ends', 'display $ at the end of each line', ARGS_ENDS, section=2),
-    ArgConstant('--chr', '--chr', 'display special characters', ARGS_CHR, section=2),
+    ArgConstant('--chr', '--char', 'display special characters', ARGS_CHR, section=2),
 
     # line manipulation
     ArgConstant('-b', '--blank', 'hide empty lines', ARGS_BLANK, section=3),
