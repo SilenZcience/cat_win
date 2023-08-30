@@ -6,6 +6,13 @@ except ImportError:
 import sys
 
 
+def get_newline(file: str) -> str:
+    with open(file, 'rb') as f:
+        l = f.readline()
+        l += b'\n' * (l[-1:] not in b'\r\n')
+        return '\r\n' if l[-2:] == b'\r\n' else l[-1:].decode()
+
+
 def _editor(curse_window, file: str, file_encoding: str, write_func) -> bool:
     """
     See editor() method
@@ -23,8 +30,10 @@ def _editor(curse_window, file: str, file_encoding: str, write_func) -> bool:
     y, cur_row = 0, 0
 
     has_written = False
+    line_sep = '\n'
 
     try:
+        line_sep = get_newline(file)
         with open(file, 'r', encoding=file_encoding) as f:
             for line in f.read().split('\n'):
                 window_content.append([ord(char) for char in line])
@@ -103,7 +112,8 @@ def _editor(curse_window, file: str, file_encoding: str, write_func) -> bool:
             cur_row += 1
             cur_col = 0
             window_content.insert(cur_row, [] + new_line)
-        elif char in [8, 263]: # backspace
+        # backspace
+        elif char in [8, 263]:
             unsaved_progress = True
             if cur_col: # delete char
                 cur_col -= 1
@@ -136,8 +146,9 @@ def _editor(curse_window, file: str, file_encoding: str, write_func) -> bool:
         if cur_col > rowlen:
             cur_col = rowlen
 
+        # save
         if char == (ord('s') & 0x1F):
-            content = '\n'.join([''.join([chr(char) for char in line]) for line in window_content])
+            content = line_sep.join([''.join([chr(char) for char in line]) for line in window_content])
             try:
                 write_func(content, file, file_encoding)
                 has_written = True
@@ -149,8 +160,10 @@ def _editor(curse_window, file: str, file_encoding: str, write_func) -> bool:
                 error_bar = str(e)
                 status_bar_size = 2
                 print(error_bar, file=sys.stderr)
+        # quit
         elif char == (ord('q') & 0x1F):
             break
+        # interrupt
         elif char == (ord('c') & 0x1F):
             raise KeyboardInterrupt()
 
