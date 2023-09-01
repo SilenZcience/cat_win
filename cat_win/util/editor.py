@@ -7,9 +7,21 @@ import sys
 
 
 def get_newline(file: str) -> str:
+    """
+    determines the line ending of a given file.
+    
+    Parameters:
+    file (str):
+        a file (-path) as string representation
+        
+    Returns:
+    (str):
+        the line ending that the given file is using
+        (\r or \n or \r\n)
+    """
     with open(file, 'rb') as f:
         l = f.readline()
-        l += b'\n' * (l[-1:] not in b'\r\n')
+        l += b'\n' * bool(not l[-1:] or l[-1:] not in b'\r\n')
         return '\r\n' if l[-2:] == b'\r\n' else l[-1:].decode()
 
 
