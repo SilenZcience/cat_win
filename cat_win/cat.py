@@ -17,7 +17,7 @@ from cat_win.util.argparser import ArgParser
 from cat_win.util.cbase64 import decode_base64, encode_base64
 from cat_win.util.checksum import get_checksum_from_file
 from cat_win.util.converter import Converter
-from cat_win.util.editor import editor
+from cat_win.util.editor import Editor
 from cat_win.util.fileattributes import get_file_meta_data, get_file_size, get_file_mtime, _convert_size
 from cat_win.util.holder import Holder
 from cat_win.util.rawviewer import SPECIAL_CHARS, get_raw_view_lines_gen
@@ -945,14 +945,14 @@ def main():
         holder.set_temp_file_stdin(temp_file)
     else:
         if holder.args_id[ARGS_EDITOR]:
-            unknown_files = [file for file in unknown_files if editor(file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os)]
+            unknown_files = [file for file in unknown_files if Editor.open(file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os)]
         else:
             unknown_files = stdinhelper.read_write_files_from_stdin(
                 unknown_files, arg_parser.file_encoding, on_windows_os, holder.args_id[ARGS_ONELINE])
 
     if holder.args_id[ARGS_EDITOR]:
         for file in known_files:
-            editor(file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os)
+            Editor.open(file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os)
 
     if len(known_files) + len(unknown_files) == 0:
         return
