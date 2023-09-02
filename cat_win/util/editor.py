@@ -222,8 +222,8 @@ class Editor:
             if on_windows_os:
                 print("If you are on Windows OS, try pip-installing 'windows-curses'.", file=sys.stderr)
             return False
-        if not (sys.stdin.isatty() | sys.stdout.isatty()):
-            print("The Editor could not be loaded.", file=sys.stderr)
-            return False
+        # if not (sys.stdin.isatty() | sys.stdout.isatty()):
+        #     print("The Editor could not be loaded.", file=sys.stderr)
+        #     return False
 
         return curses.wrapper(Editor._open, file, file_encoding, write_func)
