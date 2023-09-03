@@ -25,8 +25,8 @@ def _convert_size(size_bytes: int) -> str:
         a string representation with a size value suffix
     """
     if size_bytes == 0:
-        return '0 B'
-    size_name = ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
+        return '0  B'
+    size_name = (' B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
     i = int(math.floor(math.log(size_bytes, 1024)))
     power = pow(1024, i)
     size = round(size_bytes / power, 2)

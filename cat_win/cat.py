@@ -199,12 +199,12 @@ def _show_files() -> None:
         if file.file_size == -1:
             file.set_file_size(get_file_size(file.path))
         file_sizes.append(file.file_size)
-        print(f"\t{color_dic[CKW.COUNT_AND_FILES]}{_convert_size(file.file_size): <10}", end='')
+        print(f"     {color_dic[CKW.COUNT_AND_FILES]}{str(_convert_size(file.file_size)).rjust(9)}", end='')
         prefix = ' ' if file.plaintext        else '-'
         prefix+= '*' if file.contains_queried else ' '
         print(f"{prefix}{file.displayname}{color_dic[CKW.RESET_ALL]}")
     print(color_dic[CKW.COUNT_AND_FILES], end='')
-    print(f"Sum:\t{_convert_size(sum(file_sizes))}", end='')
+    print(f"Sum: {str(_convert_size(sum(file_sizes))).rjust(9)}", end='')
     print(color_dic[CKW.RESET_ALL])
     print(color_dic[CKW.COUNT_AND_FILES], end='')
     print(f"Amount:\t{len(holder.files)}", end='')

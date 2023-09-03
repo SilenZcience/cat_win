@@ -7,10 +7,10 @@ from cat_win.util.fileattributes import _convert_size, get_file_meta_data, get_f
 
 class TestFileAttributes(TestCase):
     def test__convert_size_zero(self):
-        self.assertEqual(_convert_size(0), '0 B')
+        self.assertEqual(_convert_size(0), '0  B')
 
     def test__convert_size_edge_kb(self):
-        self.assertEqual(_convert_size(1023), '1023.0 B')
+        self.assertEqual(_convert_size(1023), '1023.0  B')
 
     def test__convert_size_kb_exact(self):
         self.assertEqual(_convert_size(1024), '1.0 KB')
