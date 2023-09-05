@@ -28,6 +28,7 @@ try:
     from cat_win.util.utility import comp_eval, comp_conv, split_replace
 except SyntaxError: # in case of Python 3.7
     from cat_win.util.utilityold import comp_eval, comp_conv, split_replace
+from cat_win.util.zipviewer import display_zip
 from cat_win.util import stdinhelper
 from cat_win.web.updatechecker import print_update_information
 from cat_win import __project__, __version__, __sysversion__, __author__, __url__
@@ -656,6 +657,7 @@ def edit_file(file_index: int = 0) -> None:
         holder.files[file_index].set_plaintext(plain=False)
         if holder.args_id[ARGS_PLAIN_ONLY]:
             return
+        display_zip(holder.files[file_index].path, _convert_size)
         err_print('Failed to open:', holder.files[file_index].displayname)
         try:
             enter_char = '⏎'
@@ -757,7 +759,7 @@ def copy_to_clipboard(content: str, copy_function: object = None) -> object:
     Returns:
     (function):
         the method used for copying to the clipboard
-        (in case we want to use this function again without another import)    
+        (in case we want to use this function again without another import)
     """
     if copy_function is not None:
         copy_function(content)
@@ -780,7 +782,7 @@ def print_raw_view(file_index: int = 0, mode: str = 'X') -> None:
     skipped = -1
 
     print(holder.files[file_index].displayname, ':', sep='')
-    raw_gen = get_raw_view_lines_gen(holder.files[file_index].path, mode, 
+    raw_gen = get_raw_view_lines_gen(holder.files[file_index].path, mode,
                                      [color_dic[CKW.RAWVIEWER], color_dic[CKW.RESET_ALL]],
                                      arg_parser.file_encoding)
     print(next(raw_gen)) # the header will always be available
@@ -887,7 +889,7 @@ def init(shell: bool = False) -> tuple:
     args, _, unknown_files, echo_args = arg_parser.get_arguments(sys.argv)
 
     holder.set_args(args)
-    
+
     known_files = arg_parser.get_files(holder.args_id[ARGS_DOTFILES])
     valid_urls = []
     if holder.args_id[ARGS_URI]:
@@ -901,7 +903,7 @@ def init(shell: bool = False) -> tuple:
         sys.stderr.reconfigure(encoding=arg_parser.file_encoding)
 
     init_colors()
-    
+
     arg_suggestions = show_unknown_args_suggestions(shell)
 
     # check for special cases
@@ -1094,7 +1096,7 @@ def shell_main():
             holder.delete_args(arg_parser.get_args())
             self.exec_colors()
             print(f"successfully removed {[arg for _, arg in arg_parser.get_args()] if arg_parser.get_args() else 'parameter(s)'}.")
-            
+
         def _command_clear(self, _) -> None:
             arg_parser.reset_values()
             self._command_del([arg for _, arg in holder.args])
