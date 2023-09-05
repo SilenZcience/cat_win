@@ -111,7 +111,7 @@ class StringFinder:
                 found_list.append((keyword, _f))
         # sort by start position (necessary for a deterministic output)
         found_list.sort(key = lambda x: x[1][0])
-        
+
         for keyword in self.kw_regex:
             for _m in self._findregex(keyword, line):
                 matched_position.append(_m[:])

@@ -161,4 +161,4 @@ class TestHolder(TestCase):
 
         test_list = [(ARGS_REPLACE, '[a,b]'), (ARGS_REPLACE, '[c,a]'), (ARGS_REPLACE, '[a,b]')]
         reduced_list = diff_list(test_list, [(ARGS_REPLACE, '[a,b]'), (ARGS_REPLACE, '[a,b]')])
-        self.assertListEqual(reduced_list, [(ARGS_REPLACE, '[c,a]')])              
+        self.assertListEqual(reduced_list, [(ARGS_REPLACE, '[c,a]')])

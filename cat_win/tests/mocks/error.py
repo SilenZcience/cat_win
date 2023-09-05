@@ -4,4 +4,3 @@ class ErrorDefGen:
         def func(*args, **kwargs):
             raise error
         return func
-        

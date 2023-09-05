@@ -11,7 +11,7 @@ IS_FILE, IS_DIR, IS_PATTERN = range(0, 3)
 
 def levenshtein(str_a: str, str_b: str) -> float:
     """
-    Calculate the levenshtein distance (similarity) between 
+    Calculate the levenshtein distance (similarity) between
     two strings and return the result as a percentage value.
     char case is ignored such that uppercase letters match their
     lowercase counterparts perfectly.
@@ -34,7 +34,7 @@ def levenshtein(str_a: str, str_b: str) -> float:
 
     d = [[i] + ([0] * b) for i in range(a+1)]
     d[0] = list(range(b+1))
-    
+
     for i in range(1, a+1):
         str_a_i = str_a[i-1:i]
 
@@ -65,7 +65,7 @@ class ArgParser:
         self._unknown_files = []
         self._echo_args = []
 
-        self._known_file_structures = []       
+        self._known_file_structures = []
 
     def reset_values(self) -> None:
         """

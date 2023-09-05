@@ -29,6 +29,6 @@ class TestFile(TestCase):
     def test_file_plaintext(self):
         file = File('testPath', 'testName')
         self.assertEqual(file.plaintext, True)
-        
+
         file.set_plaintext(False)
         self.assertEqual(file.plaintext, False)

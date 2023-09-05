@@ -54,7 +54,7 @@ class TestConverter(TestCase):
         self.assertEqual(converter.c_from_oct('30071', True), expected_output)
 
         expected_output = '[Bin: 11000000111001, Dec: 12345, Hex: 3039]'
-        self.assertEqual(converter.c_from_oct('30071', False), expected_output)        
+        self.assertEqual(converter.c_from_oct('30071', False), expected_output)
 
     def test_empty_input(self):
         expected_output = False
@@ -96,7 +96,7 @@ class TestConverter(TestCase):
         group = '1/0'
         l_tokens = []
         converter._evaluate_exception_handler(exc, group, l_tokens)
-        
+
         self.assertListEqual(l_tokens, ['???'])
 
     def test_exception_handler_known_exc(self):
@@ -104,7 +104,7 @@ class TestConverter(TestCase):
         group = '1/0'
         l_tokens = ['5']
         debug_converter._evaluate_exception_handler(exc, group, l_tokens)
-        
+
         self.assertListEqual(l_tokens, ['5', "???(ZeroDivisionError: TeSt in '1/0')"])
 
     def test_exception_handler_unknown_exc(self):

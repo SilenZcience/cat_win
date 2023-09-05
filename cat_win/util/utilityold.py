@@ -54,7 +54,7 @@ def comp_conv(converter: Converter, content: list, param: str, cleaner: object):
     base = param.lstrip('-').lower()
     method_is_convertable = getattr(converter, 'is_' + base, lambda _: False)
     method_convert = getattr(converter, 'c_from_' + base, lambda x: x)
-    
+
     new_content = []
     for prefix, line in content:
         cleaned = cleaner(line)
@@ -76,7 +76,7 @@ def split_replace(param: str) -> list:
         
     Returns:
     (list):
-        a list of two elements [replace_this, replace_with]     
+        a list of two elements [replace_this, replace_with]
     """
     rep = ['', '']
     def _c_rep(l: list) -> str:
@@ -88,5 +88,5 @@ def split_replace(param: str) -> list:
         rep[1] += c if esc_c else _c_rep(rep) if c == ',' else c if c != '\\' else ''
         esc_c = False if esc_c else c == '\\'
     rep[1] = rep[1][len(rep[0]):]
-    
+
     return rep
