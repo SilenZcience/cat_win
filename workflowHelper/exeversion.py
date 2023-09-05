@@ -43,7 +43,7 @@ VSVersionInfo(
         StringStruct(u'OriginalFilename', u'cat{suffix}.exe'),
         StringStruct(u'ProductName', u'cat'),
         StringStruct(u'ProductVersion', u'{cat_win_v}')])
-      ]), 
+      ]),
     VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
   ]
 )"""

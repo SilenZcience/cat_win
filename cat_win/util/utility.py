@@ -66,7 +66,7 @@ def split_replace(param: str) -> list:
         
     Returns:
     (list):
-        a list of two elements [replace_this, replace_with]     
+        a list of two elements [replace_this, replace_with]
     """
     rep = ['', '']
     esc_c = False
@@ -83,5 +83,5 @@ def split_replace(param: str) -> list:
     #     elif c == ",":
     #         rep = [rep[1], '']
     #     else:
-    #         rep[1] += c    
+    #         rep[1] += c
     return rep

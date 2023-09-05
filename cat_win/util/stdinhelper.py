@@ -138,7 +138,7 @@ def write_files(file_list: list, content: str, file_encoding: str) -> list:
         return file_list
 
     if content == '':
-        abort_command = ''
+        user_input = ''
         try:
             print('You are about to create an empty file. Do you want to continue?', file=sys.stderr)
             enter_char = '⏎'
@@ -149,14 +149,14 @@ def write_files(file_list: list, content: str, file_encoding: str) -> list:
             except UnicodeEncodeError:
                 enter_char = 'ENTER'
             print(f"[Y/{enter_char}] Yes, Continue       [N] No, Abort :", end='', file=sys.stderr)
-            abort_command = input()
+            user_input = input()
         except EOFError:
             pass
         except UnicodeError:
             print(f"Input is not recognized in the given encoding: {file_encoding}", file=sys.stderr)
-            abort_command = 'n'
+            user_input = 'N'
         finally:
-            if abort_command and abort_command.upper() != 'Y':
+            if user_input and user_input.upper() != 'Y':
                 print('Aborting...', file=sys.stderr)
                 file_list.clear()
 

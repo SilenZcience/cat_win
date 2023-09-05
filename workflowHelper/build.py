@@ -95,5 +95,5 @@ for _init in _initFiles:
     print('creating: ', _init)
     f = open(_init, 'x', encoding='utf-8')
     f.close()
-    
+
 sys.exit(status)
