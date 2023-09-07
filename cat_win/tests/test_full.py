@@ -47,7 +47,8 @@ class TestCatFull(TestCase):
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
 
-    @patch('cat_win.cat.sys.argv', ['<CAT>', 'enc:UTF-8', test_file_path, '-ub', '[Sample,TEST]', '-le'])
+    @patch('cat_win.cat.sys.argv',
+           ['<CAT>', 'enc:UTF-8', test_file_path, '-ub', '[Sample,TEST]', '-le'])
     def test_cat_output_full_c(self):
         expected_output = ''
         with open(test_result_C, 'r', encoding='utf-8') as output:
@@ -56,7 +57,8 @@ class TestCatFull(TestCase):
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
 
-    @patch('cat_win.cat.sys.argv', ['<CAT>', 'enc=utf-8', test_file_path, 'trunc=1:6', '-n', '--reverse', '--chr'])
+    @patch('cat_win.cat.sys.argv',
+           ['<CAT>', 'enc=utf-8', test_file_path, 'trunc=1:6', '-n', '--reverse', '--chr'])
     def test_cat_output_full_d(self):
         expected_output = ''
         with open(test_result_D, 'r', encoding='utf-8') as output:
@@ -90,21 +92,25 @@ class TestCatFull(TestCase):
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
 
-    @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, 'enc=utf-8', 'trunc=0:1', 'find=ple ', 'match=:'])
+    @patch('cat_win.cat.sys.argv',
+           ['<CAT>', test_file_path, 'enc=utf-8', 'trunc=0:1', 'find=ple ', 'match=:'])
     def test_cat_output_full_find_found(self):
-        expected_output = "Sample Text:\n--------------- Found [('ple ', [3, 7])] ---------------\n--------------- Matched [(':', [11, 12])] ---------------\n"
+        expected_output = "Sample Text:\n--------------- Found [('ple ', [3, 7])] ------"
+        expected_output += "---------\n--------------- Matched [(':', [11, 12])] ---------------\n"
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
 
-    @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, 'enc=utf-8', 'trunc=0:1', 'find=NOTINLINE'])
+    @patch('cat_win.cat.sys.argv',
+           ['<CAT>', test_file_path, 'enc=utf-8', 'trunc=0:1', 'find=NOTINLINE'])
     def test_cat_output_full_find_not_found(self):
         expected_output = 'Sample Text:\n'
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
 
-    @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, 'enc=utf-8', 'trunc=0:1', 'find=Text', '--nk'])
+    @patch('cat_win.cat.sys.argv',
+           ['<CAT>', test_file_path, 'enc=utf-8', 'trunc=0:1', 'find=Text', '--nk'])
     def test_cat_output_full_find_found_nokeyword(self):
         expected_output = ''
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
@@ -162,7 +168,8 @@ class TestCatFull(TestCase):
             self.assertIn(test_empty_path, fake_out.getvalue())
             self.assertIn(test_peek, fake_out.getvalue())
 
-    @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, 'trunc=0:0', '--UNIQUE', '--b64', '-?'])
+    @patch('cat_win.cat.sys.argv',
+           ['<CAT>', test_file_path, 'trunc=0:0', '--UNIQUE', '--b64', '-?'])
     def test_cat_output_suggestions(self):
         with patch('cat_win.cat.sys.stderr', new=StdOutMockIsAtty()) as fake_out:
             cat.main()
@@ -173,7 +180,7 @@ class TestCatFull(TestCase):
             self.assertIn("Unknown argument: '-?'", fake_out.getvalue())
 
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, '--GREP', 'find=T'])
-    def test_cat_output_GREP(self):
+    def test_cat_output_grep_upper(self):
         expected_output = 'T\nT,T\nT\nT\nT\nT\n'
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()

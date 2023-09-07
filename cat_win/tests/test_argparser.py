@@ -25,7 +25,8 @@ class TestArgParser(TestCase):
 
     def test_get_arguments_duplicate(self):
         arg_parser = ArgParser()
-        args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(['CAT', '-n', '-n', '-c'])
+        args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(
+            ['CAT', '-n', '-n', '-c'])
         known_files = arg_parser.get_files()
         args = list(map(lambda x: x[1], args))
         self.assertCountEqual(args, ['-n', '-c', '-n'])
@@ -47,7 +48,8 @@ class TestArgParser(TestCase):
 
     def test_get_arguments_concatenated_unknown(self):
         arg_parser = ArgParser()
-        args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(['CAT', '-+abce?fϵg'])
+        args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(
+            ['CAT', '-+abce?fϵg'])
         known_files = arg_parser.get_files()
         args = list(map(lambda x: x[1], args))
         self.assertCountEqual(args, ['-a', '-b', '-c', '-e', '-f', '-g'])
@@ -58,7 +60,8 @@ class TestArgParser(TestCase):
 
     def test_get_arguments_concatenated_invalid(self):
         arg_parser = ArgParser()
-        args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(['CAT', '--abcde?fg'])
+        args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(
+            ['CAT', '--abcde?fg'])
         known_files = arg_parser.get_files()
         args = list(map(lambda x: x[1], args))
         self.assertCountEqual(args, [])
@@ -117,7 +120,8 @@ class TestArgParser(TestCase):
 
     def test_get_arguments_dir(self):
         arg_parser = ArgParser()
-        args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(['CAT', test_file_dir])
+        args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(
+            ['CAT', test_file_dir])
         known_files = arg_parser.get_files()
         self.assertCountEqual(args, [])
         self.assertCountEqual(unknown_args, [])
@@ -135,7 +139,8 @@ class TestArgParser(TestCase):
 
     def test_get_arguments_unknown_file(self):
         arg_parser = ArgParser()
-        args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(['CAT', 'testTesttest', 'test-file.txt'])
+        args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(
+            ['CAT', 'testTesttest', 'test-file.txt'])
         known_files = arg_parser.get_files()
         self.assertCountEqual(args, [])
         self.assertCountEqual(unknown_args, [])
@@ -152,7 +157,8 @@ class TestArgParser(TestCase):
 
     def test_get_arguments_echo_args(self):
         arg_parser = ArgParser()
-        args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(['CAT', '-n', '-E', '-n', 'random', test_file_dir])
+        args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(
+            ['CAT', '-n', '-E', '-n', 'random', test_file_dir])
         known_files = arg_parser.get_files()
         args = list(map(lambda x: x[1], args))
         self.assertCountEqual(args, ['-n', '-E'])
@@ -205,6 +211,7 @@ class TestArgParser(TestCase):
         self.assertEqual(levenshtein('', ''), 100.0)
         self.assertEqual(levenshtein('', 'test'), 0.0)
         self.assertEqual(levenshtein('abc', ''), 0.0)
-        self.assertAlmostEqual(levenshtein('The dog sat on the cat', 'The cat sat on the mat'), 81.8181, 3)
+        self.assertAlmostEqual(levenshtein('The dog sat on the cat', 'The cat sat on the mat'),
+                               81.8181, 3)
         self.assertAlmostEqual(levenshtein('lower!', 'LOWER?'), 83.3333, 3)
         self.assertAlmostEqual(levenshtein('--hecksview', '--hexview'), 66.6666, 3)

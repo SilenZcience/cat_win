@@ -21,9 +21,9 @@ class TestUrls(TestCase):
             'ftp:///test_url;param=1?query#fragment',
             'https://www google.com',
             ]
-        input = valid_expected+invalid_expected
-        random.shuffle(input)
-        valid_output, invalid_output = sep_valid_urls(input)
+        test_input = valid_expected+invalid_expected
+        random.shuffle(test_input)
+        valid_output, invalid_output = sep_valid_urls(test_input)
         self.assertCountEqual(valid_expected, valid_output)
         self.assertCountEqual(invalid_expected, invalid_output)
 

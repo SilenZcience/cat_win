@@ -60,7 +60,8 @@ class TestShell(TestCase):
 
     def test_cat_shell_delete_param(self):
         stdinhelpermock.set_content('abc\n!add -ln\n!del -l\nabc')
-        expected_output = ['abc', "successfully added ['-l', '-n'].", "successfully removed ['-l'].", '2) abc']
+        expected_output = ['abc', "successfully added ['-l', '-n'].",
+                        "successfully removed ['-l'].", '2) abc']
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.shell_main()
             fake_output = [line.lstrip('>>> ') for line in fake_out.getvalue().splitlines()[2:-1]]
