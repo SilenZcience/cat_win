@@ -1,3 +1,6 @@
+"""
+rawviewer
+"""
 
 SPECIAL_CHARS = {
      0: ( 0, 'NUL', '␀', True), # ^@ \0 null
@@ -64,21 +67,21 @@ def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors = None,
     if mode not in ['x', 'X', 'b']:
         mode = 'X'
 
-    CRLF = dict(map(lambda x: (x[0], x[2]), SPECIAL_CHARS.values()))
-    CRLF[-1] = '·' # default fallback symbol
+    special_chars = dict(map(lambda x: (x[0], x[2]), SPECIAL_CHARS.values()))
+    special_chars[-1] = '·' # default fallback symbol
     try:
-        if len(CRLF[0].encode(file_encoding)) != 3:
+        if len(special_chars[0].encode(file_encoding)) != 3:
             raise UnicodeEncodeError('', '', -1, -1, '')
     except UnicodeEncodeError:
-        CRLF = dict.fromkeys(CRLF, '.')
+        special_chars = dict.fromkeys(special_chars, '.')
 
     def get_display_char(byte: int) -> str:
         # 32 - 126 => ' ' - '~' (ASCII)
         if 32 <= byte <= 126:
             return chr(byte)
-        if byte in CRLF.keys():
-            return CRLF[byte]
-        return CRLF[-1]
+        if byte in special_chars.keys():
+            return special_chars[byte]
+        return special_chars[-1]
 
     try:
         with open(file, 'rb') as raw_file:

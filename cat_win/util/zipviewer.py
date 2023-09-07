@@ -1,3 +1,7 @@
+"""
+zipviewer
+"""
+
 import zipfile
 
 
@@ -20,10 +24,12 @@ def display_zip(file: str, size_converter) -> bool:
                 file_info_list.append((file_info.filename,
                                        str(size_converter(file_info.file_size)),
                                        str(size_converter(file_info.compress_size))))
-        print(f"The file '{file}' has been detected to be a zip-file. The archive contains the following files:")
-        length_list = [max(map(lambda c: len(c[i]), file_info_list)) for i in range(len(file_info_list[0]))]
+        print(f"The file '{file}' has been detected to be a zip-file. ", end='')
+        print('The archive contains the following files:')
+        length_list = [max(len(_f) for _f in f_info) for f_info in zip(*file_info_list)]
         for name, size, csize in file_info_list:
-            print(f"{name.ljust(length_list[0])} {size.rjust(length_list[1])} {csize.rjust(length_list[2])}")
+            print(f"{name.ljust(length_list[0])} " + \
+                f"{size.rjust(length_list[1])} {csize.rjust(length_list[2])}")
         return True
     except zipfile.BadZipfile:
         return False

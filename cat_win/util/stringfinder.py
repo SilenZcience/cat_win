@@ -1,9 +1,16 @@
+"""
+stringfinder
+"""
+
 import re
 
 from cat_win.const.colorconstants import CKW
 
 
 class StringFinder:
+    """
+    defines a stringfinder
+    """
     def __init__(self, literals: set, regex: set) -> None:
         self.kw_literals = literals
         self.kw_regex = regex
@@ -119,4 +126,6 @@ class StringFinder:
         # sort by start position (necessary for a deterministic output)
         matched_list.sort(key = lambda x: x[1][0])
 
-        return (self._merge_keyword_intervals(found_position, matched_position), found_list, matched_list)
+        return (self._merge_keyword_intervals(found_position, matched_position),
+                found_list,
+                matched_list)

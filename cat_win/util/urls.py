@@ -1,3 +1,7 @@
+"""
+urls
+"""
+
 import re
 import urllib.request
 import urllib.parse
@@ -82,5 +86,4 @@ def read_url(url: str, _rec: bool = False) -> bytes:
             return_msg = read_url(DEFAULT_SCHEME+url, True)
     except OSError:
         pass
-    finally:
-        return return_msg
+    return return_msg

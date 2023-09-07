@@ -1,3 +1,7 @@
+"""
+fileattributes
+"""
+
 from datetime import datetime
 from stat import (
     FILE_ATTRIBUTE_ARCHIVE as A,
@@ -80,6 +84,13 @@ def get_file_size(file: str) -> int:
 
 
 def get_file_mtime(file: str) -> float:
+    """
+    get the modified time of a file
+    
+    Returns:
+    (float):
+        the modified time of a file
+    """
     try:
         return os.stat(file).st_mtime
     except OSError:
@@ -112,10 +123,14 @@ def get_file_meta_data(file: str, on_windows_os: bool, colors = None) -> str:
 
         meta_data = colors[1] + file + colors[0] + '\n'
 
-        meta_data += f"{colors[1]}{'Size:' : <16}{_convert_size(stats.st_size)}{colors[0]}\n"
-        meta_data += f"{colors[1]}{'ATime:': <16}{datetime.fromtimestamp(stats.st_atime)}{colors[0]}\n"
-        meta_data += f"{colors[1]}{'MTime:': <16}{datetime.fromtimestamp(stats.st_mtime)}{colors[0]}\n"
-        meta_data += f"{colors[1]}{'CTime:': <16}{datetime.fromtimestamp(stats.st_ctime)}{colors[0]}\n"
+        meta_data += f"{colors[1]}{'Size:' : <16}"
+        meta_data += f"{_convert_size(stats.st_size)}{colors[0]}\n"
+        meta_data += f"{colors[1]}{'ATime:': <16}"
+        meta_data += f"{datetime.fromtimestamp(stats.st_atime)}{colors[0]}\n"
+        meta_data += f"{colors[1]}{'MTime:': <16}"
+        meta_data += f"{datetime.fromtimestamp(stats.st_mtime)}{colors[0]}\n"
+        meta_data += f"{colors[1]}{'CTime:': <16}"
+        meta_data += f"{datetime.fromtimestamp(stats.st_ctime)}{colors[0]}\n"
 
         if not on_windows_os:
             meta_data += '\n'

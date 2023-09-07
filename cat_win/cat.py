@@ -1,3 +1,7 @@
+"""
+cat
+"""
+
 try:
     from colorama import init as coloramaInit
 except ImportError:
@@ -10,7 +14,19 @@ import platform
 import re
 import sys
 
-from cat_win.const.argconstants import *
+from cat_win.const.argconstants import ALL_ARGS, ARGS_EDITOR
+from cat_win.const.argconstants import ARGS_HELP, ARGS_NUMBER, ARGS_ENDS, ARGS_TABS, ARGS_SQUEEZE
+from cat_win.const.argconstants import ARGS_REVERSE, ARGS_COUNT, ARGS_BLANK, ARGS_FILES
+from cat_win.const.argconstants import ARGS_INTERACTIVE, ARGS_NOCOL, ARGS_BINVIEW, ARGS_FILE_PREFIX
+from cat_win.const.argconstants import ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN
+from cat_win.const.argconstants import ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA
+from cat_win.const.argconstants import ARGS_CONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK
+from cat_win.const.argconstants import ARGS_CHR, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP
+from cat_win.const.argconstants import ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW
+from cat_win.const.argconstants import ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN
+from cat_win.const.argconstants import ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR
+from cat_win.const.argconstants import ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY
+from cat_win.const.argconstants import ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI
 from cat_win.const.colorconstants import CKW
 from cat_win.persistence.config import Config
 from cat_win.util.argparser import ArgParser
@@ -18,7 +34,8 @@ from cat_win.util.cbase64 import decode_base64, encode_base64
 from cat_win.util.checksum import get_checksum_from_file
 from cat_win.util.converter import Converter
 from cat_win.util.editor import Editor
-from cat_win.util.fileattributes import get_file_meta_data, get_file_size, get_file_mtime, _convert_size
+from cat_win.util.fileattributes import get_file_meta_data, get_file_size, get_file_mtime
+from cat_win.util.fileattributes import _convert_size
 from cat_win.util.holder import Holder
 from cat_win.util.rawviewer import SPECIAL_CHARS, get_raw_view_lines_gen
 from cat_win.util.stringfinder import StringFinder
@@ -54,10 +71,17 @@ LARGE_FILE_SIZE = 1024 * 1024 * 100  # 100 Megabytes
 
 
 def err_print(*args, **kwargs):
+    """
+    print to stderr.
+    """
     print(*args, file=sys.stderr, flush=True, **kwargs)
 
 
-def exception_handler(exception_type: type, exception, traceback, debug_hook=sys.excepthook) -> None:
+def exception_handler(exception_type: type, exception, traceback,
+                      debug_hook=sys.excepthook) -> None:
+    """
+    custom exception handler.
+    """
     try:
         err_print(color_dic[CKW.RESET_ALL])
         if holder.args_id[ARGS_DEBUG]:
@@ -92,14 +116,16 @@ def _show_help(shell: bool = False) -> None:
                 help_message += f"\t{f'{arg.short_form}, {arg.long_form}': <25}{arg.arg_help}\n"
                 relevant_section = True
         help_message += '\n' * relevant_section
-    help_message += f"\t{'-R, --R<stream>': <25}reconfigure the std-stream(s) with the parsed encoding\n"
+    help_message += f"\t{'-R, --R<stream>': <25}"
+    help_message += 'reconfigure the std-stream(s) with the parsed encoding\n'
     help_message += "\t<stream> == 'in'/'out'/'err' (default is stdin & stdout)\n"
     help_message += '\n'
     help_message += f"\t{'enc=X, enc:X'    : <25}set file encoding to X (default is utf-8)\n"
     help_message += f"\t{'find=X, find:X'  : <25}find/query a substring X in the given files\n"
     help_message += f"\t{'match=X, match:X': <25}find/query a pattern X in the given files\n"
     if not shell:
-        help_message += f"\t{'trunc=X:Y, trunc:X:Y': <25}truncate file to lines x and y (python-like)\n"
+        help_message += f"\t{'trunc=X:Y, trunc:X:Y': <25}"
+        help_message += 'truncate file to lines x and y (python-like)\n'
     help_message += '\n'
     help_message += f"\t{'[a,b]': <25}replace a with b in every line (escape chars with '\\')\n"
     help_message += f"\t{'[a:b:c]': <25}python-like string indexing syntax (line by line)\n"
@@ -112,9 +138,13 @@ def _show_help(shell: bool = False) -> None:
         help_message += '\t> >>> !help\n'
         help_message += '\t> ...\n'
     else:
-        help_message += f"\t{'catw f g -r' : <25}Output g's contents in reverse order, then f's content in reverse order\n"
-        help_message += f"\t{'catw f g -ne': <25}Output f's, then g's content, while numerating and showing the end of lines\n"
-        help_message += f"\t{'catw f trunc=a:b:c': <25}Output f's content starting at line a, ending at line b, stepping c\n"
+        help_message += f"\t{'catw f g -r' : <25}"
+        help_message += "Output g's contents in reverse order, then f's content in reverse order\n"
+        help_message += f"\t{'catw f g -ne': <25}"
+        help_message += "Output f's, then g's content, "
+        help_message += 'while numerating and showing the end of lines\n'
+        help_message += f"\t{'catw f trunc=a:b:c': <25}"
+        help_message += "Output f's content starting at line a, ending at line b, stepping c\n"
     print(help_message)
     print_update_information(__project__, __version__, color_dic, os.path.basename(sys.executable))
 
@@ -131,7 +161,8 @@ def _show_version() -> None:
     version_message += '\n'
     version_message += f"Built with: \tPython {__sysversion__}\n"  # sys.version
     try:
-        version_message += f"Install time: \t{datetime.fromtimestamp(os.path.getctime(os.path.realpath(__file__)))}\n"
+        time_stamp = datetime.fromtimestamp(os.path.getctime(os.path.realpath(__file__)))
+        version_message += f"Install time: \t{time_stamp}\n"
     except OSError: # fails on pyinstaller executable
         version_message += 'Install time: \t-\n'
     version_message += f"Author: \t{__author__}\n"
@@ -144,7 +175,8 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     """
     Print all neccassary debug information
     """
-    err_print('================================================ DEBUG ================================================')
+    err_print('================================================ ' + \
+        'DEBUG ================================================')
     err_print('sys_args:', sys.argv)
     err_print('args: ', end='')
     err_print([(arg[0], arg[1], holder.args_id[arg[0]]) for arg in args])
@@ -166,7 +198,8 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     err_print(arg_parser.file_match)
     err_print('truncate file: ', end='')
     err_print(arg_parser.file_truncate)
-    err_print('=======================================================================================================')
+    err_print('===================================================' + \
+              '====================================================')
 
 
 def _show_count() -> None:
@@ -177,11 +210,15 @@ def _show_count() -> None:
     """
     if holder.args_id[ARGS_CCOUNT]:
         longest_file_name = max(map(len, holder.all_files_lines.keys())) + 1
-        print(f"{color_dic[CKW.COUNT_AND_FILES]}{'File': <{longest_file_name}}LineCount{color_dic[CKW.RESET_ALL]}")
-        for file in holder.all_files_lines:
-            print(f"{color_dic[CKW.COUNT_AND_FILES]}{file: <{longest_file_name}}{holder.all_files_lines[file]: >{holder.all_line_number_place_holder}}{color_dic[CKW.RESET_ALL]}")
+        print(f"{color_dic[CKW.COUNT_AND_FILES]}" + \
+            f"{'File': <{longest_file_name}}LineCount{color_dic[CKW.RESET_ALL]}")
+        for file, _ in holder.all_files_lines.items():
+            print(f"{color_dic[CKW.COUNT_AND_FILES]}{file: <{longest_file_name}}" + \
+                f"{holder.all_files_lines[file]: >{holder.all_line_number_place_holder}}" + \
+                    f"{color_dic[CKW.RESET_ALL]}")
         print('')
-    print(f"{color_dic[CKW.COUNT_AND_FILES]}Lines (Sum): {holder.all_files_lines_sum}{color_dic[CKW.RESET_ALL]}")
+    print(f"{color_dic[CKW.COUNT_AND_FILES]}Lines (Sum): " + \
+        f"{holder.all_files_lines_sum}{color_dic[CKW.RESET_ALL]}")
 
 
 def _show_files() -> None:
@@ -200,7 +237,8 @@ def _show_files() -> None:
         if file.file_size == -1:
             file.set_file_size(get_file_size(file.path))
         file_sizes.append(file.file_size)
-        print(f"     {color_dic[CKW.COUNT_AND_FILES]}{str(_convert_size(file.file_size)).rjust(9)}", end='')
+        print(f"     {color_dic[CKW.COUNT_AND_FILES]}" + \
+            f"{str(_convert_size(file.file_size)).rjust(9)}", end='')
         prefix = ' ' if file.plaintext        else '-'
         prefix+= '*' if file.contains_queried else ' '
         print(f"{prefix}{file.displayname}{color_dic[CKW.RESET_ALL]}")
@@ -281,7 +319,8 @@ def remove_ansi_codes_from_line(line: str) -> str:
 
 
 # def removeAnsiCodes(content: list) -> list:
-#     return [(remove_ansi_codes_from_line(prefix), remove_ansi_codes_from_line(line)) for prefix, line in content]
+#     return [(remove_ansi_codes_from_line(prefix),
+#                   remove_ansi_codes_from_line(line)) for prefix, line in content]
 
 
 @lru_cache()
@@ -327,7 +366,8 @@ def _get_line_prefix(line_num: int, index: int) -> str:
         the new line prefix including the line number.
     """
     if len(holder.files) > 1:
-        return _calculate_line_prefix_spacing(len(str(line_num)), True, len(str(index))) % (index, line_num)
+        return _calculate_line_prefix_spacing(len(str(line_num)), True,
+                                              len(str(index))) % (index, line_num)
     return _calculate_line_prefix_spacing(len(str(line_num))) % (line_num)
 
 
@@ -425,8 +465,12 @@ def print_file(content: list) -> bool:
         # this has priority over the other arguments
         if holder.args_id[ARGS_GREP_ONLY]:
             if intervals:
-                fm_substrings = [(pos[0], f"{color_dic[CKW.FOUND]}{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_FOUND]}")     for _, pos in f_keywords]
-                fm_substrings+= [(pos[0], f"{color_dic[CKW.MATCHED]}{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_MATCHED]}") for _, pos in m_keywords]
+                fm_substrings = [(pos[0], f"{color_dic[CKW.FOUND]}" + \
+                    f"{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_FOUND]}") 
+                                 for _, pos in f_keywords]
+                fm_substrings+= [(pos[0], f"{color_dic[CKW.MATCHED]}" + \
+                    f"{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_MATCHED]}")
+                                 for _, pos in m_keywords]
                 fm_substrings.sort(key=lambda x:x[0])
                 print(f"{line_prefix}{','.join([sub for _, sub in fm_substrings])}")
             continue
@@ -494,9 +538,11 @@ def _print_excluded_by_peek(prefix_len: int, excluded_by_peek: int) -> None:
     excluded_by_peek_length = (len(str(excluded_by_peek))-1)//2
     excluded_by_peek_indent = ' ' * (prefix_len - excluded_by_peek_length + 10)
     excluded_by_peek_indent_add = ' ' * excluded_by_peek_length
-    excluded_by_peek_parting = f"{excluded_by_peek_indent}{excluded_by_peek_indent_add} {color_dic[CKW.NUMBER]}:{color_dic[CKW.RESET_ALL]}"
+    excluded_by_peek_parting = f"{excluded_by_peek_indent}{excluded_by_peek_indent_add} "
+    excluded_by_peek_parting+= f"{color_dic[CKW.NUMBER]}:{color_dic[CKW.RESET_ALL]}"
     print(excluded_by_peek_parting)
-    print(f"{excluded_by_peek_indent}{color_dic[CKW.NUMBER]}({excluded_by_peek}){color_dic[CKW.RESET_ALL]}")
+    print(f"{excluded_by_peek_indent}{color_dic[CKW.NUMBER]}", end='')
+    print(f"({excluded_by_peek}){color_dic[CKW.RESET_ALL]}")
     print(excluded_by_peek_parting)
 
 def print_excluded_by_peek(content: list, excluded_by_peek: int) -> None:
@@ -516,7 +562,8 @@ def print_excluded_by_peek(content: list, excluded_by_peek: int) -> None:
             holder.args_id[ARGS_GREP_ONLY],
             holder.args_id[ARGS_NOKEYWORD]]):
         return
-    _print_excluded_by_peek(len(remove_ansi_codes_from_line(content[0][0])), excluded_by_peek + 10 - len(content))
+    _print_excluded_by_peek(len(remove_ansi_codes_from_line(content[0][0])),
+                            excluded_by_peek + 10 - len(content))
 
 
 def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
@@ -545,8 +592,10 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
         file_mtime = get_file_mtime(holder.files[file_index].path)
         date_nowtime = datetime.timestamp(datetime.now())
         if abs(date_nowtime - file_mtime) < 0.5:
-            err_print(f"{color_dic[CKW.MESSAGE_WARNING]}Warning: It looks like you are trying to pipe a file into itself.{color_dic[CKW.RESET_ALL]}")
-            err_print(f"{color_dic[CKW.MESSAGE_WARNING]}In this case you might have lost all data.{color_dic[CKW.RESET_ALL]}")
+            err_print(f"{color_dic[CKW.MESSAGE_WARNING]}Warning: It looks like you are " + \
+                f"trying to pipe a file into itself.{color_dic[CKW.RESET_ALL]}")
+            err_print(f"{color_dic[CKW.MESSAGE_WARNING]}In this case you might have lost " + \
+                f"all data.{color_dic[CKW.RESET_ALL]}")
         # in any case we have nothing to do and can return
         return
     excluded_by_peek = 0
@@ -557,7 +606,9 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
     if holder.args_id[ARGS_NUMBER]:
         content = [(_get_line_prefix(j+line_offset, file_index+1), c[1])
                    for j, c in enumerate(content, start=1)]
-    content = content[arg_parser.file_truncate[0]:arg_parser.file_truncate[1]:arg_parser.file_truncate[2]]
+    content = content[
+        arg_parser.file_truncate[0]:arg_parser.file_truncate[1]:arg_parser.file_truncate[2]
+        ]
     if holder.args_id[ARGS_PEEK] and len(content) > 10:
         excluded_by_peek = len(content) - 10
         content = content[:5] + content[-5:]
@@ -568,7 +619,7 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
                 try:
                     content = [(prefix, eval(repr(line) + param))
                                 for prefix, line in content]
-                except Exception:
+                except (SyntaxError, NameError, ValueError):
                     err_print('Error at operation: ', param)
                     return
 
@@ -577,7 +628,9 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
                 content = [(prefix, f"{line}{color_dic[CKW.ENDS]}${color_dic[CKW.RESET_ALL]}")
                            for prefix, line in content]
             elif arg == ARGS_TABS:
-                content = [(prefix, line.replace('\t', f"{color_dic[CKW.TABS]}^I{color_dic[CKW.RESET_ALL]}"))
+                content = [(prefix, line.replace(
+                    '\t', f"{color_dic[CKW.TABS]}^I{color_dic[CKW.RESET_ALL]}"
+                    ))
                            for prefix, line in content]
             elif arg == ARGS_SQUEEZE:
                 content = [list(group)[0] for _, group in groupby(content, lambda x: x[1])]
@@ -599,21 +652,24 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
                 content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
             elif arg == ARGS_REPLACE:
                 replace_values = split_replace(param)
-                content = [(prefix, line.replace(replace_values[0], f"{color_dic[CKW.REPLACE]}{replace_values[1]}{color_dic[CKW.RESET_ALL]}"))
+                content = [(prefix, line.replace(replace_values[0], f"{color_dic[CKW.REPLACE]}" + \
+                    f"{replace_values[1]}{color_dic[CKW.RESET_ALL]}"))
                            for prefix, line in content]
             elif arg == ARGS_CHR:
-                for id, char, _, possible in SPECIAL_CHARS.values():
+                for c_id, char, _, possible in list(SPECIAL_CHARS.values()):
                     if not possible:
                         continue
-                    content = [(prefix, line.replace(chr(id), f"{color_dic[CKW.REPLACE]}^{char}{color_dic[CKW.RESET_ALL]}"))
-                                for prefix, line in content]
+                    content = [(prefix, line.replace(
+                        chr(c_id), f"{color_dic[CKW.REPLACE]}^{char}{color_dic[CKW.RESET_ALL]}"
+                        )) for prefix, line in content]
 
     if holder.args_id[ARGS_LLENGTH]:
         content = [(_get_line_length_prefix(prefix, line), line) for prefix, line in content]
     if holder.args_id[ARGS_FILE_PREFIX]:
         content = [(_get_file_prefix(prefix, file_index), line) for prefix, line in content]
     elif holder.args_id[ARGS_FFILE_PREFIX]:
-        content = [(_get_file_prefix(prefix, file_index, hyper=True), line) for prefix, line in content]
+        content = [(_get_file_prefix(prefix, file_index, hyper=True), line)
+                   for prefix, line in content]
     if holder.args_id[ARGS_B64E]:
         content = encode_base64(content, arg_parser.file_encoding)
 
@@ -647,13 +703,14 @@ def edit_file(file_index: int = 0) -> None:
             # the alternative would be worse: split('\n') would increase the linecount each
             # time catw touches a file.
             content = [('', line) for line in file.read().splitlines()]
-    except PermissionError as exc:
+    except PermissionError:
         err_print(f"Permission denied! Skipping {holder.files[file_index].displayname} ...")
         return
-    except BlockingIOError as exc:
-        err_print(f"Resource blocked/unavailable! Skipping {holder.files[file_index].displayname} ...")
+    except BlockingIOError:
+        err_print('Resource blocked/unavailable! Skipping ' + \
+            f"{holder.files[file_index].displayname} ...")
         return
-    except Exception as exc:
+    except (OSError, UnicodeError) as exc:
         holder.files[file_index].set_plaintext(plain=False)
         if holder.args_id[ARGS_PLAIN_ONLY]:
             return
@@ -670,10 +727,11 @@ def edit_file(file_index: int = 0) -> None:
                     raise UnicodeEncodeError('', '', -1, -1, '') from exc
             except UnicodeEncodeError:
                 enter_char = 'ENTER'
-            err_print(f"Do you want to open the file as a binary, without parameters?")
+            err_print('Do you want to open the file as a binary, without parameters?')
             err_print(f"[Y/{enter_char}] Yes, Continue       [N] No, Abort :", end='')
             inp = 'Y' if holder.args_id[ARGS_NOBREAK] else input()
-            if not (os.isatty(sys.stdin.fileno()) and os.isatty(sys.stdout.fileno()) and not holder.args_id[ARGS_NOBREAK]):
+            if not (os.isatty(sys.stdin.fileno()) and os.isatty(sys.stdout.fileno()) and \
+                not holder.args_id[ARGS_NOBREAK]):
                 err_print('') # if the input or output is piped, we add a newline manually
             if inp and inp.upper() != 'Y':
                 err_print('Aborting...')
@@ -682,7 +740,6 @@ def edit_file(file_index: int = 0) -> None:
             # on eoferror it is safe to assume that the user did not press
             # enter, therefor we print a new line
             err_print('')
-            pass
         except UnicodeError:
             err_print('')
             err_print(f"Input is not recognized in the given encoding: {arg_parser.file_encoding}")
@@ -693,7 +750,7 @@ def edit_file(file_index: int = 0) -> None:
                 # in binary splitlines() is our only option
                 content = [('', repr(line)[2:-1]) for line in raw_f.read().splitlines()]
             show_bytecode = True
-        except Exception:
+        except OSError:
             err_print('Operation failed! Try using the enc=X parameter.')
             return
 
@@ -722,12 +779,16 @@ def _copy_to_clipboard(content: str, __dependency: int = 3,
     if __dependency == 0:
         if __clip_board_error:
             error_msg = '\n'
-            error_msg += "ClipBoardError: You can use either 'pyperclip3', 'pyperclip', or 'pyclip' in order to use the '--clip' parameter.\n"
-            error_msg += f"Try to install a different one using '{os.path.basename(sys.executable)} -m pip install ...'"
+            error_msg += "ClipBoardError: You can use either 'pyperclip3', "
+            error_msg += "'pyperclip', or 'pyclip' in order to use the '--clip' parameter.\n"
+            error_msg += 'Try to install a different one using '
+            error_msg += f"'{os.path.basename(sys.executable)} -m pip install ...'"
         else:
             error_msg = '\n'
-            error_msg += "ImportError: You need either 'pyperclip3', 'pyperclip', or 'pyclip' in order to use the '--clip' parameter.\n"
-            error_msg += f"Should you have any problem with either module, try to install a different one using '{os.path.basename(sys.executable)} -m pip install ...'"
+            error_msg += "ImportError: You need either 'pyperclip3', 'pyperclip',"
+            error_msg += "or 'pyclip' in order to use the '--clip' parameter.\n"
+            error_msg += 'Should you have any problem with either module, try to install a diff'
+            error_msg += f"erent one using '{os.path.basename(sys.executable)} -m pip install ...'"
         err_print(error_msg)
         return None
     try:
@@ -848,10 +909,12 @@ def show_unknown_args_suggestions(shell: bool = False) -> list:
     """
     arg_suggestions = arg_parser.check_unknown_args(shell)
     for u_arg, arg_replacement in arg_suggestions:
-        err_print(f"{color_dic[CKW.MESSAGE_IMPORTANT]}Unknown argument: '{u_arg}'{color_dic[CKW.RESET_ALL]}")
+        err_print(f"{color_dic[CKW.MESSAGE_IMPORTANT]}Unknown argument: " + \
+            f"'{u_arg}'{color_dic[CKW.RESET_ALL]}")
         if arg_replacement:
             arg_replacement = [arg_r[0] for arg_r in arg_replacement]
-            err_print(f"\t{color_dic[CKW.MESSAGE_IMPORTANT]}Did you mean {' or '.join(arg_replacement)}{color_dic[CKW.RESET_ALL]}")
+            err_print(f"\t{color_dic[CKW.MESSAGE_IMPORTANT]}Did you mean " + \
+                f"{' or '.join(arg_replacement)}{color_dic[CKW.RESET_ALL]}")
     return arg_suggestions
 
 
@@ -868,7 +931,9 @@ def init_colors() -> None:
         color_dic = default_color_dic.copy()
 
     converter.set_params(holder.args_id[ARGS_DEBUG],
-                         [color_dic[CKW.EVALUATION], color_dic[CKW.CONVERSION], color_dic[CKW.RESET_ALL]])
+                         [color_dic[CKW.EVALUATION],
+                          color_dic[CKW.CONVERSION],
+                          color_dic[CKW.RESET_ALL]])
 
 
 def init(shell: bool = False) -> tuple:
@@ -932,37 +997,48 @@ def init(shell: bool = False) -> tuple:
 
 
 def main():
+    """
+    main function
+    """
     piped_input = temp_file = ''
     known_files, unknown_files, echo_args, valid_urls = init(shell=False)
 
     if holder.args_id[ARGS_ECHO]:
-        temp_file = stdinhelper.write_file(echo_args, tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding)
+        temp_file = stdinhelper.write_file(echo_args, tmp_file_helper.generate_temp_file_name(),
+                                           arg_parser.file_encoding)
         known_files.append(temp_file)
         holder.set_temp_file_echo(temp_file)
     if holder.args_id[ARGS_URI]:
         # the dictionary should contain an entry for each valid_url, since
         # generated temp-files are unique
         temp_files = dict([
-            (stdinhelper.write_file(read_url(valid_url), tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding), valid_url)
+            (stdinhelper.write_file(read_url(valid_url), tmp_file_helper.generate_temp_file_name(),
+                                    arg_parser.file_encoding), valid_url)
             for valid_url in valid_urls])
         known_files.extend(list(temp_files.keys()))
         holder.set_temp_files_url(temp_files)
     if holder.args_id[ARGS_INTERACTIVE]:
         piped_input = ''.join(stdinhelper.get_stdin_content(holder.args_id[ARGS_ONELINE]))
-        temp_file = stdinhelper.write_file(piped_input, tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding)
+        temp_file = stdinhelper.write_file(piped_input, tmp_file_helper.generate_temp_file_name(),
+                                           arg_parser.file_encoding)
         known_files.append(temp_file)
-        unknown_files = stdinhelper.write_files(unknown_files, piped_input, arg_parser.file_encoding)
+        unknown_files = stdinhelper.write_files(unknown_files, piped_input,
+                                                arg_parser.file_encoding)
         holder.set_temp_file_stdin(temp_file)
     else:
         if holder.args_id[ARGS_EDITOR]:
-            unknown_files = [file for file in unknown_files if Editor.open(file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os, holder.args_id[ARGS_DEBUG])]
+            unknown_files = [file for file in unknown_files if Editor.open(
+                file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os,
+                holder.args_id[ARGS_DEBUG])]
         else:
             unknown_files = stdinhelper.read_write_files_from_stdin(
-                unknown_files, arg_parser.file_encoding, on_windows_os, holder.args_id[ARGS_ONELINE])
+                unknown_files, arg_parser.file_encoding, on_windows_os,
+                holder.args_id[ARGS_ONELINE])
 
     if holder.args_id[ARGS_EDITOR]:
         for file in known_files:
-            Editor.open(file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os, holder.args_id[ARGS_DEBUG])
+            Editor.open(file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os,
+                        holder.args_id[ARGS_DEBUG])
 
     if len(known_files) + len(unknown_files) == 0:
         return
@@ -983,12 +1059,14 @@ def main():
         file_size_sum += file.file_size
         if file_size_sum >= LARGE_FILE_SIZE:
             err_print(color_dic[CKW.MESSAGE_IMPORTANT], end='')
-            err_print('An exceedingly large amount of data is being loaded. This may require a lot of time and resources.', end='')
+            err_print('An exceedingly large amount of data is being loaded. ', end='')
+            err_print('This may require a lot of time and resources.', end='')
             err_print(color_dic[CKW.RESET_ALL])
             break
 
     if holder.args_id[ARGS_B64D]:
-        holder.set_decoding_temp_files([tmp_file_helper.generate_temp_file_name() for _ in holder.files])
+        holder.set_decoding_temp_files(
+            [tmp_file_helper.generate_temp_file_name() for _ in holder.files])
     holder.generate_values(arg_parser.file_encoding)
 
     if holder.args_id[ARGS_CCOUNT]:
@@ -1004,7 +1082,8 @@ def main():
 
     # clean-up
     if holder.args_id[ARGS_DEBUG]:
-        err_print('================================================ DEBUG ================================================')
+        err_print('================================================ ' + \
+            'DEBUG ================================================')
         caches = [
             remove_ansi_codes_from_line,
             _calculate_line_prefix_spacing,
@@ -1017,10 +1096,14 @@ def main():
                         str(cache.cache_info().misses),
                         str(cache.cache_info().maxsize),
                         str(cache.cache_info().currsize)) for cache in caches]
-        max_val = [max(map(lambda c: len(c[i]), caches_info))+1 for i in range(5)]
+        max_val = [max(len(_c) for _c in c_info)+1 for c_info in zip(*caches_info)]
         for name, hits, misses, maxsize, currsize in caches_info:
-            cache_info = f"def:{name.ljust(max_val[0])}hits:{hits.ljust(max_val[1])}misses:{misses.ljust(max_val[2])}"
-            cache_info+= f"maxsize:{maxsize.ljust(max_val[3])}currsize:{currsize.ljust(max_val[4])}full:{100*int(currsize)/int(maxsize):6.2f}%"
+            cache_info = f"def:{name.ljust(max_val[0])}"
+            cache_info+= f"hits:{hits.ljust(max_val[1])}"
+            cache_info+= f"misses:{misses.ljust(max_val[2])}"
+            cache_info+= f"maxsize:{maxsize.ljust(max_val[3])}"
+            cache_info+= f"currsize:{currsize.ljust(max_val[4])}"
+            cache_info+= f"full:{100*int(currsize)/int(maxsize):6.2f}%"
             err_print(cache_info)
     for tmp_file in tmp_file_helper.get_generated_temp_files():
         if holder.args_id[ARGS_DEBUG]:
@@ -1034,10 +1117,14 @@ def main():
             if holder.args_id[ARGS_DEBUG]:
                 err_print('PermissionError  ', tmp_file)
     if holder.args_id[ARGS_DEBUG]:
-        err_print('=======================================================================================================')
+        err_print('===================================================' + \
+            '====================================================')
 
 
 def shell_main():
+    """
+    run the shell.
+    """
     init(True)
 
     command_prefix = '!'
@@ -1046,11 +1133,17 @@ def shell_main():
     oneline = holder.args_id[ARGS_ONELINE]
 
     class CmdExec:
+        """
+        handle shell commands.
+        """
         def __init__(self) -> None:
             self.exit_shell = False
             self.last_cmd = ''
 
         def exec_colors(self) -> None:
+            """
+            reset the colors cache and init colors.
+            """
             init_colors()
             _calculate_line_prefix_spacing.cache_clear()
             _calculate_line_length_prefix_spacing.cache_clear()
@@ -1079,11 +1172,13 @@ def shell_main():
 
         def _command_unknown(self, _) -> None:
             print("Command '!", self.last_cmd, "' is unknown.", sep='')
-            print("If you want to escape the command input, type: '\\!", self.last_cmd, "'.", sep='')
+            print("If you want to escape the command input, type: '\\!",
+                  self.last_cmd, "'.", sep='')
 
         def _command_cat(self, _) -> None:
             cat = " ,_     _\n |\\\\_,-~/\n / _  _ |    ,--.\n(  @  @ )   / ,-'\n \\  _T_/"
-            cat += "-._( (\n /         `. \\\n|         _  \\ |\n \\ \\ ,  /      |\n  || |-_\\__   /\n ((_/`(____,-'\a\n"
+            cat += "-._( (\n /         `. \\\n|         _  \\ |\n \\ \\ ,  /      |\n  || "
+            cat += "|-_\\__   /\n ((_/`(____,-'\a\n"
             print('\n'.join(['\t\t\t' + c for c in cat.split('\n')]))
 
         def _command_help(self, _) -> None:
@@ -1097,13 +1192,17 @@ def shell_main():
             holder.add_args(arg_parser.get_args())
             show_unknown_args_suggestions(shell=True)
             self.exec_colors()
-            print(f"successfully added {[arg for _, arg in arg_parser.get_args()] if arg_parser.get_args() else 'parameter(s)'}.")
+            _removed = [arg for _, arg in arg_parser.get_args()] \
+                if arg_parser.get_args() else 'parameter(s)'
+            print(f"successfully added {_removed}.")
 
         def _command_del(self, cmd: list) -> None:
             arg_parser.gen_arguments([''] + cmd, True)
             holder.delete_args(arg_parser.get_args())
             self.exec_colors()
-            print(f"successfully removed {[arg for _, arg in arg_parser.get_args()] if arg_parser.get_args() else 'parameter(s)'}.")
+            _removed = [arg for _, arg in arg_parser.get_args()] \
+                if arg_parser.get_args() else 'parameter(s)'
+            print(f"successfully removed {_removed}.")
 
         def _command_clear(self, _) -> None:
             arg_parser.reset_values()
@@ -1140,7 +1239,8 @@ def shell_main():
             if stripped_line:
                 edit_content([('', stripped_line)], False, -1, i-command_count)
                 if holder.args_id[ARGS_CLIP]:
-                    copy_function = copy_to_clipboard(remove_ansi_codes_from_line(holder.clip_board), copy_function)
+                    copy_function = copy_to_clipboard(
+                        remove_ansi_codes_from_line(holder.clip_board), copy_function)
                     holder.clip_board = ''
         if not oneline:
             print(shell_prefix, end='', flush=True)

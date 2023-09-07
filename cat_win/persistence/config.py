@@ -1,3 +1,7 @@
+"""
+config
+"""
+
 import configparser
 import os
 import sys
@@ -105,18 +109,20 @@ class Config:
         config_menu = ''
         options = []
 
-        for index in range(len(fore_options)):
-            key, value = fore_options[index]
+        for index, fore_option in enumerate(fore_options):
+            key, value = fore_option
             colored_option = f"{value}Fore.{key}{ColorOptions.Style['RESET']}"
-            config_menu += f"{index+1: <{index_offset}}: {colored_option: <{self.longest_char_count+len(value)}}"
+            config_menu += f"{index+1: <{index_offset}}: "
+            config_menu += f"{colored_option: <{self.longest_char_count+len(value)}}"
             if index % self.rows == self.rows-1:
                 config_menu += '\n'
             options.append('Fore.' + key)
         config_menu += '\n'
-        for index in range(len(back_options)):
-            key, value = back_options[index]
+        for index, back_option in enumerate(back_options):
+            key, value = back_option
             colored_option = f"{value}Back.{key}{ColorOptions.Style['RESET']}"
-            config_menu += f"{len(fore_options)+index+1: <{index_offset}}: {colored_option: <{self.longest_char_count+len(value)}}"
+            config_menu += f"{len(fore_options)+index+1: <{index_offset}}: "
+            config_menu += f"{colored_option: <{self.longest_char_count+len(value)}}"
             if index % self.rows == self.rows-1:
                 config_menu += '\n'
             options.append('Back.' + key)
@@ -135,10 +141,11 @@ class Config:
         index_offset = len(str(len(self.elements) + 1))
 
         config_menu = ''
-        for index in range(len(self.elements)):
-            element = self.elements[index]
+        for index, element in enumerate(self.elements):
             colored_element = f"{self.color_dic[element]}{element}{ColorOptions.Style['RESET']}"
-            config_menu += f"{index+1: <{index_offset}}: {colored_element: <{self.longest_char_count+len(self.color_dic[element])}}"
+            config_menu += f"{index+1: <{index_offset}}: "
+            offset = self.longest_char_count+len(self.color_dic[element])
+            config_menu += f"{colored_element: <{offset}}"
             if index % self.rows == self.rows-1:
                 config_menu += '\n'
 
@@ -163,7 +170,8 @@ class Config:
             if keyword.isdigit():
                 keyword = self.elements[int(keyword)-1] if (
                     0 < int(keyword) <= len(self.elements)) else keyword
-        print(f"Successfully selected element '{self.color_dic[keyword]}{keyword}{ColorOptions.Style['RESET']}'.")
+        print('Successfully selected element ', end='')
+        print(f"'{self.color_dic[keyword]}{keyword}{ColorOptions.Style['RESET']}'.")
 
         color_options = self._print_get_all_available_colors()
         color = ''
@@ -187,7 +195,9 @@ class Config:
             return
 
         color_split = color.split('.')
-        print(f"Successfully selected element '{getattr(ColorOptions, color_split[0])[color_split[1]]}{color}{ColorOptions.Style['RESET']}'.")
+        print('Successfully selected element ', end='')
+        print(f"'{getattr(ColorOptions, color_split[0])[color_split[1]]}", end='')
+        print(f"{color}{ColorOptions.Style['RESET']}'.")
 
         self.config_parser['COLORS'][keyword] = color
         try:
