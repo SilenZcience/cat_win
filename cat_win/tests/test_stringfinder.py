@@ -71,6 +71,8 @@ class TestStringFinder(TestCase):
         line = 'ThisIsATest!1!'
         intervals, f_keywords, m_keywords = string_finder.find_keywords(line)
 
-        self.assertCountEqual(intervals, [[14, 'reset_matched'], [12, 'matched_pattern'], [11, 'reset_found'], [7, 'found_keyword'], [6, 'reset_found'], [4, 'found_keyword']])
+        self.assertCountEqual(intervals, [[14, 'reset_matched'], [12, 'matched_pattern'],
+                                          [11, 'reset_found'], [7, 'found_keyword'],
+                                          [6, 'reset_found'], [4, 'found_keyword']])
         self.assertCountEqual(f_keywords, [('Is', [4, 6]), ('Test', [7, 11])])
         self.assertCountEqual(m_keywords, [(r"[0-9]\!", [12, 14])])

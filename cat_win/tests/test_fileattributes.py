@@ -31,7 +31,8 @@ class TestFileAttributes(TestCase):
         self.assertEqual(_convert_size(1024*1024*1024*1024*1024*1024*1024*1024), '1.0 YB')
 
     def test__convert_size_edge_yb(self):
-        self.assertEqual(_convert_size(1024*1024*1024*1024*1024*1024*1024*1024 * 1023.99), '1023.99 YB')
+        self.assertEqual(_convert_size(1024*1024*1024*1024*1024*1024*1024*1024 * 1023.99),
+                         '1023.99 YB')
 
     def test__convert_size_out_of_range(self):
         self.assertEqual(_convert_size(1024*1024*1024*1024*1024*1024*1024*1024*1024), '1.0 ?')
@@ -43,9 +44,11 @@ class TestFileAttributes(TestCase):
         self.assertIn('MTime:', meta_data)
         self.assertIn('CTime:', meta_data)
 
-        meta_data = get_file_meta_data('randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|', False)
+        meta_data = get_file_meta_data(
+            'randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|',False)
         self.assertEqual(meta_data, '')
 
     def test_get_file_size(self):
         self.assertGreater(get_file_size(__file__), 0)
-        self.assertEqual(get_file_size('randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|'), 0)
+        self.assertEqual(get_file_size(
+            'randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|'), 0)

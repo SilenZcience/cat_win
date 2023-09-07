@@ -80,7 +80,8 @@ Address  00       01       02       03       04       05       06       07      
 *000000A0! 65 21 0D 0A 54 68 69 73 20 4C 69 6E 65 20 69 73 *#! e ! ␍ ␤ T h i s   L i n e   i s
 *000000B0! 20 61 20 44 75 70 6C 69 63 61 74 65 21          *#!   a   D u p l i c a t e !"""
 
-        self.assertEqual('\n'.join(get_raw_view_lines_gen(test_file_path, 'X', ['*', '!'])), expected_result)
+        self.assertEqual('\n'.join(get_raw_view_lines_gen(test_file_path, 'X', ['*', '!'])),
+                         expected_result)
 
     def test_encoding_error(self):
         result = '\n'.join(get_raw_view_lines_gen(test_file_path, 'X', None, 'utf-16'))
