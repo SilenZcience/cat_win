@@ -1,3 +1,7 @@
+"""
+updatechecker
+"""
+
 import json
 import sys
 import urllib.request
@@ -35,7 +39,8 @@ def get_latest_package_version(package: str) -> str:
         on Error: a zero version '0.0.0
     """
     try:
-        with urllib.request.urlopen(f"https://pypi.org/pypi/{package}/json", timeout=2) as _response:
+        with urllib.request.urlopen(f"https://pypi.org/pypi/{package}/json",
+                                    timeout=2) as _response:
             response = _response.read()
         return json.loads(response)['info']['version']
     except (ValueError, OSError):
@@ -121,7 +126,8 @@ def new_version_available(current_version: str, latest_version: str) -> int:
     return status
 
 
-def print_update_information(package: str, current_version: str, color_dic: dict, py_executable: str) -> None:
+def print_update_information(package: str, current_version: str, color_dic: dict,
+                             py_executable: str) -> None:
     """
     prints update information if there are any.
     
@@ -155,7 +161,8 @@ def print_update_information(package: str, current_version: str, color_dic: dict
     message += f"{color_dic[CKW.RESET_ALL]}"
     if status < STATUS_UP_TO_DATE:
         warning += f"{color_dic[CKW.MESSAGE_WARNING]}"
-        warning += 'Warning: Due to the drastic version increase, backwards compatibility is no longer guaranteed!'
+        warning += 'Warning: Due to the drastic version increase, '
+        warning += 'backwards compatibility is no longer guaranteed!'
         warning += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_WARNING]}"
         warning += 'You may experience fundamental differences.'
         warning += f"{color_dic[CKW.RESET_ALL]}"

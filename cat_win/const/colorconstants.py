@@ -1,3 +1,6 @@
+"""
+colorconstants
+"""
 
 ESC_CODE = '\x1b'
 
@@ -63,11 +66,11 @@ class ColorOptions:
     Back  = {'NONE': ''}
     Style = {'NONE': ''}
 
-    for key in __Fore:
+    for key, _ in __Fore.items():
         Fore[key]  = id_to_code(__Fore[key])
-    for key in __Back:
+    for key, _ in __Back.items():
         Back[key]  = id_to_code(__Back[key])
-    for key in __Style:
+    for key, _ in __Style.items():
         Style[key] = id_to_code(__Style[key])
 
 

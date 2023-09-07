@@ -1,3 +1,7 @@
+"""
+argparser
+"""
+
 import glob
 import os
 import re
@@ -27,31 +31,35 @@ def levenshtein(str_a: str, str_b: str) -> float:
         the similarity of the two strings as a percentage between 0.0 and 100.0
     """
     str_a, str_b = str_a.lstrip('-'), str_b.lstrip('-')
-    a, b = len(str_a), len(str_b)
-    max_len = max(a, b)
-    if a*b == 0:
-        return (100 if max_len == 0 else (1 - (a+b)/max_len) * 100)
+    len_a, len_b = len(str_a), len(str_b)
+    max_len = max(len_a, len_b)
+    if len_a*len_b == 0:
+        return (100 if max_len == 0 else (1 - (len_a+len_b)/max_len) * 100)
 
-    d = [[i] + ([0] * b) for i in range(a+1)]
-    d[0] = list(range(b+1))
+    d_arr = [[i] + ([0] * len_b) for i in range(len_a+1)]
+    d_arr[0] = list(range(len_b+1))
 
-    for i in range(1, a+1):
+    for i in range(1, len_a+1):
         str_a_i = str_a[i-1:i]
 
-        for j in range(1, b+1):
+        for j in range(1, len_b+1):
             str_b_j = str_b[j-1:j]
 
-            d[i][j] = min(d[i-1][j]+1,
-                          d[i][j-1]+1,
-                          d[i-1][j-1]+int(str_a_i.lower() != str_b_j.lower()))
+            d_arr[i][j] = min(d_arr[i-1][j]+1,
+                              d_arr[i][j-1]+1,
+                              d_arr[i-1][j-1]+int(str_a_i.lower() != str_b_j.lower()))
 
-    return (1 - d[a][b]/max_len) * 100
+    return (1 - d_arr[len_a][len_b]/max_len) * 100
 
 
 class ArgParser:
+    """
+    defines the ArgParser
+    """
     SIMILARITY_LIMIT = 50.0
 
     def __init__(self) -> None:
+        self.file_encoding: str = ''
         self._clear_values()
         self.reset_values()
 
@@ -71,12 +79,19 @@ class ArgParser:
         """
         The here defined variables may be accessed from the outside.
         """
-        self.file_encoding: str = DEFAULT_FILE_ENCODING
+        self.file_encoding = DEFAULT_FILE_ENCODING
         self.file_search = set()
         self.file_match = set()
         self.file_truncate = [None, None, None]
 
     def get_args(self) -> list:
+        """
+        getter of self._args
+        
+        Returns:
+        self._args (list)
+            the list of args
+        """
         return self._args
 
     def check_unknown_args(self, shell_arg: bool = False) -> list:
@@ -101,8 +116,8 @@ class ArgParser:
                     continue
                 leven_short = levenshtein(arg.short_form, u_arg)
                 leven_long = levenshtein(arg.long_form, u_arg)
-                # print(leven_short.__round__(3), leven_long.__round__(3),
-                #       max(leven_short, leven_long).__round__(3), u_arg, arg.long_form, sep="\t") # DEBUG
+# print(leven_short.__round__(3), leven_long.__round__(3),
+#       max(leven_short, leven_long).__round__(3), u_arg, arg.long_form, sep="\t") # DEBUG
                 if max(leven_short, leven_long) > self.SIMILARITY_LIMIT:
                     if leven_short > leven_long:
                         possible_arg_replacement[1].append((arg.short_form, leven_short))
@@ -192,12 +207,13 @@ class ArgParser:
                 return False
             self.file_search.add(param[5:])
             return False
-        # 'trunc' + ('=' or ':') + file_truncate[0] + ':' + file_truncate[1] [+ ':' + file_truncate[2]]
-        if re.match(r"\Atrunc[\=\:][0-9\(\)\+\-\*\/]*\:[0-9\(\)\+\-\*\/]*\:?[0-9\(\)\+\-\*\/]*\Z", param, re.IGNORECASE):
+        # 'trunc' + ('='/':') + file_truncate[0] +':'+ file_truncate[1] [+ ':' + file_truncate[2]]
+        if re.match(r"\Atrunc[\=\:][0-9\(\)\+\-\*\/]*\:[0-9\(\)\+\-\*\/]*\:?[0-9\(\)\+\-\*\/]*\Z",
+                    param, re.IGNORECASE):
             for i, p_split in enumerate(param[6:].split(':')):
                 try:
                     self.file_truncate[i] = int(eval(p_split))
-                except:
+                except (SyntaxError, NameError, ValueError):
                     self.file_truncate[i] = None
             return False
         # '[' + ARGS_CUT + ']'

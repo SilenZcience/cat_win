@@ -1,3 +1,7 @@
+"""
+converter
+"""
+
 import re
 
 class Converter():
@@ -5,12 +9,34 @@ class Converter():
     converts a binary, octal, decimal or hex number
     into the corresponding others, or evaluates an expression.
     """
-    # matches a mathematical expression consisting of either hex-numbers = (0x...), binary-numbers (0b...) or
-    # default decimal numbers (these are not allowed to have a leading zero before the decimal point, yet something like "-.06" is allowed).
+    # matches a mathematical expression consisting of
+    # either hex-numbers = (0x...), binary-numbers (0b...) or
+    # default decimal numbers
+    # (these are not allowed to have a leading zero
+    # before the decimal point, yet something like "-.06" is allowed).
     # between every number has to be a valid operator (*,/,+,-,%,**,//)
-    # before every number there may be opening parenthesis, after every number there may be closing parenthesis
-    # (it is not validated that all parenthesis match each other to a valid expression ...)
-    _eval_regex = re.compile(r'(?:\(\s*)*(?:(?:\-?0(?:(?:x[0-9a-fA-F]+)|(?:o[0-7]+)|b[01]+)|(?:\-?(?:(?:0|[1-9][0-9]*)\.[0-9]*|\.[0-9]+|0|[1-9][0-9]*)))[\)\s]*[%\-\/\+\*][\/\*]?[\(\s]*)+(?:\-?0(?:(?:x[0-9a-fA-F]+)|(?:o[0-7]+)|b[01]+)|(?:\-?(?:(?:0|[1-9][0-9]*)\.[0-9]*|\.[0-9]+|0|[1-9][0-9]*)))(?:\s*\))*')
+    # before every number there may be opening parenthesis,
+    # after every number there may be closing parenthesis
+    # (it is not validated that all parenthesis
+    # match each other to a valid expression ...)
+    _eval_regex = re.compile(
+        r'(?:\(\s*)*' + \
+        r'(?:' + \
+            r'(?:\-?0' + \
+                r'(?:' + \
+                    r'(?:x[0-9a-fA-F]+)' + \
+                    r'|(?:o[0-7]+)' + \
+                r'|b[01]+)' + \
+            r'|(?:\-?(?:(?:0|[1-9][0-9]*)\.[0-9]*|\.[0-9]+|0|[1-9][0-9]*)))' + \
+        r'[\)\s]*[%\-\/\+\*][\/\*]?[\(\s]*)+' + \
+        r'(?:\-?0' + \
+            r'(?:' + \
+                r'(?:x[0-9a-fA-F]+)' + \
+                r'|(?:o[0-7]+)' + \
+            r'|b[01]+)' + \
+        r'|(?:\-?(?:(?:0|[1-9][0-9]*)\.[0-9]*|\.[0-9]+|0|[1-9][0-9]*)))' + \
+        r'(?:\s*\))*'
+        )
 
     bindigits = '01'
     octdigits = '01234567'
@@ -67,29 +93,32 @@ class Converter():
         new_l_tokens = []
         res = re.search(self._eval_regex, _l)
 
-        while (res):
+        while res:
             if integrated:
                 new_l_tokens.append(_l[:res.start()])
             try:
                 new_l_tokens.append(f"{self.colors[0]}{eval(res.group())}{self.colors[2]}")
-            except SyntaxError:
+            except SyntaxError as exc:
                 p_diff = res.group().count('(') - res.group().count(')')
                 try:
                     if p_diff > 0 and res.group()[:p_diff] == '(' * p_diff:
-                        new_l_tokens.append(f"{self.colors[0]}{eval(res.group()[p_diff:])}{self.colors[2]}")
+                        new_l_tokens.append(f"{self.colors[0]}" + \
+                            f"{eval(res.group()[p_diff:])}{self.colors[2]}")
                         if integrated:
                             new_l_tokens.insert(len(new_l_tokens)-1, '(' * p_diff)
                     elif p_diff < 0 and res.group()[p_diff:] == ')' * (-1 * p_diff):
-                        new_l_tokens.append(f"{self.colors[0]}{eval(res.group()[:p_diff])}{self.colors[2]}")
+                        new_l_tokens.append(f"{self.colors[0]}" + \
+                            f"{eval(res.group()[:p_diff])}{self.colors[2]}")
                         _l = ')' * (-1 * p_diff) + _l
                     else:
-                        raise SyntaxError()
+                        raise SyntaxError() from exc
                 except SyntaxError:
-                    new_l_tokens.append(f"{self.colors[0]}{('?' * len(res.group()) if integrated else '?')}{self.colors[2]}")
-                except Exception as e:
-                    self._evaluate_exception_handler(e, res.group(), new_l_tokens)
-            except Exception as e:
-                self._evaluate_exception_handler(e, res.group(), new_l_tokens)
+                    new_l_tokens.append(f"{self.colors[0]}" + \
+                        f"{('?' * len(res.group()) if integrated else '?')}{self.colors[2]}")
+                except (NameError, ValueError) as exc_inner:
+                    self._evaluate_exception_handler(exc_inner, res.group(), new_l_tokens)
+            except (NameError, ValueError) as exc:
+                self._evaluate_exception_handler(exc, res.group(), new_l_tokens)
             _l = _l[res.end():]
             res = re.search(self._eval_regex, _l)
 
@@ -178,7 +207,8 @@ class Converter():
         Binary, Octal and Decimal number.
         """
         return f"{self.colors[1]}[Bin: {self.__hex_to_bin__(value, leading)}, Oct: " + \
-            f"{self.__hex_to_oct__(value, leading)}, Dec: {self.__hex_to_dec__(value)}]{self.colors[2]}"
+            f"{self.__hex_to_oct__(value, leading)}, Dec: {self.__hex_to_dec__(value)}]" + \
+                f"{self.colors[2]}"
 
 
     def __dec_to_hex__(self, value: int, leading: bool = False) -> str:
@@ -197,7 +227,8 @@ class Converter():
         """
         value = int(value)
         return f"{self.colors[1]}[Bin: {self.__dec_to_bin__(value, leading)}, Oct: " + \
-            f"{self.__dec_to_oct__(value, leading)}, Hex: {self.__dec_to_hex__(value, leading)}]{self.colors[2]}"
+            f"{self.__dec_to_oct__(value, leading)}, Hex: " + \
+                f"{self.__dec_to_hex__(value, leading)}]{self.colors[2]}"
 
 
     def __oct_to_hex__(self, value: str, leading: bool = False) -> str:
@@ -215,7 +246,8 @@ class Converter():
         Binary, Decimal and Hexadecimal number.
         """
         return f"{self.colors[1]}[Bin: {self.__oct_to_bin__(value, leading)}, Dec: " + \
-            f"{self.__oct_to_dec__(value)}, Hex: {self.__oct_to_hex__(value, leading)}]{self.colors[2]}"
+            f"{self.__oct_to_dec__(value)}, Hex: {self.__oct_to_hex__(value, leading)}]" + \
+                f"{self.colors[2]}"
 
 
     def __bin_to_hex__(self, value: str, leading: bool = False) -> str:
@@ -233,4 +265,5 @@ class Converter():
         Octal, Decimal and Hexadecimal number.
         """
         return f"{self.colors[1]}[Oct: {self.__bin_to_oct__(value, leading)}, Dec: " + \
-            f"{self.__bin_to_dec__(value)}, Hex: {self.__bin_to_hex__(value, leading)}]{self.colors[2]}"
+            f"{self.__bin_to_dec__(value)}, Hex: {self.__bin_to_hex__(value, leading)}]" + \
+                f"{self.colors[2]}"

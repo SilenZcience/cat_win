@@ -59,7 +59,8 @@ def comp_conv(converter: Converter, content: list, param: str, cleaner: object):
     for prefix, line in content:
         cleaned = cleaner(line)
         if cleaned and method_is_convertable(cleaned):
-            new_content.append((prefix, f"{line} {method_convert(cleaned, (param == param.lower()))}"))
+            new_content.append((prefix, line + \
+                f" {method_convert(cleaned, (param == param.lower()))}"))
     return new_content
 
 def split_replace(param: str) -> list:
@@ -79,14 +80,14 @@ def split_replace(param: str) -> list:
         a list of two elements [replace_this, replace_with]
     """
     rep = ['', '']
-    def _c_rep(l: list) -> str:
-        l[0] = l[1]
+    def _c_rep(_l: list) -> str:
+        _l[0] = _l[1]
         return ''
 
     esc_c = False
-    for c in param[1:-1]:
-        rep[1] += c if esc_c else _c_rep(rep) if c == ',' else c if c != '\\' else ''
-        esc_c = False if esc_c else c == '\\'
+    for _c in param[1:-1]:
+        rep[1] += _c if esc_c else _c_rep(rep) if _c == ',' else _c if _c != '\\' else ''
+        esc_c = False if esc_c else _c == '\\'
     rep[1] = rep[1][len(rep[0]):]
 
     return rep

@@ -52,7 +52,8 @@ def comp_conv(converter: Converter, content: list, param: str, cleaner: object):
     method_convert = getattr(converter, 'c_from_' + base, lambda x: x)
 
     return [(prefix, f"{line} {method_convert(cleaned, (param == param.lower()))}")
-            for prefix, line in content if (cleaned := cleaner(line)) and method_is_convertable(cleaned)]
+            for prefix, line in content if (cleaned := cleaner(line)) \
+                and method_is_convertable(cleaned)]
 
 def split_replace(param: str) -> list:
     """
@@ -70,9 +71,11 @@ def split_replace(param: str) -> list:
     """
     rep = ['', '']
     esc_c = False
-    for c in param[1:-1]:
-        rep[1] += c if esc_c else (rep := [rep[1], ''])[1] if c == ',' else c if c != '\\' else ''
-        esc_c = False if esc_c else c == '\\'
+    for _c in param[1:-1]:
+        rep[1] += _c if esc_c else (
+            rep := [rep[1], '']
+            )[1] if _c == ',' else _c if _c != '\\' else ''
+        esc_c = False if esc_c else _c == '\\'
     # equivalent to:
     # for c in param[1:-1]:
     #     if esc_c:

@@ -1,3 +1,7 @@
+"""
+stdinhelper
+"""
+
 import os
 import sys
 
@@ -140,7 +144,8 @@ def write_files(file_list: list, content: str, file_encoding: str) -> list:
     if content == '':
         user_input = ''
         try:
-            print('You are about to create an empty file. Do you want to continue?', file=sys.stderr)
+            print('You are about to create an empty file. ', end='', file=sys.stderr)
+            print('Do you want to continue?', file=sys.stderr)
             enter_char = '⏎'
 
             try:
@@ -153,7 +158,8 @@ def write_files(file_list: list, content: str, file_encoding: str) -> list:
         except EOFError:
             pass
         except UnicodeError:
-            print(f"Input is not recognized in the given encoding: {file_encoding}", file=sys.stderr)
+            print('Input is not recognized in the given encoding: ', end='', file=sys.stderr)
+            print(file_encoding, file=sys.stderr)
             user_input = 'N'
         finally:
             if user_input and user_input.upper() != 'Y':

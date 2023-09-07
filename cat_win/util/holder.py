@@ -1,3 +1,7 @@
+"""
+holder
+"""
+
 from functools import lru_cache
 import heapq
 
@@ -25,13 +29,13 @@ def reduce_list(args: list) -> list:
     temp_args_id = []
 
     for arg in args:
-        id, _ = arg
+        arg_id, _ = arg
         # it can make sense to have the exact same parameter twice, even if it does
         # the same information, therefor we do not test for the param here.
-        if id in DIFFERENTIABLE_ARGS:
+        if arg_id in DIFFERENTIABLE_ARGS:
             new_args.append(arg)
-        elif id not in temp_args_id:
-            temp_args_id.append(id)
+        elif arg_id not in temp_args_id:
+            temp_args_id.append(arg_id)
             new_args.append(arg)
 
     return new_args
@@ -57,8 +61,8 @@ def diff_list(args: list, to_remove: list) -> list:
     temp_args = [arg for arg in to_remove if arg[0] in DIFFERENTIABLE_ARGS]
 
     for arg in args:
-        id, _ = arg
-        if id not in temp_args_id or id in DIFFERENTIABLE_ARGS:
+        arg_id, _ = arg
+        if arg_id not in temp_args_id or arg_id in DIFFERENTIABLE_ARGS:
             new_args.append(arg)
 
     for arg in temp_args:
@@ -70,13 +74,17 @@ def diff_list(args: list, to_remove: list) -> list:
     return new_args
 
 class Holder():
+    """
+    define a holder object to store useful meta information
+    """
     def __init__(self) -> None:
         self.files: list = []  # all files, including tmp-file from stdin
         self._inner_files: list = []
         self.args: list = []  # list of all used parameters: format [[id, param]]
         self.args_id: list = [False] * (HIGHEST_ARG_ID + 1)
         self.temp_file_stdin = None  # if stdin is used, this temp_file will contain the stdin-input
-        self.temp_file_echo = None  # if ARGS_ECHO is used, this temp_file will contain the following parameters
+        # if ARGS_ECHO is used, this temp_file will contain the following parameters
+        self.temp_file_echo = None
         self.temp_file_urls = {}
         self.reversed = False
 
@@ -88,7 +96,8 @@ class Holder():
         self.all_files_lines = {}
         # the amount of chars neccessary to display the last line (breaks on base64 decoding)
         self.all_line_number_place_holder = 0
-        # the amount of chars neccessary to display the longest line within all files (breaks on base64 decoding)
+        # the amount of chars neccessary to display the longest line within all files
+        # (breaks on base64 decoding)
         self.file_line_length_place_holder = 0
 
         self.clip_board = ''
@@ -119,10 +128,16 @@ class Holder():
         return file
 
     def set_files(self, files: list) -> None:
+        """
+        set the files to display.
+        """
         self.files = [File(path, self._get_file_display_name(path)) for path in files]
         self._inner_files = files[:]
 
     def set_args(self, args: list) -> None:
+        """
+        set the args to use.
+        """
         self.args = reduce_list(args)
         for arg_id, _ in self.args:
             self.args_id[arg_id] = True
@@ -131,20 +146,35 @@ class Holder():
         self.reversed = self.args_id[ARGS_REVERSE]
 
     def add_args(self, args: list) -> None:
+        """
+        add args to use from now on.
+        """
         self.args_id = [False] * (HIGHEST_ARG_ID + 1)
         self.set_args(self.args + args)
 
     def delete_args(self, args: list) -> None:
+        """
+        delete (some) args to longer use them from now on.
+        """
         self.args_id = [False] * (HIGHEST_ARG_ID + 1)
         self.set_args(diff_list(self.args, args))
 
     def set_temp_file_stdin(self, file: str) -> None:
+        """
+        set the tempfile used for stdin.
+        """
         self.temp_file_stdin = file
 
     def set_temp_file_echo(self, file: str) -> None:
+        """
+        set the tempfile used for the echo arg.
+        """
         self.temp_file_echo = file
 
     def set_temp_files_url(self, files: dict) -> None:
+        """
+        set the tempfiles used for urls.
+        """
         self.temp_file_urls = files
 
     def __calc_file_number_place_holder__(self) -> None:
@@ -220,9 +250,15 @@ class Holder():
                                              for file in self._inner_files)
 
     def set_decoding_temp_files(self, temp_files: list) -> None:
+        """
+        set the tempfiles used for base64 en/de-coding.
+        """
         self._inner_files = temp_files[:]
 
     def generate_values(self, encoding: str) -> None:
+        """
+        generate the metadata for all files
+        """
         self.__calc_file_number_place_holder__()
         if self.args_id[ARGS_B64D]:
             for i, file in enumerate(self.files):

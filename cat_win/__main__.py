@@ -1,3 +1,7 @@
+"""
+__main__
+"""
+
 import sys
 
 
@@ -11,9 +15,15 @@ except Exception as e:
     sys.exit(1)
 
 def shell_entry_point():
+    """
+    run the shell.
+    """
     cat.shell_main()
 
 def entry_point():
+    """
+    run the main program.
+    """
     cat.main()
 
 if __name__ == '__main__':
