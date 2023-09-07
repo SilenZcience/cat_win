@@ -380,6 +380,8 @@ Sorts the Output alphabetically without case sensitivity.
 
 Everything passed in after this Argument will be handled as its own File.
 It is not possible to break out of this state therefor this Parameter must be used last.
+When using the one-letter Variant of this Parameter the following Input will be decoded with unicode Escape Sequences instead of parsing a raw String.
+This way it is possible to define new lines (\n) or other special characters.
 
 ```console
 > catw -l -E -n The last 'Parameter' does not count!

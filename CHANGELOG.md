@@ -10,6 +10,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added -`!`, --`edit` parameter to open a simple editor to write/edit any provided File. 
 - renamed --`chr`, --`chr` to --`chr`, --`char`.
 - cat_win will now detect simple zip-archives and display the contained files.
+- When using the Parameter Variant -`E` from -`E`, --`echo` the input will be decoded with unicode sequences.
 
 ## [1.6.0] - 2023-08-22
 
