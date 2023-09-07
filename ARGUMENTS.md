@@ -253,7 +253,7 @@ This Argument will be used at the end such that other Arguments may influence th
 [10] long_line!
 ```
 
-### <a id="fileprefix">--fp, --fileprefix</a>
+### <a id="fileprefix">--fp, --file-prefix</a>
 
 Shows the Path to the File in each Line prefix.
 This can be useful when querying for Substrings or Patterns such that only a few Lines are being displayed.
