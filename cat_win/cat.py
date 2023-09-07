@@ -920,6 +920,14 @@ def init(shell: bool = False) -> tuple:
         config.save_config()
         sys.exit(0)
 
+    if holder.args_id[ARGS_ECHO]:
+        echo_args = ' '.join(echo_args)
+        for arg, param in holder.args:
+            if arg == ARGS_ECHO:
+                if param == param.upper():
+                    echo_args = echo_args.encode(arg_parser.file_encoding).decode('unicode_escape')
+                break
+
     return (known_files, unknown_files, echo_args, valid_urls)
 
 
@@ -928,7 +936,7 @@ def main():
     known_files, unknown_files, echo_args, valid_urls = init(shell=False)
 
     if holder.args_id[ARGS_ECHO]:
-        temp_file = stdinhelper.write_file(' '.join(echo_args), tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding)
+        temp_file = stdinhelper.write_file(echo_args, tmp_file_helper.generate_temp_file_name(), arg_parser.file_encoding)
         known_files.append(temp_file)
         holder.set_temp_file_echo(temp_file)
     if holder.args_id[ARGS_URI]:
