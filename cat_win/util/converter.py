@@ -111,7 +111,7 @@ class Converter():
                             f"{eval(res.group()[:p_diff])}{self.colors[2]}")
                         _l = ')' * (-1 * p_diff) + _l
                     else:
-                        raise SyntaxError() from exc
+                        raise SyntaxError from exc
                 except SyntaxError:
                     new_l_tokens.append(f"{self.colors[0]}" + \
                         f"{('?' * len(res.group()) if integrated else '?')}{self.colors[2]}")
