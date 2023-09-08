@@ -31,5 +31,5 @@ def display_zip(file: str, size_converter) -> bool:
             print(f"{name.ljust(length_list[0])} " + \
                 f"{size.rjust(length_list[1])} {csize.rjust(length_list[2])}")
         return True
-    except zipfile.BadZipfile:
+    except (zipfile.BadZipfile, OSError):
         return False
