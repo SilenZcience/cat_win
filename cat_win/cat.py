@@ -718,7 +718,7 @@ def edit_file(file_index: int = 0) -> None:
     except PermissionError:
         err_print(f"Permission denied! Skipping {holder.files[file_index].displayname} ...")
         return
-    except BlockingIOError:
+    except (BlockingIOError, FileNotFoundError):
         err_print('Resource blocked/unavailable! Skipping ' + \
             f"{holder.files[file_index].displayname} ...")
         return
