@@ -324,7 +324,8 @@ def remove_ansi_codes_from_line(line: str) -> str:
 
 
 @lru_cache()
-def _calculate_line_prefix_spacing(line_char_length: int, include_file_prefix: bool = False,
+def _calculate_line_prefix_spacing(line_char_length: int, file_name_prefix: bool = False,
+                                   include_file_prefix: bool = False,
                                    file_char_length: int = 0) -> str:
     """
     calculate a string template for the line prefix.
@@ -332,6 +333,8 @@ def _calculate_line_prefix_spacing(line_char_length: int, include_file_prefix: b
     Parameters:
     line_char_length (int):
         the length of the line number
+    file_name_prefix (bool):
+        will the full file path be included in the prefix
     include_file_prefix (bool):
         should the file be included in the prefix
     file_char_length (int):
@@ -342,9 +345,14 @@ def _calculate_line_prefix_spacing(line_char_length: int, include_file_prefix: b
         a non-finished but correctly formatted string template to insert line number
         and file index into
     """
-    line_prefix = (' ' * (holder.all_line_number_place_holder - line_char_length)) + '%i)'
+    line_prefix = ' ' * (holder.all_line_number_place_holder - line_char_length)
 
-    if include_file_prefix:
+    if file_name_prefix:
+        line_prefix = '%i' + line_prefix
+    else:
+        line_prefix += '%i)'
+
+    if include_file_prefix and not file_name_prefix:
         file_prefix = (' ' * (holder.file_number_place_holder - file_char_length)) + '%i.'
         return color_dic[CKW.NUMBER] + file_prefix + line_prefix + color_dic[CKW.RESET_ALL] + ' '
 
@@ -365,8 +373,10 @@ def _get_line_prefix(line_num: int, index: int) -> str:
     (str):
         the new line prefix including the line number.
     """
+    if holder.args_id[ARGS_FILE_PREFIX]:
+        return _calculate_line_prefix_spacing(len(str(line_num)), True) % (line_num)
     if len(holder.files) > 1:
-        return _calculate_line_prefix_spacing(len(str(line_num)), True,
+        return _calculate_line_prefix_spacing(len(str(line_num)), False, True,
                                               len(str(index))) % (index, line_num)
     return _calculate_line_prefix_spacing(len(str(line_num))) % (line_num)
 
@@ -429,7 +439,9 @@ def _get_file_prefix(prefix: str, file_index: int, hyper: bool = False) -> str:
     file = file_uri_prefix * hyper + holder.files[file_index].displayname
     if hyper:
         file = file.replace('\\', '/')
-    return f"{prefix}{color_dic[CKW.FILE_PREFIX]}{file}{color_dic[CKW.RESET_ALL]} "
+    if not holder.args_id[ARGS_NUMBER] or hyper:
+        return f"{prefix}{color_dic[CKW.FILE_PREFIX]}{file}{color_dic[CKW.RESET_ALL]} "
+    return f"{color_dic[CKW.FILE_PREFIX]}{file}{color_dic[CKW.RESET_ALL]}:{prefix}"
 
 
 def print_file(content: list) -> bool:
