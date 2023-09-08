@@ -259,6 +259,7 @@ Shows the Path to the File in each Line prefix.
 This can be useful when querying for Substrings or Patterns such that only a few Lines are being displayed.
 Using this Argument in uppercase (--FP, --FILEPREFIX) will result in the Path being shown as the url file Protocol.
 This can be useful in case the Terminal supports interacting with Links such that the File can be instantly opened.
+Using the lowercase Argument in Combination with the <a href="#number">-n, --number</a> Parameter a GNU-style link format will be displayed.
 
 ```console
 > catw test.txt --fp
@@ -266,9 +267,14 @@ This can be useful in case the Terminal supports interacting with Links such tha
 <Path>/test.txt line 2
 ```
 ```console
-> catw test.txt --FP
-file:///<Path>/test.txt line 1
-file:///<Path>/test.txt line 2
+> catw test.txt --FP -n
+1) file:///<Path>/test.txt line 1
+2) file:///<Path>/test.txt line 2
+```
+```console
+> catw test.txt --fp -n
+<Path>/test.txt:1 line 1
+<Path>/test.txt:2 line 2
 ```
 
 <a id="simplereplace"></a>
