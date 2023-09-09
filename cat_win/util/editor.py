@@ -477,6 +477,8 @@ class Editor:
             brow = row + self.wpos.row
             for col in range(max_x):
                 bcol = col + self.wpos.col
+                if brow >= len(self.window_content) or bcol >= len(self.window_content[brow]):
+                    break
                 try:
                     if self.window_content[brow][bcol] == '\t':
                         self.curse_window.addch(row, col, '>', self._get_color(4))
@@ -487,7 +489,7 @@ class Editor:
                                                 self._get_color(3))
                     else:
                         self.curse_window.addch(row, col, self.window_content[brow][bcol])
-                except (IndexError, curses.error):
+                except curses.error:
                     break
             self.curse_window.clrtoeol()
             try:
