@@ -1,3 +1,8 @@
+"""
+editorhelper
+"""
+
+
 UNIFY_HOTKEYS = {
     # newline
     b'^M'           : b'_key_enter', # CR
@@ -68,12 +73,220 @@ UNIFY_HOTKEYS = {
     b'CTL_HOME'     : b'_key_ctl_home', # windows
     b'kHOM5'        : b'_key_ctl_home', # xterm
     b'CTL_PAD7'     : b'_key_ctl_home', # numpad
+    # default alnum key
+    b'_key_string'  : b'_key_string',
+    # history
+    b'^Z'           : b'_key_undo',
+    b'^Y'           : b'_key_redo',
     # actions
     b'^S'           : b'_action_save',
     b'^Q'           : b'_action_quit',
     b'^C'           : b'_action_interrupt',
     b'KEY_RESIZE'   : b'_action_resize',
-}
+} # translates key-inputs to pre-defined actions/methods
 
 KEY_HOTKEYS    = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_key'   ))
 ACTION_HOTKEYS = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_action'))
+
+REVERSE_ACTION = {
+    b'_key_dc'           : b'_key_string',
+    b'_key_dl'           : b'_key_string',
+    b'_key_backspace'    : b'_key_string',
+    b'_key_ctl_backspace': b'_key_string',
+    b'_key_string'         : b'_key_backspace',
+} # defines the counter action if the file has the same amount of lines
+
+REVERSE_ACTION_SIZE_CHANGE = {
+    b'_key_enter'        : b'_key_backspace',
+    b'_key_dc'           : b'_key_enter',
+    b'_key_dl'           : b'_key_enter',
+    b'_key_backspace'    : b'_key_enter',
+    b'_key_ctl_backspace': b'_key_enter',
+} # defines the counter action if the file has a different amount of lines
+
+ACTION_STACKABLE = [
+    b'_key_dc',
+    b'_key_backspace',
+    b'_key_string',
+]
+# these actions will be chained
+# (e.g. when writing a word, the entire word should be undone/redone)
+
+
+class Position:
+    """
+    define a position in the text
+    """
+    def __init__(self, row: int, column: int) -> None:
+        self.row = row
+        self.col = column
+
+    def get_pos(self) -> tuple:
+        """
+        return a tuple that defines the position.
+        this makes comparison easier.
+        """
+        return (self.row, self.col)
+
+    def set_pos(self, new_pos: tuple) -> None:
+        """
+        setter for row and column of position
+        """
+        self.row, self.col = new_pos
+
+
+class _Action:
+    def __init__(self, key_action: bytes, action_text: str, file_len: int,
+                 pre_pos: tuple, post_pos: tuple) -> None:
+        """
+        defines an action.
+        
+        Parameters:
+        key_action (bytes):
+            the action taken as defined by UNIFY_HOTKEYS
+        action_text (str):
+            the text added/removed by the action
+        file_len (int)
+            the amount of lines the file had before the action
+        pre_pos (tuple):
+            the cursor position before the action
+        post_pos (tuple):
+            the cursor position after the action        
+        """
+        self.key_action: bytes = key_action
+        self.action_text: str  = action_text
+        self.file_len: int     = file_len
+        self.pre_pos: tuple    = pre_pos
+        self.post_pos: tuple   = post_pos
+
+
+class History:
+    """
+    keeps track of editing history and provided
+    undo/redo functionality.
+    """
+    def __init__(self, stack_size: int = 800) -> None:
+        self.stack_size = max(stack_size, 1)
+
+        # following stacks/lists will contain _Action objects.
+        # each object needs ~300Bytes, meaning that both lists
+        # together will be, at max, of the size ~600*stack_size (Bytes)
+        # 500KB = 500_000B, 500_000/600 ~= 800
+        self._stack_undo: list = []
+        self._stack_redo: list = []
+
+    def _add(self, action: _Action, stack_type: str = 'undo') -> None:
+        """
+        Add an action to the stack.
+        
+        Parameters:
+        action (_Action):
+            the action to append
+        stack_type (str):
+            defines the stack to use
+        """
+        if stack_type == 'undo':
+            _stack = self._stack_undo
+        elif stack_type == 'redo':
+            _stack = self._stack_redo
+        else:
+            return
+
+        if len(_stack) == self.stack_size:
+            del _stack[0]
+        _stack.append(action)
+
+    def add(self, key_action: bytes, action_text: str, file_len: int, pre_pos: tuple,
+            post_pos: tuple, stack_type: str = 'undo') -> None:
+        """
+        Add an action to the stack.
+        
+        Parameters:
+        __init__ variables of _Action
+        
+        stack_type (str):
+            defines the stack to use
+        """
+        if key_action not in REVERSE_ACTION and key_action not in REVERSE_ACTION_SIZE_CHANGE:
+            return
+        if action_text is None:
+            # no edit has been made (e.g. invalid edit (backspace in top left))
+            return
+
+        if stack_type == 'undo':
+            self._stack_redo.clear()
+
+        action = _Action(key_action, action_text, file_len, pre_pos, post_pos)
+        self._add(action, stack_type)
+
+    def _undo(self, editor: object, action: _Action) -> None:
+        self._add(action, 'redo')
+        if len(editor.window_content) == action.file_len:
+            reverse_action = REVERSE_ACTION.get(action.key_action)
+        else:
+            reverse_action = REVERSE_ACTION_SIZE_CHANGE.get(action.key_action)
+        if reverse_action is None:
+            assert False, 'unreachable.'
+        reverse_action_method = getattr(editor, reverse_action.decode(), lambda *_: None)
+        editor.cpos.set_pos(action.post_pos)
+        reverse_action_method(action.action_text)
+        editor.cpos.set_pos(action.pre_pos)
+
+    def undo(self, editor: object) -> None:
+        """
+        Undo an action taken.
+        
+        Parameters:
+        editor (Editor):
+            the editor in use
+        """
+        try:
+            action: _Action = self._stack_undo.pop()
+        except IndexError:
+            return
+
+        self._undo(editor, action)
+        while self._stack_undo:
+            n_action: _Action = self._stack_undo.pop()
+            if action.key_action == n_action.key_action and \
+                action.pre_pos == n_action.post_pos and \
+                action.key_action in ACTION_STACKABLE and \
+                not action.action_text.isspace():
+                action = n_action
+                self._undo(editor, action)
+            else:
+                self._stack_undo.append(n_action)
+                break
+
+    def _redo(self, editor: object, action: _Action) -> None:
+        self._add(action, 'undo')
+        reverse_action_method = getattr(editor, action.key_action.decode(), lambda *_: None)
+        editor.cpos.set_pos(action.pre_pos)
+        reverse_action_method(action.action_text)
+        editor.cpos.set_pos(action.post_pos)
+
+    def redo(self, editor: object) -> None:
+        """
+        Redo an action taken.
+        
+        Parameters:
+        editor (Editor):
+            the editor in use
+        """
+        try:
+            action: _Action = self._stack_redo.pop()
+        except IndexError:
+            return
+
+        self._redo(editor, action)
+        while self._stack_redo:
+            n_action: _Action = self._stack_redo.pop()
+            if action.key_action == n_action.key_action and \
+                action.post_pos == n_action.pre_pos and \
+                action.key_action in ACTION_STACKABLE and \
+                not action.action_text.isspace():
+                action = n_action
+                self._redo(editor, action)
+            else:
+                self._stack_redo.append(n_action)
+                break
