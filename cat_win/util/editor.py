@@ -76,9 +76,9 @@ class Editor:
             self.line_sep = get_newline(self.file)
             with open(self.file, 'r', encoding=self.file_encoding) as _f:
                 for line in _f.read().split('\n'):
-                    self.window_content.append([*line])
+                    self.window_content.append(line)
         except (OSError, UnicodeDecodeError) as exc:
-            self.window_content.append([])
+            self.window_content.append('')
             self.status_bar_size = 2
             self.error_bar = str(exc)
             self.unsaved_progress = True
@@ -100,14 +100,16 @@ class Editor:
         self.window_content[self.cpos.row] = self.window_content[self.cpos.row][:self.cpos.col]
         self.cpos.row += 1
         self.cpos.col = 0
-        self.window_content.insert(self.cpos.row, [] + new_line)
+        self.window_content.insert(self.cpos.row, new_line)
         self.unsaved_progress = True
         return ''
 
     def _key_dc(self, _) -> str:
         if self.cpos.col < len(self.window_content[self.cpos.row]):
             deleted = self.window_content[self.cpos.row][self.cpos.col]
-            del self.window_content[self.cpos.row][self.cpos.col]
+            self.window_content[self.cpos.row] = \
+                self.window_content[self.cpos.row][:self.cpos.col] + \
+                self.window_content[self.cpos.row][self.cpos.col+1:]
             self.unsaved_progress = True
             return deleted
         if self.cpos.row < len(self.window_content)-1:
@@ -120,7 +122,7 @@ class Editor:
     def _key_dl(self, _) -> str:
         if self.cpos.col == len(self.window_content[self.cpos.row])-1:
             deleted = self.window_content[self.cpos.row][-1]
-            self.window_content[self.cpos.row] = self.window_content[self.cpos.row][:self.cpos.col]
+            self.window_content[self.cpos.row] = self.window_content[self.cpos.row][:-1]
             self.unsaved_progress = True
             return deleted
         if self.cpos.col < len(self.window_content[self.cpos.row])-1:
@@ -129,7 +131,7 @@ class Editor:
             while cur_col < len(self.window_content[self.cpos.row]) and \
                 t_p == self.window_content[self.cpos.row][cur_col].isalnum():
                 cur_col += 1
-            deleted = ''.join(self.window_content[self.cpos.row][self.cpos.col:cur_col])
+            deleted = self.window_content[self.cpos.row][self.cpos.col:cur_col]
             self.window_content[self.cpos.row] = (
                 self.window_content[self.cpos.row][:self.cpos.col] + \
                 self.window_content[self.cpos.row][cur_col:])
@@ -146,7 +148,9 @@ class Editor:
         if self.cpos.col: # delete char
             self.cpos.col -= 1
             deleted = self.window_content[self.cpos.row][self.cpos.col]
-            del self.window_content[self.cpos.row][self.cpos.col]
+            self.window_content[self.cpos.row] = \
+                self.window_content[self.cpos.row][:self.cpos.col] + \
+                self.window_content[self.cpos.row][self.cpos.col+1:]
             self.unsaved_progress = True
             return deleted
         if self.cpos.row: # or delete line
@@ -163,7 +167,7 @@ class Editor:
         if self.cpos.col == 1: # delete char
             self.cpos.col = 0
             deleted = self.window_content[self.cpos.row][self.cpos.col]
-            del self.window_content[self.cpos.row][self.cpos.col]
+            self.window_content[self.cpos.row] = self.window_content[self.cpos.row][1:]
             self.unsaved_progress = True
             return deleted
         if self.cpos.col > 1:
@@ -175,8 +179,10 @@ class Editor:
                 self.cpos.col -= 1
             if self.cpos.col:
                 self.cpos.col += 1
-            deleted = ''.join(self.window_content[self.cpos.row][self.cpos.col:old_col])
-            del self.window_content[self.cpos.row][self.cpos.col:old_col]
+            deleted = self.window_content[self.cpos.row][self.cpos.col:old_col]
+            self.window_content[self.cpos.row] = \
+                self.window_content[self.cpos.row][:self.cpos.col] + \
+                self.window_content[self.cpos.row][old_col:]
             self.unsaved_progress = True
             return deleted
         if self.cpos.row: # or delete line
@@ -297,7 +303,9 @@ class Editor:
         if not (isinstance(wchars, str) and wchars.isprintable() or wchars == '\t'):
             return ''
         self.unsaved_progress = True
-        self.window_content[self.cpos.row][self.cpos.col:self.cpos.col] = list(wchars)
+        self.window_content[self.cpos.row] = \
+            self.window_content[self.cpos.row][:self.cpos.col] + wchars + \
+            self.window_content[self.cpos.row][self.cpos.col:]
         self.cpos.col += len(wchars)
         return wchars
 
@@ -321,7 +329,7 @@ class Editor:
         (bool):
             indicates if the editor should keep running
         """
-        content = self.line_sep.join([''.join(line) for line in self.window_content])
+        content = self.line_sep.join(self.window_content)
         try:
             write_func(content, self.file, self.file_encoding)
             self.changes_made = True
