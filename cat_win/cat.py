@@ -668,7 +668,7 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
                     f"{replace_values[1]}{color_dic[CKW.RESET_ALL]}"))
                            for prefix, line in content]
             elif arg == ARGS_CHR:
-                for c_id, char, _, possible in list(SPECIAL_CHARS.values()):
+                for c_id, char, _, possible in SPECIAL_CHARS:
                     if not possible:
                         continue
                     content = [(prefix, line.replace(
