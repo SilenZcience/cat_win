@@ -246,12 +246,13 @@ class History:
             return
 
         self._undo(editor, action)
+        is_space = action.action_text.isspace()
         while self._stack_undo:
             n_action: _Action = self._stack_undo.pop()
             if action.key_action == n_action.key_action and \
                 action.pre_pos == n_action.post_pos and \
                 action.key_action in ACTION_STACKABLE and \
-                not action.action_text.isspace():
+                is_space == n_action.action_text.isspace():
                 action = n_action
                 self._undo(editor, action)
             else:
@@ -279,12 +280,13 @@ class History:
             return
 
         self._redo(editor, action)
+        is_space = action.action_text.isspace()
         while self._stack_redo:
             n_action: _Action = self._stack_redo.pop()
             if action.key_action == n_action.key_action and \
                 action.post_pos == n_action.pre_pos and \
                 action.key_action in ACTION_STACKABLE and \
-                not action.action_text.isspace():
+                is_space == n_action.action_text.isspace():
                 action = n_action
                 self._redo(editor, action)
             else:
