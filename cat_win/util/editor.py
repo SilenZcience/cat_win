@@ -10,6 +10,7 @@ except ImportError:
 import sys
 
 from cat_win.util.editorhelper import History, Position, UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS
+from cat_win.util.rawviewer import SPECIAL_CHARS
 
 def get_newline(file: str) -> str:
     """
@@ -55,6 +56,7 @@ class Editor:
         self.window_content = []
 
         self.debug_mode = debug_mode
+        self.special_chars: dict = {}
 
         self.status_bar_size = 1
         self.error_bar = ''
@@ -67,6 +69,14 @@ class Editor:
         self.wpos = Position(0, 0)
 
         self._setup_file()
+
+    def _setput_special_chars(self, special_chars: dict) -> None:
+        self.special_chars = special_chars
+
+    def _get_special_char(self, char: str) -> str:
+        if char in self.special_chars.keys():
+            return self.special_chars[char]
+        return '?'
 
     def _setup_file(self) -> None:
         """
@@ -480,15 +490,17 @@ class Editor:
                 if brow >= len(self.window_content) or bcol >= len(self.window_content[brow]):
                     break
                 try:
-                    if self.window_content[brow][bcol] == '\t':
+                    cur_char = self.window_content[brow][bcol]
+                    if cur_char == '\t':
                         self.curse_window.addch(row, col, '>', self._get_color(4))
-                    elif not self.window_content[brow][bcol].isprintable():
-                        self.curse_window.addch(row, col, '?', self._get_color(5))
+                    elif not cur_char.isprintable():
+                        self.curse_window.addch(row, col, self._get_special_char(cur_char),
+                                                self._get_color(5))
                     elif all(map(lambda c: c.isspace(), self.window_content[brow][bcol:])):
-                        self.curse_window.addch(row, col, self.window_content[brow][bcol],
+                        self.curse_window.addch(row, col, cur_char,
                                                 self._get_color(3))
                     else:
-                        self.curse_window.addch(row, col, self.window_content[brow][bcol])
+                        self.curse_window.addch(row, col, cur_char)
                 except curses.error:
                     break
             self.curse_window.clrtoeol()
@@ -616,6 +628,10 @@ class Editor:
         #     print("The Editor could not be loaded.", file=sys.stderr)
         #     return False
 
+
         editor = cls(file, file_encoding, debug_mode)
+        special_chars = dict(map(lambda x: (chr(x[0]), x[2]), SPECIAL_CHARS))
+        editor._setput_special_chars(special_chars)
+
         curses.wrapper(editor._open, write_func)
         return editor.changes_made
