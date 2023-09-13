@@ -300,7 +300,7 @@ class Editor:
         return None
 
     def _key_string(self, wchars) -> str:
-        if not (isinstance(wchars, str) and wchars.isprintable() or wchars == '\t'):
+        if not isinstance(wchars, str):
             return ''
         self.unsaved_progress = True
         self.window_content[self.cpos.row] = \
