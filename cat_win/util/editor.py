@@ -472,8 +472,7 @@ class Editor:
         row = self.window_content[self.cpos.row] if (
             self.cpos.row < len(self.window_content)) else None
         rowlen = len(row) if row is not None else 0
-        if self.cpos.col > rowlen:
-            self.cpos.col = rowlen
+        self.cpos.col = min(self.cpos.col, rowlen)
 
         # set/enforce the boundaries
         curses.curs_set(0)
@@ -519,12 +518,7 @@ class Editor:
         try:
             if self.error_bar:
                 self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
-                                         self.error_bar[:max_x], self._get_color(2))
-                if (max_x - len(self.error_bar) - 1) > 0:
-                    self.curse_window.addstr(max_y + self.status_bar_size - 2,
-                                             len(self.error_bar),
-                                             " " * (max_x - len(self.error_bar) - 1),
-                                             self._get_color(2))
+                                         self.error_bar[:max_x].ljust(max_x), self._get_color(2))
 
             status_bar = f"File: {self.file} | Exit: ^q | Save: ^s | Pos: {self.cpos.col}"
             status_bar += f", {self.cpos.row} | {'NOT ' * self.unsaved_progress}Saved!"
@@ -533,12 +527,9 @@ class Editor:
                 status_bar = f"File: ...{self.file[-necc_space:] * bool(necc_space)} "
                 status_bar += f"| Exit: ^q | Save: ^s | Pos: {self.cpos.col}, {self.cpos.row} "
                 status_bar += f"| {'NOT ' * self.unsaved_progress}Saved!"[:max_x]
+            status_bar = status_bar.ljust(max_x)
             self.curse_window.addstr(max_y + self.status_bar_size - 1, 0,
                                      status_bar, self._get_color(1))
-            if (max_x - len(status_bar) - 1) > 0:
-                self.curse_window.addstr(max_y + self.status_bar_size - 1,
-                                         len(status_bar), " " * (max_x - len(status_bar) - 1),
-                                         self._get_color(1))
         except curses.error:
             pass
 
