@@ -367,18 +367,24 @@ class Editor:
             indicates if the editor should keep running
         """
         if self.unsaved_progress:
-            max_y, max_x = self.getxymax()
-            save_message = 'Save changes? [y]es, [n]o'[:max_x]
-            self.curse_window.addstr(max_y + self.status_bar_size - 1, 0, save_message,
-                                     self._get_color(5))
-            if max_x > len(save_message):
-                self.curse_window.addstr(max_y + self.status_bar_size - 1,
-                                         len(save_message), ' ' * (max_x-len(save_message)-1),
-                                         self._get_color(5))
-            self.curse_window.refresh()
+            def _render_scr() -> None:
+                max_y, max_x = self.getxymax()
+                try:
+                    if self.error_bar:
+                        self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
+                                                self.error_bar[:max_x].ljust(max_x),
+                                                self._get_color(2))
+                    save_message = 'Save changes? [y]es, [n]o; Abort? ^[, ESC'[:max_x].ljust(max_x)
+                    self.curse_window.addstr(max_y + self.status_bar_size - 1, 0, save_message,
+                                            self._get_color(5))
+                except curses.error:
+                    pass
+                self.curse_window.refresh()
+            curses.curs_set(0)
 
             wchar = ''
-            while self.unsaved_progress and wchar.upper() != 'N':
+            while self.unsaved_progress and str(wchar).upper() != 'N':
+                _render_scr()
                 wchar, key = self._get_new_char()
                 if key in ACTION_HOTKEYS:
                     if key == b'_action_quit':
@@ -386,7 +392,8 @@ class Editor:
                     getattr(self, key.decode(), lambda *_: False)(write_func)
                 elif wchar.upper() in ['Y', 'J']:
                     self._action_save(write_func)
-                    break
+                elif wchar == '\x1b': # ESC
+                    return True
 
         return False
 
