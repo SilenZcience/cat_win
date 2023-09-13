@@ -346,7 +346,7 @@ class Editor:
             self.unsaved_progress = False
             self.error_bar = ''
             self.status_bar_size = 1
-        except OSError as exc:
+        except (OSError, UnicodeError) as exc:
             self.unsaved_progress = True
             self.error_bar = str(exc)
             self.status_bar_size = 2
