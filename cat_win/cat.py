@@ -9,6 +9,7 @@ except ImportError:
 from datetime import datetime
 from functools import lru_cache
 from itertools import groupby
+from time import monotonic
 import os
 import platform
 import re
@@ -1143,6 +1144,7 @@ def shell_main():
     shell_prefix = '>>> '
     eof_control_char = 'Z' if on_windows_os else 'D'
     oneline = holder.args_id[ARGS_ONELINE]
+    shell_session_time_start = monotonic()
 
     class CmdExec:
         """
@@ -1188,9 +1190,13 @@ def shell_main():
                   self.last_cmd, "'.", sep='')
 
         def _command_cat(self, _) -> None:
+            shell_session_time = monotonic()-shell_session_time_start
+            hrs, mins, secs = (int(shell_session_time/3600),
+                               int(shell_session_time%3600/60),
+                               int(shell_session_time%60))
             cat = " ,_     _\n |\\\\_,-~/\n / _  _ |    ,--.\n(  @  @ )   / ,-'\n \\  _T_/"
             cat += "-._( (\n /         `. \\\n|         _  \\ |\n \\ \\ ,  /      |\n  || "
-            cat += "|-_\\__   /\n ((_/`(____,-'\a\n"
+            cat += f"|-_\\__   /\n ((_/`(____,-' Session time: {hrs:02d}:{mins:02d}:{secs:02d}s\a\n"
             print('\n'.join(['\t\t\t' + c for c in cat.split('\n')]))
 
         def _command_help(self, _) -> None:
