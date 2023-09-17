@@ -35,7 +35,7 @@ class Editor:
     """
     Editor
     """
-    def __init__(self, file: str, file_encoding: str, debug_mode: bool) -> None:
+    def __init__(self, file: str, file_encoding: str, debug_mode: bool = False) -> None:
         """
         defines an Editor object.
         
@@ -70,7 +70,7 @@ class Editor:
 
         self._setup_file()
 
-    def _setput_special_chars(self, special_chars: dict) -> None:
+    def _set_special_chars(self, special_chars: dict) -> None:
         self.special_chars = special_chars
 
     def _get_special_char(self, char: str) -> str:
@@ -310,7 +310,14 @@ class Editor:
         return None
 
     def _key_string(self, wchars) -> str:
-        if not isinstance(wchars, str):
+        """
+        tries to append (a) char(s) to the screen.
+        
+        Parameters:
+        wchars (int|str):
+            given by curses get_wch()
+        """
+        if not isinstance(wchars, str) or wchars in '\0\x1b':
             return ''
         self.unsaved_progress = True
         self.window_content[self.cpos.row] = \
@@ -629,7 +636,7 @@ class Editor:
 
         editor = cls(file, file_encoding, debug_mode)
         special_chars = dict(map(lambda x: (chr(x[0]), x[2]), SPECIAL_CHARS))
-        editor._setput_special_chars(special_chars)
+        editor._set_special_chars(special_chars)
 
         curses.wrapper(editor._open, write_func)
         return editor.changes_made
