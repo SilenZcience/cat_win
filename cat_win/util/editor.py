@@ -294,8 +294,6 @@ class Editor:
         return None
 
     def _key_ctl_end(self, _) -> str:
-        max_y, _ = self.getxymax()
-        self.wpos.row = max(len(self.window_content)-1-max_y, 0)
         self.cpos.row = len(self.window_content)-1
         self.cpos.col = len(self.window_content[-1])
         return None
