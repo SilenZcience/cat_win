@@ -2,6 +2,7 @@
 zipviewer
 """
 
+import sys
 import zipfile
 
 
@@ -24,12 +25,12 @@ def display_zip(file: str, size_converter) -> bool:
                 file_info_list.append((file_info.filename,
                                        str(size_converter(file_info.file_size)),
                                        str(size_converter(file_info.compress_size))))
-        print(f"The file '{file}' has been detected to be a zip-file. ", end='')
-        print('The archive contains the following files:')
+        print(f"The file '{file}' has been detected to be a zip-file. ", end='', file=sys.stderr)
+        print('The archive contains the following files:', file=sys.stderr)
         length_list = [max(len(_f) for _f in f_info) for f_info in zip(*file_info_list)]
         for name, size, csize in file_info_list:
             print(f"{name.ljust(length_list[0])} " + \
-                f"{size.rjust(length_list[1])} {csize.rjust(length_list[2])}")
+                f"{size.rjust(length_list[1])} {csize.rjust(length_list[2])}", file=sys.stderr)
         return True
     except (zipfile.BadZipfile, OSError):
         return False
