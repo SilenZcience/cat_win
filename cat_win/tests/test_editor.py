@@ -55,6 +55,9 @@ class TestEditor(TestCase):
         editor._key_end(None)
         editor._key_dc(None)
         self.assertListEqual(editor.window_content, ['ie 1line 2'])
+        editor._key_end(None)
+        editor._key_dc(None)
+        self.assertListEqual(editor.window_content, ['ie 1line 2'])        
 
     def test_editor_key_dl(self):
         editor = Editor(test_file_path_editor, 'utf-8')
@@ -65,9 +68,14 @@ class TestEditor(TestCase):
         self.assertListEqual(editor.window_content, [' ', 'line 2'])
         editor._key_dl(None)
         self.assertListEqual(editor.window_content, [' line 2'])
+        editor._key_end(None)
+        editor._key_dl(None)
+        self.assertListEqual(editor.window_content, [' line 2'])
 
     def test_editor_key_backspace(self):
         editor = Editor(test_file_path_editor, 'utf-8')
+        editor._key_backspace(None)
+        self.assertListEqual(editor.window_content, ['line 1', 'line 2'])
         editor._key_ctl_end(None)
         editor._key_backspace(None)
         self.assertListEqual(editor.window_content, ['line 1', 'line '])
@@ -80,6 +88,8 @@ class TestEditor(TestCase):
 
     def test_editor_key_ctl_backspace(self):
         editor = Editor(test_file_path_editor, 'utf-8')
+        editor._key_ctl_backspace(None)
+        self.assertListEqual(editor.window_content, ['line 1', 'line 2'])
         editor._key_ctl_end(None)
         editor._key_ctl_backspace(None)
         self.assertListEqual(editor.window_content, ['line 1', 'line'])
@@ -145,6 +155,9 @@ class TestEditor(TestCase):
         editor = Editor(test_file_path_editor, 'utf-8')
         editor._key_ctl_right(None)
         self.assertEqual(editor.cpos.get_pos(), (0,4))
+        editor._key_ctl_right(None)
+        self.assertEqual(editor.cpos.get_pos(), (0,6))
+        editor.cpos.set_pos((0,5))
         editor._key_ctl_right(None)
         self.assertEqual(editor.cpos.get_pos(), (0,6))
         editor._key_ctl_right(None)
@@ -213,11 +226,13 @@ class TestEditor(TestCase):
         self.assertListEqual(editor.window_content, ['ltestine 1', 'line 2'])
 
     def test_editor_action_save(self):
-        editor = Editor(test_file_path, 'utf-8')
+        editor = Editor(test_file_path, 'utf-8', True)
         exc = OSError('TestError')
         error_def = ErrorDefGen.get_def(exc)
-        self.assertEqual(editor._action_save(error_def), True)
-        self.assertEqual(editor.error_bar, 'TestError')
+        with patch('cat_win.cat.sys.stderr', new=StdOutMock()) as fake_out:
+            self.assertEqual(editor._action_save(error_def), True)
+            self.assertEqual(editor.error_bar, 'TestError')
+            self.assertEqual('TestError\n', fake_out.getvalue())
 
         no_error_def = lambda *_: None
         self.assertEqual(editor._action_save(no_error_def), True)
@@ -230,7 +245,9 @@ class TestEditor(TestCase):
     def test_editor_interrupt(self):
         editor = Editor(test_file_path_oneline, 'utf-8', True)
         with self.assertRaises(KeyboardInterrupt):
-            editor._action_interrupt(None)
+            with patch('cat_win.cat.sys.stderr', new=StdOutMock()) as fake_out:
+                editor._action_interrupt(None)
+                self.assertEqual('Interrupting...\n', fake_out.getvalue())
 
     @patch('cat_win.util.editor.CURSES_MODULE_ERROR', new=True)
     def test_editor_no_curses_error(self):
