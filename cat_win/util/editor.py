@@ -379,7 +379,7 @@ class Editor:
                         self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
                                                 self.error_bar[:max_x].ljust(max_x),
                                                 self._get_color(2))
-                    save_message = 'Save changes? [y]es, [n]o; Abort? ^[, ESC'[:max_x].ljust(max_x)
+                    save_message = 'Save changes? [y]es, [n]o; Abort? ESC'[:max_x].ljust(max_x)
                     self.curse_window.addstr(max_y + self.status_bar_size - 1, 0, save_message,
                                             self._get_color(5))
                 except curses.error:
