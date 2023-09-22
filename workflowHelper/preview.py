@@ -26,7 +26,8 @@ img_path   = os.path.abspath(os.path.join(script_dir, '..', 'img', 'socialPrevie
 text = ''
 with open(init_path, 'r', encoding='utf-8') as iFile:
     text = iFile.readlines()
-text = [t.rstrip() for t in text]
+text = ["__sysversion__ = '3.7 - 3.11'" if t.startswith('__sysversion__') else t.rstrip()
+        for t in text]
 
 LINE_INDEX_LENGTH = len(str(len(text)))
 LINE_LENGTH_LENGTH = len(str(max(map(len, text))))
