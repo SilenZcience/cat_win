@@ -315,7 +315,7 @@ class Editor:
         wchars (int|str):
             given by curses get_wch()
         """
-        if not isinstance(wchars, str) or wchars in '\0\x1b':
+        if not isinstance(wchars, str) or not wchars:
             return ''
         self.unsaved_progress = True
         self.window_content[self.cpos.row] = \
