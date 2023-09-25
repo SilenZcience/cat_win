@@ -293,6 +293,7 @@ line 2$
 
 Replaces every special Character with a readable Token.
 Each Token starts with the '^' Character, followed by a short ASCII Descriptor.
+Note that the special Char ␛ will not be displayed as ^ESC because it is needed for the colored output.
 
 ```console
 > catw test.txt
