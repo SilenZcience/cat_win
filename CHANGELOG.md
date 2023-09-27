@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.6.2] - TBA
+
+### Minor Changes
+
+- special characters like ␛ and ␀ will now be able to be used in the editor.
+
+
 ## [1.6.1] - 2023-09-22
 
 ### Minor Changes
@@ -12,6 +19,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - cat_win will now detect simple zip-archives and display the contained files.
 - When using the Parameter Variant -`E` from -`E`, --`echo` the input will be decoded with unicode sequences.
 - a combination of using --`number` and --`file-prefix` will result in a prefix of the scheme \<sourcefile\>:\<lineno\> in order to support GNU-style link formats.
+
 
 ## [1.6.0] - 2023-08-22
 
