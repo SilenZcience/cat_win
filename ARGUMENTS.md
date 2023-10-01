@@ -494,7 +494,23 @@ it is true for all that, that that 'that' which that 'that' refers to is not the
 ```
 ```console
 > catw test.txt -W
-('that', 4) ("'that'", 4) ('is', 2) ('which', 2) ('refers', 2) ('to', 2) ('it', 1) ('true', 1) ('for', 1) ('all', 1) ('that,', 1) ('not', 1) ('the', 1) ('same', 1)
+The word count includes the following files:
+    <Path>
+
+that: 9
+': 8
+is: 2
+refers: 2
+to: 2
+which: 2
+,: 1
+all: 1
+for: 1
+it: 1
+not: 1
+same: 1
+the: 1
+true: 1
 ```
 
 <a id="search"></a>
