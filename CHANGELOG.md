@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - special characters like ␛ and ␀ will now be able to be used in the editor.
+- added -`w`, --`wordcount` parameter to count the occurrence of every token in all given files.
 
 
 ## [1.6.1] - 2023-09-22
