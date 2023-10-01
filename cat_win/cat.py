@@ -16,7 +16,7 @@ import re
 import sys
 
 from cat_win.const.argconstants import ALL_ARGS, ARGS_EDITOR, ARGS_WORDCOUNT, ARGS_WWORDCOUNT
-from cat_win.const.argconstants import ARGS_HELP, ARGS_NUMBER, ARGS_ENDS, ARGS_TABS, ARGS_SQUEEZE
+from cat_win.const.argconstants import ARGS_HELP, ARGS_NUMBER, ARGS_ENDS, ARGS_SQUEEZE
 from cat_win.const.argconstants import ARGS_REVERSE, ARGS_COUNT, ARGS_BLANK, ARGS_FILES
 from cat_win.const.argconstants import ARGS_INTERACTIVE, ARGS_NOCOL, ARGS_BINVIEW, ARGS_FILE_PREFIX
 from cat_win.const.argconstants import ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN
@@ -663,11 +663,6 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
         for arg, param in holder.args:
             if arg == ARGS_ENDS:
                 content = [(prefix, f"{line}{color_dic[CKW.ENDS]}${color_dic[CKW.RESET_ALL]}")
-                           for prefix, line in content]
-            elif arg == ARGS_TABS:
-                content = [(prefix, line.replace(
-                    '\t', f"{color_dic[CKW.TABS]}^I{color_dic[CKW.RESET_ALL]}"
-                    ))
                            for prefix, line in content]
             elif arg == ARGS_SQUEEZE:
                 content = [list(group)[0] for _, group in groupby(content, lambda x: x[1])]

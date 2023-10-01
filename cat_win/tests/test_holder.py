@@ -2,7 +2,7 @@ from unittest import TestCase
 import os
 
 from cat_win.const.argconstants import ARGS_B64E, ARGS_NOCOL, ARGS_LLENGTH
-from cat_win.const.argconstants import ARGS_NUMBER, ARGS_TABS, ARGS_ENDS, ARGS_REPLACE
+from cat_win.const.argconstants import ARGS_NUMBER, ARGS_ENDS, ARGS_REPLACE
 from cat_win.util.holder import Holder, reduce_list, diff_list
 # import sys
 # sys.path.append('../cat_win')
@@ -127,9 +127,9 @@ class TestHolder(TestCase):
         self.assertListEqual(holder.args, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
         self.assertEqual(holder.args_id.count(True), 2)
 
-        holder.add_args([(ARGS_TABS, 'c')])
+        holder.add_args([(ARGS_ENDS, 'c')])
         self.assertListEqual(holder.args,
-                             [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_TABS, 'c')])
+                             [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_ENDS, 'c')])
         self.assertEqual(holder.args_id.count(True), 3)
 
     def test_delete_args(self):

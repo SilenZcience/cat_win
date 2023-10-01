@@ -60,9 +60,9 @@ class TestCat(TestCase):
 
     def test_cat_output_ends_and_tabs(self):
         cat.holder.set_files([test_file_path])
-        cat.holder.set_args([(2, ''), (3, '')]) #ends & tabs
+        cat.holder.set_args([(2, ''), (25, '')]) #ends & char
 
-        check_against = ('\n'.join([c.replace('\t', '^I') + '$' for c in test_file_content]) +
+        check_against = ('\n'.join([c.replace('\t', '^TAB') + '$' for c in test_file_content]) +
                          '\n')
 
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
