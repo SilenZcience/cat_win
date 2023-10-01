@@ -210,8 +210,7 @@ def _show_wordcount() -> None:
     for hfile in holder.files:
         try:
             with open(hfile.path, 'r', encoding=arg_parser.file_encoding) as file:
-                content = file.read().split()
-                for token in content:
+                for token in re.findall(r'\w+|[^\s\w]', file.read()):
                     if token in word_count:
                         word_count[token] += 1
                     else:
@@ -223,7 +222,12 @@ def _show_wordcount() -> None:
     print(color_dic[CKW.COUNT_AND_FILES], end='')
     print('The word count includes the following files:', end='\n\t')
     print('\n\t'.join(used_files))
-    print(*sorted(word_count.items(), key=lambda token: token[1], reverse=True), end='')
+    sorted_word_count = sorted(word_count.items(), key=lambda token: token[1], reverse=True)
+    format_delimeter = f"{color_dic[CKW.RESET_ALL]}:{color_dic[CKW.COUNT_AND_FILES]} "
+    for _, group in groupby(sorted_word_count, lambda token: token[1]):
+        sorted_group = sorted(group, key=lambda token: token[0])
+        formatted_word_count = map(lambda x: f"{x[0]}{format_delimeter}{x[1]}", sorted_group)
+        print('\n' + '\n'.join(formatted_word_count), end='')
     print(color_dic[CKW.RESET_ALL])
 
 
