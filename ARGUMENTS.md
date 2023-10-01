@@ -58,6 +58,7 @@
                   <li><a href="#url">-U, --url</a></li>
                   <li><a href="#files">-f, --files</a></li>
                   <li><a href="#sum">-s, --sum</a></li>
+                  <li><a href="#wordcount">-w, --wordcount</a></li>
                   <li><a href="#grep">-g, --grep</a></li>
                   <li><a href="#nokeyword">--nk, --nokeyword</a></li>
                   <li><a href="#nobreak">--nb, --nobreak</a></li>
@@ -131,6 +132,7 @@
 ||| |
 | *<a href="#files">-f, --files</a>* | list applied files and file sizes |❌|
 | *<a href="#sum">-s, --sum</a>* | show sum of lines |❌|
+| *<a href="#wordcount">-w, --wordcount</a>* | display the wordcount |❌|
 ||| |
 | *<a href="#grep">-g, --grep</a>* | only show lines containing queried keywords or patterns |✔|
 | *<a href="#nokeyword">--nk, --nokeyword</a>* | inverse the grep output |✔|
@@ -456,7 +458,6 @@ Sum:    13.0 B
 Amount: 1
 ```
 
-
 ### <a id="sum">-s, --sum</a>
 
 Displays a small Message at the End of Code execution showing the Number of the Amount of all Lines received.
@@ -478,6 +479,22 @@ File             LineCount
 <Path>/test.txt  2
 
 Lines (Sum): 4
+```
+
+### <a id="wordcount">-w, --wordcount</a>
+
+Displays a Summary of all Tokens/Words found in the given Files and how frequent they occured.
+The Output will be sorted by the Frequency of Occurrence starting with the most common Word.
+In Addition the used Files will be displayed beforehand.
+Using this Argument in uppercase (-W, --WORDCOUNT) will ONLY display this Message and stop Code execution.
+
+```console
+> catw test.txt
+it is true for all that, that that 'that' which that 'that' refers to is not the same 'that' which that 'that' refers to
+```
+```console
+> catw test.txt -W
+('that', 4) ("'that'", 4) ('is', 2) ('which', 2) ('refers', 2) ('to', 2) ('it', 1) ('true', 1) ('for', 1) ('all', 1) ('that,', 1) ('not', 1) ('the', 1) ('same', 1)
 ```
 
 <a id="search"></a>
