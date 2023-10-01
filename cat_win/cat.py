@@ -692,7 +692,7 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
                     if not possible:
                         continue
                     content = [(prefix, line.replace(
-                        chr(c_id), f"{color_dic[CKW.REPLACE]}^{char}{color_dic[CKW.RESET_ALL]}"
+                        chr(c_id), f"{color_dic[CKW.CHARS]}^{char}{color_dic[CKW.RESET_ALL]}"
                         )) for prefix, line in content]
 
     if holder.args_id[ARGS_LLENGTH]:
