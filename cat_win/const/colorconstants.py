@@ -86,7 +86,7 @@ class CKW:
     LINE_LENGTH = 'line_length'
     FILE_PREFIX = 'file_prefix'
     ENDS = 'line_ends'
-    TABS = 'tab_characters'
+    CHARS = 'special_chars'
     CONVERSION = 'number_conversion'
     EVALUATION = 'number_evaluation'
     REPLACE = 'substring_replacement'
