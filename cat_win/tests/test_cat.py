@@ -3,6 +3,7 @@ from unittest.mock import patch
 import os
 
 from cat_win import cat
+from cat_win.const.argconstants import ARGS_ENDS, ARGS_REVERSE, ARGS_CHR
 from cat_win.tests.mocks.std import StdOutMock
 from cat_win.util.file import File
 from cat_win.util.holder import Holder
@@ -48,7 +49,7 @@ class TestCat(TestCase):
 
     def test_cat_output_reverse(self):
         cat.holder.set_files([test_file_path])
-        cat.holder.set_args([(5, '')]) #reverse
+        cat.holder.set_args([(ARGS_REVERSE, '')]) #reverse
 
         check_against = test_file_content
         check_against.reverse()
@@ -60,7 +61,7 @@ class TestCat(TestCase):
 
     def test_cat_output_ends_and_tabs(self):
         cat.holder.set_files([test_file_path])
-        cat.holder.set_args([(2, ''), (25, '')]) #ends & char
+        cat.holder.set_args([(ARGS_ENDS, ''), (ARGS_CHR, '')]) #ends & char
 
         check_against = ('\n'.join([c.replace('\t', '^TAB') + '$' for c in test_file_content]) +
                          '\n')
