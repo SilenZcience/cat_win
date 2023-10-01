@@ -35,6 +35,7 @@ SPECIAL_CHARS = [
     # (29, 'GS' , '␝', False), # ^] group seperator
     # (30, 'RS' , '␞', False), # ^^ record seperator
     # (31, 'US' , '␟', False), # ^_ unit seperator
+    # (127,'DEL', '␡', False), # delete
 ]
 
 

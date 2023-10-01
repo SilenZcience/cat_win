@@ -15,7 +15,7 @@ import platform
 import re
 import sys
 
-from cat_win.const.argconstants import ALL_ARGS, ARGS_EDITOR
+from cat_win.const.argconstants import ALL_ARGS, ARGS_EDITOR, ARGS_WORDCOUNT, ARGS_WWORDCOUNT
 from cat_win.const.argconstants import ARGS_HELP, ARGS_NUMBER, ARGS_ENDS, ARGS_TABS, ARGS_SQUEEZE
 from cat_win.const.argconstants import ARGS_REVERSE, ARGS_COUNT, ARGS_BLANK, ARGS_FILES
 from cat_win.const.argconstants import ARGS_INTERACTIVE, ARGS_NOCOL, ARGS_BINVIEW, ARGS_FILE_PREFIX
@@ -201,6 +201,30 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     err_print(arg_parser.file_truncate)
     err_print('===================================================' + \
               '====================================================')
+
+
+def _show_wordcount() -> None:
+    word_count = {}
+    used_files = []
+
+    for hfile in holder.files:
+        try:
+            with open(hfile.path, 'r', encoding=arg_parser.file_encoding) as file:
+                content = file.read().split()
+                for token in content:
+                    if token in word_count:
+                        word_count[token] += 1
+                    else:
+                        word_count[token] = 1
+            used_files.append(hfile.displayname)
+        except (OSError, UnicodeError):
+            pass
+
+    print(color_dic[CKW.COUNT_AND_FILES], end='')
+    print('The word count includes the following files:', end='\n\t')
+    print('\n\t'.join(used_files))
+    print(*sorted(word_count.items(), key=lambda token: token[1], reverse=True), end='')
+    print(color_dic[CKW.RESET_ALL])
 
 
 def _show_count() -> None:
@@ -897,6 +921,9 @@ def edit_files() -> None:
             print_raw_view(i, raw_view_mode)
         else:
             edit_file(i)
+    if holder.args_id[ARGS_WORDCOUNT]:
+        print('')
+        _show_wordcount()
     if holder.args_id[ARGS_COUNT]:
         print('')
         _show_count()
@@ -1084,6 +1111,9 @@ def main():
 
     if holder.args_id[ARGS_CCOUNT]:
         _show_count()
+        return
+    if holder.args_id[ARGS_WWORDCOUNT]:
+        _show_wordcount()
         return
 
     try:

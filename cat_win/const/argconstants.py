@@ -29,6 +29,7 @@ ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN = range(35, 38)
 ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(38, 40)
 ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY, ARGS_FILE_PREFIX = range(40, 45)
 ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI, ARGS_EDITOR = range(45, 50)
+ARGS_WORDCOUNT, ARGS_WWORDCOUNT = range(50, 52)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -87,6 +88,10 @@ ALL_ARGS = [
 				ARGS_COUNT, show_arg_on_shell=False, section=5),
     ArgConstant('-S', '--SUM', 'ONLY show sum of lines',
 				ARGS_CCOUNT, show_arg=False, section=5),
+    ArgConstant('-w', '--wordcount', 'display the wordcount',
+                ARGS_WORDCOUNT, section=5),
+    ArgConstant('-W', '--WORDCOUNT', 'ONLY display the wordcount',
+                ARGS_WWORDCOUNT, section=5),
 
     # search and match
     ArgConstant('-g', '--grep', 'only show lines containing queried keywords or patterns',
