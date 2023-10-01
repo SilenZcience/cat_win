@@ -89,9 +89,9 @@ ALL_ARGS = [
     ArgConstant('-S', '--SUM', 'ONLY show sum of lines',
 				ARGS_CCOUNT, show_arg=False, section=5),
     ArgConstant('-w', '--wordcount', 'display the wordcount',
-                ARGS_WORDCOUNT, section=5),
+                ARGS_WORDCOUNT, show_arg_on_shell=False, section=5),
     ArgConstant('-W', '--WORDCOUNT', 'ONLY display the wordcount',
-                ARGS_WWORDCOUNT, section=5),
+                ARGS_WWORDCOUNT, show_arg=False, section=5),
 
     # search and match
     ArgConstant('-g', '--grep', 'only show lines containing queried keywords or patterns',
