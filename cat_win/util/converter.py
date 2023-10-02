@@ -115,9 +115,9 @@ class Converter():
                 except SyntaxError:
                     new_l_tokens.append(f"{self.colors[0]}" + \
                         f"{('?' * len(res.group()) if integrated else '?')}{self.colors[2]}")
-                except (NameError, ValueError) as exc_inner:
+                except (NameError, ValueError, ArithmeticError) as exc_inner:
                     self._evaluate_exception_handler(exc_inner, res.group(), new_l_tokens)
-            except (NameError, ValueError) as exc:
+            except (NameError, ValueError, ArithmeticError) as exc:
                 self._evaluate_exception_handler(exc, res.group(), new_l_tokens)
             _l = _l[res.end():]
             res = re.search(self._eval_regex, _l)
