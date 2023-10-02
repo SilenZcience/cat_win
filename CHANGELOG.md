@@ -13,6 +13,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Bugfixes
 
 - fix Bug where the colors used were not consistent.
+- fix Bug where the --`eval`, --`EVAL` parameter would crash on invalid expressions.
 
 
 ## [1.6.1] - 2023-09-22
