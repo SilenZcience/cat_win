@@ -91,6 +91,14 @@ class TestConverter(TestCase):
         self.assertEqual(converter.is_bin('2'), expected_output)
         self.assertEqual(converter.is_bin('0x1'), expected_output)
 
+    def test_evaluate_integrated(self):
+        self.assertEqual(converter.evaluate('test11**2test', True), 'test121test')
+        self.assertEqual(converter.evaluate('test(5/(3-0x3))test', True), 'test???test')
+
+    def test_evaluate_not_integrated(self):
+        self.assertEqual(converter.evaluate('test11**2test', False), '121')
+        self.assertEqual(converter.evaluate('test(5/(3-0x3))test', False), '???')
+
     def test_exception_handler(self):
         exc = ZeroDivisionError()
         group = '1/0'
