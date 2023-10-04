@@ -213,7 +213,7 @@ class ArgParser:
             for i, p_split in enumerate(param[6:].split(':')):
                 try:
                     self.file_truncate[i] = int(eval(p_split))
-                except (SyntaxError, NameError, ValueError):
+                except (SyntaxError, NameError, ValueError, ArithmeticError):
                     self.file_truncate[i] = None
             return False
         # '[' + ARGS_CUT + ']'
