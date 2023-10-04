@@ -660,7 +660,7 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
                 try:
                     content = [(prefix, eval(repr(line) + param))
                                 for prefix, line in content]
-                except (SyntaxError, NameError, ValueError):
+                except (SyntaxError, NameError, ValueError, ArithmeticError):
                     err_print('Error at operation: ', param)
                     return
 
