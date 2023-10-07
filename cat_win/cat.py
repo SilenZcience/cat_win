@@ -657,12 +657,14 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
     if not show_bytecode:
         for arg, param in holder.args:
             if arg == ARGS_CUT:
-                try:
-                    content = [(prefix, eval(repr(line) + param))
-                                for prefix, line in content]
-                except (SyntaxError, NameError, ValueError, ArithmeticError):
-                    err_print('Error at operation: ', param)
-                    return
+                slice_evals = [None, None, None]
+                for i, p_split in enumerate(param[1:-1].split(':')):
+                    try:
+                        slice_evals[i] = int(eval(p_split))
+                    except (SyntaxError, NameError, ValueError, ArithmeticError):
+                        pass
+                content = [(prefix, line[slice_evals[0]:slice_evals[1]:slice_evals[2]])
+                            for prefix, line in content]
 
         for arg, param in holder.args:
             if arg == ARGS_ENDS:
