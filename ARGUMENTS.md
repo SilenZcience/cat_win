@@ -770,10 +770,44 @@ Using --nocolor will disable all Colors and only display the Output in plain mon
 
 Opens a simple Editor to write/edit the Content of any provided File one by one.
 Not-existing Files will be opened first and existing Ones will be able to be edited after that.
-The Editor can be closed using the Hotkey ^q (Ctrl-q).
-The Editor will not save changes automatically.
-To Save the Edits use the Hotkey ^s (Ctrl-s).
+The Editor will not save Changes automatically.
 Files will be saved with the text Encoding defined by <a href="#enc">enc=X, enc&#42889;X</a>.
+Note that ^c (Ctrl-c) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
+The currently supported Key bindings are as follows:
+
+- <kbd>arrow-left</kbd>: move one char left
+- <kbd>arrow-right</kbd>: move one char right
+- <kbd>arrow-up</kbd>: move one line up
+- <kbd>arrow-down</kbd>: move one line down
+- <kbd>ctrl-arrow-left</kbd>: move one word left
+- <kbd>ctrl-arrow-right</kbd>: move one word right
+- <kbd>ctrl-arrow-up</kbd>: move ten lines up
+- <kbd>ctrl-arrow-down</kbd>: move ten lines down
+- <kbd>page-up</kbd>: move one page up
+- <kbd>page-down</kbd>: move one page down
+- <kbd>end</kbd>: move to end of line
+- <kbd>ctrl-end</kbd>: move to end of file
+- <kbd>home</kbd>: move to start of line
+- <kbd>ctrl-home</kbd>: move to start of file
+
+</br>
+
+- <kbd>backspace</kbd>: delete a char on the left side
+- <kbd>ctrl-backspace</kbd>: delete a word on the left side (Windows only)
+- <kbd>delete</kbd>: delete a char on the right side
+- <kbd>ctrl-delete</kbd>: delete a word on the right side
+
+
+</br>
+
+- <kbd>ctrl-z</kbd>: undo an action
+- <kbd>ctrl-y</kbd>: redo an action
+
+</br>
+
+- <kbd>ctrl-s</kbd>: save changes
+- <kbd>ctrl-q</kbd>: close editor (prompt to save, if neccessary)
+- <kbd>ctrl-c</kbd>: interrupt program
 
 ### <a id="clip">-c, --clip</a>
 
