@@ -35,6 +35,8 @@ class Editor:
     """
     Editor
     """
+    loading_failed = False
+
     def __init__(self, file: str, file_encoding: str, debug_mode: bool = False) -> None:
         """
         defines an Editor object.
@@ -621,11 +623,16 @@ class Editor:
         (bool):
             indicates whether or not the editor has written any content to the provided files
         """
+        if Editor.loading_failed:
+            return False
+
         if CURSES_MODULE_ERROR:
             print("The Editor could not be loaded. No Module 'curses' was found.", file=sys.stderr)
             if on_windows_os:
                 print('If you are on Windows OS, try pip-installing ', end='', file=sys.stderr)
                 print("'windows-curses'.", file=sys.stderr)
+            print(file=sys.stderr)
+            Editor.loading_failed = True
             return False
         # if not (sys.stdin.isatty() | sys.stdout.isatty()):
         #     print("The Editor could not be loaded.", file=sys.stderr)
