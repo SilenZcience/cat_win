@@ -773,6 +773,8 @@ Not-existing Files will be opened first and existing Ones will be able to be edi
 The Editor will not save Changes automatically.
 Files will be saved with the text Encoding defined by <a href="#enc">enc=X, enc&#42889;X</a>.
 Note that ^c (Ctrl-c) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
+On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module
+(not working on Python3.12 at the moment).
 The currently supported Key bindings are as follows:
 
 - <kbd>arrow-left</kbd>: move one char left
