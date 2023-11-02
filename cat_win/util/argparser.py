@@ -74,6 +74,7 @@ class ArgParser:
         self._echo_args = []
 
         self._known_file_structures = []
+        self._known_directories = []
 
     def reset_values(self) -> None:
         """
@@ -93,6 +94,16 @@ class ArgParser:
             the list of args
         """
         return self._args
+
+    def get_dirs(self) -> list:
+        """
+        getter of self._known_directories
+        
+        Returns:
+        self._known_directories (list)
+            the list of directories
+        """
+        return self._known_directories
 
     def check_unknown_args(self, shell_arg: bool = False) -> list:
         """
@@ -166,10 +177,19 @@ class ArgParser:
         for struct_type, structure in self._known_file_structures:
             if struct_type == IS_FILE:
                 self._known_files.append(structure)
-                continue
-            for filename in glob.iglob(structure, recursive=True):
-                if os.path.isfile(filename):
-                    self._known_files.append(os.path.realpath(filename))
+            elif struct_type == IS_DIR:
+                for filename in glob.iglob(structure):
+                    if os.path.isfile(filename):
+                        self._known_files.append(os.path.realpath(filename))
+                    else:
+                        self._known_directories.append(filename)
+            elif struct_type == IS_PATTERN:
+                for _filename in glob.iglob(structure, recursive=True):
+                    filename = os.path.realpath(_filename)
+                    if os.path.isfile(filename):
+                        self._known_files.append(os.path.realpath(filename))
+                    else:
+                        self._known_directories.append(filename)
 
         return self._known_files
 
