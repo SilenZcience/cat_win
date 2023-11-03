@@ -28,6 +28,7 @@ from cat_win.const.argconstants import ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RE
 from cat_win.const.argconstants import ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR
 from cat_win.const.argconstants import ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY
 from cat_win.const.argconstants import ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI
+from cat_win.const.argconstants import ARGS_DIRECTORIES, ARGS_DDIRECTORIES
 from cat_win.const.colorconstants import CKW
 from cat_win.persistence.config import Config
 from cat_win.util.argparser import ArgParser
@@ -276,6 +277,22 @@ def _show_files() -> None:
     print(color_dic[CKW.RESET_ALL])
     print(color_dic[CKW.COUNT_AND_FILES], end='')
     print(f"Amount:\t{len(holder.files)}", end='')
+    print(color_dic[CKW.RESET_ALL])
+
+
+def _show_dirs():
+    known_directories = arg_parser.get_dirs()
+    if len(known_directories) == 0:
+        print('No directores have been found!')
+        return
+    print(color_dic[CKW.COUNT_AND_FILES], end='')
+    print('found DIR(s):', end='')
+    print(color_dic[CKW.RESET_ALL])
+    for directory in known_directories:
+        print(f"     {color_dic[CKW.COUNT_AND_FILES]}" + \
+            f"{directory}{color_dic[CKW.RESET_ALL]}")
+    print(color_dic[CKW.COUNT_AND_FILES], end='')
+    print(f"Amount:\t{len(known_directories)}", end='')
     print(color_dic[CKW.RESET_ALL])
 
 
@@ -931,6 +948,9 @@ def edit_files() -> None:
     if holder.args_id[ARGS_FILES]:
         print('')
         _show_files()
+    if holder.args_id[ARGS_DIRECTORIES]:
+        print('')
+        _show_dirs()
     if holder.args_id[ARGS_CLIP]:
         copy_to_clipboard(remove_ansi_codes_from_line(holder.clip_board))
 
@@ -1089,6 +1109,9 @@ def main():
 
     if holder.args_id[ARGS_FFILES]:
         _show_files()
+        return
+    if holder.args_id[ARGS_DDIRECTORIES]:
+        _show_dirs()
         return
     if holder.args_id[ARGS_DATA] or holder.args_id[ARGS_CHECKSUM]:
         _print_meta_and_checksum(holder.args_id[ARGS_DATA], holder.args_id[ARGS_CHECKSUM])

@@ -29,7 +29,7 @@ ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN = range(35, 38)
 ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(38, 40)
 ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY, ARGS_FILE_PREFIX = range(40, 45)
 ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI, ARGS_WORDCOUNT = range(45, 50)
-ARGS_WWORDCOUNT,  = range(50, 51)
+ARGS_WWORDCOUNT, ARGS_DIRECTORIES, ARGS_DDIRECTORIES = range(50, 53)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -84,6 +84,10 @@ ALL_ARGS = [
 				ARGS_FILES, show_arg_on_shell=False, section=5),
     ArgConstant('-F', '--FILES', 'ONLY list applied files and file sizes',
 				ARGS_FFILES, show_arg=False, section=5),
+    ArgConstant('-d', '--dirs', 'list found directories',
+				ARGS_DIRECTORIES, show_arg_on_shell=False, section=5),
+    ArgConstant('-D', '--DIRS', 'ONLY list found directories',
+				ARGS_DDIRECTORIES, show_arg=False, section=5),
     ArgConstant('-s', '--sum', 'show sum of lines',
 				ARGS_COUNT, show_arg_on_shell=False, section=5),
     ArgConstant('-S', '--SUM', 'ONLY show sum of lines',
