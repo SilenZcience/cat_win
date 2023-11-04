@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.6.4] - TBA
+
+### Minor Changes
+
+- providing a directory as an argument will no longer result in a recursive query. Recursion will still be possible using file-patterns.
+- added -`d`, --`dirs` parameter to display all found directories.
+
+
 ## [1.6.3] - 2023-10-31
 
 ### Bugfixes
