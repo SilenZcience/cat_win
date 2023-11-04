@@ -6,8 +6,9 @@ from cat_win.util.argparser import ArgParser, levenshtein
 # import sys
 # sys.path.append('../cat_win')
 
-
-test_file_dir = os.path.join(os.path.dirname(__file__), 'texts')
+test_file_dir = os.path.dirname(__file__)
+project_dir = os.path.dirname(test_file_dir)
+test_text_file_dir = os.path.join(test_file_dir, 'texts')
 
 
 class TestArgParser(TestCase):
@@ -121,7 +122,7 @@ class TestArgParser(TestCase):
     def test_get_arguments_dir(self):
         arg_parser = ArgParser()
         args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(
-            ['CAT', test_file_dir])
+            ['CAT', test_text_file_dir])
         known_files = arg_parser.get_files()
         self.assertCountEqual(args, [])
         self.assertCountEqual(unknown_args, [])
@@ -131,9 +132,9 @@ class TestArgParser(TestCase):
 
     def test_get_arguments_files_equal_dir(self):
         arg_parser = ArgParser()
-        arg_parser.get_arguments(['CAT', test_file_dir])
+        arg_parser.get_arguments(['CAT', test_text_file_dir])
         known_files_dir = arg_parser.get_files()
-        arg_parser.get_arguments(['CAT', test_file_dir + '/**.txt'])
+        arg_parser.get_arguments(['CAT', test_text_file_dir + '/**.txt'])
         known_files_files = arg_parser.get_files()
         self.assertCountEqual(known_files_dir, known_files_files)
 
@@ -158,14 +159,14 @@ class TestArgParser(TestCase):
     def test_get_arguments_echo_args(self):
         arg_parser = ArgParser()
         args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(
-            ['CAT', '-n', '-E', '-n', 'random', test_file_dir])
+            ['CAT', '-n', '-E', '-n', 'random', test_text_file_dir])
         known_files = arg_parser.get_files()
         args = list(map(lambda x: x[1], args))
         self.assertCountEqual(args, ['-n', '-E'])
         self.assertCountEqual(unknown_args, [])
         self.assertCountEqual(known_files, [])
         self.assertCountEqual(unknown_files, [])
-        self.assertCountEqual(echo_args, ['-n', 'random', test_file_dir])
+        self.assertCountEqual(echo_args, ['-n', 'random', test_text_file_dir])
 
     def test_get_arguments_echo_args_recursive(self):
         arg_parser = ArgParser()
@@ -215,3 +216,37 @@ class TestArgParser(TestCase):
                                81.8181, 3)
         self.assertAlmostEqual(levenshtein('lower!', 'LOWER?'), 83.3333, 3)
         self.assertAlmostEqual(levenshtein('--hecksview', '--hexview'), 66.6666, 3)
+
+    def test_known_directories(self):
+        inside_project_dirs = [
+            'const',
+            'persistence',
+            'tests',
+            'util',
+            'web',
+        ]
+        inside_test_dirs = [
+            'mocks',
+            'resources',
+            'texts',
+        ]
+        arg_parser = ArgParser()
+        arg_parser._add_argument(test_file_dir)
+        arg_parser.get_files()
+        dirs = '\n'.join(arg_parser.get_dirs())
+        for dir in inside_test_dirs:
+            self.assertIn(dir, dirs)
+
+        arg_parser = ArgParser()
+        arg_parser._add_argument(project_dir)
+        arg_parser.get_files()
+        dirs = '\n'.join(arg_parser.get_dirs())
+        for dir in inside_project_dirs:
+            self.assertIn(dir, dirs)
+
+        arg_parser = ArgParser()
+        arg_parser._add_argument(project_dir + '/**')
+        arg_parser.get_files()
+        dirs = '\n'.join(arg_parser.get_dirs())
+        for dir in inside_project_dirs + inside_test_dirs:
+            self.assertIn(dir, dirs)

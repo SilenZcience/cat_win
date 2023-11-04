@@ -179,4 +179,11 @@ class TestCat(TestCase):
         prefix = cat._get_file_prefix('pre ', 0, True)
         self.assertEqual(prefix, 'pre test_uri/b/c.x ')
 
+    @patch('cat_win.cat.arg_parser._known_directories', new=['dirA', 'dirB'])
+    def test__dirs_output(self):
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+            cat._show_dirs()
+            self.assertIn('dirA', fake_out.getvalue())
+            self.assertIn('dirB', fake_out.getvalue())
+
 # python -m unittest discover -s cat_win.tests -p test*.py
