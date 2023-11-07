@@ -10,12 +10,16 @@ Start of documentation: 2023-02-16 / v1.1.0
 - providing a directory as an argument will no longer result in a recursive query. Recursion will still be possible using file-patterns.
 - added -`d`, --`dirs` parameter to display all found directories.
 
+### Bugfixes
+
+- tested compatibility with pypy-3.7 and pypy-3.10.
+
 
 ## [1.6.3] - 2023-10-31
 
 ### Bugfixes
 
-- compatibily for Python v3.12.
+- compatibility for Python v3.12.
 
 
 ## [1.6.2] - 2023-10-10
