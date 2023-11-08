@@ -57,6 +57,7 @@
                   <li><a href="#oneline">-o, --oneline</a></li>
                   <li><a href="#url">-U, --url</a></li>
                   <li><a href="#files">-f, --files</a></li>
+                  <li><a href="#dirs">-d, --dirs</a></li>
                   <li><a href="#sum">-s, --sum</a></li>
                   <li><a href="#wordcount">-w, --wordcount</a></li>
                   <li><a href="#grep">-g, --grep</a></li>
@@ -131,6 +132,7 @@
 | *<a href="#url">-U, --url</a>* | display the contents of any provided url |❌|
 ||| |
 | *<a href="#files">-f, --files</a>* | list applied files and file sizes |❌|
+| *<a href="#dirs">-d, --dirs</a>* | list found directories |❌|
 | *<a href="#sum">-s, --sum</a>* | show sum of lines |❌|
 | *<a href="#wordcount">-w, --wordcount</a>* | display the wordcount |❌|
 ||| |
@@ -457,6 +459,35 @@ applied FILE(s):
 Sum:    13.0 B
 Amount: 1
 ```
+
+### <a id="dirs">-d, --dirs</a>
+
+Displays a small Summary at the End of Code execution showing every Directory found.
+Using this Argument in uppercase (-D, --DIRS) will ONLY display the Summary and stop Code execution.
+
+```console
+> catw ./** -d
+Line 1
+Line 2
+...
+
+found DIR(s):
+        <Path>
+        <Path>/<PathA>
+        <Path>/<PathA>/<PathAA>
+        <Path>/<PathB>
+Amount: 4
+```
+```console
+> catw ./** -D
+found DIR(s):
+        <Path>
+        <Path>/<PathA>
+        <Path>/<PathA>/<PathAA>
+        <Path>/<PathB>
+Amount: 4
+```
+
 
 ### <a id="sum">-s, --sum</a>
 
