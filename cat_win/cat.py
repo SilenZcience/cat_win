@@ -283,7 +283,9 @@ def _show_files() -> None:
 def _show_dirs():
     known_directories = arg_parser.get_dirs()
     if len(known_directories) == 0:
-        print('No directores have been found!')
+        print(color_dic[CKW.COUNT_AND_FILES], end='')
+        print('No directores have been found!', end='')
+        print(color_dic[CKW.RESET_ALL])
         return
     print(color_dic[CKW.COUNT_AND_FILES], end='')
     print('found DIR(s):', end='')
