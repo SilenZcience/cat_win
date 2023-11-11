@@ -27,7 +27,7 @@ class Config:
                    CKW.MATCHED: ColorOptions.Back['CYAN'],
                    CKW.MATCHED_MESSAGE: ColorOptions.Fore['LIGHTCYAN'],
                    CKW.CHECKSUM: ColorOptions.Fore['CYAN'],
-                   CKW.COUNT_AND_FILES: ColorOptions.Fore['CYAN'],
+                   CKW.SUMMARY: ColorOptions.Fore['CYAN'],
                    CKW.ATTRIB_POSITIVE: ColorOptions.Fore['LIGHTGREEN'],
                    CKW.ATTRIB_NEGATIVE: ColorOptions.Fore['LIGHTRED'],
                    CKW.ATTRIB: ColorOptions.Fore['CYAN'],
