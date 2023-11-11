@@ -95,7 +95,7 @@ class CKW:
     MATCHED = 'matched_pattern'
     MATCHED_MESSAGE = 'matched_pattern_message'
     CHECKSUM = 'checksum_message'
-    COUNT_AND_FILES = 'processed_message'
+    SUMMARY = 'processed_message'
     ATTRIB = 'file_attribute_message'
     ATTRIB_POSITIVE = 'active_file_attributes'
     ATTRIB_NEGATIVE = 'missing_file_attributes'
