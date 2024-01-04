@@ -61,6 +61,8 @@
    </ol>
 </details>
 
+<div id="about-the-project"></div>
+
 ## About The Project
 
 [![Unittests]](https://github.com/SilenZcience/cat_win/actions/workflows/unit_test.yml)
@@ -75,18 +77,25 @@ Additionally it includes the feature to strip and reverse the content of any giv
 
 It is of course possible to use cat_win on Linux or MacOS, aswell as Windows!
 
+<div id="made-with"></div>
+
 ### Made With
 [![MadeWith-Python]](https://www.python.org/)
 [![Python][Python-Version]](https://www.python.org/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+<div id="getting-started"></div>
 
 ## Getting Started
+
+<div id="prerequisites"></div>
 
 ### Prerequisites
 
 - Using cat_win as a Python-Package demands a Python-Interpreter (>= 3.7).
 - Using cat_win as an Executable (Windows only!) demands no prerequisites, hereby the stand-alone executables `catw.exe` (& `cats.exe`) are sufficient.
+
+<div id="installation"></div>
 
 ### Installation
 [![Version][CurrentVersion]](https://pypi.org/project/cat-win/)
@@ -119,6 +128,7 @@ which can also be installed after the fact to patch the problem.
 > You can verify the creation of catw.exe yourself by reading the [source code](https://github.com/SilenZcience/cat_win/blob/main/cat_win/cat.py), checking the [origin](https://github.com/SilenZcience/cat_win/tree/main/bin) of the file and validating the corresponding [workflow](https://github.com/SilenZcience/cat_win/blob/main/.github/workflows/build_executable.yml) used.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+<div id="usage"></div>
 
 ## Usage
 
@@ -136,6 +146,8 @@ cats --help
 
 A detailed Documentation of all **Parameters** has moved to another File.
 Read about specific **Arguments & Options** [here](https://github.com/SilenZcience/cat_win/blob/main/ARGUMENTS.md).
+
+<div id="examples"></div>
 
 ### Examples
 
@@ -182,14 +194,19 @@ $ cats --eval --dec -nl
 ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+<div id="changelog"></div>
 
 ## Changelog
 
 Take a look at the [Changelog](https://github.com/SilenZcience/cat_win/blob/main/CHANGELOG.md) file.
 
+<div id="license"></div>
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/SilenZcience/cat_win/blob/main/LICENSE) file for details
+
+<div id="contact"></div>
 
 ## Contact
 
