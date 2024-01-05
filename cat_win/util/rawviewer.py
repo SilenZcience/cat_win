@@ -65,7 +65,7 @@ def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors = None,
     """
     if colors is None or len(colors) < 2:
         colors = ['', '']
-    if mode not in ['x', 'X', 'b']:
+    if mode not in 'xXb':
         mode = 'X'
 
     special_chars = dict(map(lambda x: (x[0], x[2]), SPECIAL_CHARS))
