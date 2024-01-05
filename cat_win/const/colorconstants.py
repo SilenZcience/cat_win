@@ -73,6 +73,10 @@ class ColorOptions:
     for key, _ in __Style.items():
         Style[key] = id_to_code(__Style[key])
 
+    del __Fore
+    del __Back
+    del __Style
+
 
 class CKW:
     """
