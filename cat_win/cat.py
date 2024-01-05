@@ -47,7 +47,7 @@ try:
     from cat_win.util.utility import comp_eval, comp_conv, split_replace
 except SyntaxError: # in case of Python 3.7
     from cat_win.util.utilityold import comp_eval, comp_conv, split_replace
-from cat_win.util.zipviewer import display_zip
+from cat_win.util.specific_formats.zipviewer import display_zip
 from cat_win.util import stdinhelper
 from cat_win.web.updatechecker import print_update_information
 from cat_win import __project__, __version__, __sysversion__, __author__, __url__
@@ -771,7 +771,8 @@ def edit_file(file_index: int = 0) -> None:
         holder.files[file_index].set_plaintext(plain=False)
         if holder.args_id[ARGS_PLAIN_ONLY]:
             return
-        display_zip(holder.files[file_index].path, _convert_size)
+        if display_zip(holder.files[file_index].path, _convert_size):
+            return
         err_print('Failed to open:', holder.files[file_index].displayname)
         try:
             enter_char = '⏎'
