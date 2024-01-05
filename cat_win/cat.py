@@ -532,7 +532,7 @@ def print_file(content: list) -> bool:
                     f"{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_MATCHED]}")
                                  for _, pos in m_keywords]
                 fm_substrings.sort(key=lambda x:x[0])
-                print(f"{line_prefix}{','.join([sub for _, sub in fm_substrings])}")
+                print(f"{line_prefix}{','.join(sub for _, sub in fm_substrings)}")
             continue
 
         # when bool(intervals) == True -> found keyword or matched pattern!
@@ -740,7 +740,7 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
 
     if not show_bytecode:
         if holder.args_id[ARGS_CLIP]:
-            holder.clip_board += '\n'.join([prefix + line for prefix, line in content])
+            holder.clip_board += '\n'.join(prefix + line for prefix, line in content)
 
 
 def edit_file(file_index: int = 0) -> None:
@@ -1254,7 +1254,7 @@ def shell_main():
             cat = " ,_     _\n |\\\\_,-~/\n / _  _ |    ,--.\n(  @  @ )   / ,-'\n \\  _T_/"
             cat += "-._( (\n /         `. \\\n|         _  \\ |\n \\ \\ ,  /      |\n  || "
             cat += f"|-_\\__   /\n ((_/`(____,-' Session time: {hrs:02d}:{mins:02d}:{secs:02d}s\a\n"
-            print('\n'.join(['\t\t\t' + c for c in cat.split('\n')]))
+            print('\n'.join('\t\t\t' + c for c in cat.split('\n')))
 
         def _command_help(self, _) -> None:
             print(f"Type ^{eof_control_char} (Ctrl + {eof_control_char}) or '!exit' to exit.")
