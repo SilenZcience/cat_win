@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.6.5] - TBA
+
+### Minor Changes
+
+- removed the prompt to open zip-files in binary mode.
+
+
 ## [1.6.4] - 2023-11-14
 
 ### Minor Changes
