@@ -29,7 +29,7 @@ ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN = range(35, 38)
 ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(38, 40)
 ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY, ARGS_FILE_PREFIX = range(40, 45)
 ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI, ARGS_WORDCOUNT = range(45, 50)
-ARGS_WWORDCOUNT, ARGS_DIRECTORIES, ARGS_DDIRECTORIES = range(50, 53)
+ARGS_WWORDCOUNT, ARGS_DIRECTORIES, ARGS_DDIRECTORIES, ARGS_SPECIFIC_FORMATS = range(50, 54)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -68,6 +68,8 @@ ALL_ARGS = [
 				ARGS_SQUEEZE, show_arg_on_shell=False, section=3),
     ArgConstant('--sort', '--sort', 'sort all lines alphabetically',
 				ARGS_SORT, show_arg_on_shell=False, section=3),
+    ArgConstant('--sf', '--specific-format', 'automatically format specific file types',
+                ARGS_SPECIFIC_FORMATS, show_arg_on_shell=False, section=3),
 
     # different content types
     ArgConstant('-E', '--echo', 'handle every following parameter as stdin',
@@ -160,4 +162,4 @@ ALL_ARGS = [
     ]
 ALL_ARGS.sort(key=lambda x:x.section)
 
-HIGHEST_ARG_ID = max([arg.arg_id for arg in ALL_ARGS])
+HIGHEST_ARG_ID = max(arg.arg_id for arg in ALL_ARGS)

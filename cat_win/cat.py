@@ -28,7 +28,7 @@ from cat_win.const.argconstants import ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RE
 from cat_win.const.argconstants import ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR
 from cat_win.const.argconstants import ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY
 from cat_win.const.argconstants import ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI
-from cat_win.const.argconstants import ARGS_DIRECTORIES, ARGS_DDIRECTORIES
+from cat_win.const.argconstants import ARGS_DIRECTORIES, ARGS_DDIRECTORIES, ARGS_SPECIFIC_FORMATS
 from cat_win.const.colorconstants import CKW
 from cat_win.persistence.config import Config
 from cat_win.util.argparser import ArgParser
@@ -38,6 +38,7 @@ from cat_win.util.converter import Converter
 from cat_win.util.editor import Editor
 from cat_win.util.fileattributes import get_file_meta_data, get_file_size, get_file_mtime
 from cat_win.util.fileattributes import _convert_size
+from cat_win.util.formatter import Formatter
 from cat_win.util.holder import Holder
 from cat_win.util.rawviewer import SPECIAL_CHARS, get_raw_view_lines_gen
 from cat_win.util.stringfinder import StringFinder
@@ -47,8 +48,8 @@ try:
     from cat_win.util.utility import comp_eval, comp_conv, split_replace
 except SyntaxError: # in case of Python 3.7
     from cat_win.util.utilityold import comp_eval, comp_conv, split_replace
-from cat_win.util.specific_formats.zipviewer import display_zip
 from cat_win.util import stdinhelper
+from cat_win.util.zipviewer import display_zip
 from cat_win.web.updatechecker import print_update_information
 from cat_win import __project__, __version__, __sysversion__, __author__, __url__
 
@@ -643,6 +644,9 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
     line_offset (int):
         the offset for counting the line numbers (used in the shell)
     """
+    if holder.args_id[ARGS_SPECIFIC_FORMATS]:
+        content = Formatter.format(content)
+
     if not (content or os.isatty(sys.stdout.fileno()) or file_index < 0):
         # if the content of the file is empty, we check if maybe the file is its own pipe-target.
         # an indicator would be if the file has just been modified to be empty (by the shell).
