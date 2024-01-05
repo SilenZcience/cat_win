@@ -105,7 +105,7 @@ def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors = None,
     for i, byte in enumerate(raw_file_content, start=1):
         line.append(byte)
         if not i % 16:
-            current_line +=  ' '.join([f"{b:0{repr_length}{mode}}" for b in line]) + \
+            current_line +=  ' '.join(f"{b:0{repr_length}{mode}}" for b in line) + \
                             f" {colors[0]}#{colors[1]} " + \
                             ' '.join(map(get_display_char, line))
             yield current_line
@@ -113,7 +113,7 @@ def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors = None,
                 current_line = f"{colors[0]}{i:0{8}X}{colors[1]} "
             line = []
     if line:
-        current_line +=  ' '.join([f"{b:0{repr_length}{mode}}" for b in line]) + ' ' + \
+        current_line +=  ' '.join(f"{b:0{repr_length}{mode}}" for b in line) + ' ' + \
                         ' ' * ((repr_length + 1) * (16-len(line)) - 1) + \
                         f" {colors[0]}#{colors[1]} " + \
                         ' '.join(map(get_display_char, line))

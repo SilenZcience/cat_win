@@ -138,10 +138,10 @@ def get_file_meta_data(file: str, on_windows_os: bool, colors = None) -> str:
 
         attribs = read_attribs(file)
         meta_data += colors[2]
-        meta_data += '+' + ", ".join([x for x, y in attribs if y])
+        meta_data += '+' + ", ".join(x for x, y in attribs if y)
         meta_data += colors[0] + '\n'
         meta_data += colors[3]
-        meta_data += '-' + ", ".join([x for x, y in attribs if not y])
+        meta_data += '-' + ", ".join(x for x, y in attribs if not y)
         meta_data += colors[0] + '\n'
         return meta_data
     except OSError:
