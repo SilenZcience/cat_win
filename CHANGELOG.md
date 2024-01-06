@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - removed the prompt to open zip-files in binary mode.
+- added --`sf`, --`specific-format` parameter to automatically format some file types like json or xml.
 
 
 ## [1.6.4] - 2023-11-14

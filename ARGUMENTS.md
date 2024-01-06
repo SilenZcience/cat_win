@@ -52,6 +52,7 @@
                   <li><a href="#reverse">-r, --reverse</a></li>
                   <li><a href="#unique">-u, --unique</a></li>
                   <li><a href="#sort">--sort, --sort</a></li>
+                  <li><a href="#format">--sf, --specific-format</a></li>
                   <li><a href="#echo">-E, --echo</a></li>
                   <li><a href="#interactive">-i, --interactive</a></li>
                   <li><a href="#oneline">-o, --oneline</a></li>
@@ -125,6 +126,7 @@
 | *<a href="#reverse">-r, --reverse</a>* | reverse output |❌|
 | *<a href="#unique">-u, --unique</a>* | suppress repeated output lines |❌|
 | *<a href="#sort">--sort, --sort</a>* | sort all lines alphabetically |❌|
+| *<a href="#format">--sf, --specific-format</a>* | sort all lines alphabetically |❌|
 ||| |
 | *<a href="#echo">-E, --echo</a>* | handle every following parameter as stdin |❌|
 | *<a href="#interactive">-i, --interactive</a>* | use stdin |❌|
@@ -384,6 +386,39 @@ Sorts the Output alphabetically without case sensitivity.
 > catw test.txt --sort -n
 2) A line that has been sorted to the top!
 1) This line was originally at the top!
+```
+
+### <a id="format">--sf, --specific-format</a>
+
+Automatically format specific File Types.
+Currently supported are .json and .xml.
+
+```console
+> catw --sf -E '{"person":{"name":"Alice","age":25,"employees":[{"name":"Bob"},{"name:":"David"}]}}'
+{
+  "person": {
+    "name": "Alice",
+    "age": 25,
+    "employees": [
+      {
+        "name": "Bob"
+      },
+      {
+        "name:": "David"
+      }
+    ]
+  }
+}
+```
+```console
+> catw --sf -E '<lib><book id="1"><title>Cats</title></book><book id="2"></book></lib>'
+<?xml version="1.0" ?>
+<lib>
+  <book id="1">
+    <title>Cats</title>
+  </book>
+  <book id="2"/>
+</lib>
 ```
 
 <a id="input"></a>
