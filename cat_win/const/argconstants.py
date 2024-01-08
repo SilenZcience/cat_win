@@ -148,7 +148,7 @@ ALL_ARGS = [
     ArgConstant('--nc', '--nocolor', 'disable colored output',
 				ARGS_NOCOL, section=10),
 
-    ArgConstant('--config', '--config', 'change color configuration',
+    ArgConstant('--cconfig', '--cconfig', 'change color configuration',
 				ARGS_CONFIG, section=11),
 
     ArgConstant('-R', '--R', 'reconfigure the stdin and stdout with the parsed encoding',

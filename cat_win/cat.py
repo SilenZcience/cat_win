@@ -30,7 +30,7 @@ from cat_win.const.argconstants import ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARG
 from cat_win.const.argconstants import ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI
 from cat_win.const.argconstants import ARGS_DIRECTORIES, ARGS_DDIRECTORIES, ARGS_SPECIFIC_FORMATS
 from cat_win.const.colorconstants import CKW
-from cat_win.persistence.config import Config
+from cat_win.persistence.cconfig import CConfig
 from cat_win.util.argparser import ArgParser
 from cat_win.util.cbase64 import decode_base64, encode_base64
 from cat_win.util.checksum import get_checksum_from_file
@@ -57,7 +57,7 @@ from cat_win import __project__, __version__, __sysversion__, __author__, __url_
 working_dir = os.path.dirname(os.path.realpath(__file__))
 
 coloramaInit()
-config = Config(working_dir)
+config = CConfig(working_dir)
 
 default_color_dic = config.load_config()
 color_dic = default_color_dic.copy()

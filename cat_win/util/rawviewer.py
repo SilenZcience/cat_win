@@ -39,7 +39,7 @@ SPECIAL_CHARS = [
 ]
 
 
-def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors = None,
+def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors: list = None,
                            file_encoding: str = 'utf-8'):
     """
     return the raw byte representation of a file in hexadecimal or binary
@@ -65,7 +65,7 @@ def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors = None,
     """
     if colors is None or len(colors) < 2:
         colors = ['', '']
-    if mode not in 'xXb':
+    if not (mode and mode in 'xXb'):
         mode = 'X'
 
     special_chars = dict(map(lambda x: (x[0], x[2]), SPECIAL_CHARS))

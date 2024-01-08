@@ -194,16 +194,16 @@ class TestArgParser(TestCase):
         arg_parser._add_argument('--number')
         arg_parser._add_argument('--sord')
         arg_parser._add_argument('--b64')
-        arg_parser._add_argument('--conFjh')
+        arg_parser._add_argument('--cconFjh')
         arg_parser._add_argument('--UNIQUE')
         result = [('--sord', [('--sort', 75.0)]),
                   ('--b64', [('--b64d', 75.0), ('--b64e',  75.0)]),
-                  ('--conFjh', [('--config', 200.0/3.0)]),
+                  ('--cconFjh', [('--cconfig', 500.0/7.0)]),
                   ('--UNIQUE', [('--unique', 100.0)])]
         self.assertListEqual(arg_parser.check_unknown_args(False), result)
         result = [('--sord', []),
                   ('--b64', [('--b64d', 75.0), ('--b64e',  75.0)]),
-                  ('--conFjh', [('--config', 200.0/3.0)]),
+                  ('--cconFjh', [('--cconfig', 500.0/7.0)]),
                   ('--UNIQUE', [])]
         self.assertListEqual(arg_parser.check_unknown_args(True), result)
 
