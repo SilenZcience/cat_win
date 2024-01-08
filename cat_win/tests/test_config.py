@@ -4,13 +4,13 @@ import os
 
 from cat_win.const.colorconstants import ColorOptions, CKW
 from cat_win.tests.mocks.std import StdOutMock
-from cat_win.persistence.config import Config
+from cat_win.persistence.cconfig import CConfig
 # import sys
 # sys.path.append('../cat_win')
 
 
 test_file_dir = os.path.join(os.path.dirname(__file__), 'texts')
-config = Config(test_file_dir)
+config = CConfig(test_file_dir)
 config.load_config()
 
 

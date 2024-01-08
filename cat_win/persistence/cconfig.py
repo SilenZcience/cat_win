@@ -9,7 +9,7 @@ import sys
 from cat_win.const.colorconstants import ColorOptions, CKW
 
 
-class Config:
+class CConfig:
     """
     manages the color configuration. Displays the user interface,
     allows for reading and writing the config file.
