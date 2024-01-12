@@ -1,5 +1,5 @@
 """
-config
+cconfig
 """
 
 import configparser
@@ -31,15 +31,16 @@ class CConfig:
                    CKW.ATTRIB_POSITIVE: ColorOptions.Fore['LIGHTGREEN'],
                    CKW.ATTRIB_NEGATIVE: ColorOptions.Fore['LIGHTRED'],
                    CKW.ATTRIB: ColorOptions.Fore['CYAN'],
+                   CKW.RAWVIEWER: ColorOptions.Fore['LIGHTBLACK'],
                    CKW.MESSAGE_INFORMATION: ColorOptions.Fore['LIGHTBLACK'],
                    CKW.MESSAGE_IMPORTANT: ColorOptions.Fore['YELLOW'],
                    CKW.MESSAGE_WARNING: ColorOptions.Fore['RED'],
-                   CKW.RAWVIEWER: ColorOptions.Fore['LIGHTBLACK']}
+                   }
     elements = list(default_dic.keys())
 
     def __init__(self, working_dir: str) -> None:
         """
-        Initialise the Config() object to load and save
+        Initialise the CConfig() object to load and save
         the color configs.
         
         Parameters:
@@ -80,7 +81,7 @@ class CConfig:
                     self.color_dic[element] = self.default_dic[element]
         except KeyError:
             self.config_parser['COLORS'] = {}
-            # If an error occures we simplfy use the default colors
+            # If an error occures we simply use the default colors
             self.color_dic = self.default_dic
 
         # The Reset Codes should always be the same
@@ -133,7 +134,7 @@ class CConfig:
 
     def _print_all_available_elements(self) -> None:
         """
-        print all available elements which color can be changed.
+        print all available elements that can be changed.
         """
         print('Here is a list of all available elements you may change:')
 
@@ -163,7 +164,7 @@ class CConfig:
             if keyword != '':
                 print(f"Something went wrong. Unknown keyword '{keyword}'")
             try:
-                keyword = input('Input name of keyword to change: ')
+                keyword = input('Input name or id of keyword to change: ')
             except EOFError:
                 print('\nAborting due to End-of-File character...', file=sys.stderr)
                 return
@@ -179,7 +180,7 @@ class CConfig:
             if color != '':
                 print(f"Something went wrong. Unknown option '{color}'.")
             try:
-                color = input('Input color: ')
+                color = input('Input new color: ')
             except EOFError:
                 print('\nAborting due to End-of-File character...', file=sys.stderr)
                 return
