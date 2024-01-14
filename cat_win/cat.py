@@ -21,16 +21,18 @@ from cat_win.const.argconstants import ARGS_REVERSE, ARGS_COUNT, ARGS_BLANK, ARG
 from cat_win.const.argconstants import ARGS_INTERACTIVE, ARGS_NOCOL, ARGS_BINVIEW, ARGS_FILE_PREFIX
 from cat_win.const.argconstants import ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN
 from cat_win.const.argconstants import ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA
-from cat_win.const.argconstants import ARGS_CONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK
+from cat_win.const.argconstants import ARGS_CCONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK
 from cat_win.const.argconstants import ARGS_CHR, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP
 from cat_win.const.argconstants import ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW
 from cat_win.const.argconstants import ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN
-from cat_win.const.argconstants import ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR
+from cat_win.const.argconstants import ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR, ARGS_CONFIG
 from cat_win.const.argconstants import ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY
 from cat_win.const.argconstants import ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI
 from cat_win.const.argconstants import ARGS_DIRECTORIES, ARGS_DDIRECTORIES, ARGS_SPECIFIC_FORMATS
 from cat_win.const.colorconstants import CKW
+from cat_win.const.defaultconstants import DKW
 from cat_win.persistence.cconfig import CConfig
+from cat_win.persistence.config import Config
 from cat_win.util.argparser import ArgParser
 from cat_win.util.cbase64 import decode_base64, encode_base64
 from cat_win.util.checksum import get_checksum_from_file
@@ -57,20 +59,20 @@ from cat_win import __project__, __version__, __sysversion__, __author__, __url_
 working_dir = os.path.dirname(os.path.realpath(__file__))
 
 coloramaInit()
-config = CConfig(working_dir)
+cconfig = CConfig(working_dir)
+config = Config(working_dir)
 
-default_color_dic = config.load_config()
+default_color_dic = cconfig.load_config()
 color_dic = default_color_dic.copy()
+const_dic = config.load_config()
 
-arg_parser = ArgParser()
+arg_parser = ArgParser(const_dic[DKW.DEFAULT_FILE_ENCODING])
 converter = Converter()
 holder = Holder()
 tmp_file_helper = TmpFileHelper()
 
 on_windows_os = platform.system() == 'Windows'
 file_uri_prefix = 'file://' + '/' * on_windows_os
-
-LARGE_FILE_SIZE = 1024 * 1024 * 100  # 100 Megabytes
 
 
 def err_print(*args, **kwargs):
@@ -1019,7 +1021,7 @@ def init(shell: bool = False) -> tuple:
         contains (known_files, unknown_files, echo_args, valid_urls) from the argparser
     """
     # read parameter-args
-    args, _, unknown_files, echo_args = arg_parser.get_arguments(sys.argv)
+    args, _, unknown_files, echo_args = arg_parser.get_arguments(sys.argv + config.get_cmd())
 
     holder.set_args(args)
 
@@ -1048,6 +1050,9 @@ def init(shell: bool = False) -> tuple:
         sys.exit(0)
     if holder.args_id[ARGS_VERSION]:
         _show_version()
+        sys.exit(0)
+    if holder.args_id[ARGS_CCONFIG]:
+        cconfig.save_config()
         sys.exit(0)
     if holder.args_id[ARGS_CONFIG]:
         config.save_config()
@@ -1128,7 +1133,7 @@ def main():
     for file in holder.files:
         file.set_file_size(get_file_size(file.path))
         file_size_sum += file.file_size
-        if file_size_sum >= LARGE_FILE_SIZE:
+        if file_size_sum >= const_dic[DKW.LARGE_FILE_SIZE]:
             err_print(color_dic[CKW.MESSAGE_IMPORTANT], end='')
             err_print('An exceedingly large amount of data is being loaded. ', end='')
             err_print('This may require a lot of time and resources.', end='')
