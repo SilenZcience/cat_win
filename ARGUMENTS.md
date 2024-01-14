@@ -81,6 +81,7 @@
                   <li><a href="#editor">-!, --edit</a></li>
                   <li><a href="#clip">-c, --clip</a></li>
                   <li><a href="#config">--config, --config</a></li>
+                  <li><a href="#cconfig">--cconfig, --cconfig</a></li>
                   <li><a href="#stream">-R, --R&ltstream&gt</a></li>
                   <li><a href="#enc">enc=X, enc&#42889;X</a></li>
                   <li><a href="#find">find=X, find&#42889;X</a></li>
@@ -162,7 +163,8 @@
 | *<a href="#plain">--plain, --plain-only</a>* | ignore non-plaintext files automatically |❌|
 | *<a href="#nocolor">--nc, --nocolor</a>* | disable colored output |✔|
 ||| |
-| *<a href="#config">--config, --config</a>* | change color configuration |✔|
+| *<a href="#config">--config, --config</a>* | change default parameters |✔|
+| *<a href="#cconfig">--cconfig, --cconfig</a>* | change color configuration |✔|
 ||| |
 | *<a href="#stream">-R, --R\<stream\></a>* | reconfigure the std-stream(s) with the parsed encoding </br> \<stream\> = 'in'/'out'/'err' (default is stdin & stdout) | ✔ |
 ||| |
@@ -883,11 +885,50 @@ Copies the entire Output to the Clipboard additionally to printing it to the Std
 
 ### <a id="config">--config, --config</a>
 
+Displays a user interactive config Menu allowing the User to change specific default parameters.
+Stops Code execution after finishing the Configuration.
+The config File will be saved to the installation Directory of cat_win which is by Default the Python directory.
+This means that uninstalling cat_win may result in the config File being left over.
+When using the Windows Executables this Parameter will have no (long term) Effect.
+Valid Options are:
+| Option | Description | Example | Default |
+|--------|-------------|---------|---------|
+| default_command_line | custom command line containing parameters </br> used additionally to the specific parameters </br> of the program call | -n 'find= ' | |
+| default_file_encoding | the file encoding used by default | utf-16 | utf-8 |
+| large_file_size | the size (bytes) at which a warning occurs, </br> by default 100MB | 1024 | 104857600 (100Mb) |
+
+### <a id="cconfig">--cconfig, --cconfig</a>
+
 Displays a user interactive config Menu allowing the User to change the Colors for specific Elements and Arguments.
 Stops Code execution after finishing the Configuration.
 The config File will be saved to the installation Directory of cat_win which is by Default the Python directory.
 This means that uninstalling cat_win may result in the config File being left over.
 When using the Windows Executables this Parameter will have no (long term) Effect.
+Valid Options are:
+
+| Option | Description |
+|--------|-------------|
+| line_numbers | the numbering of each line using '-n' |
+| line_length | the display of each line length using '-l' |
+| file_prefix | the file prefix using '--fp' |
+| line_ends | the end of line marker using '-e' |
+| special_chars | special chars using '--chr' |
+| number_conversion | the converted values using '--bin'/'--oct'/'--hex'/'--dec' |
+| number_evaluation | the evaluated value using '--eval' |
+| substring_replacement | the replaced string using '[a,b]' |
+| found_keyword | the found substring using 'find=x' |
+| found_keyword_message | the message displayed when using 'find=x' |
+| matched_pattern | the matched pattern using 'match=x' |
+| matched_pattern_message | the message displayed when using 'match=x' |
+| checksum_message | the calculated checksum of a given file using '-m' |
+| processed_message | the message displayed using '-f'/'-d'/'-s'/'-w' |
+| active_file_attributes | the attributes a file has set using '-a' |
+| missing_file_attributes | the attributes a file has not set using '-a' |
+| file_attribute_message | the message containing time stamps and file size using '-a' |
+| raw_viewer | the output using '--hexview'/'--binview' |
+| message_information | any informational message like update information |
+| message_important | any important message like large file sizes |
+| message_warning | any warning message like overwriting a file with itself |
 
 <a id="encoding"></a>
 ### <a id="stream">-R, --R\<stream\></a>
