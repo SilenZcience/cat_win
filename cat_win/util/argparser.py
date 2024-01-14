@@ -9,7 +9,6 @@ import re
 from cat_win.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_ECHO
 
 
-DEFAULT_FILE_ENCODING = 'utf-8'
 IS_FILE, IS_DIR, IS_PATTERN = range(0, 3)
 
 
@@ -58,7 +57,8 @@ class ArgParser:
     """
     SIMILARITY_LIMIT = 50.0
 
-    def __init__(self) -> None:
+    def __init__(self, default_file_encoding: str = 'utf-8') -> None:
+        self.default_file_encoding: str = default_file_encoding
         self.file_encoding: str = ''
         self._clear_values()
         self.reset_values()
@@ -80,7 +80,7 @@ class ArgParser:
         """
         The here defined variables may be accessed from the outside.
         """
-        self.file_encoding = DEFAULT_FILE_ENCODING
+        self.file_encoding = self.default_file_encoding
         self.file_search = set()
         self.file_match = set()
         self.file_truncate = [None, None, None]
