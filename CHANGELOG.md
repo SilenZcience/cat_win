@@ -9,6 +9,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - removed the prompt to open zip-files in binary mode.
 - added --`sf`, --`specific-format` parameter to automatically format some file types like json or xml.
+- renamed --`config`, --`config` to --`cconfig`, --`cconfig`.
+- added --`config`, --`config` parameter to configure default parameters.
 
 
 ## [1.6.4] - 2023-11-14
