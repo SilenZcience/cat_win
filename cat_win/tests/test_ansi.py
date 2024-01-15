@@ -23,14 +23,17 @@ with open(ansi_pos_file_path, 'r', encoding='utf-8') as f:
 with open(ansi_neg_file_path, 'r', encoding='utf-8') as f:
     ansi_neg_file_content = f.read()
 
+config = CConfig(os.path.join(os.path.dirname(__file__), 'texts'))
+config.load_config()
+
 strip_color_dic_true = Config.default_dic.copy()
 strip_color_dic_false = Config.default_dic.copy()
 strip_color_dic_false[DKW.STRIP_COLOR_ON_PIPE] = False
 
 
 
-@patch('cat_win.cat.default_color_dic', CConfig.default_dic)
-@patch('cat_win.cat.color_dic', CConfig.default_dic)
+@patch('cat_win.cat.default_color_dic', config.color_dic)
+@patch('cat_win.cat.color_dic', config.color_dic)
 @patch('cat_win.cat.os.isatty', OSAttyDefGen.get_def({1: False}))
 class TestAnsiPiped(TestCase):
     maxDiff = None
@@ -69,8 +72,8 @@ class TestAnsiPiped(TestCase):
             cat.main()
             self.assertEqual(fake_out.getvalue(), ansi_pos_file_content)
 
-@patch('cat_win.cat.default_color_dic', CConfig.default_dic)
-@patch('cat_win.cat.color_dic', CConfig.default_dic)
+@patch('cat_win.cat.default_color_dic', config.color_dic)
+@patch('cat_win.cat.color_dic', config.color_dic)
 @patch('cat_win.cat.os.isatty', OSAttyDefGen.get_def({1: True}))
 class TestAnsiNotPiped(TestCase):
     maxDiff = None
