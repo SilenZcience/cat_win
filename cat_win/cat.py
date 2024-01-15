@@ -56,6 +56,7 @@ from cat_win.web.updatechecker import print_update_information
 from cat_win import __project__, __version__, __sysversion__, __author__, __url__
 
 
+coloramaInit(strip=False)
 working_dir = os.path.dirname(os.path.realpath(__file__))
 
 cconfig = CConfig(working_dir)
@@ -65,8 +66,6 @@ default_color_dic = cconfig.load_config()
 color_dic = default_color_dic.copy()
 const_dic = config.load_config()
 
-coloramaInit(strip=(not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]))
-
 arg_parser = ArgParser(const_dic[DKW.DEFAULT_FILE_ENCODING])
 converter = Converter()
 holder = Holder()
@@ -74,7 +73,7 @@ tmp_file_helper = TmpFileHelper()
 
 on_windows_os = platform.system() == 'Windows'
 file_uri_prefix = 'file://' + '/' * on_windows_os
-
+ANSI_CSI_RE = re.compile('\001?\033\\[((?:\\d|;)*)([a-zA-Z])\002?')
 
 def err_print(*args, **kwargs):
     """
@@ -367,7 +366,7 @@ def remove_ansi_codes_from_line(line: str) -> str:
     #     line = line[:codePosStart] + line[codePosStart+codePosEnd+1:]
     # return line
     # version 2:
-    return re.sub(r'\x1b\[[0-9\;]*m', '', line)
+    return ANSI_CSI_RE.sub('', line)
 
 
 # def removeAnsiCodes(content: list) -> list:
@@ -766,7 +765,10 @@ def edit_file(file_index: int = 0) -> None:
             # splitlines() gives a slight inaccuracy, in case the last line is empty.
             # the alternative would be worse: split('\n') would increase the linecount each
             # time catw touches a file.
-            content = [('', line) for line in file.read().splitlines()]
+            file_content = file.read()
+            if not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]:
+                file_content = remove_ansi_codes_from_line(file_content)
+            content = [('', line) for line in file_content.splitlines()]
     except PermissionError:
         err_print(f"Permission denied! Skipping {holder.files[file_index].displayname} ...")
         return
