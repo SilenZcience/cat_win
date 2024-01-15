@@ -21,6 +21,8 @@ test_eval       = os.path.join(test_file_dir, 'full_test_eval.txt')
 
 
 @patch('cat_win.cat.sys.stdin', StdInMock())
+@patch('cat_win.cat.default_color_dic', dict.fromkeys(cat.color_dic, ''))
+@patch('cat_win.cat.color_dic', dict.fromkeys(cat.color_dic, ''))
 class TestCatFull(TestCase):
     maxDiff = None
 
