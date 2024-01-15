@@ -197,6 +197,10 @@
    - When encountering unknown Files the User is being prompted to write to Stdin.
    - The Stdin is being used to then write the Files.
    - When using the --interactive Parameter unknown Files will be automatically written with the content of Stdin.
+- Coloring
+   - The Output will contain Color by Default.
+   - cat_win will not explicitly add Color if the Argument <a href="#nocolor">--nc, --nocolor</a> is used. (The Output may still contain Color if a File itself contains the ANSI-Color-Coding.)
+   - The Output will be stripped of any Color if the Output is piped and the Configuration `strip_color_on_pipe` is set to `true` .
 
 ### <a id="help">-h, --help</a>
 
@@ -893,9 +897,10 @@ When using the Windows Executables this Parameter will have no (long term) Effec
 Valid Options are:
 | Option | Description | Example | Default |
 |--------|-------------|---------|---------|
-| default_command_line | custom command line containing parameters </br> used additionally to the specific parameters </br> of the program call | -n 'find= ' | |
-| default_file_encoding | the file encoding used by default | utf-16 | utf-8 |
-| large_file_size | the size (bytes) at which a warning occurs, </br> by default 100MB | 1024 | 104857600 (100Mb) |
+| default_command_line | custom Command Line containing Parameters </br> used additionally to the specific Parameters </br> of the Program Call | -n 'find= ' | |
+| default_file_encoding | the File Encoding used by Default | utf-16 | utf-8 |
+| large_file_size | the Size (Bytes) at which a Warning occurs. | 1024 | 104857600 (100Mb) |
+| strip_color_on_pipe | indicate if the Output should be stripped of any Color | no | true |
 
 ### <a id="cconfig">--cconfig, --cconfig</a>
 
