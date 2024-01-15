@@ -3,7 +3,7 @@ from unittest import TestCase
 import os
 
 from cat_win import cat
-from cat_win.tests.mocks.std import StdInMock, StdOutMock, StdOutMockIsAtty
+from cat_win.tests.mocks.std import StdInMock, StdOutMock
 from cat_win.util.argparser import ArgParser
 from cat_win.util.holder import Holder
 # import sys
@@ -205,7 +205,7 @@ following: 1
     @patch('cat_win.cat.sys.argv',
            ['<CAT>', test_file_path, 'trunc=0:0', '--UNIQUE', '--b64', '-?'])
     def test_cat_output_suggestions(self):
-        with patch('cat_win.cat.sys.stderr', new=StdOutMockIsAtty()) as fake_out:
+        with patch('cat_win.cat.sys.stderr', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertIn("Unknown argument: '--UNIQUE'", fake_out.getvalue())
             self.assertIn("Did you mean --unique", fake_out.getvalue())

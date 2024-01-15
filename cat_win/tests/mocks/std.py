@@ -5,6 +5,24 @@ std
 import io
 # import re
 
+
+class OSAttyDefGen:
+    """
+    generate a function to replace os.isatty()
+    """
+
+    @staticmethod
+    def get_def(mapping: dict):
+        """
+        return a function that returns the mapping
+        """
+        def isatty(no: int, *args, **kwargs) -> bool:
+            """
+            return the mapped values
+            """
+            return mapping.get(no, False)
+        return isatty
+
 # ansi_escape_8bit = re.compile(r'''
 #     (?: # either 7-bit C1, two bytes, ESC Fe (omitting CSI)
 #         \x1B
@@ -38,16 +56,6 @@ class StdOutMock(io.StringIO):
         return 1
 
 
-class StdOutMockIsAtty(io.StringIO):
-    """
-    mock for atty stdout stream
-    """
-    closed: bool = False
-
-    def isatty(self) -> bool:
-        return True
-
-
 class StdInMockIter:
     """
     mock for stdin stream iterable
@@ -59,6 +67,9 @@ class StdInMockIter:
 
     # def __iter__(self):
     #     return self
+
+    def fileno(self) -> int:
+        return 0
 
     def __next__(self) -> str:
         if self.index < len(self.splitted_input_value)-1:
