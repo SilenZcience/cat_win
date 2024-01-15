@@ -126,7 +126,7 @@ class Config:
         except KeyError:
             self.config_parser['CONSTS'] = {}
             # If an error occures we simply use the default colors
-            self.const_dic = self.default_dic
+            self.const_dic = self.default_dic.copy()
 
         return self.const_dic
 

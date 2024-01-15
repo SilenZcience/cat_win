@@ -82,7 +82,7 @@ class CConfig:
         except KeyError:
             self.config_parser['COLORS'] = {}
             # If an error occures we simply use the default colors
-            self.color_dic = self.default_dic
+            self.color_dic = self.default_dic.copy()
 
         # The Reset Codes should always be the same
         self.color_dic[CKW.RESET_ALL] = ColorOptions.Style['RESET']
