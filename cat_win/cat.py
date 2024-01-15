@@ -58,13 +58,14 @@ from cat_win import __project__, __version__, __sysversion__, __author__, __url_
 
 working_dir = os.path.dirname(os.path.realpath(__file__))
 
-coloramaInit()
 cconfig = CConfig(working_dir)
 config = Config(working_dir)
 
 default_color_dic = cconfig.load_config()
 color_dic = default_color_dic.copy()
 const_dic = config.load_config()
+
+coloramaInit(strip=(not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]))
 
 arg_parser = ArgParser(const_dic[DKW.DEFAULT_FILE_ENCODING])
 converter = Converter()
@@ -995,7 +996,9 @@ def init_colors() -> None:
     """
     # do not use colors if requested, or output will be piped anyways
     global color_dic
-    if holder.args_id[ARGS_NOCOL] or not sys.stdout.isatty() or sys.stdout.closed:
+
+    if holder.args_id[ARGS_NOCOL] or sys.stdout.closed or \
+        (not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]):
         color_dic = dict.fromkeys(color_dic, '')
     else:
         color_dic = default_color_dic.copy()

@@ -12,8 +12,8 @@ class StdOutMock(io.StringIO):
     # def reconfigure(self, encoding = None) -> None:
     #     return
 
-    # def fileno(self) -> int:
-    #     return 0
+    def fileno(self) -> int:
+        return 1
 
 
 class StdOutMockIsAtty(io.StringIO):

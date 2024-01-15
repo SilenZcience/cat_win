@@ -18,6 +18,7 @@ class Config:
     default_dic = {DKW.DEFAULT_COMMAND_LINE: '',
                    DKW.DEFAULT_FILE_ENCODING: 'utf-8',
                    DKW.LARGE_FILE_SIZE: 1024 * 1024 * 100,  # 100 Megabytes
+                   DKW.STRIP_COLOR_ON_PIPE: True,
                    }
 
     elements = list(default_dic.keys())
@@ -40,6 +41,63 @@ class Config:
         self.longest_char_count = 30
         self.rows = 3
 
+    @staticmethod
+    def convert_config_element(element: str, element_type: type):
+        """
+        Parameters:
+        element (str):
+            the element to convert
+        element_type (type):
+            the type the element should have
+        
+        Returns:
+        (element_type):
+            whatever the element got converted to
+        """
+        if element_type == bool:
+            if element.upper() in ['FALSE', 'NO', 'N', '0']:
+                return False
+            return True
+
+        return element_type(element)
+
+    @staticmethod
+    def is_valid_value(value: str, value_type: type) -> bool:
+        """
+        check if a given value is a valid argument for an element
+        in the constant dict.
+        
+        Parameters:
+        value (str):
+            the value to check
+        value_type (type):
+            the type the value should have
+        
+        Returns
+        (bool):
+            indicates whether the value is valid.
+        """
+        if value == '':
+            return False
+        try:
+            value_type(value)
+            if value_type in [int, float]:
+                return value_type(value) >= 0.0
+            if value_type == bool:
+                return value.upper() in [
+                    'TRUE',
+                    'YES',
+                    'Y',
+                    '1',
+                    'FALSE',
+                    'NO',
+                    'N',
+                    '0',
+                ]
+            return bool(value)
+        except ValueError:
+            return False
+
     def get_cmd(self) -> list:
         """
         split the default command line string correctly into a parameter list
@@ -60,8 +118,9 @@ class Config:
             config_colors = self.config_parser['CONSTS']
             for element in self.elements:
                 try:
-                    type_def = type(self.default_dic[element])
-                    self.const_dic[element] = type_def(config_colors[element])
+                    self.const_dic[element] = Config.convert_config_element(
+                        config_colors[element],
+                        type(self.default_dic[element]))
                 except KeyError:
                     self.const_dic[element] = self.default_dic[element]
         except KeyError:
@@ -111,19 +170,8 @@ class Config:
         print(f"Successfully selected element '{keyword}'")
         print(f"The current value of '{keyword}' is '{self.const_dic[keyword]}'")
 
-        def is_valid_value(value: str) -> bool:
-            type_def = type(self.default_dic[keyword])
-            try:
-                type_def(value)
-                try:
-                    return type_def(value) >= 0
-                except TypeError:
-                    return bool(value)
-            except ValueError:
-                return False
-
         value = ''
-        while not is_valid_value(value):
+        while not Config.is_valid_value(value, type(self.default_dic[keyword])):
             if value != '':
                 print(f"Something went wrong. Invalid option '{value}'.")
             try:
