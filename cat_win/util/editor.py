@@ -634,7 +634,7 @@ class Editor:
             print(file=sys.stderr)
             Editor.loading_failed = True
             return False
-        # if not (sys.stdin.isatty() | sys.stdout.isatty()):
+        # if not (sys.stdin.isatty() | sys.stdout.isatty()): # use os.isatty instead
         #     print("The Editor could not be loaded.", file=sys.stderr)
         #     return False
 
