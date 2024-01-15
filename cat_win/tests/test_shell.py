@@ -11,6 +11,8 @@ stdinhelpermock = StdInHelperMock()
 
 @patch('cat_win.cat.sys.argv', ['<CAT>'])
 @patch('cat_win.cat.stdinhelper.get_stdin_content', stdinhelpermock.get_stdin_content)
+@patch('cat_win.cat.default_color_dic', dict.fromkeys(cat.color_dic, ''))
+@patch('cat_win.cat.color_dic', dict.fromkeys(cat.color_dic, ''))
 class TestShell(TestCase):
     maxDiff = None
 

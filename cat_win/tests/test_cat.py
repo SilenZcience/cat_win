@@ -18,6 +18,7 @@ with open(test_file_path, 'r', encoding='utf-8') as f:
     test_file_content = f.read().split('\n')
 
 
+@patch('cat_win.cat.default_color_dic', dict.fromkeys(cat.color_dic, ''))
 @patch('cat_win.cat.color_dic', dict.fromkeys(cat.color_dic, ''))
 class TestCat(TestCase):
     maxDiff = None
