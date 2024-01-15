@@ -81,6 +81,8 @@ class TestAnsiNotPiped(TestCase):
     def tearDown(self):
         cat._calculate_line_prefix_spacing.cache_clear()
         cat._calculate_line_length_prefix_spacing.cache_clear()
+        cat.arg_parser = ArgParser()
+        cat.holder = Holder()
 
     @patch('cat_win.cat.sys.argv', ['<CAT>', ansi_pos_file_path])
     @patch('cat_win.cat.const_dic', strip_color_dic_true)
