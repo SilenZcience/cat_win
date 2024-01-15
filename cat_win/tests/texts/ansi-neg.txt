@@ -1,0 +1,10 @@
+ 1) [17] import subprocess
+ 2) [10] import sys
+ 3) [14] import hashlib
+ 4) [ 0] 
+ 5) [23] possible_py_version = [
+ 6) [14]     'py -3.7',
+ 7) [14]     'py -3.8',
+ 8) [14]     'py -3.9',
+ 9) [15]     'py -3.10',
+10) [15]     'py -3.11',
