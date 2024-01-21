@@ -529,6 +529,8 @@ class Editor:
 
             status_bar = f"File: {self.file} | Exit: ^q | Save: ^s | Pos: {self.cpos.col}"
             status_bar += f", {self.cpos.row} | {'NOT ' * self.unsaved_progress}Saved!"
+            if self.debug_mode:
+                status_bar += f" - Win: {self.wpos.col} {self.wpos.row} | {max_y}x{max_x}"
             if len(status_bar) > max_x:
                 necc_space = max(0, max_x - (len(status_bar) - len(self.file) + 3))
                 status_bar = f"File: ...{self.file[-necc_space:] * bool(necc_space)} "
