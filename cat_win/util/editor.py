@@ -64,6 +64,7 @@ class Editor:
         self.error_bar = ''
         self.unsaved_progress = False
         self.changes_made = False
+        self.scrolling = False
 
         # current cursor position
         self.cpos = Position(0, 0)
@@ -207,33 +208,29 @@ class Editor:
             return ''
         return None
 
-    def _key_left(self, _) -> str:
+    def _move_key_left(self) -> None:
         if self.cpos.col:
             self.cpos.col -= 1
         elif self.cpos.row:
             self.cpos.row -= 1
             self.cpos.col = len(self.window_content[self.cpos.row])
-        return None
 
-    def _key_right(self, _) -> str:
+    def _move_key_right(self) -> None:
         if self.cpos.col < len(self.window_content[self.cpos.row]):
             self.cpos.col += 1
         elif self.cpos.row < len(self.window_content)-1:
             self.cpos.row += 1
             self.cpos.col = 0
-        return None
 
-    def _key_up(self, _) -> str:
+    def _move_key_up(self) -> None:
         if self.cpos.row:
             self.cpos.row -= 1
-        return None
 
-    def _key_down(self, _) -> str:
+    def _move_key_down(self) -> None:
         if self.cpos.row < len(self.window_content)-1:
             self.cpos.row += 1
-        return None
 
-    def _key_ctl_left(self, _) -> str:
+    def _move_key_ctl_left(self) -> None:
         if self.cpos.col == 1:
             self.cpos.col = 0
         elif self.cpos.col > 1:
@@ -247,9 +244,8 @@ class Editor:
         elif self.cpos.row:
             self.cpos.row -= 1
             self.cpos.col = len(self.window_content[self.cpos.row])
-        return None
 
-    def _key_ctl_right(self, _) -> str:
+    def _move_key_ctl_right(self) -> None:
         if self.cpos.col == len(self.window_content[self.cpos.row])-1:
             self.cpos.col = len(self.window_content[self.cpos.row])
         elif self.cpos.col < len(self.window_content[self.cpos.row])-1:
@@ -261,53 +257,73 @@ class Editor:
         elif self.cpos.row < len(self.window_content)-1:
             self.cpos.row += 1
             self.cpos.col = 0
-        return None
 
-    def _key_ctl_up(self, _) -> str:
+    def _move_key_ctl_up(self) -> None:
         if self.cpos.row >= 10:
             self.cpos.row -= 10
         else:
             self.cpos.row = 0
             self.cpos.col = 0
-        return None
 
-    def _key_ctl_down(self, _) -> str:
+    def _move_key_ctl_down(self) -> None:
         if self.cpos.row < len(self.window_content)-10:
             self.cpos.row += 10
         else:
             self.cpos.row = len(self.window_content)-1
             self.cpos.col = len(self.window_content[self.cpos.row])
-        return None
 
-    def _key_page_up(self, _) -> str:
+    def _scroll_key_shift_left(self) -> None:
+        self.scrolling = True
+        # _, max_x = self.getxymax()
+        self.wpos.col = max(self.wpos.col-1, 0)
+        # if self.cpos.col == self.wpos.col + max_x:
+        #     self.cpos.col -= 1
+
+    def _scroll_key_shift_right(self) -> None:
+        self.scrolling = True
+        max_y, max_x = self.getxymax()
+        max_line = max(map(len,self.window_content[self.wpos.row:self.wpos.row+max_y]))
+        self.wpos.col = max(min(self.wpos.col+1, max_line+1-max_x), 0)
+        # if self.cpos.col == self.wpos.col-1:
+        #     self.cpos.col += 1
+
+    def _scroll_key_shift_up(self) -> None:
+        self.scrolling = True
+        # max_y, _ = self.getxymax()
+        self.wpos.row = max(self.wpos.row-1, 0)
+        # if self.cpos.row == self.wpos.row + max_y:
+        #     self.cpos.row -= 1
+
+    def _scroll_key_shift_down(self) -> None:
+        self.scrolling = True
+        max_y, _ = self.getxymax()
+        self.wpos.row = max(min(self.wpos.row+1, len(self.window_content)-max_y), 0)
+        # if self.cpos.row == self.wpos.row-1:
+        #     self.cpos.row += 1
+
+    def _move_key_page_up(self) -> None:
         max_y, _ = self.getxymax()
         self.wpos.row = max(self.wpos.row-max_y, 0)
         self.cpos.row = max(self.cpos.row-max_y, 0)
-        return None
 
-    def _key_page_down(self, _) -> str:
+    def _move_key_page_down(self) -> None:
         max_y, _ = self.getxymax()
         self.wpos.row = max(min(self.wpos.row+max_y, len(self.window_content)-max_y), 0)
         self.cpos.row = min(self.cpos.row+max_y, len(self.window_content)-1)
-        return None
 
-    def _key_end(self, _) -> str:
+    def _move_key_end(self) -> None:
         self.cpos.col = len(self.window_content[self.cpos.row])
-        return None
 
-    def _key_ctl_end(self, _) -> str:
+    def _move_key_ctl_end(self) -> None:
         self.cpos.row = len(self.window_content)-1
         self.cpos.col = len(self.window_content[-1])
-        return None
 
-    def _key_home(self, _) -> str:
+    def _move_key_home(self) -> None:
         self.cpos.col = 0
-        return None
 
-    def _key_ctl_home(self, _) -> str:
+    def _move_key_ctl_home(self) -> None:
         self.cpos.row = 0
         self.cpos.col = 0
-        return None
 
     def _key_string(self, wchars) -> str:
         """
@@ -482,19 +498,21 @@ class Editor:
         self.cpos.col = min(self.cpos.col, rowlen)
 
         # set/enforce the boundaries
-        curses.curs_set(0)
         try:
             self.curse_window.move(0, 0)
         except curses.error:
             pass
-        if self.cpos.row < self.wpos.row:
-            self.wpos.row = self.cpos.row
-        elif self.cpos.row >= self.wpos.row + max_y:
-            self.wpos.row = self.cpos.row - max_y + 1
-        if self.cpos.col < self.wpos.col:
-            self.wpos.col = self.cpos.col
-        elif self.cpos.col >= self.wpos.col + max_x:
-            self.wpos.col = self.cpos.col - max_x + 1
+
+        if not self.scrolling:
+            if self.cpos.row < self.wpos.row:
+                self.wpos.row = self.cpos.row
+            elif self.cpos.row >= self.wpos.row + max_y:
+                self.wpos.row = self.cpos.row - max_y + 1
+            if self.cpos.col < self.wpos.col:
+                self.wpos.col = self.cpos.col
+            elif self.cpos.col >= self.wpos.col + max_x:
+                self.wpos.col = self.cpos.col - max_x + 1
+
         # display screen
         for row in range(max_y):
             brow = row + self.wpos.row
@@ -547,7 +565,11 @@ class Editor:
                                    max(self.cpos.col-self.wpos.col, 0))
         except curses.error:
             pass
-        curses.curs_set(1)
+        curses.curs_set(not self.scrolling or not (
+            self.cpos.row < self.wpos.row or self.cpos.col < self.wpos.col
+        ))
+
+        self.scrolling = False
         self.curse_window.refresh()
 
     def _run(self, write_func) -> None:
@@ -573,6 +595,8 @@ class Editor:
                 self.history.add(key, action_text, f_len, pre_pos, self.cpos.get_pos())
             elif key in ACTION_HOTKEYS:
                 running &= getattr(self, key.decode(), lambda *_: False)(write_func)
+            else:
+                getattr(self, key.decode(), lambda *_: None)()
 
     def _open(self, curse_window, write_func) -> None:
         """
