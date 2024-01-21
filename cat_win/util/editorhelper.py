@@ -26,53 +26,60 @@ UNIFY_HOTKEYS = {
     # ctrl-backspace
     b'^?'           : b'_key_ctl_backspace', # windows
     # arrows
-    b'KEY_LEFT'     : b'_key_left', # windows & xterm
-    b'KEY_RIGHT'    : b'_key_right',
-    b'KEY_UP'       : b'_key_up',
-    b'KEY_DOWN'     : b'_key_down',
-    b'KEY_B1'       : b'_key_left', # numpad
-    b'KEY_B3'       : b'_key_right',
-    b'KEY_A2'       : b'_key_up',
-    b'KEY_C2'       : b'_key_down',
+    b'KEY_LEFT'     : b'_move_key_left', # windows & xterm
+    b'KEY_RIGHT'    : b'_move_key_right',
+    b'KEY_UP'       : b'_move_key_up',
+    b'KEY_DOWN'     : b'_move_key_down',
+    b'KEY_B1'       : b'_move_key_left', # numpad
+    b'KEY_B3'       : b'_move_key_right',
+    b'KEY_A2'       : b'_move_key_up',
+    b'KEY_C2'       : b'_move_key_down',
     # ctrl-arrows
-    b'CTL_LEFT'     : b'_key_ctl_left', # windows
-    b'CTL_RIGHT'    : b'_key_ctl_right',
-    b'CTL_UP'       : b'_key_ctl_up',
-    b'CTL_DOWN'     : b'_key_ctl_down',
-    b'kLFT5'        : b'_key_ctl_left', # xterm
-    b'kRIT5'        : b'_key_ctl_right',
-    b'kUP5'         : b'_key_ctl_up',
-    b'kDN5'         : b'_key_ctl_down',
-    b'CTL_PAD4'     : b'_key_ctl_left', # numpad
-    b'CTL_PAD6'     : b'_key_ctl_right',
-    b'CTL_PAD8'     : b'_key_ctl_up',
-    b'CTL_PAD2'     : b'_key_ctl_down',
+    b'CTL_LEFT'     : b'_move_key_ctl_left', # windows
+    b'CTL_RIGHT'    : b'_move_key_ctl_right',
+    b'CTL_UP'       : b'_move_key_ctl_up',
+    b'CTL_DOWN'     : b'_move_key_ctl_down',
+    b'kLFT5'        : b'_move_key_ctl_left', # xterm
+    b'kRIT5'        : b'_move_key_ctl_right',
+    b'kUP5'         : b'_move_key_ctl_up',
+    b'kDN5'         : b'_move_key_ctl_down',
+    b'CTL_PAD4'     : b'_move_key_ctl_left', # numpad
+    b'CTL_PAD6'     : b'_move_key_ctl_right',
+    b'CTL_PAD8'     : b'_move_key_ctl_up',
+    b'CTL_PAD2'     : b'_move_key_ctl_down',
+    # shift-arrows
+    b'KEY_SLEFT'    : b'_scroll_key_shift_left', # windows
+    b'KEY_SRIGHT'   : b'_scroll_key_shift_right',
+    b'KEY_SUP'      : b'_scroll_key_shift_up',
+    b'KEY_SDOWN'    : b'_scroll_key_shift_down',
+    b'KEY_SR'       : b'_scroll_key_shift_up', # xterm
+    b'KEY_SF'       : b'_scroll_key_shift_down',
     # page
-    b'KEY_PPAGE'    : b'_key_page_up', # windows & xterm
-    b'KEY_NPAGE'    : b'_key_page_down',
-    b'KEY_A3'       : b'_key_page_up', # numpad
-    b'KEY_C3'       : b'_key_page_down',
+    b'KEY_PPAGE'    : b'_move_key_page_up', # windows & xterm
+    b'KEY_NPAGE'    : b'_move_key_page_down',
+    b'KEY_A3'       : b'_move_key_page_up', # numpad
+    b'KEY_C3'       : b'_move_key_page_down',
     # ctrl - page
-    b'CTL_PGUP'     : b'_key_page_up', # windows
-    b'CTL_PGDN'     : b'_key_page_down',
-    b'kPRV5'        : b'_key_page_up', # xterm
-    b'kNXT5'        : b'_key_page_down',
-    b'CTL_PAD9'     : b'_key_page_up', # numpad
-    b'CTL_PAD3'     : b'_key_page_down',
+    b'CTL_PGUP'     : b'_move_key_page_up', # windows
+    b'CTL_PGDN'     : b'_move_key_page_down',
+    b'kPRV5'        : b'_move_key_page_up', # xterm
+    b'kNXT5'        : b'_move_key_page_down',
+    b'CTL_PAD9'     : b'_move_key_page_up', # numpad
+    b'CTL_PAD3'     : b'_move_key_page_down',
     # end
-    b'KEY_END'      : b'_key_end', # windows & xterm
-    b'KEY_C1'       : b'_key_end', # numpad
+    b'KEY_END'      : b'_move_key_end', # windows & xterm
+    b'KEY_C1'       : b'_move_key_end', # numpad
     # ctrl - end
-    b'CTL_END'      : b'_key_ctl_end', # windows
-    b'kEND5'        : b'_key_ctl_end', # xterm
-    b'CTL_PAD1'     : b'_key_ctl_end', # numpad
+    b'CTL_END'      : b'_move_key_ctl_end', # windows
+    b'kEND5'        : b'_move_key_ctl_end', # xterm
+    b'CTL_PAD1'     : b'_move_key_ctl_end', # numpad
     # pos/home
-    b'KEY_HOME'     : b'_key_home', # windows & xterm
-    b'KEY_A1'       : b'_key_home', # numpad
+    b'KEY_HOME'     : b'_move_key_home', # windows & xterm
+    b'KEY_A1'       : b'_move_key_home', # numpad
     # ctrl - pos/home
-    b'CTL_HOME'     : b'_key_ctl_home', # windows
-    b'kHOM5'        : b'_key_ctl_home', # xterm
-    b'CTL_PAD7'     : b'_key_ctl_home', # numpad
+    b'CTL_HOME'     : b'_move_key_ctl_home', # windows
+    b'kHOM5'        : b'_move_key_ctl_home', # xterm
+    b'CTL_PAD7'     : b'_move_key_ctl_home', # numpad
     # default alnum key
     b'_key_string'  : b'_key_string',
     # history
