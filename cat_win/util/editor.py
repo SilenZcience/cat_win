@@ -554,6 +554,8 @@ class Editor:
                 status_bar = f"File: ...{self.file[-necc_space:] * bool(necc_space)} "
                 status_bar += f"| Exit: ^q | Save: ^s | Pos: {self.cpos.col}, {self.cpos.row} "
                 status_bar += f"| {'NOT ' * self.unsaved_progress}Saved!"[:max_x]
+                if self.debug_mode:
+                    status_bar += f" - Win: {self.wpos.col} {self.wpos.row} | {max_y}x{max_x}"
             status_bar = status_bar.ljust(max_x)
             self.curse_window.addstr(max_y + self.status_bar_size - 1, 0,
                                      status_bar, self._get_color(1))
