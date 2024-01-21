@@ -287,7 +287,7 @@ class Editor:
 
     def _key_page_down(self, _) -> str:
         max_y, _ = self.getxymax()
-        self.wpos.row = max(min(self.wpos.row+max_y, len(self.window_content)-1-max_y), 0)
+        self.wpos.row = max(min(self.wpos.row+max_y, len(self.window_content)-max_y), 0)
         self.cpos.row = min(self.cpos.row+max_y, len(self.window_content)-1)
         return None
 
