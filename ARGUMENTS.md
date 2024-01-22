@@ -845,47 +845,27 @@ Not-existing Files will be opened first and existing Ones will be able to be edi
 The Editor will not save Changes automatically.
 Files will be saved with the text Encoding defined by <a href="#enc">enc=X, enc&#42889;X</a>.
 Note that ^c (Ctrl-c) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
-On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module
-(not working on Python3.12 at the moment).
+On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module.
 The currently supported Key bindings are as follows:
 
-- <kbd>arrow-left</kbd>: move one char left
-- <kbd>arrow-right</kbd>: move one char right
-- <kbd>arrow-up</kbd>: move one line up
-- <kbd>arrow-down</kbd>: move one line down
-- <kbd>ctrl-arrow-left</kbd>: move one word left
-- <kbd>ctrl-arrow-right</kbd>: move one word right
-- <kbd>ctrl-arrow-up</kbd>: move ten lines up
-- <kbd>ctrl-arrow-down</kbd>: move ten lines down
-- <kbd>shift-arrow-left</kbd>: scroll one char left
-- <kbd>shift-arrow-right</kbd>: scroll one char right
-- <kbd>shift-arrow-up</kbd>: scroll one line up
-- <kbd>shift-arrow-down</kbd>: scroll one line down
-- <kbd>page-up</kbd>: move one page up
-- <kbd>page-down</kbd>: move one page down
-- <kbd>end</kbd>: move to end of line
-- <kbd>ctrl-end</kbd>: move to end of file
-- <kbd>home</kbd>: move to start of line
-- <kbd>ctrl-home</kbd>: move to start of file
+| Key(s) | default behaviour | shift click | control click | alt click |
+|--------|:-----------------:|:-----------:|:-------------:|:---------:|
+| <kbd>Arrows</kbd> | move cursor by char | scroll window by char | move cursor by word | move cursor by char |
+| <kbd>Page Up/Down</kbd> | move cursor by page | scroll window by page | move cursor by page | move cursor by page |
+| <kbd>Home/Pos</kbd> | move cursor to start of line | scroll window to start of file | move cursor to start of file | move cursor to start of line |
+| <kbd>End</kbd> | move cursor to end of line | scroll window to end of file| move cursor to end of file | move cursor to end of line |
+||||||
+| <kbd>Enter</kbd> | write newline | write newline | write newline | - |
+| <kbd>Backspace</kbd> | delete char on the left | delete char on the left | delete word on the left | delete char on the left |
+| <kbd>Delete</kbd> | delete char on the right | delete char on the right | delete word on the right | delete char on the right |
+||||||
+| <kbd>Undo/^Z</kbd> | - | - | undo an action | - |
+| <kbd>Redo/^Y</kbd> | - | - | redo an action | - |
+||||||
+| <kbd>Save/^S</kbd> | - | - | save changes | - |
+| <kbd>Close/^Q</kbd> | - | - | close editor </br>(prompt to save, if neccessary) | - |
+| <kbd>Interrupt/^C</kbd> | - | - | interrupt program | - |
 
-</br>
-
-- <kbd>backspace</kbd>: delete a char on the left side
-- <kbd>ctrl-backspace</kbd>: delete a word on the left side (Windows only)
-- <kbd>delete</kbd>: delete a char on the right side
-- <kbd>ctrl-delete</kbd>: delete a word on the right side
-
-
-</br>
-
-- <kbd>ctrl-z</kbd>: undo an action
-- <kbd>ctrl-y</kbd>: redo an action
-
-</br>
-
-- <kbd>ctrl-s</kbd>: save changes
-- <kbd>ctrl-q</kbd>: close editor (prompt to save, if neccessary)
-- <kbd>ctrl-c</kbd>: interrupt program
 
 ### <a id="clip">-c, --clip</a>
 
