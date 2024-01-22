@@ -20,7 +20,7 @@ except ImportError:
     CURSES_MODULE_ERROR = True
 import sys
 
-from cat_win.util.editorhelper import History, Position, UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS
+from cat_win.util.editorhelper import History, Position, UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS
 from cat_win.util.rawviewer import SPECIAL_CHARS
 
 def get_newline(file: str) -> str:
@@ -284,33 +284,19 @@ class Editor:
             self.cpos.col = len(self.window_content[self.cpos.row])
 
     def _scroll_key_shift_left(self) -> None:
-        self.scrolling = True
-        # _, max_x = self.getxymax()
         self.wpos.col = max(self.wpos.col-1, 0)
-        # if self.cpos.col == self.wpos.col + max_x:
-        #     self.cpos.col -= 1
 
     def _scroll_key_shift_right(self) -> None:
-        self.scrolling = True
         max_y, max_x = self.getxymax()
         max_line = max(map(len,self.window_content[self.wpos.row:self.wpos.row+max_y]))
         self.wpos.col = max(min(self.wpos.col+1, max_line+1-max_x), 0)
-        # if self.cpos.col == self.wpos.col-1:
-        #     self.cpos.col += 1
 
     def _scroll_key_shift_up(self) -> None:
-        self.scrolling = True
-        # max_y, _ = self.getxymax()
         self.wpos.row = max(self.wpos.row-1, 0)
-        # if self.cpos.row == self.wpos.row + max_y:
-        #     self.cpos.row -= 1
 
     def _scroll_key_shift_down(self) -> None:
-        self.scrolling = True
         max_y, _ = self.getxymax()
         self.wpos.row = max(min(self.wpos.row+1, len(self.window_content)-max_y), 0)
-        # if self.cpos.row == self.wpos.row-1:
-        #     self.cpos.row += 1
 
     def _move_key_page_up(self) -> None:
         max_y, _ = self.getxymax()
@@ -322,6 +308,14 @@ class Editor:
         self.wpos.row = max(min(self.wpos.row+max_y, len(self.window_content)-max_y), 0)
         self.cpos.row = min(self.cpos.row+max_y, len(self.window_content)-1)
 
+    def _scroll_key_page_up(self) -> None:
+        max_y, _ = self.getxymax()
+        self.wpos.row = max(self.wpos.row-max_y, 0)
+
+    def _scroll_key_page_down(self) -> None:
+        max_y, _ = self.getxymax()
+        self.wpos.row = max(min(self.wpos.row+max_y, len(self.window_content)-max_y), 0)
+
     def _move_key_end(self) -> None:
         self.cpos.col = len(self.window_content[self.cpos.row])
 
@@ -329,12 +323,19 @@ class Editor:
         self.cpos.row = len(self.window_content)-1
         self.cpos.col = len(self.window_content[-1])
 
+    def _scroll_key_end(self) -> None:
+        max_y, _ = self.getxymax()
+        self.wpos.row = max(len(self.window_content)-max_y, 0)
+
     def _move_key_home(self) -> None:
         self.cpos.col = 0
 
     def _move_key_ctl_home(self) -> None:
         self.cpos.row = 0
         self.cpos.col = 0
+
+    def _scroll_key_home(self) -> None:
+        self.wpos.row = 0
 
     def _key_string(self, wchars) -> str:
         """
@@ -608,6 +609,9 @@ class Editor:
                 self.history.add(key, action_text, f_len, pre_pos, self.cpos.get_pos())
             elif key in ACTION_HOTKEYS:
                 running &= getattr(self, key.decode(), lambda *_: False)(write_func)
+            elif key in SCROLL_HOTKEYS:
+                self.scrolling = True
+                getattr(self, key.decode(), lambda *_: None)()
             else:
                 getattr(self, key.decode(), lambda *_: None)()
 
