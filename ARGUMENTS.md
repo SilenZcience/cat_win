@@ -857,6 +857,10 @@ The currently supported Key bindings are as follows:
 - <kbd>ctrl-arrow-right</kbd>: move one word right
 - <kbd>ctrl-arrow-up</kbd>: move ten lines up
 - <kbd>ctrl-arrow-down</kbd>: move ten lines down
+- <kbd>shift-arrow-left</kbd>: scroll one char left
+- <kbd>shift-arrow-right</kbd>: scroll one char right
+- <kbd>shift-arrow-up</kbd>: scroll one line up
+- <kbd>shift-arrow-down</kbd>: scroll one line down
 - <kbd>page-up</kbd>: move one page up
 - <kbd>page-down</kbd>: move one page down
 - <kbd>end</kbd>: move to end of line
