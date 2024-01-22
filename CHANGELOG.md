@@ -12,6 +12,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - renamed --`config`, --`config` to --`cconfig`, --`cconfig`.
 - added --`config`, --`config` parameter to configure default parameters.
 - added Shift-Arrow hotkeys to the editor to scroll through the file without moving the cursor.
+- fix the editor for Python 3.12
 
 
 ## [1.6.4] - 2023-11-14
