@@ -4,6 +4,17 @@ editor
 
 try:
     import curses
+    def initscr():
+        # fix windows-curses for Python 3.12:
+        # https://github.com/zephyrproject-rtos/windows-curses/issues/50
+        import _curses
+        stdscr = _curses.initscr()
+        for key, value in _curses.__dict__.items():
+            if key[0:4] == 'ACS_' or key in ('LINES', 'COLS'):
+                setattr(curses, key, value)
+
+        return stdscr
+    curses.initscr = initscr
     CURSES_MODULE_ERROR = False
 except ImportError:
     CURSES_MODULE_ERROR = True
