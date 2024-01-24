@@ -8,6 +8,7 @@ UNIFY_HOTKEYS = {
     b'^M'           : b'_key_enter', # CR
     b'^J'           : b'_key_enter', # LF
     b'PADENTER'     : b'_key_enter', # numpad
+    b'SHF_PADENTER' : b'_key_enter',
     b'KEY_ENTER'    : b'_key_enter', # 'fn' mode
     # ctrl - newline
     b'CTL_ENTER'    : b'_key_enter', # windows
