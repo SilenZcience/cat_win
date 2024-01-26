@@ -324,8 +324,10 @@ class Editor:
         self.cpos.col = len(self.window_content[-1])
 
     def _scroll_key_end(self) -> None:
-        max_y, _ = self.getxymax()
+        max_y, max_x = self.getxymax()
         self.wpos.row = max(len(self.window_content)-max_y, 0)
+        max_line = max(map(len,self.window_content[-max_y:]))
+        self.wpos.col = max(max_line+1-max_x, 0)
 
     def _move_key_home(self) -> None:
         self.cpos.col = 0
@@ -336,6 +338,7 @@ class Editor:
 
     def _scroll_key_home(self) -> None:
         self.wpos.row = 0
+        self.wpos.col = 0
 
     def _key_string(self, wchars) -> str:
         """
