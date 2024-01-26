@@ -1281,9 +1281,9 @@ def shell_main():
             holder.add_args(arg_parser.get_args())
             show_unknown_args_suggestions(shell=True)
             self.exec_colors()
-            _removed = [arg for _, arg in arg_parser.get_args()] \
+            _added= [arg for _, arg in arg_parser.get_args()] \
                 if arg_parser.get_args() else 'parameter(s)'
-            print(f"successfully added {_removed}.")
+            print(f"successfully added {_added}.")
 
         def _command_del(self, cmd: list) -> None:
             arg_parser.gen_arguments([''] + cmd, True)
