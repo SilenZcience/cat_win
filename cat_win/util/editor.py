@@ -583,8 +583,12 @@ class Editor:
         except curses.error:
             pass
         curses.curs_set(not self.scrolling or not (
-            self.cpos.row < self.wpos.row or self.cpos.col < self.wpos.col
-        ))
+                            self.cpos.row < self.wpos.row or \
+                            self.cpos.col < self.wpos.col or \
+                            self.cpos.row >= self.wpos.row+max_y or \
+                            self.cpos.col >= self.wpos.col+max_x
+                        )
+        )
 
         self.scrolling = False
         self.curse_window.refresh()
