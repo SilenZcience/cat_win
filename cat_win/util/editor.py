@@ -5,8 +5,10 @@ editor
 try:
     import curses
     def initscr():
-        # fix windows-curses for Python 3.12:
-        # https://github.com/zephyrproject-rtos/windows-curses/issues/50
+        """
+        fix windows-curses for Python 3.12:
+        https://github.com/zephyrproject-rtos/windows-curses/issues/50
+        """
         import _curses
         stdscr = _curses.initscr()
         for key, value in _curses.__dict__.items():
@@ -20,7 +22,8 @@ except ImportError:
     CURSES_MODULE_ERROR = True
 import sys
 
-from cat_win.util.editorhelper import History, Position, UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS
+from cat_win.util.editorhelper import History, Position, UNIFY_HOTKEYS, \
+    KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS
 from cat_win.util.rawviewer import SPECIAL_CHARS
 
 def get_newline(file: str) -> str:
