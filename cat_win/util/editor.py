@@ -489,7 +489,6 @@ class Editor:
             elif key == b'_key_enter':
                 self.search = sub_s if sub_s else self.search
                 f_len = len(self.window_content)
-                print(f_len, self.cpos.row)
                 if self.search in self.window_content[self.cpos.row][self.cpos.col+1:]:
                     self.cpos.col += \
                         self.window_content[self.cpos.row][self.cpos.col+1:].find(self.search)+1
