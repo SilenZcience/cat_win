@@ -13,6 +13,9 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added --`config`, --`config` parameter to configure default parameters.
 - added Shift-Arrow hotkeys to the editor to scroll through the file without moving the cursor.
 - fix the editor for Python 3.12
+- added `KEY_BTAB`(Shift+Tab) to the editor to decrease indent of the current line.
+- added functionality to the editor to jump to specific line using `^E`.
+- added functionality to search the file in the editor using `^F`.
 
 
 ## [1.6.4] - 2023-11-14
