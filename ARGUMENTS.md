@@ -854,6 +854,7 @@ The currently supported Key bindings are as follows:
 | <kbd>Page Up/Down</kbd> | move cursor by page | scroll window by page | move cursor by page | move cursor by page |
 | <kbd>Home/Pos</kbd> | move cursor to start of line | scroll window to start of file | move cursor to start of file | move cursor to start of line |
 | <kbd>End</kbd> | move cursor to end of line | scroll window to end of file| move cursor to end of file | move cursor to end of line |
+|<kbd>Tab</kbd> | insert a tab | decrease indent | - | - |
 ||||||
 | <kbd>Enter</kbd> | write newline | write newline | write newline | - |
 | <kbd>Backspace</kbd> | delete char on the left | delete char on the left | delete word on the left | delete char on the left |
@@ -863,6 +864,8 @@ The currently supported Key bindings are as follows:
 | <kbd>Redo/^Y</kbd> | - | - | redo an action | - |
 ||||||
 | <kbd>Save/^S</kbd> | - | - | save changes | - |
+| <kbd>Jump/^E</kbd> | - | - | prompt to jump to specific line | - |
+| <kbd>Find/^F</kbd> | - | - | prompt to search in the file | - |
 | <kbd>Close/^Q</kbd> | - | - | close editor </br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^C</kbd> | - | - | interrupt program | - |
 
