@@ -413,6 +413,42 @@ class Editor:
                 print(self.error_bar, file=sys.stderr)
         return True
 
+    def _action_jump(self, _) -> bool:
+        def _render_scr(l_jmp: str) -> None:
+            max_y, max_x = self.getxymax()
+            try:
+                if self.error_bar:
+                    self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
+                                            self.error_bar[:max_x].ljust(max_x),
+                                            self._get_color(2))
+                jump_message = f"Confirm: [y]es, [n]o - Jump to line: {l_jmp}_"[:max_x].ljust(max_x)
+                self.curse_window.addstr(max_y + self.status_bar_size - 1, 0, jump_message,
+                                        self._get_color(5))
+            except curses.error:
+                pass
+            self.curse_window.refresh()
+        curses.curs_set(0)
+
+        wchar, l_jmp = '', ''
+        while str(wchar).upper() not in ['\x1b', 'N']:
+            _render_scr(l_jmp)
+            wchar, key = self._get_new_char()
+            if key in ACTION_HOTKEYS:
+                if key in [b'_action_quit', b'_action_interrupt']:
+                    break
+                if key == b'_action_resize':
+                    getattr(self, key.decode(), lambda *_: False)(None)
+                    self._render_scr()
+                    curses.curs_set(0)
+            if key == b'_key_string' and wchar.isdigit():
+                l_jmp += wchar
+            elif (key == b'_key_string' and wchar.upper() in ['Y', 'J']) or \
+                key == b'_key_enter':
+                if l_jmp:
+                    self.cpos.row = min(int(l_jmp), len(self.window_content)-1)
+                break
+        return True
+
     def _action_quit(self, write_func) -> bool:
         """
         handles the quit editor action.
