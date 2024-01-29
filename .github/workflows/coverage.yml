@@ -22,12 +22,12 @@ jobs:
         run: |
           git config --global core.autocrlf true
       - name: Git Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0 # otherwise, it will fail to push refs to dest repo
       - name: Install Python 3.10
         id: python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
           cache: 'pip'
