@@ -535,9 +535,14 @@ class Editor:
                 _render_scr()
                 wchar, key = self._get_new_char()
                 if key in ACTION_HOTKEYS:
-                    if key == b'_action_quit':
+                    if key in [b'_action_quit', b'_action_interrupt']:
                         break
-                    getattr(self, key.decode(), lambda *_: False)(write_func)
+                    if key == b'_action_save':
+                        getattr(self, key.decode(), lambda *_: False)(write_func)
+                    if key == b'_action_resize':
+                        getattr(self, key.decode(), lambda *_: False)(None)
+                        self._render_scr()
+                        curses.curs_set(0)
                 elif wchar.upper() in ['Y', 'J']:
                     self._action_save(write_func)
                 elif wchar == '\x1b': # ESC
