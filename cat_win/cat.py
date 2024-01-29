@@ -73,7 +73,8 @@ tmp_file_helper = TmpFileHelper()
 
 on_windows_os = platform.system() == 'Windows'
 file_uri_prefix = 'file://' + '/' * on_windows_os
-ANSI_CSI_RE = re.compile('\001?\033\\[((?:\\d|;)*)([a-zA-Z])\002?')
+ANSI_CSI_RE = re.compile(r'\001?\033\[(?:\d|;)*[a-zA-Z]\002?') # Control Sequence Introducer
+# ANSI_OSC_RE = re.compile(r'\001?\033\]([^\a]*)(\a)\002?')          # Operating System Command
 
 def err_print(*args, **kwargs):
     """
