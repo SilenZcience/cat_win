@@ -73,6 +73,7 @@ class Editor:
 
         self.debug_mode = debug_mode
         self.special_chars: dict = {}
+        self.search = ''
 
         self.status_bar_size = 1
         self.error_bar = ''
@@ -446,6 +447,58 @@ class Editor:
                 key == b'_key_enter':
                 if l_jmp:
                     self.cpos.row = min(int(l_jmp), len(self.window_content)-1)
+                break
+        return True
+
+    def _action_find(self, _) -> bool:
+        def _render_scr(sub_s: str) -> None:
+            max_y, max_x = self.getxymax()
+            try:
+                if self.error_bar:
+                    self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
+                                            self.error_bar[:max_x].ljust(max_x),
+                                            self._get_color(2))
+                pre_s = f" [{self.search}]" if self.search else ''
+                jump_msg = f"Confirm: 'ENTER' - Search for{pre_s}: {sub_s}_"[:max_x].ljust(max_x)
+                self.curse_window.addstr(max_y + self.status_bar_size - 1, 0, jump_msg,
+                                        self._get_color(5))
+            except curses.error:
+                pass
+            self.curse_window.refresh()
+        curses.curs_set(0)
+
+        wchar, sub_s = '', ''
+        while str(wchar).upper() != '\x1b':
+            _render_scr(sub_s)
+            wchar, key = self._get_new_char()
+            if key in ACTION_HOTKEYS:
+                if key in [b'_action_quit', b'_action_interrupt']:
+                    break
+                if key == b'_action_resize':
+                    getattr(self, key.decode(), lambda *_: False)(None)
+                    self._render_scr()
+                    curses.curs_set(0)
+            if key == b'_key_backspace':
+                sub_s = sub_s[:-1]
+            if key == b'_key_ctl_backspace':
+                t_p = sub_s[-1:].isalnum()
+                while sub_s and sub_s[-1:].isalnum() == t_p:
+                    sub_s = sub_s[:-1]
+            if key == b'_key_string' and wchar.isprintable():
+                sub_s += wchar
+            elif key == b'_key_enter':
+                self.search = sub_s if sub_s else self.search
+                f_len = len(self.window_content)
+                print(f_len, self.cpos.row)
+                if self.search in self.window_content[self.cpos.row][self.cpos.col+1:]:
+                    self.cpos.col += \
+                        self.window_content[self.cpos.row][self.cpos.col+1:].find(self.search)+1
+                    break
+                for i in range(self.cpos.row+1, self.cpos.row+f_len+1):
+                    if self.search in self.window_content[i%f_len]:
+                        self.cpos.row = i%f_len
+                        self.cpos.col = self.window_content[i%f_len].find(self.search)
+                        break
                 break
         return True
 
