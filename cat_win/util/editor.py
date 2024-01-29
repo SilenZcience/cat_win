@@ -343,6 +343,24 @@ class Editor:
         self.wpos.row = 0
         self.wpos.col = 0
 
+    def _key_btab(self, _) -> str:
+        c_row = self.window_content[self.cpos.row]
+        if c_row[:1] == '\t':
+            self.window_content[self.cpos.row] = c_row[1:]
+            self.cpos.col = max(self.cpos.col-1, 0)
+            return '\t'
+        if c_row[:4] == '    ':
+            self.window_content[self.cpos.row] = c_row[4:]
+            self.cpos.col = max(self.cpos.col-4, 0)
+            return '    '
+        return None
+
+    def _key_btab_reverse(self, tab) -> str:
+        c_row = self.window_content[self.cpos.row]
+        self.window_content[self.cpos.row] = tab + c_row
+        self.cpos.col += len(tab)
+        return tab
+
     def _key_string(self, wchars) -> str:
         """
         tries to append (a) char(s) to the screen.

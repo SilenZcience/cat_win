@@ -131,6 +131,9 @@ UNIFY_HOTKEYS = {
     # shift - pos/home
     b'KEY_SHOME'     : b'_scroll_key_home', # windows & xterm
 
+    # shift + tab
+    b'KEY_BTAB'      : b'_key_btab', # windows & xterm
+
     # default alnum key
     b'_key_string'  : b'_key_string',
     # history
@@ -152,7 +155,8 @@ REVERSE_ACTION = {
     b'_key_dl'           : b'_key_string',
     b'_key_backspace'    : b'_key_string',
     b'_key_ctl_backspace': b'_key_string',
-    b'_key_string'         : b'_key_backspace',
+    b'_key_string'       : b'_key_backspace',
+    b'_key_btab'         : b'_key_btab_reverse',
 } # defines the counter action if the file has the same amount of lines
 
 REVERSE_ACTION_SIZE_CHANGE = {
