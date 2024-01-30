@@ -19,6 +19,7 @@ class Config:
                    DKW.DEFAULT_FILE_ENCODING: 'utf-8',
                    DKW.LARGE_FILE_SIZE: 1024 * 1024 * 100,  # 100 Megabytes
                    DKW.STRIP_COLOR_ON_PIPE: True,
+                   DKW.EDITOR_INDENTATION: '\t',
                    }
 
     elements = list(default_dic.keys())
@@ -54,6 +55,7 @@ class Config:
         (element_type):
             whatever the element got converted to
         """
+        element = element[1:-1] # strip the quotes
         if element_type == bool:
             if element.upper() in ['FALSE', 'NO', 'N', '0']:
                 return False
@@ -77,7 +79,7 @@ class Config:
         (bool):
             indicates whether the value is valid.
         """
-        if value == '':
+        if value is None:
             return False
         try:
             value_type(value)
@@ -168,19 +170,22 @@ class Config:
                 keyword = self.elements[int(keyword)-1] if (
                     0 < int(keyword) <= len(self.elements)) else keyword
         print(f"Successfully selected element '{keyword}'")
-        print(f"The current value of '{keyword}' is '{self.const_dic[keyword]}'")
+        c_value_rep = repr(self.const_dic[keyword])
+        if c_value_rep[0] not in ['"', "'"]:
+            c_value_rep = f"'{c_value_rep}'"
+        print(f"The current value of '{keyword}' is {c_value_rep}")
 
-        value = ''
+        value = None
         while not Config.is_valid_value(value, type(self.default_dic[keyword])):
             if value != '':
-                print(f"Something went wrong. Invalid option '{value}'.")
+                print(f"Something went wrong. Invalid option: {repr(value)}.")
             try:
                 value = input('Input new value: ')
             except EOFError:
                 print('\nAborting due to End-of-File character...', file=sys.stderr)
                 return
 
-        self.config_parser['CONSTS'][keyword] = value
+        self.config_parser['CONSTS'][keyword] = f'"{value}"'
         try:
             with open(self.config_file, 'w', encoding='utf-8') as conf:
                 self.config_parser.write(conf)
