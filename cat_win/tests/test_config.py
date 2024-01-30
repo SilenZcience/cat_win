@@ -18,16 +18,16 @@ class TestConfig(TestCase):
     maxDiff = None
 
     def test_convert_config_element(self):
-        self.assertEqual(Config.convert_config_element('15', int), 15)
-        self.assertEqual(Config.convert_config_element('7.4', float), 7.4)
-        self.assertEqual(Config.convert_config_element('15', list), ['1', '5'])
-        self.assertEqual(Config.convert_config_element('false', bool), False)
-        self.assertEqual(Config.convert_config_element('FALSE', bool), False)
-        self.assertEqual(Config.convert_config_element('no', bool), False)
-        self.assertEqual(Config.convert_config_element('n', bool), False)
-        self.assertEqual(Config.convert_config_element('0', bool), False)
-        self.assertEqual(Config.convert_config_element('nfalse', bool), True)
-        self.assertEqual(Config.convert_config_element('1', bool), True)
+        self.assertEqual(Config.convert_config_element('"15"', int), 15)
+        self.assertEqual(Config.convert_config_element('"7.4"', float), 7.4)
+        self.assertEqual(Config.convert_config_element('"15"', list), ['1', '5'])
+        self.assertEqual(Config.convert_config_element('"false"', bool), False)
+        self.assertEqual(Config.convert_config_element('"FALSE"', bool), False)
+        self.assertEqual(Config.convert_config_element('"no"', bool), False)
+        self.assertEqual(Config.convert_config_element('"n"', bool), False)
+        self.assertEqual(Config.convert_config_element('"0"', bool), False)
+        self.assertEqual(Config.convert_config_element('"nfalse"', bool), True)
+        self.assertEqual(Config.convert_config_element('"1"', bool), True)
 
     def test_is_valid_value(self):
         self.assertEqual(Config.is_valid_value('', int), False)
