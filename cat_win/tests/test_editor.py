@@ -74,16 +74,16 @@ class TestEditor(TestCase):
 
     def test_editor_key_backspace(self):
         editor = Editor(test_file_path_editor, 'utf-8')
-        editor._key_backspace(None)
+        editor._key_backspace('\b')
         self.assertListEqual(editor.window_content, ['line 1', 'line 2'])
         editor._move_key_ctl_end()
-        editor._key_backspace(None)
+        editor._key_backspace('\b')
         self.assertListEqual(editor.window_content, ['line 1', 'line '])
         editor._move_key_left()
-        editor._key_backspace(None)
+        editor._key_backspace('\b')
         self.assertListEqual(editor.window_content, ['line 1', 'lin '])
         editor._move_key_home()
-        editor._key_backspace(None)
+        editor._key_backspace('\b')
         self.assertListEqual(editor.window_content, ['line 1lin '])
 
     def test_editor_key_ctl_backspace(self):

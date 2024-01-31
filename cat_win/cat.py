@@ -70,6 +70,7 @@ arg_parser = ArgParser(const_dic[DKW.DEFAULT_FILE_ENCODING])
 converter = Converter()
 holder = Holder()
 tmp_file_helper = TmpFileHelper()
+Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
 
 on_windows_os = platform.system() == 'Windows'
 file_uri_prefix = 'file://' + '/' * on_windows_os
