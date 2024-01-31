@@ -20,6 +20,7 @@ class Config:
                    DKW.LARGE_FILE_SIZE: 1024 * 1024 * 100,  # 100 Megabytes
                    DKW.STRIP_COLOR_ON_PIPE: True,
                    DKW.EDITOR_INDENTATION: '\t',
+                   DKW.EDITOR_AUTO_INDENT: True,
                    }
 
     elements = list(default_dic.keys())
@@ -177,7 +178,7 @@ class Config:
 
         value = None
         while not Config.is_valid_value(value, type(self.default_dic[keyword])):
-            if value != '':
+            if value is not None:
                 print(f"Something went wrong. Invalid option: {repr(value)}.")
             try:
                 value = input('Input new value: ')
