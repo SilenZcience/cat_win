@@ -12,3 +12,4 @@ class DKW:
     LARGE_FILE_SIZE = 'large_file_size'
     STRIP_COLOR_ON_PIPE = 'strip_color_on_pipe'
     EDITOR_INDENTATION = 'editor_indentation'
+    EDITOR_AUTO_INDENT = 'editor_auto_indent'
