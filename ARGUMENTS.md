@@ -888,6 +888,8 @@ Valid Options are:
 | default_file_encoding | the File Encoding used by Default | utf-16 | utf-8 |
 | large_file_size | the Size (Bytes) at which a Warning occurs. | 1024 | 104857600 (100Mb) |
 | strip_color_on_pipe | indicate if the Output should be stripped of any Color | no | true |
+| editor_indentation | set the indentation used in the editor </br> when pressing ↹ | <b>␣ ␣ ␣ ␣</b> | ↹ |
+| editor_auto_indent | set whether the editor should auto indent or not | False | true |
 
 ### <a id="cconfig">--cconfig, --cconfig</a>
 
