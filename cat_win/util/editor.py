@@ -50,6 +50,8 @@ class Editor:
     Editor
     """
     loading_failed = False
+    special_indentation = '\t'
+    auto_indent = True
 
     def __init__(self, file: str, file_encoding: str, debug_mode: bool = False) -> None:
         """
@@ -126,11 +128,16 @@ class Editor:
     def _key_enter(self, _) -> str:
         new_line = self.window_content[self.cpos.row][self.cpos.col:]
         self.window_content[self.cpos.row] = self.window_content[self.cpos.row][:self.cpos.col]
+        # calculate indentation on prev line (0 if auto_indent is set to False)
+        auto_indent_size = self.window_content[self.cpos.row].count(
+            self.special_indentation) * self.auto_indent
         self.cpos.row += 1
-        self.cpos.col = 0
+        self.cpos.col = len(self.special_indentation) * auto_indent_size
+        auto_indent = self.special_indentation * auto_indent_size
+        new_line = auto_indent + new_line
         self.window_content.insert(self.cpos.row, new_line)
         self.unsaved_progress = True
-        return ''
+        return auto_indent
 
     def _key_dc(self, _) -> str:
         if self.cpos.col < len(self.window_content[self.cpos.row]):
@@ -172,15 +179,24 @@ class Editor:
             return ''
         return None
 
-    def _key_backspace(self, _) -> str:
+    def _key_backspace(self, wchars) -> str:
+        # usually wchars has len() == 1
+        # generic backspace handling in case of auto indent
+        wchar_l = len(wchars)
         if self.cpos.col: # delete char
-            self.cpos.col -= 1
-            deleted = self.window_content[self.cpos.row][self.cpos.col]
+            self.cpos.col -= wchar_l
+            deleted = self.window_content[self.cpos.row][self.cpos.col:self.cpos.col+wchar_l]
             self.window_content[self.cpos.row] = \
                 self.window_content[self.cpos.row][:self.cpos.col] + \
-                self.window_content[self.cpos.row][self.cpos.col+1:]
+                self.window_content[self.cpos.row][self.cpos.col+wchar_l:]
             self.unsaved_progress = True
-            return deleted
+            try: # ignore exceptions ([-1] could be inaccessible)
+                # if the last action was 'enter' then we just deleted the auto indent
+                # and need to remove the linebreak next
+                if self.history._stack_redo[-1].key_action == b'_key_enter':
+                    return self._key_backspace('\b')
+            finally:
+                return deleted
         if self.cpos.row: # or delete line
             line = self.window_content[self.cpos.row]
             del self.window_content[self.cpos.row]
@@ -346,14 +362,11 @@ class Editor:
 
     def _key_btab(self, _) -> str:
         c_row = self.window_content[self.cpos.row]
-        if c_row[:1] == '\t':
-            self.window_content[self.cpos.row] = c_row[1:]
-            self.cpos.col = max(self.cpos.col-1, 0)
-            return '\t'
-        if c_row[:4] == '    ':
-            self.window_content[self.cpos.row] = c_row[4:]
-            self.cpos.col = max(self.cpos.col-4, 0)
-            return '    '
+        indent_l = len(self.special_indentation)
+        if c_row.startswith(self.special_indentation):
+            self.window_content[self.cpos.row] = c_row[indent_l:]
+            self.cpos.col = max(self.cpos.col-indent_l, 0)
+            return self.special_indentation
         return None
 
     def _key_btab_reverse(self, tab) -> str:
@@ -372,6 +385,12 @@ class Editor:
         """
         if not isinstance(wchars, str) or not wchars:
             return ''
+        # in case the line has no text yet and tab is pressed, we indent with
+        # the custom indentation
+        if self.special_indentation != '\t' == wchars and \
+            (self.window_content[self.cpos.row][:self.cpos.col].replace(
+                self.special_indentation, '') + ' ').isspace():
+            return self._key_string(self.special_indentation)
         self.unsaved_progress = True
         self.window_content[self.cpos.row] = \
             self.window_content[self.cpos.row][:self.cpos.col] + wchars + \
@@ -422,7 +441,7 @@ class Editor:
                     self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
                                             self.error_bar[:max_x].ljust(max_x),
                                             self._get_color(2))
-                jump_message = f"Confirm: [y]es, [n]o - Jump to line: {l_jmp}_"[:max_x].ljust(max_x)
+                jump_message = f"Confirm: [y]es, [n]o - Jump to line: {l_jmp}␣"[:max_x].ljust(max_x)
                 self.curse_window.addstr(max_y + self.status_bar_size - 1, 0, jump_message,
                                         self._get_color(5))
             except curses.error:
@@ -459,7 +478,7 @@ class Editor:
                                             self.error_bar[:max_x].ljust(max_x),
                                             self._get_color(2))
                 pre_s = f" [{self.search}]" if self.search else ''
-                jump_msg = f"Confirm: 'ENTER' - Search for{pre_s}: {sub_s}_"[:max_x].ljust(max_x)
+                jump_msg = f"Confirm: 'ENTER' - Search for{pre_s}: {sub_s}␣"[:max_x].ljust(max_x)
                 self.curse_window.addstr(max_y + self.status_bar_size - 1, 0, jump_msg,
                                         self._get_color(5))
             except curses.error:
@@ -656,7 +675,7 @@ class Editor:
                     elif not cur_char.isprintable():
                         self.curse_window.addch(row, col, self._get_special_char(cur_char),
                                                 self._get_color(5))
-                    elif all(map(lambda c: c.isspace(), self.window_content[brow][bcol:])):
+                    elif self.window_content[brow][bcol:].isspace():
                         self.curse_window.addch(row, col, cur_char,
                                                 self._get_color(3))
                     else:
@@ -809,3 +828,18 @@ class Editor:
 
         curses.wrapper(editor._open, write_func)
         return editor.changes_made
+
+    @staticmethod
+    def set_indentation(indentation: str = '\t', auto_indent: bool = True):
+        """
+        set the indentation when using tab on an empty line
+        
+        Parameters:
+        indentation (str):
+            the indentation to use (may be choosen by the user via config)
+        auto_indent (bool):
+            indicates whetcher the editor should automatically match the
+            previous indentation when pressing enter
+        """
+        Editor.special_indentation = indentation
+        Editor.auto_indent = auto_indent
