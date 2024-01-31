@@ -854,7 +854,7 @@ The currently supported Key bindings are as follows:
 | <kbd>Page Up/Down</kbd> | move cursor by page | scroll window by page | move cursor by page | move cursor by page |
 | <kbd>Home/Pos</kbd> | move cursor to start of line | scroll window to start of file | move cursor to start of file | move cursor to start of line |
 | <kbd>End</kbd> | move cursor to end of line | scroll window to end of file| move cursor to end of file | move cursor to end of line |
-|<kbd>Tab</kbd> | insert a tab | decrease indent | - | - |
+|<kbd>Tab</kbd> | insert a tab or </br> indent on empty line | decrease indent | - | - |
 ||||||
 | <kbd>Enter</kbd> | write newline | write newline | write newline | - |
 | <kbd>Backspace</kbd> | delete char on the left | delete char on the left | delete word on the left | delete char on the left |
@@ -888,7 +888,7 @@ Valid Options are:
 | default_file_encoding | the File Encoding used by Default | utf-16 | utf-8 |
 | large_file_size | the Size (Bytes) at which a Warning occurs. | 1024 | 104857600 (100Mb) |
 | strip_color_on_pipe | indicate if the Output should be stripped of any Color | no | true |
-| editor_indentation | set the indentation used in the editor </br> when pressing ↹ | <b>␣ ␣ ␣ ␣</b> | ↹ |
+| editor_indentation | set the indentation used in the editor </br> when pressing ↹ on an empty line | <b>␣ ␣ ␣ ␣</b> | ↹ |
 | editor_auto_indent | set whether the editor should auto indent or not | False | true |
 
 ### <a id="cconfig">--cconfig, --cconfig</a>
