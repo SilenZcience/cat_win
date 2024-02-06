@@ -89,6 +89,12 @@ def exception_handler(exception_type: type, exception, traceback,
     """
     custom exception handler.
     """
+    # STATUS_PIPE_CLOSING can map to WinAPI EINVAL (errno: 22)
+    if isinstance(exception, BrokenPipeError) or \
+        isinstance(exception, OSError) and exception.errno == 22:
+        devnull = os.open(os.devnull, os.O_WRONLY)
+        os.dup2(devnull, sys.stdout.fileno())
+        sys.exit(1)  # Python exits with error code 1 on EPIPE
     try:
         err_print(color_dic[CKW.RESET_ALL])
         if holder.args_id[ARGS_DEBUG]:
@@ -97,7 +103,12 @@ def exception_handler(exception_type: type, exception, traceback,
         if exception_type != KeyboardInterrupt:
             err_print('If this Exception is unexpected, please raise an official Issue at:')
             err_print(f"{__url__}/issues")
-    except Exception:
+        sys.exit(0)
+    except BrokenPipeError: # we only used stderr in the try-block, so it has to be the broken pipe
+        devnull = os.open(os.devnull, os.O_WRONLY)
+        os.dup2(devnull, sys.stderr.fileno())
+        sys.exit(1)  # Python exits with error code 1 on EPIPE
+    except:
         debug_hook(exception_type, exception, traceback)
 
 
@@ -1159,12 +1170,7 @@ def main():
         _show_wordcount()
         return
 
-    try:
-        edit_files()  # print the cat-output
-    except IOError: # catch broken-pipe error
-        devnull = os.open(os.devnull, os.O_WRONLY)
-        os.dup2(devnull, sys.stdout.fileno())
-        sys.exit(1)  # Python exits with error code 1 on EPIPE
+    edit_files()  # print the cat-output
 
     # clean-up
     if holder.args_id[ARGS_DEBUG]:
