@@ -108,7 +108,7 @@ def exception_handler(exception_type: type, exception, traceback,
         devnull = os.open(os.devnull, os.O_WRONLY)
         os.dup2(devnull, sys.stderr.fileno())
         sys.exit(1)  # Python exits with error code 1 on EPIPE
-    except:
+    except (Exception, KeyboardInterrupt):
         debug_hook(exception_type, exception, traceback)
 
 
