@@ -20,7 +20,7 @@ class Config:
                    DKW.LARGE_FILE_SIZE: 1024 * 1024 * 100,  # 100 Megabytes
                    DKW.STRIP_COLOR_ON_PIPE: True,
                    DKW.EDITOR_INDENTATION: '\t',
-                   DKW.EDITOR_AUTO_INDENT: True,
+                   DKW.EDITOR_AUTO_INDENT: False,
                    }
 
     elements = list(default_dic.keys())
