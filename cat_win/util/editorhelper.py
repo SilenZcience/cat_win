@@ -60,25 +60,25 @@ UNIFY_HOTKEYS = {
     b'CTL_PAD8'     : b'_move_key_ctl_up',
     b'CTL_PAD2'     : b'_move_key_ctl_down',
     # shift-arrows
-    b'KEY_SLEFT'    : b'_scroll_key_shift_left', # windows
-    b'KEY_SRIGHT'   : b'_scroll_key_shift_right',
-    b'KEY_SUP'      : b'_scroll_key_shift_up',
-    b'KEY_SDOWN'    : b'_scroll_key_shift_down',
-    b'KEY_SR'       : b'_scroll_key_shift_up', # xterm
-    b'KEY_SF'       : b'_scroll_key_shift_down',
+    b'KEY_SLEFT'    : b'_move_key_left', # windows
+    b'KEY_SRIGHT'   : b'_move_key_right',
+    b'KEY_SUP'      : b'_move_key_up',
+    b'KEY_SDOWN'    : b'_move_key_down',
+    b'KEY_SR'       : b'_move_key_up', # xterm
+    b'KEY_SF'       : b'_move_key_down',
     # alt - arrows
-    b'ALT_LEFT'     : b'_move_key_left', # windows
-    b'ALT_RIGHT'    : b'_move_key_right',
-    b'ALT_UP'       : b'_move_key_up',
-    b'ALT_DOWN'     : b'_move_key_down',
-    b'kLFT3'        : b'_move_key_left', # xterm
-    b'kRIT3'        : b'_move_key_right',
-    b'kUP3'         : b'_move_key_up',
-    b'kDN3'         : b'_move_key_down',
-    b'ALT_PAD4'     : b'_move_key_left', # numpad
-    b'ALT_PAD6'     : b'_move_key_right',
-    b'ALT_PAD8'     : b'_move_key_up',
-    b'ALT_PAD2'     : b'_move_key_down',
+    b'ALT_LEFT'     : b'_scroll_key_shift_left', # windows
+    b'ALT_RIGHT'    : b'_scroll_key_shift_right',
+    b'ALT_UP'       : b'_scroll_key_shift_up',
+    b'ALT_DOWN'     : b'_scroll_key_shift_down',
+    b'kLFT3'        : b'_scroll_key_shift_left', # xterm
+    b'kRIT3'        : b'_scroll_key_shift_right',
+    b'kUP3'         : b'_scroll_key_shift_up',
+    b'kDN3'         : b'_scroll_key_shift_down',
+    b'ALT_PAD4'     : b'_scroll_key_shift_left', # numpad
+    b'ALT_PAD6'     : b'_scroll_key_shift_right',
+    b'ALT_PAD8'     : b'_scroll_key_shift_up',
+    b'ALT_PAD2'     : b'_scroll_key_shift_down',
 
     # page
     b'KEY_PPAGE'    : b'_move_key_page_up', # windows & xterm
@@ -93,15 +93,15 @@ UNIFY_HOTKEYS = {
     b'CTL_PAD9'     : b'_move_key_page_up', # numpad
     b'CTL_PAD3'     : b'_move_key_page_down',
     # alt - page
-    b'ALT_PGUP'     : b'_move_key_page_up', # windows
-    b'ALT_PGDN'     : b'_move_key_page_down',
-    b'kPRV3'        : b'_move_key_page_up', # xterm
-    b'kNXT3'        : b'_move_key_page_down',
-    b'ALT_PAD9'     : b'_move_key_page_up', # numpad
-    b'ALT_PAD3'     : b'_move_key_page_down',
+    b'ALT_PGUP'     : b'_scroll_key_page_up', # windows
+    b'ALT_PGDN'     : b'_scroll_key_page_down',
+    b'kPRV3'        : b'_scroll_key_page_up', # xterm
+    b'kNXT3'        : b'_scroll_key_page_down',
+    b'ALT_PAD9'     : b'_scroll_key_page_up', # numpad
+    b'ALT_PAD3'     : b'_scroll_key_page_down',
     # shift - page
-    b'KEY_SPREVIOUS': b'_scroll_key_page_up', # windows & xterm
-    b'KEY_SNEXT'    : b'_scroll_key_page_down',
+    b'KEY_SPREVIOUS': b'_move_key_page_up', # windows & xterm
+    b'KEY_SNEXT'    : b'_move_key_page_down',
 
     # end
     b'KEY_END'      : b'_move_key_end', # windows & xterm
@@ -111,11 +111,11 @@ UNIFY_HOTKEYS = {
     b'kEND5'        : b'_move_key_ctl_end', # xterm
     b'CTL_PAD1'     : b'_move_key_ctl_end', # numpad
     # alt - end
-    b'ALT_END'      : b'_move_key_end', # windows
-    b'kEND3'        : b'_move_key_end', # xterm
-    b'ALT_PAD1'     : b'_move_key_end', # numpad
+    b'ALT_END'      : b'_scroll_key_end', # windows
+    b'kEND3'        : b'_scroll_key_end', # xterm
+    b'ALT_PAD1'     : b'_scroll_key_end', # numpad
     # shift - end
-    b'KEY_SEND'     : b'_scroll_key_end', # windows & xterm
+    b'KEY_SEND'     : b'_move_key_end', # windows & xterm
 
     # pos/home
     b'KEY_HOME'     : b'_move_key_home', # windows & xterm
@@ -125,11 +125,11 @@ UNIFY_HOTKEYS = {
     b'kHOM5'        : b'_move_key_ctl_home', # xterm
     b'CTL_PAD7'     : b'_move_key_ctl_home', # numpad
     # alt - pos/home
-    b'ALT_HOME'     : b'_move_key_home', # windows
-    b'kHOM3'        : b'_move_key_home', # xterm
-    b'ALT_PAD7'     : b'_move_key_home', # numpad
+    b'ALT_HOME'     : b'_scroll_key_home', # windows
+    b'kHOM3'        : b'_scroll_key_home', # xterm
+    b'ALT_PAD7'     : b'_scroll_key_home', # numpad
     # shift - pos/home
-    b'KEY_SHOME'     : b'_scroll_key_home', # windows & xterm
+    b'KEY_SHOME'     : b'_move_key_home', # windows & xterm
 
     # shift + tab
     b'KEY_BTAB'      : b'_key_btab', # windows & xterm
