@@ -850,10 +850,10 @@ The currently supported Key bindings are as follows:
 
 | Key(s) | default behaviour | shift click | control click | alt click |
 |--------|:-----------------:|:-----------:|:-------------:|:---------:|
-| <kbd>Arrows</kbd> | move cursor by char | scroll window by char | move cursor by word | move cursor by char |
-| <kbd>Page Up/Down</kbd> | move cursor by page | scroll window by page | move cursor by page | move cursor by page |
-| <kbd>Home/Pos</kbd> | move cursor to start of line | scroll window to start of file | move cursor to start of file | move cursor to start of line |
-| <kbd>End</kbd> | move cursor to end of line | scroll window to end of file| move cursor to end of file | move cursor to end of line |
+| <kbd>Arrows</kbd> | move cursor by char | move cursor by char | move cursor by word | scroll window by char |
+| <kbd>Page Up/Down</kbd> | move cursor by page | move cursor by page | move cursor by page | scroll window by page |
+| <kbd>Home/Pos</kbd> | move cursor to start of line | move cursor to start of line | move cursor to start of file | scroll window to start of file |
+| <kbd>End</kbd> | move cursor to end of line | move cursor to end of line | move cursor to end of file | scroll window to end of file |
 |<kbd>Tab</kbd> | insert a tab or </br> indent on empty line | decrease indent | - | - |
 ||||||
 | <kbd>Enter</kbd> | write newline | write newline | write newline | - |
@@ -887,9 +887,15 @@ Valid Options are:
 | default_command_line | custom Command Line containing Parameters </br> used additionally to the specific Parameters </br> of the Program Call | -n 'find= ' | |
 | default_file_encoding | the File Encoding used by Default | utf-16 | utf-8 |
 | large_file_size | the Size (Bytes) at which a Warning occurs. | 1024 | 104857600 (100Mb) |
-| strip_color_on_pipe | indicate if the Output should be stripped of any Color | no | true |
+| strip_color_on_pipe | indicate if the Output should be stripped of any Color | no | True |
 | editor_indentation | set the indentation used in the editor </br> when pressing ↹ on an empty line | <b>␣ ␣ ␣ ␣</b> | ↹ |
-| editor_auto_indent | set whether the editor should auto indent or not | False | true |
+| editor_auto_indent | set whether the editor should auto indent or not | 1 | False |
+
+Accepted Input for enabling a Setting:  `true, yes, y, 1`
+</br>
+Accepted Input for disabling a Setting: `false, no, n, 0`
+</br>
+(Input is not case sensitive)
 
 ### <a id="cconfig">--cconfig, --cconfig</a>
 
