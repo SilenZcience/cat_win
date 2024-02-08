@@ -182,7 +182,7 @@ class Editor:
     def _key_backspace(self, wchars) -> str:
         # usually wchars has len() == 1
         # generic backspace handling in case of auto indent
-        wchar_l = len(wchars)
+        wchar_l = len(wchars) if isinstance(wchars, str) else 1
         if self.cpos.col: # delete char
             self.cpos.col -= wchar_l
             deleted = self.window_content[self.cpos.row][self.cpos.col:self.cpos.col+wchar_l]
@@ -646,10 +646,7 @@ class Editor:
         self.cpos.col = min(self.cpos.col, rowlen)
 
         # set/enforce the boundaries
-        try:
-            self.curse_window.move(0, 0)
-        except curses.error:
-            pass
+        self.curse_window.move(0, 0)
 
         if not self.scrolling:
             if self.cpos.row < self.wpos.row:
@@ -671,7 +668,8 @@ class Editor:
                 try:
                     cur_char = self.window_content[brow][bcol]
                     if cur_char == '\t':
-                        self.curse_window.addch(row, col, '>', self._get_color(4))
+                        self.curse_window.addch(row, col, '>',
+                                                self._get_color(4))
                     elif not cur_char.isprintable():
                         self.curse_window.addch(row, col, self._get_special_char(cur_char),
                                                 self._get_color(5))
@@ -683,10 +681,8 @@ class Editor:
                 except curses.error:
                     break
             self.curse_window.clrtoeol()
-            try:
-                self.curse_window.addch('\n')
-            except curses.error:
-                break
+            self.curse_window.move(row+1, 0)
+
         # display status/error_bar
         try:
             if self.error_bar:
@@ -704,6 +700,7 @@ class Editor:
                 status_bar += f"| {'NOT ' * self.unsaved_progress}Saved!"[:max_x]
                 if self.debug_mode:
                     status_bar += f" - Win: {self.wpos.col} {self.wpos.row} | {max_y}x{max_x}"
+            # this throws an error (should be max_x-1), but looks better:
             status_bar = status_bar.ljust(max_x)
             self.curse_window.addstr(max_y + self.status_bar_size - 1, 0,
                                      status_bar, self._get_color(1))
@@ -711,6 +708,9 @@ class Editor:
             pass
 
         try:
+            # can throw an error when using the scrolling functionality:
+            # ==> max(self.cpos.row-self.wpos.row, 0) > max_y ==> Error
+            # ==> max(self.cpos.col-self.wpos.col, 0) > max_x ==> Error
             self.curse_window.move(max(self.cpos.row-self.wpos.row, 0),
                                    max(self.cpos.col-self.wpos.col, 0))
         except curses.error:
@@ -817,10 +817,6 @@ class Editor:
             print(file=sys.stderr)
             Editor.loading_failed = True
             return False
-        # if not (sys.stdin.isatty() | sys.stdout.isatty()): # use os.isatty instead
-        #     print("The Editor could not be loaded.", file=sys.stderr)
-        #     return False
-
 
         editor = cls(file, file_encoding, debug_mode)
         special_chars = dict(map(lambda x: (chr(x[0]), x[2]), SPECIAL_CHARS))
