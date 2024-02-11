@@ -866,7 +866,9 @@ The currently supported Key bindings are as follows:
 | <kbd>Save/^S</kbd> | - | - | save changes | - |
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to specific line | - |
 | <kbd>Find/^F</kbd> | - | - | prompt to search in the file | - |
-| <kbd>Close/^Q</kbd> | - | - | close editor </br>(prompt to save, if neccessary) | - |
+| <kbd>Background/^B</kbd> | - | - | put the editor in the background</br>(UNIX only) | - |
+| <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
+| <kbd>Close/^Q</kbd> | - | - | close editor</br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^C</kbd> | - | - | interrupt program | - |
 
 
