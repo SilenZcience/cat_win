@@ -17,6 +17,11 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added functionality to the editor to jump to specific line using `^E`.
 - added functionality to search the file in the editor using `^F`.
 
+### Bugfixes
+
+- better performance in editor
+- changed windows-curses dependency for better char-detection experience
+
 
 ## [1.6.4] - 2023-11-14
 
