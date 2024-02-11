@@ -20,6 +20,8 @@ try:
     CURSES_MODULE_ERROR = False
 except ImportError:
     CURSES_MODULE_ERROR = True
+import os
+import signal
 import sys
 
 from cat_win.util.editorhelper import History, Position, UNIFY_HOTKEYS, \
@@ -105,6 +107,7 @@ class Editor:
         """
         try:
             self.line_sep = get_newline(self.file)
+            self.window_content = []
             with open(self.file, 'r', encoding=self.file_encoding) as _f:
                 for line in _f.read().split('\n'):
                     self.window_content.append(line)
@@ -407,6 +410,20 @@ class Editor:
         self.history.redo(self)
         return None
 
+    def _action_render_scr(self, msg) -> None:
+        max_y, max_x = self.getxymax()
+        try:
+            if self.error_bar:
+                self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
+                                        self.error_bar[:max_x].ljust(max_x),
+                                        self._get_color(2))
+            self.curse_window.addstr(max_y + self.status_bar_size - 1, 0,
+                                        msg[:max_x].ljust(max_x),
+                                        self._get_color(5))
+        except curses.error:
+            pass
+        self.curse_window.refresh()
+
     def _action_save(self, write_func) -> bool:
         """
         handle the save file action.
@@ -435,28 +452,27 @@ class Editor:
         return True
 
     def _action_jump(self, _) -> bool:
-        def _render_scr(l_jmp: str) -> None:
-            max_y, max_x = self.getxymax()
-            try:
-                if self.error_bar:
-                    self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
-                                            self.error_bar[:max_x].ljust(max_x),
-                                            self._get_color(2))
-                jump_message = f"Confirm: [y]es, [n]o - Jump to line: {l_jmp}␣"[:max_x].ljust(max_x)
-                self.curse_window.addstr(max_y + self.status_bar_size - 1, 0, jump_message,
-                                        self._get_color(5))
-            except curses.error:
-                pass
-            self.curse_window.refresh()
+        """
+        handles the jump to line action.
+        
+        Parameters:
+        _ (Any):
+        
+        Returns:
+        (bool):
+            indicates if the editor should keep running
+        """
         curses.curs_set(0)
 
         wchar, l_jmp = '', ''
         while str(wchar).upper() not in ['\x1b', 'N']:
-            _render_scr(l_jmp)
+            self._action_render_scr(f"Confirm: [y]es, [n]o - Jump to line: {l_jmp}␣")
             wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
+                if key == b'_action_background':
+                    getattr(self, key.decode(), lambda *_: False)(None)
                 if key == b'_action_resize':
                     getattr(self, key.decode(), lambda *_: False)(None)
                     self._render_scr()
@@ -466,34 +482,33 @@ class Editor:
             elif (key == b'_key_string' and wchar.upper() in ['Y', 'J']) or \
                 key == b'_key_enter':
                 if l_jmp:
-                    self.cpos.row = min(int(l_jmp), len(self.window_content)-1)
+                    self.cpos.row = min(max(int(l_jmp)-1, 0), len(self.window_content)-1)
                 break
         return True
 
     def _action_find(self, _) -> bool:
-        def _render_scr(sub_s: str) -> None:
-            max_y, max_x = self.getxymax()
-            try:
-                if self.error_bar:
-                    self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
-                                            self.error_bar[:max_x].ljust(max_x),
-                                            self._get_color(2))
-                pre_s = f" [{self.search}]" if self.search else ''
-                jump_msg = f"Confirm: 'ENTER' - Search for{pre_s}: {sub_s}␣"[:max_x].ljust(max_x)
-                self.curse_window.addstr(max_y + self.status_bar_size - 1, 0, jump_msg,
-                                        self._get_color(5))
-            except curses.error:
-                pass
-            self.curse_window.refresh()
+        """
+        handles the find in editor action.
+        
+        Parameters:
+        _ (Any):
+        
+        Returns:
+        (bool):
+            indicates if the editor should keep running
+        """
         curses.curs_set(0)
 
         wchar, sub_s = '', ''
         while str(wchar).upper() != '\x1b':
-            _render_scr(sub_s)
+            pre_s = f" [{repr(self.search)[1:-1]}]" if self.search else ''
+            self._action_render_scr(f"Confirm: 'ENTER' - Search for{pre_s}: {sub_s}␣")
             wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
+                if key == b'_action_background':
+                    getattr(self, key.decode(), lambda *_: False)(None)
                 if key == b'_action_resize':
                     getattr(self, key.decode(), lambda *_: False)(None)
                     self._render_scr()
@@ -504,7 +519,7 @@ class Editor:
                 t_p = sub_s[-1:].isalnum()
                 while sub_s and sub_s[-1:].isalnum() == t_p:
                     sub_s = sub_s[:-1]
-            if key == b'_key_string' and wchar.isprintable():
+            if key == b'_key_string':
                 sub_s += wchar
             elif key == b'_key_enter':
                 self.search = sub_s if sub_s else self.search
@@ -521,6 +536,48 @@ class Editor:
                 break
         return True
 
+    def _action_background(self, _) -> bool:
+        # only callable on UNIX
+        curses.endwin()
+        os.kill(os.getpid(), signal.SIGSTOP)
+        self._init_screen()
+        self.get_char = self._get_new_char()
+        return True
+
+    def _action_reload(self, _) -> bool:
+        """
+        prompt to reload the file.
+        
+        Parameters:
+        _ (Any):
+        
+        Returns:
+        (bool):
+            indicates if the editor should keep running
+        """
+        curses.curs_set(0)
+
+        wchar = ''
+        while str(wchar).upper() != '\x1b':
+            self._action_render_scr('Reload File? [y]es, [n]o; Abort? ESC')
+            wchar, key = next(self.get_char)
+            if key in ACTION_HOTKEYS:
+                if key in [b'_action_quit', b'_action_interrupt']:
+                    break
+                if key == b'_action_background':
+                    getattr(self, key.decode(), lambda *_: False)(None)
+                if key == b'_action_resize':
+                    getattr(self, key.decode(), lambda *_: False)(None)
+                    self._render_scr()
+                    curses.curs_set(0)
+            elif wchar.upper() in ['Y', 'J']:
+                self._setup_file()
+                self.cpos = Position(0, 0)
+                self.wpos = Position(0, 0)
+                break
+
+        return True
+
     def _action_quit(self, write_func) -> bool:
         """
         handles the quit editor action.
@@ -534,28 +591,17 @@ class Editor:
             indicates if the editor should keep running
         """
         if self.unsaved_progress:
-            def _render_scr() -> None:
-                max_y, max_x = self.getxymax()
-                try:
-                    if self.error_bar:
-                        self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
-                                                self.error_bar[:max_x].ljust(max_x),
-                                                self._get_color(2))
-                    save_message = 'Save changes? [y]es, [n]o; Abort? ESC'[:max_x].ljust(max_x)
-                    self.curse_window.addstr(max_y + self.status_bar_size - 1, 0, save_message,
-                                            self._get_color(5))
-                except curses.error:
-                    pass
-                self.curse_window.refresh()
             curses.curs_set(0)
 
             wchar = ''
             while self.unsaved_progress and str(wchar).upper() != 'N':
-                _render_scr()
+                self._action_render_scr('Save changes? [y]es, [n]o; Abort? ESC')
                 wchar, key = next(self.get_char)
                 if key in ACTION_HOTKEYS:
                     if key in [b'_action_quit', b'_action_interrupt']:
                         break
+                    if key == b'_action_background':
+                        getattr(self, key.decode(), lambda *_: False)(None)
                     if key == b'_action_save':
                         getattr(self, key.decode(), lambda *_: False)(write_func)
                     if key == b'_action_resize':
@@ -674,6 +720,7 @@ class Editor:
 
         # set/enforce the boundaries
         self.curse_window.move(0, 0)
+        curses.curs_set(0)
 
         if not self.scrolling:
             if self.cpos.row < self.wpos.row:
@@ -716,14 +763,14 @@ class Editor:
                 self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
                                          self.error_bar[:max_x].ljust(max_x), self._get_color(2))
 
-            status_bar = f"File: {self.file} | Exit: ^q | Save: ^s | Pos: {self.cpos.col}"
-            status_bar += f", {self.cpos.row} | {'NOT ' * self.unsaved_progress}Saved!"
+            status_bar = f"File: {self.file} | Exit: ^q | Save: ^s | Pos: {self.cpos.col+1}"
+            status_bar += f", {self.cpos.row+1} | {'NOT ' * self.unsaved_progress}Saved!"
             if self.debug_mode:
                 status_bar += f" - Win: {self.wpos.col} {self.wpos.row} | {max_y}x{max_x}"
             if len(status_bar) > max_x:
                 necc_space = max(0, max_x - (len(status_bar) - len(self.file) + 3))
                 status_bar = f"File: ...{self.file[-necc_space:] * bool(necc_space)} "
-                status_bar += f"| Exit: ^q | Save: ^s | Pos: {self.cpos.col}, {self.cpos.row} "
+                status_bar += f"| Exit: ^q | Save: ^s | Pos: {self.cpos.col+1}, {self.cpos.row+1} "
                 status_bar += f"| {'NOT ' * self.unsaved_progress}Saved!"[:max_x]
                 if self.debug_mode:
                     status_bar += f" - Win: {self.wpos.col} {self.wpos.row} | {max_y}x{max_x}"
@@ -795,40 +842,66 @@ class Editor:
                     self.get_char = self._get_new_char()
                     break
 
-    def _open(self, curse_window, write_func) -> None:
+    def _init_screen(self):
         """
-        define curses settings and
-        run the editor on the initialized data.
+        init and define curses
+        """
+        self.curse_window = curses.initscr()
+
+        # Turn off echoing of keys, and enter cbreak mode,
+        # where no buffering is performed on keyboard input
+        curses.noecho()
+        curses.cbreak()
+
+        # --------https://github.com/asottile/babi/blob/main/babi/main.py-------- #
+        # set the escape delay so curses does not pause waiting for sequences
+        if (
+                sys.version_info >= (3, 9) and
+                hasattr(curses, 'set_escdelay')
+        ):  # pragma: >=3.9 cover
+            curses.set_escdelay(25)
+        else:  # pragma: <3.9 cover
+            os.environ.setdefault('ESCDELAY', '25')
+        # ----------------------------------------------------------------------- #
+
+        # In keypad mode, escape sequences for special keys
+        # (like the cursor keys) will be interpreted and
+        # a special value like curses.KEY_LEFT will be returned
+        self.curse_window.keypad(1)
+        try:
+            curses.start_color()
+        finally:
+            if curses.can_change_color():
+                # status_bar
+                curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+                # error_bar
+                curses.init_pair(2, curses.COLOR_RED  , curses.COLOR_WHITE)
+                # trailing_whitespace
+                curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_RED  )
+                # tab-char
+                curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_GREEN)
+                # special char (not printable) & quit-prompt
+                curses.init_pair(5, curses.COLOR_WHITE, curses.COLOR_RED  )
+        curses.raw()
+        self.curse_window.nodelay(False)
+
+    def _open(self, write_func) -> None:
+        """
+        init, run, deinit
         
         Parameters:
-        curse_window (curses._Window):
-            the curses window from initscr()
         write_func (function):
             a function to write a file
         """
-        self.curse_window = curse_window
-        if curses.can_change_color():
-            # status_bar
-            curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
-            # error_bar
-            curses.init_pair(2, curses.COLOR_RED  , curses.COLOR_WHITE)
-            # trailing_whitespace
-            curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_RED  )
-            # tab-char
-            curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_GREEN)
-            # special char (not printable) & quit-prompt
-            curses.init_pair(5, curses.COLOR_WHITE, curses.COLOR_RED  )
-        curses.raw()
-        self.curse_window.nodelay(False)
+        self._init_screen()
         self._run(write_func)
+        curses.endwin()
 
     @classmethod
     def open(cls, file: str, file_encoding: str, write_func, on_windows_os: bool,
              debug_mode: bool = False) -> bool:
         """
         simple editor to change the contents of any provided file.
-        the first file in the list will be loaded as a basis but all
-        files will be written with the changed content.
         
         Parameters:
         file (str):
@@ -862,7 +935,14 @@ class Editor:
         special_chars = dict(map(lambda x: (chr(x[0]), x[2]), SPECIAL_CHARS))
         editor._set_special_chars(special_chars)
 
-        curses.wrapper(editor._open, write_func)
+        if on_windows_os:
+            # disable background feature on windows
+            editor._action_background =  lambda *_: True
+        else:
+            # ignore background signals on UNIX, since a custom background implementation exists
+            signal.signal(signal.SIGTSTP, signal.SIG_IGN)
+
+        editor._open(write_func)
         return editor.changes_made
 
     @staticmethod
