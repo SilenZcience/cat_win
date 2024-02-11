@@ -16,11 +16,14 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added `KEY_BTAB`(Shift+Tab) to the editor to decrease indent of the current line.
 - added functionality to the editor to jump to specific line using `^E`.
 - added functionality to search the file in the editor using `^F`.
+- added functionality to put the editor in the background on UNIX using `^B`.
+- added functionality to reload the file to the editor using `^R`.
 
 ### Bugfixes
 
-- better performance in editor
-- changed windows-curses dependency for better char-detection experience
+- better performance in editor.
+- changed windows-curses dependency for better char-detection experience.
+- fix Bug where the editor would show the wrong cursor position.
 
 
 ## [1.6.4] - 2023-11-14
