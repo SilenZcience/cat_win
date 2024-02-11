@@ -67,6 +67,7 @@ class Editor:
         """
         self.curse_window = None
         self.history = History()
+        self.get_char = self._get_new_char()
 
         self.file = file
         self.file_encoding = file_encoding
@@ -452,7 +453,7 @@ class Editor:
         wchar, l_jmp = '', ''
         while str(wchar).upper() not in ['\x1b', 'N']:
             _render_scr(l_jmp)
-            wchar, key = self._get_new_char()
+            wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
@@ -489,7 +490,7 @@ class Editor:
         wchar, sub_s = '', ''
         while str(wchar).upper() != '\x1b':
             _render_scr(sub_s)
-            wchar, key = self._get_new_char()
+            wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
@@ -551,7 +552,7 @@ class Editor:
             wchar = ''
             while self.unsaved_progress and str(wchar).upper() != 'N':
                 _render_scr()
-                wchar, key = self._get_new_char()
+                wchar, key = next(self.get_char)
                 if key in ACTION_HOTKEYS:
                     if key in [b'_action_quit', b'_action_interrupt']:
                         break
@@ -595,27 +596,53 @@ class Editor:
         self.curse_window.clear()
         return True
 
-    def _get_new_char(self) -> tuple:
+    def _get_new_char(self):
         """
         get next char
         
-        Returns
+        Yields
         (tuple):
             the char received and the possible action it means.
         """
-        wchar = -1
-        while wchar == -1:
-            try: # try-except in case of no delay mode
-                wchar = self.curse_window.get_wch()
-            except curses.error:
-                pass
-        _key = curses.keyname(wchar if isinstance(wchar, int) else ord(wchar))
-        key = UNIFY_HOTKEYS.get(_key, b'_key_string')
-        if self.debug_mode:
-            _debug_info = repr(chr(wchar)) if isinstance(wchar, int) else ord(wchar)
-            print(f"__DEBUG__: Received wchar \t{repr(wchar)} " + \
-                f"\t{_debug_info} \t{str(_key).ljust(15)} \t{key}", file=sys.stderr)
-        return (wchar, key)
+        def debug_out(wchar_, key__, key_) -> None:
+            if self.debug_mode:
+                _debug_info = repr(chr(wchar_)) if isinstance(wchar_, int) else \
+                    ord(wchar_) if len(wchar_) == 1 else '-'
+                print(f"__DEBUG__: Received  {key_}\t{_debug_info}" + \
+                    f"\t{str(key__):<15} \t{repr(wchar_)}", file=sys.stderr)
+        buffer: tuple = None
+        while True:
+            if buffer is not None:
+                key = UNIFY_HOTKEYS.get(buffer[1], b'_key_string')
+                debug_out(*buffer, key)
+                yield (buffer[0], key)
+                buffer = None
+            wchar = self.curse_window.get_wch()
+            _key = curses.keyname(wchar if isinstance(wchar, int) else ord(wchar))
+            key = UNIFY_HOTKEYS.get(_key, b'_key_string')
+
+            if key == b'_key_string':
+                self.curse_window.nodelay(True)
+                while True:
+                    try:
+                        nchar = self.curse_window.get_wch()
+                        if UNIFY_HOTKEYS.get(curses.keyname(
+                                        nchar if isinstance(nchar, int) else ord(nchar)
+                                        ), b'_key_string') == b'_key_string':
+                            wchar += nchar
+                        else:
+                            buffer = (nchar,
+                                    curses.keyname(
+                                        nchar if isinstance(nchar, int) else ord(nchar)
+                                        )
+                                    )
+                            break
+                    except curses.error:
+                        break
+
+            self.curse_window.nodelay(False)
+            debug_out(wchar, _key, key)
+            yield (wchar, key)
 
     def _get_color(self, c_id: int) -> int:
         """
@@ -738,22 +765,35 @@ class Editor:
 
         while running:
             self._render_scr()
+            force_render = 0
+            while True:
+                try:
+                    wchar, key = next(self.get_char)
 
-            wchar, key = self._get_new_char()
-
-            # handle new wchar
-            if key in KEY_HOTKEYS:
-                f_len = len(self.window_content)
-                pre_pos = self.cpos.get_pos()
-                action_text = getattr(self, key.decode(), lambda *_: None)(wchar)
-                self.history.add(key, action_text, f_len, pre_pos, self.cpos.get_pos())
-            elif key in ACTION_HOTKEYS:
-                running &= getattr(self, key.decode(), lambda *_: False)(write_func)
-            elif key in SCROLL_HOTKEYS:
-                self.scrolling = True
-                getattr(self, key.decode(), lambda *_: None)()
-            else:
-                getattr(self, key.decode(), lambda *_: None)()
+                    # handle new wchar
+                    if key in KEY_HOTKEYS:
+                        f_len = len(self.window_content)
+                        pre_pos = self.cpos.get_pos()
+                        action_text = getattr(self, key.decode(), lambda *_: None)(wchar)
+                        self.history.add(key, action_text, f_len, pre_pos, self.cpos.get_pos())
+                    # actions like search, jump, quit, save, resize:
+                    elif key in ACTION_HOTKEYS:
+                        running &= getattr(self, key.decode(), lambda *_: False)(write_func)
+                    # scrolling via alt + ...
+                    elif key in SCROLL_HOTKEYS:
+                        self.scrolling = True
+                        getattr(self, key.decode(), lambda *_: None)()
+                    # moving the cursor:
+                    else:
+                        getattr(self, key.decode(), lambda *_: None)()
+                    self.curse_window.nodelay(True)
+                    force_render += 1
+                    if force_render > 50:
+                        break
+                except curses.error:
+                    self.curse_window.nodelay(False)
+                    self.get_char = self._get_new_char()
+                    break
 
     def _open(self, curse_window, write_func) -> None:
         """
