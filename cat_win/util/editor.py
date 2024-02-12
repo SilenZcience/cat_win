@@ -53,7 +53,7 @@ class Editor:
     """
     loading_failed = False
     special_indentation = '\t'
-    auto_indent = True
+    auto_indent = False
 
     def __init__(self, file: str, file_encoding: str, debug_mode: bool = False) -> None:
         """
