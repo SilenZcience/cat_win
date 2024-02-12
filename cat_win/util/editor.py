@@ -766,14 +766,14 @@ class Editor:
             status_bar = f"File: {self.file} | Exit: ^q | Save: ^s | Pos: {self.cpos.col+1}"
             status_bar += f", {self.cpos.row+1} | {'NOT ' * self.unsaved_progress}Saved!"
             if self.debug_mode:
-                status_bar += f" - Win: {self.wpos.col} {self.wpos.row} | {max_y}x{max_x}"
+                status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x}"
             if len(status_bar) > max_x:
                 necc_space = max(0, max_x - (len(status_bar) - len(self.file) + 3))
                 status_bar = f"File: ...{self.file[-necc_space:] * bool(necc_space)} "
                 status_bar += f"| Exit: ^q | Save: ^s | Pos: {self.cpos.col+1}, {self.cpos.row+1} "
                 status_bar += f"| {'NOT ' * self.unsaved_progress}Saved!"[:max_x]
                 if self.debug_mode:
-                    status_bar += f" - Win: {self.wpos.col} {self.wpos.row} | {max_y}x{max_x}"
+                    status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x}"
             # this throws an error (should be max_x-1), but looks better:
             status_bar = status_bar.ljust(max_x)
             self.curse_window.addstr(max_y + self.status_bar_size - 1, 0,
