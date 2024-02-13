@@ -11,9 +11,9 @@ class StringFinder:
     """
     defines a stringfinder
     """
-    def __init__(self, literals: set, regex: set) -> None:
-        self.kw_literals = literals
-        self.kw_regex = regex
+    def __init__(self, literals: set = None, regex: set = None) -> None:
+        self.kw_literals = literals if literals is not None else {}
+        self.kw_regex = regex if regex is not None else {}
 
     def _findliterals(self, sub: str, _s: str):
         """
