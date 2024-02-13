@@ -2,5 +2,5 @@
 edit
 """
 
-def getmaxyx(*_, **__) -> tuple:
+def getxymax(*_, **__) -> tuple:
     return (30, 120)

@@ -4,6 +4,7 @@ import os
 
 from cat_win.tests.mocks.error import ErrorDefGen
 from cat_win.tests.mocks.std import StdOutMock
+from cat_win.tests.mocks.edit import getxymax
 from cat_win.util.editor import Editor, get_newline
 # import sys
 # sys.path.append('../cat_win')
@@ -14,6 +15,7 @@ test_file_path_oneline = os.path.join(test_file_dir, 'test_oneline.txt')
 test_file_path_editor = os.path.join(test_file_dir, 'test_editor.txt')
 
 
+@patch('cat_win.util.editor.Editor.getxymax', getxymax)
 class TestEditor(TestCase):
     maxDiff = None
 
@@ -187,6 +189,118 @@ class TestEditor(TestCase):
         editor._move_key_ctl_down()
         self.assertEqual(editor.cpos.get_pos(), (1,3))
 
+    def test_editor_scroll_key_shift_left(self):
+        editor = Editor(test_file_path_editor, 'utf-8')
+        editor.wpos.set_pos((1,2))
+        editor._scroll_key_shift_left()
+        self.assertEqual(editor.wpos.get_pos(), (1,1))
+        editor._scroll_key_shift_left()
+        self.assertEqual(editor.wpos.get_pos(), (1,0))
+        editor._scroll_key_shift_left()
+        self.assertEqual(editor.wpos.get_pos(), (1,0))
+
+    def test_editor_scroll_key_shift_right(self):
+        editor = Editor(test_file_path_editor, 'utf-8')
+        editor.wpos.set_pos((0,2))
+        editor._scroll_key_shift_right()
+        self.assertEqual(editor.wpos.get_pos(), (0,0))
+        editor._key_string('x' * 115)
+        editor._scroll_key_shift_right()
+        self.assertEqual(editor.wpos.get_pos(), (0,1))
+        editor._scroll_key_shift_right()
+        self.assertEqual(editor.wpos.get_pos(), (0,2))
+        editor._scroll_key_shift_right()
+        self.assertEqual(editor.wpos.get_pos(), (0,2))
+
+    def test_editor_scroll_key_shift_up(self):
+        editor = Editor(test_file_path_editor, 'utf-8')
+        editor.wpos.set_pos((2,0))
+        editor._scroll_key_shift_up()
+        self.assertEqual(editor.wpos.get_pos(), (1,0))
+        editor._scroll_key_shift_up()
+        self.assertEqual(editor.wpos.get_pos(), (0,0))
+        editor._scroll_key_shift_up()
+        self.assertEqual(editor.wpos.get_pos(), (0,0))
+
+    def test_editor_scroll_key_shift_down(self):
+        editor = Editor(test_file_path_editor, 'utf-8')
+        editor._scroll_key_shift_down()
+        self.assertEqual(editor.wpos.get_pos(), (0,0))
+        for _ in range(30):
+            editor._key_enter('')
+        editor._scroll_key_shift_down()
+        self.assertEqual(editor.wpos.get_pos(), (1,0))
+        editor._scroll_key_shift_down()
+        self.assertEqual(editor.wpos.get_pos(), (2,0))
+        editor._scroll_key_shift_down()
+        self.assertEqual(editor.wpos.get_pos(), (2,0))
+
+    def test_editor_move_key_page_up(self):
+        editor = Editor(test_file_path_editor, 'utf-8')
+        editor._move_key_page_up()
+        self.assertEqual(editor.wpos.get_pos(), (0,0))
+        self.assertEqual(editor.cpos.get_pos(), (0,0))
+        for _ in range(61):
+            editor._key_enter('')
+        editor._move_key_right()
+        self.assertEqual(editor.cpos.get_pos(), (61,1))
+        editor.wpos.set_pos(editor.cpos.get_pos())
+        editor._move_key_page_up()
+        self.assertEqual(editor.wpos.get_pos(), (31,1))
+        self.assertEqual(editor.cpos.get_pos(), (31,1))
+        editor._move_key_page_up()
+        self.assertEqual(editor.wpos.get_pos(), (1,1))
+        self.assertEqual(editor.cpos.get_pos(), (1,1))
+        editor._move_key_page_up()
+        self.assertEqual(editor.wpos.get_pos(), (0,1))
+        self.assertEqual(editor.cpos.get_pos(), (0,1))
+
+    def test_editor_move_key_page_down(self):
+        editor = Editor(test_file_path_editor, 'utf-8')
+        editor._move_key_page_down()
+        for _ in range(61): # file_len == 63
+            editor._key_enter('')
+            editor._move_key_up()
+        self.assertEqual(editor.wpos.get_pos(), (0,0))
+        self.assertEqual(editor.cpos.get_pos(), (1,0))
+        editor._move_key_page_down()
+        self.assertEqual(editor.wpos.get_pos(), (30,0))
+        self.assertEqual(editor.cpos.get_pos(), (31,0))
+        editor._move_key_page_down()
+        self.assertEqual(editor.wpos.get_pos(), (33,0))
+        self.assertEqual(editor.cpos.get_pos(), (61,0))
+        editor._move_key_page_down()
+        self.assertEqual(editor.wpos.get_pos(), (33,0))
+        self.assertEqual(editor.cpos.get_pos(), (62,0))
+
+    def test_editor_scroll_key_page_up(self):
+        editor = Editor(test_file_path_editor, 'utf-8')
+        editor._scroll_key_page_up()
+        self.assertEqual(editor.wpos.get_pos(), (0,0))
+        for _ in range(61):
+            editor._key_enter('')
+        editor.wpos.set_pos(editor.cpos.get_pos())
+        editor._scroll_key_page_up()
+        self.assertEqual(editor.wpos.get_pos(), (31,0))
+        editor._scroll_key_page_up()
+        self.assertEqual(editor.wpos.get_pos(), (1,0))
+        editor._scroll_key_page_up()
+        self.assertEqual(editor.wpos.get_pos(), (0,0))
+
+    def test_editor_scroll_key_page_down(self):
+        editor = Editor(test_file_path_editor, 'utf-8')
+        editor._move_key_page_down()
+        for _ in range(61): # file_len == 63
+            editor._key_enter('')
+            editor._move_key_up()
+        self.assertEqual(editor.wpos.get_pos(), (0,0))
+        editor._move_key_page_down()
+        self.assertEqual(editor.wpos.get_pos(), (30,0))
+        editor._move_key_page_down()
+        self.assertEqual(editor.wpos.get_pos(), (33,0))
+        editor._move_key_page_down()
+        self.assertEqual(editor.wpos.get_pos(), (33,0))
+
     def test_editor_move_key_end(self):
         editor = Editor(test_file_path_editor, 'utf-8')
         editor._move_key_end()
@@ -200,6 +314,14 @@ class TestEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (1,6))
         editor._move_key_ctl_end()
         self.assertEqual(editor.cpos.get_pos(), (1,6))
+
+    def test_editor_scroll_key_end(self):
+        editor = Editor(test_file_path_editor, 'utf-8')
+        for _ in range(61):
+            editor._key_enter('')
+        editor._key_string('!' * 150)
+        editor._scroll_key_end()
+        self.assertEqual(editor.wpos.get_pos(), (33, 37))
 
     def test_editor_move_key_home(self):
         editor = Editor(test_file_path_editor, 'utf-8')
@@ -217,13 +339,54 @@ class TestEditor(TestCase):
         editor._move_key_ctl_home()
         self.assertEqual(editor.cpos.get_pos(), (0,0))
 
+    def test_editor_scroll_key_home(self):
+        editor = Editor(test_file_path_editor, 'utf-8')
+        for _ in range(61):
+            editor._key_enter('')
+        editor._key_string('!' * 150)
+        editor.wpos.set_pos((33, 37))
+        editor._scroll_key_home()
+        self.assertEqual(editor.wpos.get_pos(), (0,0))
+
+    @patch('cat_win.util.editor.Editor.special_indentation', ':)')
+    def test_editor_key_btab(self):
+        editor = Editor(test_file_path_editor, 'utf-8')
+        editor._key_string(':):)')
+        editor._key_string('\t')
+        self.assertListEqual(editor.window_content, [':):):)line 1', 'line 2'])
+        editor._move_key_ctl_right()
+        self.assertEqual(editor._key_btab(''), ':)')
+        self.assertListEqual(editor.window_content, [':):)line 1', 'line 2'])
+        self.assertEqual(editor._key_btab(''), ':)')
+        self.assertListEqual(editor.window_content, [':)line 1', 'line 2'])
+        self.assertEqual(editor._key_btab(''), ':)')
+        self.assertListEqual(editor.window_content, ['line 1', 'line 2'])
+        self.assertEqual(editor._key_btab(''), None)
+        self.assertListEqual(editor.window_content, ['line 1', 'line 2'])
+
+    def test_editor_key_btab_reverse(self):
+        editor = Editor(test_file_path_editor, 'utf-8')
+        editor.cpos.set_pos((0,4))
+        editor._key_btab_reverse(':)')
+        self.assertListEqual(editor.window_content, [':)line 1', 'line 2'])
+        self.assertEqual(editor.cpos.get_pos(), (0,6))
+
+    @patch('cat_win.util.editor.Editor.special_indentation', '!!!')
     def test_editor_key_string(self):
         editor = Editor(test_file_path_editor, 'utf-8')
         self.assertEqual(editor._key_string(1), '')
+        self.assertEqual(editor._key_string(''), '')
         self.assertListEqual(editor.window_content, ['line 1', 'line 2'])
         editor._move_key_right()
         editor._key_string('test')
         self.assertListEqual(editor.window_content, ['ltestine 1', 'line 2'])
+        editor._key_string('\t')
+        self.assertListEqual(editor.window_content, ['ltest\tine 1', 'line 2'])
+        editor._key_enter('')
+        editor._key_string('\t')
+        self.assertListEqual(editor.window_content, ['ltest\t', '!!!ine 1', 'line 2'])
+        editor._key_string('\t')
+        self.assertListEqual(editor.window_content, ['ltest\t', '!!!!!!ine 1', 'line 2'])
 
     def test_editor_action_save(self):
         editor = Editor(test_file_path, 'utf-8', True)
@@ -251,7 +414,19 @@ class TestEditor(TestCase):
 
     @patch('cat_win.util.editor.CURSES_MODULE_ERROR', new=True)
     def test_editor_no_curses_error(self):
-        with patch('cat_win.cat.sys.stderr', new=StdOutMock()) as fake_out:
+        with patch('cat_win.util.editor.sys.stderr', new=StdOutMock()) as fake_out:
             self.assertEqual(Editor.open('', '', None, True), False)
             self.assertIn('could not be loaded', fake_out.getvalue())
             self.assertIn('windows-curses', fake_out.getvalue())
+        with patch('cat_win.util.editor.sys.stderr', new=StdOutMock()) as fake_out:
+            self.assertEqual(Editor.open('', '', None, True), False)
+            self.assertEqual('', fake_out.getvalue())
+
+    def test_editor_set_indentation(self):
+        self.assertEqual(Editor.special_indentation, '\t')
+        self.assertEqual(Editor.auto_indent, False)
+        Editor.set_indentation('  ', True)
+        self.assertEqual(Editor.special_indentation, '  ')
+        self.assertEqual(Editor.auto_indent, True)
+
+
