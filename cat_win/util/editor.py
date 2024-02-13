@@ -735,25 +735,25 @@ class Editor:
         # display screen
         for row in range(max_y):
             brow = row + self.wpos.row
+            if brow >= len(self.window_content):
+                self.curse_window.clrtobot()
+                break
             for col in range(max_x):
                 bcol = col + self.wpos.col
-                if brow >= len(self.window_content) or bcol >= len(self.window_content[brow]):
+                if bcol >= len(self.window_content[brow]):
                     break
-                try:
-                    cur_char = self.window_content[brow][bcol]
-                    if cur_char == '\t':
-                        self.curse_window.addch(row, col, '>',
-                                                self._get_color(4))
-                    elif not cur_char.isprintable():
-                        self.curse_window.addch(row, col, self._get_special_char(cur_char),
-                                                self._get_color(5))
-                    elif self.window_content[brow][bcol:].isspace():
-                        self.curse_window.addch(row, col, cur_char,
-                                                self._get_color(3))
-                    else:
-                        self.curse_window.addch(row, col, cur_char)
-                except curses.error:
-                    break
+                cur_char = self.window_content[brow][bcol]
+                if cur_char == '\t':
+                    self.curse_window.addch(row, col, '>',
+                                            self._get_color(4))
+                elif not cur_char.isprintable():
+                    self.curse_window.addch(row, col, self._get_special_char(cur_char),
+                                            self._get_color(5))
+                elif self.window_content[brow][bcol:].isspace():
+                    self.curse_window.addch(row, col, cur_char,
+                                            self._get_color(3))
+                else:
+                    self.curse_window.addch(row, col, cur_char)
             self.curse_window.clrtoeol()
             self.curse_window.move(row+1, 0)
 
