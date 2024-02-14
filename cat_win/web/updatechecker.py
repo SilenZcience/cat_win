@@ -3,6 +3,7 @@ updatechecker
 """
 
 import json
+import os
 import sys
 import urllib.request
 
@@ -127,7 +128,7 @@ def new_version_available(current_version: str, latest_version: str) -> int:
 
 
 def print_update_information(package: str, current_version: str, color_dic: dict,
-                             py_executable: str) -> None:
+                             on_windows_os: bool) -> None:
     """
     prints update information if there are any.
     
@@ -138,16 +139,23 @@ def print_update_information(package: str, current_version: str, color_dic: dict
         a version representation as string of the current version
     color_dic (dict):
         a dictionary translating the color-keywords to ANSI-Colorcodes
-    py_executable (str):
-        the python executable (from sys.executable)
+    on_windows_os (bool):
+        indicates whether the platfowm is Windows or not
     """
+    py_executable = sys.executable
+    if os.path.dirname(py_executable) in os.environ['PATH'].split(os.pathsep):
+        py_executable = os.path.basename(py_executable)
+    elif ' ' in py_executable:
+        py_executable = f'"{py_executable}"' if on_windows_os else py_executable.replace(' ', '\\ ')
+
     latest_version = get_latest_package_version(package)
     status = new_version_available(current_version, latest_version)
+
     if status == STATUS_UP_TO_DATE:
         return
-    message = ''
-    warning = ''
-    info    = ''
+
+    message, warning, info = '', '', ''
+
     if abs(status) == STATUS_STABLE_RELEASE_AVAILABLE:
         message += f"{color_dic[CKW.MESSAGE_IMPORTANT]}"
         message += f"A new stable release of {package} is available: v{latest_version}"
@@ -169,6 +177,7 @@ def print_update_information(package: str, current_version: str, color_dic: dict
     info += f"{color_dic[CKW.MESSAGE_INFORMATION]}Take a look at the changelog here:"
     info += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_INFORMATION]}"
     info += f"{__url__}/blob/main/CHANGELOG.md{color_dic[CKW.RESET_ALL]}"
+
     print(message)
     print(warning, file=sys.stderr)
     print(info)
