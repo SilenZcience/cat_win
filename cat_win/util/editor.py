@@ -41,10 +41,13 @@ def get_newline(file: str) -> str:
         the line ending that the given file is using
         (\r or \n or \r\n)
     """
-    with open(file, 'rb') as _f:
-        _l = _f.readline()
-        _l += b'\n' * bool(not _l[-1:] or _l[-1:] not in b'\r\n')
-        return '\r\n' if _l[-2:] == b'\r\n' else _l[-1:].decode()
+    try:
+        with open(file, 'rb') as _f:
+            _l = _f.readline()
+            _l += b'\n' * bool(not _l[-1:] or _l[-1:] not in b'\r\n')
+            return '\r\n' if _l[-2:] == b'\r\n' else _l[-1:].decode()
+    except OSError:
+        return '\n'
 
 
 class Editor:
@@ -111,7 +114,7 @@ class Editor:
             with open(self.file, 'r', encoding=self.file_encoding) as _f:
                 for line in _f.read().split('\n'):
                     self.window_content.append(line)
-        except (OSError, UnicodeDecodeError) as exc:
+        except (OSError, UnicodeError) as exc:
             self.window_content.append('')
             self.status_bar_size = 2
             self.error_bar = str(exc)
@@ -899,7 +902,7 @@ class Editor:
 
     @classmethod
     def open(cls, file: str, file_encoding: str, write_func, on_windows_os: bool,
-             debug_mode: bool = False) -> bool:
+             skip_binary: bool = False, debug_mode: bool = False) -> bool:
         """
         simple editor to change the contents of any provided file.
         
@@ -932,6 +935,8 @@ class Editor:
             return False
 
         editor = cls(file, file_encoding, debug_mode)
+        if skip_binary and editor.error_bar:
+            return False
         special_chars = dict(map(lambda x: (chr(x[0]), x[2]), SPECIAL_CHARS))
         editor._set_special_chars(special_chars)
 
