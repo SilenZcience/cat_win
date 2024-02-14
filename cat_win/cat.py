@@ -1120,7 +1120,7 @@ def main():
         if holder.args_id[ARGS_EDITOR]:
             unknown_files = [file for file in unknown_files if Editor.open(
                 file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os,
-                holder.args_id[ARGS_DEBUG])]
+                holder.args_id[ARGS_PLAIN_ONLY], holder.args_id[ARGS_DEBUG])]
         else:
             unknown_files = stdinhelper.read_write_files_from_stdin(
                 unknown_files, arg_parser.file_encoding, on_windows_os,
@@ -1129,7 +1129,7 @@ def main():
     if holder.args_id[ARGS_EDITOR]:
         for file in known_files:
             Editor.open(file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os,
-                        holder.args_id[ARGS_DEBUG])
+                        holder.args_id[ARGS_PLAIN_ONLY], holder.args_id[ARGS_DEBUG])
 
     if len(known_files) + len(unknown_files) == 0:
         return
