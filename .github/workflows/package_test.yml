@@ -7,10 +7,9 @@ on:
       - .github/workflows/package_test.yml
       - cat_win/**
       - workflowHelper/**
-    # specify (all) branches such that the workflow will
-    # not trigger on tag/release-creation
+    # only trigger on development branch
     branches:
-      - '**'
+      - 'dev'
 
 jobs:
   build:
@@ -24,6 +23,8 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
+        with:
+          ref: 'dev'
       - name: Install Python ${{ matrix.python-version }}
         id: python
         uses: actions/setup-python@v5
@@ -42,7 +43,7 @@ jobs:
       - name: Install Local Package
         # this should also install the code dependency in requirements.txt
         run: |
-          python ./workflowHelper/dist.py 
+          python -m workflowHelper.dist 
       - name: Test Code Execution
         run: |
           python -m cat_win.cat -h

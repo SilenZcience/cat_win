@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
+        with:
+          ref: 'dev'
       - name: Install Python 3.10
         id: python
         uses: actions/setup-python@v5
@@ -27,13 +29,15 @@ jobs:
           python -m pip install --upgrade Pillow
       - name: Generate Social Preview
         run: |
-          python ./workflowHelper/preview.py
-      - name: Show and Push
+          python -m workflowHelper.preview
+      - name: Show Changes
         run: |
           git status
+      - name: Commit Changes
+        run: |
           git config --local user.name 'github-actions[bot]'
           git config --local user.email 'github-actions[bot]@users.noreply.github.com'
           git add ./img/socialPreview.png
           git commit -m "🤖Generated Social Preview."
-          git push origin HEAD:main
+          git push origin HEAD:dev
         continue-on-error: true
