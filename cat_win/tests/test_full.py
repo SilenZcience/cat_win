@@ -163,7 +163,7 @@ class TestCatFull(TestCase):
             self.assertIn(test_peek, fake_out.getvalue())
 
     @patch('cat_win.cat.sys.argv', ['<CAT>', test_file_path, test_empty_path, test_peek, '-S'])
-    def test_cat_output_full_show_count(self):
+    def test_cat_output_full_show_sum(self):
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertIn(test_file_path, fake_out.getvalue())

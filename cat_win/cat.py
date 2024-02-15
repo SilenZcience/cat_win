@@ -17,13 +17,13 @@ import sys
 
 from cat_win.const.argconstants import ALL_ARGS, ARGS_EDITOR, ARGS_WORDCOUNT, ARGS_WWORDCOUNT
 from cat_win.const.argconstants import ARGS_HELP, ARGS_NUMBER, ARGS_ENDS, ARGS_SQUEEZE
-from cat_win.const.argconstants import ARGS_REVERSE, ARGS_COUNT, ARGS_BLANK, ARGS_FILES
+from cat_win.const.argconstants import ARGS_REVERSE, ARGS_SUM, ARGS_BLANK, ARGS_FILES
 from cat_win.const.argconstants import ARGS_INTERACTIVE, ARGS_NOCOL, ARGS_BINVIEW, ARGS_FILE_PREFIX
 from cat_win.const.argconstants import ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN
 from cat_win.const.argconstants import ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA
 from cat_win.const.argconstants import ARGS_CCONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK
 from cat_win.const.argconstants import ARGS_CHR, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP
-from cat_win.const.argconstants import ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW
+from cat_win.const.argconstants import ARGS_NOBREAK, ARGS_ECHO, ARGS_SSUM, ARGS_HEXVIEW
 from cat_win.const.argconstants import ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN
 from cat_win.const.argconstants import ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR, ARGS_CONFIG
 from cat_win.const.argconstants import ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY
@@ -248,16 +248,16 @@ def _show_wordcount() -> None:
     print(color_dic[CKW.RESET_ALL])
 
 
-def _show_count() -> None:
+def _show_sum() -> None:
     """
     display the line sum of each file individually if
-    ARGS_CCOUNT is specified.
+    ARGS_SSUM is specified.
     display the line sum of all files.
     """
-    if holder.args_id[ARGS_CCOUNT]:
+    if holder.args_id[ARGS_SSUM]:
         longest_file_name = max(map(len, holder.all_files_lines.keys())) + 1
-        print(f"{color_dic[CKW.SUMMARY]}" + \
-            f"{'File': <{longest_file_name}}LineCount{color_dic[CKW.RESET_ALL]}")
+        print(f"{color_dic[CKW.SUMMARY]}{'File': <{longest_file_name}}{color_dic[CKW.RESET_ALL]}"
+            f"{color_dic[CKW.SUMMARY]}LineCount{color_dic[CKW.RESET_ALL]}")
         for file, _ in holder.all_files_lines.items():
             print(f"{color_dic[CKW.SUMMARY]}{file: <{longest_file_name}}" + \
                 f"{holder.all_files_lines[file]: >{holder.all_line_number_place_holder}}" + \
@@ -967,9 +967,9 @@ def edit_files() -> None:
     if holder.args_id[ARGS_WORDCOUNT]:
         print('')
         _show_wordcount()
-    if holder.args_id[ARGS_COUNT]:
+    if holder.args_id[ARGS_SUM]:
         print('')
-        _show_count()
+        _show_sum()
     if holder.args_id[ARGS_FILES]:
         print('')
         _show_files()
@@ -1163,8 +1163,8 @@ def main():
             [tmp_file_helper.generate_temp_file_name() for _ in holder.files])
     holder.generate_values(arg_parser.file_encoding)
 
-    if holder.args_id[ARGS_CCOUNT]:
-        _show_count()
+    if holder.args_id[ARGS_SSUM]:
+        _show_sum()
         return
     if holder.args_id[ARGS_WWORDCOUNT]:
         _show_wordcount()
