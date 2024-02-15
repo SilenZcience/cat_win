@@ -6,7 +6,7 @@ from functools import lru_cache
 import heapq
 
 from cat_win.const.argconstants import HIGHEST_ARG_ID, ARGS_NOCOL, ARGS_LLENGTH, ARGS_NUMBER, \
-    ARGS_REVERSE, ARGS_B64D, ARGS_B64E, ARGS_COUNT, ARGS_CCOUNT, DIFFERENTIABLE_ARGS
+    ARGS_REVERSE, ARGS_B64D, ARGS_B64E, ARGS_SUM, ARGS_SSUM, DIFFERENTIABLE_ARGS
 from cat_win.util.cbase64 import _decode_base64
 from cat_win.util.file import File
 
@@ -268,7 +268,7 @@ class Holder():
                             raw_f_write.write(_decode_base64(raw_f_read.read().decode(encoding)))
                 except OSError:
                     pass
-        if self.args_id[ARGS_COUNT] or self.args_id[ARGS_CCOUNT] or self.args_id[ARGS_NUMBER]:
+        if self.args_id[ARGS_SUM] or self.args_id[ARGS_SSUM] or self.args_id[ARGS_NUMBER]:
             self.__calc_place_holder__()
         if self.args_id[ARGS_LLENGTH]:
             self.__calc_file_line_length_place_holder__()

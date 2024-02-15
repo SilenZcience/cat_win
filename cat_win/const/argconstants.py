@@ -19,12 +19,12 @@ class ArgConstant():
 
 
 ARGS_HELP, ARGS_NUMBER, ARGS_ENDS, ARGS_EDITOR, ARGS_SQUEEZE = range(0, 5)
-ARGS_REVERSE, ARGS_COUNT, ARGS_BLANK, ARGS_FILES, ARGS_INTERACTIVE = range(5, 10)
+ARGS_REVERSE, ARGS_SUM, ARGS_BLANK, ARGS_FILES, ARGS_INTERACTIVE = range(5, 10)
 ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN = range(10, 15)
 ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA = range(15, 20)
 ARGS_CCONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK, ARGS_NOCOL = range(20, 25)
 ARGS_CHR, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP = range(25, 30)
-ARGS_NOBREAK, ARGS_ECHO, ARGS_CCOUNT, ARGS_HEXVIEW, ARGS_BINVIEW = range(30, 35)
+ARGS_NOBREAK, ARGS_ECHO, ARGS_SSUM, ARGS_HEXVIEW, ARGS_BINVIEW = range(30, 35)
 ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN = range(35, 38)
 ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(38, 40)
 ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY, ARGS_FILE_PREFIX = range(40, 45)
@@ -92,9 +92,9 @@ ALL_ARGS = [
     ArgConstant('-D', '--DIRS', 'ONLY list found directories',
 				ARGS_DDIRECTORIES, show_arg=False, section=5),
     ArgConstant('-s', '--sum', 'show sum of lines',
-				ARGS_COUNT, show_arg_on_shell=False, section=5),
+				ARGS_SUM, show_arg_on_shell=False, section=5),
     ArgConstant('-S', '--SUM', 'ONLY show sum of lines',
-				ARGS_CCOUNT, show_arg=False, section=5),
+				ARGS_SSUM, show_arg=False, section=5),
     ArgConstant('-w', '--wordcount', 'display the wordcount',
                 ARGS_WORDCOUNT, show_arg_on_shell=False, section=5),
     ArgConstant('-W', '--WORDCOUNT', 'ONLY display the wordcount',
