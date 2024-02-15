@@ -37,6 +37,7 @@ SPECIAL_CHARS = [
     # (31, 'US' , '␟', False), # ^_ unit seperator
     # (127,'DEL', '␡', False), # delete
 ]
+# (ord[dec],char,symbol,use in --chr)
 
 
 def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors: list = None,
