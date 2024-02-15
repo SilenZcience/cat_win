@@ -422,7 +422,7 @@ class Editor:
                                         self._get_color(2))
             self.curse_window.addstr(max_y + self.status_bar_size - 1, 0,
                                         msg[:max_x].ljust(max_x),
-                                        self._get_color(5))
+                                        self._get_color(3))
         except curses.error:
             pass
         self.curse_window.refresh()
@@ -751,7 +751,7 @@ class Editor:
                                             self._get_color(4))
                 elif not cur_char.isprintable():
                     self.curse_window.addch(row, col, self._get_special_char(cur_char),
-                                            self._get_color(5))
+                                            self._get_color(3))
                 elif self.window_content[brow][bcol:].isspace():
                     self.curse_window.addch(row, col, cur_char,
                                             self._get_color(3))
@@ -879,12 +879,10 @@ class Editor:
                 curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
                 # error_bar
                 curses.init_pair(2, curses.COLOR_RED  , curses.COLOR_WHITE)
-                # trailing_whitespace
-                curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_RED  )
+                # special char (not printable or ws) & quit-prompt
+                curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_RED  )
                 # tab-char
                 curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_GREEN)
-                # special char (not printable) & quit-prompt
-                curses.init_pair(5, curses.COLOR_WHITE, curses.COLOR_RED  )
         curses.raw()
         self.curse_window.nodelay(False)
 
