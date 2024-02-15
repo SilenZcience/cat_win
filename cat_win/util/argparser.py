@@ -10,6 +10,18 @@ from cat_win.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_EC
 
 
 IS_FILE, IS_DIR, IS_PATTERN = range(0, 3)
+RE_ENCODING = re.compile(r"\Aenc[\=\:].+\Z",   re.IGNORECASE)
+RE_MATCH    = re.compile(r"\Amatch[\=\:].+\Z", re.IGNORECASE)
+RE_FIND     = re.compile(r"\Afind[\=\:].+\Z",  re.IGNORECASE)
+RE_TRUNC    = re.compile(r"\Atrunc[\=\:][0-9\(\)\+\-\*\/]*"
+                         r"\:[0-9\(\)\+\-\*\/]*\:?"
+                         r"[0-9\(\)\+\-\*\/]*\Z")
+RE_CUT      = re.compile(r"\A\[[0-9\(\)\+\-\*\/]*\:"
+                         r"[0-9\(\)\+\-\*\/]*\:?"
+                         r"[0-9\(\)\+\-\*\/]*\]\Z")
+RE_REPLACE  = re.compile(r"\A\[(?:.*[^\\])?(?:\\\\)*,"
+                         r"(?:.*[^\\])?(?:\\\\)*\]\Z")
+# using simple if-statements (e.g. startwith()) would be faster, but arguably less readable
 
 
 def levenshtein(str_a: str, str_b: str) -> float:
@@ -210,26 +222,25 @@ class ArgParser:
             should simply be printed to stdout.
         """
         # 'enc' + ('=' or ':') + file_encoding
-        if re.match(r"\Aenc[\=\:].+\Z", param, re.IGNORECASE):
+        if RE_ENCODING.match(param):
             self.file_encoding = param[4:]
             return False
         # 'match' + ('=' or ':') + file_match
-        if re.match(r"\Amatch[\=\:].+\Z", param, re.IGNORECASE):
+        if RE_MATCH.match(param):
             if delete:
                 self.file_match.discard(param[6:])
                 return False
             self.file_match.add(fr'{param[6:]}')
             return False
         # 'find' + ('=' or ':') + file_search
-        if re.match(r"\Afind[\=\:].+\Z", param, re.IGNORECASE):
+        if RE_FIND.match(param):
             if delete:
                 self.file_search.discard(param[5:])
                 return False
             self.file_search.add(param[5:])
             return False
         # 'trunc' + ('='/':') + file_truncate[0] +':'+ file_truncate[1] [+ ':' + file_truncate[2]]
-        if re.match(r"\Atrunc[\=\:][0-9\(\)\+\-\*\/]*\:[0-9\(\)\+\-\*\/]*\:?[0-9\(\)\+\-\*\/]*\Z",
-                    param, re.IGNORECASE):
+        if RE_TRUNC.match(param):
             for i, p_split in enumerate(param[6:].split(':')):
                 try:
                     self.file_truncate[i] = int(eval(p_split))
@@ -237,11 +248,11 @@ class ArgParser:
                     self.file_truncate[i] = None
             return False
         # '[' + ARGS_CUT + ']'
-        if re.match(r"\A\[[0-9\(\)\+\-\*\/]*\:[0-9\(\)\+\-\*\/]*\:?[0-9\(\)\+\-\*\/]*\]\Z", param):
+        if RE_CUT.match(param):
             self._args.append((ARGS_CUT, param))
             return False
         # '[' + ARGS_REPLACE_THIS + ',' + ARGS_REPLACE_WITH + ']' (escape chars with '\')
-        if re.match(r"\A\[(?:.*[^\\])?(?:\\\\)*,(?:.*[^\\])?(?:\\\\)*\]\Z", param):
+        if RE_REPLACE.match(param):
             self._args.append((ARGS_REPLACE, param))
             return False
 
