@@ -99,13 +99,12 @@ class CKW:
     MATCHED = 'matched_pattern'
     MATCHED_MESSAGE = 'matched_pattern_message'
     CHECKSUM = 'checksum_message'
-    SUMMARY = 'processed_message'
+    SUMMARY = 'summary_message'
     ATTRIB = 'file_attribute_message'
     ATTRIB_POSITIVE = 'active_file_attributes'
     ATTRIB_NEGATIVE = 'missing_file_attributes'
+    RAWVIEWER = 'raw_viewer'
 
     MESSAGE_INFORMATION = 'message_information'
     MESSAGE_IMPORTANT = 'message_important'
     MESSAGE_WARNING = 'message_warning'
-
-    RAWVIEWER = 'raw_viewer'
