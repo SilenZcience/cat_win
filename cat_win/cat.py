@@ -237,13 +237,20 @@ def _show_wordcount() -> None:
             pass
 
     print(color_dic[CKW.SUMMARY], end='')
-    print('The word count includes the following files:', end='\n\t')
-    print('\n\t'.join(used_files))
+    print('The word count includes the following files:', end='')
+    print(color_dic[CKW.RESET_ALL], end='\n\t')
+    print('\n\t'.join(map(
+        lambda f: f"{color_dic[CKW.SUMMARY]}{f}{color_dic[CKW.RESET_ALL]}",used_files
+        )))
     sorted_word_count = sorted(word_count.items(), key=lambda token: token[1], reverse=True)
     format_delimeter = f"{color_dic[CKW.RESET_ALL]}:{color_dic[CKW.SUMMARY]} "
     for _, group in groupby(sorted_word_count, lambda token: token[1]):
         sorted_group = sorted(group, key=lambda token: token[0])
-        formatted_word_count = map(lambda x: f"{x[0]}{format_delimeter}{x[1]}", sorted_group)
+        formatted_word_count = map(
+            lambda x: f"{color_dic[CKW.SUMMARY]}{x[0]}"
+            f"{format_delimeter}{x[1]}{color_dic[CKW.RESET_ALL]}",
+            sorted_group
+            )
         print('\n' + '\n'.join(formatted_word_count), end='')
     print(color_dic[CKW.RESET_ALL])
 
