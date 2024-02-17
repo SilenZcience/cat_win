@@ -228,10 +228,7 @@ def _show_wordcount() -> None:
         try:
             with open(hfile.path, 'r', encoding=arg_parser.file_encoding) as file:
                 for token in re.findall(r'\w+|[^\s\w]', file.read()):
-                    if token in word_count:
-                        word_count[token] += 1
-                    else:
-                        word_count[token] = 1
+                    word_count[token] = word_count.get(token, 0)+1
             used_files.append(hfile.displayname)
         except (OSError, UnicodeError):
             pass
