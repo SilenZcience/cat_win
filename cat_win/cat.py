@@ -1120,20 +1120,24 @@ def main():
         unknown_files = stdinhelper.write_files(unknown_files, piped_input,
                                                 arg_parser.file_encoding)
         holder.set_temp_file_stdin(temp_file)
+    elif holder.args_id[ARGS_EDITOR]:
+        unknown_files = [file for file in unknown_files if Editor.open(
+            file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os,
+            holder.args_id[ARGS_PLAIN_ONLY], holder.args_id[ARGS_DEBUG])]
     else:
-        if holder.args_id[ARGS_EDITOR]:
-            unknown_files = [file for file in unknown_files if Editor.open(
-                file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os,
-                holder.args_id[ARGS_PLAIN_ONLY], holder.args_id[ARGS_DEBUG])]
-        else:
-            unknown_files = stdinhelper.read_write_files_from_stdin(
-                unknown_files, arg_parser.file_encoding, on_windows_os,
-                holder.args_id[ARGS_ONELINE])
+        unknown_files = stdinhelper.read_write_files_from_stdin(
+            unknown_files, arg_parser.file_encoding, on_windows_os,
+            holder.args_id[ARGS_ONELINE])
 
     if holder.args_id[ARGS_EDITOR]:
+        stdin_backup = os.dup(sys.stdin.fileno())
+        if holder.args_id[ARGS_STDIN]:
+            tty = os.open('CONIN$' if on_windows_os else '/dev/tty', os.O_RDONLY)
+            os.dup2(tty, sys.stdin.fileno())
         for file in known_files:
             Editor.open(file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os,
                         holder.args_id[ARGS_PLAIN_ONLY], holder.args_id[ARGS_DEBUG])
+        os.dup2(stdin_backup, sys.stdin.fileno())
 
     if len(known_files) + len(unknown_files) == 0:
         return
