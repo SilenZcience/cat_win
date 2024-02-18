@@ -22,5 +22,5 @@ class TestArgConstants(TestCase):
         parameters = parameters_short_form + parameters_long_form
         for param in parameters:
             self.assertEqual(param[:1], '-')
-            if not param.startswith('--'):
+            if not param.startswith('--') and param != '-':
                 self.assertEqual(len(param), 2)
