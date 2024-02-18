@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - renamed -`i`, --`interactive` to -, --`stdin`.
+- added `Alt+S` hotkey to the editor to save the current changes. 
 
 ### Bugfixes
 
