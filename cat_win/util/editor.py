@@ -894,9 +894,11 @@ class Editor:
         write_func (function):
             a function to write a file
         """
-        self._init_screen()
-        self._run(write_func)
-        curses.endwin()
+        try:
+            self._init_screen()
+            self._run(write_func)
+        finally:
+            curses.endwin()
 
     @classmethod
     def open(cls, file: str, file_encoding: str, write_func, on_windows_os: bool,
