@@ -19,7 +19,7 @@ class ArgConstant():
 
 
 ARGS_HELP, ARGS_NUMBER, ARGS_ENDS, ARGS_EDITOR, ARGS_SQUEEZE = range(0, 5)
-ARGS_REVERSE, ARGS_SUM, ARGS_BLANK, ARGS_FILES, ARGS_INTERACTIVE = range(5, 10)
+ARGS_REVERSE, ARGS_SUM, ARGS_BLANK, ARGS_FILES, ARGS_STDIN = range(5, 10)
 ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN = range(10, 15)
 ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA = range(15, 20)
 ARGS_CCONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK, ARGS_NOCOL = range(20, 25)
@@ -75,8 +75,8 @@ ALL_ARGS = [
     # different content types
     ArgConstant('-E', '--echo', 'handle every following parameter as stdin',
 				ARGS_ECHO, show_arg_on_shell=False, section=4),
-    ArgConstant('-i', '--interactive', 'use stdin',
-				ARGS_INTERACTIVE, show_arg_on_shell=False, section=4),
+    ArgConstant('-', '--stdin', 'use stdin',
+				ARGS_STDIN, show_arg_on_shell=False, section=4),
     ArgConstant('-o', '--oneline', 'take only the first stdin-line',
 				ARGS_ONELINE, section=4),
     ArgConstant('-U', '--url', 'display the contents of any provided url',

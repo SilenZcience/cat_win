@@ -18,7 +18,7 @@ import sys
 from cat_win.const.argconstants import ALL_ARGS, ARGS_EDITOR, ARGS_WORDCOUNT, ARGS_WWORDCOUNT
 from cat_win.const.argconstants import ARGS_HELP, ARGS_NUMBER, ARGS_ENDS, ARGS_SQUEEZE
 from cat_win.const.argconstants import ARGS_REVERSE, ARGS_SUM, ARGS_BLANK, ARGS_FILES
-from cat_win.const.argconstants import ARGS_INTERACTIVE, ARGS_NOCOL, ARGS_BINVIEW, ARGS_FILE_PREFIX
+from cat_win.const.argconstants import ARGS_STDIN, ARGS_NOCOL, ARGS_BINVIEW, ARGS_FILE_PREFIX
 from cat_win.const.argconstants import ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN
 from cat_win.const.argconstants import ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA
 from cat_win.const.argconstants import ARGS_CCONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK
@@ -1112,7 +1112,7 @@ def main():
             for valid_url in valid_urls])
         known_files.extend(list(temp_files.keys()))
         holder.set_temp_files_url(temp_files)
-    if holder.args_id[ARGS_INTERACTIVE]:
+    if holder.args_id[ARGS_STDIN]:
         piped_input = ''.join(stdinhelper.get_stdin_content(holder.args_id[ARGS_ONELINE]))
         temp_file = stdinhelper.write_file(piped_input, tmp_file_helper.generate_temp_file_name(),
                                            arg_parser.file_encoding)
