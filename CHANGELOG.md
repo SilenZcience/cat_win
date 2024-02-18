@@ -15,6 +15,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fix Bug where the editor would not correctly respond to setting the --`plain` parameter.
 - fix Bug where the --`wordcount` would have incorrect coloring when using background colors.
 - fix Bug where the editor would not work when reading from stdin.
+- fix Bug where KeyboardInterrupt in editor would leave the curses module open.
 
 
 ## [1.6.5] - 2024-02-13
