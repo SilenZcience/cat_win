@@ -863,7 +863,7 @@ The currently supported Key bindings are as follows:
 | <kbd>Undo/^Z</kbd> | - | - | undo an action | - |
 | <kbd>Redo/^Y</kbd> | - | - | redo an action | - |
 ||||||
-| <kbd>Save/^S</kbd> | - | - | save changes | - |
+| <kbd>Save/^S</kbd> | - | - | save changes | save changes |
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to specific line | - |
 | <kbd>Find/^F</kbd> | - | - | prompt to search in the file | - |
 | <kbd>Background/^B</kbd> | - | - | put the editor in the background</br>(UNIX only) | - |
