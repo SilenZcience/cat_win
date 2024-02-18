@@ -8,12 +8,13 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - renamed -`i`, --`interactive` to -, --`stdin`.
-- added `Alt+S` hotkey to the editor to save the current changes. 
+- added `Alt+S` hotkey to the editor to save the current changes.
 
 ### Bugfixes
 
 - fix Bug where the editor would not correctly respond to setting the --`plain` parameter.
 - fix Bug where the --`wordcount` would have incorrect coloring when using background colors.
+- fix Bug where the editor would not work when reading from stdin.
 
 
 ## [1.6.5] - 2024-02-13
