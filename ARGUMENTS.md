@@ -54,7 +54,7 @@
                   <li><a href="#sort">--sort, --sort</a></li>
                   <li><a href="#format">--sf, --specific-format</a></li>
                   <li><a href="#echo">-E, --echo</a></li>
-                  <li><a href="#interactive">-i, --interactive</a></li>
+                  <li><a href="#stdin">-, --stdin</a></li>
                   <li><a href="#oneline">-o, --oneline</a></li>
                   <li><a href="#url">-U, --url</a></li>
                   <li><a href="#files">-f, --files</a></li>
@@ -130,7 +130,7 @@
 | *<a href="#format">--sf, --specific-format</a>* | sort all lines alphabetically |❌|
 ||| |
 | *<a href="#echo">-E, --echo</a>* | handle every following parameter as stdin |❌|
-| *<a href="#interactive">-i, --interactive</a>* | use stdin |❌|
+| *<a href="#stdin">-, --stdin</a>* | use stdin |❌|
 | *<a href="#oneline">-o, --oneline</a>* | take only the first stdin-line |✔|
 | *<a href="#url">-U, --url</a>* | display the contents of any provided url |❌|
 ||| |
@@ -196,7 +196,7 @@
 - Unknown Files
    - When encountering unknown Files the User is being prompted to write to Stdin.
    - The Stdin is being used to then write the Files.
-   - When using the --interactive Parameter unknown Files will be automatically written with the content of Stdin.
+   - When using the --stdin Parameter unknown Files will be automatically written with the content of StdIn.
 - Coloring
    - The Output will contain Color by Default.
    - cat_win will not explicitly add Color if the Argument <a href="#nocolor">--nc, --nocolor</a> is used. (The Output may still contain Color if a File itself contains the ANSI-Color-Coding.)
@@ -440,7 +440,7 @@ This way it is possible to define new lines (\n) or other special characters.
 [37] -n The last Parameter does not count!
 ```
 
-### <a id="interactive">-i, --interactive</a>
+### <a id="stdin">-, --stdin</a>
 
 Using this Argument allows to pass in Data via the Stdin Stream.
 The Stdin Pipe will be handled as its own File.
@@ -453,7 +453,7 @@ The Stdin Pipe will be handled as its own File.
 ### <a id="oneline">-o, --oneline</a>
 
 Limits the Stdin Stream to the first Line.
-Can only be used in Combination with <a href="#interactive">-i, --interactive</a>.
+Can only be used in Combination with <a href="#stdin">-, --stdin</a>.
 
 ```console
 > catw test.txt
