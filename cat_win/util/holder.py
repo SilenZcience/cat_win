@@ -102,7 +102,7 @@ class Holder():
 
         self.clip_board = ''
 
-    def _get_file_display_name(self, file: str) -> str:
+    def get_file_display_name(self, file: str) -> str:
         """
         return the display name of a file. Expects self.temp_file_stdin
         and self.temp_file_echo to be set already.
@@ -131,7 +131,7 @@ class Holder():
         """
         set the files to display.
         """
-        self.files = [File(path, self._get_file_display_name(path)) for path in files]
+        self.files = [File(path, self.get_file_display_name(path)) for path in files]
         self._inner_files = files[:]
 
     def set_args(self, args: list) -> None:

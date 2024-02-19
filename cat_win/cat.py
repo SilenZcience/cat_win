@@ -1122,7 +1122,8 @@ def main():
         holder.set_temp_file_stdin(temp_file)
     elif holder.args_id[ARGS_EDITOR]:
         unknown_files = [file for file in unknown_files if Editor.open(
-            file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os,
+            file, holder.get_file_display_name(file), arg_parser.file_encoding,
+            stdinhelper.write_file, on_windows_os,
             holder.args_id[ARGS_PLAIN_ONLY], holder.args_id[ARGS_DEBUG])]
     else:
         unknown_files = stdinhelper.read_write_files_from_stdin(
@@ -1135,7 +1136,8 @@ def main():
             tty = os.open('CONIN$' if on_windows_os else '/dev/tty', os.O_RDONLY)
             os.dup2(tty, sys.stdin.fileno())
         for file in known_files:
-            Editor.open(file, arg_parser.file_encoding, stdinhelper.write_file, on_windows_os,
+            Editor.open(file, holder.get_file_display_name(file), arg_parser.file_encoding,
+                        stdinhelper.write_file, on_windows_os,
                         holder.args_id[ARGS_PLAIN_ONLY], holder.args_id[ARGS_DEBUG])
         os.dup2(stdin_backup, sys.stdin.fileno())
 

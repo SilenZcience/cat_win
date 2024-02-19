@@ -58,13 +58,16 @@ class Editor:
     special_indentation = '\t'
     auto_indent = False
 
-    def __init__(self, file: str, file_encoding: str, debug_mode: bool = False) -> None:
+    def __init__(self, file: str, display_name: str,
+                 file_encoding: str, debug_mode: bool = False) -> None:
         """
         defines an Editor object.
         
         Parameters:
         file (str):
             a string representation of a file (-path)
+        display_name (str):
+            the display name for the current file
         file_encoding:
             the encoding to read and write the given file
         debug_mode (bool)
@@ -75,6 +78,7 @@ class Editor:
         self.get_char = self._get_new_char()
 
         self.file = file
+        self.display_name = display_name
         self.file_encoding = file_encoding
         self.line_sep = '\n'
         self.window_content = []
@@ -768,13 +772,13 @@ class Editor:
                 self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
                                          self.error_bar[:max_x].ljust(max_x), self._get_color(2))
 
-            status_bar = f"File: {self.file} | Exit: ^q | Save: ^s | Pos: {self.cpos.col+1}"
+            status_bar = f"File: {self.display_name} | Exit: ^q | Save: ^s | Pos: {self.cpos.col+1}"
             status_bar += f", {self.cpos.row+1} | {'NOT ' * self.unsaved_progress}Saved!"
             if self.debug_mode:
                 status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x}"
             if len(status_bar) > max_x:
-                necc_space = max(0, max_x - (len(status_bar) - len(self.file) + 3))
-                status_bar = f"File: ...{self.file[-necc_space:] * bool(necc_space)} "
+                necc_space = max(0, max_x - (len(status_bar) - len(self.display_name) + 3))
+                status_bar = f"File: ...{self.display_name[-necc_space:] * bool(necc_space)} "
                 status_bar += f"| Exit: ^q | Save: ^s | Pos: {self.cpos.col+1}, {self.cpos.row+1} "
                 status_bar += f"| {'NOT ' * self.unsaved_progress}Saved!"[:max_x]
                 if self.debug_mode:
@@ -903,7 +907,8 @@ class Editor:
             curses.endwin()
 
     @classmethod
-    def open(cls, file: str, file_encoding: str, write_func, on_windows_os: bool,
+    def open(cls, file: str, display_name: str, file_encoding: str,
+             write_func, on_windows_os: bool,
              skip_binary: bool = False, debug_mode: bool = False) -> bool:
         """
         simple editor to change the contents of any provided file.
@@ -911,6 +916,8 @@ class Editor:
         Parameters:
         file (str):
             a string representing a file(-path)
+        display_name (str):
+            the display name for the current file
         file_encoding (str):
             an encoding the open the file with
         write_func (method):
@@ -936,7 +943,7 @@ class Editor:
             Editor.loading_failed = True
             return False
 
-        editor = cls(file, file_encoding, debug_mode)
+        editor = cls(file, display_name, file_encoding, debug_mode)
         if skip_binary and editor.error_bar:
             return False
         special_chars = dict(map(lambda x: (chr(x[0]), x[2]), SPECIAL_CHARS))
