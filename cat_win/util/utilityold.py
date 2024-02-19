@@ -26,7 +26,7 @@ def comp_eval(converter: Converter, content: list, param: str, cleaner: object) 
     """
     new_content = []
     for prefix, line in content:
-        evaluated = converter.evaluate(cleaner(line), (param == param.lower()))
+        evaluated = converter.evaluate(cleaner(line), (param.islower()))
         if evaluated is not None:
             new_content.append((prefix, evaluated))
     return new_content
@@ -60,7 +60,7 @@ def comp_conv(converter: Converter, content: list, param: str, cleaner: object):
         cleaned = cleaner(line)
         if cleaned and method_is_convertable(cleaned):
             new_content.append((prefix, line + \
-                f" {method_convert(cleaned, (param == param.lower()))}"))
+                f" {method_convert(cleaned, (param.islower()))}"))
     return new_content
 
 def split_replace(param: str) -> list:

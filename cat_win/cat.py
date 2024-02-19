@@ -1084,7 +1084,7 @@ def init(shell: bool = False) -> tuple:
         echo_args = ' '.join(echo_args)
         for arg, param in holder.args:
             if arg == ARGS_ECHO:
-                if param == param.upper():
+                if param.isupper():
                     echo_args = echo_args.encode(arg_parser.file_encoding).decode('unicode_escape')
                 break
 
