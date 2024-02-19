@@ -436,8 +436,14 @@ When using the one-letter Variant of this Parameter the following Input will be 
 This way it is possible to define new lines (\n) or other special characters.
 
 ```console
-> catw -l -E -n The last 'Parameter' does not count!
+> catw -l --echo -n The last 'Parameter' does not count!\nThis is not a newline!
+[57] -n The last Parameter does not count!\nThis is not a newline!
+```
+
+```console
+> catw -l -E -n The last 'Parameter' does not count!\nThis is a newline!
 [37] -n The last Parameter does not count!
+[18] This is a newline!
 ```
 
 ### <a id="stdin">-, --stdin</a>
