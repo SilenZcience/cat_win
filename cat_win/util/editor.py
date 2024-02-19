@@ -601,8 +601,10 @@ class Editor:
                 self._action_render_scr('Save changes? [y]es, [n]o; Abort? ESC')
                 wchar, key = next(self.get_char)
                 if key in ACTION_HOTKEYS:
-                    if key in [b'_action_quit', b'_action_interrupt']:
+                    if key == b'_action_quit':
                         break
+                    if key == b'_action_interrupt':
+                        return True
                     if key == b'_action_background':
                         getattr(self, key.decode(), lambda *_: False)(None)
                     if key == b'_action_save':
