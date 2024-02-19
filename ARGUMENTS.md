@@ -983,11 +983,21 @@ This Text is written in Utf-16!
 Defines a Literal to search for within the Text of any provided File.
 When the Literal contains Whitespaces it is neccessary to encase the entire Parameter with Quotes as defined by the Terminal used.
 It is possible to define multiple Substrings to search for by simply providing the Parameter find=X multiple times.
+When using this Parameter in Uppercase the Case of the Substring will be ignored.
 
 ```console
 > catw test.txt "find=cats and"
 It's raining cats and dogs!
 --------------- Found [('cats and', [13, 21])] ---------------
+
+> catw test.txt "find=CATS and"
+It's raining cats and dogs!
+```
+
+```console
+> catw test.txt "FIND=CATS and"
+It's raining cats and dogs!
+--------------- Found [('CATS and', [13, 21])] ---------------
 ```
 
 ### <a id="match">match=X, match&#42889;X</a>
@@ -995,11 +1005,21 @@ It's raining cats and dogs!
 Defines a Pattern to search for within the Text of any provided File.
 It is possible to define multiple Patterns to match for by simply providing the Parameter match=X multiple times.
 The given Patterns is simply treated as a regular Expression.
+When using this Parameter in Uppercase the Case of the Pattern will be ignored.
 
 ```console
 > catw test.txt "match=cat.\s.{3,}"
 It's raining cats and dogs!
 --------------- Matched [('cat.\\s.{3,}', [13, 27])] ---------------
+
+> catw test.txt "match=CAT.\s.{3,}"
+It's raining cats and dogs!
+```
+
+```console
+> catw test.txt "MATCH=CAT.\s.{3,}"
+It's raining cats and dogs!
+--------------- Matched [('CAT.\\s.{3,}', [13, 27])] ---------------
 ```
 
 ### <a id="trunc">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>
