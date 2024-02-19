@@ -25,7 +25,7 @@ def comp_eval(converter: Converter, content: list, param: str, cleaner: object) 
         the new comprehended content list with all equations evaluated
     """
     return [(prefix, evaluated) for prefix, line in content if
-            (evaluated := converter.evaluate(cleaner(line), (param == param.lower()))) is not None]
+            (evaluated := converter.evaluate(cleaner(line), (param.islower()))) is not None]
 
 def comp_conv(converter: Converter, content: list, param: str, cleaner: object):
     """
@@ -51,7 +51,7 @@ def comp_conv(converter: Converter, content: list, param: str, cleaner: object):
     method_is_convertable = getattr(converter, 'is_' + base, lambda _: False)
     method_convert = getattr(converter, 'c_from_' + base, lambda x: x)
 
-    return [(prefix, f"{line} {method_convert(cleaned, (param == param.lower()))}")
+    return [(prefix, f"{line} {method_convert(cleaned, (param.islower()))}")
             for prefix, line in content if (cleaned := cleaner(line)) \
                 and method_is_convertable(cleaned)]
 
