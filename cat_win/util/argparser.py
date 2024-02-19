@@ -94,7 +94,9 @@ class ArgParser:
         """
         self.file_encoding = self.default_file_encoding
         self.file_search = set()
+        self.file_search_ignore_case = False
         self.file_match = set()
+        self.file_match_ignore_case = False
         self.file_truncate = [None, None, None]
 
     def get_args(self) -> list:
@@ -230,6 +232,8 @@ class ArgParser:
             if delete:
                 self.file_match.discard(param[6:])
                 return False
+            if param[:5].isupper():
+                self.file_match_ignore_case = True
             self.file_match.add(fr'{param[6:]}')
             return False
         # 'find' + ('=' or ':') + file_search
@@ -237,6 +241,8 @@ class ArgParser:
             if delete:
                 self.file_search.discard(param[5:])
                 return False
+            if param[:4].isupper():
+                self.file_search_ignore_case = True
             self.file_search.add(param[5:])
             return False
         # 'trunc' + ('='/':') + file_truncate[0] +':'+ file_truncate[1] [+ ':' + file_truncate[2]]

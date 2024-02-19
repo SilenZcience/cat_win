@@ -11,9 +11,12 @@ class StringFinder:
     """
     defines a stringfinder
     """
-    def __init__(self, literals: set = None, regex: set = None) -> None:
+    def __init__(self, literals: set = None, regex: set = None,
+                 literals_ignore_case: bool = False, regex_ignore_case: bool = False) -> None:
         self.kw_literals = literals if literals is not None else {}
         self.kw_regex = regex if regex is not None else {}
+        self.literals_ignore_case = literals_ignore_case
+        self.regex_ignore_case = regex_ignore_case
 
     def _findliterals(self, sub: str, _s: str):
         """
@@ -29,6 +32,8 @@ class StringFinder:
         (list):
             containing the start and end indeces like [start, end]
         """
+        if self.literals_ignore_case:
+            sub, _s = sub.lower(), _s.lower()
         _l = len(sub)
         i = _s.find(sub)
         while i != -1:
@@ -49,7 +54,7 @@ class StringFinder:
         (list):
             containing the start and end indeces like [start, end]
         """
-        for match in re.finditer(fr'{pattern}', _s):
+        for match in re.finditer(fr'{pattern}', _s, re.IGNORECASE if self.regex_ignore_case else 0):
             yield list(match.span())
 
     def _optimize_intervals(self, intervals: list) -> list:
