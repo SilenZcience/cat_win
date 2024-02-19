@@ -10,6 +10,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 - renamed -`i`, --`interactive` to -, --`stdin`.
 - added `Alt+S` hotkey to the editor to save the current changes.
 - show associated file display name in editor instead of full path in case of stdin/url or -`E`.
+- when using `find=` in uppercase (`FIND=`) the substring search is no longer case sensitive.
+- when using `match=` in uppercase (`MATCH=`) the pattern search is no longer csae sensitive.
 
 ### Bugfixes
 
