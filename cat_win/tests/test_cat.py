@@ -64,7 +64,7 @@ class TestCat(TestCase):
         cat.holder.set_files([test_file_path])
         cat.holder.set_args([(ARGS_ENDS, ''), (ARGS_CHR, '')]) #ends & char
 
-        check_against = ('\n'.join([c.replace('\t', '^TAB') + '$' for c in test_file_content]) +
+        check_against = ('\n'.join(c.replace('\t', '^TAB') + '$' for c in test_file_content) +
                          '\n')
 
         with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
