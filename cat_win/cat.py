@@ -1210,12 +1210,9 @@ def main():
             err_print('Cleaning', tmp_file)
         try:
             os.remove(tmp_file)
-        except FileNotFoundError:
+        except (FileNotFoundError, PermissionError, OSError) as e:
             if holder.args_id[ARGS_DEBUG]:
-                err_print('FileNotFoundError', tmp_file)
-        except PermissionError:
-            if holder.args_id[ARGS_DEBUG]:
-                err_print('PermissionError  ', tmp_file)
+                err_print(type(e).__name__, tmp_file)
     if holder.args_id[ARGS_DEBUG]:
         err_print('===================================================' + \
             '====================================================')
