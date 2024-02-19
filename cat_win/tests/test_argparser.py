@@ -245,7 +245,7 @@ class TestArgParser(TestCase):
             self.assertIn(dir, dirs)
 
         arg_parser = ArgParser()
-        arg_parser._add_argument(project_dir + '/**')
+        arg_parser._add_argument(project_dir + '/**/')
         arg_parser.get_files()
         dirs = '\n'.join(arg_parser.get_dirs())
         for dir in inside_project_dirs + inside_test_dirs:
