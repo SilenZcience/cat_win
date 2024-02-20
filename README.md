@@ -195,7 +195,7 @@ Read about specific **Arguments & Options** [here](https://github.com/SilenZcien
 </details>
 
 ```py
-$ echo "Hello World :)" | catw -i [6:] | catw -i [::-1] -ln
+$ echo "Hello World :)" | catw - [6:] | catw - [::-1] -ln
 > 1) [8] ): dlroW
 ```
 

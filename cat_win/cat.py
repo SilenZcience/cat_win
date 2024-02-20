@@ -598,7 +598,7 @@ def print_file(content: list) -> bool:
 
         if found_sth:
             try:
-                # fails when using -i mode, because the stdin will send en EOF char
+                # fails when using --stdin mode, because the stdin will send en EOF char
                 # to input without prompting the user
                 input()
             except (EOFError, UnicodeDecodeError):
@@ -672,7 +672,7 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
         # if the content of the file is empty, we check if maybe the file is its own pipe-target.
         # an indicator would be if the file has just been modified to be empty (by the shell).
         # also the stdout cannot be atty.
-        # checking if the file is an _unknown_file is not valid, because by using '-i'
+        # checking if the file is an _unknown_file is not valid, because by using '--stdin'
         # the stdin will be used to write the file
         file_mtime = get_file_mtime(holder.files[file_index].path)
         date_nowtime = datetime.timestamp(datetime.now())
