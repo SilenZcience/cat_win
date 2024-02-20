@@ -70,7 +70,6 @@ arg_parser = ArgParser(const_dic[DKW.DEFAULT_FILE_ENCODING])
 converter = Converter()
 holder = Holder()
 tmp_file_helper = TmpFileHelper()
-Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
 
 on_windows_os = platform.system() == 'Windows'
 file_uri_prefix = 'file://' + '/' * on_windows_os
@@ -1091,6 +1090,9 @@ def init(shell: bool = False) -> tuple:
                     echo_args = echo_args.encode(arg_parser.file_encoding).decode('unicode_escape')
                 break
 
+    Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
+    Editor.set_flags(holder.args_id[ARGS_STDIN] and on_windows_os, holder.args_id[ARGS_DEBUG])
+
     return (known_files, unknown_files, echo_args, valid_urls)
 
 
@@ -1126,8 +1128,7 @@ def main():
     elif holder.args_id[ARGS_EDITOR]:
         unknown_files = [file for file in unknown_files if Editor.open(
             file, holder.get_file_display_name(file), arg_parser.file_encoding,
-            stdinhelper.write_file, on_windows_os,
-            holder.args_id[ARGS_PLAIN_ONLY], holder.args_id[ARGS_DEBUG])]
+            stdinhelper.write_file, on_windows_os, holder.args_id[ARGS_PLAIN_ONLY])]
     else:
         unknown_files = stdinhelper.read_write_files_from_stdin(
             unknown_files, arg_parser.file_encoding, on_windows_os,
@@ -1138,10 +1139,17 @@ def main():
         if holder.args_id[ARGS_STDIN]:
             tty = os.open('CONIN$' if on_windows_os else '/dev/tty', os.O_RDONLY)
             os.dup2(tty, sys.stdin.fileno())
+            if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'): # pyinstaller
+                import ctypes
+# stdin, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+# None security, OPEN_EXISTING, 0 flags, None template
+                conin_handle = ctypes.windll.kernel32.CreateFileW(
+                    "CONIN$", 0x80000000, 3, None, 3, 0, None
+                    ) # os.dup2 does not work on pyinstaller
+                ctypes.windll.kernel32.SetStdHandle(-10, conin_handle)
         for file in known_files:
             Editor.open(file, holder.get_file_display_name(file), arg_parser.file_encoding,
-                        stdinhelper.write_file, on_windows_os,
-                        holder.args_id[ARGS_PLAIN_ONLY], holder.args_id[ARGS_DEBUG])
+                        stdinhelper.write_file, on_windows_os, holder.args_id[ARGS_PLAIN_ONLY])
         os.dup2(stdin_backup, sys.stdin.fileno())
 
     if len(known_files) + len(unknown_files) == 0:
