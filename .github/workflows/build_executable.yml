@@ -12,7 +12,7 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
     env:
-      f_suffix: ${{ matrix.os == 'macos-latest' && '_darwin' || matrix.os == 'windows-latest' && '_windows.exe' || '_linux' }}
+      bin: ${{ matrix.os == 'macos-latest' && './bin/darwin/catw' || matrix.os == 'windows-latest' && './bin/windows/catw.exe' || './bin/linux/catw' }}
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
@@ -41,9 +41,9 @@ jobs:
           python -m workflowHelper.build
       - name: Test Executable ${{ matrix.os }}
         run: |
-          ./bin/catw${{ env.f_suffix }} -h
-          ./bin/catw${{ env.f_suffix }} -v
-          ./bin/catw${{ env.f_suffix }} -p ./bin/catw${{ env.f_suffix }} -R --debug
+          ${{ env.bin }} -h
+          ${{ env.bin }} -v
+          ${{ env.bin }} -p ${{ env.bin }} -R --debug
       - name: Show Changes
         run: |
           git status
