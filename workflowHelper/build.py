@@ -1,7 +1,8 @@
 #!/usr/bin/python
-import glob
+# import glob
 import os
-import shutil
+import platform
+# import shutil
 import subprocess
 import sys
 
@@ -14,17 +15,17 @@ print('package directory:', package_dir)
 print('entry directory:', entry_dir)
 print('init directory:', init_dir)
 
-# add the pyclip import to the cat.py main file, since pyinstaller will not
-# detect the import statement hidden in the middle of the file
-cat = ''
-with open(entry_dir, 'r', encoding='utf-8') as f:
-    cat = f.read()
+# # add the pyclip import to the cat.py main file, since pyinstaller will not
+# # detect the import statement hidden in the middle of the file
+# cat = ''
+# with open(entry_dir, 'r', encoding='utf-8') as f:
+#     cat = f.read()
 
-if cat == '':
-    sys.exit(1)
+# if cat == '':
+#     sys.exit(1)
 
-with open(entry_dir, 'w', encoding='utf-8') as f:
-    f.write('import pyperclip as pc\n' + cat)
+# with open(entry_dir, 'w', encoding='utf-8') as f:
+#     f.write('import pyperclip as pc\n' + cat)
 
 
 # change the __sysversion__ to the current sys.version
@@ -43,27 +44,28 @@ with open(init_dir, 'w', encoding='utf-8') as f:
         else:
             f.write(line)
 
-# clear pycache
-for path in glob.iglob(package_dir + '/**/__pycache__', recursive=True):
-    try:
-        print('deleting: ', path)
-        shutil.rmtree(path)
-    except OSError as e:
-        print(f"Error: {e.filename} - {e.strerror}.")
+# # clear pycache
+# for path in glob.iglob(package_dir + '/**/__pycache__', recursive=True):
+#     try:
+#         print('deleting: ', path)
+#         shutil.rmtree(path)
+#     except OSError as e:
+#         print(f"Error: {e.filename} - {e.strerror}.")
 
-# pyinstaller is more reliable without the __init__ files, they will be created again later.
-# temporarily delete all __init__ files except the main one containing information.
-_initFiles = []
-for path in glob.iglob(package_dir + '/*/__init__.py', recursive=True):
-    _initFiles.append(path)
-    try:
-        print('deleting: ', path)
-        os.remove(path)
-    except OSError as e:
-        print(f"Error: {e.filename} - {e.strerror}.")
+# # pyinstaller is more reliable without the __init__ files, they will be created again later.
+# # temporarily delete all __init__ files except the main one containing information.
+# _initFiles = []
+# for path in glob.iglob(package_dir + '/*/__init__.py', recursive=True):
+#     _initFiles.append(path)
+#     try:
+#         print('deleting: ', path)
+#         os.remove(path)
+#     except OSError as e:
+#         print(f"Error: {e.filename} - {e.strerror}.")
 
 status = 1
-command = 'pyinstaller ./cat_win/__main__.py --onefile --clean --dist ./bin --version-file ./bin/catwversionfile -n catw'.split(' ')
+platform_name = platform.system().lower()
+command = f'pyinstaller ./cat_win/__main__.py --onefile --clean --dist ./bin --version-file ./bin/catwversionfile -n catw_{platform_name}'.split(' ')
 # try pyinstaller 3 times at most...
 for _ in range(3):
     try:
@@ -78,7 +80,7 @@ for _ in range(3):
 if status > 0:
     sys.exit(status)
 
-command = 'pyinstaller ./cat_win/shell.py --onefile --clean --dist ./bin --version-file ./bin/catsversionfile -n cats'.split(' ')
+command = f'pyinstaller ./cat_win/shell.py --onefile --clean --dist ./bin --version-file ./bin/catsversionfile -n cats_{platform_name}'.split(' ')
 # try pyinstaller 3 times at most...
 for _ in range(3):
     try:
@@ -91,9 +93,9 @@ for _ in range(3):
         pass
 
 
-for _init in _initFiles:
-    print('creating: ', _init)
-    f = open(_init, 'x', encoding='utf-8')
-    f.close()
+# for _init in _initFiles:
+#     print('creating: ', _init)
+#     f = open(_init, 'x', encoding='utf-8')
+#     f.close()
 
 sys.exit(status)

@@ -5,9 +5,14 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
+      max-parallel: 1
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    env:
+      f_suffix: ${{ matrix.os == 'macos-latest' && '_darwin' || matrix.os == 'windows-latest' && '_windows.exe' || '_linux' }}
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
@@ -34,11 +39,11 @@ jobs:
       - name: Compile Package
         run: |
           python -m workflowHelper.build
-      - name: Test Executable
+      - name: Test Executable ${{ matrix.os }}
         run: |
-          ./bin/catw.exe -h
-          ./bin/catw.exe -v
-          ./bin/catw.exe -p ./bin/catw.exe -R --debug
+          ./bin/catw${{ env.f_suffix }} -h
+          ./bin/catw${{ env.f_suffix }} -v
+          ./bin/catw${{ env.f_suffix }} -p ./bin/catw${{ env.f_suffix }} -R --debug
       - name: Show Changes
         run: |
           git status
@@ -47,6 +52,6 @@ jobs:
           git config --local user.name 'github-actions[bot]'
           git config --local user.email 'github-actions[bot]@users.noreply.github.com'
           git add ./bin/*
-          git commit -m "🤖Compiled Binary."
+          git commit -m "🤖Compiled Binary for ${{ matrix.os }}."
           git push origin HEAD:dev
         continue-on-error: true
