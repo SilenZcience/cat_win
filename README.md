@@ -122,7 +122,7 @@ This fix will use the [colorama](https://pypi.org/project/colorama/) module
 which can also be installed after the fact to patch the problem.
 
 #### `Binary Executable`
-**OR alternatively** you can use the binary executable version (as a standalone executable) compiled using PyInstaller:
+**OR alternatively** you can use the (standalone) binary executable version:
 
 Download:
 </br>
@@ -132,7 +132,7 @@ Download:
 [Linux - __cats__ (shell)](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/linux/cats) </br>
 [MacOS - __catw__](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/darwin/catw) </br>
 [MacOS - __cats__ (shell)](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/darwin/cats) </br>
-
+(compiled using PyInstaller)
 
 It is recommended to add the file path(s) to your system-environment `PATH`-variables.
 
