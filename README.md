@@ -124,7 +124,7 @@ which can also be installed after the fact to patch the problem.
 ##### `Binary Executable`
 **OR alternatively** you can use the (standalone) binary executable version:
 
-Download:
+Direct Download:
 </br>
 [Windows - __catw.exe__](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/windows/catw.exe) </br>
 [Windows - __cats.exe__ (shell)](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/windows/cats.exe) </br>
@@ -132,8 +132,8 @@ Download:
 [Linux - __cats__ (shell)](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/linux/cats) </br>
 [MacOS - __catw__](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/darwin/catw) </br>
 [MacOS - __cats__ (shell)](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/darwin/cats) </br>
-(compiled using PyInstaller)
 
+(compiled using PyInstaller) </br>
 It is recommended to add the file path(s) to your system-environment `PATH`-variables.
 
 > ⚠️ **You should never trust any executable file!** Feel free to compile the package yourself (e.g. using [PyInstaller](https://pyinstaller.org/en/stable/)).
