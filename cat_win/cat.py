@@ -1147,7 +1147,7 @@ def main():
                 conin_handle = ctypes.windll.kernel32.CreateFileW(
                     "CONIN$", 0x80000000, 3, None, 3, 0, None
                     ) # os.dup2 does not work on pyinstaller
-                ctypes.windll.kernel32.SetStdHandle(-10, conin_handle)
+                ctypes.windll.kernel32.SetStdHandle(-10, conin_handle) # -10 = stdin
         for file in known_files:
             Editor.open(file, holder.get_file_display_name(file), arg_parser.file_encoding,
                         stdinhelper.write_file, on_windows_os, holder.args_id[ARGS_PLAIN_ONLY])
