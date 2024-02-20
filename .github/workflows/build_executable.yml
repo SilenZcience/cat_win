@@ -1,4 +1,4 @@
-name: Compile and Push
+name: Compile Binaries
 
 on:
   workflow_dispatch:
