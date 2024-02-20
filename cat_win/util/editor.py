@@ -58,8 +58,10 @@ class Editor:
     special_indentation = '\t'
     auto_indent = False
 
-    def __init__(self, file: str, display_name: str,
-                 file_encoding: str, debug_mode: bool = False) -> None:
+    debug_mode = False
+    save_with_alt = False
+
+    def __init__(self, file: str, display_name: str, file_encoding: str) -> None:
         """
         defines an Editor object.
         
@@ -70,8 +72,6 @@ class Editor:
             the display name for the current file
         file_encoding:
             the encoding to read and write the given file
-        debug_mode (bool)
-            if True debug-statements will be printed to stderr
         """
         self.curse_window = None
         self.history = History()
@@ -83,7 +83,6 @@ class Editor:
         self.line_sep = '\n'
         self.window_content = []
 
-        self.debug_mode = debug_mode
         self.special_chars: dict = {}
         self.search = ''
 
@@ -772,14 +771,17 @@ class Editor:
                 self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
                                          self.error_bar[:max_x].ljust(max_x), self._get_color(2))
 
-            status_bar = f"File: {self.display_name} | Exit: ^q | Save: ^s | Pos: {self.cpos.col+1}"
+            save_hotkey = ('alt+' if self.save_with_alt else '^') + 's'
+            status_bar = f"File: {self.display_name} | Exit: ^q | Save: {save_hotkey} | "
+            status_bar += f"Pos: {self.cpos.col+1}"
             status_bar += f", {self.cpos.row+1} | {'NOT ' * self.unsaved_progress}Saved!"
             if self.debug_mode:
                 status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x}"
             if len(status_bar) > max_x:
                 necc_space = max(0, max_x - (len(status_bar) - len(self.display_name) + 3))
                 status_bar = f"File: ...{self.display_name[-necc_space:] * bool(necc_space)} "
-                status_bar += f"| Exit: ^q | Save: ^s | Pos: {self.cpos.col+1}, {self.cpos.row+1} "
+                status_bar += f"| Exit: ^q | Save: {save_hotkey} | "
+                status_bar += f"Pos: {self.cpos.col+1}, {self.cpos.row+1} "
                 status_bar += f"| {'NOT ' * self.unsaved_progress}Saved!"[:max_x]
                 if self.debug_mode:
                     status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x}"
@@ -908,8 +910,7 @@ class Editor:
 
     @classmethod
     def open(cls, file: str, display_name: str, file_encoding: str,
-             write_func, on_windows_os: bool,
-             skip_binary: bool = False, debug_mode: bool = False) -> bool:
+             write_func, on_windows_os: bool, skip_binary: bool = False) -> bool:
         """
         simple editor to change the contents of any provided file.
         
@@ -924,8 +925,8 @@ class Editor:
             stdinhelper.write_file [simply writes a file]
         on_windows_os (bool):
             indicates if the user is on windows OS using platform.system() == 'Windows'
-        debug_mode (bool):
-            indicates if debug information should be displayed
+        skip_binary (bool):
+            indicates if the Editor should skip non-plaintext files
         
         Returns:
         (bool):
@@ -943,7 +944,7 @@ class Editor:
             Editor.loading_failed = True
             return False
 
-        editor = cls(file, display_name, file_encoding, debug_mode)
+        editor = cls(file, display_name, file_encoding)
         if skip_binary and editor.error_bar:
             return False
         special_chars = dict(map(lambda x: (chr(x[0]), x[2]), SPECIAL_CHARS))
@@ -960,7 +961,7 @@ class Editor:
         return editor.changes_made
 
     @staticmethod
-    def set_indentation(indentation: str = '\t', auto_indent: bool = True):
+    def set_indentation(indentation: str = '\t', auto_indent: bool = True) -> None:
         """
         set the indentation when using tab on an empty line
         
@@ -973,3 +974,17 @@ class Editor:
         """
         Editor.special_indentation = indentation
         Editor.auto_indent = auto_indent
+
+    @staticmethod
+    def set_flags(save_with_alt: bool, debug_mode: bool) -> None:
+        """
+        set the config flags for the Editor
+        
+        Parameters:
+        save_with_alt (bool):
+            indicates whetcher the stdin pipe has been used (and therefor tampered)
+        debug_mode (bool)
+            indicates if debug info should be displayed
+        """
+        Editor.save_with_alt = save_with_alt
+        Editor.debug_mode = debug_mode
