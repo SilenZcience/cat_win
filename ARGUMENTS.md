@@ -452,7 +452,7 @@ Using this Argument allows to pass in Data via the Stdin Stream.
 The Stdin Pipe will be handled as its own File.
 
 ```console
-> echo Hello World! | catw -in
+> echo Hello World! | catw - -n
 1) Hello World!
 ```
 
@@ -468,7 +468,7 @@ Line 2
 Line 3
 ```
 ```console
-> catw test.txt | catw -io
+> catw test.txt | catw - -o
 Line 1
 ```
 
@@ -670,7 +670,7 @@ This Parameter will be used before most other Arguments such that other Paramete
 This means a Base64 encoded Input is expected and neccessary.
 
 ```console
-> echo SGVsbG8gV29ybGQ= | catw -i --b64d
+> echo SGVsbG8gV29ybGQ= | catw - --b64d
 Hello World
 ```
 
@@ -680,7 +680,7 @@ Encodes a given Text in Base64.
 This Parameter will be used after most other Arguments such that other Parameter will be used on the plain Text beforehand.
 
 ```console
-> echo Hello World | catw -i --b64e
+> echo Hello World | catw - --b64e
 SGVsbG8gV29ybGQ=
 ```
 
@@ -694,11 +694,11 @@ In the uppercase Variant of the Parameter any non-mathematical Text will be stri
 On Error The Expression will evaluate to '???'.
 
 ```console
-> echo Calculate: (5 * 0x10 * -0b101) % (0o5 ** 2) ! | catw -i --eval
+> echo Calculate: (5 * 0x10 * -0b101) % (0o5 ** 2) ! | catw - --eval
 Calculate: 0 !
 ```
 ```console
-> echo Calculate: (5 * 0x10 * -0b101) % (0o5 ** 2) ! | catw -i --EVAL
+> echo Calculate: (5 * 0x10 * -0b101) % (0o5 ** 2) ! | catw - --EVAL
 0
 ```
 
