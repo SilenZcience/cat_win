@@ -92,14 +92,18 @@ It is of course possible to use cat_win on Linux or MacOS, aswell as Windows!
 
 ### Prerequisites
 
-- Using cat_win as a Python-Package demands a Python-Interpreter (>= 3.7).
-- Using cat_win as an Executable (Windows only!) demands no prerequisites, hereby the stand-alone executables `catw.exe` (& `cats.exe`) are sufficient.
+#### `Python-Package`
+Using cat_win as a Python-Package demands a Python-Interpreter (>= 3.7).
+
+#### `Binary Executable`
+Using cat_win as a binary executable demands no prerequisites, hereby the stand-alone executables are sufficient.
 
 <div id="installation"></div>
 
 ### Installation
 [![Version][CurrentVersion]](https://pypi.org/project/cat-win/)
 
+#### `Python-Package`
 Simply install the python package (via [PyPI-cat_win](https://pypi.org/project/cat-win/)):
 ```console
 python -m pip install --upgrade cat_win[clip]
@@ -117,15 +121,24 @@ In this case you can try to fix the problem by installing the cat_win-package wi
 This fix will use the [colorama](https://pypi.org/project/colorama/) module
 which can also be installed after the fact to patch the problem.
 
-**OR alternatively** you can use the compiled version (*`Windows only`*):
+#### `Binary Executable`
+**OR alternatively** you can use the binary executable version (as a standalone executable) compiled using PyInstaller:
 
-1. Simply download the [catw.exe](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/catw.exe) file to handle filecontents.
-2. Download the [cats.exe](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/cats.exe) file to use the cat-shell (optional).
-3. Add the file path(s) to your system-environment `PATH`-variables.
+Download:
+</br>
+[Windows - __catw.exe__](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/windows/catw.exe) </br>
+[Windows - __cats.exe__ (shell)](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/windows/cats.exe) </br>
+[Linux - __catw__](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/linux/catw) </br>
+[Linux - __cats__ (shell)](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/linux/cats) </br>
+[MacOS - __catw__](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/darwin/catw) </br>
+[MacOS - __cats__ (shell)](https://raw.githubusercontent.com/SilenZcience/cat_win/main/bin/darwin/cats) </br>
+
+
+It is recommended to add the file path(s) to your system-environment `PATH`-variables.
 
 > ⚠️ **You should never trust any executable file!** Feel free to compile the package yourself (e.g. using [PyInstaller](https://pyinstaller.org/en/stable/)).
 
-> You can verify the creation of catw.exe yourself by reading the [source code](https://github.com/SilenZcience/cat_win/blob/main/cat_win/cat.py), checking the [origin](https://github.com/SilenZcience/cat_win/tree/main/bin) of the file and validating the corresponding [workflow](https://github.com/SilenZcience/cat_win/blob/main/.github/workflows/build_executable.yml) used.
+> You can verify the creation of the executable files yourself by reading the [source code](https://github.com/SilenZcience/cat_win/blob/main/cat_win/cat.py), checking the [origin](https://github.com/SilenZcience/cat_win/tree/main/bin) of the file and validating the corresponding [workflow](https://github.com/SilenZcience/cat_win/blob/main/.github/workflows/build_executable.yml) used.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 <div id="usage"></div>
@@ -133,15 +146,17 @@ which can also be installed after the fact to patch the problem.
 ## Usage
 
 ```console
-catw [FILE]... [OPTION]...
-catw --help
+> catw [FILE]... [OPTION]...
+> catw --help
+Concatenate FILE(s) to standard output.
+...
 ```
 
-> ⚠️ *from v1.0.33 to v1.1.0 the entrypoint changes from `cat` to `catw`. If you wish to keep the old command, you will have to define an alias yourself.*
-
 ```console
-cats [OPTION]...
-cats --help
+> cats [OPTION]...
+> cats --help
+Interactively manipulate standard input.
+...
 ```
 
 A detailed Documentation of all **Parameters** has moved to another File.
