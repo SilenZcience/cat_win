@@ -1139,7 +1139,8 @@ def main():
         if holder.args_id[ARGS_STDIN]:
             tty = os.open('CONIN$' if on_windows_os else '/dev/tty', os.O_RDONLY)
             os.dup2(tty, sys.stdin.fileno())
-            if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'): # pyinstaller
+            if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS') and on_windows_os:
+                # for pyinstaller:
                 import ctypes
 # stdin, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
 # None security, OPEN_EXISTING, 0 flags, None template
