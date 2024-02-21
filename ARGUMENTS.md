@@ -929,10 +929,10 @@ Valid Options are:
 | matched_pattern | the matched pattern using 'match=x' |
 | matched_pattern_message | the message displayed when using 'match=x' |
 | checksum_message | the calculated checksum of a given file using '-m' |
-| processed_message | the message displayed using '-f'/'-d'/'-s'/'-w' |
+| summary_message | the message displayed using '-f'/'-d'/'-s'/'-w' |
+| file_attribute_message | the message containing time stamps and file size using '-a' |
 | active_file_attributes | the attributes a file has set using '-a' |
 | missing_file_attributes | the attributes a file has not set using '-a' |
-| file_attribute_message | the message containing time stamps and file size using '-a' |
 | raw_viewer | the output using '--hexview'/'--binview' |
 | message_information | any informational message like update information |
 | message_important | any important message like large file sizes |
