@@ -29,6 +29,7 @@ from cat_win.const.argconstants import ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ER
 from cat_win.const.argconstants import ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY
 from cat_win.const.argconstants import ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI
 from cat_win.const.argconstants import ARGS_DIRECTORIES, ARGS_DDIRECTORIES, ARGS_SPECIFIC_FORMATS
+from cat_win.const.argconstants import ARGS_CHARCOUNT, ARGS_CCHARCOUNT
 from cat_win.const.colorconstants import CKW
 from cat_win.const.defaultconstants import DKW
 from cat_win.persistence.cconfig import CConfig
@@ -236,7 +237,7 @@ def _show_wordcount() -> None:
     print('The word count includes the following files:', end='')
     print(color_dic[CKW.RESET_ALL], end='\n\t')
     print('\n\t'.join(map(
-        lambda f: f"{color_dic[CKW.SUMMARY]}{f}{color_dic[CKW.RESET_ALL]}",used_files
+        lambda f: f"{color_dic[CKW.SUMMARY]}{f}{color_dic[CKW.RESET_ALL]}", used_files
         )))
     sorted_word_count = sorted(word_count.items(), key=lambda token: token[1], reverse=True)
     format_delimeter = f"{color_dic[CKW.RESET_ALL]}:{color_dic[CKW.SUMMARY]} "
@@ -248,6 +249,38 @@ def _show_wordcount() -> None:
             sorted_group
             )
         print('\n' + '\n'.join(formatted_word_count), end='')
+    print(color_dic[CKW.RESET_ALL])
+
+
+def _show_charcount() -> None:
+    char_count = {}
+    used_files = []
+
+    for hfile in holder.files:
+        try:
+            with open(hfile.path, 'r', encoding=arg_parser.file_encoding) as file:
+                for char in list(file.read()):
+                    char_count[char] = char_count.get(char, 0)+1
+            used_files.append(hfile.displayname)
+        except (OSError, UnicodeError):
+            pass
+
+    print(color_dic[CKW.SUMMARY], end='')
+    print('The char count includes the following files:', end='')
+    print(color_dic[CKW.RESET_ALL], end='\n\t')
+    print('\n\t'.join(map(
+        lambda f: f"{color_dic[CKW.SUMMARY]}{f}{color_dic[CKW.RESET_ALL]}", used_files
+        )))
+    sorted_char_count = sorted(char_count.items(), key=lambda token: token[1], reverse=True)
+    format_delimeter = f"{color_dic[CKW.RESET_ALL]}:{color_dic[CKW.SUMMARY]} "
+    for _, group in groupby(sorted_char_count, lambda token: token[1]):
+        sorted_group = sorted(group, key=lambda token: token[0])
+        formatted_char_count = map(
+            lambda x: f"{color_dic[CKW.SUMMARY]}{repr(x[0]) if x[0].isspace() else x[0]}"
+            f"{format_delimeter}{x[1]}{color_dic[CKW.RESET_ALL]}",
+            sorted_group
+            )
+        print('\n' + '\n'.join(formatted_char_count), end='')
     print(color_dic[CKW.RESET_ALL])
 
 
@@ -973,6 +1006,9 @@ def edit_files() -> None:
     if holder.args_id[ARGS_WORDCOUNT]:
         print('')
         _show_wordcount()
+    if holder.args_id[ARGS_CHARCOUNT]:
+        print('')
+        _show_charcount()
     if holder.args_id[ARGS_SUM]:
         print('')
         _show_sum()
@@ -1190,6 +1226,9 @@ def main():
         return
     if holder.args_id[ARGS_WWORDCOUNT]:
         _show_wordcount()
+        return
+    if holder.args_id[ARGS_CCHARCOUNT]:
+        _show_charcount()
         return
 
     edit_files()  # print the cat-output

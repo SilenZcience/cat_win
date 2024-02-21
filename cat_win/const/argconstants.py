@@ -30,7 +30,8 @@ ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(38, 40)
 ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY, ARGS_FILE_PREFIX = range(40, 45)
 ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI, ARGS_WORDCOUNT = range(45, 50)
 ARGS_WWORDCOUNT, ARGS_DIRECTORIES, ARGS_DDIRECTORIES = range(50, 53)
-ARGS_SPECIFIC_FORMATS, ARGS_CONFIG = range(53, 55)
+ARGS_SPECIFIC_FORMATS, ARGS_CONFIG, ARGS_CHARCOUNT = range(53, 56)
+ARGS_CCHARCOUNT, = range(56, 57)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -99,6 +100,10 @@ ALL_ARGS = [
                 ARGS_WORDCOUNT, show_arg_on_shell=False, section=5),
     ArgConstant('-W', '--WORDCOUNT', 'ONLY display the wordcount',
                 ARGS_WWORDCOUNT, show_arg=False, section=5),
+    ArgConstant('--cc', '--charcount', 'display the charcount',
+                ARGS_CHARCOUNT, show_arg_on_shell=False, section=5),
+    ArgConstant('--CC', '--CHARCOUNT', 'ONLY display the charcount',
+                ARGS_CCHARCOUNT, show_arg=False, section=5),
 
     # search and match
     ArgConstant('-g', '--grep', 'only show lines containing queried keywords or patterns',
