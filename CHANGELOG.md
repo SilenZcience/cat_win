@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.7.1] - TBA
+
+### Minor Changes
+
+- added --`cc`, --`charcount` parameter to count the occurrence of every char in all given files.
+
+
 ## [1.7.0] - 2024-02-20
 
 ### Minor Changes
