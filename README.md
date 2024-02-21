@@ -185,11 +185,20 @@ Read about specific **Arguments & Options** [here](https://github.com/SilenZcien
       <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example6.png" width="49%"/>
    </p>
 
-   - - - -
-
    <p float="left">
       <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example7.png" width="49%"/>
       <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example8.png" width="49%"/>
+   </p>
+
+   - - - -
+
+   <p float="left">
+      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example9.png" width="49%"/>
+      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example10.png" width="49%"/>
+   </p>
+
+   <p float="left">
+      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example11.png" width="49%"/>
    </p>
 
 </details>
