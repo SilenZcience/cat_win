@@ -61,6 +61,7 @@
                   <li><a href="#dirs">-d, --dirs</a></li>
                   <li><a href="#sum">-s, --sum</a></li>
                   <li><a href="#wordcount">-w, --wordcount</a></li>
+                  <li><a href="#charcount">--cc, --charcount</a></li>
                   <li><a href="#grep">-g, --grep</a></li>
                   <li><a href="#nokeyword">--nk, --nokeyword</a></li>
                   <li><a href="#nobreak">--nb, --nobreak</a></li>
@@ -138,6 +139,7 @@
 | *<a href="#dirs">-d, --dirs</a>* | list found directories |❌|
 | *<a href="#sum">-s, --sum</a>* | show sum of lines |❌|
 | *<a href="#wordcount">-w, --wordcount</a>* | display the wordcount |❌|
+| *<a href="#charcount">--cc, --charcount</a>* | display the charcount |❌|
 ||| |
 | *<a href="#grep">-g, --grep</a>* | only show lines containing queried keywords or patterns |✔|
 | *<a href="#nokeyword">--nk, --nokeyword</a>* | inverse the grep output |✔|
@@ -590,6 +592,44 @@ same: 1
 the: 1
 true: 1
 ```
+
+### <a id="charcount">--cc, --charcount</a>
+
+Displays a Summary of all Chars/Letters found in the given Files and how frequent they occured.
+Whitespace Chars like Spaces and Tabs will be wrapped with quotes.
+The Output will be sorted by the Frequency of Occurrence starting with the most common Char.
+In Addition the used Files will be displayed beforehand.
+Using this Argument in uppercase (--CC, --CHARCOUNT) will ONLY display this Message and stop Code execution.
+
+```console
+> catw test.txt
+it is true for all that, that that 'that' which that 'that' refers to is not the same 'that' which that 'that' refers to
+```
+```console
+> catw test.txt --CC
+The char count includes the following files:
+    <Path>
+
+t: 24
+' ': 23
+h: 14
+a: 11
+': 8
+e: 7
+r: 6
+i: 5
+s: 5
+o: 4
+f: 3
+c: 2
+l: 2
+w: 2
+,: 1
+m: 1
+n: 1
+u: 1
+```
+
 
 <a id="search"></a>
 ### <a id="grep">-g, --grep</a>
