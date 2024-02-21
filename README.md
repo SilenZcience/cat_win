@@ -92,7 +92,7 @@ It is of course possible to use cat_win on Linux or MacOS, aswell as Windows!
 
 ### Prerequisites
 
-##### `Python-Package`
+##### `Python Package`
 Using cat_win as a Python-Package demands a Python-Interpreter (>= 3.7).
 
 ##### `Binary Executable`
@@ -103,7 +103,7 @@ Using cat_win as a binary executable demands no prerequisites, hereby the stand-
 ### Installation
 [![Version][CurrentVersion]](https://pypi.org/project/cat-win/)
 
-##### `Python-Package`
+##### `Python Package`
 Simply install the python package (via [PyPI-cat_win](https://pypi.org/project/cat-win/)):
 ```console
 python -m pip install --upgrade cat_win[clip]
