@@ -187,4 +187,91 @@ class TestCat(TestCase):
             self.assertIn('dirA', fake_out.getvalue())
             self.assertIn('dirB', fake_out.getvalue())
 
+    @patch('cat_win.cat.arg_parser.file_encoding', 'utf-8')
+    def test__show_wordcount(self):
+        output = r"""
+:: 5
+is: 4
+Line: 3
+This: 3
+a: 3
+!: 2
+-: 2
+Duplicate: 2
+<: 1
+>: 1
+Ary: 1
+Character: 1
+Chars: 1
+Empty: 1
+N: 1
+Sample: 1
+Special: 1
+Summation: 1
+Tab: 1
+Text: 1
+The: 1
+These: 1
+are: 1
+following: 1
+äöüÄÖÜ: 1
+∑: 1
+"""
+        cat.holder.files = [File(test_file_path, '')]
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+            cat._show_wordcount()
+            self.assertIn(output, fake_out.getvalue())
+
+    @patch('cat_win.cat.arg_parser.file_encoding', 'utf-8')
+    def test__show_charcount(self):
+        output = r"""
+' ': 23
+i: 15
+a: 13
+e: 13
+s: 9
+'\n': 7
+T: 7
+h: 7
+l: 6
+t: 6
+:: 5
+n: 5
+p: 5
+r: 5
+c: 4
+m: 4
+L: 3
+S: 3
+o: 3
+u: 3
+!: 2
+-: 2
+C: 2
+D: 2
+y: 2
+'\t': 1
+<: 1
+>: 1
+A: 1
+E: 1
+N: 1
+b: 1
+f: 1
+g: 1
+w: 1
+x: 1
+Ä: 1
+Ö: 1
+Ü: 1
+ä: 1
+ö: 1
+ü: 1
+∑: 1
+"""
+        cat.holder.files = [File(test_file_path, '')]
+        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+            cat._show_charcount()
+            self.assertIn(output, fake_out.getvalue())
+
 # python -m unittest discover -s cat_win.tests -p test*.py
