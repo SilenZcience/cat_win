@@ -144,7 +144,7 @@ class ArgParser:
 # print(leven_short.__round__(3), leven_long.__round__(3),
 #       max(leven_short, leven_long).__round__(3), u_arg, arg.long_form, sep="\t") # DEBUG
                 if max(leven_short, leven_long) > self.SIMILARITY_LIMIT:
-                    if leven_short > leven_long:
+                    if leven_short >= leven_long:
                         possible_arg_replacement[1].append((arg.short_form, leven_short))
                     else:
                         possible_arg_replacement[1].append((arg.long_form, leven_long))
