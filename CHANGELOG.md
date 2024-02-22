@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - added --`cc`, --`charcount` parameter to count the occurrence of every char in all given files.
+- added functionality to sort lines by length when using uppercase --`SORT`.
 
 
 ## [1.7.0] - 2024-02-20
