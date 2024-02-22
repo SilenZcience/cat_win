@@ -68,7 +68,7 @@ ALL_ARGS = [
 				ARGS_REVERSE, show_arg_on_shell=False, section=3),
     ArgConstant('-u', '--unique', 'suppress repeated output lines',
 				ARGS_SQUEEZE, show_arg_on_shell=False, section=3),
-    ArgConstant('--sort', '--sort', 'sort all lines alphabetically',
+    ArgConstant('--sort', '--SORT', 'sort all lines alphabetically or by length',
 				ARGS_SORT, show_arg_on_shell=False, section=3),
     ArgConstant('--sf', '--specific-format', 'automatically format specific file types',
                 ARGS_SPECIFIC_FORMATS, show_arg_on_shell=False, section=3),
