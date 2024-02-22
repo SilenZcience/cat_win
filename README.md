@@ -92,10 +92,10 @@ It is of course possible to use cat_win on Linux or MacOS, aswell as Windows!
 
 ### Prerequisites
 
-##### `Python Package`
+`Python Package` </br>
 Using cat_win as a Python-Package demands a Python-Interpreter (>= 3.7).
 
-##### `Binary Executable`
+`Binary Executable` </br>
 Using cat_win as a binary executable demands no prerequisites, hereby the stand-alone executables are sufficient.
 
 <div id="installation"></div>
@@ -103,7 +103,7 @@ Using cat_win as a binary executable demands no prerequisites, hereby the stand-
 ### Installation
 [![Version][CurrentVersion]](https://pypi.org/project/cat-win/)
 
-##### `Python Package`
+`Python Package` </br>
 Simply install the python package (via [PyPI-cat_win](https://pypi.org/project/cat-win/)):
 ```console
 python -m pip install --upgrade cat_win[clip]
@@ -121,8 +121,10 @@ In this case you can try to fix the problem by installing the cat_win-package wi
 This fix will use the [colorama](https://pypi.org/project/colorama/) module
 which can also be installed after the fact to patch the problem.
 
-##### `Binary Executable`
+`Binary Executable` </br>
 **OR alternatively** you can use the (standalone) binary executable version:
+
+<div id="download"></div>
 
 Direct Download:
 </br>
