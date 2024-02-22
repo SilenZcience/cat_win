@@ -128,7 +128,7 @@
 | *<a href="#reverse">-r, --reverse</a>* | reverse output |❌|
 | *<a href="#unique">-u, --unique</a>* | suppress repeated output lines |❌|
 | *<a href="#sort">--sort, --sort</a>* | sort all lines alphabetically |❌|
-| *<a href="#format">--sf, --specific-format</a>* | sort all lines alphabetically |❌|
+| *<a href="#format">--sf, --specific-format</a>* | automatically format specific file types |❌|
 ||| |
 | *<a href="#echo">-E, --echo</a>* | handle every following parameter as stdin |❌|
 | *<a href="#stdin">-, --stdin</a>* | use stdin |❌|
