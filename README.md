@@ -159,14 +159,14 @@ Interactively manipulate standard input.
 ...
 ```
 
-A detailed Documentation of all **Parameters** has moved to another File.
+👉 A detailed [Documentation🖺](https://github.com/SilenZcience/cat_win/blob/main/ARGUMENTS.md) of all **Parameters** has moved to another File.
 Read about specific **Arguments & Options** [here](https://github.com/SilenZcience/cat_win/blob/main/ARGUMENTS.md).
 
 <div id="examples"></div>
 
 ### Examples
 
-<details open>
+<details>
 	<summary><b>📂 Images 📂</b></summary>
    </br>
 
@@ -202,6 +202,7 @@ Read about specific **Arguments & Options** [here](https://github.com/SilenZcien
    </p>
 
 </details>
+</br>
 
 ```py
 $ echo "Hello World :)" | catw - [6:] | catw - [::-1] -ln
