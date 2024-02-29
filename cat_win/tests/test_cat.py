@@ -34,7 +34,7 @@ class TestCat(TestCase):
 
         check_against = '\n'.join(test_file_content) + '\n'
 
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.edit_files()
             self.assertEqual(fake_out.getvalue(), check_against)
 
@@ -44,7 +44,7 @@ class TestCat(TestCase):
 
         check_against = '\n'.join(test_file_content * 3) + '\n'
 
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.edit_files()
             self.assertEqual(fake_out.getvalue(), check_against)
 
@@ -56,7 +56,7 @@ class TestCat(TestCase):
         check_against.reverse()
         check_against = '\n'.join(check_against) + '\n'
 
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.edit_files()
             self.assertEqual(fake_out.getvalue(), check_against)
 
@@ -67,7 +67,7 @@ class TestCat(TestCase):
         check_against = ('\n'.join(c.replace('\t', '^TAB') + '$' for c in test_file_content) +
                          '\n')
 
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.edit_files()
             self.assertEqual(fake_out.getvalue(), check_against)
 
@@ -140,7 +140,7 @@ class TestCat(TestCase):
 
     @patch('cat_win.cat.print_update_information', new=lambda *_: '')
     def test__show_help(self):
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat._show_help()
             for arg in cat.ALL_ARGS:
                 if arg.show_arg:
@@ -150,7 +150,7 @@ class TestCat(TestCase):
 
     @patch('cat_win.cat.print_update_information', new=lambda *_: '')
     def test__show_help_shell(self):
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat._show_help(True)
             for arg in cat.ALL_ARGS:
                 if arg.show_arg and arg.show_arg_on_shell:
@@ -160,14 +160,14 @@ class TestCat(TestCase):
 
     @patch('cat_win.cat.print_update_information', new=lambda *_: '')
     def test__show_version(self):
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat._show_version()
             self.assertIn('Catw', fake_out.getvalue())
             self.assertIn('Author', fake_out.getvalue())
 
     @patch('cat_win.cat.arg_parser.file_search', new=set(['hello', 'world']))
     def test__show_debug(self):
-        with patch('cat_win.cat.sys.stderr', new=StdOutMock()) as fake_out:
+        with patch('sys.stderr', new=StdOutMock()) as fake_out:
             cat._show_debug([], ['test'], [], [], [], [])
             self.assertIn('test', fake_out.getvalue())
             self.assertIn('DEBUG', fake_out.getvalue())
@@ -182,7 +182,7 @@ class TestCat(TestCase):
 
     @patch('cat_win.cat.arg_parser._known_directories', new=['dirA', 'dirB'])
     def test__dirs_output(self):
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat._show_dirs()
             self.assertIn('dirA', fake_out.getvalue())
             self.assertIn('dirB', fake_out.getvalue())
@@ -218,7 +218,7 @@ following: 1
 ∑: 1
 """
         cat.holder.files = [File(test_file_path, '')]
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat._show_wordcount()
             self.assertIn(output, fake_out.getvalue())
 
@@ -270,7 +270,7 @@ x: 1
 ∑: 1
 """
         cat.holder.files = [File(test_file_path, '')]
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat._show_charcount()
             self.assertIn(output, fake_out.getvalue())
 

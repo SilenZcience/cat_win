@@ -19,7 +19,7 @@ class TestZipviewer(TestCase):
         self.assertEqual(display_zip('', lambda x: x), False)
         self.assertEqual(display_zip(test_file_path, lambda x: x), False)
 
-    @patch('cat_win.cat.sys.stderr', new=StdOutMock())
+    @patch('sys.stderr', new=StdOutMock())
     def test_display_zip(self):
         self.assertEqual(display_zip(test_zip_file_path, lambda x: x), True)
 
@@ -29,6 +29,6 @@ class TestZipviewer(TestCase):
         expected_output += 'FileName       FileSize CompressedFileSize\n'
         expected_output += 'test.txt            189                145\n'
         expected_output += 'test_empty.txt        0                  0\n'
-        with patch('cat_win.cat.sys.stderr', new=StdOutMock()) as fake_out:
+        with patch('sys.stderr', new=StdOutMock()) as fake_out:
             display_zip(test_zip_file_path, lambda x: x)
             self.assertEqual(fake_out.getvalue(), expected_output)
