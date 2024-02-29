@@ -31,7 +31,7 @@ ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY, ARGS_FILE_PREFIX = range(
 ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI, ARGS_WORDCOUNT = range(45, 50)
 ARGS_WWORDCOUNT, ARGS_DIRECTORIES, ARGS_DDIRECTORIES = range(50, 53)
 ARGS_SPECIFIC_FORMATS, ARGS_CONFIG, ARGS_CHARCOUNT = range(53, 56)
-ARGS_CCHARCOUNT, = range(56, 57)
+ARGS_CCHARCOUNT, ARGS_STRINGS = range(56, 58)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -120,6 +120,8 @@ ALL_ARGS = [
 				ARGS_DATA, show_arg_on_shell=False, section=7),
     ArgConstant('-m', '--checksum', 'show the checksums of all files',
 				ARGS_CHECKSUM, show_arg_on_shell=False, section=7),
+    ArgConstant('--strings', '--strings', 'print the sequences of printable characters',
+                ARGS_STRINGS, section=7),
 
     # numbers
     ArgConstant('--b64d', '--b64d', 'decode the input from base64',

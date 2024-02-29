@@ -21,6 +21,8 @@ class Config:
                    DKW.STRIP_COLOR_ON_PIPE: True,
                    DKW.EDITOR_INDENTATION: '\t',
                    DKW.EDITOR_AUTO_INDENT: False,
+                   DKW.STRINGS_MIN_SEQUENCE_LENGTH: 4,
+                   DKW.STRINGS_DELIMETER: '\n',
                    }
 
     elements = list(default_dic.keys())
