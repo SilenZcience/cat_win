@@ -54,7 +54,7 @@ class TestConfig(TestCase):
     def test__print_all_available_elements(self):
         all_elements = list(config.default_dic.keys())
 
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             config._print_all_available_elements()
             for i, k in enumerate(all_elements, start=1):
                 self.assertIn(str(i), fake_out.getvalue())

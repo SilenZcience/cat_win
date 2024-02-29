@@ -34,7 +34,7 @@ strip_color_dic_false[DKW.STRIP_COLOR_ON_PIPE] = False
 
 @patch('cat_win.cat.default_color_dic', config.color_dic)
 @patch('cat_win.cat.color_dic', config.color_dic)
-@patch('cat_win.cat.os.isatty', OSAttyDefGen.get_def({1: False}))
+@patch('os.isatty', OSAttyDefGen.get_def({1: False}))
 class TestAnsiPiped(TestCase):
     maxDiff = None
 
@@ -44,37 +44,37 @@ class TestAnsiPiped(TestCase):
         cat.arg_parser = ArgParser()
         cat.holder = Holder()
 
-    @patch('cat_win.cat.sys.argv', ['<CAT>', ansi_pos_file_path])
+    @patch('sys.argv', ['<CAT>', ansi_pos_file_path])
     @patch('cat_win.cat.const_dic', strip_color_dic_true)
     def test_cat_ansi_input_strip(self):
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), ansi_neg_file_content)
 
-    @patch('cat_win.cat.sys.argv', ['<CAT>', ansi_pos_file_path])
+    @patch('sys.argv', ['<CAT>', ansi_pos_file_path])
     @patch('cat_win.cat.const_dic', strip_color_dic_false)
     def test_cat_ansi_input_no_strip(self):
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), ansi_pos_file_content)
 
-    @patch('cat_win.cat.sys.argv', ['<CAT>', ansi_base_file_path, '-ln'])
+    @patch('sys.argv', ['<CAT>', ansi_base_file_path, '-ln'])
     @patch('cat_win.cat.const_dic', strip_color_dic_true)
     def test_cat_ansi_strip(self):
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), ansi_neg_file_content)
 
-    @patch('cat_win.cat.sys.argv', ['<CAT>', ansi_base_file_path, '-ln'])
+    @patch('sys.argv', ['<CAT>', ansi_base_file_path, '-ln'])
     @patch('cat_win.cat.const_dic', strip_color_dic_false)
     def test_cat_ansi_no_strip(self):
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), ansi_pos_file_content)
 
 @patch('cat_win.cat.default_color_dic', config.color_dic)
 @patch('cat_win.cat.color_dic', config.color_dic)
-@patch('cat_win.cat.os.isatty', OSAttyDefGen.get_def({1: True}))
+@patch('os.isatty', OSAttyDefGen.get_def({1: True}))
 class TestAnsiNotPiped(TestCase):
     maxDiff = None
 
@@ -84,30 +84,30 @@ class TestAnsiNotPiped(TestCase):
         cat.arg_parser = ArgParser()
         cat.holder = Holder()
 
-    @patch('cat_win.cat.sys.argv', ['<CAT>', ansi_pos_file_path])
+    @patch('sys.argv', ['<CAT>', ansi_pos_file_path])
     @patch('cat_win.cat.const_dic', strip_color_dic_true)
     def test_cat_ansi_input_strip(self):
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), ansi_pos_file_content)
 
-    @patch('cat_win.cat.sys.argv', ['<CAT>', ansi_pos_file_path])
+    @patch('sys.argv', ['<CAT>', ansi_pos_file_path])
     @patch('cat_win.cat.const_dic', strip_color_dic_false)
     def test_cat_ansi_input_no_strip(self):
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), ansi_pos_file_content)
 
-    @patch('cat_win.cat.sys.argv', ['<CAT>', ansi_base_file_path, '-ln'])
+    @patch('sys.argv', ['<CAT>', ansi_base_file_path, '-ln'])
     @patch('cat_win.cat.const_dic', strip_color_dic_true)
     def test_cat_ansi_strip(self):
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), ansi_pos_file_content)
 
-    @patch('cat_win.cat.sys.argv', ['<CAT>', ansi_base_file_path, '-ln'])
+    @patch('sys.argv', ['<CAT>', ansi_base_file_path, '-ln'])
     @patch('cat_win.cat.const_dic', strip_color_dic_false)
     def test_cat_ansi_no_strip(self):
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), ansi_pos_file_content)

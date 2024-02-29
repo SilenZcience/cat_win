@@ -22,7 +22,7 @@ class TestCConfig(TestCase):
         all_color_options = list(ColorOptions.Fore.keys()) + list(ColorOptions.Back.keys())
         all_color_options = [k for k in all_color_options if k != 'RESET']
 
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             config._print_get_all_available_colors()
             for i, k in enumerate(all_color_options, start=1):
                 self.assertIn(str(i), fake_out.getvalue())
@@ -33,7 +33,7 @@ class TestCConfig(TestCase):
             callable(getattr(CKW, attr)) or attr.startswith('__') or attr.startswith('RESET')
         )]
 
-        with patch('cat_win.cat.sys.stdout', new=StdOutMock()) as fake_out:
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
             config._print_all_available_elements()
             for i, k in enumerate(class_members, start=1):
                 self.assertIn(str(i), fake_out.getvalue())

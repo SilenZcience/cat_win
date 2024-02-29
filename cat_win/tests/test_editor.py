@@ -393,7 +393,7 @@ class TestEditor(TestCase):
         editor = Editor(test_file_path, '', 'utf-8')
         exc = OSError('TestError')
         error_def = ErrorDefGen.get_def(exc)
-        with patch('cat_win.cat.sys.stderr', new=StdOutMock()) as fake_out:
+        with patch('sys.stderr', new=StdOutMock()) as fake_out:
             self.assertEqual(editor._action_save(error_def), True)
             self.assertEqual(editor.error_bar, 'TestError')
             self.assertEqual('TestError\n', fake_out.getvalue())
@@ -411,18 +411,18 @@ class TestEditor(TestCase):
         Editor.debug_mode = True
         editor = Editor(test_file_path_oneline, '', 'utf-8')
         with self.assertRaises(KeyboardInterrupt):
-            with patch('cat_win.cat.sys.stderr', new=StdOutMock()) as fake_out:
+            with patch('sys.stderr', new=StdOutMock()) as fake_out:
                 editor._action_interrupt(None)
                 self.assertEqual('Interrupting...\n', fake_out.getvalue())
         Editor.debug_mode = False
 
     @patch('cat_win.util.editor.CURSES_MODULE_ERROR', new=True)
     def test_editor_no_curses_error(self):
-        with patch('cat_win.util.editor.sys.stderr', new=StdOutMock()) as fake_out:
+        with patch('sys.stderr', new=StdOutMock()) as fake_out:
             self.assertEqual(Editor.open('', '', '', None, True), False)
             self.assertIn('could not be loaded', fake_out.getvalue())
             self.assertIn('windows-curses', fake_out.getvalue())
-        with patch('cat_win.util.editor.sys.stderr', new=StdOutMock()) as fake_out:
+        with patch('sys.stderr', new=StdOutMock()) as fake_out:
             self.assertEqual(Editor.open('', '', '', None, True), False)
             self.assertEqual('', fake_out.getvalue())
 
