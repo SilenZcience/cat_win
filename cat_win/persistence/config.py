@@ -23,6 +23,7 @@ class Config:
                    DKW.EDITOR_AUTO_INDENT: False,
                    DKW.STRINGS_MIN_SEQUENCE_LENGTH: 4,
                    DKW.STRINGS_DELIMETER: '\n',
+                   DKW.BINARY_HEX_VIEW: False,
                    }
 
     elements = list(default_dic.keys())
