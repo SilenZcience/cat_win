@@ -64,7 +64,7 @@ class Config:
                 return False
             return True
 
-        return element_type(element)
+        return element_type(element.encode().decode('unicode_escape'))
 
     @staticmethod
     def is_valid_value(value: str, value_type: type) -> bool:
@@ -181,14 +181,13 @@ class Config:
         value = None
         while not Config.is_valid_value(value, type(self.default_dic[keyword])):
             if value is not None:
-                print(f"Something went wrong. Invalid option: {repr(value)}.")
+                print(f"Something went wrong. Invalid option: '{value}'.")
             try:
                 value = input('Input new value: ')
             except EOFError:
                 print('\nAborting due to End-of-File character...', file=sys.stderr)
                 return
 
-        value = value.encode().decode('unicode_escape')
         self.config_parser['CONSTS'][keyword] = f'"{value}"'
         try:
             with open(self.config_file, 'w', encoding='utf-8') as conf:
