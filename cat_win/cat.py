@@ -29,7 +29,7 @@ from cat_win.const.argconstants import ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ER
 from cat_win.const.argconstants import ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY
 from cat_win.const.argconstants import ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI
 from cat_win.const.argconstants import ARGS_DIRECTORIES, ARGS_DDIRECTORIES, ARGS_SPECIFIC_FORMATS
-from cat_win.const.argconstants import ARGS_CHARCOUNT, ARGS_CCHARCOUNT
+from cat_win.const.argconstants import ARGS_CHARCOUNT, ARGS_CCHARCOUNT, ARGS_STRINGS
 from cat_win.const.colorconstants import CKW
 from cat_win.const.defaultconstants import DKW
 from cat_win.persistence.cconfig import CConfig
@@ -45,6 +45,7 @@ from cat_win.util.formatter import Formatter
 from cat_win.util.holder import Holder
 from cat_win.util.rawviewer import SPECIAL_CHARS, get_raw_view_lines_gen
 from cat_win.util.stringfinder import StringFinder
+from cat_win.util.strings import get_strings
 from cat_win.util.tmpfilehelper import TmpFileHelper
 from cat_win.util.urls import sep_valid_urls, read_url
 try:
@@ -698,6 +699,14 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
     line_offset (int):
         the offset for counting the line numbers (used in the shell)
     """
+    if holder.args_id[ARGS_STRINGS]:
+        content = get_strings(content,
+                              const_dic[DKW.STRINGS_MIN_SEQUENCE_LENGTH],
+                              const_dic[DKW.STRINGS_DELIMETER])
+    elif show_bytecode:
+        content = [(prefix, repr(line)[2:-1]) for prefix, line in content]
+
+
     if holder.args_id[ARGS_SPECIFIC_FORMATS]:
         content = Formatter.format(content)
 
@@ -835,40 +844,42 @@ def edit_file(file_index: int = 0) -> None:
             return
         if display_zip(holder.files[file_index].path, _convert_size):
             return
-        err_print('Failed to open:', holder.files[file_index].displayname)
-        try:
-            enter_char = '⏎'
+        if not holder.args_id[ARGS_STRINGS]:
+            err_print('Failed to open:', holder.files[file_index].displayname)
             try:
-                # on e.g. utf-16 the encoded form would be 4 bytes and also
-                # raise an exception event, so the char could be displayed.
-                # but the stdout and terminal would need to be configured
-                # correctly ...
-                if len(enter_char.encode(arg_parser.file_encoding)) != 3:
-                    raise UnicodeEncodeError('', '', -1, -1, '') from exc
-            except UnicodeEncodeError:
-                enter_char = 'ENTER'
-            err_print('Do you want to open the file as a binary, without parameters?')
-            err_print(f"[Y/{enter_char}] Yes, Continue       [N] No, Abort :", end='')
-            inp = 'Y' if holder.args_id[ARGS_NOBREAK] else input()
-            if not (os.isatty(sys.stdin.fileno()) and os.isatty(sys.stdout.fileno()) and \
-                not holder.args_id[ARGS_NOBREAK]):
-                err_print('') # if the input or output is piped, we add a newline manually
-            if inp and inp.upper() != 'Y':
+                enter_char = '⏎'
+                try:
+                    # on e.g. utf-16 the encoded form would be 4 bytes and also
+                    # raise an exception event, so the char could be displayed.
+                    # but the stdout and terminal would need to be configured
+                    # correctly ...
+                    if len(enter_char.encode(arg_parser.file_encoding)) != 3:
+                        raise UnicodeEncodeError('', '', -1, -1, '') from exc
+                except UnicodeEncodeError:
+                    enter_char = 'ENTER'
+                err_print('Do you want to open the file as a binary, without parameters?')
+                err_print(f"[Y/{enter_char}] Yes, Continue       [N] No, Abort :", end='')
+                inp = 'Y' if holder.args_id[ARGS_NOBREAK] else input()
+                if not (os.isatty(sys.stdin.fileno()) and os.isatty(sys.stdout.fileno()) and \
+                    not holder.args_id[ARGS_NOBREAK]):
+                    err_print('') # if the input or output is piped, we add a newline manually
+                if inp and inp.upper() != 'Y':
+                    err_print('Aborting...')
+                    return
+            except EOFError:
+                # on eoferror it is safe to assume that the user did not press
+                # enter, therefor we print a new line
+                err_print('')
+            except UnicodeError:
+                err_print('')
+                err_print('Input is not recognized in the given encoding: '
+                          f"{arg_parser.file_encoding}")
                 err_print('Aborting...')
                 return
-        except EOFError:
-            # on eoferror it is safe to assume that the user did not press
-            # enter, therefor we print a new line
-            err_print('')
-        except UnicodeError:
-            err_print('')
-            err_print(f"Input is not recognized in the given encoding: {arg_parser.file_encoding}")
-            err_print('Aborting...')
-            return
         try:
             with open(holder.files[file_index].path, 'rb') as raw_f:
                 # in binary splitlines() is our only option
-                content = [('', repr(line)[2:-1]) for line in raw_f.read().splitlines()]
+                content = [('', line) for line in raw_f.read().splitlines()]
             show_bytecode = True
         except OSError:
             err_print('Operation failed! Try using the enc=X parameter.')
