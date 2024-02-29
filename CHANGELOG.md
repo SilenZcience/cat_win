@@ -113,7 +113,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - the --`nb`, --`nobreak` parameter will now also skip the 'open in binary mode' - dialogue.
 - removed -`t`, --`tabs` and --`eof`, --`eof` parameters.
 - added --`chr`, --`chr` parameter to display most special characters as readable tokens.
-- changed -`E`, --`ECHO` to -`E`, -`echo`.
+- changed -`E`, --`ECHO` to -`E`, --`echo`.
 - added support for octal numbers when evaluating expressions using --`eval`.
 
 ### Bugfixes
