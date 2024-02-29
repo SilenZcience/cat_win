@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - the config menu now decodes the input as unicode escape sequences making it possible to enter special characters like tabs (\t) and newlines (\n).
+- added --`strings`, --`strings` parameter to print the sequences of printable characters in any given file.
 
 
 ## [1.7.1] - 2024-02-22
