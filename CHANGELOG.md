@@ -11,6 +11,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added --`strings`, --`strings` parameter to print the sequences of printable characters in any given file.
 - added `strings_minimum_sequence_length` to the config menu to set the minimum length of characters required to identify a sequence as a string using --`string`.
 - added `strings_delimeter` to the config menu to set the delimeter of multiple strings found on the same line using --`string`.
+- added `binary_hex_view` to the config menu to display unknown bytes in hexadecimal when opening binary files.
 
 
 ## [1.7.1] - 2024-02-22
