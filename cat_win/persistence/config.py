@@ -43,7 +43,7 @@ class Config:
         self.const_dic = {}
 
         self.longest_char_count = 30
-        self.rows = 3
+        self.columns = 3
 
     @staticmethod
     def convert_config_element(element: str, element_type: type):
@@ -141,14 +141,19 @@ class Config:
         """
         print('Here is a list of all available elements you may change:')
 
-        self.longest_char_count = max(map(len, self.elements)) + 12
+        h_width, _ = os.get_terminal_size()
         index_offset = len(str(len(self.elements) + 1))
+        self.longest_char_count = max(map(len, self.elements))
+        self.longest_char_count+= max(
+            (h_width - self.columns * (index_offset+3 + self.longest_char_count)) // self.columns,
+            1
+        )
 
         config_menu = ''
         for index, element in enumerate(self.elements):
             config_menu += f"{index+1: <{index_offset}}: "
             config_menu += f"{element: <{self.longest_char_count}}"
-            if index % self.rows == self.rows-1:
+            if index % self.columns == self.columns-1:
                 config_menu += '\n'
 
         print(config_menu)

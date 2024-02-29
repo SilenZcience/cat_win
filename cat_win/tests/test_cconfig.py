@@ -14,6 +14,7 @@ config = CConfig(test_file_dir)
 config.load_config()
 
 
+@patch('os.get_terminal_size', lambda: (120, 30))
 class TestCConfig(TestCase):
     maxDiff = None
 

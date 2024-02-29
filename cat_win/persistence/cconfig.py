@@ -56,7 +56,7 @@ class CConfig:
         self.color_dic = {}
 
         self.longest_char_count = 30
-        self.rows = 3
+        self.columns = 3
 
     def load_config(self) -> dict:
         """
@@ -112,19 +112,21 @@ class CConfig:
 
         for index, fore_option in enumerate(fore_options):
             key, value = fore_option
-            colored_option = f"{value}Fore.{key}{ColorOptions.Style['RESET']}"
-            config_menu += f"{index+1: <{index_offset}}: "
-            config_menu += f"{colored_option: <{self.longest_char_count+len(value)}}"
-            if index % self.rows == self.rows-1:
+            f_key = f"Fore.{key}"
+            config_menu += f"{index+1: <{index_offset}}: {value}"
+            config_menu += f"{f_key: <{self.longest_char_count}}"
+            config_menu += f"{ColorOptions.Style['RESET']} "
+            if index % self.columns == self.columns-1:
                 config_menu += '\n'
             options.append('Fore.' + key)
         config_menu += '\n'
         for index, back_option in enumerate(back_options):
             key, value = back_option
-            colored_option = f"{value}Back.{key}{ColorOptions.Style['RESET']}"
-            config_menu += f"{len(fore_options)+index+1: <{index_offset}}: "
-            config_menu += f"{colored_option: <{self.longest_char_count+len(value)}}"
-            if index % self.rows == self.rows-1:
+            b_key = f"Back.{key}"
+            config_menu += f"{len(fore_options)+index+1: <{index_offset}}: {value}"
+            config_menu += f"{b_key: <{self.longest_char_count}}"
+            config_menu += f"{ColorOptions.Style['RESET']} "
+            if index % self.columns == self.columns-1:
                 config_menu += '\n'
             options.append('Back.' + key)
         config_menu += '\n'
@@ -138,16 +140,19 @@ class CConfig:
         """
         print('Here is a list of all available elements you may change:')
 
-        self.longest_char_count = max(map(len, self.elements)) + 12
+        h_width, _ = os.get_terminal_size()
         index_offset = len(str(len(self.elements) + 1))
-
+        self.longest_char_count = max(map(len, self.elements))
+        self.longest_char_count+= max(
+            (h_width - self.columns * (index_offset+3 + self.longest_char_count)) // self.columns,
+            1
+        )
         config_menu = ''
         for index, element in enumerate(self.elements):
-            colored_element = f"{self.color_dic[element]}{element}{ColorOptions.Style['RESET']}"
-            config_menu += f"{index+1: <{index_offset}}: "
-            offset = self.longest_char_count+len(self.color_dic[element])
-            config_menu += f"{colored_element: <{offset}}"
-            if index % self.rows == self.rows-1:
+            config_menu += f"{index+1: <{index_offset}}: {self.color_dic[element]}"
+            config_menu += f"{element: <{self.longest_char_count}}"
+            config_menu += f"{ColorOptions.Style['RESET']} "
+            if index % self.columns == self.columns-1:
                 config_menu += '\n'
 
         print(config_menu)
