@@ -94,6 +94,9 @@ class StdInMock:
     # def reconfigure(self, encoding = None) -> None:
     #     return
 
+    def fileno(self) -> int:
+        return 0
+
     def readline(self) -> str:
         """
         return the next line from stdin mock
