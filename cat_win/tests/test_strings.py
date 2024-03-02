@@ -6,7 +6,7 @@ from cat_win.util.strings import get_strings
 # sys.path.append('../cat_win')
 
 
-test_file_dir = os.path.join(os.path.dirname(__file__), 'texts')
+test_file_dir = os.path.join(os.path.dirname(__file__), 'resources')
 test_file_path = os.path.join(test_file_dir, 'test.bin')
 with open(test_file_path, 'rb') as raw_f:
     test_content = [('', line) for line in raw_f.read().splitlines()]
