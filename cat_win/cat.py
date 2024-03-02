@@ -61,22 +61,35 @@ from cat_win import __project__, __version__, __sysversion__, __author__, __url_
 coloramaInit(strip=False)
 working_dir = os.path.dirname(os.path.realpath(__file__))
 
-cconfig = CConfig(working_dir)
-config = Config(working_dir)
-
-default_color_dic = cconfig.load_config()
-color_dic = default_color_dic.copy()
-const_dic = config.load_config()
-
-arg_parser = ArgParser(const_dic[DKW.DEFAULT_FILE_ENCODING])
-converter = Converter()
-holder = Holder()
-tmp_file_helper = TmpFileHelper()
-
 on_windows_os = platform.system() == 'Windows'
 file_uri_prefix = 'file://' + '/' * on_windows_os
 ANSI_CSI_RE = re.compile(r'\001?\033\[(?:\d|;)*[a-zA-Z]\002?') # Control Sequence Introducer
-# ANSI_OSC_RE = re.compile(r'\001?\033\]([^\a]*)(\a)\002?')          # Operating System Command
+# ANSI_OSC_RE = re.compile(r'\001?\033\]([^\a]*)(\a)\002?')    # Operating System Command
+
+cconfig = CConfig(working_dir)
+config = Config(working_dir)
+
+default_color_dic, color_dic, const_dic = None, None, None
+
+arg_parser, converter, holder, tmp_file_helper = None, None, None, None
+
+
+def setup():
+    """
+    setup the global variables.
+    """
+    global default_color_dic, color_dic, const_dic
+    global arg_parser, converter, holder, tmp_file_helper
+
+    default_color_dic = cconfig.load_config()
+    color_dic = default_color_dic.copy()
+    const_dic = config.load_config()
+
+    arg_parser = ArgParser(const_dic[DKW.DEFAULT_FILE_ENCODING])
+    converter = Converter()
+    holder = Holder()
+    tmp_file_helper = TmpFileHelper()
+
 
 def err_print(*args, **kwargs):
     """
@@ -1094,6 +1107,8 @@ def init(shell: bool = False) -> tuple:
     (tuple):
         contains (known_files, unknown_files, echo_args, valid_urls) from the argparser
     """
+    setup()
+
     # read parameter-args
     args, _, unknown_files, echo_args = arg_parser.get_arguments(sys.argv + config.get_cmd())
 

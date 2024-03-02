@@ -3,14 +3,16 @@ from unittest import TestCase
 import os
 
 from cat_win import cat
+from cat_win.const.defaultconstants import DKW
 from cat_win.tests.mocks.std import StdInMock, StdOutMock
-from cat_win.util.argparser import ArgParser
-from cat_win.util.holder import Holder
+from cat_win.persistence.cconfig import CConfig
+from cat_win.persistence.config import Config
 # import sys
 # sys.path.append('../cat_win')
 
 
 test_file_dir = os.path.join(os.path.dirname(__file__), 'texts')
+test_res_dir  = os.path.join(os.path.dirname(__file__), 'resources')
 test_file_path  = os.path.join(test_file_dir, 'test.txt')
 test_empty_path = os.path.join(test_file_dir, 'test_empty.txt')
 test_peek       = os.path.join(test_file_dir, 'test_peek.txt')
@@ -18,19 +20,18 @@ test_result_B   = os.path.join(test_file_dir, 'full_test_result_B.txt')
 test_result_C   = os.path.join(test_file_dir, 'full_test_result_C.txt')
 test_result_D   = os.path.join(test_file_dir, 'full_test_result_D.txt')
 test_eval       = os.path.join(test_file_dir, 'full_test_eval.txt')
+test_binary     = os.path.join(test_res_dir, 'test.bin')
 
 
 @patch('sys.stdin', StdInMock())
-@patch('cat_win.cat.default_color_dic', dict.fromkeys(cat.color_dic, ''))
-@patch('cat_win.cat.color_dic', dict.fromkeys(cat.color_dic, ''))
+@patch('cat_win.cat.cconfig.load_config', lambda: dict.fromkeys(CConfig.default_dic, ''))
+@patch('cat_win.cat.config.load_config', lambda: Config.default_dic.copy())
 class TestCatFull(TestCase):
     maxDiff = None
 
     def tearDown(self):
         cat._calculate_line_prefix_spacing.cache_clear()
         cat._calculate_line_length_prefix_spacing.cache_clear()
-        cat.arg_parser = ArgParser()
-        cat.holder = Holder()
 
     # no files parsed
     @patch('sys.argv', ['<CAT>', '-ln', '[::-2]', 'enc=utf8'])

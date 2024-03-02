@@ -6,8 +6,8 @@ from cat_win import cat
 from cat_win.const.argconstants import ARGS_ENDS, ARGS_REVERSE, ARGS_CHR
 from cat_win.tests.mocks.std import StdOutMock
 from cat_win.util.file import File
-from cat_win.util.holder import Holder
-
+from cat_win.persistence.cconfig import CConfig
+from cat_win.persistence.config import Config
 # import sys
 # sys.path.append('../cat_win')
 
@@ -18,15 +18,25 @@ with open(test_file_path, 'r', encoding='utf-8') as f:
     test_file_content = f.read().split('\n')
 
 
-@patch('cat_win.cat.default_color_dic', dict.fromkeys(cat.color_dic, ''))
-@patch('cat_win.cat.color_dic', dict.fromkeys(cat.color_dic, ''))
 class TestCat(TestCase):
     maxDiff = None
+
+    @patch('cat_win.cat.cconfig.load_config', lambda: dict.fromkeys(CConfig.default_dic, ''))
+    @patch('cat_win.cat.config.load_config', lambda: Config.default_dic.copy())
+    def setUp(self):
+        """
+        the config patches are neccessary for the setup() function.
+        in the other TestCases this function is called indirectly through main() or shell_main()
+        in that case the patch can be applied on the class-level (therefor on every test-method)
+        in this case only needed in setUp().
+        using start and stop to manage the patch lifecycle is not needed, since the test-method
+        itself does not need the patch, only the setUp()/setup()  call. 
+        """
+        cat.setup()
 
     def tearDown(self):
         cat._calculate_line_prefix_spacing.cache_clear()
         cat._calculate_line_length_prefix_spacing.cache_clear()
-        cat.holder = Holder()
 
     def test_cat_output_default_file(self):
         cat.holder.set_files([test_file_path])
