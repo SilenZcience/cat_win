@@ -15,16 +15,17 @@ class Config:
     manages the constant configuration. Displays the user interface,
     allows for reading and writing the config file.
     """
-    default_dic = {DKW.DEFAULT_COMMAND_LINE: '',
-                   DKW.DEFAULT_FILE_ENCODING: 'utf-8',
-                   DKW.LARGE_FILE_SIZE: 1024 * 1024 * 100,  # 100 Megabytes
-                   DKW.STRIP_COLOR_ON_PIPE: True,
-                   DKW.EDITOR_INDENTATION: '\t',
-                   DKW.EDITOR_AUTO_INDENT: False,
-                   DKW.STRINGS_MIN_SEQUENCE_LENGTH: 4,
-                   DKW.STRINGS_DELIMETER: '\n',
-                   DKW.BINARY_HEX_VIEW: False,
-                   }
+    default_dic = {
+        DKW.DEFAULT_COMMAND_LINE: '',
+        DKW.DEFAULT_FILE_ENCODING: 'utf-8',
+        DKW.LARGE_FILE_SIZE: 1024 * 1024 * 100,  # 100 Megabytes
+        DKW.STRIP_COLOR_ON_PIPE: True,
+        DKW.EDITOR_INDENTATION: '\t',
+        DKW.EDITOR_AUTO_INDENT: False,
+        DKW.STRINGS_MIN_SEQUENCE_LENGTH: 4,
+        DKW.STRINGS_DELIMETER: '\n',
+        DKW.BINARY_HEX_VIEW: False,
+        }
 
     elements = list(default_dic.keys())
 
