@@ -63,9 +63,13 @@ def _decode_base64(content: str) -> bytes:
     decoded_content (bytes):
         the base64 decoded string
     """
-    # encode the string to bytes and decode with base64
-    base64_bytes = content.encode(encoding='ascii')
-    decoded_content = base64.b64decode(base64_bytes)
+    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+
+    binary_str = ''.join(f"{chars.index(char):06b}" for char in content if char in chars)
+    if len(binary_str) % 8 != 0:
+        binary_str = binary_str[:-(len(binary_str)%8)]
+    decoded_content = bytearray()
+    decoded_content.extend([int(binary_str[i:i+8], 2) for i in range(0, len(binary_str), 8)])
 
     # return as a single line
     return decoded_content
@@ -90,7 +94,7 @@ def decode_base64(content: list, encoding: str = 'utf-8') -> list:
     content_line = ''.join(content_lines)
 
     decoded_content = _decode_base64(content_line)
-    decoded_content = decoded_content.decode(encoding=encoding)
+    decoded_content = decoded_content.decode(encoding=encoding, errors='ignore')
 
     # return as content list, split at line breaks
     decoded_content = decoded_content.split('\n')
