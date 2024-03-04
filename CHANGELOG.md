@@ -13,6 +13,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added `strings_delimeter` to the config menu to set the delimeter of multiple strings found on the same line using --`string`.
 - added `binary_hex_view` to the config menu to display unknown bytes in hexadecimal when opening binary files.
 
+### Bugfixes
+
+- when decoding a corrupted base64 string cat_win will now decode as much as possible instead of throwing an error.
+
 
 ## [1.7.1] - 2024-02-22
 
