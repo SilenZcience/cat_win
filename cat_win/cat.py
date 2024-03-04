@@ -35,7 +35,7 @@ from cat_win.const.defaultconstants import DKW
 from cat_win.persistence.cconfig import CConfig
 from cat_win.persistence.config import Config
 from cat_win.util.argparser import ArgParser
-from cat_win.util.cbase64 import decode_base64, encode_base64
+from cat_win.util.cbase64 import _decode_base64, encode_base64
 from cat_win.util.checksum import get_checksum_from_file
 from cat_win.util.converter import Converter
 from cat_win.util.editor import Editor
@@ -742,9 +742,6 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
         return
     excluded_by_peek = 0
 
-    if not show_bytecode and holder.args_id[ARGS_B64D]:
-        content = decode_base64(content, arg_parser.file_encoding)
-
     if holder.args_id[ARGS_NUMBER]:
         content = [(_get_line_prefix(j+line_offset, file_index+1), c[1])
                    for j, c in enumerate(content, start=1)]
@@ -1246,9 +1243,17 @@ def main():
             break
 
     if holder.args_id[ARGS_B64D]:
-        holder.set_decoding_temp_files(
-            [tmp_file_helper.generate_temp_file_name() for _ in holder.files])
-    holder.generate_values(arg_parser.file_encoding)
+        for i, file in enumerate(holder.files):
+            try:
+                tmp_file_path = tmp_file_helper.generate_temp_file_name()
+                with open(file.path, 'r', encoding=arg_parser.file_encoding) as f_read:
+                    with open(tmp_file_path, 'w', encoding=arg_parser.file_encoding) as f_write:
+                        f_write.write(_decode_base64(f_read.read())
+                                            .decode(arg_parser.file_encoding, errors='ignore'))
+                holder.files[i].path = tmp_file_path
+            except (OSError, UnicodeError):
+                err_print(f"Base64 decoding failed for file: {file.displayname}")
+    holder.generate_values()
 
     if holder.args_id[ARGS_SSUM]:
         _show_sum()

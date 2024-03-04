@@ -79,7 +79,6 @@ class Holder():
     """
     def __init__(self) -> None:
         self.files: list = []  # all files, including tmp-file from stdin
-        self._inner_files: list = []
         self.args: list = []  # list of all used parameters: format [[id, param]]
         self.args_id: list = [False] * (HIGHEST_ARG_ID + 1)
         self.temp_file_stdin = None  # if stdin is used, this temp_file will contain the stdin-input
@@ -132,7 +131,6 @@ class Holder():
         set the files to display.
         """
         self.files = [File(path, self.get_file_display_name(path)) for path in files]
-        self._inner_files = files[:]
 
     def set_args(self, args: list) -> None:
         """
@@ -207,10 +205,10 @@ class Holder():
 
     def __calc_place_holder__(self) -> None:
         file_lines = []
-        for file in self._inner_files:
-            file_line_sum = self.__get_file_lines_sum__(file)
+        for file in self.files:
+            file_line_sum = self.__get_file_lines_sum__(file.path)
             file_lines.append(file_line_sum)
-            self.all_files_lines[file] = file_line_sum
+            self.all_files_lines[file.path] = file_line_sum
         self.all_files_lines_sum = sum(file_lines)
         self.all_line_number_place_holder = len(str(max(file_lines)))
 
@@ -246,28 +244,14 @@ class Holder():
         return len(str(max(longest_line_len, last_line_len)))
 
     def __calc_file_line_length_place_holder__(self) -> None:
-        self.file_line_length_place_holder = max(self.__calc_max_line_length__(file)
-                                             for file in self._inner_files)
+        self.file_line_length_place_holder = max(self.__calc_max_line_length__(file.path)
+                                             for file in self.files)
 
-    def set_decoding_temp_files(self, temp_files: list) -> None:
-        """
-        set the tempfiles used for base64 en/de-coding.
-        """
-        self._inner_files = temp_files[:]
-
-    def generate_values(self, encoding: str) -> None:
+    def generate_values(self) -> None:
         """
         generate the metadata for all files
         """
         self.__calc_file_number_place_holder__()
-        if self.args_id[ARGS_B64D]:
-            for i, file in enumerate(self.files):
-                try:
-                    with open(file.path, 'rb') as raw_f_read:
-                        with open(self._inner_files[i], 'wb') as raw_f_write:
-                            raw_f_write.write(_decode_base64(raw_f_read.read().decode(encoding)))
-                except OSError:
-                    pass
         if self.args_id[ARGS_SUM] or self.args_id[ARGS_SSUM] or self.args_id[ARGS_NUMBER]:
             self.__calc_place_holder__()
         if self.args_id[ARGS_LLENGTH]:

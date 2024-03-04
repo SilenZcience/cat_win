@@ -112,14 +112,6 @@ class TestHolder(TestCase):
         self.assertEqual(
             holder.get_file_display_name(test_file_edge_case_4), test_file_edge_case_4)
 
-    def test_set_decoding_temp_files(self):
-        holder = Holder()
-        holder.set_files([test_file_path] * 3)
-        self.assertListEqual(holder._inner_files, [test_file_path] * 3)
-
-        holder.set_decoding_temp_files([test_file_empty] * 4)
-        self.assertListEqual(holder._inner_files, [test_file_empty] * 4)
-
     def test_add_args(self):
         holder = Holder()
         holder.set_args([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
