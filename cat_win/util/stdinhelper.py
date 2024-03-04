@@ -138,7 +138,7 @@ def write_files(file_list: list, content: str, file_encoding: str) -> list:
     (list):
         containing all files, that could succesfully be written.
     """
-    if len(file_list) == 0:
+    if not file_list:
         return file_list
 
     if content == '':
@@ -202,7 +202,7 @@ def read_write_files_from_stdin(file_list: list, file_encoding: str, on_windows_
     (list):
         containing all files, that could succesfully be written.
     """
-    if len(file_list) == 0:
+    if not file_list:
         return file_list
 
     print('The given FILE(s)', end='', file=sys.stderr)
