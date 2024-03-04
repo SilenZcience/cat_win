@@ -234,7 +234,7 @@ class Holder():
         except OSError:
             return 0
         heap = heapq.nlargest(1, lines, len)
-        if len(heap) == 0:
+        if not heap:
             return 0
         # also check the longest line against the last line because
         # the lines still contain (\r)\n, except the last line does not

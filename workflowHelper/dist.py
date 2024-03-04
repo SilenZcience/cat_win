@@ -13,7 +13,7 @@ print('dist directory:', dist_dir)
 target_package = os.listdir(dist_dir)
 print('Found packages:', target_package)
 
-if len(target_package) > 0:
+if target_package:
     target_package_whl = [package for package in target_package if package[-4:] == '.whl']
     print(target_package_whl)
     target_package_tar = [package for package in target_package if package[-7:] == '.tar.gz']
