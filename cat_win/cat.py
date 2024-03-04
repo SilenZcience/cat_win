@@ -246,6 +246,11 @@ def _show_wordcount() -> None:
             used_files.append(hfile.displayname)
         except (OSError, UnicodeError):
             pass
+    if not used_files:
+        print(color_dic[CKW.SUMMARY], end='')
+        print('The word count could not be calculated.', end='')
+        print(color_dic[CKW.RESET_ALL])
+        return
 
     print(color_dic[CKW.SUMMARY], end='')
     print('The word count includes the following files:', end='')
@@ -278,6 +283,11 @@ def _show_charcount() -> None:
             used_files.append(hfile.displayname)
         except (OSError, UnicodeError):
             pass
+    if not used_files:
+        print(color_dic[CKW.SUMMARY], end='')
+        print('The char count could not be calculated.', end='')
+        print(color_dic[CKW.RESET_ALL])
+        return
 
     print(color_dic[CKW.SUMMARY], end='')
     print('The char count includes the following files:', end='')
@@ -322,7 +332,7 @@ def _show_files() -> None:
     displays holder.files including their size and calculates
     their size sum.
     """
-    if len(holder.files) == 0:
+    if not holder.files:
         return
     file_sizes = []
     msg = 'found' if holder.args_id[ARGS_FFILES] else 'applied'
@@ -348,7 +358,7 @@ def _show_files() -> None:
 
 def _show_dirs():
     known_directories = arg_parser.get_dirs()
-    if len(known_directories) == 0:
+    if not known_directories:
         print(color_dic[CKW.SUMMARY], end='')
         print('No directores have been found!', end='')
         print(color_dic[CKW.RESET_ALL])
