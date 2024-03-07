@@ -15,12 +15,12 @@ VSVersionInfo(
       StringTable(
         u'040904B0',
         [StringStruct(u'CompanyName', u''),
-        StringStruct(u'FileDescription', u'OS Independent cat Command-line Tool made in Python.'),
+        StringStruct(u'FileDescription', u'OS Independent cat Command-line Tool.'),
         StringStruct(u'FileVersion', u'0.1.7.2'),
         StringStruct(u'InternalName', u'cat_win'),
         StringStruct(u'LegalCopyright', u''),
         StringStruct(u'OriginalFilename', u'cats.exe'),
-        StringStruct(u'ProductName', u'cat'),
+        StringStruct(u'ProductName', u'cat_win'),
         StringStruct(u'ProductVersion', u'0.1.7.2')])
       ]),
     VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
