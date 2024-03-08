@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.7.3] - TBA
+
+### Bugfixes
+
+- fix Bug where the config menu would not allow the default-command-line to reset (be empty).
+
+
 ## [1.7.2] - 2024-03-05
 
 ### Minor Changes
