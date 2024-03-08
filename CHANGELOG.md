@@ -5,6 +5,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ## [1.7.3] - TBA
 
+### Minor Changes
+
+- the config menus now scale to the size of the terminal and are better formatted.
+
 ### Bugfixes
 
 - fix Bug where the color-config menu would allow to change elements that should not be changed.
