@@ -7,6 +7,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ### Bugfixes
 
+- fix Bug where the color-config menu would allow to change elements that should not be changed.
 - fix Bug where the config menu would not allow the default-command-line to reset (be empty).
 
 
