@@ -39,8 +39,8 @@ class CConfig:
         CKW.RESET_ALL: ColorOptions.Style['RESET'],
         CKW.RESET_FOUND: ColorOptions.Fore['RESET'],
         CKW.RESET_MATCHED: ColorOptions.Back['RESET'],
-        }
-    elements = list(default_dic.keys())
+    }
+    elements = [k for k in default_dic.keys() if 'reset' not in k]
 
     def __init__(self, working_dir: str) -> None:
         """
@@ -58,9 +58,6 @@ class CConfig:
                                       'Back': [CKW.MATCHED]}  # can only be Background
         self.config_parser = configparser.ConfigParser()
         self.color_dic = {}
-
-        self.longest_char_count = 30
-        self.columns = 3
 
     def load_config(self) -> dict:
         """
@@ -109,7 +106,19 @@ class CConfig:
         fore_options = [(k, v) for k, v in fore_options if k != 'RESET']
         back_options = list(ColorOptions.Back.items())
         back_options = [(k, v) for k, v in back_options if k != 'RESET']
-        index_offset = len(str(len(fore_options) + len(back_options) + 1))
+
+        h_width, _ = os.get_terminal_size()
+        index_offset = max(len(str(len(fore_options) + len(back_options))),
+                           len(str(len(self.elements))))
+
+        longest_char_count = max(max(map(len, fore_options+back_options))+5,
+                                 max(map(len, self.elements)))
+        column_width = index_offset+4 + longest_char_count
+        columns = max(h_width // column_width, 1)
+        element_offset = longest_char_count + max(
+            (h_width - columns * column_width) // columns,
+            1
+        )
 
         config_menu = ''
         options = []
@@ -118,9 +127,14 @@ class CConfig:
             key, value = fore_option
             f_key = f"Fore.{key}"
             config_menu += f"{index+1: <{index_offset}}: {value}"
-            config_menu += f"{f_key: <{self.longest_char_count}}"
-            config_menu += f"{ColorOptions.Style['RESET']} "
-            if index % self.columns == self.columns-1:
+            if key == 'BLACK':
+                config_menu += f"{ColorOptions.Back['LIGHTBLACK']}"
+                config_menu += f"{f_key}{ColorOptions.Style['RESET']}"
+                config_menu += f"{' ' * (element_offset-len(f_key))} "
+            else:
+                config_menu += f"{f_key: <{element_offset}}"
+                config_menu += f"{ColorOptions.Style['RESET']} "
+            if index % columns == columns-1:
                 config_menu += '\n'
             options.append('Fore.' + key)
         config_menu += '\n'
@@ -128,9 +142,11 @@ class CConfig:
             key, value = back_option
             b_key = f"Back.{key}"
             config_menu += f"{len(fore_options)+index+1: <{index_offset}}: {value}"
-            config_menu += f"{b_key: <{self.longest_char_count}}"
+            if key not in ['NONE', 'BLACK']:
+                config_menu += f"{ColorOptions.Fore['BLACK']}"
+            config_menu += f"{b_key: <{element_offset}}"
             config_menu += f"{ColorOptions.Style['RESET']} "
-            if index % self.columns == self.columns-1:
+            if index % columns == columns-1:
                 config_menu += '\n'
             options.append('Back.' + key)
         config_menu += '\n'
@@ -145,18 +161,29 @@ class CConfig:
         print('Here is a list of all available elements you may change:')
 
         h_width, _ = os.get_terminal_size()
-        index_offset = len(str(len(self.elements) + 1))
-        self.longest_char_count = max(map(len, self.elements))
-        self.longest_char_count+= max(
-            (h_width - self.columns * (index_offset+3 + self.longest_char_count)) // self.columns,
+        index_offset = len(str(len(self.elements)))
+
+        longest_char_count = max(map(len, self.elements))
+        column_width = index_offset+4 + longest_char_count
+        columns = max(h_width // column_width, 1)
+        element_offset = longest_char_count + max(
+            (h_width - columns * column_width) // columns,
             1
         )
         config_menu = ''
+
         for index, element in enumerate(self.elements):
             config_menu += f"{index+1: <{index_offset}}: {self.color_dic[element]}"
-            config_menu += f"{element: <{self.longest_char_count}}"
-            config_menu += f"{ColorOptions.Style['RESET']} "
-            if index % self.columns == self.columns-1:
+            if self.color_dic[element] == ColorOptions.Fore['BLACK']:
+                config_menu += f"{ColorOptions.Back['LIGHTBLACK']}"
+                config_menu += f"{element}{ColorOptions.Style['RESET']}"
+                config_menu += f"{' ' * (element_offset-len(element))} "
+            else:
+                if self.color_dic[element] in [c for k,c in ColorOptions.Back.items() if k not in ['NONE', 'BLACK']]:
+                    config_menu += f"{ColorOptions.Fore['BLACK']}"
+                config_menu += f"{element: <{element_offset}}"
+                config_menu += f"{ColorOptions.Style['RESET']} "
+            if index % columns == columns-1:
                 config_menu += '\n'
 
         print(config_menu)
@@ -173,7 +200,7 @@ class CConfig:
             if keyword != '':
                 print(f"Something went wrong. Unknown keyword '{keyword}'")
             try:
-                keyword = input('Input name or id of keyword to change: ')
+                keyword = input('Input name or id of the element to change: ')
             except EOFError:
                 print('\nAborting due to End-of-File character...', file=sys.stderr)
                 return
