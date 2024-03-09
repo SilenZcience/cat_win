@@ -54,8 +54,9 @@ class StringFinder:
         (list):
             containing the start and end indeces like [start, end]
         """
-        for match in re.finditer(fr'{pattern}', _s, re.IGNORECASE if self.regex_ignore_case else 0):
-            yield list(match.span())
+        for _match in re.finditer(fr'{pattern}', _s,
+                                 re.IGNORECASE if self.regex_ignore_case else 0 | re.DOTALL):
+            yield list(_match.span())
 
     def _optimize_intervals(self, intervals: list) -> list:
         """
