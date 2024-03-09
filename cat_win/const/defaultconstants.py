@@ -15,3 +15,4 @@ class DKW:
     EDITOR_AUTO_INDENT = 'editor_auto_indent'
     STRINGS_MIN_SEQUENCE_LENGTH = 'strings_minimum_sequence_length'
     STRINGS_DELIMETER = 'strings_delimeter'
+    IGNORE_UNKNOWN_BYTES = 'ignore_unknown_bytes'
