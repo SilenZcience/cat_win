@@ -946,7 +946,6 @@ Valid Options are:
 | editor_auto_indent | set whether the Editor should auto indent or not | 1 | False |
 | strings_minimum_sequence_length | set the minimum Length of a String </br> (for the --`strings` Parameter) | 2 | 4 |
 | strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the --`strings` Parameter) | \| | \n |
-| binary_hex_view | display unknown bytes as hexadecimal when opening binary files | true | False |
 
 Accepted Input for enabling a Setting:  `true, yes, y, 1`
 </br>
