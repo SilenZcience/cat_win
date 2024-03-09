@@ -705,16 +705,13 @@ def print_excluded_by_peek(content: list, excluded_by_peek: int) -> None:
                             excluded_by_peek + 10 - len(content))
 
 
-def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
-                 line_offset: int = 0) -> None:
+def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> None:
     """
     apply all parameters to a string (file Content).
     
     Parameters:
     content (list):
         the content of a file like [(prefix, line), ...]
-    show_bytecode (bool).
-        indicates if the content lines are string or bytes
     file_index (int):
         the index of the holder.files list, pointing to the file that
         is currently being processed. a negative value can be used for
@@ -726,8 +723,6 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
         content = get_strings(content,
                               const_dic[DKW.STRINGS_MIN_SEQUENCE_LENGTH],
                               const_dic[DKW.STRINGS_DELIMETER])
-    elif show_bytecode:
-        content = [(prefix, ''.join(map(chr, line))) for prefix, line in content] 
 
     if holder.args_id[ARGS_SPECIFIC_FORMATS]:
         content = Formatter.format(content)
@@ -759,53 +754,52 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
         excluded_by_peek = len(content) - 10
         content = content[:5] + content[-5:]
 
-    if not show_bytecode:
-        for arg, param in holder.args:
-            if arg == ARGS_CUT:
-                slice_evals = [None, None, None]
-                for i, p_split in enumerate(param[1:-1].split(':')):
-                    try:
-                        slice_evals[i] = int(eval(p_split))
-                    except (SyntaxError, NameError, ValueError, ArithmeticError):
-                        pass
-                content = [(prefix, line[slice_evals[0]:slice_evals[1]:slice_evals[2]])
-                            for prefix, line in content]
+    for arg, param in holder.args:
+        if arg == ARGS_CUT:
+            slice_evals = [None, None, None]
+            for i, p_split in enumerate(param[1:-1].split(':')):
+                try:
+                    slice_evals[i] = int(eval(p_split))
+                except (SyntaxError, NameError, ValueError, ArithmeticError):
+                    pass
+            content = [(prefix, line[slice_evals[0]:slice_evals[1]:slice_evals[2]])
+                        for prefix, line in content]
 
-        for arg, param in holder.args:
-            if arg == ARGS_ENDS:
-                content = [(prefix, f"{line}{color_dic[CKW.ENDS]}${color_dic[CKW.RESET_ALL]}")
-                           for prefix, line in content]
-            elif arg == ARGS_SQUEEZE:
-                content = [list(group)[0] for _, group in groupby(content, lambda x: x[1])]
-            elif arg == ARGS_REVERSE:
-                content.reverse()
-            elif arg == ARGS_SORT:
-                sort_method = len if param.isupper() else str.casefold
-                content.sort(key = lambda l: sort_method(l[1]))
-            elif arg == ARGS_BLANK:
-                content = [c for c in content if c[1]]
-            elif arg == ARGS_EVAL:
-                content = comp_eval(converter, content, param, remove_ansi_codes_from_line)
-            elif arg == ARGS_HEX:
-                content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
-            elif arg == ARGS_DEC:
-                content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
-            elif arg == ARGS_OCT:
-                content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
-            elif arg == ARGS_BIN:
-                content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
-            elif arg == ARGS_REPLACE:
-                replace_values = split_replace(param)
-                content = [(prefix, line.replace(replace_values[0], f"{color_dic[CKW.REPLACE]}" + \
-                    f"{replace_values[1]}{color_dic[CKW.RESET_ALL]}"))
-                           for prefix, line in content]
-            elif arg == ARGS_CHR:
-                for c_id, char, _, possible in SPECIAL_CHARS:
-                    if not possible:
-                        continue
-                    content = [(prefix, line.replace(
-                        chr(c_id), f"{color_dic[CKW.CHARS]}^{char}{color_dic[CKW.RESET_ALL]}"
-                        )) for prefix, line in content]
+    for arg, param in holder.args:
+        if arg == ARGS_ENDS:
+            content = [(prefix, f"{line}{color_dic[CKW.ENDS]}${color_dic[CKW.RESET_ALL]}")
+                        for prefix, line in content]
+        elif arg == ARGS_SQUEEZE:
+            content = [list(group)[0] for _, group in groupby(content, lambda x: x[1])]
+        elif arg == ARGS_REVERSE:
+            content.reverse()
+        elif arg == ARGS_SORT:
+            sort_method = len if param.isupper() else str.casefold
+            content.sort(key = lambda l: sort_method(l[1]))
+        elif arg == ARGS_BLANK:
+            content = [c for c in content if c[1]]
+        elif arg == ARGS_EVAL:
+            content = comp_eval(converter, content, param, remove_ansi_codes_from_line)
+        elif arg == ARGS_HEX:
+            content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
+        elif arg == ARGS_DEC:
+            content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
+        elif arg == ARGS_OCT:
+            content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
+        elif arg == ARGS_BIN:
+            content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
+        elif arg == ARGS_REPLACE:
+            replace_values = split_replace(param)
+            content = [(prefix, line.replace(replace_values[0], f"{color_dic[CKW.REPLACE]}" + \
+                f"{replace_values[1]}{color_dic[CKW.RESET_ALL]}"))
+                        for prefix, line in content]
+        elif arg == ARGS_CHR:
+            for c_id, char, _, possible in SPECIAL_CHARS:
+                if not possible:
+                    continue
+                content = [(prefix, line.replace(
+                    chr(c_id), f"{color_dic[CKW.CHARS]}^{char}{color_dic[CKW.RESET_ALL]}"
+                    )) for prefix, line in content]
 
     if holder.args_id[ARGS_LLENGTH]:
         content = [(_get_line_length_prefix(prefix, line), line) for prefix, line in content]
@@ -825,9 +819,8 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
     if file_index >= 0:
         holder.files[file_index].set_contains_queried(found_queried)
 
-    if not show_bytecode:
-        if holder.args_id[ARGS_CLIP]:
-            holder.clip_board += '\n'.join(prefix + line for prefix, line in content)
+    if holder.args_id[ARGS_CLIP]:
+        holder.clip_board += '\n'.join(prefix + line for prefix, line in content)
 
 
 def edit_file(file_index: int = 0) -> None:
@@ -838,11 +831,10 @@ def edit_file(file_index: int = 0) -> None:
     file_index (int):
         the index regarding which file is currently being edited
     """
-    show_bytecode = False
-
     content = [('', '')]
     try:
-        with open(holder.files[file_index].path, 'r', encoding=arg_parser.file_encoding) as file:
+        with open(holder.files[file_index].path, 'r', encoding=arg_parser.file_encoding,
+                  errors='strict') as file:
             # splitlines() gives a slight inaccuracy, in case the last line is empty.
             # the alternative would be worse: split('\n') would increase the linecount each
             # time catw touches a file.
@@ -857,54 +849,22 @@ def edit_file(file_index: int = 0) -> None:
         err_print('Resource blocked/unavailable! Skipping ' + \
             f"{holder.files[file_index].displayname} ...")
         return
-    except (OSError, UnicodeError) as exc:
+    except (OSError, UnicodeError):
         holder.files[file_index].set_plaintext(plain=False)
         if holder.args_id[ARGS_PLAIN_ONLY]:
             return
         if display_zip(holder.files[file_index].path, _convert_size):
             return
-        if not holder.args_id[ARGS_STRINGS]:
-            err_print('Failed to open:', holder.files[file_index].displayname)
-            try:
-                enter_char = '⏎'
-                try:
-                    # on e.g. utf-16 the encoded form would be 4 bytes and also
-                    # raise an exception event, so the char could be displayed.
-                    # but the stdout and terminal would need to be configured
-                    # correctly ...
-                    if len(enter_char.encode(arg_parser.file_encoding)) != 3:
-                        raise UnicodeEncodeError('', '', -1, -1, '') from exc
-                except UnicodeEncodeError:
-                    enter_char = 'ENTER'
-                err_print('Do you want to open the file as a binary, without parameters?')
-                err_print(f"[Y/{enter_char}] Yes, Continue       [N] No, Abort :", end='')
-                inp = 'Y' if holder.args_id[ARGS_NOBREAK] else input()
-                if not (os.isatty(sys.stdin.fileno()) and os.isatty(sys.stdout.fileno()) and \
-                    not holder.args_id[ARGS_NOBREAK]):
-                    err_print('') # if the input or output is piped, we add a newline manually
-                if inp and inp.upper() != 'Y':
-                    err_print('Aborting...')
-                    return
-            except EOFError:
-                # on eoferror it is safe to assume that the user did not press
-                # enter, therefor we print a new line
-                err_print('')
-            except UnicodeError:
-                err_print('')
-                err_print('Input is not recognized in the given encoding: '
-                          f"{arg_parser.file_encoding}")
-                err_print('Aborting...')
-                return
         try:
-            with open(holder.files[file_index].path, 'rb') as raw_f:
-                # in binary splitlines() is our only option
-                content = [('', line) for line in raw_f.read().splitlines()]
-            show_bytecode = True
+            with open(holder.files[file_index].path, 'r', encoding=arg_parser.file_encoding,
+                      errors=('ignore' if const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace')
+                      ) as file:
+                content = [('', line) for line in file.read().splitlines()]
         except OSError:
             err_print('Operation failed! Try using the enc=X parameter.')
             return
 
-    edit_content(content, show_bytecode, file_index)
+    edit_content(content, file_index)
 
 
 def _copy_to_clipboard(content: str, __dependency: int = 3,
@@ -1433,7 +1393,7 @@ def shell_main():
         else:
             stripped_line = stripped_line[:1].replace('\\', '') + stripped_line[1:]
             if stripped_line:
-                edit_content([('', stripped_line)], False, -1, i-command_count)
+                edit_content([('', stripped_line)], -1, i-command_count)
                 if holder.args_id[ARGS_CLIP]:
                     copy_function = copy_to_clipboard(
                         remove_ansi_codes_from_line(holder.clip_board), copy_function)
