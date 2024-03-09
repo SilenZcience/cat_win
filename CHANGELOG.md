@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - the config menus now scale to the size of the terminal and are better formatted.
+- removed `binary_hex_view` from config.
 
 ### Bugfixes
 
