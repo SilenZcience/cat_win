@@ -6,8 +6,7 @@ from functools import lru_cache
 import heapq
 
 from cat_win.const.argconstants import HIGHEST_ARG_ID, ARGS_NOCOL, ARGS_LLENGTH, ARGS_NUMBER, \
-    ARGS_REVERSE, ARGS_B64D, ARGS_B64E, ARGS_SUM, ARGS_SSUM, DIFFERENTIABLE_ARGS
-from cat_win.util.cbase64 import _decode_base64
+    ARGS_REVERSE, ARGS_B64E, ARGS_SUM, ARGS_SSUM, DIFFERENTIABLE_ARGS
 from cat_win.util.file import File
 
 
