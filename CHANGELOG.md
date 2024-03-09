@@ -9,6 +9,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - the config menus now scale to the size of the terminal and are better formatted.
 - removed `binary_hex_view` from config.
+- allow all parameters to be applied to binary files.
+- added `ignore_unknown_bytes` option to the config menu to ignore unknown bytes in binary mode instead of replacing them with �.
 
 ### Bugfixes
 
