@@ -15,4 +15,3 @@ class DKW:
     EDITOR_AUTO_INDENT = 'editor_auto_indent'
     STRINGS_MIN_SEQUENCE_LENGTH = 'strings_minimum_sequence_length'
     STRINGS_DELIMETER = 'strings_delimeter'
-    BINARY_HEX_VIEW = 'binary_hex_view'

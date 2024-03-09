@@ -727,10 +727,7 @@ def edit_content(content: list, show_bytecode: bool, file_index: int = 0,
                               const_dic[DKW.STRINGS_MIN_SEQUENCE_LENGTH],
                               const_dic[DKW.STRINGS_DELIMETER])
     elif show_bytecode:
-        if const_dic[DKW.BINARY_HEX_VIEW]:
-            content = [(prefix, repr(line)[2:-1]) for prefix, line in content]
-        else:
-            content = [(prefix, ''.join(map(chr, line))) for prefix, line in content] 
+        content = [(prefix, ''.join(map(chr, line))) for prefix, line in content] 
 
     if holder.args_id[ARGS_SPECIFIC_FORMATS]:
         content = Formatter.format(content)
