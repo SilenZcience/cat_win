@@ -36,7 +36,6 @@ class TestConfig(TestCase):
         self.assertEqual(config.is_valid_value('a', DKW.EDITOR_INDENTATION), True)
         self.assertEqual(config.is_valid_value("5", DKW.STRINGS_MIN_SEQUENCE_LENGTH), True)
         self.assertEqual(config.is_valid_value("5", DKW.LARGE_FILE_SIZE), True)
-        self.assertEqual(config.is_valid_value('True', DKW.BINARY_HEX_VIEW), True)
         self.assertEqual(config.is_valid_value('TrUe', DKW.EDITOR_AUTO_INDENT), True)
         self.assertEqual(config.is_valid_value('FaLSe', DKW.EDITOR_AUTO_INDENT), True)
         self.assertEqual(config.is_valid_value('Yes', DKW.STRIP_COLOR_ON_PIPE), True)

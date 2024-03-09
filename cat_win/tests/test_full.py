@@ -267,11 +267,4 @@ Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text
             cat.main()
             self.assertIn('\0' * 3723, fake_out.getvalue())
 
-        hex_bin_dic = Config.default_dic.copy()
-        hex_bin_dic[DKW.BINARY_HEX_VIEW] = True
-
-        with patch('cat_win.cat.config.load_config', lambda: hex_bin_dic), patch('sys.stdout', new=StdOutMock()) as fake_out:
-            cat.main()
-            self.assertIn('\\x00' * 3723, fake_out.getvalue())
-
 # python -m unittest discover -s cat_win.tests -p test*.py

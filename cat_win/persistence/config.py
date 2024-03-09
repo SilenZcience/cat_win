@@ -58,7 +58,6 @@ class Config:
         DKW.EDITOR_AUTO_INDENT: False,
         DKW.STRINGS_MIN_SEQUENCE_LENGTH: 4,
         DKW.STRINGS_DELIMETER: '\n',
-        DKW.BINARY_HEX_VIEW: False,
     }
 
     v_validation = {
@@ -70,7 +69,6 @@ class Config:
         DKW.EDITOR_AUTO_INDENT: validator_bool,
         DKW.STRINGS_MIN_SEQUENCE_LENGTH: validator_int,
         DKW.STRINGS_DELIMETER: validator_string,
-        DKW.BINARY_HEX_VIEW: validator_bool,
     }
 
     elements = list(default_dic.keys())
