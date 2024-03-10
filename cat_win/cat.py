@@ -207,7 +207,7 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     """
     Print all neccassary debug information
     """
-    err_print('================================================ ' + \
+    err_print('================================================ '
         'DEBUG ================================================')
     err_print('sys_args:', sys.argv)
     err_print('args: ', end='')
@@ -230,7 +230,7 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     err_print(arg_parser.file_match)
     err_print('truncate file: ', end='')
     err_print(arg_parser.file_truncate)
-    err_print('===================================================' + \
+    err_print('==================================================='
               '====================================================')
 
 
@@ -859,7 +859,10 @@ def edit_file(file_index: int = 0) -> None:
             with open(holder.files[file_index].path, 'r', encoding=arg_parser.file_encoding,
                       errors=('ignore' if const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace')
                       ) as file:
-                content = [('', line) for line in file.read().splitlines()]
+                file_content = file.read()
+                if not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]:
+                    file_content = remove_ansi_codes_from_line(file_content)
+                content = [('', line) for line in file_content.splitlines()]
         except OSError:
             err_print('Operation failed! Try using the enc=X parameter.')
             return
@@ -1236,7 +1239,7 @@ def main():
 
     # clean-up
     if holder.args_id[ARGS_DEBUG]:
-        err_print('================================================ ' + \
+        err_print('================================================ '
             'DEBUG ================================================')
         caches = [
             remove_ansi_codes_from_line,
@@ -1268,7 +1271,7 @@ def main():
             if holder.args_id[ARGS_DEBUG]:
                 err_print(type(e).__name__, tmp_file)
     if holder.args_id[ARGS_DEBUG]:
-        err_print('===================================================' + \
+        err_print('==================================================='
             '====================================================')
 
 
