@@ -244,7 +244,7 @@ class ArgParser:
             if param[:4].isupper():
                 self.file_search_ignore_case = True
             try:
-                self.file_search.add(param[5:].encode().decode('unicode-escape'))
+                self.file_search.add(param[5:].encode().decode('unicode_escape'))
             except UnicodeError:
                 self.file_search.add(param[5:])
             return False
