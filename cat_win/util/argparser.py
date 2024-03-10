@@ -234,7 +234,7 @@ class ArgParser:
                 return False
             if param[:5].isupper():
                 self.file_match_ignore_case = True
-            self.file_match.add(fr'{param[6:]}')
+            self.file_match.add(param[6:])
             return False
         # 'find' + ('=' or ':') + file_search
         if RE_FIND.match(param):
@@ -243,7 +243,10 @@ class ArgParser:
                 return False
             if param[:4].isupper():
                 self.file_search_ignore_case = True
-            self.file_search.add(param[5:])
+            try:
+                self.file_search.add(param[5:].encode().decode('unicode-escape'))
+            except UnicodeError:
+                self.file_search.add(param[5:])
             return False
         # 'trunc' + ('='/':') + file_truncate[0] +':'+ file_truncate[1] [+ ':' + file_truncate[2]]
         if RE_TRUNC.match(param):

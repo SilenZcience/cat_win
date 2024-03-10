@@ -54,7 +54,7 @@ class StringFinder:
         (list):
             containing the start and end indeces like [start, end]
         """
-        for _match in re.finditer(fr'{pattern}', _s,
+        for _match in re.finditer(pattern, _s,
                                  re.IGNORECASE if self.regex_ignore_case else 0 | re.DOTALL):
             yield list(_match.span())
 
