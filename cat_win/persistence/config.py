@@ -18,7 +18,7 @@ BOOL_RESPONSE = BOOL_POS_RESPONSE + BOOL_NEG_RESPONSE
 
 def validator_string(_, d_h: bool=False):
     if d_h:
-        print('Any Utf-8 String', file=sys.stderr)
+        print('Any UTF-8 String (unicode-escaped)', file=sys.stderr)
         return False
     return True
 
@@ -103,14 +103,24 @@ class Config:
             whatever the element got converted to
         """
         def fix_invalid_value(value: str, element: str):
+            c_value_rep = repr(self.default_dic[element])
+            if c_value_rep[0] not in ['"', "'"]:
+                c_value_rep = f"'{c_value_rep}'"
             print(f"invalid config value '{value}' for '{element}'", file=sys.stderr)
-            print(f"resetting to '{self.default_dic[element]}' ...", file=sys.stderr)
+            print(f"resetting to {c_value_rep} ...", file=sys.stderr)
             self._save_config(element, self.default_dic[element])
             sys.exit(1)
 
         value = value[1:-1] # strip the quotes
+
+        # check validity and possibly reset to default:
         if not self.v_validation[element](value):
             fix_invalid_value(value, element)
+        try:
+            value.encode().decode('unicode_escape')
+        except UnicodeError:
+            fix_invalid_value(value, element)
+
         element_type = type(self.default_dic[element])
         if element_type == bool:
             if value.upper() in BOOL_POS_RESPONSE:
