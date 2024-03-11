@@ -69,7 +69,7 @@ class CConfig:
         On Error: Return the default color config
         """
         try:
-            self.config_parser.read(self.config_file)
+            self.config_parser.read(self.config_file, encoding='utf-8')
             config_colors = self.config_parser['COLORS']
             for element in self.elements:
                 try:
