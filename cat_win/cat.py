@@ -836,6 +836,7 @@ def edit_file(file_index: int = 0) -> None:
         with open(holder.files[file_index].path, 'r', encoding=arg_parser.file_encoding,
                   errors='strict') as file:
             # splitlines() gives a slight inaccuracy, in case the last line is empty.
+            # (it also splits on other bytes than \r and \n ...)
             # the alternative would be worse: split('\n') would increase the linecount each
             # time catw touches a file.
             file_content = file.read()
@@ -1119,7 +1120,7 @@ def init(shell: bool = False) -> tuple:
         for arg, param in holder.args:
             if arg == ARGS_ECHO:
                 if param.isupper():
-                    echo_args = echo_args.encode(arg_parser.file_encoding).decode('unicode_escape')
+                    echo_args = echo_args.encode(arg_parser.file_encoding).decode('unicode_escape').encode('latin-1').decode(arg_parser.file_encoding)
                 break
 
     Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
