@@ -6,12 +6,12 @@ import os
 import sys
 
 
-def write_file(content: str, src_file: str, file_encoding: str) -> str:
+def write_file(content, src_file: str, file_encoding: str) -> str:
     """
     Writes content into a generated temp-file.
     
     Parameters:
-    content (str):
+    content (str|bytes):
         the content to write in a file
     src_file (str):
         a string representation of a file (-path)
@@ -22,9 +22,13 @@ def write_file(content: str, src_file: str, file_encoding: str) -> str:
     src_file (str):
         the path to the temporary file written
     """
-    if not isinstance(content, str): # in case the content is of types bytes
-        content = content.decode(file_encoding)
-    with open(src_file, 'w', encoding=file_encoding, errors='replace') as raw_f:
+    if isinstance(content, str):
+        with open(src_file, 'w', encoding=file_encoding, errors='replace') as file:
+            file.write(content)
+        return src_file
+    # in case the content is of types bytes:
+    # important for the editor, so the encoding errors do not get replaced!
+    with open(src_file, 'wb') as raw_f:
         raw_f.write(content)
     return src_file
 
