@@ -8,7 +8,7 @@ from cat_win.util.strings import get_strings
 
 test_file_dir = os.path.join(os.path.dirname(__file__), 'resources')
 test_file_path = os.path.join(test_file_dir, 'test.bin')
-with open(test_file_path, 'rb') as raw_f:
+with open(test_file_path, 'r', encoding='utf-8', errors='replace') as raw_f:
     test_content = [('', line) for line in raw_f.read().splitlines()]
 
 class TestFile(TestCase):
