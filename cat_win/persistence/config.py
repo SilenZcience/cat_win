@@ -126,7 +126,7 @@ class Config:
             if value.upper() in BOOL_POS_RESPONSE:
                 return True
             return False
-        return element_type(value.encode().decode('unicode_escape'))
+        return element_type(value.encode().decode('unicode_escape').encode('latin-1').decode())
 
     def is_valid_value(self, value: str, element: str) -> bool:
         """
@@ -168,7 +168,7 @@ class Config:
         On Error: Return the default const config
         """
         try:
-            self.config_parser.read(self.config_file)
+            self.config_parser.read(self.config_file, encoding='utf-8')
             config_consts = self.config_parser['CONSTS']
             for element in self.elements:
                 try:
