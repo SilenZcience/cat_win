@@ -443,7 +443,8 @@ class Editor:
         """
         content = self.line_sep.join(self.window_content)
         try:
-            write_func(content, self.file, self.file_encoding)
+            # encode here to potentially trigger the unicodeerror event
+            write_func(content.encode(self.file_encoding), self.file, self.file_encoding)
             self.changes_made = True
             self.unsaved_progress = False
             self.error_bar = ''
