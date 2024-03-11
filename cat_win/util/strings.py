@@ -24,8 +24,6 @@ def get_strings(content: list, min_seq_len: int, delim: str) -> list:
     for _, line in content:
         new_line = []
         for char in line:
-            if isinstance(char, int): # in case of a binary file
-                char = chr(char)
             if 32 <= ord(char) <= 126: # if it is printable ascii
                 new_string += char
                 continue
