@@ -117,7 +117,7 @@ class Config:
         if not self.v_validation[element](value):
             fix_invalid_value(value, element)
         try:
-            value.encode().decode('unicode_escape')
+            value.encode().decode('unicode_escape').encode('latin-1').decode()
         except UnicodeError:
             fix_invalid_value(value, element)
 
