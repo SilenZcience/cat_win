@@ -18,6 +18,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - fix Bug where the color-config menu would allow to change elements that should not be changed.
 - fix Bug where the config menu would not allow the default-command-line to reset (be empty).
+- fix Bug where the config menus could not handle utf-8 characters.
+- fix Bug where the -`E` command would not correctly handle utf-8 characters.
 
 
 ## [1.7.2] - 2024-03-05
