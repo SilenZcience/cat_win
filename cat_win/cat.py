@@ -203,7 +203,7 @@ def _show_version() -> None:
 
 
 def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files: list,
-                echo_args: list, valid_urls: list) -> None:
+                echo_args: str, valid_urls: list) -> None:
     """
     Print all neccassary debug information
     """
@@ -219,7 +219,7 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     err_print('unknown_files: ', end='')
     err_print(unknown_files)
     err_print('echo_args: ', end='')
-    err_print(echo_args)
+    err_print(repr(echo_args))
     err_print('valid_urls: ', end='')
     err_print(valid_urls)
     err_print('file encoding: ', end='')
@@ -1114,17 +1114,6 @@ def init(shell: bool = False) -> tuple:
     if holder.args_id[ARGS_CONFIG]:
         config.save_config()
         sys.exit(0)
-
-    if holder.args_id[ARGS_ECHO]:
-        echo_args = ' '.join(echo_args)
-        for arg, param in holder.args:
-            if arg == ARGS_ECHO:
-                if param.isupper():
-                    try:
-                        echo_args = echo_args.encode(arg_parser.file_encoding).decode('unicode_escape').encode('latin-1').decode(arg_parser.file_encoding)
-                    except UnicodeError:
-                        pass
-                break
 
     Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
     Editor.set_flags(holder.args_id[ARGS_STDIN] and on_windows_os,
