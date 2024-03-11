@@ -61,7 +61,9 @@ class Editor:
     debug_mode = False
     save_with_alt = False
 
-    def __init__(self, file: str, display_name: str, file_encoding: str) -> None:
+    file_encoding = 'utf-8'
+
+    def __init__(self, file: str, display_name: str) -> None:
         """
         defines an Editor object.
         
@@ -70,8 +72,6 @@ class Editor:
             a string representation of a file (-path)
         display_name (str):
             the display name for the current file
-        file_encoding:
-            the encoding to read and write the given file
         """
         self.curse_window = None
         self.history = History()
@@ -79,7 +79,6 @@ class Editor:
 
         self.file = file
         self.display_name = display_name
-        self.file_encoding = file_encoding
         self.line_sep = '\n'
         self.window_content = []
 
@@ -909,8 +908,8 @@ class Editor:
             curses.endwin()
 
     @classmethod
-    def open(cls, file: str, display_name: str, file_encoding: str,
-             write_func, on_windows_os: bool, skip_binary: bool = False) -> bool:
+    def open(cls, file: str, display_name: str, write_func, on_windows_os: bool,
+             skip_binary: bool = False) -> bool:
         """
         simple editor to change the contents of any provided file.
         
@@ -919,8 +918,6 @@ class Editor:
             a string representing a file(-path)
         display_name (str):
             the display name for the current file
-        file_encoding (str):
-            an encoding the open the file with
         write_func (method):
             stdinhelper.write_file [simply writes a file]
         on_windows_os (bool):
@@ -944,7 +941,7 @@ class Editor:
             Editor.loading_failed = True
             return False
 
-        editor = cls(file, display_name, file_encoding)
+        editor = cls(file, display_name)
         if skip_binary and editor.error_bar:
             return False
         special_chars = dict(map(lambda x: (chr(x[0]), x[2]), SPECIAL_CHARS))
@@ -976,7 +973,7 @@ class Editor:
         Editor.auto_indent = auto_indent
 
     @staticmethod
-    def set_flags(save_with_alt: bool, debug_mode: bool) -> None:
+    def set_flags(save_with_alt: bool, debug_mode: bool, file_encoding: str) -> None:
         """
         set the config flags for the Editor
         
@@ -985,6 +982,9 @@ class Editor:
             indicates whetcher the stdin pipe has been used (and therefor tampered)
         debug_mode (bool)
             indicates if debug info should be displayed
+        file_encoding (str):
+            the file encoding to use when opening a file
         """
         Editor.save_with_alt = save_with_alt
         Editor.debug_mode = debug_mode
+        Editor.file_encoding = file_encoding

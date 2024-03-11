@@ -1127,7 +1127,8 @@ def init(shell: bool = False) -> tuple:
                 break
 
     Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
-    Editor.set_flags(holder.args_id[ARGS_STDIN] and on_windows_os, holder.args_id[ARGS_DEBUG])
+    Editor.set_flags(holder.args_id[ARGS_STDIN] and on_windows_os,
+                     holder.args_id[ARGS_DEBUG], arg_parser.file_encoding)
 
     return (known_files, unknown_files, echo_args, valid_urls)
 
@@ -1163,8 +1164,8 @@ def main():
         holder.set_temp_file_stdin(temp_file)
     elif holder.args_id[ARGS_EDITOR]:
         unknown_files = [file for file in unknown_files if Editor.open(
-            file, holder.get_file_display_name(file), arg_parser.file_encoding,
-            stdinhelper.write_file, on_windows_os, holder.args_id[ARGS_PLAIN_ONLY])]
+            file, holder.get_file_display_name(file), stdinhelper.write_file,
+            on_windows_os, holder.args_id[ARGS_PLAIN_ONLY])]
     else:
         unknown_files = stdinhelper.read_write_files_from_stdin(
             unknown_files, arg_parser.file_encoding, on_windows_os,
@@ -1185,8 +1186,8 @@ def main():
                     ) # os.dup2 does not work on pyinstaller
                 ctypes.windll.kernel32.SetStdHandle(-10, conin_handle) # -10 = stdin
         for file in known_files:
-            Editor.open(file, holder.get_file_display_name(file), arg_parser.file_encoding,
-                        stdinhelper.write_file, on_windows_os, holder.args_id[ARGS_PLAIN_ONLY])
+            Editor.open(file, holder.get_file_display_name(file), stdinhelper.write_file,
+                        on_windows_os, holder.args_id[ARGS_PLAIN_ONLY])
         os.dup2(stdin_backup, sys.stdin.fileno())
 
     if len(known_files) + len(unknown_files) == 0:
