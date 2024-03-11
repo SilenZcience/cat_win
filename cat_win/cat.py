@@ -1120,7 +1120,10 @@ def init(shell: bool = False) -> tuple:
         for arg, param in holder.args:
             if arg == ARGS_ECHO:
                 if param.isupper():
-                    echo_args = echo_args.encode(arg_parser.file_encoding).decode('unicode_escape').encode('latin-1').decode(arg_parser.file_encoding)
+                    try:
+                        echo_args = echo_args.encode(arg_parser.file_encoding).decode('unicode_escape').encode('latin-1').decode(arg_parser.file_encoding)
+                    except UnicodeError:
+                        pass
                 break
 
     Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
