@@ -71,7 +71,7 @@ class ArgParser:
 
     def __init__(self, default_file_encoding: str = 'utf-8') -> None:
         self.default_file_encoding: str = default_file_encoding
-        self.file_encoding: str = ''
+        self.unicode_echo: bool = False
         self._clear_values()
         self.reset_values()
 
@@ -169,7 +169,13 @@ class ArgParser:
             contains the paramater in a sorted manner
         """
         self.gen_arguments(argv, delete)
-        return (self._args, self._unknown_args, self._unknown_files, self._echo_args)
+        echo_args = ' '.join(self._echo_args)
+        if self.unicode_echo:
+            try:
+                echo_args = echo_args.encode(self.file_encoding).decode('unicode_escape').encode('latin-1').decode(self.file_encoding)
+            except UnicodeError:
+                pass
+        return (self._args, self._unknown_args, self._unknown_files, echo_args)
 
     def get_files(self, dot_files: bool = False) -> list:
         """
@@ -270,6 +276,7 @@ class ArgParser:
             if param in (arg.short_form, arg.long_form):
                 self._args.append((arg.arg_id, param))
                 if arg.arg_id == ARGS_ECHO:
+                    self.unicode_echo = param.isupper()
                     return True
                 return False
         possible_path = os.path.realpath(param)

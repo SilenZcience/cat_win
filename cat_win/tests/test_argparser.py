@@ -159,14 +159,26 @@ class TestArgParser(TestCase):
     def test_get_arguments_echo_args(self):
         arg_parser = ArgParser()
         args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(
-            ['CAT', '-n', '-E', '-n', 'random', test_text_file_dir])
+            ['CAT', '-n', '--echo', '-n', 'random', test_text_file_dir])
+        known_files = arg_parser.get_files()
+        args = list(map(lambda x: x[1], args))
+        self.assertCountEqual(args, ['-n', '--echo'])
+        self.assertCountEqual(unknown_args, [])
+        self.assertCountEqual(known_files, [])
+        self.assertCountEqual(unknown_files, [])
+        self.assertEqual(echo_args, '-n random ' + test_text_file_dir)
+
+    def test_get_arguments_echo_args_escaped(self):
+        arg_parser = ArgParser()
+        args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(
+            ['CAT', '-n', '-E', '-n', '\\n', 'random'])
         known_files = arg_parser.get_files()
         args = list(map(lambda x: x[1], args))
         self.assertCountEqual(args, ['-n', '-E'])
         self.assertCountEqual(unknown_args, [])
         self.assertCountEqual(known_files, [])
         self.assertCountEqual(unknown_files, [])
-        self.assertCountEqual(echo_args, ['-n', 'random', test_text_file_dir])
+        self.assertEqual(echo_args, '-n \n random')
 
     def test_get_arguments_echo_args_recursive(self):
         arg_parser = ArgParser()
