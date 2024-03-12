@@ -155,9 +155,10 @@ def _show_help(shell: bool = False) -> None:
     help_message += f"\t{'enc=X, enc:X'    : <25}set file encoding to X (default is utf-8)\n"
     help_message += f"\t{'find=X, find:X'  : <25}find/query a substring X in the given files\n"
     help_message += f"\t{'match=X, match:X': <25}find/query a pattern X in the given files\n"
+    help_message += f"\t{'replace=X, replace:X': <25}replace queried substrings or patterns with X in the given files\n"
     if not shell:
         help_message += f"\t{'trunc=X:Y, trunc:X:Y': <25}"
-        help_message += 'truncate file to lines x and y (python-like)\n'
+        help_message += 'truncate file to lines X and Y (python-like)\n'
     help_message += '\n'
     help_message += f"\t{'[a,b]': <25}replace a with b in every line (escape chars with '\\')\n"
     help_message += f"\t{'[a:b:c]': <25}python-like string indexing syntax (line by line)\n"
@@ -228,6 +229,8 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     err_print(arg_parser.file_search)
     err_print('search match(es): ', end='')
     err_print(arg_parser.file_match)
+    err_print('search replace: ', end='')
+    err_print(repr(arg_parser.file_replace))
     err_print('truncate file: ', end='')
     err_print(arg_parser.file_truncate)
     err_print('==================================================='
@@ -600,6 +603,16 @@ def print_file(content: list) -> bool:
 
         # used for marking the file when displaying applied files
         contains_queried |= bool(intervals)
+
+        if arg_parser.file_replace is not None:
+            l_keywords = m_keywords if arg_parser.file_replace_pattern else f_keywords
+            l_keywords.reverse()
+            for _, (pos_a, pos_b) in l_keywords:
+                cleaned_line = f"{cleaned_line[:pos_a]}{color_dic[CKW.REPLACE]}" + \
+                               f"{arg_parser.file_replace}" + \
+                               f"{color_dic[CKW.RESET_ALL]}{cleaned_line[pos_b:]}"
+            print(cleaned_line)
+            continue
 
         # this has priority over the other arguments
         if holder.args_id[ARGS_GREP_ONLY]:
