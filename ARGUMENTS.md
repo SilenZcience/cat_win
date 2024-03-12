@@ -33,6 +33,7 @@
                   <li><a href="#mathematical">Mathematical</a></li>
                   <li><a href="#byteview">Byte Representation</a></li>
                   <li><a href="#settings">Settings</a></li>
+                  <li><a href="#configuration">Configuration</a></li>
                   <li><a href="#encoding">Text Encoding</a></li>
                </ul>
             </li>
@@ -67,6 +68,7 @@
                   <li><a href="#nobreak">--nb, --nobreak</a></li>
                   <li><a href="#attributes">-a, --attributes</a></li>
                   <li><a href="#checksum">-m, --checksum</a></li>
+                  <li><a href="#strings">--strings, --strings</a></li>
                   <li><a href="#b64d">--b64d, --b64d</a></li>
                   <li><a href="#b64e">--b64e, --b64e</a></li>
                   <li><a href="#eval">--eval, --EVAL</a></li>
@@ -76,17 +78,18 @@
                   <li><a href="#bin">--bin, --BIN</a></li>
                   <li><a href="#binview">--binview, --binview</a></li>
                   <li><a href="#hexview">--hexview, --HEXVIEW</a></li>
-                  <li><a href="#plain">--plain, --plain-only</a></li>
-                  <li><a href="#dot">--dot, --dotfiles</a></li>
-                  <li><a href="#nocolor">--nc, --nocolor</a></li>
                   <li><a href="#editor">-!, --edit</a></li>
                   <li><a href="#clip">-c, --clip</a></li>
+                  <li><a href="#dot">--dot, --dotfiles</a></li>
+                  <li><a href="#plain">--plain, --plain-only</a></li>
+                  <li><a href="#nocolor">--nc, --nocolor</a></li>
                   <li><a href="#config">--config, --config</a></li>
                   <li><a href="#cconfig">--cconfig, --cconfig</a></li>
                   <li><a href="#stream">-R, --R&ltstream&gt</a></li>
                   <li><a href="#enc">enc=X, enc&#42889;X</a></li>
                   <li><a href="#find">find=X, find&#42889;X</a></li>
                   <li><a href="#match">match=X, match&#42889;X</a></li>
+                  <li><a href="#replace_queried">replace=X, replace&#42889;X</a></li>
                   <li><a href="#trunc">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a></li>
                   <li><a href="#replace">[a,b]</a></li>
                   <li><a href="#cut">[a&#42889;b&#42889;c]</a></li>
@@ -147,6 +150,7 @@
 ||| |
 | *<a href="#attributes">-a, --attributes</a>* | show meta-information about the files |❌|
 | *<a href="#checksum">-m, --checksum</a>* | show the checksums of all files |❌|
+| *<a href="#strings">--strings, --strings</a>* | print the sequences of printable characters |✔|
 ||| |
 | *<a href="#b64d">--b64d, --b64d</a>* | decode the input from base64 |✔|
 | *<a href="#b64e">--b64e, --b64e</a>* | encode the input to base64 |✔|
@@ -173,6 +177,7 @@
 | *<a href="#enc">enc=X, enc&#42889;X</a>* | set file enconding to X (default is utf-8) |✔|
 | *<a href="#find">find=X, find&#42889;X</a>* | find/query a substring X in the given files |✔|
 | *<a href="#match">match=X, match&#42889;X</a>* | find/query a pattern X in the given files |✔|
+| *<a href="#replace_queried">replace=X, replace&#42889;X</a>* | replace queried substrings or patterns with X in the given files |✔|
 | *<a href="#trunc">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>* | truncate file to lines X and Y (python-like) |❌|
 ||| |
 | *<a href="#replace">[a,b]</a>* | replace a with b in every line (escape chars with '\\') |✔|
@@ -236,6 +241,17 @@ Displays debug Information before and after the Code execution.
 This Argument is not shown in the default help Message and is provided for Developers/Development.
 
 <a id="prefix"></a>
+### <a id="length">-l, --linelength</a>
+
+Displays the Length of each Line as a Prefix to the Line itself.
+This Argument will be used at the end such that other Arguments may influence the Length of the Lines beforehand.
+
+```console
+> catw test.txt -l
+[ 6] line 1
+[10] long_line!
+```
+
 ### <a id="number">-n, --number</a>
 
 Numbers all Lines.
@@ -254,17 +270,6 @@ If multiple Files are provided, the Prefix will also include the Number of the F
 1.2) line 2
 2.1) line 1
 2.2) line 2
-```
-
-### <a id="length">-l, --linelength</a>
-
-Displays the Length of each Line as a Prefix to the Line itself.
-This Argument will be used at the end such that other Arguments may influence the Length of the Lines beforehand.
-
-```console
-> catw test.txt -l
-[ 6] line 1
-[10] long_line!
 ```
 
 ### <a id="fileprefix">--fp, --file-prefix</a>
@@ -440,7 +445,7 @@ Currently supported are .json and .xml.
 
 Everything passed in after this Argument will be handled as its own File.
 It is not possible to break out of this state therefor this Parameter must be used last.
-When using the one-letter Variant of this Parameter the following Input will be decoded with unicode Escape Sequences instead of parsing a raw String.
+When using the one-letter Variant of this Parameter the following Input will be unicode-escaped instead of parsed as a raw String.
 This way it is possible to define new lines (\n) or other special characters.
 
 ```console
@@ -543,7 +548,6 @@ found DIR(s):
 Amount: 4
 ```
 
-
 ### <a id="sum">-s, --sum</a>
 
 Displays a small Message at the End of Code execution showing the Number of the Amount of all Lines received.
@@ -636,7 +640,6 @@ n: 1
 u: 1
 ```
 
-
 <a id="search"></a>
 ### <a id="grep">-g, --grep</a>
 
@@ -706,6 +709,24 @@ Checksum of '<Path>/test.txt':
         SHA1:    cecdcba1cd12a9fdfdb32a1aa1bc40bdb9b1261c
         SHA256:  1d4bf9f69b9d1529a5f6231b4edeba61a86deeebf00060c4de6f67f0c4e3b711
         SHA512:  db9a71ef22360f171daa4e4aed033337f4f97812baf38a51bdd6ed64b5c2a0d4a5c4152e20b68f881df9e5f1087c1293853eac13f928b845b9b71c3ce517c9e3
+```
+
+### <a id="strings">--strings, --strings</a>
+
+Only displays Sequences of printable Characters that exceed a certain Length.
+This Length can be configured using the `strings_minimum_sequence_length` element in the config menu (<a href="#config">--config, --config</a>).
+The Delimeter of different Sequences on the same Line can be configured using the `strings_delimeter` element in the config menu.
+
+```console
+> catw --strings test.bin
+/lib64/ld-linux-x86-64.so.2
+__cxa_finalize
+__libc_start_main
+puts
+libc.so.6
+GLIBC_2.2.5
+GLIBC_2.34
+...
 ```
 
 <a id="mathematical"></a>
@@ -854,42 +875,6 @@ Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text
 ```
 
 <a id="settings"></a>
-### <a id="plain">--plain, --plain-only</a>
-
-By default the User is being prompted when a non-plaintext File is being encountered as to if the File should be opened in Binary or not.
-Using --plain-only these Files will be automaticaly skipped.
-Note that these Prompts are not descriptive enough to say that a File can only be opened in Binary.
-Often the Problem is being fixed by providing another Codepage using the <a href="#enc">enc=X, enc&#42889;X</a> Parameter.
-
-### <a id="dot">--dot, --dotfiles</a>
-
-When providing file Patterns or entire Directories cat_win will find every File including those set to hidden (e.g. on Windows OS).
-However Dotfiles, meaning Files that start with a literal Dot, will not be found by Default.
-Using this Parameter cat_win will also include Dotfiles.
-
-```console
-> catw * -F
-found FILE(s):
-        12.35 KB   <Path>/CHANGELOG.md
-        1.06 KB    <Path>/LICENSE
-        15.07 KB   <Path>/README.md
-...
-```
-```console
-> catw * -F --dot
-found FILE(s):
-        969.0 B    <Path>/.gitignore
-        12.35 KB   <Path>/CHANGELOG.md
-        1.06 KB    <Path>/LICENSE
-        15.07 KB   <Path>/README.md
-...
-```
-
-### <a id="nocolor">--nc, --nocolor</a>
-
-By default different Colors will be used to better highlight specific Parts of the Output or make original and changed Parts of a Line more distinguishable.
-Using --nocolor will disable all Colors and only display the Output in plain monochrome Text.
-
 ### <a id="editor">-!, --edit</a>
 
 Opens a simple Editor to write/edit the Content of any provided File one by one.
@@ -897,6 +882,8 @@ Not-existing Files will be opened first and existing Ones will be able to be edi
 The Editor will not save Changes automatically.
 Files will be saved with the text Encoding defined by <a href="#enc">enc=X, enc&#42889;X</a>.
 Note that ^c (Ctrl-c) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
+The Auto-Indendation Feature can be turned on in the config menu using the `editor_auto_indent` element.
+The Indendation when using Auto-Indendation can be configured in the config menu (<a href="#config">--config, --config</a>) using `editor_indentation`.
 On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module.
 The currently supported Key bindings are as follows:
 
@@ -923,11 +910,47 @@ The currently supported Key bindings are as follows:
 | <kbd>Close/^Q</kbd> | - | - | close editor</br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^C</kbd> | - | - | interrupt program | - |
 
-
 ### <a id="clip">-c, --clip</a>
 
 Copies the entire Output to the Clipboard additionally to printing it to the Stdout Stream.
 
+### <a id="dot">--dot, --dotfiles</a>
+
+When providing file Patterns or entire Directories cat_win will find every File including those set to hidden (e.g. on Windows OS).
+However Dotfiles, meaning Files that start with a literal Dot, will not be found by Default.
+Using this Parameter cat_win will also include Dotfiles.
+
+```console
+> catw * -F
+found FILE(s):
+        12.35 KB   <Path>/CHANGELOG.md
+        1.06 KB    <Path>/LICENSE
+        15.07 KB   <Path>/README.md
+...
+```
+```console
+> catw * -F --dot
+found FILE(s):
+        969.0 B    <Path>/.gitignore
+        12.35 KB   <Path>/CHANGELOG.md
+        1.06 KB    <Path>/LICENSE
+        15.07 KB   <Path>/README.md
+...
+```
+
+### <a id="plain">--plain, --plain-only</a>
+
+By default the User is being prompted when a non-plaintext File is being encountered as to if the File should be opened in Binary or not.
+Using --plain-only these Files will be automaticaly skipped.
+Note that these Prompts are not descriptive enough to say that a File can only be opened in Binary.
+Often the Problem is being fixed by providing another Codepage using the <a href="#enc">enc=X, enc&#42889;X</a> Parameter.
+
+### <a id="nocolor">--nc, --nocolor</a>
+
+By default different Colors will be used to better highlight specific Parts of the Output or make original and changed Parts of a Line more distinguishable.
+Using --nocolor will disable all Colors and only display the Output in plain monochrome Text.
+
+<a id="configuration"></a>
 ### <a id="config">--config, --config</a>
 
 Displays a user interactive config Menu allowing the User to change specific default parameters.
@@ -1009,12 +1032,12 @@ UnicodeEncodeError: 'charmap' codec can't encode character ...
 > catw ./CHANGELOG.md --Rout > test.txt
 ```
 
-
 ### <a id="enc">enc=X, enc&#42889;X</a>
 
 Sets the text Encoding that is being used to read and write Files.
 Valid Options are defined by the Python Interpreter used (e.g. for [Python3.10](https://docs.python.org/3.8/library/codecs.html#standard-encodings)).
 The default Encoding is Utf-8.
+The default Encoding can be configured using the `default_file_encoding` element in the config menu (<a href="#config">--config, --config</a>).
 
 ```console
 > catw test.txt
@@ -1030,6 +1053,7 @@ This Text is written in Utf-16!
 ### <a id="find">find=X, find&#42889;X</a>
 
 Defines a Literal to search for within the Text of any provided File.
+The Substring is unicode-escaped (\n will be interpreted as an actual Newline) but in Case of an unicode-error the Substring will simply be used literally.
 When the Literal contains Whitespaces it is neccessary to encase the entire Parameter with Quotes as defined by the Terminal used.
 It is possible to define multiple Substrings to search for by simply providing the Parameter find=X multiple times.
 When using this Parameter in Uppercase the Case of the Substring will be ignored.
@@ -1071,6 +1095,31 @@ It's raining cats and dogs!
 --------------- Matched [('CAT.\\s.{3,}', [13, 27])] ---------------
 ```
 
+### <a id="replace_queried">replace=X, replace&#42889;X</a>
+
+Defines a Literal to replace queried Substrings with within the Text of any provided File.
+The Substring is unicode-escaped (\n will be interpreted as an actual Newline) but in Case of an unicode-error the Substring will simply be used literally.
+When the Literal contains Whitespaces it is neccessary to encase the entire Parameter with Quotes as defined by the Terminal used.
+When this Argument is defined multiple times only the last one will be used.
+When using this Parameter in Uppercase it will not replace queried Substrings but matched Patterns.
+This Parameter will only work in Combination with <a href="#find">find=X, find&#42889;X</a> or <a href="#match">match=X, match&#42889;X</a>.
+When using this Argument the default Behaviour of searching Subtrings/Patterns will not take Effect.
+
+```console
+> catw "find= " replace:\n -E "This is all in one Line!"
+This
+is
+all
+in
+one
+Line!
+```
+
+```console
+> catw "match=[A-Za-z]+" REPLACE=:D -E "It is raining Cats and Dogs!"
+:D :D :D :D :D :D!
+```
+
 ### <a id="trunc">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>
 
 Truncates every File by the Specifics defined.
@@ -1090,7 +1139,8 @@ Replaces the Substring defined by a with the Substring b in every Line of Every 
 Characters within one of the two Substrings can be escaped using a Backslash.
 For example this way it is possible to replace a comma which is also used as the delimeter of both Strings.
 When one of the Substrings contains Whitespaces it is neccessary to encase the entire Parameter with Quotes as defined by the Terminal used.
-It is possible to define multiple replace Arguments.
+In Comparison to the <a href="#replace_queried">replace=X, replace&#42889;X</a> Parameter it is possible to define multiple replace Arguments,
+a and b are not unicode-escaped and the search Behaviour functions as Normal.
 
 ```console
 > catw test.txt "[\,,X]" "[\\,/]"
