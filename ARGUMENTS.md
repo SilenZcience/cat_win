@@ -1001,7 +1001,7 @@ Valid Options are:
 | matched_pattern | the matched pattern using 'match=x' |
 | matched_pattern_message | the message displayed when using 'match=x' |
 | checksum_message | the calculated checksum of a given file using '-m' |
-| summary_message | the message displayed using '-f'/'-d'/'-s'/'-w' |
+| summary_message | the message displayed using '-f'/'-d'/'-s'/'-w'/'--cc' |
 | file_attribute_message | the message containing time stamps and file size using '-a' |
 | active_file_attributes | the attributes a file has set using '-a' |
 | missing_file_attributes | the attributes a file has not set using '-a' |
