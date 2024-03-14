@@ -50,8 +50,7 @@ class TestCatFull(TestCase):
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
 
-    @patch('sys.argv',
-           ['<CAT>', 'enc:UTF-8', test_file_path, '-ub', '[Sample,TEST]', '-le'])
+    @patch('sys.argv', ['<CAT>', 'enc:UTF-8', test_file_path, '-ub', '[Sample,TEST]', '-le'])
     def test_cat_output_full_c(self):
         expected_output = ''
         with open(test_result_C, 'r', encoding='utf-8') as output:

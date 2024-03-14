@@ -4,9 +4,9 @@ from cat_win.const.argconstants import ARGS_EVAL, ALL_ARGS
 from cat_win.cat import remove_ansi_codes_from_line as cleaner
 from cat_win.util.converter import Converter
 try:
-    from cat_win.util.utility import comp_eval, comp_conv, split_replace
+    from cat_win.util.utility import comp_eval, comp_conv
 except SyntaxError: # in case of Python 3.7
-    from cat_win.util.utilityold import comp_eval, comp_conv, split_replace
+    from cat_win.util.utilityold import comp_eval, comp_conv
 
 # import sys
 # sys.path.append('../cat_win')
@@ -165,10 +165,5 @@ class TestConverterComp(TestCase):
         ]
         new_content = comp_conv(converter, test_content_in, '--bin', cleaner)
         self.assertListEqual(new_content, test_content_out)
-
-    def test_split_replace(self):
-        param = '[\\\\x\\,\\\\,wt\\f\\]]'
-        expected_result = ['\\x,\\', 'wtf]']
-        self.assertListEqual(split_replace(param), expected_result)
 
 # python -m unittest discover -s cat_win.tests -p test*.py
