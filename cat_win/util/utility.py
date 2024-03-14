@@ -54,37 +54,3 @@ def comp_conv(converter: Converter, content: list, param: str, cleaner: object):
     return [(prefix, f"{line} {method_convert(cleaned, (param.islower()))}")
             for prefix, line in content if (cleaned := cleaner(line)) \
                 and method_is_convertable(cleaned)]
-
-def split_replace(param: str) -> list:
-    """
-    create the two elements replace_this and replace_with from
-    the given parameter, checking for escaped characters and the
-    splitting delimiter.
-
-    Parameters:
-    param (str):
-        the replace parameter of the form "[a,b]"
-        
-    Returns:
-    (list):
-        a list of two elements [replace_this, replace_with]
-    """
-    rep = ['', '']
-    esc_c = False
-    for _c in param[1:-1]:
-        rep[1] += _c if esc_c else (
-            rep := [rep[1], '']
-            )[1] if _c == ',' else _c if _c != '\\' else ''
-        esc_c = False if esc_c else _c == '\\'
-    # equivalent to:
-    # for c in param[1:-1]:
-    #     if esc_c:
-    #         rep[1] += c
-    #         esc_c = False
-    #     elif c == "\\":
-    #         esc_c = True
-    #     elif c == ",":
-    #         rep = [rep[1], '']
-    #     else:
-    #         rep[1] += c
-    return rep

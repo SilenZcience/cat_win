@@ -62,32 +62,3 @@ def comp_conv(converter: Converter, content: list, param: str, cleaner: object):
             new_content.append((prefix, line + \
                 f" {method_convert(cleaned, (param.islower()))}"))
     return new_content
-
-def split_replace(param: str) -> list:
-    """
-    create the two elements replace_this and replace_with from
-    the given parameter, checking for escaped characters and the
-    splitting delimiter.
-    An implementation equivalent to split_replace() in utility.py
-    without the usage of the walrus operator however.
-
-    Parameters:
-    param (str):
-        the replace parameter of the form "[a,b]"
-        
-    Returns:
-    (list):
-        a list of two elements [replace_this, replace_with]
-    """
-    rep = ['', '']
-    def _c_rep(_l: list) -> str:
-        _l[0] = _l[1]
-        return ''
-
-    esc_c = False
-    for _c in param[1:-1]:
-        rep[1] += _c if esc_c else _c_rep(rep) if _c == ',' else _c if _c != '\\' else ''
-        esc_c = False if esc_c else _c == '\\'
-    rep[1] = rep[1][len(rep[0]):]
-
-    return rep
