@@ -10,18 +10,18 @@ from cat_win.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_EC
 
 
 IS_FILE, IS_DIR, IS_PATTERN = range(0, 3)
-RE_ENCODING = re.compile(r"\Aenc[\=\:].+\Z",   re.IGNORECASE)
-RE_MATCH    = re.compile(r"\Amatch[\=\:].+\Z", re.IGNORECASE)
-RE_FIND     = re.compile(r"\Afind[\=\:].*\Z",  re.IGNORECASE)
-RE_REPLACE_ = re.compile(r"\Areplace[\=\:].+\Z", re.IGNORECASE)
-RE_TRUNC    = re.compile(r"\Atrunc[\=\:][0-9\(\)\+\-\*\/]*"
-                         r"\:[0-9\(\)\+\-\*\/]*\:?"
-                         r"[0-9\(\)\+\-\*\/]*\Z")
-RE_CUT      = re.compile(r"\A\[[0-9\(\)\+\-\*\/]*\:"
-                         r"[0-9\(\)\+\-\*\/]*\:?"
-                         r"[0-9\(\)\+\-\*\/]*\]\Z")
-RE_REPLACE  = re.compile(r"\A\[(?:.*[^\\])?(?:\\\\)*,"
-                         r"(?:.*[^\\])?(?:\\\\)*\]\Z")
+RE_ENCODING      = re.compile(r"\Aenc[\=\:].+\Z",     re.IGNORECASE)
+RE_MATCH         = re.compile(r"\Amatch[\=\:].+\Z",   re.IGNORECASE)
+RE_FIND          = re.compile(r"\Afind[\=\:].*\Z",    re.IGNORECASE)
+RE_REPLACE_      = re.compile(r"\Areplace[\=\:].+\Z", re.IGNORECASE)
+RE_TRUNC         = re.compile(r"\Atrunc[\=\:][0-9\(\)\+\-\*\/]*"
+                              r"\:[0-9\(\)\+\-\*\/]*\:?"
+                              r"[0-9\(\)\+\-\*\/]*\Z")
+RE_CUT           = re.compile(r"\A\[[0-9\(\)\+\-\*\/]*\:"
+                              r"[0-9\(\)\+\-\*\/]*\:?"
+                              r"[0-9\(\)\+\-\*\/]*\]\Z")
+RE_REPLACE       = re.compile(r"\A\[(.*?(?<!\\)(?:\\\\)*),(.*)\]\Z")
+RE_REPLACE_COMMA = re.compile(r"(?<!\\)((?:\\\\)*)\\,")
 # using simple if-statements (e.g. startwith()) would be faster, but arguably less readable
 
 
@@ -100,6 +100,7 @@ class ArgParser:
         self.file_match_ignore_case = False
         self.file_replace = None
         self.file_replace_pattern = False
+        self.file_replace_mapping = {}
         self.file_truncate = [None, None, None]
 
     def get_args(self) -> list:
@@ -279,6 +280,16 @@ class ArgParser:
             return False
         # '[' + ARGS_REPLACE_THIS + ',' + ARGS_REPLACE_WITH + ']' (escape chars with '\')
         if RE_REPLACE.match(param):
+            re_match = RE_REPLACE.match(param)
+            try:
+                replace_this = re.sub(RE_REPLACE_COMMA, r"\1,", re_match.group(1))
+                replace_with = re.sub(RE_REPLACE_COMMA, r"\1,", re_match.group(2))
+                self.file_replace_mapping[param] = (
+                    replace_this.encode().decode('unicode_escape').encode('latin-1').decode(),
+                    replace_with.encode().decode('unicode_escape').encode('latin-1').decode()
+                )
+            except UnicodeError:
+                self.file_replace_mapping[param] = re_match.groups()
             self._args.append((ARGS_REPLACE, param))
             return False
 

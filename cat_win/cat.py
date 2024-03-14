@@ -49,9 +49,9 @@ from cat_win.util.strings import get_strings
 from cat_win.util.tmpfilehelper import TmpFileHelper
 from cat_win.util.urls import sep_valid_urls, read_url
 try:
-    from cat_win.util.utility import comp_eval, comp_conv, split_replace
+    from cat_win.util.utility import comp_eval, comp_conv
 except SyntaxError: # in case of Python 3.7
-    from cat_win.util.utilityold import comp_eval, comp_conv, split_replace
+    from cat_win.util.utilityold import comp_eval, comp_conv
 from cat_win.util import stdinhelper
 from cat_win.util.zipviewer import display_zip
 from cat_win.web.updatechecker import print_update_information
@@ -233,6 +233,8 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     err_print(repr(arg_parser.file_replace))
     err_print('truncate file: ', end='')
     err_print(arg_parser.file_truncate)
+    err_print('replace mapping: ', end='')
+    err_print(arg_parser.file_replace_mapping)
     err_print('==================================================='
               '====================================================')
 
@@ -802,9 +804,9 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
         elif arg == ARGS_BIN:
             content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
         elif arg == ARGS_REPLACE:
-            replace_values = split_replace(param)
-            content = [(prefix, line.replace(replace_values[0], f"{color_dic[CKW.REPLACE]}" + \
-                f"{replace_values[1]}{color_dic[CKW.RESET_ALL]}"))
+            replace_this, replace_with = arg_parser.file_replace_mapping[param]
+            content = [(prefix, line.replace(replace_this, f"{color_dic[CKW.REPLACE]}" + \
+                f"{replace_with}{color_dic[CKW.RESET_ALL]}"))
                         for prefix, line in content]
         elif arg == ARGS_CHR:
             for c_id, char, _, possible in SPECIAL_CHARS:
