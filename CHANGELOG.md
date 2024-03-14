@@ -14,7 +14,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added `ignore_unknown_bytes` option to the config menu to ignore unknown bytes in binary mode instead of replacing them with �.
 - when using `find=` the queried substring is now unicode-escaped and no longer literal.
 - when using `find=` it is now possible to query for an empty substring.
-- added parameter `replace=X`, `replace:X` to replace queried substrings or patterns with X in the given files.
+- the replace parameter `[a,b]` now unicode-escapes a and b.
 
 ### Bugfixes
 
