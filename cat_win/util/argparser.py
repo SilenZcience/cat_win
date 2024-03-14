@@ -13,7 +13,6 @@ IS_FILE, IS_DIR, IS_PATTERN = range(0, 3)
 RE_ENCODING      = re.compile(r"\Aenc[\=\:].+\Z",     re.IGNORECASE)
 RE_MATCH         = re.compile(r"\Amatch[\=\:].+\Z",   re.IGNORECASE)
 RE_FIND          = re.compile(r"\Afind[\=\:].*\Z",    re.IGNORECASE)
-RE_REPLACE_      = re.compile(r"\Areplace[\=\:].+\Z", re.IGNORECASE)
 RE_TRUNC         = re.compile(r"\Atrunc[\=\:][0-9\(\)\+\-\*\/]*"
                               r"\:[0-9\(\)\+\-\*\/]*\:?"
                               r"[0-9\(\)\+\-\*\/]*\Z")
@@ -98,8 +97,6 @@ class ArgParser:
         self.file_search_ignore_case = False
         self.file_match = set()
         self.file_match_ignore_case = False
-        self.file_replace = None
-        self.file_replace_pattern = False
         self.file_replace_mapping = {}
         self.file_truncate = [None, None, None]
 
@@ -255,16 +252,6 @@ class ArgParser:
                 self.file_search.add(param[5:].encode().decode('unicode_escape').encode('latin-1').decode())
             except UnicodeError:
                 self.file_search.add(param[5:])
-            return False
-        if RE_REPLACE_.match(param):
-            if delete:
-                self.file_replace = None
-                return False
-            self.file_replace_pattern = param[:7].isupper()
-            try:
-                self.file_replace = param[8:].encode().decode('unicode_escape').encode('latin-1').decode()
-            except UnicodeError:
-                self.file_replace = param[8:]
             return False
         # 'trunc' + ('='/':') + file_truncate[0] +':'+ file_truncate[1] [+ ':' + file_truncate[2]]
         if RE_TRUNC.match(param):
