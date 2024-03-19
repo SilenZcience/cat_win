@@ -159,7 +159,7 @@ def _show_help(shell: bool = False) -> None:
         help_message += f"\t{'trunc=X:Y, trunc:X:Y': <25}"
         help_message += 'truncate file to lines X and Y (python-like)\n'
     help_message += '\n'
-    help_message += f"\t{'[a,b]': <25}replace a with b in every line (escape chars with '\\')\n"
+    help_message += f"\t{'[a,b]': <25}replace a with b in every line\n"
     help_message += f"\t{'[a:b:c]': <25}python-like string indexing syntax (line by line)\n"
     help_message += '\n'
     help_message += 'Examples:\n'
