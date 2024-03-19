@@ -89,7 +89,6 @@
                   <li><a href="#enc">enc=X, enc&#42889;X</a></li>
                   <li><a href="#find">find=X, find&#42889;X</a></li>
                   <li><a href="#match">match=X, match&#42889;X</a></li>
-                  <li><a href="#replace_queried">replace=X, replace&#42889;X</a></li>
                   <li><a href="#trunc">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a></li>
                   <li><a href="#replace">[a,b]</a></li>
                   <li><a href="#cut">[a&#42889;b&#42889;c]</a></li>
@@ -177,10 +176,9 @@
 | *<a href="#enc">enc=X, enc&#42889;X</a>* | set file enconding to X (default is utf-8) |✔|
 | *<a href="#find">find=X, find&#42889;X</a>* | find/query a substring X in the given files |✔|
 | *<a href="#match">match=X, match&#42889;X</a>* | find/query a pattern X in the given files |✔|
-| *<a href="#replace_queried">replace=X, replace&#42889;X</a>* | replace queried substrings or patterns with X in the given files |✔|
 | *<a href="#trunc">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>* | truncate file to lines X and Y (python-like) |❌|
 ||| |
-| *<a href="#replace">[a,b]</a>* | replace a with b in every line (escape chars with '\\') |✔|
+| *<a href="#replace">[a,b]</a>* | replace a with b in every line |✔|
 | *<a href="#cut">[a&#42889;b&#42889;c]</a>* | python-like string indexing syntax (line by line) |✔|
 
 
@@ -446,7 +444,7 @@ Currently supported are .json and .xml.
 Everything passed in after this Argument will be handled as its own File.
 It is not possible to break out of this state therefor this Parameter must be used last.
 When using the one-letter Variant of this Parameter the following Input will be unicode-escaped instead of parsed as a raw String.
-This way it is possible to define new lines (\n) or other special characters.
+This way it is possible to define new lines (\\n) or other special characters.
 
 ```console
 > catw -l --echo -n The last 'Parameter' does not count!\nThis is not a newline!
@@ -968,7 +966,7 @@ Valid Options are:
 | editor_indentation | set the Indentation used in the Editor </br> when pressing ↹ on an empty Line | <b>␣ ␣ ␣ ␣</b> | ↹ |
 | editor_auto_indent | set whether the Editor should auto indent or not | 1 | False |
 | strings_minimum_sequence_length | set the minimum Length of a String </br> (for the --`strings` Parameter) | 2 | 4 |
-| strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the --`strings` Parameter) | \| | \n |
+| strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the --`strings` Parameter) | \| | \\n |
 | ignore_unknown_bytes | ignore unknown bytes instead of replacing them with � | true | False |
 
 Accepted Input for enabling a Setting:  `true, yes, y, 1`
@@ -1053,7 +1051,7 @@ This Text is written in Utf-16!
 ### <a id="find">find=X, find&#42889;X</a>
 
 Defines a Literal to search for within the Text of any provided File.
-The Substring is unicode-escaped (\n will be interpreted as an actual Newline) but in Case of an unicode-error the Substring will simply be used literally.
+The Substring is unicode-escaped (\\n will be interpreted as an actual Newline) but in Case of an unicode-error the Substring will simply be used literally.
 When the Literal contains Whitespaces it is neccessary to encase the entire Parameter with Quotes as defined by the Terminal used.
 It is possible to define multiple Substrings to search for by simply providing the Parameter find=X multiple times.
 When using this Parameter in Uppercase the Case of the Substring will be ignored.
@@ -1095,31 +1093,6 @@ It's raining cats and dogs!
 --------------- Matched [('CAT.\\s.{3,}', [13, 27])] ---------------
 ```
 
-### <a id="replace_queried">replace=X, replace&#42889;X</a>
-
-Defines a Literal to replace queried Substrings with within the Text of any provided File.
-The Substring is unicode-escaped (\n will be interpreted as an actual Newline) but in Case of an unicode-error the Substring will simply be used literally.
-When the Literal contains Whitespaces it is neccessary to encase the entire Parameter with Quotes as defined by the Terminal used.
-When this Argument is defined multiple times only the last one will be used.
-When using this Parameter in Uppercase it will not replace queried Substrings but matched Patterns.
-This Parameter will only work in Combination with <a href="#find">find=X, find&#42889;X</a> or <a href="#match">match=X, match&#42889;X</a>.
-When using this Argument the default Behaviour of searching Subtrings/Patterns will not take Effect.
-
-```console
-> catw "find= " replace:\n -E "This is all in one Line!"
-This
-is
-all
-in
-one
-Line!
-```
-
-```console
-> catw "match=[A-Za-z]+" REPLACE=:D -E "It is raining Cats and Dogs!"
-:D :D :D :D :D :D!
-```
-
 ### <a id="trunc">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>
 
 Truncates every File by the Specifics defined.
@@ -1136,11 +1109,9 @@ The Argument is valid by defining trunc=\<start\>\:\<stop\> or trunc=\<start\>\:
 ### <a id="replace">[a,b]</a>
 
 Replaces the Substring defined by a with the Substring b in every Line of Every File.
-Characters within one of the two Substrings can be escaped using a Backslash.
-For example this way it is possible to replace a comma which is also used as the delimeter of both Strings.
+The Substrings a and b are unicode-escaped (\\n will be interpreted as an actual Newline) but in Case of an unicode-error the Substrings will simply be used literally.
+Comma (,) can be escaped using `\,` despite it not being a valid unicode-escape Sequence.
 When one of the Substrings contains Whitespaces it is neccessary to encase the entire Parameter with Quotes as defined by the Terminal used.
-In Comparison to the <a href="#replace_queried">replace=X, replace&#42889;X</a> Parameter it is possible to define multiple replace Arguments,
-a and b are not unicode-escaped and the search Behaviour functions as Normal.
 
 ```console
 > catw test.txt "[\,,X]" "[\\,/]"
