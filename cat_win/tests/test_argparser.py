@@ -116,8 +116,17 @@ class TestArgParser(TestCase):
 
     def test_get_arguments_replace(self):
         arg_parser = ArgParser()
+
         args, _, _, _ = arg_parser.get_arguments(['CAT', '[test,404]'])
         self.assertCountEqual(args, [(ARGS_REPLACE, '[test,404]')])
+
+        args, _, _, _ = arg_parser.get_arguments(['CAT', '[test\\,,404]'])
+        self.assertCountEqual(args, [(ARGS_REPLACE, '[test\\,,404]')])
+
+        self.assertEqual(arg_parser.file_replace_mapping['[test\\,,404]'], ('test,', '404'))
+        args, _, _, _ = arg_parser.get_arguments(['CAT', '[\\n\\t,\\,\f]'])
+        self.assertCountEqual(args, [(ARGS_REPLACE, '[\\n\\t,\\,\x0c]')])
+        self.assertEqual(arg_parser.file_replace_mapping['[\\n\\t,\\,\x0c]'], ('\n\t', ',\x0c'))
 
     def test_get_arguments_dir(self):
         arg_parser = ArgParser()
