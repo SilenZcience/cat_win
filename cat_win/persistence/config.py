@@ -60,6 +60,7 @@ class Config:
         DKW.STRINGS_MIN_SEQUENCE_LENGTH: 4,
         DKW.STRINGS_DELIMETER: '\n',
         DKW.UNICODE_ESCAPED_FIND: True,
+        DKW.UNICODE_ESCAPED_REPLACE: True,
     }
 
     v_validation = {
@@ -73,6 +74,7 @@ class Config:
         DKW.STRINGS_MIN_SEQUENCE_LENGTH: validator_int,
         DKW.STRINGS_DELIMETER: validator_string,
         DKW.UNICODE_ESCAPED_FIND: validator_bool,
+        DKW.UNICODE_ESCAPED_REPLACE: validator_bool,
     }
 
     elements = list(default_dic.keys())

@@ -17,3 +17,4 @@ class DKW:
     STRINGS_MIN_SEQUENCE_LENGTH = 'strings_minimum_sequence_length'
     STRINGS_DELIMETER = 'strings_delimeter'
     UNICODE_ESCAPED_FIND = 'unicode_escaped_find'
+    UNICODE_ESCAPED_REPLACE = 'unicode_escaped_replace'
