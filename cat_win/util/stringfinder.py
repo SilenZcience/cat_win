@@ -11,14 +11,11 @@ class StringFinder:
     """
     defines a stringfinder
     """
-    def __init__(self, literals: set = None, regex: set = None,
-                 literals_ignore_case: bool = False, regex_ignore_case: bool = False) -> None:
+    def __init__(self, literals: set = None, regex: set = None) -> None:
         self.kw_literals = literals if literals is not None else {}
         self.kw_regex = regex if regex is not None else {}
-        self.literals_ignore_case = literals_ignore_case
-        self.regex_ignore_case = regex_ignore_case
 
-    def _findliterals(self, sub: str, _s: str):
+    def _findliterals(self, sub: str, _s: str, ignore_case: bool):
         """
         Generate lists containing the position of sub in s.
         
@@ -32,7 +29,7 @@ class StringFinder:
         (list):
             containing the start and end indeces like [start, end]
         """
-        if self.literals_ignore_case:
+        if ignore_case:
             sub, _s = sub.lower(), _s.lower()
         _l = len(sub)
         i = _s.find(sub)
@@ -40,7 +37,7 @@ class StringFinder:
             yield [i, i+_l]
             i = _s.find(sub, i+1)
 
-    def _findregex(self, pattern: str, _s: str):
+    def _findregex(self, pattern: str, _s: str, ignore_case: bool):
         """
         Generate lists containing the position of pattern in s.
         
@@ -55,7 +52,7 @@ class StringFinder:
             containing the start and end indeces like [start, end]
         """
         for _match in re.finditer(pattern, _s,
-                                 re.IGNORECASE if self.regex_ignore_case else 0 | re.DOTALL):
+                                 re.IGNORECASE if ignore_case else 0 | re.DOTALL):
             yield list(_match.span())
 
     def _optimize_intervals(self, intervals: list) -> list:
@@ -118,15 +115,15 @@ class StringFinder:
         matched_list = []
         matched_position = []
 
-        for keyword in self.kw_literals:
-            for _f in self._findliterals(keyword, line):
+        for keyword, ignore_case in self.kw_literals:
+            for _f in self._findliterals(keyword, line, ignore_case):
                 found_position.append(_f[:])
                 found_list.append((keyword, _f))
         # sort by start position (necessary for a deterministic output)
         found_list.sort(key = lambda x: x[1][0])
 
-        for keyword in self.kw_regex:
-            for _m in self._findregex(keyword, line):
+        for keyword, ignore_case in self.kw_regex:
+            for _m in self._findregex(keyword, line, ignore_case):
                 matched_position.append(_m[:])
                 matched_list.append((keyword, _m))
         # sort by start position (necessary for a deterministic output)
