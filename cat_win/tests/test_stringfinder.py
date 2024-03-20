@@ -8,43 +8,43 @@ from cat_win.util.stringfinder import StringFinder
 class TestStringFinder(TestCase):
     def test_find_literals_true(self):
         string_finder = StringFinder(set(), set())
-        _x = list(string_finder._findliterals('test', 'abctestdef'))
+        _x = list(string_finder._findliterals('test', 'abctestdef', False))
         self.assertEqual(_x, [[3, 7]])
 
-        _x = list(string_finder._findliterals('test', 'testabctestdetestf'))
+        _x = list(string_finder._findliterals('test', 'testabctestdetestf', False))
         self.assertEqual(_x, [[0, 4], [7, 11], [13, 17]])
 
-        _x = list(string_finder._findliterals('', ''))
+        _x = list(string_finder._findliterals('', '', False))
         self.assertEqual(_x, [[0, 0]])
 
-        _x = list(string_finder._findliterals('', 'x'))
+        _x = list(string_finder._findliterals('', 'x', False))
         self.assertEqual(_x, [[0, 0], [1, 1]])
 
     def test_find_literals_false(self):
         string_finder = StringFinder(set(), set())
-        _x = list(string_finder._findliterals('a', ''))
+        _x = list(string_finder._findliterals('a', '', False))
         self.assertEqual(_x, [])
 
-        _x = list(string_finder._findliterals('test', 'tsetabctesdeestf'))
+        _x = list(string_finder._findliterals('test', 'tsetabctesdeestf', False))
         self.assertEqual(_x, [])
 
     def test_find_regex_true(self):
         string_finder = StringFinder(set(), set())
-        _x = list(string_finder._findregex(r"[0-9]{2}", '123'))
+        _x = list(string_finder._findregex(r"[0-9]{2}", '123', False))
         self.assertEqual(_x, [[0, 2]])
 
-        _x = list(string_finder._findregex(r"[0-9]{2}", '1234'))
+        _x = list(string_finder._findregex(r"[0-9]{2}", '1234', False))
         self.assertEqual(_x, [[0, 2], [2, 4]])
 
-        _x = list(string_finder._findregex(r"[A-Z]{1}[a-z]*\s?.*\.+\s", 'Silas A. Kraume'))
+        _x = list(string_finder._findregex(r"[A-Z]{1}[a-z]*\s?.*\.+\s", 'Silas A. Kraume', False))
         self.assertEqual(_x, [[0, 9]])
 
-        _x = list(string_finder._findregex(r"[A-Z]{1}[a-z]*\s?.*\.+\s", 'silas A. Kraume'))
+        _x = list(string_finder._findregex(r"[A-Z]{1}[a-z]*\s?.*\.+\s", 'silas A. Kraume', False))
         self.assertEqual(_x, [[6, 9]])
 
     def test_find_regex_false(self):
         string_finder = StringFinder(set(), set())
-        _x = list(string_finder._findregex(r"[A-Z]{1}[a-z]+\s?.*\.+\s", 'silas A. Kraume'))
+        _x = list(string_finder._findregex(r"[A-Z]{1}[a-z]+\s?.*\.+\s", 'silas A. Kraume', False))
         self.assertEqual(_x, [])
 
     def test_optimize_intervals(self):
@@ -67,7 +67,10 @@ class TestStringFinder(TestCase):
         self.assertEqual(_x, [])
 
     def test_find_keywords(self):
-        string_finder = StringFinder(set(['Is', 'Test', 'Not']), set([r"[0-9]\!"]))
+        string_finder = StringFinder(set([('Is', False),
+                                          ('Test', False),
+                                          ('Not', False)]),
+                                     set([(r"[0-9]\!", False)]))
         line = 'ThisIsATest!1!'
         intervals, f_keywords, m_keywords = string_finder.find_keywords(line)
 

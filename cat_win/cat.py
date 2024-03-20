@@ -592,9 +592,7 @@ def print_file(content: list) -> bool:
 
     contains_queried = False
     string_finder = StringFinder(arg_parser.file_search,
-                                 arg_parser.file_match,
-                                 arg_parser.file_search_ignore_case,
-                                 arg_parser.file_match_ignore_case)
+                                 arg_parser.file_match)
 
     for line_prefix, line in content:
         cleaned_line = remove_ansi_codes_from_line(line)

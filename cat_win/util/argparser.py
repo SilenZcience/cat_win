@@ -94,9 +94,7 @@ class ArgParser:
         """
         self.file_encoding = self.default_file_encoding
         self.file_search = set()
-        self.file_search_ignore_case = False
         self.file_match = set()
-        self.file_match_ignore_case = False
         self.file_replace_mapping = {}
         self.file_truncate = [None, None, None]
 
@@ -237,21 +235,22 @@ class ArgParser:
         # 'match' + ('=' or ':') + file_match
         if RE_MATCH.match(param):
             if delete:
-                self.file_match.discard(param[6:])
+                self.file_match.discard((param[6:], param[:5].isupper()))
                 return False
-            self.file_match_ignore_case = param[:5].isupper()
-            self.file_match.add(param[6:])
+            self.file_match.add((param[6:], param[:5].isupper()))
             return False
         # 'find' + ('=' or ':') + file_search
         if RE_FIND.match(param):
             if delete:
-                self.file_search.discard(param[5:])
+                self.file_search.discard((param[5:], param[:4].isupper()))
                 return False
-            self.file_search_ignore_case = param[:4].isupper()
             try:
-                self.file_search.add(param[5:].encode().decode('unicode_escape').encode('latin-1').decode())
+                self.file_search.add((
+                    param[5:].encode().decode('unicode_escape').encode('latin-1').decode(),
+                    param[:4].isupper()
+                ))
             except UnicodeError:
-                self.file_search.add(param[5:])
+                self.file_search.add((param[5:], param[:4].isupper()))
             return False
         # 'trunc' + ('='/':') + file_truncate[0] +':'+ file_truncate[1] [+ ':' + file_truncate[2]]
         if RE_TRUNC.match(param):
