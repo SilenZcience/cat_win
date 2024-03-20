@@ -963,11 +963,12 @@ Valid Options are:
 | default_file_encoding | the File Encoding used by Default | utf-16 | utf-8 |
 | large_file_size | the Size (Bytes) at which a Warning occurs. | 1024 | 104857600 (100Mb) |
 | strip_color_on_pipe | indicate if the Output should be stripped of any Color | no | True |
-| editor_indentation | set the Indentation used in the Editor </br> when pressing ↹ on an empty Line | <b>␣ ␣ ␣ ␣</b> | ↹ |
-| editor_auto_indent | set whether the Editor should auto indent or not | 1 | False |
-| strings_minimum_sequence_length | set the minimum Length of a String </br> (for the --`strings` Parameter) | 2 | 4 |
-| strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the --`strings` Parameter) | \| | \\n |
 | ignore_unknown_bytes | ignore unknown bytes instead of replacing them with � | true | False |
+| editor_indentation | set the Indentation used in the <a href="#editor">Editor</a> </br> when pressing ↹ on an empty Line | <b>␣ ␣ ␣ ␣</b> | ↹ |
+| editor_auto_indent | set whether the <a href="#editor">Editor</a> should auto indent or not | 1 | False |
+| strings_minimum_sequence_length | set the minimum Length of a String </br> (for the <a href="#strings">--strings</a> Parameter) | 2 | 4 |
+| strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the <a href="#strings">--strings</a> Parameter) | \| | \\n |
+| unicode_escaped_find | unicode-escape the queried substring when using <a href="#find">find=</a> | false | True |
 
 Accepted Input for enabling a Setting:  `true, yes, y, 1`
 </br>

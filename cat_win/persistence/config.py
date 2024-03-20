@@ -54,11 +54,11 @@ class Config:
         DKW.DEFAULT_FILE_ENCODING: 'utf-8',
         DKW.LARGE_FILE_SIZE: 1024 * 1024 * 100,  # 100 Megabytes
         DKW.STRIP_COLOR_ON_PIPE: True,
+        DKW.IGNORE_UNKNOWN_BYTES: False,
         DKW.EDITOR_INDENTATION: '\t',
         DKW.EDITOR_AUTO_INDENT: False,
         DKW.STRINGS_MIN_SEQUENCE_LENGTH: 4,
         DKW.STRINGS_DELIMETER: '\n',
-        DKW.IGNORE_UNKNOWN_BYTES: False,
         DKW.UNICODE_ESCAPED_FIND: True,
     }
 
@@ -67,11 +67,11 @@ class Config:
         DKW.DEFAULT_FILE_ENCODING: validator_encoding,
         DKW.LARGE_FILE_SIZE: validator_int,
         DKW.STRIP_COLOR_ON_PIPE: validator_bool,
+        DKW.IGNORE_UNKNOWN_BYTES: validator_bool,
         DKW.EDITOR_INDENTATION: validator_string,
         DKW.EDITOR_AUTO_INDENT: validator_bool,
         DKW.STRINGS_MIN_SEQUENCE_LENGTH: validator_int,
         DKW.STRINGS_DELIMETER: validator_string,
-        DKW.IGNORE_UNKNOWN_BYTES: validator_bool,
         DKW.UNICODE_ESCAPED_FIND: validator_bool,
     }
 
