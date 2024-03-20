@@ -85,7 +85,8 @@ def setup():
     color_dic = default_color_dic.copy()
     const_dic = config.load_config()
 
-    arg_parser = ArgParser(const_dic[DKW.DEFAULT_FILE_ENCODING])
+    arg_parser = ArgParser(const_dic[DKW.DEFAULT_FILE_ENCODING],
+                           const_dic[DKW.UNICODE_ESCAPED_FIND])
     converter = Converter()
     holder = Holder()
     tmp_file_helper = TmpFileHelper()
