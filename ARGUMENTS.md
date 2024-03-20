@@ -969,6 +969,7 @@ Valid Options are:
 | strings_minimum_sequence_length | set the minimum Length of a String </br> (for the <a href="#strings">--strings</a> Parameter) | 2 | 4 |
 | strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the <a href="#strings">--strings</a> Parameter) | \| | \\n |
 | unicode_escaped_find | unicode-escape the queried substring when using <a href="#find">find=</a> | false | True |
+| unicode_escaped_replace | unicode-escape a and b when using <a href="#replace">[a,b]</a> | false | True |
 
 Accepted Input for enabling a Setting:  `true, yes, y, 1`
 </br>
@@ -987,24 +988,24 @@ Valid Options are:
 
 | Option | Description |
 |--------|-------------|
-| line_numbers | the numbering of each line using '-n' |
-| line_length | the display of each line length using '-l' |
-| file_prefix | the file prefix using '--fp' |
-| line_ends | the end of line marker using '-e' |
-| special_chars | special chars using '--chr' |
-| number_conversion | the converted values using '--bin'/'--oct'/'--hex'/'--dec' |
-| number_evaluation | the evaluated value using '--eval' |
-| substring_replacement | the replaced string using '[a,b]' |
-| found_keyword | the found substring using 'find=x' |
-| found_keyword_message | the message displayed when using 'find=x' |
-| matched_pattern | the matched pattern using 'match=x' |
-| matched_pattern_message | the message displayed when using 'match=x' |
-| checksum_message | the calculated checksum of a given file using '-m' |
-| summary_message | the message displayed using '-f'/'-d'/'-s'/'-w'/'--cc' |
-| file_attribute_message | the message containing time stamps and file size using '-a' |
-| active_file_attributes | the attributes a file has set using '-a' |
-| missing_file_attributes | the attributes a file has not set using '-a' |
-| raw_viewer | the output using '--hexview'/'--binview' |
+| line_numbers | the numbering of each line using <a href="#number">-n, --number</a> |
+| line_length | the display of each line length using <a href="#length">-l, --linelength</a> |
+| file_prefix | the file prefix using <a href="#fileprefix">--fp, --file-prefix</a> |
+| line_ends | the end of line marker using <a href="#ends">-e, --ends</a> |
+| special_chars | special chars using <a href="#chr">--chr, --char</a> |
+| number_conversion | the converted values using <a href="#bin">--bin</a>/<a href="#oct">--oct</a>/<a href="#dec">--dec</a>/<a href="#hex">--hex</a> |
+| number_evaluation | the evaluated value using <a href="#eval">--eval, --EVAL</a> |
+| substring_replacement | the replaced string using <a href="#replace">[a,b]</a> |
+| found_keyword | the found substring using <a href="#find">find=X, find&#42889;X</a> |
+| found_keyword_message | the message displayed when using <a href="#find">find=X, find&#42889;X</a> |
+| matched_pattern | the matched pattern using <a href="#match">match=X, match&#42889;X</a> |
+| matched_pattern_message | the message displayed when using <a href="#match">match=X, match&#42889;X</a> |
+| checksum_message | the calculated checksum of a given file using <a href="#checksum">-m, --checksum</a> |
+| summary_message | the message displayed using <a href="#files">-f</a>/<a href="#dirs">-d</a>/<a href="#sum">-s</a>/<a href="#wordcount">-w</a>/<a href="#charcount">--cc</a> |
+| file_attribute_message | the message containing time stamps and file size using <a href="#attributes">-a, --attributes</a> |
+| active_file_attributes | the attributes a file has set using <a href="#attributes">-a, --attributes</a> |
+| missing_file_attributes | the attributes a file has not set using <a href="#attributes">-a, --attributes</a> |
+| raw_viewer | the output using <a href="#hexview">--hexview, --HEXVIEW</a>/<a href="#binview">--binview, --binview</a> |
 | message_information | any informational message like update information |
 | message_important | any important message like large file sizes |
 | message_warning | any warning message like overwriting a file with itself |
