@@ -15,6 +15,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added `unicode_escaped_find` option to the config menu to unicode-escape the queried substrings using `find=`.
 - when using `find=` it is now possible to query for an empty substring.
 - the replace parameter `[a,b]` now unicode-escapes a and b.
+- added `unicode_escaped_replace` option to the config menu to unicode-escape a and b using `[a,b]`.
 
 ### Bugfixes
 
