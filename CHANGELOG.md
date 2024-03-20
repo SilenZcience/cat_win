@@ -12,7 +12,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - removed the prompt to open a file in binary mode (the file will now always be opened).
 - allow all parameters to be applied to binary files.
 - added `ignore_unknown_bytes` option to the config menu to ignore unknown bytes in binary mode instead of replacing them with �.
-- when using `find=` the queried substring is now unicode-escaped and no longer literal.
+- added `unicode_escaped_find` option to the config menu to unicode-escape the queried substrings using `find=`.
 - when using `find=` it is now possible to query for an empty substring.
 - the replace parameter `[a,b]` now unicode-escapes a and b.
 
@@ -28,7 +28,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ### Minor Changes
 
-- the config menu now decodes the input as unicode escape sequences making it possible to enter special characters like tabs (\t) and newlines (\n).
+- the config menu now decodes the input as unicode-escape sequences making it possible to enter special characters like tabs (\t) and newlines (\n).
 - added --`strings`, --`strings` parameter to print the sequences of printable characters in any given file.
 - added `strings_minimum_sequence_length` to the config menu to set the minimum length of characters required to identify a sequence as a string using --`string`.
 - added `strings_delimeter` to the config menu to set the delimeter of multiple strings found on the same line using --`string`.
