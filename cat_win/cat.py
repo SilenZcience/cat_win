@@ -179,7 +179,13 @@ def _show_help(shell: bool = False) -> None:
         help_message += 'while numerating and showing the end of lines\n'
         help_message += f"\t{'catw f trunc=a:b:c': <25}"
         help_message += "Output f's content starting at line a, ending at line b, stepping c\n"
-    print(help_message)
+    t_height = max(os.get_terminal_size()[1], 2)
+    for chunk_s, line in enumerate(help_message.splitlines()):
+        print(line)
+        if chunk_s % (t_height-1) == t_height-2:
+            if input('(q to quit) ...').upper() in ['\x11', 'Q', 'QUIT']:
+                sys.exit(0)
+            print('\x1b[1F\x1b[2K', end='', flush=True) # clear input() line
     print_update_information(__project__, __version__, color_dic, on_windows_os)
 
 

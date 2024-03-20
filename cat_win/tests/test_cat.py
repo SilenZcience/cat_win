@@ -4,7 +4,7 @@ import os
 
 from cat_win import cat
 from cat_win.const.argconstants import ARGS_ENDS, ARGS_REVERSE, ARGS_CHR
-from cat_win.tests.mocks.std import StdOutMock
+from cat_win.tests.mocks.std import StdOutMock, StdInMock
 from cat_win.util.file import File
 from cat_win.persistence.cconfig import CConfig
 from cat_win.persistence.config import Config
@@ -18,6 +18,7 @@ with open(test_file_path, 'r', encoding='utf-8') as f:
     test_file_content = f.read().split('\n')
 
 
+@patch('os.get_terminal_size', lambda: (120, 30))
 class TestCat(TestCase):
     maxDiff = None
 
@@ -150,7 +151,9 @@ class TestCat(TestCase):
 
     @patch('cat_win.cat.print_update_information', new=lambda *_: '')
     def test__show_help(self):
-        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+        stdin_mock = StdInMock()
+        stdin_mock.set_content('\n\n\n')
+        with patch('sys.stdin', new=stdin_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat._show_help()
             for arg in cat.ALL_ARGS:
                 if arg.show_arg:
@@ -160,13 +163,17 @@ class TestCat(TestCase):
 
     @patch('cat_win.cat.print_update_information', new=lambda *_: '')
     def test__show_help_shell(self):
-        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+        stdin_mock = StdInMock()
+        stdin_mock.set_content('\n\n\n')
+        with patch('sys.stdin', new=stdin_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat._show_help(True)
             for arg in cat.ALL_ARGS:
                 if arg.show_arg and arg.show_arg_on_shell:
                     self.assertIn(arg.short_form, fake_out.getvalue())
                     self.assertIn(arg.long_form, fake_out.getvalue())
                     self.assertIn(arg.arg_help, fake_out.getvalue())
+                elif arg.show_arg:
+                    self.assertNotIn(arg.arg_help, fake_out.getvalue())
 
     @patch('cat_win.cat.print_update_information', new=lambda *_: '')
     def test__show_version(self):
