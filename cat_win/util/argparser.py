@@ -69,8 +69,9 @@ class ArgParser:
     """
     SIMILARITY_LIMIT = 50.0
 
-    def __init__(self, default_file_encoding: str = 'utf-8') -> None:
+    def __init__(self, default_file_encoding: str = 'utf-8', unicode_find: bool = True) -> None:
         self.default_file_encoding: str = default_file_encoding
+        self.unicode_find = unicode_find
         self.unicode_echo: bool = False
         self._clear_values()
         self.reset_values()
@@ -244,13 +245,14 @@ class ArgParser:
             if delete:
                 self.file_search.discard((param[5:], param[:4].isupper()))
                 return False
+            query = param[5:]
             try:
-                self.file_search.add((
-                    param[5:].encode().decode('unicode_escape').encode('latin-1').decode(),
-                    param[:4].isupper()
-                ))
+                if self.unicode_find:
+                    query = query.encode().decode('unicode_escape').encode('latin-1').decode()
             except UnicodeError:
-                self.file_search.add((param[5:], param[:4].isupper()))
+                pass
+            finally:
+                self.file_search.add((query, param[:4].isupper()))
             return False
         # 'trunc' + ('='/':') + file_truncate[0] +':'+ file_truncate[1] [+ ':' + file_truncate[2]]
         if RE_TRUNC.match(param):
