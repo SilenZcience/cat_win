@@ -86,7 +86,8 @@ def setup():
     const_dic = config.load_config()
 
     arg_parser = ArgParser(const_dic[DKW.DEFAULT_FILE_ENCODING],
-                           const_dic[DKW.UNICODE_ESCAPED_FIND])
+                           const_dic[DKW.UNICODE_ESCAPED_FIND],
+                           const_dic[DKW.UNICODE_ESCAPED_REPLACE])
     converter = Converter()
     holder = Holder()
     tmp_file_helper = TmpFileHelper()

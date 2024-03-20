@@ -69,9 +69,12 @@ class ArgParser:
     """
     SIMILARITY_LIMIT = 50.0
 
-    def __init__(self, default_file_encoding: str = 'utf-8', unicode_find: bool = True) -> None:
+    def __init__(self, default_file_encoding: str = 'utf-8',
+                 unicode_find: bool = True,
+                 unicode_replace: bool = True) -> None:
         self.default_file_encoding: str = default_file_encoding
         self.unicode_find = unicode_find
+        self.unicode_replace = unicode_replace
         self.unicode_echo: bool = False
         self._clear_values()
         self.reset_values()
@@ -269,15 +272,16 @@ class ArgParser:
         # '[' + ARGS_REPLACE_THIS + ',' + ARGS_REPLACE_WITH + ']' (escape chars with '\')
         if RE_REPLACE.match(param):
             re_match = RE_REPLACE.match(param)
+            re_this = re.sub(RE_REPLACE_COMMA, r"\1,", re_match.group(1))
+            re_with = re.sub(RE_REPLACE_COMMA, r"\1,", re_match.group(2))
             try:
-                replace_this = re.sub(RE_REPLACE_COMMA, r"\1,", re_match.group(1))
-                replace_with = re.sub(RE_REPLACE_COMMA, r"\1,", re_match.group(2))
-                self.file_replace_mapping[param] = (
-                    replace_this.encode().decode('unicode_escape').encode('latin-1').decode(),
-                    replace_with.encode().decode('unicode_escape').encode('latin-1').decode()
-                )
+                if self.unicode_replace:
+                    re_this = re_this.encode().decode('unicode_escape').encode('latin-1').decode()
+                    re_with = re_with.encode().decode('unicode_escape').encode('latin-1').decode()
             except UnicodeError:
-                self.file_replace_mapping[param] = re_match.groups()
+                pass
+            finally:
+                self.file_replace_mapping[param] = ((re_this, re_with))
             self._args.append((ARGS_REPLACE, param))
             return False
 
