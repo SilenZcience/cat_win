@@ -12,10 +12,9 @@ Start of documentation: 2023-02-16 / v1.1.0
 - removed the prompt to open a file in binary mode (the file will now always be opened).
 - allow all parameters to be applied to binary files.
 - added `ignore_unknown_bytes` option to the config menu to ignore unknown bytes in binary mode instead of replacing them with �.
-- added `unicode_escaped_find` option to the config menu to unicode-escape the queried substrings using `find=`.
+- added `unicode_escaped_find` option to the config menu to unicode-escape the queried substrings using `find=` (default is True).
 - when using `find=` it is now possible to query for an empty substring.
-- the replace parameter `[a,b]` now unicode-escapes a and b.
-- added `unicode_escaped_replace` option to the config menu to unicode-escape a and b using `[a,b]`.
+- added `unicode_escaped_replace` option to the config menu to unicode-escape a and b using `[a,b]` (default is True).
 
 ### Bugfixes
 
