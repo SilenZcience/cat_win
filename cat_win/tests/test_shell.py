@@ -70,9 +70,9 @@ class TestShell(TestCase):
             self.assertListEqual(fake_output, expected_output)
 
     def test_cat_shell_see_param(self):
-        stdinhelpermock.set_content('!add -ln find=test match=[0-9]\n!see')
+        stdinhelpermock.set_content('!add -ln FIND=test match=[0-9]\n!see')
         expected_output = ["successfully added ['-l', '-n'].", "Active Args: ['-l', '-n']",
-                           "Literals:    {('test', False)}", "Matches:     {('[0-9]', False)}"]
+                           "Literals:    [('test', 'CI')]", "Matches:     [('[0-9]', 'CS')]"]
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.shell_main()
             fake_output = [line.lstrip('>>> ') for line in fake_out.getvalue().splitlines()[2:-1]]
@@ -81,7 +81,7 @@ class TestShell(TestCase):
     def test_cat_shell_clear_param(self):
         stdinhelpermock.set_content('!add -ln find=test match=[0-9]\n!see\n!clear\n!see')
         expected_output = ["successfully added ['-l', '-n'].", "Active Args: ['-l', '-n']",
-                           "Literals:    {('test', False)}", "Matches:     {('[0-9]', False)}",
+                           "Literals:    [('test', 'CS')]", "Matches:     [('[0-9]', 'CS')]",
                            "successfully removed ['-l', '-n'].", 'Active Args: []']
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.shell_main()

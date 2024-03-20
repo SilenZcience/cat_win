@@ -225,9 +225,9 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     err_print('file encoding: ', end='')
     err_print(arg_parser.file_encoding)
     err_print('search keyword(s): ', end='')
-    err_print(arg_parser.file_search)
+    err_print([(v, 'CI' if c else 'CS') for v, c in arg_parser.file_search])
     err_print('search match(es): ', end='')
-    err_print(arg_parser.file_match)
+    err_print([(v, 'CI' if c else 'CS') for v, c in arg_parser.file_match])
     err_print('truncate file: ', end='')
     err_print(arg_parser.file_truncate)
     err_print('replace mapping: ', end='')
@@ -1364,9 +1364,11 @@ def shell_main():
         def _command_see(self, _) -> None:
             print(f"{'Active Args:': <12} {[arg for _, arg in holder.args]}")
             if arg_parser.file_search:
-                print(f"{'Literals:':<12} {arg_parser.file_search}")
+                file_search = [(v, 'CI' if c else 'CS') for v, c in arg_parser.file_search]
+                print(f"{'Literals:':<12} {file_search}")
             if arg_parser.file_match:
-                print(f"{'Matches:': <12} {arg_parser.file_match}")
+                file_match = [(v, 'CI' if c else 'CS') for v, c in arg_parser.file_match]
+                print(f"{'Matches:': <12} {file_match}")
 
         def _command_exit(self, _) -> None:
             self.exit_shell = True
