@@ -175,7 +175,7 @@ class TestCat(TestCase):
             self.assertIn('Catw', fake_out.getvalue())
             self.assertIn('Author', fake_out.getvalue())
 
-    @patch('cat_win.cat.arg_parser.file_search', new=set(['hello', 'world']))
+    @patch('cat_win.cat.arg_parser.file_search', new=set([('hello', False), ('world', True)]))
     def test__show_debug(self):
         with patch('sys.stderr', new=StdOutMock()) as fake_out:
             cat._show_debug([], ['test'], [], [], [], [])
@@ -183,6 +183,8 @@ class TestCat(TestCase):
             self.assertIn('DEBUG', fake_out.getvalue())
             self.assertIn('hello', fake_out.getvalue())
             self.assertIn('world', fake_out.getvalue())
+            self.assertIn('CS', fake_out.getvalue())
+            self.assertIn('CI', fake_out.getvalue())
 
     def test__get_file_prefix(self):
         cat.holder.files = [File('a', 'b/c.x')]
