@@ -1053,7 +1053,7 @@ This Text is written in Utf-16!
 ### <a id="find">find=X, find&#42889;X</a>
 
 Defines a Literal to search for within the Text of any provided File.
-The Substring is unicode-escaped (\\n will be interpreted as an actual Newline) but in Case of an unicode-error the Substring will simply be used literally.
+The Substring is unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_find` is set but in Case of an unicode-error the Substring will simply be used literally.
 When the Literal contains Whitespaces it is neccessary to encase the entire Parameter with Quotes as defined by the Terminal used.
 It is possible to define multiple Substrings to search for by simply providing the Parameter find=X multiple times.
 When using this Parameter in Uppercase the Case of the Substring will be ignored.
@@ -1111,7 +1111,7 @@ The Argument is valid by defining trunc=\<start\>\:\<stop\> or trunc=\<start\>\:
 ### <a id="replace">[a,b]</a>
 
 Replaces the Substring defined by a with the Substring b in every Line of Every File.
-The Substrings a and b are unicode-escaped (\\n will be interpreted as an actual Newline) but in Case of an unicode-error the Substrings will simply be used literally.
+The Substrings a and b are unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_replace` is set but in Case of an unicode-error the Substrings will simply be used literally.
 Comma (,) can be escaped using `\,` despite it not being a valid unicode-escape Sequence.
 When one of the Substrings contains Whitespaces it is neccessary to encase the entire Parameter with Quotes as defined by the Terminal used.
 
