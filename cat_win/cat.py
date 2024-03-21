@@ -179,7 +179,10 @@ def _show_help(shell: bool = False) -> None:
         help_message += 'while numerating and showing the end of lines\n'
         help_message += f"\t{'catw f trunc=a:b:c': <25}"
         help_message += "Output f's content starting at line a, ending at line b, stepping c\n"
-    t_height = max(os.get_terminal_size()[1], 2)
+    try:
+        t_height = max(os.get_terminal_size()[1], 2)
+    except OSError: # PyPy "Inappropriate ioctl for device"
+        t_height = 30
     for chunk_s, line in enumerate(help_message.splitlines()):
         print(line)
         if chunk_s % (t_height-1) == t_height-2:
