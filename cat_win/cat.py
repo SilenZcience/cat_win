@@ -186,8 +186,13 @@ def _show_help(shell: bool = False) -> None:
     for chunk_s, line in enumerate(help_message.splitlines()):
         print(line)
         if chunk_s % (t_height-1) == t_height-2:
-            if input('(q to quit) ...').upper() in ['\x11', 'Q', 'QUIT']:
-                sys.exit(0)
+            try:
+                if input('(q to quit) ...').upper() in ['\x11', 'Q', 'QUIT']:
+                    sys.exit(0)
+            except EOFError:
+                pass
+            if not os.isatty(sys.stdin.fileno()):
+                print() # emulate enter-press on piped input
             print('\x1b[1F\x1b[2K', end='', flush=True) # clear input() line
     print_update_information(__project__, __version__, color_dic, on_windows_os)
 
