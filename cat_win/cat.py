@@ -46,6 +46,7 @@ from cat_win.util.holder import Holder
 from cat_win.util.rawviewer import SPECIAL_CHARS, get_raw_view_lines_gen
 from cat_win.util.stringfinder import StringFinder
 from cat_win.util.strings import get_strings
+from cat_win.util.summary import Summary
 from cat_win.util.tmpfilehelper import TmpFileHelper
 from cat_win.util.urls import sep_valid_urls, read_url
 try:
@@ -91,6 +92,7 @@ def setup():
     converter = Converter()
     holder = Holder()
     tmp_file_helper = TmpFileHelper()
+    Summary.setup_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
 
 
 def err_print(*args, **kwargs):
@@ -250,146 +252,6 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     err_print(arg_parser.file_replace_mapping)
     err_print('==================================================='
               '====================================================')
-
-
-def _show_wordcount() -> None:
-    word_count = {}
-    used_files = []
-
-    for hfile in holder.files:
-        try:
-            with open(hfile.path, 'r', encoding=arg_parser.file_encoding) as file:
-                for token in re.findall(r'\w+|[^\s\w]', file.read()):
-                    word_count[token] = word_count.get(token, 0)+1
-            used_files.append(hfile.displayname)
-        except (OSError, UnicodeError):
-            pass
-    if not used_files:
-        print(color_dic[CKW.SUMMARY], end='')
-        print('The word count could not be calculated.', end='')
-        print(color_dic[CKW.RESET_ALL])
-        return
-
-    print(color_dic[CKW.SUMMARY], end='')
-    print('The word count includes the following files:', end='')
-    print(color_dic[CKW.RESET_ALL], end='\n\t')
-    print('\n\t'.join(map(
-        lambda f: f"{color_dic[CKW.SUMMARY]}{f}{color_dic[CKW.RESET_ALL]}", used_files
-        )))
-    sorted_word_count = sorted(word_count.items(), key=lambda token: token[1], reverse=True)
-    format_delimeter = f"{color_dic[CKW.RESET_ALL]}:{color_dic[CKW.SUMMARY]} "
-    for _, group in groupby(sorted_word_count, lambda token: token[1]):
-        sorted_group = sorted(group, key=lambda token: token[0])
-        formatted_word_count = map(
-            lambda x: f"{color_dic[CKW.SUMMARY]}{x[0]}"
-            f"{format_delimeter}{x[1]}{color_dic[CKW.RESET_ALL]}",
-            sorted_group
-            )
-        print('\n' + '\n'.join(formatted_word_count), end='')
-    print(color_dic[CKW.RESET_ALL])
-
-
-def _show_charcount() -> None:
-    char_count = {}
-    used_files = []
-
-    for hfile in holder.files:
-        try:
-            with open(hfile.path, 'r', encoding=arg_parser.file_encoding) as file:
-                for char in list(file.read()):
-                    char_count[char] = char_count.get(char, 0)+1
-            used_files.append(hfile.displayname)
-        except (OSError, UnicodeError):
-            pass
-    if not used_files:
-        print(color_dic[CKW.SUMMARY], end='')
-        print('The char count could not be calculated.', end='')
-        print(color_dic[CKW.RESET_ALL])
-        return
-
-    print(color_dic[CKW.SUMMARY], end='')
-    print('The char count includes the following files:', end='')
-    print(color_dic[CKW.RESET_ALL], end='\n\t')
-    print('\n\t'.join(map(
-        lambda f: f"{color_dic[CKW.SUMMARY]}{f}{color_dic[CKW.RESET_ALL]}", used_files
-        )))
-    sorted_char_count = sorted(char_count.items(), key=lambda token: token[1], reverse=True)
-    format_delimeter = f"{color_dic[CKW.RESET_ALL]}:{color_dic[CKW.SUMMARY]} "
-    for _, group in groupby(sorted_char_count, lambda token: token[1]):
-        sorted_group = sorted(group, key=lambda token: token[0])
-        formatted_char_count = map(
-            lambda x: f"{color_dic[CKW.SUMMARY]}{repr(x[0]) if x[0].isspace() else x[0]}"
-            f"{format_delimeter}{x[1]}{color_dic[CKW.RESET_ALL]}",
-            sorted_group
-            )
-        print('\n' + '\n'.join(formatted_char_count), end='')
-    print(color_dic[CKW.RESET_ALL])
-
-
-def _show_sum() -> None:
-    """
-    display the line sum of each file individually if
-    ARGS_SSUM is specified.
-    display the line sum of all files.
-    """
-    if holder.args_id[ARGS_SSUM]:
-        longest_file_name = max(map(len, holder.all_files_lines.keys())) + 1
-        print(f"{color_dic[CKW.SUMMARY]}{'File': <{longest_file_name}}{color_dic[CKW.RESET_ALL]}"
-            f"{color_dic[CKW.SUMMARY]}LineCount{color_dic[CKW.RESET_ALL]}")
-        for file, _ in holder.all_files_lines.items():
-            print(f"{color_dic[CKW.SUMMARY]}{file: <{longest_file_name}}" + \
-                f"{holder.all_files_lines[file]: >{holder.all_line_number_place_holder}}" + \
-                    f"{color_dic[CKW.RESET_ALL]}")
-        print('')
-    print(f"{color_dic[CKW.SUMMARY]}Lines (Sum): " + \
-        f"{holder.all_files_lines_sum}{color_dic[CKW.RESET_ALL]}")
-
-
-def _show_files() -> None:
-    """
-    displays holder.files including their size and calculates
-    their size sum.
-    """
-    if not holder.files:
-        return
-    file_sizes = []
-    msg = 'found' if holder.args_id[ARGS_FFILES] else 'applied'
-    print(color_dic[CKW.SUMMARY], end='')
-    print(f"{msg} FILE(s):", end='')
-    print(color_dic[CKW.RESET_ALL])
-    for file in holder.files:
-        if file.file_size == -1:
-            file.set_file_size(get_file_size(file.path))
-        file_sizes.append(file.file_size)
-        print(f"     {color_dic[CKW.SUMMARY]}" + \
-            f"{str(_convert_size(file.file_size)).rjust(9)}", end='')
-        prefix = ' ' if file.plaintext        else '-'
-        prefix+= '*' if file.contains_queried else ' '
-        print(f"{prefix}{file.displayname}{color_dic[CKW.RESET_ALL]}")
-    print(color_dic[CKW.SUMMARY], end='')
-    print(f"Sum: {str(_convert_size(sum(file_sizes))).rjust(9)}", end='')
-    print(color_dic[CKW.RESET_ALL])
-    print(color_dic[CKW.SUMMARY], end='')
-    print(f"Amount:\t{len(holder.files)}", end='')
-    print(color_dic[CKW.RESET_ALL])
-
-
-def _show_dirs():
-    known_directories = arg_parser.get_dirs()
-    if not known_directories:
-        print(color_dic[CKW.SUMMARY], end='')
-        print('No directores have been found!', end='')
-        print(color_dic[CKW.RESET_ALL])
-        return
-    print(color_dic[CKW.SUMMARY], end='')
-    print('found DIR(s):', end='')
-    print(color_dic[CKW.RESET_ALL])
-    for directory in known_directories:
-        print(f"     {color_dic[CKW.SUMMARY]}" + \
-            f"{directory}{color_dic[CKW.RESET_ALL]}")
-    print(color_dic[CKW.SUMMARY], end='')
-    print(f"Amount:\t{len(known_directories)}", end='')
-    print(color_dic[CKW.RESET_ALL])
 
 
 def _print_meta(file: str) -> None:
@@ -1014,21 +876,22 @@ def edit_files() -> None:
             print_raw_view(i, raw_view_mode)
         else:
             edit_file(i)
-    if holder.args_id[ARGS_WORDCOUNT]:
-        print('')
-        _show_wordcount()
-    if holder.args_id[ARGS_CHARCOUNT]:
-        print('')
-        _show_charcount()
-    if holder.args_id[ARGS_SUM]:
-        print('')
-        _show_sum()
     if holder.args_id[ARGS_FILES]:
         print('')
-        _show_files()
+        Summary.show_files(holder.args_id[ARGS_FFILES], holder.files)
     if holder.args_id[ARGS_DIRECTORIES]:
         print('')
-        _show_dirs()
+        Summary.show_dirs(arg_parser.get_dirs())
+    if holder.args_id[ARGS_SUM]:
+        print('')
+        Summary.show_sum(holder.args_id[ARGS_SSUM], holder.all_files_lines,
+                         holder.all_line_number_place_holder, holder.all_files_lines_sum)
+    if holder.args_id[ARGS_WORDCOUNT]:
+        print('')
+        Summary.show_wordcount(holder.files, arg_parser.file_encoding)
+    if holder.args_id[ARGS_CHARCOUNT]:
+        print('')
+        Summary.show_charcount(holder.files, arg_parser.file_encoding)
     if holder.args_id[ARGS_CLIP]:
         copy_to_clipboard(remove_ansi_codes_from_line(holder.clip_board))
 
@@ -1202,10 +1065,10 @@ def main():
     holder.set_files([*known_files, *unknown_files])
 
     if holder.args_id[ARGS_FFILES]:
-        _show_files()
+        Summary.show_files(holder.args_id[ARGS_FFILES], holder.files)
         return
     if holder.args_id[ARGS_DDIRECTORIES]:
-        _show_dirs()
+        Summary.show_dirs(arg_parser.get_dirs())
         return
     if holder.args_id[ARGS_DATA] or holder.args_id[ARGS_CHECKSUM]:
         _print_meta_and_checksum(holder.args_id[ARGS_DATA], holder.args_id[ARGS_CHECKSUM])
@@ -1236,13 +1099,14 @@ def main():
     holder.generate_values()
 
     if holder.args_id[ARGS_SSUM]:
-        _show_sum()
+        Summary.show_sum(holder.args_id[ARGS_SSUM], holder.all_files_lines,
+                         holder.all_line_number_place_holder, holder.all_files_lines_sum)
         return
     if holder.args_id[ARGS_WWORDCOUNT]:
-        _show_wordcount()
+        Summary.show_wordcount(holder.files, arg_parser.file_encoding)
         return
     if holder.args_id[ARGS_CCHARCOUNT]:
-        _show_charcount()
+        Summary.show_charcount(holder.files, arg_parser.file_encoding)
         return
 
     edit_files()  # print the cat-output
