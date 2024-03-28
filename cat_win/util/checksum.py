@@ -52,3 +52,18 @@ def get_checksum_from_file(file: str, colors = None) -> str:
     checksum += f"\t{colors[0]}{'SHA256:': <9}{str(sha256.hexdigest())}{colors[1]}\n"
     checksum += f"\t{colors[0]}{'SHA512:': <9}{str(sha512.hexdigest())}{colors[1]}\n"
     return checksum
+
+def print_checksum(file: str, color: str, color_reset: str) -> None:
+    """
+    print the information retrieved by get_checksum_from_file()
+    
+    Parameters:
+    file (str):
+        a string representation of a file (-path)
+    color (str):
+        the color to use
+    color_reset (str):
+        the reset color code
+    """
+    print(f"{color}Checksum of '{file}':{color_reset}")
+    print(get_checksum_from_file(file, [color, color_reset]))

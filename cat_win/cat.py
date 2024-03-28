@@ -36,10 +36,10 @@ from cat_win.persistence.cconfig import CConfig
 from cat_win.persistence.config import Config
 from cat_win.util.argparser import ArgParser
 from cat_win.util.cbase64 import _decode_base64, encode_base64
-from cat_win.util.checksum import get_checksum_from_file
+from cat_win.util.checksum import print_checksum
 from cat_win.util.converter import Converter
 from cat_win.util.editor import Editor
-from cat_win.util.fileattributes import get_file_meta_data, get_file_size, get_file_mtime
+from cat_win.util.fileattributes import get_file_size, get_file_mtime, print_meta
 from cat_win.util.fileattributes import _convert_size
 from cat_win.util.formatter import Formatter
 from cat_win.util.holder import Holder
@@ -254,34 +254,6 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
               '====================================================')
 
 
-def _print_meta(file: str) -> None:
-    """
-    print the information retrieved by get_file_meta_data()
-    
-    Parameters:
-    file (str):
-        a string representation of a file (-path)
-    """
-    meta_data = get_file_meta_data(file, on_windows_os,
-                               [color_dic[CKW.RESET_ALL],
-                               color_dic[CKW.ATTRIB],
-                               color_dic[CKW.ATTRIB_POSITIVE],
-                               color_dic[CKW.ATTRIB_NEGATIVE]])
-    print(meta_data)
-
-
-def _print_checksum(file: str) -> None:
-    """
-    print the information retrieved by get_checksum_from_file()
-    
-    Parameters:
-    file (str):
-        a string representation of a file (-path)
-    """
-    print(f"{color_dic[CKW.CHECKSUM]}Checksum of '{file}':{color_dic[CKW.RESET_ALL]}")
-    print(get_checksum_from_file(file, [color_dic[CKW.CHECKSUM], color_dic[CKW.RESET_ALL]]))
-
-
 def _print_meta_and_checksum(show_meta: bool, show_checksum: bool) -> None:
     """
     calls _print_meta() and _print_checksum() on every file.
@@ -294,9 +266,13 @@ def _print_meta_and_checksum(show_meta: bool, show_checksum: bool) -> None:
     """
     for file in holder.files:
         if show_meta:
-            _print_meta(file.path)
+            print_meta(file.path, on_windows_os,
+                        [color_dic[CKW.RESET_ALL],
+                        color_dic[CKW.ATTRIB],
+                        color_dic[CKW.ATTRIB_POSITIVE],
+                        color_dic[CKW.ATTRIB_NEGATIVE]])
         if show_checksum:
-            _print_checksum(file.path)
+            print_checksum(file.path, color_dic[CKW.CHECKSUM], color_dic[CKW.RESET_ALL])
 
 @lru_cache(maxsize=250)
 def remove_ansi_codes_from_line(line: str) -> str:
@@ -320,11 +296,6 @@ def remove_ansi_codes_from_line(line: str) -> str:
     # return line
     # version 2:
     return ANSI_CSI_RE.sub('', line)
-
-
-# def removeAnsiCodes(content: list) -> list:
-#     return [(remove_ansi_codes_from_line(prefix),
-#                   remove_ansi_codes_from_line(line)) for prefix, line in content]
 
 
 @lru_cache()

@@ -146,3 +146,18 @@ def get_file_meta_data(file: str, on_windows_os: bool, colors = None) -> str:
         return meta_data
     except OSError:
         return ''
+
+def print_meta(file: str, on_windows_os: bool, colors: list) -> None:
+    """
+    print the information retrieved by get_file_meta_data()
+    
+    Parameters:
+    file (str):
+        a string representation of a file (-path)
+    on_windows_os (bool):
+        indicates if the current system is Windows
+    colors (list):
+        [reset, attributes, positive_attr, negative_attr] color codes
+    """
+    meta_data = get_file_meta_data(file, on_windows_os, colors)
+    print(meta_data)
