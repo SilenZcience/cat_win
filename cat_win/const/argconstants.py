@@ -31,7 +31,7 @@ ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY, ARGS_FILE_PREFIX = range(
 ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI, ARGS_WORDCOUNT = range(45, 50)
 ARGS_WWORDCOUNT, ARGS_DIRECTORIES, ARGS_DDIRECTORIES = range(50, 53)
 ARGS_SPECIFIC_FORMATS, ARGS_CONFIG, ARGS_CHARCOUNT = range(53, 56)
-ARGS_CCHARCOUNT, ARGS_STRINGS = range(56, 58)
+ARGS_CCHARCOUNT, ARGS_STRINGS, ARGS_MORE = range(56, 59)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -146,20 +146,23 @@ ALL_ARGS = [
 				ARGS_HEXVIEW, show_arg_on_shell=False, section=9),
 
     ArgConstant('-!', '--edit', 'open each file in a simple editor',
-				ARGS_EDITOR, section=10),
+				ARGS_EDITOR, show_arg_on_shell=False, section=10),
     ArgConstant('-c', '--clip', 'copy output to clipboard',
 				ARGS_CLIP, section=10),
+    ArgConstant('-M', '--more', 'walk through the file step by step',
+                ARGS_MORE, show_arg_on_shell=False, section=10),
+
     ArgConstant('--dot', '--dotfiles', 'additionally query and edit dotfiles',
-				ARGS_DOTFILES, show_arg_on_shell=False, section=10),
+				ARGS_DOTFILES, show_arg_on_shell=False, section=11),
     ArgConstant('--plain', '--plain-only', 'ignore non-plaintext files automatically',
-				ARGS_PLAIN_ONLY, show_arg_on_shell=False, section=10),
+				ARGS_PLAIN_ONLY, show_arg_on_shell=False, section=11),
     ArgConstant('--nc', '--nocolor', 'disable colored output',
-				ARGS_NOCOL, section=10),
+				ARGS_NOCOL, section=11),
 
     ArgConstant('--config', '--config', 'change default parameters',
-				ARGS_CONFIG, section=11),
+				ARGS_CONFIG, section=12),
     ArgConstant('--cconfig', '--cconfig', 'change color configuration',
-				ARGS_CCONFIG, section=11),
+				ARGS_CCONFIG, section=12),
 
     ArgConstant('-R', '--R', 'reconfigure the stdin and stdout with the parsed encoding',
 				ARGS_RECONFIGURE, show_arg=False),
