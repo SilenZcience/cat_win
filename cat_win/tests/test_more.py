@@ -1,11 +1,12 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from cat_win.tests.mocks.std import StdInMock, StdOutMock
+from cat_win.tests.mocks.std import StdInMock, StdOutMock, OSAttyDefGen
 from cat_win.util.more import More
 
 
 @patch('os.get_terminal_size', lambda: (120, 30))
+@patch('os.isatty', OSAttyDefGen.get_def({0: True}))
 @patch('sys.stdin', new=StdInMock())
 class TestMore(TestCase):
     def test_output_short(self):
