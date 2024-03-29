@@ -29,7 +29,7 @@ from cat_win.const.argconstants import ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ER
 from cat_win.const.argconstants import ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY
 from cat_win.const.argconstants import ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI
 from cat_win.const.argconstants import ARGS_DIRECTORIES, ARGS_DDIRECTORIES, ARGS_SPECIFIC_FORMATS
-from cat_win.const.argconstants import ARGS_CHARCOUNT, ARGS_CCHARCOUNT, ARGS_STRINGS
+from cat_win.const.argconstants import ARGS_CHARCOUNT, ARGS_CCHARCOUNT, ARGS_STRINGS, ARGS_MORE
 from cat_win.const.colorconstants import CKW
 from cat_win.const.defaultconstants import DKW
 from cat_win.persistence.cconfig import CConfig
@@ -43,6 +43,7 @@ from cat_win.util.fileattributes import get_file_size, get_file_mtime, print_met
 from cat_win.util.fileattributes import _convert_size
 from cat_win.util.formatter import Formatter
 from cat_win.util.holder import Holder
+from cat_win.util.more import More
 from cat_win.util.rawviewer import SPECIAL_CHARS, get_raw_view_lines_gen
 from cat_win.util.stringfinder import StringFinder
 from cat_win.util.strings import get_strings
@@ -93,6 +94,7 @@ def setup():
     holder = Holder()
     tmp_file_helper = TmpFileHelper()
     Summary.setup_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
+    More.setup(remove_ansi_codes_from_line, const_dic[DKW.MORE_STEP_LENGTH])
 
 
 def err_print(*args, **kwargs):
@@ -181,21 +183,7 @@ def _show_help(shell: bool = False) -> None:
         help_message += 'while numerating and showing the end of lines\n'
         help_message += f"\t{'catw f trunc=a:b:c': <25}"
         help_message += "Output f's content starting at line a, ending at line b, stepping c\n"
-    try:
-        t_height = max(os.get_terminal_size()[1], 2)
-    except OSError: # PyPy "Inappropriate ioctl for device"
-        t_height = 30
-    for chunk_s, line in enumerate(help_message.splitlines()):
-        print(line)
-        if chunk_s % (t_height-1) == t_height-2:
-            try:
-                if input('(q to quit) ...').upper() in ['\x11', 'Q', 'QUIT']:
-                    sys.exit(0)
-            except EOFError:
-                pass
-            if not os.isatty(sys.stdin.fileno()):
-                print() # emulate enter-press on piped input
-            print('\x1b[1F\x1b[2K', end='', flush=True) # clear input() line
+    (More(help_message.splitlines())).step_through()
     print_update_information(__project__, __version__, color_dic, on_windows_os)
 
 
@@ -419,7 +407,7 @@ def _get_file_prefix(prefix: str, file_index: int, hyper: bool = False) -> str:
     return f"{color_dic[CKW.FILE_PREFIX]}{file}{color_dic[CKW.RESET_ALL]}:{prefix}"
 
 
-def print_file(content: list) -> bool:
+def print_file(content: list, stepper: More) -> bool:
     """
     print a file and possibly include the substrings and patterns to search for.
     
@@ -436,6 +424,9 @@ def print_file(content: list) -> bool:
         return False
     if not any([arg_parser.file_search, arg_parser.file_match,
                 holder.args_id[ARGS_GREP], holder.args_id[ARGS_GREP_ONLY]]):
+        if holder.args_id[ARGS_MORE]:
+            stepper.add_lines([prefix + line for prefix, line in content])
+            return False
         print(*[prefix + line for prefix, line in content], sep='\n')
         return False
 
@@ -460,7 +451,11 @@ def print_file(content: list) -> bool:
                     f"{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_MATCHED]}")
                                  for _, pos in m_keywords]
                 fm_substrings.sort(key=lambda x:x[0])
-                print(f"{line_prefix}{','.join(sub for _, sub in fm_substrings)}")
+                grepped_line = f"{line_prefix}{','.join(sub for _, sub in fm_substrings)}"
+                if holder.args_id[ARGS_MORE]:
+                    stepper.add_line(grepped_line)
+                    continue
+                print(grepped_line)
             continue
 
         # when bool(intervals) == True -> found keyword or matched pattern!
@@ -475,6 +470,9 @@ def print_file(content: list) -> bool:
         #     1     |  1   |     1     ->   0
         if not intervals:
             if not holder.args_id[ARGS_GREP]:
+                if holder.args_id[ARGS_MORE]:
+                    stepper.add_line(line_prefix + line)
+                    continue
                 print(line_prefix + line)
             continue
 
@@ -485,24 +483,33 @@ def print_file(content: list) -> bool:
             for kw_pos, kw_code in intervals:
                 cleaned_line = cleaned_line[:kw_pos] + color_dic[kw_code] + cleaned_line[kw_pos:]
 
-        print(line_prefix + cleaned_line)
+        if holder.args_id[ARGS_MORE]:
+            stepper.add_line(line_prefix + cleaned_line)
+        else:
+            print(line_prefix + cleaned_line)
 
         if holder.args_id[ARGS_GREP] or holder.args_id[ARGS_NOBREAK]:
             continue
 
         found_sth = False
         if f_keywords:
-            print(color_dic[CKW.FOUND_MESSAGE], end='')
-            print('--------------- Found', f_keywords, '---------------', end='')
-            print(color_dic[CKW.RESET_ALL])
+            found_message = f"{color_dic[CKW.FOUND_MESSAGE]}--------------- Found "
+            found_message+= f"{f_keywords} ---------------{color_dic[CKW.RESET_ALL]}"
+            if holder.args_id[ARGS_MORE]:
+                stepper.add_line(found_message)
+            else:
+                print(found_message)
             found_sth = True
         if m_keywords:
-            print(color_dic[CKW.MATCHED_MESSAGE], end='')
-            print('--------------- Matched', m_keywords, '---------------', end='')
-            print(color_dic[CKW.RESET_ALL])
+            matched_message = f"{color_dic[CKW.MATCHED_MESSAGE]}--------------- Matched "
+            matched_message+= f"{m_keywords} ---------------{color_dic[CKW.RESET_ALL]}"
+            if holder.args_id[ARGS_MORE]:
+                stepper.add_line(matched_message)
+            else:
+                print(matched_message)
             found_sth = True
 
-        if found_sth:
+        if found_sth and not holder.args_id[ARGS_MORE]:
             try:
                 # fails when using --stdin mode, because the stdin will send en EOF char
                 # to input without prompting the user
@@ -548,7 +555,8 @@ def print_excluded_by_peek(content: list, excluded_by_peek: int) -> None:
         return
     if any([holder.args_id[ARGS_GREP],
             holder.args_id[ARGS_GREP_ONLY],
-            holder.args_id[ARGS_NOKEYWORD]]):
+            holder.args_id[ARGS_NOKEYWORD],
+            holder.args_id[ARGS_MORE]]):
         return
     _print_excluded_by_peek(len(remove_ansi_codes_from_line(content[0][0])),
                             excluded_by_peek + 10 - len(content))
@@ -660,13 +668,17 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
     if holder.args_id[ARGS_B64E]:
         content = encode_base64(content, arg_parser.file_encoding)
 
-    found_queried = print_file(content[:len(content)//2])
+    stepper = More()
+    found_queried = print_file(content[:len(content)//2], stepper)
     if file_index >= 0:
         holder.files[file_index].set_contains_queried(found_queried)
     print_excluded_by_peek(content, excluded_by_peek)
-    found_queried = print_file(content[len(content)//2:])
+    found_queried = print_file(content[len(content)//2:], stepper)
     if file_index >= 0:
         holder.files[file_index].set_contains_queried(found_queried)
+
+    if holder.args_id[ARGS_MORE]:
+        stepper.step_through()
 
     if holder.args_id[ARGS_CLIP]:
         holder.clip_board += '\n'.join(prefix + line for prefix, line in content)
