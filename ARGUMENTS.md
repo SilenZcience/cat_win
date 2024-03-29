@@ -164,7 +164,9 @@
 | *<a href="#hexview">--hexview, --HEXVIEW</a>* | display the raw byte representation in hexadecimal |❌|
 ||| |
 | *<a href="#editor">-!, --edit</a>* | open each file in a simple editor |❌|
+| *<a href="#clip">-c, --clip</a>* | copy output to clipboard |✔|
 | *<a href="#more">-M, --more</a>* | walk through the file step by step |❌|
+||| |
 | *<a href="#dot">--dot, --dotfiles</a>* | additionally query and edit dotfiles |❌|
 | *<a href="#plain">--plain, --plain-only</a>* | ignore non-plaintext files automatically |❌|
 | *<a href="#nocolor">--nc, --nocolor</a>* | disable colored output |✔|
