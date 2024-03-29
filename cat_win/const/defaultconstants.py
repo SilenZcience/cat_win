@@ -18,3 +18,4 @@ class DKW:
     STRINGS_DELIMETER = 'strings_delimeter'
     UNICODE_ESCAPED_FIND = 'unicode_escaped_find'
     UNICODE_ESCAPED_REPLACE = 'unicode_escaped_replace'
+    MORE_STEP_LENGTH = 'more_step_length'
