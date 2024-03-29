@@ -80,6 +80,7 @@
                   <li><a href="#hexview">--hexview, --HEXVIEW</a></li>
                   <li><a href="#editor">-!, --edit</a></li>
                   <li><a href="#clip">-c, --clip</a></li>
+                  <li><a href="#more">-M, --more</a></li>
                   <li><a href="#dot">--dot, --dotfiles</a></li>
                   <li><a href="#plain">--plain, --plain-only</a></li>
                   <li><a href="#nocolor">--nc, --nocolor</a></li>
@@ -163,7 +164,7 @@
 | *<a href="#hexview">--hexview, --HEXVIEW</a>* | display the raw byte representation in hexadecimal |❌|
 ||| |
 | *<a href="#editor">-!, --edit</a>* | open each file in a simple editor |❌|
-| *<a href="#clip">-c, --clip</a>* | copy output to clipboard |✔|
+| *<a href="#more">-M, --more</a>* | walk through the file step by step |❌|
 | *<a href="#dot">--dot, --dotfiles</a>* | additionally query and edit dotfiles |❌|
 | *<a href="#plain">--plain, --plain-only</a>* | ignore non-plaintext files automatically |❌|
 | *<a href="#nocolor">--nc, --nocolor</a>* | disable colored output |✔|
@@ -338,7 +339,7 @@ Beware that other Arguments can change a Line to be not empty beforehand.
 Only displays the first and last 5 Lines of each File.
 Between the Beginning and End of the File will be displayed how many Lines have been skipped.
 Useful for getting a quick impression of how data in a given File is structured.
-This Argument is not being used when provided alongside with Queries for Substrings of Patterns.
+This Argument is ignored when provided alongside with Queries for Substrings of Patterns or the <a href="#more">-M, --more</a> Parameter.
 Does nothing when the File has at most 10 Lines.
 
 ```console
@@ -912,6 +913,29 @@ The currently supported Key bindings are as follows:
 
 Copies the entire Output to the Clipboard additionally to printing it to the Stdout Stream.
 
+### <a id="more">-M, --more</a>
+
+Page through the File Contents Step by Step.
+Each Step the Output is paused until User Interaction.
+The first Step always fills the entire Screen.
+The following Steps have the Size as defined by the config Element `more_step_length`.
+Display the available Commands by entering `?` or `help`.
+The Output can be stopped entirely when entering `q` or `quit` on the User Prompt.
+When entering `n` or `next` the Programm will skip to the next File.
+
+```console
+> catw file -M
+line 1
+line 2
+...
+line 29
+> -- More ( 6%) -- 
+line 30
+...
+> -- More (11%) --
+... 
+```
+
 ### <a id="dot">--dot, --dotfiles</a>
 
 When providing file Patterns or entire Directories cat_win will find every File including those set to hidden (e.g. on Windows OS).
@@ -968,8 +992,9 @@ Valid Options are:
 | editor_auto_indent | set whether the <a href="#editor">Editor</a> should auto indent or not | 1 | False |
 | strings_minimum_sequence_length | set the minimum Length of a String </br> (for the <a href="#strings">--strings</a> Parameter) | 2 | 4 |
 | strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the <a href="#strings">--strings</a> Parameter) | \| | \\n |
-| unicode_escaped_find | unicode-escape the queried substring when using <a href="#find">find=</a> | false | True |
+| unicode_escaped_find | unicode-escape the queried Substring when using <a href="#find">find=</a> | false | True |
 | unicode_escaped_replace | unicode-escape a and b when using <a href="#replace">[a,b]</a> | false | True |
+| more_step_length | define the Step Length used by <a href="#more">-M</a></br>a Value of 0 is equivalent to the Size/Height of the Terminal Window | 5 | 0 |
 
 Accepted Input for enabling a Setting:  `true, yes, y, 1`
 </br>
@@ -1123,7 +1148,7 @@ This is a Backslash: /
 
 ### <a id="cut">[a&#42889;b&#42889;c]</a>
 
-Similiar to the trunc=X\:Y parameter this Argument is used on each Line individually.
+Similiar to the <a href="#trunc">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a> parameter this Argument is used on each Line individually.
 Every Line is being cut down as specified by the Elements within the Argument [\<start\>\:\<stop\>\:\<step>].
 
 ```console
