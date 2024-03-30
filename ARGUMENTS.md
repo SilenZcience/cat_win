@@ -118,40 +118,40 @@
 | *<a href="#help">-h, --help</a>* | show help message and exit |✔|
 | *<a href="#version">-v, --version</a>* | output version information and exit |✔|
 | *<a href="#debug">--debug, --debug</a>* | show debug information |✔|
-||| |
+||||
 | *<a href="#length">-l, --linelength</a>* | display the length of each line |✔|
 | *<a href="#number">-n, --number</a>* | number all output lines |✔|
 | *<a href="#fileprefix">--fp, --file-prefix</a>* | include the file in every line prefix |❌|
-||| |
+||||
 | *<a href="#ends">-e, --ends</a>* | display $ at the end of each line |✔|
 | *<a href="#chr">--chr, --char</a>* | display special characters |✔|
-||| |
+||||
 | *<a href="#blank">-b, --blank</a>* | hide empty lines |✔|
 | *<a href="#peek">-p, --peek</a>* | only print the first and last lines |❌|
 | *<a href="#reverse">-r, --reverse</a>* | reverse output |❌|
 | *<a href="#unique">-u, --unique</a>* | suppress repeated output lines |❌|
 | *<a href="#sort">--sort, --SORT</a>* | sort all lines alphabetically or by length |❌|
 | *<a href="#format">--sf, --specific-format</a>* | automatically format specific file types |❌|
-||| |
+||||
 | *<a href="#echo">-E, --echo</a>* | handle every following parameter as stdin |❌|
 | *<a href="#stdin">-, --stdin</a>* | use stdin |❌|
 | *<a href="#oneline">-o, --oneline</a>* | take only the first stdin-line |✔|
 | *<a href="#url">-U, --url</a>* | display the contents of any provided url |❌|
-||| |
+||||
 | *<a href="#files">-f, --files</a>* | list applied files and file sizes |❌|
 | *<a href="#dirs">-d, --dirs</a>* | list found directories |❌|
 | *<a href="#sum">-s, --sum</a>* | show sum of lines |❌|
 | *<a href="#wordcount">-w, --wordcount</a>* | display the wordcount |❌|
 | *<a href="#charcount">--cc, --charcount</a>* | display the charcount |❌|
-||| |
+||||
 | *<a href="#grep">-g, --grep</a>* | only show lines containing queried keywords or patterns |✔|
 | *<a href="#nokeyword">--nk, --nokeyword</a>* | inverse the grep output |✔|
 | *<a href="#nobreak">--nb, --nobreak</a>* | do not interrupt the output |✔|
-||| |
+||||
 | *<a href="#attributes">-a, --attributes</a>* | show meta-information about the files |❌|
 | *<a href="#checksum">-m, --checksum</a>* | show the checksums of all files |❌|
 | *<a href="#strings">--strings, --strings</a>* | print the sequences of printable characters |✔|
-||| |
+||||
 | *<a href="#b64d">--b64d, --b64d</a>* | decode the input from base64 |✔|
 | *<a href="#b64e">--b64e, --b64e</a>* | encode the input to base64 |✔|
 | *<a href="#eval">--eval, --EVAL</a>* | evaluate simple mathematical equations |✔|
@@ -159,28 +159,28 @@
 | *<a href="#dec">--dec, --DEC</a>* | convert decimal numbers to binary, octal and hexadecimal |✔|
 | *<a href="#oct">--oct, --oct</a>* | convert octal numbers to binary, decimal and hexadecimal |✔|
 | *<a href="#bin">--bin, --BIN</a>* | convert binary numbers to octal, decimal and hexadecimal |✔|
-||| |
+||||
 | *<a href="#binview">--binview, --binview</a>* | display the raw byte representation in binary |❌|
 | *<a href="#hexview">--hexview, --HEXVIEW</a>* | display the raw byte representation in hexadecimal |❌|
-||| |
+||||
 | *<a href="#editor">-!, --edit</a>* | open each file in a simple editor |❌|
 | *<a href="#clip">-c, --clip</a>* | copy output to clipboard |✔|
 | *<a href="#more">-M, --more</a>* | walk through the file step by step |❌|
-||| |
+||||
 | *<a href="#dot">--dot, --dotfiles</a>* | additionally query and edit dotfiles |❌|
 | *<a href="#plain">--plain, --plain-only</a>* | ignore non-plaintext files automatically |❌|
 | *<a href="#nocolor">--nc, --nocolor</a>* | disable colored output |✔|
-||| |
+||||
 | *<a href="#config">--config, --config</a>* | change default parameters |✔|
 | *<a href="#cconfig">--cconfig, --cconfig</a>* | change color configuration |✔|
-||| |
+||||
 | *<a href="#stream">-R, --R\<stream\></a>* | reconfigure the std-stream(s) with the parsed encoding </br> \<stream\> = 'in'/'out'/'err' (default is stdin & stdout) | ✔ |
-||| |
+||||
 | *<a href="#enc">enc=X, enc&#42889;X</a>* | set file enconding to X (default is utf-8) |✔|
 | *<a href="#find">find=X, find&#42889;X</a>* | find/query a substring X in the given files |✔|
 | *<a href="#match">match=X, match&#42889;X</a>* | find/query a pattern X in the given files |✔|
 | *<a href="#trunc">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>* | truncate file to lines X and Y (python-like) |❌|
-||| |
+||||
 | *<a href="#replace">[a,b]</a>* | replace a with b in every line |✔|
 | *<a href="#cut">[a&#42889;b&#42889;c]</a>* | python-like string indexing syntax (line by line) |✔|
 
