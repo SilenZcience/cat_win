@@ -136,3 +136,13 @@ class TestMore(TestCase):
             with patch('builtins.input', input_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
                 more.step_through()
                 self.assertIn('\x1b[2K\x1b[1F\x1b[2K' + str(max(n, 1)), fake_out.getvalue())
+
+
+@patch('os.isatty', OSAttyDefGen.get_def({0: True, 1: False}))
+class TestMorePiped(TestCase):
+    maxDiff = None
+
+    def test_piped_output(self):
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            (More(['a'] * 100)).step_through()
+            self.assertEqual('a\n' * 100, fake_out.getvalue())
