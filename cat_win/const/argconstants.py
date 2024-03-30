@@ -139,7 +139,7 @@ ALL_ARGS = [
     ArgConstant('--bin', '--BIN', 'convert binary numbers to octal, decimal and hexadecimal',
 				ARGS_BIN, section=8),
 
-    # raw
+    # raw-view
     ArgConstant('--binview', '--binview', 'display the raw byte representation in binary',
 				ARGS_BINVIEW, show_arg_on_shell=False, section=9),
     ArgConstant('--hexview', '--HEXVIEW', 'display the raw byte representation in hexadecimal',
@@ -149,9 +149,10 @@ ALL_ARGS = [
 				ARGS_EDITOR, show_arg_on_shell=False, section=10),
     ArgConstant('-c', '--clip', 'copy output to clipboard',
 				ARGS_CLIP, section=10),
-    ArgConstant('-M', '--more', 'walk through the file step by step',
+    ArgConstant('-M', '--more', 'page through the file step by step',
                 ARGS_MORE, show_arg_on_shell=False, section=10),
 
+    # behavioural
     ArgConstant('--dot', '--dotfiles', 'additionally query and edit dotfiles',
 				ARGS_DOTFILES, show_arg_on_shell=False, section=11),
     ArgConstant('--plain', '--plain-only', 'ignore non-plaintext files automatically',
@@ -159,11 +160,13 @@ ALL_ARGS = [
     ArgConstant('--nc', '--nocolor', 'disable colored output',
 				ARGS_NOCOL, section=11),
 
+    # configuration
     ArgConstant('--config', '--config', 'change default parameters',
 				ARGS_CONFIG, section=12),
     ArgConstant('--cconfig', '--cconfig', 'change color configuration',
 				ARGS_CCONFIG, section=12),
 
+    # streams
     ArgConstant('-R', '--R', 'reconfigure the stdin and stdout with the parsed encoding',
 				ARGS_RECONFIGURE, show_arg=False),
     ArgConstant('--Rin', '--Rin', 'reconfigure the stdin with the parsed encoding',

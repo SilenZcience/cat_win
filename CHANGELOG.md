@@ -7,7 +7,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ### Minor Changes
 
-- added -`M`, --`more` parameter to walk through a file step by step and pause output each step.
+- added -`M`, --`more` parameter to page through a file step by step and pause output each step.
 - added `more_step_length` option to the config menu to define the step length used by -`M`, --`more`.
 
 
