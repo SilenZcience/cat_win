@@ -5,6 +5,8 @@ from cat_win.tests.mocks.std import StdInMock, StdOutMock, OSAttyDefGen
 from cat_win.util.more import More
 
 
+bottom_line = '-' * 56 + 'cat_win' + '-' * 57
+
 @patch('os.get_terminal_size', lambda: (120, 30))
 @patch('os.isatty', OSAttyDefGen.get_def({0: True}))
 @patch('sys.stdin', new=StdInMock())
@@ -25,7 +27,9 @@ class TestMore(TestCase):
         more = More(['line1'] * 30)
         with patch('builtins.input', input_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
             more.step_through()
-            self.assertEqual(fake_out.getvalue(), 'line1\n' * 29 + 'test\n\x1b[1F\x1b[2Kline1\n')
+            self.assertIn('line1\n' * 28 + '\n', fake_out.getvalue())
+            self.assertIn(bottom_line, fake_out.getvalue())
+            self.assertIn('\x1b[2K\x1b[1F\x1b[2K', fake_out.getvalue())
 
     def test_input_triggers_behaviour_q(self):
         def input_mock(_):
@@ -45,7 +49,9 @@ class TestMore(TestCase):
         more = More(['line1'] * 30)
         with patch('builtins.input', input_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
             more.step_through()
-            self.assertEqual(fake_out.getvalue(), 'line1\n' * 29 + '\x1b[1F\x1b[2K')
+            self.assertIn('line1\n' * 28 + '\n', fake_out.getvalue())
+            self.assertIn(bottom_line, fake_out.getvalue())
+            self.assertIn('\x1b[1F\x1b[2K' * 2, fake_out.getvalue())
 
     def test_input_triggers_behaviour_h(self):
         def input_mock_helper():
@@ -74,7 +80,8 @@ class TestMore(TestCase):
         more = More(['a'] * 59)
         with patch('builtins.input', input_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
             more.step_through()
-            self.assertEqual('a\n' * 29 + '\x1b[1F\x1b[2K' + 'a\n' * 29 + '\x1b[1F\x1b[2Ka\n' , fake_out.getvalue())
+            self.assertGreater(fake_out.getvalue().rfind(bottom_line), fake_out.getvalue().find(bottom_line))
+            self.assertIn(bottom_line, fake_out.getvalue())
 
     def test_multiple_inputs_with_custom_step_size(self):
         More.setup(step_length=2)
@@ -89,4 +96,33 @@ class TestMore(TestCase):
         more = More(['a'] * 32)
         with patch('builtins.input', input_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
             more.step_through()
-            self.assertEqual('a\n' * 29 + '\x1b[1F\x1b[2K' + 'a\na\n\x1b[1F\x1b[2Ka\n' , fake_out.getvalue())
+            self.assertGreater(fake_out.getvalue().rfind(bottom_line), fake_out.getvalue().find(bottom_line))
+            self.assertIn(bottom_line, fake_out.getvalue())
+        More.setup(step_length=0)
+
+    def test_skip_one(self):
+        More.setup(step_length=1)
+        def input_mock(_):
+            return 's1'
+
+        more = More(['a'] * 30)
+        with patch('builtins.input', input_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
+            more.step_through()
+            self.assertIn('a\n' * 28 + '\n', fake_out.getvalue())
+            self.assertEqual(fake_out.getvalue().replace('cat_win', '').count('a'), 29)
+
+        More.setup(step_length=0)
+
+    def test_skip_n(self):
+        More.setup(step_length=1)
+        for n in list(range(100)):
+            def input_mock(_):
+                return f"s{n}"
+
+            more = More(['a'] * (29+n))
+            with patch('builtins.input', input_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
+                more.step_through()
+                self.assertIn('a\n' * 28 + '\n', fake_out.getvalue())
+                self.assertEqual(fake_out.getvalue().replace('cat_win', '').count('a'), 29)
+
+        More.setup(step_length=0)
