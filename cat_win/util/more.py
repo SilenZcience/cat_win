@@ -57,6 +57,10 @@ class More:
         """
         step through the lines and wait for user input.
         """
+        if not os.isatty(sys.stdout.fileno()):
+            print(*self.lines, sep='\n')
+            return
+
         def pause_output(percentage: int, info: str, t_width: int) -> str:
             print() # move to bottom line
             if t_width < 7:
