@@ -6,6 +6,7 @@ from math import ceil
 import os
 import sys
 
+
 class More:
     """
     implements 'more' behaviour
@@ -14,7 +15,7 @@ class More:
     step_length = 0
 
     @staticmethod
-    def setup(ansi_cleaner = lambda x: x, step_length: int = 0):
+    def setup(ansi_cleaner = None, step_length: int = 0):
         """
         setup the configuration
         
@@ -25,7 +26,8 @@ class More:
             defines how many lines should be displayed before pausing.
             a value of 0 is equivalent to the size of the terminal window
         """
-        More.ansi_cleaner = ansi_cleaner
+        if ansi_cleaner is not None:
+            More.ansi_cleaner = ansi_cleaner
         More.step_length = step_length
 
     def __init__(self, lines: list = None) -> None:
@@ -66,7 +68,7 @@ class More:
             try:
                 user_input = input(
                     f"-- More ({percentage: >2}%){('['+info+']') if info else ''} -- "
-                    ).upper()
+                    ).strip().upper()
             except EOFError:
                 user_input = ''
             if not os.isatty(sys.stdin.fileno()):
@@ -82,39 +84,52 @@ class More:
 
         i_length = len(self.lines)
         first_chunk, chunk_s = True, 1
-        skip_to_line = 0
-        for nr, line in enumerate(self.lines, start=1):
-            if nr < skip_to_line:
+        current_line, skip_to_line = 0, 0
+        while current_line < i_length:
+            if (current_line+1) < skip_to_line:
+                current_line += 1
                 continue
-            print(line)
+            print(self.lines[current_line])
 
-            if len(More.ansi_cleaner(line)) > t_width:
-                chunk_s += ceil(len(More.ansi_cleaner(line)) / t_width)-1
-            if chunk_s >= t_height and nr < i_length:
+            if len(More.ansi_cleaner(self.lines[current_line])) > t_width:
+                chunk_s += ceil(len(More.ansi_cleaner(self.lines[current_line])) / t_width)-1
+            if chunk_s >= t_height and (current_line+1) < i_length:
                 info = ''
                 while True:
-                    user_input = pause_output(nr*100//i_length, info, t_width)
+                    user_input = pause_output((current_line+1)*100//i_length, info, t_width)
                     info = ''
                     if user_input in ['?', 'H', 'HELP']:
                         print('Q QUIT       quit')
                         print('N NEXT       skip to next file')
                         print('L LINE       display current line number')
                         print('S SKIP <x>   skip x lines')
+                        print('J JUMP <x>   jump to line x')
                         continue
-                    if user_input in ['N', 'NEXT']:
-                        return
                     if user_input in ['\x11', 'Q', 'QUIT']: # '\x11' = ^Q
                         sys.exit(0)
-                    if user_input in ['=', 'L', 'LINE']:
-                        info = f"Line: {nr}"
+                    if user_input in ['N', 'NEXT']:
+                        return
+                    if user_input in ['L', 'LINE']:
+                        info = f"Line: {current_line+1}"
                         continue
                     if user_input.startswith('S') or user_input.startswith('SKIP'):
                         iskip = user_input[4:] if user_input.startswith('SKIP') else user_input[1:]
                         iskip = '1' if not iskip else iskip
                         try:
-                            skip_to_line = nr+int(iskip)+1
+                            skip_to_line = current_line+int(iskip)+2
                         except ValueError:
                             info = f"invalid input: {iskip}"
+                            user_input = '?'
+                            continue
+                        break
+                    if user_input.startswith('J') or user_input.startswith('JUMP'):
+                        ijump = user_input[4:] if user_input.startswith('JUMP') else user_input[1:]
+                        ijump = str(current_line+1) if not ijump else ijump
+                        try:
+                            current_line = int(ijump)-2
+                            skip_to_line = 1
+                        except ValueError:
+                            info = f"invalid input: {ijump}"
                             user_input = '?'
                             continue
                         break
@@ -125,3 +140,4 @@ class More:
                         t_height = More.step_length
                 chunk_s = 0
             chunk_s += 1
+            current_line += 1

@@ -11,6 +11,8 @@ bottom_line = '-' * 56 + 'cat_win' + '-' * 57
 @patch('os.isatty', OSAttyDefGen.get_def({0: True}))
 @patch('sys.stdin', new=StdInMock())
 class TestMore(TestCase):
+    maxDiff = None
+
     def test_output_short(self):
         more = More(['line1'])
         more.add_lines(['line2', 'line3'])
@@ -83,8 +85,8 @@ class TestMore(TestCase):
             self.assertGreater(fake_out.getvalue().rfind(bottom_line), fake_out.getvalue().find(bottom_line))
             self.assertIn(bottom_line, fake_out.getvalue())
 
+    @patch('cat_win.util.more.More.step_length', 2)
     def test_multiple_inputs_with_custom_step_size(self):
-        More.setup(step_length=2)
         def input_mock_helper():
             yield ''
             yield ''
@@ -98,10 +100,8 @@ class TestMore(TestCase):
             more.step_through()
             self.assertGreater(fake_out.getvalue().rfind(bottom_line), fake_out.getvalue().find(bottom_line))
             self.assertIn(bottom_line, fake_out.getvalue())
-        More.setup(step_length=0)
 
     def test_skip_one(self):
-        More.setup(step_length=1)
         def input_mock(_):
             return 's1'
 
@@ -111,10 +111,7 @@ class TestMore(TestCase):
             self.assertIn('a\n' * 28 + '\n', fake_out.getvalue())
             self.assertEqual(fake_out.getvalue().replace('cat_win', '').count('a'), 29)
 
-        More.setup(step_length=0)
-
     def test_skip_n(self):
-        More.setup(step_length=1)
         for n in list(range(100)):
             def input_mock(_):
                 return f"s{n}"
@@ -125,4 +122,17 @@ class TestMore(TestCase):
                 self.assertIn('a\n' * 28 + '\n', fake_out.getvalue())
                 self.assertEqual(fake_out.getvalue().replace('cat_win', '').count('a'), 29)
 
-        More.setup(step_length=0)
+    def test_jump_n(self):
+        for n in list(range(-10, 100)):
+            def input_mock_helper():
+                yield f"j{n}"
+                yield 'n'
+
+            helper = input_mock_helper()
+            def input_mock(_):
+                return next(helper)
+
+            more = More(list(map(str, range(1, max(30+n, 30)))))
+            with patch('builtins.input', input_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
+                more.step_through()
+                self.assertIn('\x1b[2K\x1b[1F\x1b[2K' + str(max(n, 1)), fake_out.getvalue())
