@@ -93,6 +93,12 @@ class More:
             if (current_line+1) < skip_to_line:
                 current_line += 1
                 continue
+
+            # potentially the offset is wrong when the last line is too long for the terminal size
+            # and wraps around to the next line. in this case the first line will not be visible
+            # in the current frame ...
+            # it is however not possible to pre-cut the lines to the correct lengths, because the
+            # lines may very likely contain color/ANSI-codes
             print(self.lines[current_line])
 
             if len(More.ansi_cleaner(self.lines[current_line])) > t_width:
