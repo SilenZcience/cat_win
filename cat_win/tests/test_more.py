@@ -8,7 +8,7 @@ from cat_win.util.more import More
 bottom_line = '-' * 56 + 'cat_win' + '-' * 57
 
 @patch('os.get_terminal_size', lambda: (120, 30))
-@patch('os.isatty', OSAttyDefGen.get_def({0: True}))
+@patch('os.isatty', OSAttyDefGen.get_def({0: True, 1: True}))
 @patch('sys.stdin', new=StdInMock())
 class TestMore(TestCase):
     maxDiff = None
