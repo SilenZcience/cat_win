@@ -22,6 +22,7 @@ class TestUpdateChecker(TestCase):
 
     def test_version_comparison_up_to_date(self):
         self.assertEqual(updatechecker.new_version_available('1.0.9', '1.0.9'), 0)
+        self.assertEqual(updatechecker.new_version_available('1.0.9b', '1.0.9a'), 0)
         self.assertEqual(updatechecker.new_version_available('1.0.9', '1.0.09'), 0)
         self.assertEqual(updatechecker.new_version_available('1.10.9', 'v1.10.9'), 0)
         self.assertEqual(updatechecker.new_version_available('1.7a.9', '1.7a.9'), 0)
@@ -38,8 +39,8 @@ class TestUpdateChecker(TestCase):
         self.assertEqual(updatechecker.new_version_available('v2.1b.5a', '2.1b.051'), 1)
 
     def test_version_comparison_pre_release(self):
-        self.assertEqual(updatechecker.new_version_available('v1.0.9', '1.0.9a'), 2)
-        self.assertEqual(updatechecker.new_version_available('1.0.9', '1.0.09b'), 2)
+        self.assertEqual(updatechecker.new_version_available('v1.0.9a', '1.0.9b'), 2)
+        self.assertEqual(updatechecker.new_version_available('1.0.9', '1.0.19b'), 2)
         self.assertEqual(updatechecker.new_version_available('1.0.9', 'v1.0.10b'), 2)
         self.assertEqual(updatechecker.new_version_available('2.1.5a', '2.1.5b'), 2)
 
@@ -52,12 +53,14 @@ class TestUpdateChecker(TestCase):
         self.assertEqual(updatechecker.new_version_available('2.1.5a', '2.2.5'), -1)
 
     def test_version_comparison_pre_release_unsafe(self):
-        self.assertEqual(updatechecker.new_version_available('v1.0.9', '1a.0.9a'), -2)
-        self.assertEqual(updatechecker.new_version_available('1.0.9', '1.0a.9'), -2)
-        self.assertEqual(updatechecker.new_version_available('1.0.9', 'v1a.0.9'), -2)
+        self.assertEqual(updatechecker.new_version_available('v1.0.9', '2a.0.9a'), -2)
+        self.assertEqual(updatechecker.new_version_available('1.0.9', '1.1a.9'), -2)
+        self.assertEqual(updatechecker.new_version_available('1a.0.9', '1.0a.9'), -2)
+        self.assertEqual(updatechecker.new_version_available('0.0.9', 'v1a.0.9'), -2)
         self.assertEqual(updatechecker.new_version_available('1.0.9', '2b.0.10b'), -2)
-        self.assertEqual(updatechecker.new_version_available('v1.0.9', '1.0b.10'), -2)
-        self.assertEqual(updatechecker.new_version_available('2.1.5a', '2.1a.5'), -2)
+        self.assertEqual(updatechecker.new_version_available('v1.0.9', '1.1b.10a'), -2)
+        self.assertEqual(updatechecker.new_version_available('2.1.5a', '2.2a.5'), -2)
+        self.assertEqual(updatechecker.new_version_available('2.1.5', '2.2.0a'), -2)
 
     def test_version_availability_current_is_newest(self):
         self.assertEqual(updatechecker.new_version_available('v1.1.9', '1.0.9a'), 0)
