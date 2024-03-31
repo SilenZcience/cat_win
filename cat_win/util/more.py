@@ -61,8 +61,9 @@ class More:
             print(*self.lines, sep='\n')
             return
 
-        def pause_output(percentage: int, info: str, t_width: int) -> str:
+        def pause_output(percentage: int, info: str, t_width: int, clear_size: int = 0) -> str:
             print() # move to bottom line
+            # print bottom line:
             if t_width < 7:
                 print('=' * t_width)
             else:
@@ -77,7 +78,8 @@ class More:
                 user_input = ''
             if not os.isatty(sys.stdin.fileno()):
                 print() # emulate enter-press on piped input
-            print('\x1b[2K\x1b[1F\x1b[2K', end='', flush=True) # clear bottom & input() line
+            print('\x1b[2K\x1b[1F\x1b[2K', end='') # clear bottom & input() line
+            print('\x1b[1F\x1b[2K' * clear_size, end='', flush=True) # clear lines above
             return user_input
 
         try:
@@ -85,10 +87,12 @@ class More:
             t_width, t_height = max(t_width, 1), max(t_height-2, 1)
         except OSError: # PyPy-Error: "Inappropriate ioctl for device"
             t_width, t_height = 120, 28
+        step_length = t_height
 
         i_length = len(self.lines)
         first_chunk, chunk_s = True, 1
         current_line, skip_to_line = 0, 0
+
         while current_line < i_length:
             if (current_line+1) < skip_to_line:
                 current_line += 1
@@ -103,17 +107,30 @@ class More:
 
             if len(More.ansi_cleaner(self.lines[current_line])) > t_width:
                 chunk_s += ceil(len(More.ansi_cleaner(self.lines[current_line])) / t_width)-1
-            if chunk_s >= t_height and (current_line+1) < i_length:
-                info = ''
+
+            if chunk_s >= step_length and (current_line+1) < i_length:
+                chunk_s = 0
+                if first_chunk:
+                    first_chunk = False
+                    step_length = More.step_length if More.step_length > 0 else t_height
+
+                info, clear_size = '', 0
                 while True:
-                    user_input = pause_output((current_line+1)*100//i_length, info, t_width)
-                    info = ''
+                    user_input = pause_output((current_line+1)*100//i_length,
+                                              info,
+                                              t_width,
+                                              clear_size)
+                    info, clear_size = '', 0
+
                     if user_input in ['?', 'H', 'HELP']:
+                        print('H HELP       display this help message')
                         print('Q QUIT       quit')
                         print('N NEXT       skip to next file')
                         print('L LINE       display current line number')
+                        print('D DOWN <x>   step x lines down')
                         print('S SKIP <x>   skip x lines')
                         print('J JUMP <x>   jump to line x')
+                        clear_size = 7
                         continue
                     if user_input in ['\x11', 'Q', 'QUIT']: # '\x11' = ^Q
                         sys.exit(0)
@@ -122,6 +139,17 @@ class More:
                     if user_input in ['L', 'LINE']:
                         info = f"Line: {current_line+1}"
                         continue
+                    if user_input.startswith('D') or user_input.startswith('DOWN'):
+                        idown = user_input[4:] if user_input.startswith('DOWN') else user_input[1:]
+                        idown = '1' if not idown else idown
+                        try:
+                            step_length = int(idown)
+                            first_chunk = True
+                        except ValueError:
+                            info = f"invalid input: {idown}"
+                            user_input = '?'
+                            continue
+                        break
                     if user_input.startswith('S') or user_input.startswith('SKIP'):
                         iskip = user_input[4:] if user_input.startswith('SKIP') else user_input[1:]
                         iskip = '1' if not iskip else iskip
@@ -144,10 +172,6 @@ class More:
                             continue
                         break
                     break
-                if first_chunk:
-                    first_chunk = False
-                    if More.step_length > 0:
-                        t_height = More.step_length
-                chunk_s = 0
+
             chunk_s += 1
             current_line += 1
