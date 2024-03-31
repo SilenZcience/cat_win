@@ -10,6 +10,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added -`M`, --`more` parameter to page through a file step by step and pause output each step.
 - added `more_step_length` option to the config menu to define the step length used by -`M`, --`more`.
 
+### Bugfixes
+
+- fixed Bug where the update notification message was wrong in certain pre-release scenarios.
+
 
 ## [1.7.3] - 2024-03-21
 
