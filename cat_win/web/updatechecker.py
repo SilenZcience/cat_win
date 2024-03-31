@@ -64,6 +64,24 @@ def only_numeric(_s: str) -> int:
     return int('0' + ''.join(filter(str.isdigit, _s)))
 
 
+def only_alpha(_s: str) -> str:
+    """
+    strips every numeric character of a string and
+    appends 'z' for comparison.
+    
+    Parameters:
+    s (str):
+        the string to filter.
+        
+    Returns:
+    (str):
+        the resulting string of the string containing
+        only alpha chars and 'z'
+    """
+    x = 'abcdefghijklmnopqrstuvwxyz'
+    return ''.join(filter(lambda c: c in x, _s.lower())) + 'z'
+
+
 def gen_version_tuples(_v: str, _w: str) -> tuple:
     """
     create comparable version tuples.
@@ -112,14 +130,17 @@ def new_version_available(current_version: str, latest_version: str) -> int:
     for _c, _l in zip(current, latest):
         i += 1
         c_num, l_num = only_numeric(_c), only_numeric(_l)
+        c_alpha, l_alpha = only_alpha(_c), only_alpha(_l)
         if c_num > l_num:
             break
         if c_num < l_num:
             status = STATUS_STABLE_RELEASE_AVAILABLE
-            if not _l.isdigit():
-                status = STATUS_PRE_RELEASE_AVAILABLE
+            for j in range(i-1, len(latest)):
+                if not latest[j].isdigit():
+                    status = STATUS_PRE_RELEASE_AVAILABLE
+                    break
             break
-        if _c < _l:
+        if c_alpha < l_alpha:
             status = STATUS_PRE_RELEASE_AVAILABLE
             break
     if i < len(current):
