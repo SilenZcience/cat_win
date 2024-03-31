@@ -183,8 +183,10 @@ def _show_help(shell: bool = False) -> None:
         help_message += 'while numerating and showing the end of lines\n'
         help_message += f"\t{'catw f trunc=a:b:c': <25}"
         help_message += "Output f's content starting at line a, ending at line b, stepping c\n"
-    (More(help_message.splitlines())).step_through()
-    print_update_information(__project__, __version__, color_dic, on_windows_os)
+    try:
+        (More(help_message.splitlines())).step_through()
+    finally:
+        print_update_information(__project__, __version__, color_dic, on_windows_os)
 
 
 def _show_version() -> None:

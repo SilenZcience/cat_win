@@ -76,7 +76,9 @@ class More:
                     ).strip().upper()
             except EOFError:
                 user_input = ''
-            if not os.isatty(sys.stdin.fileno()):
+            except KeyboardInterrupt:
+                user_input = 'INTERRUPT'
+            if not os.isatty(sys.stdin.fileno()) or user_input == 'INTERRUPT':
                 print() # emulate enter-press on piped input
             print('\x1b[2K\x1b[1F\x1b[2K', end='') # clear bottom & input() line
             print('\x1b[1F\x1b[2K' * clear_size, end='', flush=True) # clear lines above
@@ -122,6 +124,8 @@ class More:
                                               clear_size)
                     info, clear_size = '', 0
 
+                    if user_input == 'INTERRUPT':
+                        raise KeyboardInterrupt
                     if user_input in ['?', 'H', 'HELP']:
                         print('H HELP       display this help message')
                         print('Q QUIT       quit')
