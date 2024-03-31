@@ -922,8 +922,6 @@ Each Step the Output is paused until User Interaction.
 The first Step always fills the entire Screen.
 The following Steps have the Size as defined by the config Element `more_step_length`.
 Display the available Commands by entering `?` or `help`.
-The Output can be stopped entirely when entering `q` or `quit` on the User Prompt.
-When entering `n` or `next` the Programm will skip to the next File.
 
 ```console
 > catw file -M
@@ -936,6 +934,19 @@ line 30
 ...
 > -- More (11%) --
 ... 
+```
+```console
+> catw file -M
+...
+> --More (10%) -- ?
+H HELP       display this help message
+Q QUIT       quit
+N NEXT       skip to next file
+L LINE       display current line number
+D DOWN <x>   step x lines down
+S SKIP <x>   skip x lines
+J JUMP <x>   jump to line x
+...
 ```
 
 ### <a id="dot">--dot, --dotfiles</a>
