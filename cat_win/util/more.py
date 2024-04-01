@@ -65,7 +65,7 @@ class More:
             print() # move to bottom line
             # print bottom line:
             if t_width < 7:
-                print('=' * t_width)
+                print('-' * t_width)
             else:
                 padding = '-' * ((t_width-7)//2)
                 print(padding + 'cat_win' + '-' * (t_width-7-len(padding)), end='')
