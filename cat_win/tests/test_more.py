@@ -137,6 +137,21 @@ class TestMore(TestCase):
                 more.step_through()
                 self.assertIn('\x1b[2K\x1b[1F\x1b[2K' + str(max(n, 1)), fake_out.getvalue())
 
+    def test_down_n(self):
+        for n in list(range(-10, 100)):
+            def input_mock_helper():
+                yield f"d{n}"
+                yield 'n'
+
+            helper = input_mock_helper()
+            def input_mock(_):
+                return next(helper)
+
+            more = More(list(map(str, range(1, max(31+n, 31)))))
+            with patch('builtins.input', input_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
+                more.step_through()
+                self.assertIn('\x1b[2K\x1b[1F\x1b[2K' + '\n'.join(list(map(str, range(29, max(29+n, 30))))) + '\n\n-', fake_out.getvalue())
+
 
 @patch('os.isatty', OSAttyDefGen.get_def({0: True, 1: False}))
 class TestMorePiped(TestCase):
