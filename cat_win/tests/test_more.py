@@ -7,7 +7,7 @@ from cat_win.util.more import More
 
 bottom_line = '-' * 56 + 'cat_win' + '-' * 57
 
-@patch('os.get_terminal_size', lambda: (120, 30))
+# @patch('os.get_terminal_size', lambda: (120, 30))
 @patch('os.isatty', OSAttyDefGen.get_def({0: True, 1: True}))
 @patch('sys.stdin', new=StdInMock())
 class TestMore(TestCase):
@@ -95,7 +95,7 @@ class TestMore(TestCase):
         def input_mock(_):
             return next(helper)
 
-        more = More(['a'] * 32)
+        more = More(['a'] * 30)
         with patch('builtins.input', input_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
             more.step_through()
             self.assertGreater(fake_out.getvalue().rfind(bottom_line), fake_out.getvalue().find(bottom_line))
@@ -132,10 +132,12 @@ class TestMore(TestCase):
             def input_mock(_):
                 return next(helper)
 
-            more = More(list(map(str, range(1, max(30+n, 30)))))
+            l = list(map(str, range(1, max(30+n, 30))))
+
+            more = More(l)
             with patch('builtins.input', input_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
                 more.step_through()
-                self.assertIn('\x1b[2K\x1b[1F\x1b[2K' + str(max(n, 1)), fake_out.getvalue())
+                self.assertIn('\x1b[2K\x1b[1F\x1b[2K' + str(l[n]), fake_out.getvalue())
 
     def test_down_n(self):
         for n in list(range(-10, 100)):
