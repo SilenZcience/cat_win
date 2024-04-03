@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.7.5] - TBA
+
+### Minor Changes
+
+- when using -`a`, --`attributes` on windows the output will also inform about advanced data streams (on ntfs systems).
+
+
 ## [1.7.4] - 2024-04-02
 
 ### Minor Changes
