@@ -24,9 +24,9 @@ import os
 import signal
 import sys
 
-from cat_win.util.editorhelper import History, Position, UNIFY_HOTKEYS, \
+from cat_win.util.helper.editorhelper import History, Position, UNIFY_HOTKEYS, \
     KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS
-from cat_win.util.rawviewer import SPECIAL_CHARS
+from cat_win.util.service.rawviewer import SPECIAL_CHARS
 
 def get_newline(file: str) -> str:
     """

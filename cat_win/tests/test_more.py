@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from cat_win.tests.mocks.std import StdInMock, StdOutMock, OSAttyDefGen
-from cat_win.util.more import More
+from cat_win.util.service.more import More
 
 
 bottom_line = '-' * 56 + 'cat_win' + '-' * 57
@@ -85,7 +85,7 @@ class TestMore(TestCase):
             self.assertGreater(fake_out.getvalue().rfind(bottom_line), fake_out.getvalue().find(bottom_line))
             self.assertIn(bottom_line, fake_out.getvalue())
 
-    @patch('cat_win.util.more.More.step_length', 2)
+    @patch('cat_win.util.service.more.More.step_length', 2)
     def test_multiple_inputs_with_custom_step_size(self):
         def input_mock_helper():
             yield ''

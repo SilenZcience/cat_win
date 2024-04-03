@@ -5,7 +5,7 @@ import os
 from cat_win import cat
 from cat_win.const.argconstants import ARGS_ENDS, ARGS_REVERSE, ARGS_CHR
 from cat_win.tests.mocks.std import StdOutMock, StdInMock
-from cat_win.util.file import File
+from cat_win.util.helper.file import File
 from cat_win.persistence.cconfig import CConfig
 from cat_win.persistence.config import Config
 # import sys

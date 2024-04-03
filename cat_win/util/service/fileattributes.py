@@ -15,7 +15,7 @@ from stat import (
 import math
 import os
 
-from cat_win.util.winstreams import WinStreams
+from cat_win.util.helper.winstreams import WinStreams
 
 
 def _convert_size(size_bytes: int) -> str:

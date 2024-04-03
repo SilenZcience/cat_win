@@ -35,28 +35,28 @@ from cat_win.const.defaultconstants import DKW
 from cat_win.persistence.cconfig import CConfig
 from cat_win.persistence.config import Config
 from cat_win.util.argparser import ArgParser
-from cat_win.util.cbase64 import _decode_base64, encode_base64
-from cat_win.util.checksum import print_checksum
-from cat_win.util.converter import Converter
-from cat_win.util.editor import Editor
-from cat_win.util.fileattributes import get_file_size, get_file_mtime, print_meta
-from cat_win.util.fileattributes import _convert_size
-from cat_win.util.formatter import Formatter
 from cat_win.util.holder import Holder
-from cat_win.util.more import More
-from cat_win.util.rawviewer import SPECIAL_CHARS, get_raw_view_lines_gen
-from cat_win.util.stringfinder import StringFinder
-from cat_win.util.strings import get_strings
-from cat_win.util.summary import Summary
-from cat_win.util.tmpfilehelper import TmpFileHelper
-from cat_win.util.urls import sep_valid_urls, read_url
+from cat_win.util.helper.tmpfilehelper import TmpFileHelper
 try:
-    from cat_win.util.utility import comp_eval, comp_conv
+    from cat_win.util.helper.utility import comp_eval, comp_conv
 except SyntaxError: # in case of Python 3.7
-    from cat_win.util.utilityold import comp_eval, comp_conv
-from cat_win.util import stdinhelper
-from cat_win.util.zipviewer import display_zip
+    from cat_win.util.helper.utilityold import comp_eval, comp_conv
+from cat_win.util.helper.zipviewer import display_zip
+from cat_win.util.helper import stdinhelper
+from cat_win.util.service.cbase64 import _decode_base64, encode_base64
+from cat_win.util.service.checksum import print_checksum
+from cat_win.util.service.converter import Converter
+from cat_win.util.service.editor import Editor
+from cat_win.util.service.fileattributes import get_file_size, get_file_mtime, print_meta
+from cat_win.util.service.fileattributes import _convert_size
+from cat_win.util.service.formatter import Formatter
+from cat_win.util.service.more import More
+from cat_win.util.service.rawviewer import SPECIAL_CHARS, get_raw_view_lines_gen
+from cat_win.util.service.stringfinder import StringFinder
+from cat_win.util.service.strings import get_strings
+from cat_win.util.service.summary import Summary
 from cat_win.web.updatechecker import print_update_information
+from cat_win.web.urls import sep_valid_urls, read_url
 from cat_win import __project__, __version__, __sysversion__, __author__, __url__
 
 

@@ -4,7 +4,8 @@ tmpfilehelper
 
 import tempfile
 
-class TmpFileHelper():
+
+class TmpFileHelper:
     """
     defines a TmpFileHelper
     """

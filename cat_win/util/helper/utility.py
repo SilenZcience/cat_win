@@ -3,7 +3,7 @@ A collection of methods for list comprehension in regard to the converter.py mod
 for Python >= 3.8 (using the Walrus operator).
 """
 
-from cat_win.util.converter import Converter
+from cat_win.util.service.converter import Converter
 
 
 def comp_eval(converter: Converter, content: list, param: str, cleaner: object) -> list:

@@ -4,7 +4,7 @@ converter
 
 import re
 
-class Converter():
+class Converter:
     """
     converts a binary, octal, decimal or hex number
     into the corresponding others, or evaluates an expression.

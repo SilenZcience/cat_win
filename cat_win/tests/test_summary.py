@@ -3,8 +3,8 @@ from unittest.mock import patch
 import os
 
 from cat_win.tests.mocks.std import StdOutMock
-from cat_win.util.file import File
-from cat_win.util.summary import Summary
+from cat_win.util.helper.file import File
+from cat_win.util.service.summary import Summary
 
 test_file_path = os.path.join(os.path.dirname(__file__), 'texts', 'test.txt')
 

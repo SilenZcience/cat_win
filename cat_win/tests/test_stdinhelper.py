@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from cat_win.tests.mocks.std import StdInMock
-from cat_win.util.stdinhelper import path_parts, get_stdin_content
+from cat_win.util.helper.stdinhelper import path_parts, get_stdin_content
 
 
 stdin_mock = StdInMock()

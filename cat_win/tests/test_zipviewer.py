@@ -3,7 +3,7 @@ from unittest import TestCase
 import os
 
 from cat_win.tests.mocks.std import StdOutMock
-from cat_win.util.zipviewer import display_zip
+from cat_win.util.helper.zipviewer import display_zip
 # import sys
 # sys.path.append('../cat_win')
 test_file_dir = os.path.join(os.path.dirname(__file__), 'texts')
