@@ -2,11 +2,11 @@ from unittest import TestCase
 
 from cat_win.const.argconstants import ARGS_EVAL, ALL_ARGS
 from cat_win.cat import remove_ansi_codes_from_line as cleaner
-from cat_win.util.converter import Converter
+from cat_win.util.service.converter import Converter
 try:
-    from cat_win.util.utility import comp_eval, comp_conv
+    from cat_win.util.helper.utility import comp_eval, comp_conv
 except SyntaxError: # in case of Python 3.7
-    from cat_win.util.utilityold import comp_eval, comp_conv
+    from cat_win.util.helper.utilityold import comp_eval, comp_conv
 
 # import sys
 # sys.path.append('../cat_win')

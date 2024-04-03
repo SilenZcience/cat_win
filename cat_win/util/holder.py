@@ -7,7 +7,7 @@ import heapq
 
 from cat_win.const.argconstants import HIGHEST_ARG_ID, ARGS_NOCOL, ARGS_LLENGTH, ARGS_NUMBER, \
     ARGS_REVERSE, ARGS_B64E, ARGS_SUM, ARGS_SSUM, DIFFERENTIABLE_ARGS
-from cat_win.util.file import File
+from cat_win.util.helper.file import File
 
 
 def reduce_list(args: list) -> list:
@@ -72,7 +72,7 @@ def diff_list(args: list, to_remove: list) -> list:
 
     return new_args
 
-class Holder():
+class Holder:
     """
     define a holder object to store useful meta information
     """

@@ -5,7 +5,7 @@ summary
 from itertools import groupby
 import re
 
-from cat_win.util.fileattributes import get_file_size, _convert_size
+from cat_win.util.service.fileattributes import get_file_size, _convert_size
 
 
 class Summary:

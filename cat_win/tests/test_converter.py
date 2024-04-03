@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from cat_win.util.converter import Converter
+from cat_win.util.service.converter import Converter
 # import sys
 # sys.path.append('../cat_win')
 

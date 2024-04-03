@@ -5,7 +5,7 @@ import os
 from cat_win.tests.mocks.error import ErrorDefGen
 from cat_win.tests.mocks.std import StdOutMock
 from cat_win.tests.mocks.edit import getxymax
-from cat_win.util.editor import Editor, get_newline
+from cat_win.util.service.editor import Editor, get_newline
 # import sys
 # sys.path.append('../cat_win')
 test_file_dir = os.path.join(os.path.dirname(__file__), 'texts')
@@ -15,7 +15,7 @@ test_file_path_oneline = os.path.join(test_file_dir, 'test_oneline.txt')
 test_file_path_editor = os.path.join(test_file_dir, 'test_editor.txt')
 
 
-@patch('cat_win.util.editor.Editor.getxymax', getxymax)
+@patch('cat_win.util.service.editor.Editor.getxymax', getxymax)
 class TestEditor(TestCase):
     maxDiff = None
 
@@ -348,7 +348,7 @@ class TestEditor(TestCase):
         editor._scroll_key_home()
         self.assertEqual(editor.wpos.get_pos(), (0,0))
 
-    @patch('cat_win.util.editor.Editor.special_indentation', ':)')
+    @patch('cat_win.util.service.editor.Editor.special_indentation', ':)')
     def test_editor_key_btab(self):
         editor = Editor(test_file_path_editor, '')
         editor._key_string(':):)')
@@ -371,7 +371,7 @@ class TestEditor(TestCase):
         self.assertListEqual(editor.window_content, [':)line 1', 'line 2'])
         self.assertEqual(editor.cpos.get_pos(), (0,6))
 
-    @patch('cat_win.util.editor.Editor.special_indentation', '!!!')
+    @patch('cat_win.util.service.editor.Editor.special_indentation', '!!!')
     def test_editor_key_string(self):
         editor = Editor(test_file_path_editor, '')
         self.assertEqual(editor._key_string(1), '')
@@ -416,7 +416,7 @@ class TestEditor(TestCase):
                 self.assertEqual('Interrupting...\n', fake_out.getvalue())
         Editor.debug_mode = False
 
-    @patch('cat_win.util.editor.CURSES_MODULE_ERROR', new=True)
+    @patch('cat_win.util.service.editor.CURSES_MODULE_ERROR', new=True)
     def test_editor_no_curses_error(self):
         with patch('sys.stderr', new=StdOutMock()) as fake_out:
             self.assertEqual(Editor.open('', '', None, True), False)

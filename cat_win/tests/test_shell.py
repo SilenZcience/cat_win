@@ -11,7 +11,7 @@ stdinhelpermock = StdInHelperMock()
 
 
 @patch('sys.argv', ['<CAT>'])
-@patch('cat_win.cat.stdinhelper.get_stdin_content', stdinhelpermock.get_stdin_content)
+@patch('cat_win.util.helper.stdinhelper.get_stdin_content', stdinhelpermock.get_stdin_content)
 @patch('cat_win.cat.cconfig.load_config', lambda: dict.fromkeys(CConfig.default_dic, ''))
 @patch('cat_win.cat.config.load_config', lambda: Config.default_dic.copy())
 class TestShell(TestCase):

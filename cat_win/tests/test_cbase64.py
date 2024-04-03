@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from cat_win.util.cbase64 import encode_base64, decode_base64
+from cat_win.util.service.cbase64 import encode_base64, decode_base64
 # import sys
 # sys.path.append('../cat_win')
 

@@ -1,7 +1,7 @@
 from unittest import TestCase
 import os
 
-from cat_win.util.strings import get_strings
+from cat_win.util.service.strings import get_strings
 # import sys
 # sys.path.append('../cat_win')
 

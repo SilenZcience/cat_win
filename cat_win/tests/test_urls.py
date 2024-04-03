@@ -3,7 +3,7 @@ from unittest import TestCase
 import random
 
 from cat_win.tests.mocks.error import ErrorDefGen
-from cat_win.util.urls import is_valid_uri, sep_valid_urls, read_url
+from cat_win.web.urls import is_valid_uri, sep_valid_urls, read_url
 
 class TestUrls(TestCase):
     def test_is_valid_uri_valueerror(self):

@@ -2,7 +2,7 @@
 argconstants
 """
 
-class ArgConstant():
+class ArgConstant:
     """
     defines an argument
     """

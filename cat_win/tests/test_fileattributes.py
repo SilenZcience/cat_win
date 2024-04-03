@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from cat_win.util.fileattributes import _convert_size, get_file_meta_data, get_file_size
+from cat_win.util.service.fileattributes import _convert_size, get_file_meta_data, get_file_size
 # import sys
 # sys.path.append('../cat_win')
 
