@@ -15,6 +15,8 @@ from stat import (
 import math
 import os
 
+from cat_win.util.winstreams import WinStreams
+
 
 def _convert_size(size_bytes: int) -> str:
     """
@@ -135,6 +137,12 @@ def get_file_meta_data(file: str, on_windows_os: bool, colors = None) -> str:
         if not on_windows_os:
             meta_data += '\n'
             return meta_data
+
+        file_handle = WinStreams(file)
+        if file_handle.streams:
+            meta_data += f"{colors[1]}Alternate Data Streams:{colors[0]}\n"
+            for stream in file_handle.streams:
+                meta_data += f"\t{colors[1]}- {stream}{colors[0]}\n"
 
         attribs = read_attribs(file)
         meta_data += colors[2]
