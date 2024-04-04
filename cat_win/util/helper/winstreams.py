@@ -4,33 +4,30 @@ credit: https://github.com/RobinDavid/pyADS
 """
 
 try:
-    from ctypes import windll
-    from ctypes import Structure, Union, byref
-    from ctypes import c_wchar, c_wchar_p, c_ulong, c_longlong, c_void_p
+    import ctypes
 
-    WINSTREAMS_MODULE_ERROR = False
-
-    kernel32 = windll.kernel32
-
-    class LARGE_INTEGER_UNION(Structure):
+    kernel32 = ctypes.windll.kernel32 # throws AttributeError on non-Windows OS
+    class LARGE_INTEGER_UNION(ctypes.Structure):
         _fields_ = [
-            ("LowPart", c_ulong),
-            ("HighPart", c_ulong),
+            ("LowPart", ctypes.c_ulong),
+            ("HighPart", ctypes.c_ulong),
             ]
 
-    class LARGE_INTEGER(Union):
+    class LARGE_INTEGER(ctypes.Union):
         _fields_ = [
             ("large1", LARGE_INTEGER_UNION),
             ("large2", LARGE_INTEGER_UNION),
-            ("QuadPart",    c_longlong),
+            ("QuadPart",    ctypes.c_longlong),
             ]
 
-    class WIN32_FIND_STREAM_DATA(Structure):
+    class WIN32_FIND_STREAM_DATA(ctypes.Structure):
         _fields_ = [
             ("StreamSize", LARGE_INTEGER),
-            ("cStreamName", c_wchar * 296),
+            ("cStreamName", ctypes.c_wchar * 296),
             ]
-except ImportError:
+
+    WINSTREAMS_MODULE_ERROR = False
+except AttributeError:
     WINSTREAMS_MODULE_ERROR = True
 
 
@@ -47,17 +44,18 @@ class WinStreams:
         streamlist = []
 
         findFirstStreamW = kernel32.FindFirstStreamW
-        findFirstStreamW.restype = c_void_p
+        findFirstStreamW.restype = ctypes.c_void_p
 
-        myhandler = kernel32.FindFirstStreamW(c_wchar_p(self.filename), 0, byref(file_infos), 0)
-        p = c_void_p(myhandler)
+        myhandler = kernel32.FindFirstStreamW(ctypes.c_wchar_p(self.filename),
+                                              0, ctypes.byref(file_infos), 0)
+        p = ctypes.c_void_p(myhandler)
 
         if file_infos.cStreamName:
             streamname = file_infos.cStreamName.split(":")[1]
             if streamname:
                 streamlist.append(streamname)
 
-            while kernel32.FindNextStreamW(p, byref(file_infos)):
+            while kernel32.FindNextStreamW(p, ctypes.byref(file_infos)):
                 streamlist.append(file_infos.cStreamName.split(":")[1])
 
         kernel32.FindClose(p)  # Close the handle
