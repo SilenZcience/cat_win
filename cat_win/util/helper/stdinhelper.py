@@ -2,6 +2,8 @@
 stdinhelper
 """
 
+import contextlib
+import ctypes
 import os
 import sys
 
@@ -218,3 +220,37 @@ def read_write_files_from_stdin(file_list: list, file_encoding: str, on_windows_
     std_input = ''.join(get_stdin_content(one_line))
 
     return write_files(file_list, std_input, file_encoding)
+
+
+@contextlib.contextmanager
+def dup_stdin(on_windows_os: bool, dup: bool = True):
+    """
+    dup the stdin so the user can interact while also piping into cat.
+    
+    Parameters:
+    on_windows_os (bool):
+        indicates if the current system is Windows
+    dup (bool):
+        is this is false the function will not do anything.
+        only implemented to eliminate repeated code somewhere else
+    """
+    if not dup:
+        yield
+        return
+    stdin_backup = os.dup(sys.stdin.fileno())
+    try:
+        tty = os.open('CONIN$' if on_windows_os else '/dev/tty', os.O_RDONLY)
+        os.dup2(tty, sys.stdin.fileno())
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS') and on_windows_os:
+            # for pyinstaller:
+# stdin, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+# None security, OPEN_EXISTING, 0 flags, None template
+            conin_handle = ctypes.windll.kernel32.CreateFileW(
+                "CONIN$", 0x80000000, 3, None, 3, 0, None
+                ) # os.dup2 does not work on pyinstaller
+            ctypes.windll.kernel32.SetStdHandle(-10, conin_handle) # -10 = stdin
+            # if this fails it is better to let the exception raise than to be stuck
+            # without user interaction being recognized
+        yield
+    finally:
+        os.dup2(stdin_backup, sys.stdin.fileno())
