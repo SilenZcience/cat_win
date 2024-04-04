@@ -51,10 +51,7 @@ cfix = [
 
 [tool.flit.sdist]
 exclude = [
-    "cat_win/build",
-    "**/**.spec",
     "**/**.config",
-    ".pytest*",
 ]
 
 [project.scripts]
