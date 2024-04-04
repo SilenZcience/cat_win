@@ -8,7 +8,12 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - when using -`a`, --`attributes` on windows the output will also inform about advanced data streams (on ntfs systems).
-- reworked -`m`, --`more` to work with long lines wrapping around to the next line and lines containing escape-sequences.
+- reworked -`M`, --`more` to work with long lines wrapping around to the next line and lines containing escape-sequences.
+
+
+### Bugfixes
+
+- fixed Bug where -`M`, --`more` would not work when catw was piped into.
 
 
 ## [1.7.4] - 2024-04-02
