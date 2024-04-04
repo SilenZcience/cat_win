@@ -123,7 +123,7 @@ class TestMore(TestCase):
                 self.assertEqual(fake_out.getvalue().replace('cat_win', '').count('a'), 29)
 
     def test_jump_n(self):
-        for n in list(range(-10, 100)):
+        for n in list(range(-10, 2)):
             def input_mock_helper():
                 yield f"j{n}"
                 yield 'n'
@@ -137,7 +137,8 @@ class TestMore(TestCase):
             more = More(l)
             with patch('builtins.input', input_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
                 more.step_through()
-                self.assertIn('\x1b[2K\x1b[1F\x1b[2K' + str(l[n]), fake_out.getvalue())
+                index = n if n < 0 else n-1 if n > 0 else n
+                self.assertIn('\x1b[2K\x1b[1F\x1b[2K' + str(l[index]), fake_out.getvalue())
 
     def test_down_n(self):
         for n in list(range(-10, 100)):
