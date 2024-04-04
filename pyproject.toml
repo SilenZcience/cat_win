@@ -54,6 +54,7 @@ exclude = [
     "cat_win/build",
     "**/**.spec",
     # "**/**.config", # include empty config file so pip knows about it when uninstalling
+    ".pytest*",
 ]
 
 [project.scripts]
