@@ -5,25 +5,31 @@ more
 import os
 import sys
 
+from cat_win.util.helper import stdinhelper
+
 
 class More:
     """
     implements 'more' behaviour
     """
+    on_windows_os = True
     step_length = 0
     t_width = 120
     t_height = 28
 
     @staticmethod
-    def setup(step_length: int = 0) -> None:
+    def setup(on_windows_os: bool, step_length: int = 0) -> None:
         """
         setup the configuration
         
         Parameters:
+        on_windows_os (bool):
+            indicates if the current system is Windows
         step_length (int):
             defines how many lines should be displayed before pausing.
             a value of 0 is equivalent to the size of the terminal window
         """
+        More.on_windows_os = on_windows_os
         More.step_length = step_length
         try:
             t_width, t_height = os.get_terminal_size()
@@ -102,14 +108,7 @@ class More:
         if sub_string:
             yield sub_string
 
-    def step_through(self) -> None:
-        """
-        step through the lines and wait for user input.
-        """
-        if not os.isatty(sys.stdout.fileno()):
-            print(*self.lines, sep='\n')
-            return
-
+    def _step_through(self) -> None:
         i_length, line_index = len(self.lines), 0
         step_length = More.t_height
 
@@ -202,3 +201,18 @@ class More:
                         break
 
             line_index += 1
+
+    def step_through(self, dup_needed: bool = False) -> None:
+        """
+        step through the lines and wait for user input.
+        
+        Parameters:
+        dup_needed (bool):
+            indicates if the stdin-dup is needed
+        """
+        if not os.isatty(sys.stdout.fileno()):
+            print(*self.lines, sep='\n')
+            return
+
+        with stdinhelper.dup_stdin(More.on_windows_os, dup_needed):
+            self._step_through()

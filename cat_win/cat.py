@@ -94,7 +94,7 @@ def setup():
     holder = Holder()
     tmp_file_helper = TmpFileHelper()
     Summary.setup_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
-    More.setup(const_dic[DKW.MORE_STEP_LENGTH])
+    More.setup(on_windows_os, const_dic[DKW.MORE_STEP_LENGTH])
 
 
 def err_print(*args, **kwargs):
@@ -680,7 +680,7 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
         holder.files[file_index].set_contains_queried(found_queried)
 
     if holder.args_id[ARGS_MORE]:
-        stepper.step_through()
+        stepper.step_through(holder.args_id[ARGS_STDIN])
 
     if holder.args_id[ARGS_CLIP]:
         holder.clip_board += '\n'.join(prefix + line for prefix, line in content)
@@ -1025,23 +1025,10 @@ def main():
             holder.args_id[ARGS_ONELINE])
 
     if holder.args_id[ARGS_EDITOR]:
-        stdin_backup = os.dup(sys.stdin.fileno())
-        if holder.args_id[ARGS_STDIN]:
-            tty = os.open('CONIN$' if on_windows_os else '/dev/tty', os.O_RDONLY)
-            os.dup2(tty, sys.stdin.fileno())
-            if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS') and on_windows_os:
-                # for pyinstaller:
-                import ctypes
-# stdin, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
-# None security, OPEN_EXISTING, 0 flags, None template
-                conin_handle = ctypes.windll.kernel32.CreateFileW(
-                    "CONIN$", 0x80000000, 3, None, 3, 0, None
-                    ) # os.dup2 does not work on pyinstaller
-                ctypes.windll.kernel32.SetStdHandle(-10, conin_handle) # -10 = stdin
-        for file in known_files:
-            Editor.open(file, holder.get_file_display_name(file), stdinhelper.write_file,
-                        on_windows_os, holder.args_id[ARGS_PLAIN_ONLY])
-        os.dup2(stdin_backup, sys.stdin.fileno())
+        with stdinhelper.dup_stdin(on_windows_os, holder.args_id[ARGS_STDIN]):
+            for file in known_files:
+                Editor.open(file, holder.get_file_display_name(file), stdinhelper.write_file,
+                            on_windows_os, holder.args_id[ARGS_PLAIN_ONLY])
 
     if len(known_files) + len(unknown_files) == 0:
         return
