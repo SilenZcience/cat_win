@@ -63,5 +63,6 @@ cats = "cat_win.__main__:shell_entry_point"
 
 [project.urls]
 Github = "https://github.com/SilenZcience/cat_win"
+Documentation = "https://github.com/SilenZcience/cat_win/blob/main/ARGUMENTS.md#cat_win"
 Download = "https://github.com/SilenZcience/cat_win/tarball/master"
 Issues = "https://github.com/SilenZcience/cat_win/issues"
