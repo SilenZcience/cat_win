@@ -94,7 +94,7 @@ def setup():
     holder = Holder()
     tmp_file_helper = TmpFileHelper()
     Summary.setup_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
-    More.setup(remove_ansi_codes_from_line, const_dic[DKW.MORE_STEP_LENGTH])
+    More.setup(const_dic[DKW.MORE_STEP_LENGTH])
 
 
 def err_print(*args, **kwargs):
