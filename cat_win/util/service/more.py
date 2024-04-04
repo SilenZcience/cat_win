@@ -10,25 +10,20 @@ class More:
     """
     implements 'more' behaviour
     """
-    ansi_cleaner = lambda x: x
     step_length = 0
     t_width = 120
     t_height = 28
 
     @staticmethod
-    def setup(ansi_cleaner = None, step_length: int = 0):
+    def setup(step_length: int = 0) -> None:
         """
         setup the configuration
         
         Parameters:
-        ansi_cleaner (function):
-            remove_ansi_codes_from_line
         step_length (int):
             defines how many lines should be displayed before pausing.
             a value of 0 is equivalent to the size of the terminal window
         """
-        if ansi_cleaner is not None:
-            More.ansi_cleaner = ansi_cleaner
         More.step_length = step_length
         try:
             t_width, t_height = os.get_terminal_size()
