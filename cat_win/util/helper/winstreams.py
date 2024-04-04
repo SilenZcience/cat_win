@@ -54,13 +54,11 @@ class WinStreams:
 
         if file_infos.cStreamName:
             streamname = file_infos.cStreamName.split(":")[1]
-            if streamname and not self.filename.endswith(':'+streamname):
+            if streamname:
                 streamlist.append(streamname)
 
             while kernel32.FindNextStreamW(p, byref(file_infos)):
-                streamname = file_infos.cStreamName.split(":")[1]
-                if not self.filename.endswith(':'+streamname):
-                    streamlist.append(streamname)
+                streamlist.append(file_infos.cStreamName.split(":")[1])
 
         kernel32.FindClose(p)  # Close the handle
 
