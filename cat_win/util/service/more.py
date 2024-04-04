@@ -181,8 +181,16 @@ class More:
                             ijump = user_input[4:] if user_input.startswith('JUMP') else user_input[1:]
                             ijump = str(line_index+1) if not ijump else ijump
                             try:
-                                line_index = int(ijump)-1
-                                line_index = i_length+line_index if line_index < -1 else line_index
+                                # will be incremented again after the for-loop
+                                line_index = int(ijump)-2
+                                # user entered '0' -> mapped to line 1
+                                # just like entering '1' ...
+                                if line_index == -2:
+                                    line_index = -1
+                                # map negative numbers to positive ones, so the
+                                # percentage is correct
+                                elif line_index < -2:
+                                    line_index = i_length+line_index+1
                             except ValueError:
                                 info = f"invalid input: {ijump}"
                                 continue
