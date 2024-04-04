@@ -53,7 +53,7 @@ cfix = [
 exclude = [
     "cat_win/build",
     "**/**.spec",
-    "**/**.config",
+    # "**/**.config", # include empty config file so pip knows about it when uninstalling
 ]
 
 [project.scripts]
