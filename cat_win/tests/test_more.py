@@ -123,7 +123,7 @@ class TestMore(TestCase):
                 self.assertEqual(fake_out.getvalue().replace('cat_win', '').count('a'), 29)
 
     def test_jump_n(self):
-        for n in list(range(-10, 2)):
+        for n in list(range(-10, 100)):
             def input_mock_helper():
                 yield f"j{n}"
                 yield 'n'
