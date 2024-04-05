@@ -137,16 +137,11 @@ class Editor:
     def _key_enter(self, _) -> str:
         new_line = self.window_content[self.cpos.row][self.cpos.col:]
         self.window_content[self.cpos.row] = self.window_content[self.cpos.row][:self.cpos.col]
-        # calculate indentation on prev line (0 if auto_indent is set to False)
-        auto_indent_size = self.window_content[self.cpos.row].count(
-            self.special_indentation) * self.auto_indent
         self.cpos.row += 1
-        self.cpos.col = len(self.special_indentation) * auto_indent_size
-        auto_indent = self.special_indentation * auto_indent_size
-        new_line = auto_indent + new_line
+        self.cpos.col = 0
         self.window_content.insert(self.cpos.row, new_line)
         self.unsaved_progress = True
-        return auto_indent
+        return ''
 
     def _key_dc(self, _) -> str:
         if self.cpos.col < len(self.window_content[self.cpos.row]):
@@ -199,13 +194,7 @@ class Editor:
                 self.window_content[self.cpos.row][:self.cpos.col] + \
                 self.window_content[self.cpos.row][self.cpos.col+wchar_l:]
             self.unsaved_progress = True
-            try: # ignore exceptions ([-1] could be inaccessible)
-                # if the last action was 'enter' then we just deleted the auto indent
-                # and need to remove the linebreak next
-                if self.history._stack_redo[-1].key_action == b'_key_enter':
-                    return self._key_backspace('\b')
-            finally:
-                return deleted
+            return deleted
         if self.cpos.row: # or delete line
             line = self.window_content[self.cpos.row]
             del self.window_content[self.cpos.row]
@@ -213,7 +202,7 @@ class Editor:
             self.cpos.col = len(self.window_content[self.cpos.row])
             self.window_content[self.cpos.row] += line
             self.unsaved_progress = True
-            return ''
+            return wchars
         return None
 
     def _key_ctl_backspace(self, _) -> str:
@@ -834,6 +823,16 @@ class Editor:
                         pre_pos = self.cpos.get_pos()
                         action_text = getattr(self, key.decode(), lambda *_: None)(wchar)
                         self.history.add(key, action_text, f_len, pre_pos, self.cpos.get_pos())
+                        if key == b'_key_enter':
+                            indent_offset = 0
+                            while self.window_content[self.cpos.row-1][indent_offset:].startswith(
+                                self.special_indentation):
+                                f_len = len(self.window_content)
+                                pre_pos = self.cpos.get_pos()
+                                action_text = self._key_string(self.special_indentation)
+                                self.history.add(b'_key_string', action_text, f_len,
+                                                 pre_pos, self.cpos.get_pos())
+                                indent_offset += len(self.special_indentation)
                     # actions like search, jump, quit, save, resize:
                     elif key in ACTION_HOTKEYS:
                         running &= getattr(self, key.decode(), lambda *_: False)(write_func)
