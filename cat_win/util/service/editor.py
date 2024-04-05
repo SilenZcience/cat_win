@@ -773,15 +773,15 @@ class Editor:
 
             save_hotkey = ('alt+' if self.save_with_alt else '^') + 's'
             status_bar = f"File: {self.display_name} | Exit: ^q | Save: {save_hotkey} | "
-            status_bar += f"Pos: {self.cpos.col+1}"
-            status_bar += f", {self.cpos.row+1} | {'NOT ' * self.unsaved_progress}Saved!"
+            status_bar += f"Ln {self.cpos.row+1}, Col {self.cpos.col+1} "
+            status_bar += f"| {'NOT ' * self.unsaved_progress}Saved!"
             if self.debug_mode:
                 status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x}"
             if len(status_bar) > max_x:
                 necc_space = max(0, max_x - (len(status_bar) - len(self.display_name) + 3))
                 status_bar = f"File: ...{self.display_name[-necc_space:] * bool(necc_space)} "
                 status_bar += f"| Exit: ^q | Save: {save_hotkey} | "
-                status_bar += f"Pos: {self.cpos.col+1}, {self.cpos.row+1} "
+                status_bar += f"Ln {self.cpos.row+1}, Col {self.cpos.col+1} "
                 status_bar += f"| {'NOT ' * self.unsaved_progress}Saved!"[:max_x]
                 if self.debug_mode:
                     status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x}"
