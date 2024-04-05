@@ -227,6 +227,10 @@ class _Action:
         self.pre_pos: tuple    = pre_pos
         self.post_pos: tuple   = post_pos
 
+    def __str__(self) -> str:
+        s_self = f"{self.key_action}|{repr(self.action_text)}|"
+        s_self+= f"{self.file_len}{self.pre_pos}{self.post_pos}"
+        return s_self
 
 class History:
     """
@@ -286,6 +290,8 @@ class History:
 
         action = _Action(key_action, action_text, file_len, pre_pos, post_pos)
         self._add(action, stack_type)
+        # print('Added', list(map(str, self._stack_undo)))
+        # print('     ', list(map(str, self._stack_redo)))
 
     def _undo(self, editor: object, action: _Action) -> None:
         self._add(action, 'redo')
@@ -326,6 +332,8 @@ class History:
             else:
                 self._stack_undo.append(n_action)
                 break
+        # print('Undo ', list(map(str, self._stack_undo)))
+        # print('     ', list(map(str, self._stack_redo)))
 
     def _redo(self, editor: object, action: _Action) -> None:
         self._add(action, 'undo')
@@ -360,3 +368,5 @@ class History:
             else:
                 self._stack_redo.append(n_action)
                 break
+        # print('Redo ', list(map(str, self._stack_undo)))
+        # print('     ', list(map(str, self._stack_redo)))
