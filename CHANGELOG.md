@@ -14,6 +14,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Bugfixes
 
 - fixed Bug where -`M`, --`more` would not work when catw was piped into.
+- fixed Bug where the Editor would wrongly indent the next line.
+- fixed Bug where the Editor would break the undo/redo capability when indenting the next line.
 
 
 ## [1.7.4] - 2024-04-02
