@@ -56,6 +56,7 @@ jobs:
       - name: Fetch Binaries Branch
         run: |
           git fetch origin binaries
+          git checkout binaries
           git stash pop
       - name: Commit & Push
         run: |
