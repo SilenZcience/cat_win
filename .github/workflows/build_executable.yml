@@ -66,6 +66,7 @@ jobs:
       - name: Commit & Push
         run: |
           git add ./bin/*
+          git status
           git commit -m "🤖Compiled Binary for ${{ matrix.os }}."
           git push origin HEAD:binaries
         continue-on-error: true
