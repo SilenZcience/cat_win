@@ -12,7 +12,7 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
     env:
-      bin: ${{ matrix.os == 'macos-latest' && './bin/darwin/catw' || matrix.os == 'windows-latest' && './bin/windows/catw.exe' || './bin/linux/catw' }}
+      bin: ${{ matrix.os == 'macos-latest' && './bin_temp/darwin/catw' || matrix.os == 'windows-latest' && './bin_temp/windows/catw.exe' || './bin_temp/linux/catw' }}
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
@@ -60,6 +60,9 @@ jobs:
           git fetch origin binaries
           git checkout binaries
           git stash pop
+      - name: Copy To Bin
+        run: |
+          python -c "import sys; import shutil; shutil.copytree('./bin_temp', './bin', dirs_exist_ok=True)"
       - name: Commit & Push
         run: |
           git add ./bin/*
