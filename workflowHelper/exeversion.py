@@ -51,7 +51,7 @@ VSVersionInfo(
 
 
 if not os.path.exists(CATversionFileDIR):
-	os.makedirs(CATversionFileDIR)
+    os.makedirs(CATversionFileDIR)
 
 with open(CATWversionFile, 'w', encoding='utf-8') as vF:
     vF.write(get_version_file_content(CAT_WIN_VERSION_SEP, CAT_WIN_VERSION, 'w'))
