@@ -51,8 +51,8 @@ jobs:
         run: |
           git config --local user.name 'github-actions[bot]'
           git config --local user.email 'github-actions[bot]@users.noreply.github.com'
-          git add ./bin/*
-          git stash -- bin
+          git add ./bin_temp/*
+          git stash push -m "stashed bin_temp" bin_temp
           git clean -df
           git restore .
       - name: Fetch Binaries Branch
