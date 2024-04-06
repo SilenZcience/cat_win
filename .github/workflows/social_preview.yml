@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
+        with:
+          ref: 'main'
       - name: Install Python 3.10
         id: python
         uses: actions/setup-python@v5
