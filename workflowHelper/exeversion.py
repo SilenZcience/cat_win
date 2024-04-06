@@ -12,9 +12,9 @@ print('Current Version:', CAT_WIN_VERSION, CAT_WIN_VERSION_SEP)
 
 script_dir = os.path.dirname(__file__)
 root_dir = os.path.abspath(os.path.join(script_dir, os.pardir))
-CATversionFileDIR = os.path.abspath(os.path.join(root_dir, 'bin_'))
-CATWversionFile = os.path.abspath(os.path.join(root_dir, 'bin_', 'catwversionfile'))
-CATSversionFile = os.path.abspath(os.path.join(root_dir, 'bin_', 'catsversionfile'))
+CATversionFileDIR = os.path.abspath(os.path.join(root_dir, 'temp'))
+CATWversionFile = os.path.abspath(os.path.join(root_dir, 'temp', 'catwversionfile'))
+CATSversionFile = os.path.abspath(os.path.join(root_dir, 'temp', 'catsversionfile'))
 print('VersionFile Path:', CATWversionFile)
 print('VersionFile Path:', CATSversionFile)
 

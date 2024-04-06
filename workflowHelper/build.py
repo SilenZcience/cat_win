@@ -65,7 +65,7 @@ with open(init_dir, 'w', encoding='utf-8') as f:
 
 status = 1
 platform_name = platform.system().lower()
-command = f'pyinstaller ./cat_win/__main__.py --onefile --clean --dist ./bin_/{platform_name} --icon ./bin_/cat_icon.ico --version-file ./bin_/catwversionfile -n catw'.split(' ')
+command = f'pyinstaller ./cat_win/__main__.py --onefile --clean --dist ./temp/{platform_name} --icon ./bin_/cat_icon.ico --version-file ./temp/catwversionfile -n catw'.split(' ')
 # try pyinstaller 3 times at most...
 for _ in range(3):
     try:
@@ -80,7 +80,7 @@ for _ in range(3):
 if status > 0:
     sys.exit(status)
 
-command = f'pyinstaller ./cat_win/shell.py --onefile --clean --dist ./bin_/{platform_name} --icon ./bin_/cat_icon.ico --version-file ./bin_/catsversionfile -n cats'.split(' ')
+command = f'pyinstaller ./cat_win/shell.py --onefile --clean --dist ./temp/{platform_name} --icon ./bin_/cat_icon.ico --version-file ./temp/catsversionfile -n cats'.split(' ')
 # try pyinstaller 3 times at most...
 for _ in range(3):
     try:
