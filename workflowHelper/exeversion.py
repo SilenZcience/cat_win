@@ -12,8 +12,9 @@ print('Current Version:', CAT_WIN_VERSION, CAT_WIN_VERSION_SEP)
 
 script_dir = os.path.dirname(__file__)
 root_dir = os.path.abspath(os.path.join(script_dir, os.pardir))
-CATWversionFile = os.path.abspath(os.path.join(root_dir, 'bin_temp', 'catwversionfile'))
-CATSversionFile = os.path.abspath(os.path.join(root_dir, 'bin_temp', 'catsversionfile'))
+CATversionFileDIR = os.path.abspath(os.path.join(root_dir, 'bin_'))
+CATWversionFile = os.path.abspath(os.path.join(root_dir, 'bin_', 'catwversionfile'))
+CATSversionFile = os.path.abspath(os.path.join(root_dir, 'bin_', 'catsversionfile'))
 print('VersionFile Path:', CATWversionFile)
 print('VersionFile Path:', CATSversionFile)
 
@@ -48,6 +49,9 @@ VSVersionInfo(
   ]
 )"""
 
+
+if not os.path.exists(CATversionFileDIR):
+	os.makedirs(CATversionFileDIR)
 
 with open(CATWversionFile, 'w', encoding='utf-8') as vF:
     vF.write(get_version_file_content(CAT_WIN_VERSION_SEP, CAT_WIN_VERSION, 'w'))
