@@ -12,7 +12,7 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
     env:
-      bin: ${{ matrix.os == 'macos-latest' && './bin_temp/darwin/catw' || matrix.os == 'windows-latest' && './bin_temp/windows/catw.exe' || './bin_temp/linux/catw' }}
+      bin: ${{ matrix.os == 'macos-latest' && './bin_/darwin/catw' || matrix.os == 'windows-latest' && './bin_/windows/catw.exe' || './bin_/linux/catw' }}
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
