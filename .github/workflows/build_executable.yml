@@ -47,10 +47,18 @@ jobs:
       - name: Show Changes
         run: |
           git status
-      - name: Commit Changes
+      - name: Stash Changes
         run: |
           git config --local user.name 'github-actions[bot]'
           git config --local user.email 'github-actions[bot]@users.noreply.github.com'
+          git add ./bin/*
+          git stash -- bin
+      - name: Fetch Binaries Branch
+        run: |
+          git fetch origin binaries
+          git stash pop
+      - name: Commit & Push
+        run: |
           git add ./bin/*
           git commit -m "🤖Compiled Binary for ${{ matrix.os }}."
           git push origin HEAD:binaries
