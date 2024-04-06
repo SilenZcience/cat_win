@@ -44,8 +44,8 @@ jobs:
           python -m coverage report --show-missing
       - name: Generate Badges
         run: |
-          python -m genbadge.main tests -i ./reports/pytest.xml -o ./badges/badge-tests.svg
-          python -m genbadge.main coverage -i ./reports/coverage.xml -o ./badges/badge-coverage.svg
+          python -m genbadge.main tests -i ./reports/pytest.xml -o ./badges_/badge-tests.svg
+          python -m genbadge.main coverage -i ./reports/coverage.xml -o ./badges_/badge-coverage.svg
       - name: Show Changes
         run: |
           git status
@@ -53,8 +53,8 @@ jobs:
         run: |
           git config --local user.name 'github-actions[bot]'
           git config --local user.email 'github-actions[bot]@users.noreply.github.com'
-          git add ./badges/*
-          git stash -- badges
+          git add ./badges_/*
+          git stash push -m "stashed badges_" badges_
           git clean -df
           git restore .
       - name: Fetch Badges Branch
@@ -62,9 +62,14 @@ jobs:
           git fetch origin badges
           git checkout badges
           git stash pop
+      - name: Copy To Badges
+        run: |
+          python -c "import sys; import shutil; shutil.copytree('./badges_', './badges', dirs_exist_ok=True)"
       - name: Commit & Push
         run: |
           git add ./badges/*
+          git reset ./badges_/*
+          git status
           git commit -m "🤖Generated Coverage Badges."
           git push origin HEAD:binaries
         continue-on-error: true
