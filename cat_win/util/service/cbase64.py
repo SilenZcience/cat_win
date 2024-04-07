@@ -5,23 +5,22 @@ cbase64
 import base64
 
 
-def _encode_base64(content: str, encoding: str) -> bytes:
+def _encode_base64(content_bytes: bytes) -> str:
     """
     Encode a string to base64.
     
     Parameters:
-    content (str):
-        the string to encode
-    encoding (str):
-        the encoding the string is using
+    content_bytes (bytes):
+        the bytes representation of the string to encode
         
     Returns:
-    encoded_content (bytes):
-        the base64 encoded string
+    encoded_content (str):
+        the base64 encoded string in ascii
     """
     # encode the string to bytes and encode with base64
-    content_bytes = content.encode(encoding=encoding)
+
     encoded_content = base64.b64encode(content_bytes)
+    encoded_content = encoded_content.decode(encoding='ascii')
 
     # return as a single line
     return encoded_content
@@ -45,8 +44,9 @@ def encode_base64(content: list, encoding: str = 'utf-8') -> list:
     content_lines = [''.join(x) for x in content]
     content_line = '\n'.join(content_lines)
 
-    encoded_content = _encode_base64(content_line, encoding)
-    encoded_content = encoded_content.decode(encoding='ascii')
+    content_bytes = content_line.encode(encoding=encoding, errors='ignore')
+    encoded_content = _encode_base64(content_bytes)
+
     # return as a list containing a single line
     return [('', encoded_content)]
 
