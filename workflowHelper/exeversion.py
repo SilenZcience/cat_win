@@ -20,12 +20,12 @@ CATSversionFile = os.path.abspath(os.path.join(root_dir, 'temp', 'catsversionfil
 print('VersionFile Path:', CATWversionFile)
 print('VersionFile Path:', CATSversionFile)
 
-def get_version_file_content(cat_win_v_sep: str, cat_win_v: str, suffix: str) -> str:
+def get_version_file_content(suffix: str) -> str:
     return f"""\
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=({cat_win_v_sep}),
-    prodvers=({cat_win_v_sep}),
+    filevers=({CAT_WIN_VERSION_SEP}),
+    prodvers=({CAT_WIN_VERSION_SEP}),
     mask=0x3f,
     flags=0x0,
     OS=0x40004,
@@ -40,12 +40,12 @@ VSVersionInfo(
         u'040904B0',
         [StringStruct(u'CompanyName', u''),
         StringStruct(u'FileDescription', u'OS Independent cat Command-line Tool.'),
-        StringStruct(u'FileVersion', u'{cat_win_v}'),
+        StringStruct(u'FileVersion', u'{CAT_WIN_VERSION}'),
         StringStruct(u'InternalName', u'cat_win'),
         StringStruct(u'LegalCopyright', u''),
         StringStruct(u'OriginalFilename', u'cat{suffix}.exe'),
         StringStruct(u'ProductName', u'cat_win'),
-        StringStruct(u'ProductVersion', u'{cat_win_v}')])
+        StringStruct(u'ProductVersion', u'{CAT_WIN_VERSION}')])
       ]),
     VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
   ]
@@ -62,7 +62,7 @@ with open(CATiconfile, 'wb') as iF:
     iF.write(get_icon_file_content())
 
 with open(CATWversionFile, 'w', encoding='utf-8') as vF:
-    vF.write(get_version_file_content(CAT_WIN_VERSION_SEP, CAT_WIN_VERSION, 'w'))
+    vF.write(get_version_file_content('w'))
 
 with open(CATSversionFile, 'w', encoding='utf-8') as vF:
-    vF.write(get_version_file_content(CAT_WIN_VERSION_SEP, CAT_WIN_VERSION, 's'))
+    vF.write(get_version_file_content('s'))
