@@ -81,6 +81,7 @@
                   <li><a href="#editor">-!, --edit</a></li>
                   <li><a href="#clip">-c, --clip</a></li>
                   <li><a href="#more">-M, --more</a></li>
+                  <li><a href="#raw">-B, --raw</a></li>
                   <li><a href="#dot">--dot, --dotfiles</a></li>
                   <li><a href="#plain">--plain, --plain-only</a></li>
                   <li><a href="#nocolor">--nc, --nocolor</a></li>
@@ -167,6 +168,7 @@
 | *<a href="#clip">-c, --clip</a>* | copy output to clipboard |✔|
 | *<a href="#more">-M, --more</a>* | page through the file step by step |❌|
 ||||
+| *<a href="#raw">-B, --raw</a>* | open the file as raw bytes |❌|
 | *<a href="#dot">--dot, --dotfiles</a>* | additionally query and edit dotfiles |❌|
 | *<a href="#plain">--plain, --plain-only</a>* | ignore non-plaintext files automatically |❌|
 | *<a href="#nocolor">--nc, --nocolor</a>* | disable colored output |✔|
@@ -947,6 +949,25 @@ D DOWN <x>   step x lines down
 S SKIP <x>   skip x lines
 J JUMP <x>   jump to line x
 ...
+```
+
+### <a id="raw">-B, --raw</a>
+
+Opens the given Files in Binary Mode.
+Prints the Output as Raw Binary to the stdout-Stream.
+The only valid Parameters in Combination to -`b`, --`raw` are <a href="#b64e">--b64e, --b64e</a>, <a href="#b64d">--b64d, --b64d</a> and <a href="#strings">--strings, --strings</a>.
+
+```console
+> catw img.png > copy.png
+UnicodeEncodeError: 'charmap' codec can't encode character '\ufffd' in position 0: character maps to <undefined>
+...
+> catw img.png -R > copy.png
+(works but copy.png is corrupted)
+```
+```console
+> catw img.png --raw > copy.png
+⇕
+> catw img.png --b64e --raw | catw - --b64d --raw > copy.png
 ```
 
 ### <a id="dot">--dot, --dotfiles</a>
