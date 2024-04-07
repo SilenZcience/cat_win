@@ -17,7 +17,7 @@ import sys
 
 from cat_win.const.argconstants import ALL_ARGS, ARGS_EDITOR, ARGS_WORDCOUNT, ARGS_WWORDCOUNT
 from cat_win.const.argconstants import ARGS_HELP, ARGS_NUMBER, ARGS_ENDS, ARGS_SQUEEZE
-from cat_win.const.argconstants import ARGS_REVERSE, ARGS_SUM, ARGS_BLANK, ARGS_FILES
+from cat_win.const.argconstants import ARGS_REVERSE, ARGS_SUM, ARGS_BLANK, ARGS_FILES, ARGS_RAW
 from cat_win.const.argconstants import ARGS_STDIN, ARGS_NOCOL, ARGS_BINVIEW, ARGS_FILE_PREFIX
 from cat_win.const.argconstants import ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN
 from cat_win.const.argconstants import ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA
@@ -43,7 +43,7 @@ except SyntaxError: # in case of Python 3.7
     from cat_win.util.helper.utilityold import comp_eval, comp_conv
 from cat_win.util.helper.zipviewer import display_zip
 from cat_win.util.helper import stdinhelper
-from cat_win.util.service.cbase64 import _decode_base64, encode_base64
+from cat_win.util.service.cbase64 import _encode_base64, encode_base64, _decode_base64
 from cat_win.util.service.checksum import print_checksum
 from cat_win.util.service.converter import Converter
 from cat_win.util.service.editor import Editor
@@ -564,6 +564,27 @@ def print_excluded_by_peek(content: list, excluded_by_peek: int) -> None:
                             excluded_by_peek + 10 - len(content))
 
 
+def edit_raw_content(content: bytes, file_index: int = 0) -> None:
+    """
+    write raw binary
+
+    Parameters:
+    content (bytes):
+        the raw content of a binary file
+    file_index (int):
+        the index of the holder.files list, pointing to the file that
+        is currently being processed. a negative value can be used for
+        the shell mode
+    """
+    if holder.args_id[ARGS_STRINGS]:
+        content = get_strings([(b'', content)],
+                              const_dic[DKW.STRINGS_MIN_SEQUENCE_LENGTH],
+                              const_dic[DKW.STRINGS_DELIMETER])
+        return edit_content(content, file_index)
+    if holder.args_id[ARGS_B64E]:
+        content = _encode_base64(content).encode(arg_parser.file_encoding, errors='ignore')
+    sys.stdout.buffer.write(content)
+
 def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> None:
     """
     apply all parameters to a string (file Content).
@@ -578,14 +599,6 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
     line_offset (int):
         the offset for counting the line numbers (used in the shell)
     """
-    if holder.args_id[ARGS_STRINGS]:
-        content = get_strings(content,
-                              const_dic[DKW.STRINGS_MIN_SEQUENCE_LENGTH],
-                              const_dic[DKW.STRINGS_DELIMETER])
-
-    if holder.args_id[ARGS_SPECIFIC_FORMATS]:
-        content = Formatter.format(content)
-
     if not (content or os.isatty(sys.stdout.fileno()) or file_index < 0):
         # if the content of the file is empty, we check if maybe the file is its own pipe-target.
         # an indicator would be if the file has just been modified to be empty (by the shell).
@@ -601,6 +614,15 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
                 f"all data.{color_dic[CKW.RESET_ALL]}")
         # in any case we have nothing to do and can return
         return
+
+    if holder.args_id[ARGS_STRINGS]:
+        content = get_strings(content,
+                              const_dic[DKW.STRINGS_MIN_SEQUENCE_LENGTH],
+                              const_dic[DKW.STRINGS_DELIMETER])
+
+    if holder.args_id[ARGS_SPECIFIC_FORMATS]:
+        content = Formatter.format(content)
+
     excluded_by_peek = 0
 
     if holder.args_id[ARGS_NUMBER]:
@@ -694,7 +716,12 @@ def edit_file(file_index: int = 0) -> None:
     file_index (int):
         the index regarding which file is currently being edited
     """
-    content = [('', '')]
+    if holder.args_id[ARGS_RAW]:
+        with open(holder.files[file_index].path, 'rb') as raw_file:
+            raw_content = raw_file.read()
+        edit_raw_content(raw_content, file_index)
+        return
+    content = []
     try:
         with open(holder.files[file_index].path, 'r', encoding=arg_parser.file_encoding,
                   errors='strict') as file:
@@ -1062,9 +1089,13 @@ def main():
             try:
                 tmp_file_path = tmp_file_helper.generate_temp_file_name()
                 with open(file.path, 'r', encoding=arg_parser.file_encoding) as f_read:
-                    with open(tmp_file_path, 'w', encoding=arg_parser.file_encoding) as f_write:
-                        f_write.write(_decode_base64(f_read.read())
-                                            .decode(arg_parser.file_encoding, errors='ignore'))
+                    if holder.args_id[ARGS_RAW]:
+                        with open(tmp_file_path, 'wb') as f_write_raw:
+                            f_write_raw.write(_decode_base64(f_read.read()))
+                    else:
+                        with open(tmp_file_path, 'w', encoding=arg_parser.file_encoding) as f_write:
+                            f_write.write(_decode_base64(f_read.read())
+                                                .decode(arg_parser.file_encoding, errors='ignore'))
                 holder.files[i].path = tmp_file_path
             except (OSError, UnicodeError):
                 err_print(f"Base64 decoding failed for file: {file.displayname}")
