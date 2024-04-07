@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.7.6] - TBA
+
+### Minor Changes
+
+- added -`B`, --`raw` parameter to read a file as binary and write raw binary as output.
+
+
 ## [1.7.5] - 2024-04-06
 
 ### Minor Changes
