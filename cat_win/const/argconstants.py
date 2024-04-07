@@ -31,7 +31,7 @@ ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY, ARGS_FILE_PREFIX = range(
 ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI, ARGS_WORDCOUNT = range(45, 50)
 ARGS_WWORDCOUNT, ARGS_DIRECTORIES, ARGS_DDIRECTORIES = range(50, 53)
 ARGS_SPECIFIC_FORMATS, ARGS_CONFIG, ARGS_CHARCOUNT = range(53, 56)
-ARGS_CCHARCOUNT, ARGS_STRINGS, ARGS_MORE = range(56, 59)
+ARGS_CCHARCOUNT, ARGS_STRINGS, ARGS_MORE, ARGS_RAW = range(56, 60)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -153,6 +153,8 @@ ALL_ARGS = [
                 ARGS_MORE, show_arg_on_shell=False, section=10),
 
     # behavioural
+    ArgConstant('-B', '--raw', 'open the file as raw bytes',
+                ARGS_RAW, show_arg_on_shell=False, section=11),
     ArgConstant('--dot', '--dotfiles', 'additionally query and edit dotfiles',
 				ARGS_DOTFILES, show_arg_on_shell=False, section=11),
     ArgConstant('--plain', '--plain-only', 'ignore non-plaintext files automatically',
