@@ -18,10 +18,13 @@ def get_strings(content: list, min_seq_len: int, delim: str) -> list:
     new_content (list):
         the new file content containing all found strings [('', string), ...]
     """
+    content_type_raw = bool(content) and isinstance(content[0][1], bytes)
     new_content = []
     min_seq_len = max(min_seq_len, 1)
     new_string = ''
     for _, line in content:
+        if content_type_raw:
+            line = line.decode(errors='replace')
         new_line = []
         for char in line:
             if 32 <= ord(char) <= 126: # if it is printable ascii
