@@ -5,97 +5,62 @@ cbase64
 import base64
 
 
-def _encode_base64(content_bytes: bytes) -> str:
+def encode_base64(content, decode_bytes: bool = False,
+                  file_encoding: str = 'utf-8'):
     """
     Encode a string to base64.
     
     Parameters:
-    content_bytes (bytes):
-        the bytes representation of the string to encode
+    content (bytes|str):
+        the content to encode in base64
+    decode_bytes (bool):
+        indicates if the returned value should be returned as
+        an decoded string, or as encoded bytes (default)
+    file_encoding (str):
+        the encoding to use when decoding the bytes to a string
         
     Returns:
-    encoded_content (str):
-        the base64 encoded string in ascii
+    encoded_content (bytes|str):
+        the base64 encoded content as string or bytes depending on decode_bytes
     """
-    # encode the string to bytes and encode with base64
+    if isinstance(content, str):
+        content = content.encode(encoding=file_encoding, errors='ignore')
 
-    encoded_content = base64.b64encode(content_bytes)
-    encoded_content = encoded_content.decode(encoding='ascii')
+    encoded_content = base64.b64encode(content)
 
-    # return as a single line
+    if decode_bytes:
+        return encoded_content.decode(encoding='ascii')
     return encoded_content
 
 
-def encode_base64(content: list, encoding: str = 'utf-8') -> list:
-    """
-    Encode the file content to base64 by calling _encode_base64()
-    
-    Parameters:
-    content (list):
-        the file content represented as [(prefix, line), ...]
-    encoding (str):
-        the file encoding used
-        
-    Returns:
-    [('', encoded_content)] (list):
-        the encoded base64 content as a single line without any prefix
-    """
-    # concatenate all lines and join them with line breaks
-    content_lines = [''.join(x) for x in content]
-    content_line = '\n'.join(content_lines)
-
-    content_bytes = content_line.encode(encoding=encoding, errors='ignore')
-    encoded_content = _encode_base64(content_bytes)
-
-    # return as a list containing a single line
-    return [('', encoded_content)]
-
-
-def _decode_base64(content: str) -> bytes:
+def decode_base64(content: str, decode_bytes: bool = False,
+                  file_encoding: str = 'utf-8'):
     """
     Decode a string from base64.
     
     Parameters:
     content (str):
         the string to decode
+    decode_bytes (bool):
+        indicates if the returned value should be returned as
+        an decoded string, or as encoded bytes (default)
+    file_encoding (str):
+        the encoding to use when decoding the bytes to a string
         
     Returns:
-    decoded_content (bytes):
-        the base64 decoded string
+    decoded_content (bytes|str):
+        the base64 decoded content as string or bytes depending on decode_bytes
     """
     chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
+    # base64.b64decode() would raise an error on corrupted base64.
+    # the following algorithm decodes as much as possible:
     binary_str = ''.join(f"{chars.index(char):06b}" for char in content if char in chars)
     if len(binary_str) % 8 != 0:
         binary_str = binary_str[:-(len(binary_str)%8)]
     decoded_content = bytearray()
     decoded_content.extend([int(binary_str[i:i+8], 2) for i in range(0, len(binary_str), 8)])
 
-    # return as a single line
+    if decode_bytes:
+        return decoded_content.decode(file_encoding, errors='ignore')
     return decoded_content
-
-
-def decode_base64(content: list, encoding: str = 'utf-8') -> list:
-    """
-    decode the file content from base64 by calling _decode_base64()
-    
-    Parameters:
-    content (list):
-        the file content represented as [(prefix, line), ...]
-    encoding (str):
-        the file encoding used
-        
-    Returns:
-    [('', line), ...] (list):
-        the decoded base64 content line by line without any prefix
-    """
-    # concatenate all lines and join them
-    content_lines = [x for _, x in content]
-    content_line = ''.join(content_lines)
-
-    decoded_content = _decode_base64(content_line)
-    decoded_content = decoded_content.decode(encoding=encoding, errors='ignore')
-
-    # return as content list, split at line breaks
-    decoded_content = decoded_content.split('\n')
-    return [('', line) for line in decoded_content]
