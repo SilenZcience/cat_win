@@ -43,7 +43,7 @@ except SyntaxError: # in case of Python 3.7
     from cat_win.util.helper.utilityold import comp_eval, comp_conv
 from cat_win.util.helper.zipviewer import display_zip
 from cat_win.util.helper import stdinhelper
-from cat_win.util.service.cbase64 import _encode_base64, encode_base64, _decode_base64
+from cat_win.util.service.cbase64 import encode_base64, decode_base64
 from cat_win.util.service.checksum import print_checksum
 from cat_win.util.service.converter import Converter
 from cat_win.util.service.editor import Editor
@@ -582,7 +582,7 @@ def edit_raw_content(content: bytes, file_index: int = 0) -> None:
                               const_dic[DKW.STRINGS_DELIMETER])
         return edit_content(content, file_index)
     if holder.args_id[ARGS_B64E]:
-        content = _encode_base64(content).encode(arg_parser.file_encoding, errors='ignore')
+        content = encode_base64(content)
     sys.stdout.buffer.write(content)
 
 def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> None:
@@ -690,7 +690,9 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
         content = [(_get_file_prefix(prefix, file_index, hyper=True), line)
                    for prefix, line in content]
     if holder.args_id[ARGS_B64E]:
-        content = encode_base64(content, arg_parser.file_encoding)
+        content = encode_base64('\n'.join(''.join(x) for x in content), True,
+                                arg_parser.file_encoding)
+        content = [('', content)]
 
     stepper = More()
     found_queried = print_file(content[:len(content)//2], stepper)
@@ -908,6 +910,27 @@ def edit_files() -> None:
         copy_to_clipboard(remove_ansi_codes_from_line(holder.clip_board))
 
 
+def decode_files_base64():
+    """
+    decode all files from base64 and save to temporary file.
+    """
+    for i, file in enumerate(holder.files):
+        try:
+            tmp_file_path = tmp_file_helper.generate_temp_file_name()
+            with open(file.path, 'r', encoding=arg_parser.file_encoding) as f_read:
+                if holder.args_id[ARGS_RAW]:
+                    with open(tmp_file_path, 'wb') as f_write_raw:
+                        f_write_raw.write(decode_base64(f_read.read()))
+                else:
+                    with open(tmp_file_path, 'w', encoding=arg_parser.file_encoding) as f_write:
+                        f_write.write(
+                            decode_base64(f_read.read(), True, arg_parser.file_encoding)
+                            )
+            holder.files[i].path = tmp_file_path
+        except (OSError, UnicodeError):
+            err_print(f"Base64 decoding failed for file: {file.displayname}")
+
+
 def show_unknown_args_suggestions(shell: bool = False) -> list:
     """
     display the unknown arguments passed in aswell as their suggestions
@@ -1085,20 +1108,7 @@ def main():
             break
 
     if holder.args_id[ARGS_B64D]:
-        for i, file in enumerate(holder.files):
-            try:
-                tmp_file_path = tmp_file_helper.generate_temp_file_name()
-                with open(file.path, 'r', encoding=arg_parser.file_encoding) as f_read:
-                    if holder.args_id[ARGS_RAW]:
-                        with open(tmp_file_path, 'wb') as f_write_raw:
-                            f_write_raw.write(_decode_base64(f_read.read()))
-                    else:
-                        with open(tmp_file_path, 'w', encoding=arg_parser.file_encoding) as f_write:
-                            f_write.write(_decode_base64(f_read.read())
-                                                .decode(arg_parser.file_encoding, errors='ignore'))
-                holder.files[i].path = tmp_file_path
-            except (OSError, UnicodeError):
-                err_print(f"Base64 decoding failed for file: {file.displayname}")
+        decode_files_base64()
     holder.generate_values()
 
     if holder.args_id[ARGS_SSUM]:
