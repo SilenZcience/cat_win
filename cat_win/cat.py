@@ -1278,6 +1278,8 @@ def shell_main():
     print(shell_prefix, end='', flush=True)
     for i, line in enumerate(stdinhelper.get_stdin_content(oneline)):
         stripped_line = line.rstrip('\n')
+        if holder.args_id[ARGS_B64D]:
+            stripped_line = decode_base64(stripped_line, True, arg_parser.file_encoding)
         if cmd.exec(stripped_line):
             command_count += 1
             if cmd.exit_shell:
