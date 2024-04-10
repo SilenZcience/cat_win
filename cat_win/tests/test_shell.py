@@ -2,7 +2,7 @@ from unittest.mock import patch
 from unittest import TestCase
 
 from cat_win import cat
-from cat_win.tests.mocks.std import StdInHelperMock, StdOutMock
+from cat_win.tests.mocks.std import StdInHelperMock, StdOutMock, StdInMock, OSAttyDefGen
 from cat_win.persistence.cconfig import CConfig
 from cat_win.persistence.config import Config
 # import sys
@@ -14,6 +14,8 @@ stdinhelpermock = StdInHelperMock()
 @patch('cat_win.util.helper.stdinhelper.get_stdin_content', stdinhelpermock.get_stdin_content)
 @patch('cat_win.cat.cconfig.load_config', lambda: dict.fromkeys(CConfig.default_dic, ''))
 @patch('cat_win.cat.config.load_config', lambda: Config.default_dic.copy())
+@patch('sys.stdin', StdInMock())
+@patch('os.isatty', OSAttyDefGen.get_def({0: True}))
 class TestShell(TestCase):
     maxDiff = None
 
