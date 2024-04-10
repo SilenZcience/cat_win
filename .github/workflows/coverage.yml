@@ -71,5 +71,5 @@ jobs:
           git reset ./temp/*
           git status
           git commit -m "🤖Generated Coverage Badges."
-          git push origin HEAD:binaries
+          git push origin HEAD:badges
         continue-on-error: true
