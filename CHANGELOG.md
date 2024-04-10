@@ -9,6 +9,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - added -`B`, --`raw` parameter to read a file as binary and write raw binary as output.
 
+### Bugfixes
+
+- fixed Bug where --`b64d` would not work in the shell.
+
 
 ## [1.7.5] - 2024-04-06
 
