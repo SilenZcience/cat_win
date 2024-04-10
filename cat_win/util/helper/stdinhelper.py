@@ -35,7 +35,7 @@ def write_file(content, src_file: str, file_encoding: str) -> str:
     return src_file
 
 
-def get_stdin_content(one_line: bool = False):
+def get_stdin_content(one_line: bool = False, raw: bool = False):
     """
     read the stdin.
     
@@ -48,13 +48,14 @@ def get_stdin_content(one_line: bool = False):
         the input (line by line) delivered by stdin
         until the first EOF (Chr(26)) character
     """
+    s_in = sys.stdin.buffer if raw else sys.stdin
     if one_line:
-        first_line = sys.stdin.readline().rstrip('\n')
+        first_line = s_in.readline().rstrip('\n')
         if first_line[-1:] == chr(26):
             first_line = first_line[:-1]
         yield first_line
         return
-    for line in sys.stdin:
+    for line in s_in:
         if line[-2:-1] == chr(26):
             yield line[:-2]
             break
