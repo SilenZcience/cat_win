@@ -110,17 +110,19 @@ class Editor:
         """
         setup the editor content screen by reading the given file.
         """
+        self.window_content = []
         try:
             self.line_sep = get_newline(self.file)
-            self.window_content = []
             with open(self.file, 'r', encoding=self.file_encoding) as _f:
                 for line in _f.read().split('\n'):
                     self.window_content.append(line)
         except (OSError, UnicodeError) as exc:
             self.window_content.append('')
+            self.unsaved_progress = True
             self.status_bar_size = 2
             self.error_bar = str(exc)
-            self.unsaved_progress = True
+            if self.debug_mode:
+                print(self.error_bar, file=sys.stderr)
 
     def getxymax(self) -> tuple:
         """
@@ -440,8 +442,8 @@ class Editor:
             self.status_bar_size = 1
         except (OSError, UnicodeError) as exc:
             self.unsaved_progress = True
-            self.error_bar = str(exc)
             self.status_bar_size = 2
+            self.error_bar = str(exc)
             if self.debug_mode:
                 print(self.error_bar, file=sys.stderr)
         return True
