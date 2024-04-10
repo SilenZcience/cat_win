@@ -1280,13 +1280,13 @@ def shell_main():
         stripped_line = line.rstrip('\n')
         if not os.isatty(sys.stdin.fileno()):
             print(stripped_line)
-        if holder.args_id[ARGS_B64D]:
-            stripped_line = decode_base64(stripped_line, True, arg_parser.file_encoding)
         if cmd.exec(stripped_line):
             command_count += 1
             if cmd.exit_shell:
                 break
         else:
+            if holder.args_id[ARGS_B64D]:
+                stripped_line = decode_base64(stripped_line, True, arg_parser.file_encoding)
             stripped_line = stripped_line[:1].replace('\\', '') + stripped_line[1:]
             if stripped_line:
                 edit_content([('', stripped_line)], -1, i-command_count)
