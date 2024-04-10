@@ -865,7 +865,7 @@ def print_raw_view(file_index: int = 0, mode: str = 'X') -> None:
         if skipped > 9:
             _print_excluded_by_peek(21, skipped-9)
         print('\n'.join(queue))
-    print('')
+    print()
 
 
 def edit_files() -> None:
@@ -891,20 +891,20 @@ def edit_files() -> None:
         else:
             edit_file(i)
     if holder.args_id[ARGS_FILES]:
-        print('')
+        print()
         Summary.show_files(holder.args_id[ARGS_FFILES], holder.files)
     if holder.args_id[ARGS_DIRECTORIES]:
-        print('')
+        print()
         Summary.show_dirs(arg_parser.get_dirs())
     if holder.args_id[ARGS_SUM]:
-        print('')
+        print()
         Summary.show_sum(holder.args_id[ARGS_SSUM], holder.all_files_lines,
                          holder.all_line_number_place_holder, holder.all_files_lines_sum)
     if holder.args_id[ARGS_WORDCOUNT]:
-        print('')
+        print()
         Summary.show_wordcount(holder.files, arg_parser.file_encoding)
     if holder.args_id[ARGS_CHARCOUNT]:
-        print('')
+        print()
         Summary.show_charcount(holder.files, arg_parser.file_encoding)
     if holder.args_id[ARGS_CLIP]:
         copy_to_clipboard(remove_ansi_codes_from_line(holder.clip_board))
@@ -1058,7 +1058,12 @@ def main():
         known_files.extend(list(temp_files.keys()))
         holder.set_temp_files_url(temp_files)
     if holder.args_id[ARGS_STDIN]:
-        piped_input = ''.join(stdinhelper.get_stdin_content(holder.args_id[ARGS_ONELINE]))
+        piped_input = (b'' if holder.args_id[ARGS_RAW] else '').join(
+            stdinhelper.get_stdin_content(
+                holder.args_id[ARGS_ONELINE],
+                holder.args_id[ARGS_RAW]
+                )
+            )
         temp_file = stdinhelper.write_file(piped_input, tmp_file_helper.generate_temp_file_name(),
                                            arg_parser.file_encoding)
         known_files.append(temp_file)

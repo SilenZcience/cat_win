@@ -116,7 +116,7 @@ class Summary:
                 print(f"{Summary.color}{file: <{longest_file_name}}" + \
                     f"{all_files_lines[file]: >{all_line_number_place_holder}}" + \
                         f"{Summary.color_reset}")
-            print('')
+            print()
         print(f"{Summary.color}Lines (Sum): " + \
             f"{all_files_lines_sum}{Summary.color_reset}")
 
