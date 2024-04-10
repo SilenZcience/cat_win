@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - added -`B`, --`raw` parameter to read a file as binary and write raw binary as output.
+- when piping into the shell (cats) the input will also be printed to display a full context.
 
 ### Bugfixes
 
