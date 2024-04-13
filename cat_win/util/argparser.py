@@ -7,21 +7,10 @@ import os
 import re
 
 from cat_win.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_ECHO
-
+from cat_win.const.regex import compile_re
+from cat_win.const.regex import RE_ENCODING, RE_MATCH, RE_FIND, RE_TRUNC, RE_CUT, RE_REPLACE, RE_REPLACE_COMMA
 
 IS_FILE, IS_DIR, IS_PATTERN = range(0, 3)
-RE_ENCODING      = re.compile(r"\Aenc[\=\:].+\Z",     re.IGNORECASE)
-RE_MATCH         = re.compile(r"\Amatch[\=\:].+\Z",   re.IGNORECASE)
-RE_FIND          = re.compile(r"\Afind[\=\:].*\Z",    re.IGNORECASE)
-RE_TRUNC         = re.compile(r"\Atrunc[\=\:][0-9\(\)\+\-\*\/]*"
-                              r"\:[0-9\(\)\+\-\*\/]*\:?"
-                              r"[0-9\(\)\+\-\*\/]*\Z")
-RE_CUT           = re.compile(r"\A\[[0-9\(\)\+\-\*\/]*\:"
-                              r"[0-9\(\)\+\-\*\/]*\:?"
-                              r"[0-9\(\)\+\-\*\/]*\]\Z")
-RE_REPLACE       = re.compile(r"\A\[(.*?(?<!\\)(?:\\\\)*),(.*)\]\Z")
-RE_REPLACE_COMMA = re.compile(r"(?<!\\)((?:\\\\)*)\\,")
-# using simple if-statements (e.g. startwith()) would be faster, but arguably less readable
 
 
 def levenshtein(str_a: str, str_b: str) -> float:
@@ -239,9 +228,9 @@ class ArgParser:
         # 'match' + ('=' or ':') + file_match
         if RE_MATCH.match(param):
             if delete:
-                self.file_match.discard((param[6:], param[:5].isupper()))
+                self.file_match.discard(compile_re(param[6:], param[:5].isupper()))
                 return False
-            self.file_match.add((param[6:], param[:5].isupper()))
+            self.file_match.add(compile_re(param[6:], param[:5].isupper()))
             return False
         # 'find' + ('=' or ':') + file_search
         if RE_FIND.match(param):
@@ -272,8 +261,8 @@ class ArgParser:
         # '[' + ARGS_REPLACE_THIS + ',' + ARGS_REPLACE_WITH + ']' (escape chars with '\')
         if RE_REPLACE.match(param):
             re_match = RE_REPLACE.match(param)
-            re_this = re.sub(RE_REPLACE_COMMA, r"\1,", re_match.group(1))
-            re_with = re.sub(RE_REPLACE_COMMA, r"\1,", re_match.group(2))
+            re_this = RE_REPLACE_COMMA.sub(r"\1,", re_match.group(1))
+            re_with = RE_REPLACE_COMMA.sub(r"\1,", re_match.group(2))
             try:
                 if self.unicode_replace:
                     re_this = re_this.encode().decode('unicode_escape').encode('latin-1').decode()

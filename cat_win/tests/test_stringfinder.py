@@ -1,5 +1,7 @@
 from unittest import TestCase
 
+import re
+
 from cat_win.util.service.stringfinder import StringFinder
 # import sys
 # sys.path.append('../cat_win')
@@ -30,21 +32,26 @@ class TestStringFinder(TestCase):
 
     def test_find_regex_true(self):
         string_finder = StringFinder(set(), set())
-        _x = list(string_finder._findregex(r"[0-9]{2}", '123', False))
-        self.assertEqual(_x, [[0, 2]])
-
-        _x = list(string_finder._findregex(r"[0-9]{2}", '1234', False))
-        self.assertEqual(_x, [[0, 2], [2, 4]])
-
-        _x = list(string_finder._findregex(r"[A-Z]{1}[a-z]*\s?.*\.+\s", 'Silas A. Kraume', False))
-        self.assertEqual(_x, [[0, 9]])
-
-        _x = list(string_finder._findregex(r"[A-Z]{1}[a-z]*\s?.*\.+\s", 'silas A. Kraume', False))
-        self.assertEqual(_x, [[6, 9]])
+        _x = list(string_finder._findregex(re.compile(r"test", re.DOTALL | re.IGNORECASE), 'TeSt'))
+        self.assertEqual(_x, [[0, 4]])
 
     def test_find_regex_false(self):
         string_finder = StringFinder(set(), set())
-        _x = list(string_finder._findregex(r"[A-Z]{1}[a-z]+\s?.*\.+\s", 'silas A. Kraume', False))
+        _x = list(string_finder._findregex(re.compile(r"[A-Z]{1}[a-z]+\s?.*\.+\s", re.DOTALL), 'silas A. Kraume'))
+        self.assertEqual(_x, [])
+        _x = list(string_finder._findregex(re.compile(r"[0-9]{2}", re.DOTALL), '123'))
+        self.assertEqual(_x, [[0, 2]])
+
+        _x = list(string_finder._findregex(re.compile(r"[0-9]{2}", re.DOTALL), '1234'))
+        self.assertEqual(_x, [[0, 2], [2, 4]])
+
+        _x = list(string_finder._findregex(re.compile(r"[A-Z]{1}[a-z]*\s?.*\.+\s", re.DOTALL), 'Silas A. Kraume'))
+        self.assertEqual(_x, [[0, 9]])
+
+        _x = list(string_finder._findregex(re.compile(r"[A-Z]{1}[a-z]*\s?.*\.+\s", re.DOTALL), 'silas A. Kraume'))
+        self.assertEqual(_x, [[6, 9]])
+
+        _x = list(string_finder._findregex(re.compile(r"test", re.DOTALL), 'TeSt'))
         self.assertEqual(_x, [])
 
     def test_optimize_intervals(self):
@@ -70,7 +77,7 @@ class TestStringFinder(TestCase):
         string_finder = StringFinder(set([('Is', False),
                                           ('Test', False),
                                           ('Not', False)]),
-                                     set([(r"[0-9]\!", False)]))
+                                     set([re.compile(r"[0-9]\!", re.DOTALL)]))
         line = 'ThisIsATest!1!'
         intervals, f_keywords, m_keywords = string_finder.find_keywords(line)
 

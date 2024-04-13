@@ -2,41 +2,13 @@
 converter
 """
 
-import re
+from cat_win.const.regex import RE_EVAL
 
 class Converter:
     """
     converts a binary, octal, decimal or hex number
     into the corresponding others, or evaluates an expression.
     """
-    # matches a mathematical expression consisting of
-    # either hex-numbers = (0x...), binary-numbers (0b...) or
-    # default decimal numbers
-    # (these are not allowed to have a leading zero
-    # before the decimal point, yet something like "-.06" is allowed).
-    # between every number has to be a valid operator (*,/,+,-,%,**,//)
-    # before every number there may be opening parenthesis,
-    # after every number there may be closing parenthesis
-    # (it is not validated that all parenthesis
-    # match each other to a valid expression ...)
-    _eval_regex = re.compile(
-        r'(?:\(\s*)*'
-        r'(?:'
-            r'(?:\-?0'
-                r'(?:'
-                    r'(?:x[0-9a-fA-F]+)'
-                    r'|(?:o[0-7]+)'
-                r'|b[01]+)'
-            r'|(?:\-?(?:(?:0|[1-9][0-9]*)\.[0-9]*|\.[0-9]+|0|[1-9][0-9]*)))'
-        r'[\)\s]*[%\-\/\+\*][\/\*]?[\(\s]*)+'
-        r'(?:\-?0'
-            r'(?:'
-                r'(?:x[0-9a-fA-F]+)'
-                r'|(?:o[0-7]+)'
-            r'|b[01]+)'
-        r'|(?:\-?(?:(?:0|[1-9][0-9]*)\.[0-9]*|\.[0-9]+|0|[1-9][0-9]*)))'
-        r'(?:\s*\))*'
-        )
 
     bindigits = '01'
     octdigits = '01234567'
@@ -91,7 +63,7 @@ class Converter:
             the new content line with the evaluated expression
         """
         new_l_tokens = []
-        res = re.search(self._eval_regex, _l)
+        res = RE_EVAL.search(_l)
 
         while res:
             if integrated:
@@ -120,7 +92,7 @@ class Converter:
             except (NameError, ValueError, ArithmeticError) as exc:
                 self._evaluate_exception_handler(exc, res.group(), new_l_tokens)
             _l = _l[res.end():]
-            res = re.search(self._eval_regex, _l)
+            res = RE_EVAL.search(_l)
 
         if integrated:
             new_l_tokens.append(_l)

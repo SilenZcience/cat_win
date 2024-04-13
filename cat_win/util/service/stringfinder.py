@@ -2,8 +2,6 @@
 stringfinder
 """
 
-import re
-
 from cat_win.const.colorconstants import CKW
 
 
@@ -37,12 +35,12 @@ class StringFinder:
             yield [i, i+_l]
             i = _s.find(sub, i+1)
 
-    def _findregex(self, pattern: str, _s: str, ignore_case: bool):
+    def _findregex(self, pattern, _s: str):
         """
         Generate lists containing the position of pattern in s.
         
         Parameters:
-        pattern (str):
+        pattern (re_pattern):
             the regex pattern to search for
         s (str):
             the string to search in
@@ -51,8 +49,7 @@ class StringFinder:
         (list):
             containing the start and end indeces like [start, end]
         """
-        for _match in re.finditer(pattern, _s,
-                                 re.IGNORECASE if ignore_case else 0 | re.DOTALL):
+        for _match in pattern.finditer(_s):
             yield list(_match.span())
 
     def _optimize_intervals(self, intervals: list) -> list:
@@ -122,10 +119,10 @@ class StringFinder:
         # sort by start position (necessary for a deterministic output)
         found_list.sort(key = lambda x: x[1][0])
 
-        for keyword, ignore_case in self.kw_regex:
-            for _m in self._findregex(keyword, line, ignore_case):
+        for pattern in self.kw_regex:
+            for _m in self._findregex(pattern, line):
                 matched_position.append(_m[:])
-                matched_list.append((keyword, _m))
+                matched_list.append((pattern.pattern, _m))
         # sort by start position (necessary for a deterministic output)
         matched_list.sort(key = lambda x: x[1][0])
 
