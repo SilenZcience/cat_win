@@ -3,8 +3,8 @@ summary
 """
 
 from itertools import groupby
-import re
 
+from cat_win.const.regex import TOKENIZER
 from cat_win.util.service.fileattributes import get_file_size, _convert_size
 
 
@@ -137,7 +137,7 @@ class Summary:
         for hfile in files:
             try:
                 with open(hfile.path, 'r', encoding=file_encoding) as file:
-                    for token in re.findall(r'\w+|[^\s\w]', file.read()):
+                    for token in TOKENIZER.findall(file.read()):
                         word_count[token] = word_count.get(token, 0)+1
                 used_files.append(hfile.displayname)
             except (OSError, UnicodeError):

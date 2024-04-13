@@ -2,18 +2,12 @@
 urls
 """
 
-import re
 import urllib.request
 import urllib.parse
 
+from cat_win.const.regex import DJANGO_VALID_URL_PATTERN
+
 DEFAULT_SCHEME = 'https://'
-DJANGO_VALID_URL_PATTERN = re.compile(
-    r'^(?:http|ftp)s?://' # http:// or https://
-    r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
-    r'localhost|' #localhost...
-    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
-    r'(?::\d+)?' # optional port
-    r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
 
 def is_valid_uri(s_url: str, _rec: bool = False) -> bool:
@@ -34,7 +28,7 @@ def is_valid_uri(s_url: str, _rec: bool = False) -> bool:
     try:
         parse_result = urllib.parse.urlparse(s_url)
         p_result = all([parse_result.scheme, parse_result.netloc])
-        r_result = re.match(DJANGO_VALID_URL_PATTERN, s_url) is not None
+        r_result = DJANGO_VALID_URL_PATTERN.match(s_url) is not None
         valid = r_result and p_result
         if not (valid or _rec):
             return is_valid_uri(DEFAULT_SCHEME+s_url, True)

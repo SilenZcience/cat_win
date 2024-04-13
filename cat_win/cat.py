@@ -12,7 +12,7 @@ from itertools import groupby
 from time import monotonic
 import os
 import platform
-import re
+import shlex
 import sys
 
 from cat_win.const.argconstants import ALL_ARGS, ARGS_EDITOR, ARGS_WORDCOUNT, ARGS_WWORDCOUNT
@@ -32,6 +32,7 @@ from cat_win.const.argconstants import ARGS_DIRECTORIES, ARGS_DDIRECTORIES, ARGS
 from cat_win.const.argconstants import ARGS_CHARCOUNT, ARGS_CCHARCOUNT, ARGS_STRINGS, ARGS_MORE
 from cat_win.const.colorconstants import CKW
 from cat_win.const.defaultconstants import DKW
+from cat_win.const.regex import ANSI_CSI_RE
 from cat_win.persistence.cconfig import CConfig
 from cat_win.persistence.config import Config
 from cat_win.util.argparser import ArgParser
@@ -45,6 +46,7 @@ from cat_win.util.helper.zipviewer import display_zip
 from cat_win.util.helper import stdinhelper
 from cat_win.util.service.cbase64 import encode_base64, decode_base64
 from cat_win.util.service.checksum import print_checksum
+from cat_win.util.service.clipboard import Clipboard
 from cat_win.util.service.converter import Converter
 from cat_win.util.service.editor import Editor
 from cat_win.util.service.fileattributes import get_file_size, get_file_mtime, print_meta
@@ -65,8 +67,6 @@ working_dir = os.path.dirname(os.path.realpath(__file__))
 
 on_windows_os = platform.system() == 'Windows'
 file_uri_prefix = 'file://' + '/' * on_windows_os
-ANSI_CSI_RE = re.compile(r'\001?\033\[(?:\d|;)*[a-zA-Z]\002?') # Control Sequence Introducer
-# ANSI_OSC_RE = re.compile(r'\001?\033\]([^\a]*)(\a)\002?')    # Operating System Command
 
 cconfig = CConfig(working_dir)
 config = Config(working_dir)
@@ -235,7 +235,7 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     err_print('search keyword(s): ', end='')
     err_print([(v, 'CI' if c else 'CS') for v, c in arg_parser.file_search])
     err_print('search match(es): ', end='')
-    err_print([(v, 'CI' if c else 'CS') for v, c in arg_parser.file_match])
+    err_print(arg_parser.file_match)
     err_print('truncate file: ', end='')
     err_print(arg_parser.file_truncate)
     err_print('replace mapping: ', end='')
@@ -763,77 +763,6 @@ def edit_file(file_index: int = 0) -> None:
     edit_content(content, file_index)
 
 
-def _copy_to_clipboard(content: str, __dependency: int = 3,
-                       __clip_board_error: bool = False) -> object:
-    """
-    copy a string to the clipboard, by recursively checking which module exists and could
-    be used, this function should only be called by copy_to_clipboard()
-    
-    Parameters:
-    content (str):
-        the string to copy
-    __dependency (int):
-        do not change!
-    __clip_board_error (bool):
-        do not change!
-        
-    Returns:
-    (function):
-        the method used for copying to the clipboard
-        (in case we want to use this function again without another import)
-    """
-    if __dependency == 0:
-        if __clip_board_error:
-            error_msg = '\n'
-            error_msg += "ClipBoardError: You can use either 'pyperclip3', "
-            error_msg += "'pyperclip', or 'pyclip' in order to use the '--clip' parameter.\n"
-            error_msg += 'Try to install a different one using '
-            error_msg += f"'{os.path.basename(sys.executable)} -m pip install ...'"
-        else:
-            error_msg = '\n'
-            error_msg += "ImportError: You need either 'pyperclip3', 'pyperclip',"
-            error_msg += "or 'pyclip' in order to use the '--clip' parameter.\n"
-            error_msg += 'Should you have any problem with either module, try to install a diff'
-            error_msg += f"erent one using '{os.path.basename(sys.executable)} -m pip install ...'"
-        err_print(error_msg)
-        return None
-    try:
-        if __dependency == 3:
-            import pyperclip as pc
-        elif __dependency == 2:
-            import pyclip as pc
-        elif __dependency == 1:
-            import pyperclip3 as pc
-        pc.copy(content)
-        return pc.copy
-    except ImportError:
-        return _copy_to_clipboard(content, __dependency-1, False or __clip_board_error)
-    except Exception:
-        return _copy_to_clipboard(content, __dependency-1, True or __clip_board_error)
-
-
-def copy_to_clipboard(content: str, copy_function: object = None) -> object:
-    """
-    entry point to recursive function _copy_to_clipboard()
-    
-    Parameters:
-    content (str):
-        the string to copy
-    copy_function (function):
-        the method to use for copying to the clipboard
-        (in case such a method already exists we do not need to import any module (again))
-        
-    Returns:
-    (function):
-        the method used for copying to the clipboard
-        (in case we want to use this function again without another import)
-    """
-    if copy_function is not None:
-        copy_function(content)
-        return copy_function
-    return _copy_to_clipboard(content)
-
-
 def print_raw_view(file_index: int = 0, mode: str = 'X') -> None:
     """
     print the raw byte representation of a file in hexadecimal or binary
@@ -907,7 +836,7 @@ def edit_files() -> None:
         print()
         Summary.show_charcount(holder.files, arg_parser.file_encoding)
     if holder.args_id[ARGS_CLIP]:
-        copy_to_clipboard(remove_ansi_codes_from_line(holder.clip_board))
+        Clipboard.put(remove_ansi_codes_from_line(holder.clip_board))
 
 
 def decode_files_base64():
@@ -1211,7 +1140,7 @@ def shell_main():
             """
             if cmd[:1] != command_prefix:
                 return False
-            line_split = cmd[1:].split(' ')
+            line_split = shlex.split(cmd[1:])
             self.last_cmd = line_split[0]
             method = getattr(self, '_command_' + self.last_cmd, self._command_unknown)
             method(line_split[1:])
@@ -1265,8 +1194,7 @@ def shell_main():
                 file_search = [(v, 'CI' if c else 'CS') for v, c in arg_parser.file_search]
                 print(f"{'Literals:':<12} {file_search}")
             if arg_parser.file_match:
-                file_match = [(v, 'CI' if c else 'CS') for v, c in arg_parser.file_match]
-                print(f"{'Matches:': <12} {file_match}")
+                print(f"{'Matches:': <12} {arg_parser.file_match}")
 
         def _command_exit(self, _) -> None:
             self.exit_shell = True
@@ -1274,7 +1202,6 @@ def shell_main():
 
     cmd = CmdExec()
     command_count = 0
-    copy_function = None
 
     print(__project__, 'v' + __version__, 'shell', '(' + __url__ + ')', end=' - ')
     print("Use 'catw' to handle files.")
@@ -1296,8 +1223,7 @@ def shell_main():
             if stripped_line:
                 edit_content([('', stripped_line)], -1, i-command_count)
                 if holder.args_id[ARGS_CLIP]:
-                    copy_function = copy_to_clipboard(
-                        remove_ansi_codes_from_line(holder.clip_board), copy_function)
+                    Clipboard.put(remove_ansi_codes_from_line(holder.clip_board))
                     holder.clip_board = ''
         if not oneline:
             print(shell_prefix, end='', flush=True)

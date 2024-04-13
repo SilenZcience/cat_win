@@ -81,9 +81,9 @@ class TestArgParser(TestCase):
     def test_get_arguments_match(self):
         arg_parser = ArgParser()
         arg_parser.get_arguments(['CAT', 'match:\\Atest\\Z'])
-        self.assertCountEqual(arg_parser.file_match, set([('\\Atest\\Z', False)]))
+        self.assertCountEqual([p.pattern for p in arg_parser.file_match], ['\\Atest\\Z'])
         arg_parser.get_arguments(['CAT', 'match=\\Atest\\Z'])
-        self.assertCountEqual(arg_parser.file_match, set([('\\Atest\\Z', False)]))
+        self.assertCountEqual([p.pattern for p in arg_parser.file_match], ['\\Atest\\Z'])
 
     def test_get_arguments_find(self):
         arg_parser = ArgParser()
@@ -206,9 +206,11 @@ class TestArgParser(TestCase):
 
         arg_parser._add_argument('match=[a-z]')
         arg_parser._add_argument('match=[0-9]')
-        self.assertSetEqual(arg_parser.file_match, set([('[a-z]', False), ('[0-9]', False)]))
+        self.assertEqual(len(arg_parser.file_match), 2)
+        self.assertCountEqual([p.pattern for p in arg_parser.file_match], ['[a-z]', '[0-9]'])
         arg_parser._add_argument('match=[0-9]', True)
-        self.assertSetEqual(arg_parser.file_match, set([('[a-z]', False)]))
+        self.assertEqual(len(arg_parser.file_match), 1)
+        self.assertCountEqual([p.pattern for p in arg_parser.file_match], ['[a-z]'])
 
     def test_check_unknown_args(self):
         arg_parser = ArgParser()
