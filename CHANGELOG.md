@@ -13,6 +13,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Bugfixes
 
 - fixed Bug where --`b64d` would not work in the shell.
+- fixed Bug where some literals or patterns would not work in the shell (if they included whitespace)
 
 
 ## [1.7.5] - 2024-04-06
