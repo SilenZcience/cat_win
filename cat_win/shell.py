@@ -6,7 +6,7 @@ import sys
 
 
 try:
-    from cat_win import cat
+    from cat_win.src import cat
 except KeyboardInterrupt:
     sys.exit(1)
 except Exception as e:
