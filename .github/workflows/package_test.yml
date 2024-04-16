@@ -46,7 +46,7 @@ jobs:
           python -m workflowHelper.dist 
       - name: Test Code Execution
         run: |
-          python -m cat_win.cat -h
+          python -m cat_win
           python -m cat_win -v
           python -m cat_win -p -nf **/r*.txt --nocolor
       - name: Test Entrypoint
