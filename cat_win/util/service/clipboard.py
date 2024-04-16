@@ -13,10 +13,11 @@ class Clipboard:
     copy_function = None
 
     @staticmethod
-    def _copy_def(content: str, __dependency: int = 3, __clip_board_error: bool = False) -> object:
+    def _copy(content: str, __dependency: int = 3, __clip_board_error: bool = False) -> None:
         """
-        return a method to copy to the clipboard by recursively checking which module exists and
-        could be used, this function should only be called by Clipboard.put()
+        import the clipboard by recursively checking which module exists and
+        could be used, this function should only be called by Clipboard.put() and will only
+        be called once.
         
         Parameters:
         content (str):
@@ -25,26 +26,18 @@ class Clipboard:
             do not change!
         __clip_board_error (bool):
             do not change!
-            
-        Returns:
-        (function):
-            the method used for copying to the clipboard
-            (in case we want to use this function again without another import)
         """
         if __dependency == 0:
             if __clip_board_error:
-                error_msg = "ClipBoardError: You can use either 'pyperclip3', "
-                error_msg += "'pyperclip', or 'pyclip' in order to use the '--clip' parameter.\n"
-                error_msg += 'Try to install a different one using '
-                error_msg += f"'{os.path.basename(sys.executable)} -m pip install ...'"
+                error_msg = "ClipBoardError: You can use"
             else:
-                error_msg = "ImportError: You need either 'pyperclip3', 'pyperclip',"
-                error_msg += "or 'pyclip' in order to use the '--clip' parameter.\n"
-                error_msg += 'Should you have any problem with either module, '
-                error_msg += 'try to install a different one using '
-                error_msg += f"'{os.path.basename(sys.executable)} -m pip install ...'"
-            print('\n', error_msg, sep='', file=sys.stderr)
-            return None
+                error_msg = "ImportError: You need"
+            error_msg += " either 'pyperclip3', 'pyperclip', or 'pyclip' "
+            error_msg += "in order to use the '--clip' parameter.\n"
+            error_msg += 'Should you have any problem with either module, '
+            error_msg += 'try to install a different one using '
+            error_msg += f"'{os.path.basename(sys.executable)} -m pip install ...'"
+            return print('\n', error_msg, sep='', file=sys.stderr)
         try:
             if __dependency == 3:
                 import pyperclip as pc
@@ -53,11 +46,12 @@ class Clipboard:
             elif __dependency == 1:
                 import pyperclip3 as pc
             pc.copy(content)
-            return pc.copy
+            Clipboard.copy_function = pc.copy
+            return
         except ImportError:
-            return Clipboard._copy_def(content, __dependency-1, False or __clip_board_error)
+            Clipboard._copy(content, __dependency-1, False or __clip_board_error)
         except Exception:
-            return Clipboard._copy_def(content, __dependency-1, True or __clip_board_error)
+            Clipboard._copy(content, __dependency-1, True or __clip_board_error)
 
     @staticmethod
     def put(content: str) -> None:
@@ -67,12 +61,9 @@ class Clipboard:
         Parameters:
         content (str):
             the string to copy
-        copy_function (function):
-            the method to use for copying to the clipboard
-            (in case such a method already exists we do not need to import any module (again))
         """
         if Clipboard.copy_function is not None:
             Clipboard.copy_function(content)
             return
 
-        Clipboard.copy_function = Clipboard._copy_def(content)
+        Clipboard._copy(content)
