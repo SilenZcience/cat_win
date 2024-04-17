@@ -4,7 +4,6 @@ argparser
 
 import glob
 import os
-import re
 
 from cat_win.src.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_ECHO
 from cat_win.src.const.regex import compile_re
