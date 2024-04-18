@@ -208,7 +208,8 @@ class CConfig:
                 keyword = self.elements[int(keyword)-1] if (
                     0 < int(keyword) <= len(self.elements)) else keyword
         print('Successfully selected element ', end='')
-        print(f"'{self.color_dic[keyword]}{keyword}{ColorOptions.Style['RESET']}'.")
+        print(f"'{self.color_dic[keyword]}{keyword}{ColorOptions.Style['RESET']}'", end=' ')
+        print(f"[Default: '{self.default_dic[keyword]}{keyword}{ColorOptions.Style['RESET']}']")
 
         color_options = self._print_get_all_available_colors()
         color = ''
