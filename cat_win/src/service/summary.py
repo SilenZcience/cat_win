@@ -34,7 +34,7 @@ class Summary:
     @staticmethod
     def show_files(detailed: bool, files: list) -> None:
         """
-        displays holder.files including their size and calculates
+        displays u_files.files including their size and calculates
         their size sum.
         
         Parameters:
@@ -101,12 +101,12 @@ class Summary:
         detailed (bool):
             indicates if the detailed summary should be displayed.
         all_files_lines (dict):
-            the sum of lines for each file individually (see holder)
+            the sum of lines for each file individually (see files)
         all_line_number_place_holder (int):
             the amount of chars neccessary to display the last line (breaks on base64 decoding)
-            (see holder)
+            (see files)
         all_files_lines_sum (int):
-            the sum of all lines of all files (see holder)
+            the sum of all lines of all files (see files)
         """
         if detailed:
             longest_file_name = max(map(len, all_files_lines.keys())) + 1

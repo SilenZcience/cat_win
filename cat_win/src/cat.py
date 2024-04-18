@@ -34,10 +34,11 @@ from cat_win.src.const.argconstants import ARGS_CONFIG_FLUSH
 from cat_win.src.const.colorconstants import CKW
 from cat_win.src.const.defaultconstants import DKW
 from cat_win.src.const.regex import ANSI_CSI_RE
+from cat_win.src.domain.arguments import Arguments
+from cat_win.src.domain.files import Files
 from cat_win.src.persistence.cconfig import CConfig
 from cat_win.src.persistence.config import Config
 from cat_win.src.util.argparser import ArgParser
-from cat_win.src.util.holder import Holder
 from cat_win.src.service.helper.tmpfilehelper import TmpFileHelper
 try:
     from cat_win.src.service.helper.utility import comp_eval, comp_conv
@@ -74,7 +75,7 @@ config = Config(working_dir)
 
 default_color_dic, color_dic, const_dic = None, None, None
 
-arg_parser, converter, holder = None, None, None
+arg_parser, u_args, u_files, converter, = None, None, None, None
 
 
 def setup():
@@ -82,7 +83,7 @@ def setup():
     setup the global variables.
     """
     global default_color_dic, color_dic, const_dic
-    global arg_parser, converter, holder
+    global arg_parser, converter, u_files, u_args
 
     default_color_dic = cconfig.load_config()
     color_dic = default_color_dic.copy()
@@ -91,8 +92,9 @@ def setup():
     arg_parser = ArgParser(const_dic[DKW.DEFAULT_FILE_ENCODING],
                            const_dic[DKW.UNICODE_ESCAPED_FIND],
                            const_dic[DKW.UNICODE_ESCAPED_REPLACE])
+    u_args = Arguments()
+    u_files = Files()
     converter = Converter()
-    holder = Holder()
     Summary.setup_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
     More.setup(on_windows_os, const_dic[DKW.MORE_STEP_LENGTH])
 
@@ -117,7 +119,7 @@ def exception_handler(exception_type: type, exception, traceback,
         sys.exit(1)  # Python exits with error code 1 on EPIPE
     try:
         err_print(color_dic[CKW.RESET_ALL])
-        if holder.args_id[ARGS_DEBUG]:
+        if u_args[ARGS_DEBUG]:
             return debug_hook(exception_type, exception, traceback)
         err_print(f"\n{exception_type.__name__}{':' * bool(str(exception))} {exception}")
         if exception_type != KeyboardInterrupt:
@@ -219,7 +221,7 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
         'DEBUG ================================================')
     err_print('sys_args:', sys.argv)
     err_print('args: ', end='')
-    err_print([(arg[0], arg[1], holder.args_id[arg[0]]) for arg in args])
+    err_print([(arg[0], arg[1], u_args[arg[0]]) for arg in args])
     err_print('unknown_args: ', end='')
     err_print(unknown_args)
     err_print('known_files: ', end='')
@@ -254,7 +256,7 @@ def _print_meta_and_checksum(show_meta: bool, show_checksum: bool) -> None:
     show_checksum (bool):
         decides if the checksum of the files should be displayed
     """
-    for file in holder.files:
+    for file in u_files:
         if show_meta:
             print_meta(file.path, on_windows_os,
                         [color_dic[CKW.RESET_ALL],
@@ -310,7 +312,7 @@ def _calculate_line_prefix_spacing(line_char_length: int, file_name_prefix: bool
         a non-finished but correctly formatted string template to insert line number
         and file index into
     """
-    line_prefix = ' ' * (holder.all_line_number_place_holder - line_char_length)
+    line_prefix = ' ' * (u_files.all_line_number_place_holder - line_char_length)
 
     if file_name_prefix:
         line_prefix = '%i' + line_prefix
@@ -318,7 +320,7 @@ def _calculate_line_prefix_spacing(line_char_length: int, file_name_prefix: bool
         line_prefix += '%i)'
 
     if include_file_prefix and not file_name_prefix:
-        file_prefix = (' ' * (holder.file_number_place_holder - file_char_length)) + '%i.'
+        file_prefix = (' ' * (u_files.file_number_place_holder - file_char_length)) + '%i.'
         return color_dic[CKW.NUMBER] + file_prefix + line_prefix + color_dic[CKW.RESET_ALL] + ' '
 
     return color_dic[CKW.NUMBER] + line_prefix + color_dic[CKW.RESET_ALL] + ' '
@@ -338,9 +340,9 @@ def _get_line_prefix(line_num: int, index: int) -> str:
     (str):
         the new line prefix including the line number.
     """
-    if holder.args_id[ARGS_FILE_PREFIX]:
+    if u_args[ARGS_FILE_PREFIX]:
         return _calculate_line_prefix_spacing(len(str(line_num)), True) % (line_num)
-    if len(holder.files) > 1:
+    if len(u_files) > 1:
         return _calculate_line_prefix_spacing(len(str(line_num)), False, True,
                                               len(str(index))) % (index, line_num)
     return _calculate_line_prefix_spacing(len(str(line_num))) % (line_num)
@@ -359,7 +361,7 @@ def _calculate_line_length_prefix_spacing(line_char_length: int) -> str:
     (str):
         a non-finished but correctly formatted string template to insert line length into
     """
-    length_prefix = '[' + ' ' * (holder.file_line_length_place_holder - line_char_length) + '%i]'
+    length_prefix = '[' + ' ' * (u_files.file_line_length_place_holder - line_char_length) + '%i]'
     return '%s' + color_dic[CKW.LINE_LENGTH] + length_prefix + color_dic[CKW.RESET_ALL] + ' '
 
 
@@ -377,7 +379,7 @@ def _get_line_length_prefix(prefix: str, line) -> str:
     (str):
         the new line prefix including the line length.
     """
-    if not holder.args_id[ARGS_NOCOL] and isinstance(line, str):
+    if not u_args[ARGS_NOCOL] and isinstance(line, str):
         line = remove_ansi_codes_from_line(line)
     return _calculate_line_length_prefix_spacing(len(str(len(line)))) % (prefix, len(line))
 
@@ -401,10 +403,10 @@ def _get_file_prefix(prefix: str, file_index: int, hyper: bool = False) -> str:
     """
     if file_index < 0:
         return prefix
-    file = file_uri_prefix * hyper + holder.files[file_index].displayname
+    file = file_uri_prefix * hyper + u_files[file_index].displayname
     if hyper:
         file = file.replace('\\', '/')
-    if not holder.args_id[ARGS_NUMBER] or hyper:
+    if not u_args[ARGS_NUMBER] or hyper:
         return f"{prefix}{color_dic[CKW.FILE_PREFIX]}{file}{color_dic[CKW.RESET_ALL]} "
     return f"{color_dic[CKW.FILE_PREFIX]}{file}{color_dic[CKW.RESET_ALL]}:{prefix}"
 
@@ -425,8 +427,8 @@ def print_file(content: list, stepper: More) -> bool:
     if not content:
         return False
     if not any([arg_parser.file_search, arg_parser.file_match,
-                holder.args_id[ARGS_GREP], holder.args_id[ARGS_GREP_ONLY]]):
-        if holder.args_id[ARGS_MORE]:
+                u_args[ARGS_GREP], u_args[ARGS_GREP_ONLY]]):
+        if u_args[ARGS_MORE]:
             stepper.add_lines([prefix + line for prefix, line in content])
             return False
         print(*[prefix + line for prefix, line in content], sep='\n')
@@ -444,7 +446,7 @@ def print_file(content: list, stepper: More) -> bool:
         contains_queried |= bool(intervals)
 
         # this has priority over the other arguments
-        if holder.args_id[ARGS_GREP_ONLY]:
+        if u_args[ARGS_GREP_ONLY]:
             if intervals:
                 fm_substrings = [(pos[0], f"{color_dic[CKW.FOUND]}" + \
                     f"{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_FOUND]}") 
@@ -454,7 +456,7 @@ def print_file(content: list, stepper: More) -> bool:
                                  for _, pos in m_keywords]
                 fm_substrings.sort(key=lambda x:x[0])
                 grepped_line = f"{line_prefix}{','.join(sub for _, sub in fm_substrings)}"
-                if holder.args_id[ARGS_MORE]:
+                if u_args[ARGS_MORE]:
                     stepper.add_line(grepped_line)
                     continue
                 print(grepped_line)
@@ -471,33 +473,33 @@ def print_file(content: list, stepper: More) -> bool:
         #     1     |  1   |     0     ->   1
         #     1     |  1   |     1     ->   0
         if not intervals:
-            if not holder.args_id[ARGS_GREP]:
-                if holder.args_id[ARGS_MORE]:
+            if not u_args[ARGS_GREP]:
+                if u_args[ARGS_MORE]:
                     stepper.add_line(line_prefix + line)
                     continue
                 print(line_prefix + line)
             continue
 
-        if holder.args_id[ARGS_NOKEYWORD]:
+        if u_args[ARGS_NOKEYWORD]:
             continue
 
-        if not holder.args_id[ARGS_NOCOL]:
+        if not u_args[ARGS_NOCOL]:
             for kw_pos, kw_code in intervals:
                 cleaned_line = cleaned_line[:kw_pos] + color_dic[kw_code] + cleaned_line[kw_pos:]
 
-        if holder.args_id[ARGS_MORE]:
+        if u_args[ARGS_MORE]:
             stepper.add_line(line_prefix + cleaned_line)
         else:
             print(line_prefix + cleaned_line)
 
-        if holder.args_id[ARGS_GREP] or holder.args_id[ARGS_NOBREAK]:
+        if u_args[ARGS_GREP] or u_args[ARGS_NOBREAK]:
             continue
 
         found_sth = False
         if f_keywords:
             found_message = f"{color_dic[CKW.FOUND_MESSAGE]}--------------- Found "
             found_message+= f"{f_keywords} ---------------{color_dic[CKW.RESET_ALL]}"
-            if holder.args_id[ARGS_MORE]:
+            if u_args[ARGS_MORE]:
                 stepper.add_line(found_message)
             else:
                 print(found_message)
@@ -505,13 +507,13 @@ def print_file(content: list, stepper: More) -> bool:
         if m_keywords:
             matched_message = f"{color_dic[CKW.MATCHED_MESSAGE]}--------------- Matched "
             matched_message+= f"{m_keywords} ---------------{color_dic[CKW.RESET_ALL]}"
-            if holder.args_id[ARGS_MORE]:
+            if u_args[ARGS_MORE]:
                 stepper.add_line(matched_message)
             else:
                 print(matched_message)
             found_sth = True
 
-        if found_sth and not holder.args_id[ARGS_MORE]:
+        if found_sth and not u_args[ARGS_MORE]:
             try:
                 # fails when using --stdin mode, because the stdin will send en EOF char
                 # to input without prompting the user
@@ -555,10 +557,10 @@ def print_excluded_by_peek(content: list, excluded_by_peek: int) -> None:
     """
     if not excluded_by_peek or len(content) <= 5:
         return
-    if any([holder.args_id[ARGS_GREP],
-            holder.args_id[ARGS_GREP_ONLY],
-            holder.args_id[ARGS_NOKEYWORD],
-            holder.args_id[ARGS_MORE]]):
+    if any([u_args[ARGS_GREP],
+            u_args[ARGS_GREP_ONLY],
+            u_args[ARGS_NOKEYWORD],
+            u_args[ARGS_MORE]]):
         return
     _print_excluded_by_peek(len(remove_ansi_codes_from_line(content[0][0])),
                             excluded_by_peek + 10 - len(content))
@@ -572,16 +574,16 @@ def edit_raw_content(content: bytes, file_index: int = 0) -> None:
     content (bytes):
         the raw content of a binary file
     file_index (int):
-        the index of the holder.files list, pointing to the file that
+        the index of the u_files.files list, pointing to the file that
         is currently being processed. a negative value can be used for
         the shell mode
     """
-    if holder.args_id[ARGS_STRINGS]:
+    if u_args[ARGS_STRINGS]:
         content = get_strings([(b'', content)],
                               const_dic[DKW.STRINGS_MIN_SEQUENCE_LENGTH],
                               const_dic[DKW.STRINGS_DELIMETER])
         return edit_content(content, file_index)
-    if holder.args_id[ARGS_B64E]:
+    if u_args[ARGS_B64E]:
         content = encode_base64(content)
     sys.stdout.buffer.write(content)
 
@@ -593,7 +595,7 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
     content (list):
         the content of a file like [(prefix, line), ...]
     file_index (int):
-        the index of the holder.files list, pointing to the file that
+        the index of the u_files.files list, pointing to the file that
         is currently being processed. a negative value can be used for
         the shell mode
     line_offset (int):
@@ -605,7 +607,7 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
         # also the stdout cannot be atty.
         # checking if the file is an _unknown_file is not valid, because by using '--stdin'
         # the stdin will be used to write the file
-        file_mtime = get_file_mtime(holder.files[file_index].path)
+        file_mtime = get_file_mtime(u_files[file_index].path)
         date_nowtime = datetime.timestamp(datetime.now())
         if abs(date_nowtime - file_mtime) < 0.5:
             err_print(f"{color_dic[CKW.MESSAGE_WARNING]}Warning: It looks like you are " + \
@@ -615,27 +617,27 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
         # in any case we have nothing to do and can return
         return
 
-    if holder.args_id[ARGS_STRINGS]:
+    if u_args[ARGS_STRINGS]:
         content = get_strings(content,
                               const_dic[DKW.STRINGS_MIN_SEQUENCE_LENGTH],
                               const_dic[DKW.STRINGS_DELIMETER])
 
-    if holder.args_id[ARGS_SPECIFIC_FORMATS]:
+    if u_args[ARGS_SPECIFIC_FORMATS]:
         content = Formatter.format(content)
 
     excluded_by_peek = 0
 
-    if holder.args_id[ARGS_NUMBER]:
+    if u_args[ARGS_NUMBER]:
         content = [(_get_line_prefix(j+line_offset, file_index+1), c[1])
                    for j, c in enumerate(content, start=1)]
     content = content[
         arg_parser.file_truncate[0]:arg_parser.file_truncate[1]:arg_parser.file_truncate[2]
         ]
-    if holder.args_id[ARGS_PEEK] and len(content) > 10:
+    if u_args[ARGS_PEEK] and len(content) > 10:
         excluded_by_peek = len(content) - 10
         content = content[:5] + content[-5:]
 
-    for arg, param in holder.args:
+    for arg, param in u_args:
         if arg == ARGS_CUT:
             slice_evals = [None, None, None]
             for i, p_split in enumerate(param[1:-1].split(':')):
@@ -646,7 +648,7 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
             content = [(prefix, line[slice_evals[0]:slice_evals[1]:slice_evals[2]])
                         for prefix, line in content]
 
-    for arg, param in holder.args:
+    for arg, param in u_args:
         if arg == ARGS_ENDS:
             content = [(prefix, f"{line}{color_dic[CKW.ENDS]}${color_dic[CKW.RESET_ALL]}")
                         for prefix, line in content]
@@ -682,14 +684,14 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
                     chr(c_id), f"{color_dic[CKW.CHARS]}^{char}{color_dic[CKW.RESET_ALL]}"
                     )) for prefix, line in content]
 
-    if holder.args_id[ARGS_LLENGTH]:
+    if u_args[ARGS_LLENGTH]:
         content = [(_get_line_length_prefix(prefix, line), line) for prefix, line in content]
-    if holder.args_id[ARGS_FILE_PREFIX]:
+    if u_args[ARGS_FILE_PREFIX]:
         content = [(_get_file_prefix(prefix, file_index), line) for prefix, line in content]
-    elif holder.args_id[ARGS_FFILE_PREFIX]:
+    elif u_args[ARGS_FFILE_PREFIX]:
         content = [(_get_file_prefix(prefix, file_index, hyper=True), line)
                    for prefix, line in content]
-    if holder.args_id[ARGS_B64E]:
+    if u_args[ARGS_B64E]:
         content = encode_base64('\n'.join(''.join(x) for x in content), True,
                                 arg_parser.file_encoding)
         content = [('', content)]
@@ -697,17 +699,17 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
     stepper = More()
     found_queried = print_file(content[:len(content)//2], stepper)
     if file_index >= 0:
-        holder.files[file_index].set_contains_queried(found_queried)
+        u_files[file_index].set_contains_queried(found_queried)
     print_excluded_by_peek(content, excluded_by_peek)
     found_queried = print_file(content[len(content)//2:], stepper)
     if file_index >= 0:
-        holder.files[file_index].set_contains_queried(found_queried)
+        u_files[file_index].set_contains_queried(found_queried)
 
-    if holder.args_id[ARGS_MORE]:
-        stepper.step_through(holder.args_id[ARGS_STDIN])
+    if u_args[ARGS_MORE]:
+        stepper.step_through(u_args[ARGS_STDIN])
 
-    if holder.args_id[ARGS_CLIP]:
-        holder.clip_board += '\n'.join(prefix + line for prefix, line in content)
+    if u_args[ARGS_CLIP]:
+        Clipboard.clipboard += '\n'.join(prefix + line for prefix, line in content)
 
 
 def edit_file(file_index: int = 0) -> None:
@@ -718,14 +720,14 @@ def edit_file(file_index: int = 0) -> None:
     file_index (int):
         the index regarding which file is currently being edited
     """
-    if holder.args_id[ARGS_RAW]:
-        with open(holder.files[file_index].path, 'rb') as raw_file:
+    if u_args[ARGS_RAW]:
+        with open(u_files[file_index].path, 'rb') as raw_file:
             raw_content = raw_file.read()
         edit_raw_content(raw_content, file_index)
         return
     content = []
     try:
-        with open(holder.files[file_index].path, 'r', encoding=arg_parser.file_encoding,
+        with open(u_files[file_index].path, 'r', encoding=arg_parser.file_encoding,
                   errors='strict') as file:
             # splitlines() gives a slight inaccuracy, in case the last line is empty.
             # (it also splits on other bytes than \r and \n ...)
@@ -736,20 +738,20 @@ def edit_file(file_index: int = 0) -> None:
                 file_content = remove_ansi_codes_from_line(file_content)
             content = [('', line) for line in file_content.splitlines()]
     except PermissionError:
-        err_print(f"Permission denied! Skipping {holder.files[file_index].displayname} ...")
+        err_print(f"Permission denied! Skipping {u_files[file_index].displayname} ...")
         return
     except (BlockingIOError, FileNotFoundError):
         err_print('Resource blocked/unavailable! Skipping ' + \
-            f"{holder.files[file_index].displayname} ...")
+            f"{u_files[file_index].displayname} ...")
         return
     except (OSError, UnicodeError):
-        holder.files[file_index].set_plaintext(plain=False)
-        if holder.args_id[ARGS_PLAIN_ONLY]:
+        u_files[file_index].set_plaintext(plain=False)
+        if u_args[ARGS_PLAIN_ONLY]:
             return
-        if display_zip(holder.files[file_index].path, _convert_size):
+        if display_zip(u_files[file_index].path, _convert_size):
             return
         try:
-            with open(holder.files[file_index].path, 'r', encoding=arg_parser.file_encoding,
+            with open(u_files[file_index].path, 'r', encoding=arg_parser.file_encoding,
                       errors=('ignore' if const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace')
                       ) as file:
                 file_content = file.read()
@@ -777,14 +779,14 @@ def print_raw_view(file_index: int = 0, mode: str = 'X') -> None:
     queue = []
     skipped = -1
 
-    print(holder.files[file_index].displayname, ':', sep='')
-    raw_gen = get_raw_view_lines_gen(holder.files[file_index].path, mode,
+    print(u_files[file_index].displayname, ':', sep='')
+    raw_gen = get_raw_view_lines_gen(u_files[file_index].path, mode,
                                      [color_dic[CKW.RAWVIEWER], color_dic[CKW.RESET_ALL]],
                                      arg_parser.file_encoding)
     print(next(raw_gen)) # the header will always be available
     for line in raw_gen:
         skipped += 1
-        if holder.args_id[ARGS_PEEK] and skipped > 4:
+        if u_args[ARGS_PEEK] and skipped > 4:
             queue.append(line)
             if len(queue) > 5:
                 queue = queue[1:]
@@ -801,12 +803,12 @@ def edit_files() -> None:
     """
     manage the calls to edit_file() for each file.
     """
-    start = len(holder.files)-1 if holder.reversed else 0
-    end = -1 if holder.reversed else len(holder.files)
+    start = len(u_files)-1 if u_args[ARGS_REVERSE] else 0
+    end = -1 if u_args[ARGS_REVERSE] else len(u_files)
 
     raw_view_mode = None
-    if holder.args_id[ARGS_HEXVIEW] or holder.args_id[ARGS_BINVIEW]:
-        for arg, param in holder.args:
+    if u_args[ARGS_HEXVIEW] or u_args[ARGS_BINVIEW]:
+        for arg, param in u_args:
             if arg == ARGS_HEXVIEW:
                 raw_view_mode = 'X' if param.isupper() else 'x'
                 break
@@ -814,29 +816,29 @@ def edit_files() -> None:
                 raw_view_mode = 'b'
                 break
 
-    for i in range(start, end, -1 if holder.reversed else 1):
+    for i in range(start, end, -1 if u_args[ARGS_REVERSE] else 1):
         if raw_view_mode:
             print_raw_view(i, raw_view_mode)
         else:
             edit_file(i)
-    if holder.args_id[ARGS_FILES]:
+    if u_args[ARGS_FILES]:
         print()
-        Summary.show_files(holder.args_id[ARGS_FFILES], holder.files)
-    if holder.args_id[ARGS_DIRECTORIES]:
+        Summary.show_files(u_args[ARGS_FFILES], u_files.files)
+    if u_args[ARGS_DIRECTORIES]:
         print()
         Summary.show_dirs(arg_parser.get_dirs())
-    if holder.args_id[ARGS_SUM]:
+    if u_args[ARGS_SUM]:
         print()
-        Summary.show_sum(holder.args_id[ARGS_SSUM], holder.all_files_lines,
-                         holder.all_line_number_place_holder, holder.all_files_lines_sum)
-    if holder.args_id[ARGS_WORDCOUNT]:
+        Summary.show_sum(u_args[ARGS_SSUM], u_files.all_files_lines,
+                         u_files.all_line_number_place_holder, u_files.all_files_lines_sum)
+    if u_args[ARGS_WORDCOUNT]:
         print()
-        Summary.show_wordcount(holder.files, arg_parser.file_encoding)
-    if holder.args_id[ARGS_CHARCOUNT]:
+        Summary.show_wordcount(u_files.files, arg_parser.file_encoding)
+    if u_args[ARGS_CHARCOUNT]:
         print()
-        Summary.show_charcount(holder.files, arg_parser.file_encoding)
-    if holder.args_id[ARGS_CLIP]:
-        Clipboard.put(remove_ansi_codes_from_line(holder.clip_board))
+        Summary.show_charcount(u_files.files, arg_parser.file_encoding)
+    if u_args[ARGS_CLIP]:
+        Clipboard.put(remove_ansi_codes_from_line(Clipboard.clipboard))
 
 
 def decode_files_base64(tmp_file_helper: TmpFileHelper) -> None:
@@ -847,11 +849,11 @@ def decode_files_base64(tmp_file_helper: TmpFileHelper) -> None:
     tmp_file_helper (TmpFileHelper):
         the TmpFileHelper to keep track of the used tmp files
     """
-    for i, file in enumerate(holder.files):
+    for i, file in enumerate(u_files):
         try:
             tmp_file_path = tmp_file_helper.generate_temp_file_name()
             with open(file.path, 'r', encoding=arg_parser.file_encoding) as f_read:
-                if holder.args_id[ARGS_RAW]:
+                if u_args[ARGS_RAW]:
                     with open(tmp_file_path, 'wb') as f_write_raw:
                         f_write_raw.write(decode_base64(f_read.read()))
                 else:
@@ -859,7 +861,7 @@ def decode_files_base64(tmp_file_helper: TmpFileHelper) -> None:
                         f_write.write(
                             decode_base64(f_read.read(), True, arg_parser.file_encoding)
                             )
-            holder.files[i].path = tmp_file_path
+            u_files[i].path = tmp_file_path
         except (OSError, UnicodeError):
             err_print(f"Base64 decoding failed for file: {file.displayname}")
 
@@ -896,13 +898,13 @@ def init_colors() -> None:
     # do not use colors if requested, or output will be piped anyways
     global color_dic
 
-    if holder.args_id[ARGS_NOCOL] or sys.stdout.closed or \
+    if u_args[ARGS_NOCOL] or sys.stdout.closed or \
         (not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]):
         color_dic = dict.fromkeys(color_dic, '')
     else:
         color_dic = default_color_dic.copy()
 
-    converter.set_params(holder.args_id[ARGS_DEBUG],
+    converter.set_params(u_args[ARGS_DEBUG],
                          [color_dic[CKW.EVALUATION],
                           color_dic[CKW.CONVERSION],
                           color_dic[CKW.RESET_ALL]])
@@ -927,18 +929,18 @@ def init(shell: bool = False) -> tuple:
     # read parameter-args
     args, _, unknown_files, echo_args = arg_parser.get_arguments(sys.argv + config.get_cmd())
 
-    holder.set_args(args)
+    u_args.set_args(args)
 
-    known_files = arg_parser.get_files(holder.args_id[ARGS_DOTFILES])
+    known_files = arg_parser.get_files(u_args[ARGS_DOTFILES])
     valid_urls = []
-    if holder.args_id[ARGS_URI]:
+    if u_args[ARGS_URI]:
         valid_urls, unknown_files = sep_valid_urls(unknown_files)
 
-    if holder.args_id[ARGS_RECONFIGURE] or holder.args_id[ARGS_RECONFIGURE_IN]:
+    if u_args[ARGS_RECONFIGURE] or u_args[ARGS_RECONFIGURE_IN]:
         sys.stdin.reconfigure(encoding=arg_parser.file_encoding)
-    if holder.args_id[ARGS_RECONFIGURE] or holder.args_id[ARGS_RECONFIGURE_OUT]:
+    if u_args[ARGS_RECONFIGURE] or u_args[ARGS_RECONFIGURE_OUT]:
         sys.stdout.reconfigure(encoding=arg_parser.file_encoding)
-    if holder.args_id[ARGS_RECONFIGURE_ERR]:
+    if u_args[ARGS_RECONFIGURE_ERR]:
         sys.stderr.reconfigure(encoding=arg_parser.file_encoding)
 
     init_colors()
@@ -946,28 +948,28 @@ def init(shell: bool = False) -> tuple:
     arg_suggestions = show_unknown_args_suggestions(shell)
 
     # check for special cases
-    if holder.args_id[ARGS_DEBUG]:
-        _show_debug(holder.args, arg_suggestions, known_files, unknown_files, echo_args, valid_urls)
-    if (len(known_files) + len(unknown_files) + len(holder.args) == 0 and not shell) or \
-        holder.args_id[ARGS_HELP]:
+    if u_args[ARGS_DEBUG]:
+        _show_debug(u_args.args, arg_suggestions, known_files, unknown_files, echo_args, valid_urls)
+    if (len(known_files) + len(unknown_files) + len(u_args) == 0 and not shell) or \
+        u_args[ARGS_HELP]:
         _show_help(shell)
         sys.exit(0)
-    if holder.args_id[ARGS_VERSION]:
+    if u_args[ARGS_VERSION]:
         _show_version()
         sys.exit(0)
-    if holder.args_id[ARGS_CONFIG_FLUSH]:
+    if u_args[ARGS_CONFIG_FLUSH]:
         config.reset_config()
         sys.exit(0)
-    if holder.args_id[ARGS_CCONFIG]:
+    if u_args[ARGS_CCONFIG]:
         cconfig.save_config()
         sys.exit(0)
-    if holder.args_id[ARGS_CONFIG]:
+    if u_args[ARGS_CONFIG]:
         config.save_config()
         sys.exit(0)
 
     Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
-    Editor.set_flags(holder.args_id[ARGS_STDIN] and on_windows_os,
-                     holder.args_id[ARGS_DEBUG], arg_parser.file_encoding)
+    Editor.set_flags(u_args[ARGS_STDIN] and on_windows_os,
+                     u_args[ARGS_DEBUG], arg_parser.file_encoding)
 
     return (known_files, unknown_files, echo_args, valid_urls)
 
@@ -980,12 +982,12 @@ def main():
     piped_input = temp_file = ''
     known_files, unknown_files, echo_args, valid_urls = init(shell=False)
 
-    if holder.args_id[ARGS_ECHO]:
+    if u_args[ARGS_ECHO]:
         temp_file = stdinhelper.write_file(echo_args, tmp_file_helper.generate_temp_file_name(),
                                            arg_parser.file_encoding)
         known_files.append(temp_file)
-        holder.set_temp_file_echo(temp_file)
-    if holder.args_id[ARGS_URI]:
+        u_files.set_temp_file_echo(temp_file)
+    if u_args[ARGS_URI]:
         # the dictionary should contain an entry for each valid_url, since
         # generated temp-files are unique
         temp_files = dict([
@@ -993,12 +995,12 @@ def main():
                                     arg_parser.file_encoding), valid_url)
             for valid_url in valid_urls])
         known_files.extend(list(temp_files.keys()))
-        holder.set_temp_files_url(temp_files)
-    if holder.args_id[ARGS_STDIN]:
-        piped_input = (b'' if holder.args_id[ARGS_RAW] else '').join(
+        u_files.set_temp_files_url(temp_files)
+    if u_args[ARGS_STDIN]:
+        piped_input = (b'' if u_args[ARGS_RAW] else '').join(
             stdinhelper.get_stdin_content(
-                holder.args_id[ARGS_ONELINE],
-                holder.args_id[ARGS_RAW]
+                u_args[ARGS_ONELINE],
+                u_args[ARGS_RAW]
                 )
             )
         temp_file = stdinhelper.write_file(piped_input, tmp_file_helper.generate_temp_file_name(),
@@ -1006,40 +1008,40 @@ def main():
         known_files.append(temp_file)
         unknown_files = stdinhelper.write_files(unknown_files, piped_input,
                                                 arg_parser.file_encoding)
-        holder.set_temp_file_stdin(temp_file)
-    elif holder.args_id[ARGS_EDITOR]:
+        u_files.set_temp_file_stdin(temp_file)
+    elif u_args[ARGS_EDITOR]:
         unknown_files = [file for file in unknown_files if Editor.open(
-            file, holder.get_file_display_name(file), stdinhelper.write_file,
-            on_windows_os, holder.args_id[ARGS_PLAIN_ONLY])]
+            file, u_files.get_file_display_name(file), stdinhelper.write_file,
+            on_windows_os, u_args[ARGS_PLAIN_ONLY])]
     else:
         unknown_files = stdinhelper.read_write_files_from_stdin(
             unknown_files, arg_parser.file_encoding, on_windows_os,
-            holder.args_id[ARGS_ONELINE])
+            u_args[ARGS_ONELINE])
 
-    if holder.args_id[ARGS_EDITOR]:
-        with stdinhelper.dup_stdin(on_windows_os, holder.args_id[ARGS_STDIN]):
+    if u_args[ARGS_EDITOR]:
+        with stdinhelper.dup_stdin(on_windows_os, u_args[ARGS_STDIN]):
             for file in known_files:
-                Editor.open(file, holder.get_file_display_name(file), stdinhelper.write_file,
-                            on_windows_os, holder.args_id[ARGS_PLAIN_ONLY])
+                Editor.open(file, u_files.get_file_display_name(file), stdinhelper.write_file,
+                            on_windows_os, u_args[ARGS_PLAIN_ONLY])
 
     if len(known_files) + len(unknown_files) == 0:
         return
 
     # fill holder object with neccessary values
-    holder.set_files([*known_files, *unknown_files])
+    u_files.set_files([*known_files, *unknown_files])
 
-    if holder.args_id[ARGS_FFILES]:
-        Summary.show_files(holder.args_id[ARGS_FFILES], holder.files)
+    if u_args[ARGS_FFILES]:
+        Summary.show_files(u_args[ARGS_FFILES], u_files.files)
         return
-    if holder.args_id[ARGS_DDIRECTORIES]:
+    if u_args[ARGS_DDIRECTORIES]:
         Summary.show_dirs(arg_parser.get_dirs())
         return
-    if holder.args_id[ARGS_DATA] or holder.args_id[ARGS_CHECKSUM]:
-        _print_meta_and_checksum(holder.args_id[ARGS_DATA], holder.args_id[ARGS_CHECKSUM])
+    if u_args[ARGS_DATA] or u_args[ARGS_CHECKSUM]:
+        _print_meta_and_checksum(u_args[ARGS_DATA], u_args[ARGS_CHECKSUM])
         return
 
     file_size_sum = 0
-    for file in holder.files:
+    for file in u_files:
         file.set_file_size(get_file_size(file.path))
         file_size_sum += file.file_size
         if file_size_sum >= const_dic[DKW.LARGE_FILE_SIZE]:
@@ -1049,33 +1051,34 @@ def main():
             err_print(color_dic[CKW.RESET_ALL])
             break
 
-    if holder.args_id[ARGS_B64D]:
+    if u_args[ARGS_B64D]:
         decode_files_base64(tmp_file_helper)
-    holder.generate_values()
+    u_files.generate_values(u_args[ARGS_SUM] or u_args[ARGS_SSUM] or u_args[ARGS_NUMBER],
+                            u_args[ARGS_LLENGTH])
 
-    if holder.args_id[ARGS_SSUM]:
-        Summary.show_sum(holder.args_id[ARGS_SSUM], holder.all_files_lines,
-                         holder.all_line_number_place_holder, holder.all_files_lines_sum)
+    if u_args[ARGS_SSUM]:
+        Summary.show_sum(u_args[ARGS_SSUM], u_files.all_files_lines,
+                         u_files.all_line_number_place_holder, u_files.all_files_lines_sum)
         return
-    if holder.args_id[ARGS_WWORDCOUNT]:
-        Summary.show_wordcount(holder.files, arg_parser.file_encoding)
+    if u_args[ARGS_WWORDCOUNT]:
+        Summary.show_wordcount(u_files.files, arg_parser.file_encoding)
         return
-    if holder.args_id[ARGS_CCHARCOUNT]:
-        Summary.show_charcount(holder.files, arg_parser.file_encoding)
+    if u_args[ARGS_CCHARCOUNT]:
+        Summary.show_charcount(u_files.files, arg_parser.file_encoding)
         return
 
     edit_files()  # print the cat-output
 
     # clean-up
-    if holder.args_id[ARGS_DEBUG]:
+    if u_args[ARGS_DEBUG]:
         err_print('================================================ '
             'DEBUG ================================================')
         caches = [
             remove_ansi_codes_from_line,
             _calculate_line_prefix_spacing,
             _calculate_line_length_prefix_spacing,
-            holder.__get_file_lines_sum__,
-            holder.__calc_max_line_length__,
+            u_files._get_file_lines_sum_,
+            u_files._calc_max_line_length_,
             ]
         caches_info = [(cache.__name__,
                         str(cache.cache_info().hits),
@@ -1092,14 +1095,14 @@ def main():
             cache_info+= f"full:{100*int(currsize)/int(maxsize):6.2f}%"
             err_print(cache_info)
     for tmp_file in tmp_file_helper.get_generated_temp_files():
-        if holder.args_id[ARGS_DEBUG]:
+        if u_args[ARGS_DEBUG]:
             err_print('Cleaning', tmp_file)
         try:
             os.remove(tmp_file)
         except (FileNotFoundError, PermissionError, OSError) as e:
-            if holder.args_id[ARGS_DEBUG]:
+            if u_args[ARGS_DEBUG]:
                 err_print(type(e).__name__, tmp_file)
-    if holder.args_id[ARGS_DEBUG]:
+    if u_args[ARGS_DEBUG]:
         err_print('==================================================='
             '====================================================')
 
@@ -1113,7 +1116,7 @@ def shell_main():
     command_prefix = '!'
     shell_prefix = '>>> '
     eof_control_char = 'Z' if on_windows_os else 'D'
-    oneline = holder.args_id[ARGS_ONELINE]
+    oneline = u_args[ARGS_ONELINE]
     shell_session_time_start = monotonic()
 
     class CmdExec:
@@ -1177,7 +1180,7 @@ def shell_main():
 
         def _command_add(self, cmd: list) -> None:
             arg_parser.gen_arguments([''] + cmd)
-            holder.add_args(arg_parser.get_args())
+            u_args.add_args(arg_parser.get_args())
             show_unknown_args_suggestions(shell=True)
             self.exec_colors()
             _added= [arg for _, arg in arg_parser.get_args()] \
@@ -1186,7 +1189,7 @@ def shell_main():
 
         def _command_del(self, cmd: list) -> None:
             arg_parser.gen_arguments([''] + cmd, True)
-            holder.delete_args(arg_parser.get_args())
+            u_args.delete_args(arg_parser.get_args())
             self.exec_colors()
             _removed = [arg for _, arg in arg_parser.get_args()] \
                 if arg_parser.get_args() else 'parameter(s)'
@@ -1194,10 +1197,10 @@ def shell_main():
 
         def _command_clear(self, _) -> None:
             arg_parser.reset_values()
-            self._command_del([arg for _, arg in holder.args])
+            self._command_del([arg for _, arg in u_args])
 
         def _command_see(self, _) -> None:
-            print(f"{'Active Args:': <12} {[arg for _, arg in holder.args]}")
+            print(f"{'Active Args:': <12} {[arg for _, arg in u_args]}")
             if arg_parser.file_search:
                 file_search = [(v, 'CI' if c else 'CS') for v, c in arg_parser.file_search]
                 print(f"{'Literals:':<12} {file_search}")
@@ -1225,14 +1228,14 @@ def shell_main():
             if cmd.exit_shell:
                 break
         else:
-            if holder.args_id[ARGS_B64D]:
+            if u_args[ARGS_B64D]:
                 stripped_line = decode_base64(stripped_line, True, arg_parser.file_encoding)
             stripped_line = stripped_line[:1].replace('\\', '') + stripped_line[1:]
             if stripped_line:
                 edit_content([('', stripped_line)], -1, i-command_count)
-                if holder.args_id[ARGS_CLIP]:
-                    Clipboard.put(remove_ansi_codes_from_line(holder.clip_board))
-                    holder.clip_board = ''
+                if u_args[ARGS_CLIP]:
+                    Clipboard.put(remove_ansi_codes_from_line(Clipboard.clipboard))
+                    Clipboard.clipboard = ''
         if not oneline:
             print(shell_prefix, end='', flush=True)
 

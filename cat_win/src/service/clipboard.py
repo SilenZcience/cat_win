@@ -10,6 +10,7 @@ class Clipboard:
     implements clipboard functionality
     """
 
+    clipboard = ''
     copy_function = None
 
     @staticmethod
