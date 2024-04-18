@@ -87,6 +87,7 @@
                   <li><a href="#nocolor">--nc, --nocolor</a></li>
                   <li><a href="#config">--config, --config</a></li>
                   <li><a href="#cconfig">--cconfig, --cconfig</a></li>
+                  <li><a href="#configreset">--config-clear, --config-reset</a></li>
                   <li><a href="#stream">-R, --R&ltstream&gt</a></li>
                   <li><a href="#enc">enc=X, enc&#42889;X</a></li>
                   <li><a href="#find">find=X, find&#42889;X</a></li>
@@ -175,6 +176,7 @@
 ||||
 | *<a href="#config">--config, --config</a>* | change default parameters |✔|
 | *<a href="#cconfig">--cconfig, --cconfig</a>* | change color configuration |✔|
+| *<a href="#configreset">--config-clear, --config-reset</a>* | reset the config to default settings |✔|
 ||||
 | *<a href="#stream">-R, --R\<stream\></a>* | reconfigure the std-stream(s) with the parsed encoding </br> \<stream\> = 'in'/'out'/'err' (default is stdin & stdout) | ✔ |
 ||||
@@ -1068,6 +1070,17 @@ Valid Options are:
 | message_information | any informational message like update information |
 | message_important | any important message like large file sizes |
 | message_warning | any warning message like overwriting a file with itself |
+
+### <a id="configreset">--config-clear, --config-reset</a>
+
+Reset the Configuration (both <a href="#config">--config, --config</a> and <a href="#cconfig">--cconfig, --cconfig</a>) to their Default Values.
+
+```console
+> catw --config-clear
+The Config has successfully been reset!
+> catw --config-clear
+The configuration is already at default setting.
+```
 
 <a id="encoding"></a>
 ### <a id="stream">-R, --R\<stream\></a>
