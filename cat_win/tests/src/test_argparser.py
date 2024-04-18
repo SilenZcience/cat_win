@@ -2,12 +2,12 @@ from unittest import TestCase
 import os
 
 from cat_win.src.const.argconstants import ARGS_CUT, ARGS_REPLACE
-from cat_win.src.util.argparser import ArgParser, levenshtein
+from cat_win.src.argparser import ArgParser, levenshtein
 # import sys
 # sys.path.append('../cat_win')
 
-test_file_dir = os.path.join(os.path.dirname(__file__), '..', '..')
-project_dir = os.path.dirname(test_file_dir)
+test_file_dir = os.path.join(os.path.dirname(__file__), '..')
+project_dir = os.path.join(test_file_dir, '..')
 test_text_file_dir = os.path.join(test_file_dir, 'texts')
 
 
@@ -240,36 +240,35 @@ class TestArgParser(TestCase):
         self.assertAlmostEqual(levenshtein('lower!', 'LOWER?'), 83.3333, 3)
         self.assertAlmostEqual(levenshtein('--hecksview', '--hexview'), 66.6666, 3)
 
-    # def test_known_directories(self):
-    #     inside_project_dirs = [
-    #         'const',
-    #         'persistence',
-    #         'tests',
-    #         'util',
-    #         'web',
-    #     ]
-    #     inside_test_dirs = [
-    #         'mocks',
-    #         'resources',
-    #         'texts',
-    #     ]
-    #     arg_parser = ArgParser()
-    #     arg_parser._add_argument(test_file_dir)
-    #     arg_parser.get_files()
-    #     dirs = '\n'.join(arg_parser.get_dirs())
-    #     for dir in inside_test_dirs:
-    #         self.assertIn(dir, dirs)
+    def test_known_directories(self):
+        inside_project_dirs = [
+            'src',
+            'tests',
+        ]
+        inside_test_dirs = [
+            'mocks',
+            'resources',
+            'src',
+            'texts',
+        ]
 
-    #     arg_parser = ArgParser()
-    #     arg_parser._add_argument(project_dir)
-    #     arg_parser.get_files()
-    #     dirs = '\n'.join(arg_parser.get_dirs())
-    #     for dir in inside_project_dirs:
-    #         self.assertIn(dir, dirs)
+        arg_parser = ArgParser()
+        arg_parser._add_argument(test_file_dir)
+        arg_parser.get_files()
+        dirs = '\n'.join(map(os.path.basename, arg_parser.get_dirs()))
+        for _dir in inside_test_dirs:
+            self.assertIn(_dir, dirs)
 
-    #     arg_parser = ArgParser()
-    #     arg_parser._add_argument(project_dir + '/**/')
-    #     arg_parser.get_files()
-    #     dirs = '\n'.join(arg_parser.get_dirs())
-    #     for dir in inside_project_dirs + inside_test_dirs:
-    #         self.assertIn(dir, dirs)
+        arg_parser = ArgParser()
+        arg_parser._add_argument(project_dir)
+        arg_parser.get_files()
+        dirs = '\n'.join(map(os.path.basename, arg_parser.get_dirs()))
+        for _dir in inside_project_dirs:
+            self.assertIn(_dir, dirs)
+
+        arg_parser = ArgParser()
+        arg_parser._add_argument(project_dir + '/**/')
+        arg_parser.get_files()
+        dirs = '\n'.join(map(os.path.basename, arg_parser.get_dirs()))
+        for _dir in inside_project_dirs + inside_test_dirs:
+            self.assertIn(_dir, dirs)
