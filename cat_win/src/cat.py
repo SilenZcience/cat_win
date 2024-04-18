@@ -15,6 +15,7 @@ import platform
 import shlex
 import sys
 
+from cat_win.src.argparser import ArgParser
 from cat_win.src.const.argconstants import ALL_ARGS, ARGS_EDITOR, ARGS_WORDCOUNT, ARGS_WWORDCOUNT
 from cat_win.src.const.argconstants import ARGS_HELP, ARGS_NUMBER, ARGS_ENDS, ARGS_SQUEEZE
 from cat_win.src.const.argconstants import ARGS_REVERSE, ARGS_SUM, ARGS_BLANK, ARGS_FILES, ARGS_RAW
@@ -38,7 +39,6 @@ from cat_win.src.domain.arguments import Arguments
 from cat_win.src.domain.files import Files
 from cat_win.src.persistence.cconfig import CConfig
 from cat_win.src.persistence.config import Config
-from cat_win.src.util.argparser import ArgParser
 from cat_win.src.service.helper.tmpfilehelper import TmpFileHelper
 try:
     from cat_win.src.service.helper.utility import comp_eval, comp_conv
