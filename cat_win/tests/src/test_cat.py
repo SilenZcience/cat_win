@@ -40,8 +40,8 @@ class TestCat(TestCase):
         cat._calculate_line_length_prefix_spacing.cache_clear()
 
     def test_cat_output_default_file(self):
-        cat.holder.set_files([test_file_path])
-        cat.holder.set_args([])
+        cat.u_files.set_files([test_file_path])
+        cat.u_args.set_args([])
 
         check_against = '\n'.join(test_file_content) + '\n'
 
@@ -50,8 +50,8 @@ class TestCat(TestCase):
             self.assertEqual(fake_out.getvalue(), check_against)
 
     def test_cat_output_multiple_files(self):
-        cat.holder.set_files([test_file_path, test_file_path, test_file_path])
-        cat.holder.set_args([])
+        cat.u_files.set_files([test_file_path, test_file_path, test_file_path])
+        cat.u_args.set_args([])
 
         check_against = '\n'.join(test_file_content * 3) + '\n'
 
@@ -60,8 +60,8 @@ class TestCat(TestCase):
             self.assertEqual(fake_out.getvalue(), check_against)
 
     def test_cat_output_reverse(self):
-        cat.holder.set_files([test_file_path])
-        cat.holder.set_args([(ARGS_REVERSE, '')]) #reverse
+        cat.u_files.set_files([test_file_path])
+        cat.u_args.set_args([(ARGS_REVERSE, '')]) #reverse
 
         check_against = test_file_content
         check_against.reverse()
@@ -72,8 +72,8 @@ class TestCat(TestCase):
             self.assertEqual(fake_out.getvalue(), check_against)
 
     def test_cat_output_ends_and_tabs(self):
-        cat.holder.set_files([test_file_path])
-        cat.holder.set_args([(ARGS_ENDS, ''), (ARGS_CHR, '')]) #ends & char
+        cat.u_files.set_files([test_file_path])
+        cat.u_args.set_args([(ARGS_ENDS, ''), (ARGS_CHR, '')]) #ends & char
 
         check_against = ('\n'.join(c.replace('\t', '^TAB') + '$' for c in test_file_content) +
                          '\n')
@@ -83,63 +83,63 @@ class TestCat(TestCase):
             self.assertEqual(fake_out.getvalue(), check_against)
 
     def test_cat__get_line_prefix_file_excess(self):
-        cat.holder.all_line_number_place_holder = 5
+        cat.u_files.all_line_number_place_holder = 5
         self.assertEqual(cat._get_line_prefix(9, 1), '    9) ')
 
     def test_cat__get_line_prefix_file_occupied(self):
-        cat.holder.all_line_number_place_holder = 2
+        cat.u_files.all_line_number_place_holder = 2
         self.assertEqual(cat._get_line_prefix(10, 1), '10) ')
 
     def test_cat__get_line_prefix_file_excess_long(self):
-        cat.holder.all_line_number_place_holder = 12
+        cat.u_files.all_line_number_place_holder = 12
         self.assertEqual(cat._get_line_prefix(34719, 1), '       34719) ')
 
     def test_cat__get_line_prefix_file_occupied_long(self):
-        cat.holder.all_line_number_place_holder = 5
+        cat.u_files.all_line_number_place_holder = 5
         self.assertEqual(cat._get_line_prefix(34718, 1), '34718) ')
 
     def test_cat__get_line_prefix_files_excess(self):
-        cat.holder.all_line_number_place_holder = 5
-        cat.holder.file_number_place_holder = 4
-        cat.holder.files = [1,2]
+        cat.u_files.all_line_number_place_holder = 5
+        cat.u_files.file_number_place_holder = 4
+        cat.u_files.files = [1,2]
         self.assertEqual(cat._get_line_prefix(9, 1), '   1.    9) ')
 
     def test_cat__get_line_prefix_files_occupied(self):
-        cat.holder.all_line_number_place_holder = 3
-        cat.holder.file_number_place_holder = 2
-        cat.holder.files = [1,2]
+        cat.u_files.all_line_number_place_holder = 3
+        cat.u_files.file_number_place_holder = 2
+        cat.u_files.files = [1,2]
         self.assertEqual(cat._get_line_prefix(987, 10), '10.987) ')
 
     def test_cat__get_line_prefix_files_excess_long(self):
-        cat.holder.all_line_number_place_holder = 12
-        cat.holder.file_number_place_holder = 10
-        cat.holder.files = [1,2]
+        cat.u_files.all_line_number_place_holder = 12
+        cat.u_files.file_number_place_holder = 10
+        cat.u_files.files = [1,2]
         self.assertEqual(cat._get_line_prefix(101, 404), '       404.         101) ')
 
     def test_cat__get_line_prefix_files_occupied_long(self):
-        cat.holder.all_line_number_place_holder = 11
-        cat.holder.file_number_place_holder = 9
-        cat.holder.files = [1,2]
+        cat.u_files.all_line_number_place_holder = 11
+        cat.u_files.file_number_place_holder = 9
+        cat.u_files.files = [1,2]
         self.assertEqual(cat._get_line_prefix(12345123451, 123456789), '123456789.12345123451) ')
 
     def test_cat__get_line_length_prefix_string_excess(self):
-        cat.holder.file_line_length_place_holder = 5
-        cat.holder.set_args([])
+        cat.u_files.file_line_length_place_holder = 5
+        cat.u_args.set_args([])
         self.assertEqual(cat._get_line_length_prefix('testtest', 'abcdefghi'), 'testtest[    9] ')
 
     def test_cat__get_line_length_prefix_string_occupied(self):
-        cat.holder.file_line_length_place_holder = 2
-        cat.holder.set_args([])
+        cat.u_files.file_line_length_place_holder = 2
+        cat.u_args.set_args([])
         self.assertEqual(cat._get_line_length_prefix('prefix', 'abcdefghij'), 'prefix[10] ')
 
     def test_cat__get_line_length_prefix_bytes_excess(self):
-        cat.holder.file_line_length_place_holder = 5
-        cat.holder.set_args([])
+        cat.u_files.file_line_length_place_holder = 5
+        cat.u_args.set_args([])
         self.assertEqual(cat._get_line_length_prefix('testtest', b'abcdefghi'), 'testtest[    9] ')
 
     def test_cat__get_line_length_prefix_bytes_occupied(self):
-        cat.holder.file_line_length_place_holder = 2
-        cat.holder.set_args([])
+        cat.u_files.file_line_length_place_holder = 2
+        cat.u_args.set_args([])
         self.assertEqual(cat._get_line_length_prefix('prefix', b'abcdefghij'), 'prefix[10] ')
 
     def test_remove_ansi_codes_from_line(self):
@@ -194,7 +194,7 @@ class TestCat(TestCase):
             self.assertIn('CI', fake_out.getvalue())
 
     def test__get_file_prefix(self):
-        cat.holder.files = [File('a', 'b/c.x')]
+        cat.u_files.files = [File('a', 'b/c.x')]
         cat.file_uri_prefix = 'test_uri/'
         prefix = cat._get_file_prefix('pre ', 0, True)
         self.assertEqual(prefix, 'pre test_uri/b/c.x ')
