@@ -258,7 +258,11 @@ class Config:
         c_value_rep = repr(self.const_dic[keyword])
         if c_value_rep[0] not in ['"', "'"]:
             c_value_rep = f"'{c_value_rep}'"
-        print(f"The current value of '{keyword}' is {c_value_rep}")
+        d_value_rep = repr(self.default_dic[keyword])
+        if d_value_rep[0] not in ['"', "'"]:
+            d_value_rep = f"'{d_value_rep}'"
+        print(f"The current value of '{keyword}' is {c_value_rep}", end=' ')
+        print(f"[Default: {d_value_rep}]")
 
         value = None
         while not self.is_valid_value(value, keyword):
@@ -273,3 +277,17 @@ class Config:
                 return
 
         self._save_config(keyword, value)
+
+    def reset_config(self) -> None:
+        """
+        reset the config to default by simply deleting the config file.
+        """
+        try:
+            os.remove(self.config_file)
+            print('The Config has successfully been reset!')
+        except FileNotFoundError:
+            print('The configuration is already at default setting.', file=sys.stderr)
+        except PermissionError:
+            print('Permission denied! Configuration could not be reset.', file=sys.stderr)
+        except OSError:
+            print('An unexpected error occured.', file=sys.stderr)
