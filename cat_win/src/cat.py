@@ -30,6 +30,7 @@ from cat_win.src.const.argconstants import ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY,
 from cat_win.src.const.argconstants import ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI
 from cat_win.src.const.argconstants import ARGS_DIRECTORIES, ARGS_DDIRECTORIES, ARGS_SPECIFIC_FORMATS
 from cat_win.src.const.argconstants import ARGS_CHARCOUNT, ARGS_CCHARCOUNT, ARGS_STRINGS, ARGS_MORE
+from cat_win.src.const.argconstants import ARGS_CONFIG_FLUSH
 from cat_win.src.const.colorconstants import CKW
 from cat_win.src.const.defaultconstants import DKW
 from cat_win.src.const.regex import ANSI_CSI_RE
@@ -73,7 +74,7 @@ config = Config(working_dir)
 
 default_color_dic, color_dic, const_dic = None, None, None
 
-arg_parser, converter, holder, tmp_file_helper = None, None, None, None
+arg_parser, converter, holder = None, None, None
 
 
 def setup():
@@ -81,7 +82,7 @@ def setup():
     setup the global variables.
     """
     global default_color_dic, color_dic, const_dic
-    global arg_parser, converter, holder, tmp_file_helper
+    global arg_parser, converter, holder
 
     default_color_dic = cconfig.load_config()
     color_dic = default_color_dic.copy()
@@ -92,7 +93,6 @@ def setup():
                            const_dic[DKW.UNICODE_ESCAPED_REPLACE])
     converter = Converter()
     holder = Holder()
-    tmp_file_helper = TmpFileHelper()
     Summary.setup_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
     More.setup(on_windows_os, const_dic[DKW.MORE_STEP_LENGTH])
 
@@ -839,9 +839,13 @@ def edit_files() -> None:
         Clipboard.put(remove_ansi_codes_from_line(holder.clip_board))
 
 
-def decode_files_base64():
+def decode_files_base64(tmp_file_helper: TmpFileHelper) -> None:
     """
     decode all files from base64 and save to temporary file.
+    
+    Parameters:
+    tmp_file_helper (TmpFileHelper):
+        the TmpFileHelper to keep track of the used tmp files
     """
     for i, file in enumerate(holder.files):
         try:
@@ -951,6 +955,9 @@ def init(shell: bool = False) -> tuple:
     if holder.args_id[ARGS_VERSION]:
         _show_version()
         sys.exit(0)
+    if holder.args_id[ARGS_CONFIG_FLUSH]:
+        config.reset_config()
+        sys.exit(0)
     if holder.args_id[ARGS_CCONFIG]:
         cconfig.save_config()
         sys.exit(0)
@@ -969,6 +976,7 @@ def main():
     """
     main function
     """
+    tmp_file_helper = TmpFileHelper()
     piped_input = temp_file = ''
     known_files, unknown_files, echo_args, valid_urls = init(shell=False)
 
@@ -1042,7 +1050,7 @@ def main():
             break
 
     if holder.args_id[ARGS_B64D]:
-        decode_files_base64()
+        decode_files_base64(tmp_file_helper)
     holder.generate_values()
 
     if holder.args_id[ARGS_SSUM]:
