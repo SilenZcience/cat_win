@@ -1028,6 +1028,7 @@ Valid Options are:
 | large_file_size | the Size (Bytes) at which a Warning occurs. | 1024 | 104857600 (100Mb) |
 | strip_color_on_pipe | indicate if the Output should be stripped of any Color | no | True |
 | ignore_unknown_bytes | ignore unknown bytes instead of replacing them with � | true | False |
+| peek_size | define the amount of lines shown by <a href="#peek">-p, --peek</a> | 10 | 5 |
 | editor_indentation | set the Indentation used in the <a href="#editor">Editor</a> </br> when pressing ↹ on an empty Line | <b>␣ ␣ ␣ ␣</b> | ↹ |
 | editor_auto_indent | set whether the <a href="#editor">Editor</a> should auto indent or not | 1 | False |
 | strings_minimum_sequence_length | set the minimum Length of a String </br> (for the <a href="#strings">--strings</a> Parameter) | 2 | 4 |
