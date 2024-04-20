@@ -805,7 +805,7 @@ class Editor:
                         pre_pos = self.cpos.get_pos()
                         action_text = getattr(self, key.decode(), lambda *_: None)(wchar)
                         self.history.add(key, action_text, f_len, pre_pos, self.cpos.get_pos())
-                        if key == b'_key_enter':
+                        if Editor.auto_indent and key == b'_key_enter':
                             indent_offset = 0
                             while self.window_content[self.cpos.row-1][indent_offset:].startswith(
                                 self.special_indentation):
