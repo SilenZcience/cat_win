@@ -25,9 +25,15 @@ def validator_string(_, d_h: bool=False):
 
 def validator_int(value: str, d_h: bool=False):
     if d_h:
-        err_print('Integers greater than Zero')
+        err_print('Integers greater than Zero or Zero')
         return False
     return value.isdigit() and int(value) >= 0
+
+def validator_int_pos(value: str, d_h: bool=False):
+    if d_h:
+        err_print('Integers greater than Zero')
+        return False
+    return value.isdigit() and int(value) > 0
 
 def validator_bool(value: str, d_h: bool=False):
     if d_h:
@@ -56,6 +62,7 @@ class Config:
         DKW.LARGE_FILE_SIZE: 1024 * 1024 * 100,  # 100 Megabytes
         DKW.STRIP_COLOR_ON_PIPE: True,
         DKW.IGNORE_UNKNOWN_BYTES: False,
+        DKW.PEEK_SIZE: 5,
         DKW.EDITOR_INDENTATION: '\t',
         DKW.EDITOR_AUTO_INDENT: False,
         DKW.STRINGS_MIN_SEQUENCE_LENGTH: 4,
@@ -71,9 +78,10 @@ class Config:
         DKW.LARGE_FILE_SIZE: validator_int,
         DKW.STRIP_COLOR_ON_PIPE: validator_bool,
         DKW.IGNORE_UNKNOWN_BYTES: validator_bool,
+        DKW.PEEK_SIZE: validator_int_pos,
         DKW.EDITOR_INDENTATION: validator_string,
         DKW.EDITOR_AUTO_INDENT: validator_bool,
-        DKW.STRINGS_MIN_SEQUENCE_LENGTH: validator_int,
+        DKW.STRINGS_MIN_SEQUENCE_LENGTH: validator_int_pos,
         DKW.STRINGS_DELIMETER: validator_string,
         DKW.UNICODE_ESCAPED_FIND: validator_bool,
         DKW.UNICODE_ESCAPED_REPLACE: validator_bool,

@@ -20,7 +20,6 @@ def get_strings(content: list, min_seq_len: int, delim: str) -> list:
     """
     content_type_raw = bool(content) and isinstance(content[0][1], bytes)
     new_content = []
-    min_seq_len = max(min_seq_len, 1)
     new_string = ''
     for _, line in content:
         if content_type_raw:
