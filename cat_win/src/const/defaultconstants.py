@@ -12,6 +12,7 @@ class DKW:
     LARGE_FILE_SIZE = 'large_file_size'
     STRIP_COLOR_ON_PIPE = 'strip_color_on_pipe'
     IGNORE_UNKNOWN_BYTES = 'ignore_unknown_bytes'
+    PEEK_SIZE = 'peek_size'
     EDITOR_INDENTATION = 'editor_indentation'
     EDITOR_AUTO_INDENT = 'editor_auto_indent'
     STRINGS_MIN_SEQUENCE_LENGTH = 'strings_minimum_sequence_length'

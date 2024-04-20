@@ -551,7 +551,7 @@ def print_excluded_by_peek(content: list, excluded_by_peek: int) -> None:
     excluded_by_peek (int):
         the amount of lines that have been originally excluded
     """
-    if not excluded_by_peek or len(content) <= 5:
+    if not excluded_by_peek or len(content) <= const_dic[DKW.PEEK_SIZE]:
         return
     if any([u_args[ARGS_GREP],
             u_args[ARGS_GREP_ONLY],
@@ -559,7 +559,7 @@ def print_excluded_by_peek(content: list, excluded_by_peek: int) -> None:
             u_args[ARGS_MORE]]):
         return
     _print_excluded_by_peek(len(remove_ansi_codes_from_line(content[0][0])),
-                            excluded_by_peek + 10 - len(content))
+                            excluded_by_peek + 2*const_dic[DKW.PEEK_SIZE] - len(content))
 
 
 def edit_raw_content(content: bytes, file_index: int = 0) -> None:
@@ -629,9 +629,9 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
     content = content[
         arg_parser.file_truncate[0]:arg_parser.file_truncate[1]:arg_parser.file_truncate[2]
         ]
-    if u_args[ARGS_PEEK] and len(content) > 10:
-        excluded_by_peek = len(content) - 10
-        content = content[:5] + content[-5:]
+    if u_args[ARGS_PEEK] and len(content) > 2*const_dic[DKW.PEEK_SIZE]:
+        excluded_by_peek = len(content) - 2*const_dic[DKW.PEEK_SIZE]
+        content = content[:const_dic[DKW.PEEK_SIZE]] + content[-const_dic[DKW.PEEK_SIZE]:]
 
     for arg, param in u_args:
         if arg == ARGS_CUT:
@@ -770,7 +770,7 @@ def print_raw_view(file_index: int = 0, mode: str = 'X') -> None:
         or 'b' for binary
     """
     queue = []
-    skipped = -1
+    skipped = 0
 
     print(u_files[file_index].displayname, ':', sep='')
     raw_gen = get_raw_view_lines_gen(u_files[file_index].path, mode,
@@ -779,15 +779,15 @@ def print_raw_view(file_index: int = 0, mode: str = 'X') -> None:
     print(next(raw_gen)) # the header will always be available
     for line in raw_gen:
         skipped += 1
-        if u_args[ARGS_PEEK] and skipped > 4:
+        if u_args[ARGS_PEEK] and skipped > const_dic[DKW.PEEK_SIZE]:
             queue.append(line)
-            if len(queue) > 5:
+            if len(queue) > const_dic[DKW.PEEK_SIZE]:
                 queue = queue[1:]
             continue
         print(line)
     if queue:
-        if skipped > 9:
-            _print_excluded_by_peek(21, skipped-9)
+        if skipped > (2*const_dic[DKW.PEEK_SIZE]):
+            _print_excluded_by_peek(21, skipped-2*const_dic[DKW.PEEK_SIZE])
         print('\n'.join(queue))
     print()
 
