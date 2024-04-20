@@ -10,6 +10,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added -`B`, --`raw` parameter to read a file as binary and write raw binary as output.
 - when piping into the shell (cats) the input will also be printed to display a full context.
 - added --`config-clear`, --`config-reset` parameter to reset the config to the default settings.
+- added --`cconfig-clear`, --`cconfig-reset` parameter to reset the color config to the default settings.
+- added --`config-remove`, --`cconfig-remove` parameter to remove/delete the config file.
 
 ### Bugfixes
 

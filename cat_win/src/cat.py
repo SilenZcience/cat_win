@@ -31,7 +31,7 @@ from cat_win.src.const.argconstants import ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY,
 from cat_win.src.const.argconstants import ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI
 from cat_win.src.const.argconstants import ARGS_DIRECTORIES, ARGS_DDIRECTORIES, ARGS_SPECIFIC_FORMATS
 from cat_win.src.const.argconstants import ARGS_CHARCOUNT, ARGS_CCHARCOUNT, ARGS_STRINGS, ARGS_MORE
-from cat_win.src.const.argconstants import ARGS_CONFIG_FLUSH
+from cat_win.src.const.argconstants import ARGS_CONFIG_FLUSH, ARGS_CCONFIG_FLUSH, ARGS_CONFIG_REMOVE
 from cat_win.src.const.colorconstants import CKW
 from cat_win.src.const.defaultconstants import DKW
 from cat_win.src.const.regex import ANSI_CSI_RE
@@ -146,22 +146,25 @@ def _show_help(shell: bool = False) -> None:
         relevant_section = False
         for arg in group:
             if arg.show_arg and (not shell or arg.show_arg_on_shell):
-                help_message += f"\t{f'{arg.short_form}, {arg.long_form}': <25}{arg.arg_help}\n"
+                arg_descriptor = f'{arg.short_form}, {arg.long_form}'
+                if len(arg_descriptor) > 35:
+                    arg_descriptor = arg_descriptor[:31] + '...'
+                help_message += f"\t{arg_descriptor: <35}{arg.arg_help}\n"
                 relevant_section = True
         help_message += '\n' * relevant_section
-    help_message += f"\t{'-R, --R<stream>': <25}"
+    help_message += f"\t{'-R, --R<stream>': <35}"
     help_message += 'reconfigure the std-stream(s) with the parsed encoding\n'
     help_message += "\t<stream> == 'in'/'out'/'err' (default is stdin & stdout)\n"
     help_message += '\n'
-    help_message += f"\t{'enc=X, enc:X'    : <25}set file encoding to X (default is utf-8)\n"
-    help_message += f"\t{'find=X, find:X'  : <25}find/query a substring X in the given files\n"
-    help_message += f"\t{'match=X, match:X': <25}find/query a pattern X in the given files\n"
+    help_message += f"\t{'enc=X, enc:X'    : <35}set file encoding to X (default is utf-8)\n"
+    help_message += f"\t{'find=X, find:X'  : <35}find/query a substring X in the given files\n"
+    help_message += f"\t{'match=X, match:X': <35}find/query a pattern X in the given files\n"
     if not shell:
-        help_message += f"\t{'trunc=X:Y, trunc:X:Y': <25}"
+        help_message += f"\t{'trunc=X:Y, trunc:X:Y': <35}"
         help_message += 'truncate file to lines X and Y (python-like)\n'
     help_message += '\n'
-    help_message += f"\t{'[a,b]': <25}replace a with b in every line\n"
-    help_message += f"\t{'[a:b:c]': <25}python-like string indexing syntax (line by line)\n"
+    help_message += f"\t{'[a,b]': <35}replace a with b in every line\n"
+    help_message += f"\t{'[a:b:c]': <35}python-like string indexing syntax (line by line)\n"
     help_message += '\n'
     help_message += 'Examples:\n'
     if shell:
@@ -171,12 +174,12 @@ def _show_help(shell: bool = False) -> None:
         help_message += '\t> >>> !help\n'
         help_message += '\t> ...\n'
     else:
-        help_message += f"\t{'catw f g -r' : <25}"
+        help_message += f"\t{'catw f g -r' : <35}"
         help_message += "Output g's contents in reverse order, then f's content in reverse order\n"
-        help_message += f"\t{'catw f g -ne': <25}"
+        help_message += f"\t{'catw f g -ne': <35}"
         help_message += "Output f's, then g's content, "
         help_message += 'while numerating and showing the end of lines\n'
-        help_message += f"\t{'catw f trunc=a:b:c': <25}"
+        help_message += f"\t{'catw f trunc=a:b:c': <35}"
         help_message += "Output f's content starting at line a, ending at line b, stepping c\n"
     try:
         (More(help_message.splitlines())).step_through()
@@ -946,14 +949,20 @@ def init(shell: bool = False) -> tuple:
     if u_args[ARGS_VERSION]:
         _show_version()
         sys.exit(0)
+    if u_args[ARGS_CONFIG_REMOVE]:
+        config.remove_config()
+        sys.exit(0)
     if u_args[ARGS_CONFIG_FLUSH]:
         config.reset_config()
         sys.exit(0)
-    if u_args[ARGS_CCONFIG]:
-        cconfig.save_config()
+    if u_args[ARGS_CCONFIG_FLUSH]:
+        cconfig.reset_config()
         sys.exit(0)
     if u_args[ARGS_CONFIG]:
         config.save_config()
+        sys.exit(0)
+    if u_args[ARGS_CCONFIG]:
+        cconfig.save_config()
         sys.exit(0)
 
     Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
