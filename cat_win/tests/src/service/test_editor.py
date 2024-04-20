@@ -5,7 +5,7 @@ import os
 from cat_win.tests.mocks.error import ErrorDefGen
 from cat_win.tests.mocks.std import StdOutMock
 from cat_win.tests.mocks.edit import getxymax
-from cat_win.src.service.editor import Editor, get_newline
+from cat_win.src.service.editor import Editor
 # import sys
 # sys.path.append('../cat_win')
 test_file_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'texts')
@@ -18,11 +18,6 @@ test_file_path_editor = os.path.join(test_file_dir, 'test_editor.txt')
 @patch('cat_win.src.service.editor.Editor.getxymax', getxymax)
 class TestEditor(TestCase):
     maxDiff = None
-
-    def test_get_newline(self):
-        self.assertEqual(get_newline(test_file_path), '\r\n')
-        self.assertEqual(get_newline(test_file_path_empty), '\n')
-        self.assertEqual(get_newline(test_file_path_oneline), '\n')
 
     def test_editor_special_chars(self):
         editor = Editor(test_file_path_oneline, '')

@@ -26,28 +26,8 @@ import sys
 
 from cat_win.src.service.helper.editorhelper import History, Position, UNIFY_HOTKEYS, \
     KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS
+from cat_win.src.service.helper.iohelper import IoHelper, err_print
 from cat_win.src.service.rawviewer import SPECIAL_CHARS
-
-def get_newline(file: str) -> str:
-    """
-    determines the line ending of a given file.
-    
-    Parameters:
-    file (str):
-        a file (-path) as string representation
-        
-    Returns:
-    (str):
-        the line ending that the given file is using
-        (\r or \n or \r\n)
-    """
-    try:
-        with open(file, 'rb') as _f:
-            _l = _f.readline()
-            _l += b'\n' * bool(not _l[-1:] or _l[-1:] not in b'\r\n')
-            return '\r\n' if _l[-2:] == b'\r\n' else _l[-1:].decode()
-    except OSError:
-        return '\n'
 
 
 class Editor:
@@ -112,17 +92,17 @@ class Editor:
         """
         self.window_content = []
         try:
-            self.line_sep = get_newline(self.file)
-            with open(self.file, 'r', encoding=self.file_encoding) as _f:
-                for line in _f.read().split('\n'):
-                    self.window_content.append(line)
+            self.line_sep = IoHelper.get_newline(self.file)
+            _f_content = IoHelper.read_file(self.file, file_encoding=self.file_encoding)
+            for line in _f_content.split('\n'):
+                self.window_content.append(line)
         except (OSError, UnicodeError) as exc:
             self.window_content.append('')
             self.unsaved_progress = True
             self.status_bar_size = 2
             self.error_bar = str(exc)
             if self.debug_mode:
-                print(self.error_bar, file=sys.stderr)
+                err_print(self.error_bar)
 
     def getxymax(self) -> tuple:
         """
@@ -435,7 +415,7 @@ class Editor:
         content = self.line_sep.join(self.window_content)
         try:
             # encode here to potentially trigger the unicodeerror event
-            write_func(content.encode(self.file_encoding), self.file, self.file_encoding)
+            write_func(self.file, content.encode(self.file_encoding), self.file_encoding)
             self.changes_made = True
             self.unsaved_progress = False
             self.error_bar = ''
@@ -445,7 +425,7 @@ class Editor:
             self.status_bar_size = 2
             self.error_bar = str(exc)
             if self.debug_mode:
-                print(self.error_bar, file=sys.stderr)
+                err_print(self.error_bar)
         return True
 
     def _action_jump(self, _) -> bool:
@@ -623,7 +603,7 @@ class Editor:
             indicates if the editor should keep running
         """
         if self.debug_mode:
-            print('Interrupting...', file=sys.stderr)
+            err_print('Interrupting...')
         raise KeyboardInterrupt
 
     def _action_resize(self, _) -> bool:
@@ -653,8 +633,8 @@ class Editor:
             if self.debug_mode:
                 _debug_info = repr(chr(wchar_)) if isinstance(wchar_, int) else \
                     ord(wchar_) if len(wchar_) == 1 else '-'
-                print(f"__DEBUG__: Received  {key_}\t{_debug_info}" + \
-                    f"\t{str(key__):<15} \t{repr(wchar_)}", file=sys.stderr)
+                err_print(f"__DEBUG__: Received  {key_}\t{_debug_info}" + \
+                    f"\t{str(key__):<15} \t{repr(wchar_)}")
         buffer: tuple = None
         while True:
             if buffer is not None:
@@ -921,7 +901,7 @@ class Editor:
         display_name (str):
             the display name for the current file
         write_func (method):
-            stdinhelper.write_file [simply writes a file]
+            iohelper.write_file [simply writes a file]
         on_windows_os (bool):
             indicates if the user is on windows OS using platform.system() == 'Windows'
         skip_binary (bool):
@@ -935,11 +915,11 @@ class Editor:
             return False
 
         if CURSES_MODULE_ERROR:
-            print("The Editor could not be loaded. No Module 'curses' was found.", file=sys.stderr)
+            err_print("The Editor could not be loaded. No Module 'curses' was found.")
             if on_windows_os:
-                print('If you are on Windows OS, try pip-installing ', end='', file=sys.stderr)
-                print("'windows-curses'.", file=sys.stderr)
-            print(file=sys.stderr)
+                err_print('If you are on Windows OS, try pip-installing ', end='')
+                err_print("'windows-curses'.")
+            err_print()
             Editor.loading_failed = True
             return False
 

@@ -6,6 +6,7 @@ from itertools import groupby
 
 from cat_win.src.const.regex import TOKENIZER
 from cat_win.src.service.fileattributes import get_file_size, _convert_size
+from cat_win.src.service.helper.iohelper import IoHelper
 
 
 class Summary:
@@ -136,9 +137,9 @@ class Summary:
 
         for hfile in files:
             try:
-                with open(hfile.path, 'r', encoding=file_encoding) as file:
-                    for token in TOKENIZER.findall(file.read()):
-                        word_count[token] = word_count.get(token, 0)+1
+                f_content = IoHelper.read_file(hfile.path, file_encoding=file_encoding)
+                for token in TOKENIZER.findall(f_content):
+                    word_count[token] = word_count.get(token, 0)+1
                 used_files.append(hfile.displayname)
             except (OSError, UnicodeError):
                 pass
@@ -182,9 +183,9 @@ class Summary:
 
         for hfile in files:
             try:
-                with open(hfile.path, 'r', encoding=file_encoding) as file:
-                    for char in list(file.read()):
-                        char_count[char] = char_count.get(char, 0)+1
+                f_content = IoHelper.read_file(hfile.path, file_encoding=file_encoding)
+                for char in list(f_content):
+                    char_count[char] = char_count.get(char, 0)+1
                 used_files.append(hfile.displayname)
             except (OSError, UnicodeError):
                 pass

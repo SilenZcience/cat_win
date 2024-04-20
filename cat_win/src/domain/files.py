@@ -6,6 +6,7 @@ from functools import lru_cache
 import heapq
 
 from cat_win.src.domain.file import File
+from cat_win.src.service.helper.iohelper import IoHelper
 
 
 class Files:
@@ -132,22 +133,14 @@ class Files:
             the length of the placeholder to represent
             the longest line within the file
         """
-        heap = []
-        lines = []
         try:
-            with open(file, 'rb') as raw_f:
-                lines = raw_f.readlines()
+            lines = IoHelper.read_file(file, True).splitlines()
         except OSError:
             return 0
         heap = heapq.nlargest(1, lines, len)
         if not heap:
             return 0
-        # also check the longest line against the last line because
-        # the lines still contain (\r)\n, except the last line does not
-        longest_line_len = len(heap[0][:-1].rstrip(b'\n').rstrip(b'\r'))
-        last_line_len = len(lines[-1].rstrip(b'\n').rstrip(b'\r'))
-
-        return len(str(max(longest_line_len, last_line_len)))
+        return len(str(len(heap[0])))
 
     def _calc_file_line_length_place_holder_(self) -> None:
         self.file_line_length_place_holder = max(self._calc_max_line_length_(file.path)

@@ -2,6 +2,9 @@
 rawviewer
 """
 
+from cat_win.src.service.helper.iohelper import IoHelper
+
+
 SPECIAL_CHARS = [
     ( 0, 'NUL', '␀', True), # ^@ \0 null
     # ( 1, 'SOH', '␁', False), # ^A start of heading
@@ -86,9 +89,8 @@ def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors: list = None,
         return special_chars[-1]
 
     try:
-        with open(file, 'rb') as raw_file:
-            raw_file_content = raw_file.read()
-            raw_file_content_length = len(raw_file_content)
+        raw_file_content = IoHelper.read_file(file, True)
+        raw_file_content_length = len(raw_file_content)
     except OSError as exc:
         yield type(exc).__name__
         return ''
