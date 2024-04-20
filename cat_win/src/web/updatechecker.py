@@ -8,6 +8,7 @@ import sys
 import urllib.request
 
 from cat_win.src.const.colorconstants import CKW
+from cat_win.src.service.helper.iohelper import err_print
 from cat_win import __url__
 
 
@@ -200,5 +201,5 @@ def print_update_information(package: str, current_version: str, color_dic: dict
     info += f"{__url__}/blob/main/CHANGELOG.md{color_dic[CKW.RESET_ALL]}"
 
     print(message)
-    print(warning, file=sys.stderr)
+    err_print(warning)
     print(info)

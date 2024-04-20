@@ -5,6 +5,9 @@ clipboard
 import os
 import sys
 
+from cat_win.src.service.helper.iohelper import err_print
+
+
 class Clipboard:
     """
     implements clipboard functionality
@@ -38,7 +41,7 @@ class Clipboard:
             error_msg += 'Should you have any problem with either module, '
             error_msg += 'try to install a different one using '
             error_msg += f"'{os.path.basename(sys.executable)} -m pip install ...'"
-            return print('\n', error_msg, sep='', file=sys.stderr)
+            return err_print('\n', error_msg, sep='')
         try:
             if __dependency == 3:
                 import pyperclip as pc

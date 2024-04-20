@@ -45,7 +45,7 @@ try:
 except SyntaxError: # in case of Python 3.7
     from cat_win.src.service.helper.utilityold import comp_eval, comp_conv
 from cat_win.src.service.helper.zipviewer import display_zip
-from cat_win.src.service.helper import stdinhelper
+from cat_win.src.service.helper.iohelper import IoHelper, err_print
 from cat_win.src.service.cbase64 import encode_base64, decode_base64
 from cat_win.src.service.checksum import print_checksum
 from cat_win.src.service.clipboard import Clipboard
@@ -97,13 +97,6 @@ def setup():
     converter = Converter()
     Summary.setup_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
     More.setup(on_windows_os, const_dic[DKW.MORE_STEP_LENGTH])
-
-
-def err_print(*args, **kwargs):
-    """
-    print to stderr.
-    """
-    print(*args, file=sys.stderr, flush=True, **kwargs)
 
 
 def exception_handler(exception_type: type, exception, traceback,
@@ -721,22 +714,20 @@ def edit_file(file_index: int = 0) -> None:
         the index regarding which file is currently being edited
     """
     if u_args[ARGS_RAW]:
-        with open(u_files[file_index].path, 'rb') as raw_file:
-            raw_content = raw_file.read()
+        raw_content = IoHelper.read_file(u_files[file_index].path, True)
         edit_raw_content(raw_content, file_index)
         return
     content = []
     try:
-        with open(u_files[file_index].path, 'r', encoding=arg_parser.file_encoding,
-                  errors='strict') as file:
-            # splitlines() gives a slight inaccuracy, in case the last line is empty.
-            # (it also splits on other bytes than \r and \n ...)
-            # the alternative would be worse: split('\n') would increase the linecount each
-            # time catw touches a file.
-            file_content = file.read()
-            if not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]:
-                file_content = remove_ansi_codes_from_line(file_content)
-            content = [('', line) for line in file_content.splitlines()]
+        file_content = IoHelper.read_file(u_files[file_index].path, False,
+                                          arg_parser.file_encoding, 'strict')
+        # splitlines() gives a slight inaccuracy, in case the last line is empty.
+        # (it also splits on other bytes than \r and \n ...)
+        # the alternative would be worse: split('\n') would increase the linecount each
+        # time catw touches a file.
+        if not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]:
+            file_content = remove_ansi_codes_from_line(file_content)
+        content = [('', line) for line in file_content.splitlines()]
     except PermissionError:
         err_print(f"Permission denied! Skipping {u_files[file_index].displayname} ...")
         return
@@ -751,13 +742,12 @@ def edit_file(file_index: int = 0) -> None:
         if display_zip(u_files[file_index].path, _convert_size):
             return
         try:
-            with open(u_files[file_index].path, 'r', encoding=arg_parser.file_encoding,
-                      errors=('ignore' if const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace')
-                      ) as file:
-                file_content = file.read()
-                if not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]:
-                    file_content = remove_ansi_codes_from_line(file_content)
-                content = [('', line) for line in file_content.splitlines()]
+            file_content = IoHelper.read_file(u_files[file_index].path, False,
+                                              arg_parser.file_encoding,
+                                              'ignore' if const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace')
+            if not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]:
+                file_content = remove_ansi_codes_from_line(file_content)
+            content = [('', line) for line in file_content.splitlines()]
         except OSError:
             err_print('Operation failed! Try using the enc=X parameter.')
             return
@@ -852,15 +842,14 @@ def decode_files_base64(tmp_file_helper: TmpFileHelper) -> None:
     for i, file in enumerate(u_files):
         try:
             tmp_file_path = tmp_file_helper.generate_temp_file_name()
-            with open(file.path, 'r', encoding=arg_parser.file_encoding) as f_read:
-                if u_args[ARGS_RAW]:
-                    with open(tmp_file_path, 'wb') as f_write_raw:
-                        f_write_raw.write(decode_base64(f_read.read()))
-                else:
-                    with open(tmp_file_path, 'w', encoding=arg_parser.file_encoding) as f_write:
-                        f_write.write(
-                            decode_base64(f_read.read(), True, arg_parser.file_encoding)
-                            )
+            f_read_content = IoHelper.read_file(file.path, file_encoding=arg_parser.file_encoding)
+            if u_args[ARGS_RAW]:
+                IoHelper.write_file(tmp_file_path,
+                                    decode_base64(f_read_content))
+            else:
+                IoHelper.write_file(tmp_file_path,
+                                    decode_base64(f_read_content, True, arg_parser.file_encoding),
+                                    arg_parser.file_encoding)
             u_files[i].path = tmp_file_path
         except (OSError, UnicodeError):
             err_print(f"Base64 decoding failed for file: {file.displayname}")
@@ -983,45 +972,45 @@ def main():
     known_files, unknown_files, echo_args, valid_urls = init(shell=False)
 
     if u_args[ARGS_ECHO]:
-        temp_file = stdinhelper.write_file(echo_args, tmp_file_helper.generate_temp_file_name(),
-                                           arg_parser.file_encoding)
+        temp_file = IoHelper.write_file(tmp_file_helper.generate_temp_file_name(), echo_args,
+                                        arg_parser.file_encoding)
         known_files.append(temp_file)
         u_files.set_temp_file_echo(temp_file)
     if u_args[ARGS_URI]:
         # the dictionary should contain an entry for each valid_url, since
         # generated temp-files are unique
         temp_files = dict([
-            (stdinhelper.write_file(read_url(valid_url), tmp_file_helper.generate_temp_file_name(),
-                                    arg_parser.file_encoding), valid_url)
+            (IoHelper.write_file(tmp_file_helper.generate_temp_file_name(), read_url(valid_url),
+                                 arg_parser.file_encoding), valid_url)
             for valid_url in valid_urls])
         known_files.extend(list(temp_files.keys()))
         u_files.set_temp_files_url(temp_files)
     if u_args[ARGS_STDIN]:
         piped_input = (b'' if u_args[ARGS_RAW] else '').join(
-            stdinhelper.get_stdin_content(
+            IoHelper.get_stdin_content(
                 u_args[ARGS_ONELINE],
                 u_args[ARGS_RAW]
                 )
             )
-        temp_file = stdinhelper.write_file(piped_input, tmp_file_helper.generate_temp_file_name(),
-                                           arg_parser.file_encoding)
+        temp_file = IoHelper.write_file(tmp_file_helper.generate_temp_file_name(), piped_input,
+                                        arg_parser.file_encoding)
         known_files.append(temp_file)
-        unknown_files = stdinhelper.write_files(unknown_files, piped_input,
+        unknown_files = IoHelper.write_files(unknown_files, piped_input,
                                                 arg_parser.file_encoding)
         u_files.set_temp_file_stdin(temp_file)
     elif u_args[ARGS_EDITOR]:
         unknown_files = [file for file in unknown_files if Editor.open(
-            file, u_files.get_file_display_name(file), stdinhelper.write_file,
+            file, u_files.get_file_display_name(file), IoHelper.write_file,
             on_windows_os, u_args[ARGS_PLAIN_ONLY])]
     else:
-        unknown_files = stdinhelper.read_write_files_from_stdin(
+        unknown_files = IoHelper.read_write_files_from_stdin(
             unknown_files, arg_parser.file_encoding, on_windows_os,
             u_args[ARGS_ONELINE])
 
     if u_args[ARGS_EDITOR]:
-        with stdinhelper.dup_stdin(on_windows_os, u_args[ARGS_STDIN]):
+        with IoHelper.dup_stdin(on_windows_os, u_args[ARGS_STDIN]):
             for file in known_files:
-                Editor.open(file, u_files.get_file_display_name(file), stdinhelper.write_file,
+                Editor.open(file, u_files.get_file_display_name(file), IoHelper.write_file,
                             on_windows_os, u_args[ARGS_PLAIN_ONLY])
 
     if len(known_files) + len(unknown_files) == 0:
@@ -1219,7 +1208,7 @@ def shell_main():
     print("Type '!help' for more information.")
 
     print(shell_prefix, end='', flush=True)
-    for i, line in enumerate(stdinhelper.get_stdin_content(oneline)):
+    for i, line in enumerate(IoHelper.get_stdin_content(oneline)):
         stripped_line = line.rstrip('\n')
         if not os.isatty(sys.stdin.fileno()):
             print(stripped_line)

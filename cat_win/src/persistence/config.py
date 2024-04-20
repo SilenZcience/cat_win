@@ -9,6 +9,7 @@ import shlex
 import sys
 
 from cat_win.src.const.defaultconstants import DKW
+from cat_win.src.service.helper.iohelper import err_print
 
 
 BOOL_POS_RESPONSE = ['TRUE','YES','Y','1']
@@ -18,25 +19,25 @@ BOOL_RESPONSE = BOOL_POS_RESPONSE + BOOL_NEG_RESPONSE
 
 def validator_string(_, d_h: bool=False):
     if d_h:
-        print('Any UTF-8 String (unicode-escaped)', file=sys.stderr)
+        err_print('Any UTF-8 String (unicode-escaped)')
         return False
     return True
 
 def validator_int(value: str, d_h: bool=False):
     if d_h:
-        print('Integers greater than Zero', file=sys.stderr)
+        err_print('Integers greater than Zero')
         return False
     return value.isdigit() and int(value) >= 0
 
 def validator_bool(value: str, d_h: bool=False):
     if d_h:
-        print(BOOL_RESPONSE, '(not case sensitive)', file=sys.stderr)
+        err_print(BOOL_RESPONSE, '(not case sensitive)')
         return False
     return value.upper() in BOOL_RESPONSE
 
 def validator_encoding(value: str, d_h: bool=False):
     if d_h:
-        print('Valid Encoding Formats defined by the current Python Interpreter', file=sys.stderr)
+        err_print('Valid Encoding Formats defined by the current Python Interpreter')
         return False
     try:
         return codecs.lookup(value) is not None
@@ -112,8 +113,8 @@ class Config:
             c_value_rep = repr(self.default_dic[element])
             if c_value_rep[0] not in ['"', "'"]:
                 c_value_rep = f"'{c_value_rep}'"
-            print(f"invalid config value '{value}' for '{element}'", file=sys.stderr)
-            print(f"resetting to {c_value_rep} ...", file=sys.stderr)
+            err_print(f"invalid config value '{value}' for '{element}'")
+            err_print(f"resetting to {c_value_rep} ...")
             self._save_config(element, self.default_dic[element])
             sys.exit(1)
 
@@ -232,7 +233,7 @@ class Config:
                 self.config_parser.write(conf)
             print(f"Successfully updated config file:\n\t{self.config_file}")
         except OSError:
-            print(f"Could not write to config file:\n\t{self.config_file}", file=sys.stderr)
+            err_print(f"Could not write to config file:\n\t{self.config_file}")
 
 
     def save_config(self) -> None:
@@ -245,11 +246,11 @@ class Config:
         keyword = ''
         while keyword not in self.elements:
             if keyword != '':
-                print(f"Something went wrong. Unknown keyword '{keyword}'", file=sys.stderr)
+                err_print(f"Something went wrong. Unknown keyword '{keyword}'")
             try:
                 keyword = input('Input name or id of keyword to change: ')
             except EOFError:
-                print('\nAborting due to End-of-File character...', file=sys.stderr)
+                err_print('\nAborting due to End-of-File character...')
                 return
             if keyword.isdigit():
                 keyword = self.elements[int(keyword)-1] if (
@@ -267,13 +268,13 @@ class Config:
         value = None
         while not self.is_valid_value(value, keyword):
             if value is not None:
-                print(f"Something went wrong. Invalid option: '{value}'.", file=sys.stderr)
-                print('Valid Options are: ', end='', file=sys.stderr)
+                err_print(f"Something went wrong. Invalid option: '{value}'.")
+                err_print('Valid Options are: ', end='')
                 self.v_validation[keyword](None, True)
             try:
                 value = input('Input new value: ')
             except EOFError:
-                print('\nAborting due to End-of-File character...', file=sys.stderr)
+                err_print('\nAborting due to End-of-File character...')
                 return
 
         self._save_config(keyword, value)
@@ -286,8 +287,8 @@ class Config:
             os.remove(self.config_file)
             print('The Config has successfully been reset!')
         except FileNotFoundError:
-            print('The configuration is already at default setting.', file=sys.stderr)
+            err_print('The configuration is already at default setting.')
         except PermissionError:
-            print('Permission denied! Configuration could not be reset.', file=sys.stderr)
+            err_print('Permission denied! Configuration could not be reset.')
         except OSError:
-            print('An unexpected error occured.', file=sys.stderr)
+            err_print('An unexpected error occured.')

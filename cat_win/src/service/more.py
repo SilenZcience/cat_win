@@ -5,7 +5,7 @@ more
 import os
 import sys
 
-from cat_win.src.service.helper import stdinhelper
+from cat_win.src.service.helper.iohelper import IoHelper
 
 
 class More:
@@ -214,5 +214,5 @@ class More:
             print(*self.lines, sep='\n')
             return
 
-        with stdinhelper.dup_stdin(More.on_windows_os, dup_needed):
+        with IoHelper.dup_stdin(More.on_windows_os, dup_needed):
             self._step_through()
