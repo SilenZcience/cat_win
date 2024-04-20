@@ -12,6 +12,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added --`config-clear`, --`config-reset` parameter to reset the config to the default settings.
 - added --`cconfig-clear`, --`cconfig-reset` parameter to reset the color config to the default settings.
 - added --`config-remove`, --`cconfig-remove` parameter to remove/delete the config file.
+- added `peek_size` option to the config menu to define the amount of lines shown when using -`p`, --`peek`.
 
 ### Bugfixes
 
