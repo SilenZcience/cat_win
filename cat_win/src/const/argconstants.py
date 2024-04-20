@@ -32,7 +32,7 @@ ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI, ARGS_WORDCOUNT = range(45,
 ARGS_WWORDCOUNT, ARGS_DIRECTORIES, ARGS_DDIRECTORIES = range(50, 53)
 ARGS_SPECIFIC_FORMATS, ARGS_CONFIG = range(53, 55)
 ARGS_CHARCOUNT, ARGS_CCHARCOUNT, ARGS_STRINGS, ARGS_MORE, ARGS_RAW = range(55, 60)
-ARGS_CONFIG_FLUSH, = range(60, 61)
+ARGS_CONFIG_FLUSH, ARGS_CCONFIG_FLUSH, ARGS_CONFIG_REMOVE = range(60, 63)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -170,6 +170,10 @@ ALL_ARGS = [
 				ARGS_CCONFIG, section=12),
     ArgConstant('--config-clear', '--config-reset', 'reset the config to default settings',
 				ARGS_CONFIG_FLUSH, section=12),
+    ArgConstant('--cconfig-clear', '--cconfig-reset', 'reset the color config to default settings',
+				ARGS_CCONFIG_FLUSH, section=12),
+    ArgConstant('--config-remove', '--cconfig-remove', 'remove the config-file',
+				ARGS_CONFIG_REMOVE, section=12),
 
     # streams
     ArgConstant('-R', '--R', 'reconfigure the stdin and stdout with the parsed encoding',

@@ -70,7 +70,7 @@ class CConfig:
         """
         try:
             self.config_parser.read(self.config_file, encoding='utf-8')
-            config_colors = self.config_parser['COLORS']
+            config_colors = dict(self.config_parser.items('COLORS'))
             for element in self.elements:
                 try:
                     color_type, color = config_colors[element].split('.')
@@ -80,8 +80,8 @@ class CConfig:
                         )
                 except KeyError:
                     self.color_dic[element] = self.default_dic[element]
-        except KeyError:
-            self.config_parser['COLORS'] = {}
+        except configparser.NoSectionError:
+            self.config_parser.add_section('COLORS')
             # If an error occures we simply use the default colors
             self.color_dic = self.default_dic.copy()
 
@@ -188,6 +188,25 @@ class CConfig:
 
         print(config_menu)
 
+    def _save_config(self, keyword: str, value: str = ''):
+        """
+        write the value to the config-file
+        
+        Parameters:
+        keyword (str):
+            the keyword in self.elements
+        value (str):
+            the value to write
+        """
+        if keyword is not None:
+            self.config_parser.set('COLORS', keyword, f'"{value}"')
+        try:
+            with open(self.config_file, 'w', encoding='utf-8') as conf:
+                self.config_parser.write(conf)
+            print(f"Successfully updated config file:\n\t{self.config_file}")
+        except OSError:
+            err_print(f"Could not write to config file:\n\t{self.config_file}")
+
     def save_config(self) -> None:
         """
         Guide the User through the configuration options and save the changes.
@@ -237,10 +256,11 @@ class CConfig:
         print(f"'{getattr(ColorOptions, color_split[0])[color_split[1]]}", end='')
         print(f"{color}{ColorOptions.Style['RESET']}'.")
 
-        self.config_parser['COLORS'][keyword] = color
-        try:
-            with open(self.config_file, 'w', encoding='utf-8') as conf:
-                self.config_parser.write(conf)
-            print(f"Successfully updated config file:\n\t{self.config_file}")
-        except OSError:
-            err_print(f"Could not write to config file:\n\t{self.config_file}")
+        self._save_config(keyword, color)
+
+    def reset_config(self) -> None:
+        """
+        reset the cconfig to default by simply deleting the config section.
+        """
+        self.config_parser.remove_section('COLORS')
+        self._save_config(None)

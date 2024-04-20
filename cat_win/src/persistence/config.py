@@ -176,7 +176,7 @@ class Config:
         """
         try:
             self.config_parser.read(self.config_file, encoding='utf-8')
-            config_consts = self.config_parser['CONSTS']
+            config_consts = dict(self.config_parser.items('CONSTS'))
             for element in self.elements:
                 try:
                     self.const_dic[element] = self.convert_config_element(
@@ -184,8 +184,8 @@ class Config:
                         element)
                 except KeyError:
                     self.const_dic[element] = self.default_dic[element]
-        except KeyError:
-            self.config_parser['CONSTS'] = {}
+        except configparser.NoSectionError:
+            self.config_parser.add_section('CONSTS')
             # If an error occures we simply use the default colors
             self.const_dic = self.default_dic.copy()
 
@@ -217,7 +217,7 @@ class Config:
 
         print(config_menu)
 
-    def _save_config(self, keyword: str, value: str):
+    def _save_config(self, keyword: str, value: str = ''):
         """
         write the value to the config-file
         
@@ -227,7 +227,8 @@ class Config:
         value (str):
             the value to write
         """
-        self.config_parser['CONSTS'][keyword] = f'"{value}"'
+        if keyword is not None:
+            self.config_parser.set('CONSTS', keyword, f'"{value}"')
         try:
             with open(self.config_file, 'w', encoding='utf-8') as conf:
                 self.config_parser.write(conf)
@@ -281,14 +282,21 @@ class Config:
 
     def reset_config(self) -> None:
         """
-        reset the config to default by simply deleting the config file.
+        reset the config to default by simply deleting the config section.
+        """
+        self.config_parser.remove_section('CONSTS')
+        self._save_config(None)
+
+    def remove_config(self) -> None:
+        """
+        remove the config file.
         """
         try:
             os.remove(self.config_file)
-            print('The Config has successfully been reset!')
+            print('The config file has successfully been removed!')
         except FileNotFoundError:
-            err_print('The configuration is already at default setting.')
+            err_print('No active config file has been found.')
         except PermissionError:
-            err_print('Permission denied! Configuration could not be reset.')
+            err_print('Permission denied! The config file could not be deleted.')
         except OSError:
             err_print('An unexpected error occured.')

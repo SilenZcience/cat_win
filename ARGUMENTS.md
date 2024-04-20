@@ -88,6 +88,8 @@
                   <li><a href="#config">--config, --config</a></li>
                   <li><a href="#cconfig">--cconfig, --cconfig</a></li>
                   <li><a href="#configreset">--config-clear, --config-reset</a></li>
+                  <li><a href="#cconfigreset">--cconfig-clear, --cconfig-reset</a></li>
+                  <li><a href="#configremove">--config-remove, --cconfig-remove</a></li>
                   <li><a href="#stream">-R, --R&ltstream&gt</a></li>
                   <li><a href="#enc">enc=X, enc&#42889;X</a></li>
                   <li><a href="#find">find=X, find&#42889;X</a></li>
@@ -177,6 +179,8 @@
 | *<a href="#config">--config, --config</a>* | change default parameters |✔|
 | *<a href="#cconfig">--cconfig, --cconfig</a>* | change color configuration |✔|
 | *<a href="#configreset">--config-clear, --config-reset</a>* | reset the config to default settings |✔|
+| *<a href="#cconfigreset">--cconfig-clear, --cconfig-reset</a>* | reset the color config to default settings |✔|
+| *<a href="#configremove">--config-remove, --cconfig-remove</a>* | remove the config-file |✔|
 ||||
 | *<a href="#stream">-R, --R\<stream\></a>* | reconfigure the std-stream(s) with the parsed encoding </br> \<stream\> = 'in'/'out'/'err' (default is stdin & stdout) | ✔ |
 ||||
@@ -1073,13 +1077,35 @@ Valid Options are:
 
 ### <a id="configreset">--config-clear, --config-reset</a>
 
-Reset the Configuration (both <a href="#config">--config, --config</a> and <a href="#cconfig">--cconfig, --cconfig</a>) to their Default Values.
+Reset the Configuration (of <a href="#config">--config, --config</a>) to their Default Values.
 
 ```console
 > catw --config-clear
-The Config has successfully been reset!
+Successfully updated config file:
+   <Path>\cat.config
+```
+
+### <a id="cconfigreset">--cconfig-clear, --cconfig-reset</a>
+
+Reset the Configuration (of <a href="#cconfig">--cconfig, --cconfig</a>) to their Default Values.
+
+```console
 > catw --config-clear
-The configuration is already at default setting.
+Successfully updated config file:
+   <Path>\cat.config
+```
+
+### <a id="configremove">--config-remove, --cconfig-remove</a>
+
+Delete the Config File.
+This will reset both <a href="#config">--config, --config</a> and <a href="#cconfig">--cconfig, --cconfig</a> Configurations to their Default Values.
+The cat.config File will be erased from the System.
+
+```console
+> catw --config-remove
+The config file has successfully been removed!
+> catw --config-remove
+No active config file has been found.
 ```
 
 <a id="encoding"></a>
