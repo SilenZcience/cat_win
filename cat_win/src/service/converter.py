@@ -111,9 +111,9 @@ class Converter:
             True if v is a Hexadecimal number.
             False if it is not.
         """
-        if _v[:1] == '-':
+        if _v.startswith('-'):
             _v = _v[1:]
-        if _v[:2] == '0x':
+        if _v.startswith('0x'):
             _v = _v[2:]
         return all(c in self.hexdigits for c in _v) and _v != ''
 
@@ -127,7 +127,7 @@ class Converter:
             True if v is a Decimal number.
             False if it is not.
         """
-        if _v[:1] == '-':
+        if _v.startswith('-'):
             _v = _v[1:]
         return _v.isdecimal() and _v != ''
 
@@ -141,9 +141,9 @@ class Converter:
             True if v is a Octal number.
             False if it is not.
         """
-        if _v[:1] == '-':
+        if _v.startswith('-'):
             _v = _v[1:]
-        if _v[:2] == '0o':
+        if _v.startswith('0o'):
             _v = _v[2:]
         return all(c in self.octdigits for c in _v) and _v != ''
 
@@ -157,9 +157,9 @@ class Converter:
             True if v is a Binary number.
             False if it is not.
         """
-        if _v[:1] == '-':
+        if _v.startswith('-'):
             _v = _v[1:]
-        if _v[:2] == '0b':
+        if _v.startswith('0b'):
             _v = _v[2:]
         return all(c in self.bindigits for c in set(_v)) and _v != ''
 

@@ -187,7 +187,7 @@ class IoHelper:
         s_in = sys.stdin.buffer if raw else sys.stdin
         if one_line:
             first_line = s_in.readline().rstrip('\n')
-            if first_line[-1:] == chr(26):
+            if first_line.endswith(chr(26)):
                 first_line = first_line[:-1]
             yield first_line
             return

@@ -269,7 +269,7 @@ class ArgParser:
             except UnicodeError:
                 pass
             finally:
-                self.file_replace_mapping[param] = ((re_this, re_with))
+                self.file_replace_mapping[param] = (re_this, re_with)
             self._args.append((ARGS_REPLACE, param))
             return False
 

@@ -1097,7 +1097,7 @@ def main():
             err_print('Cleaning', tmp_file)
         try:
             os.remove(tmp_file)
-        except (FileNotFoundError, PermissionError, OSError) as e:
+        except OSError as e:
             if u_args[ARGS_DEBUG]:
                 err_print(type(e).__name__, tmp_file)
     if u_args[ARGS_DEBUG]:
@@ -1147,7 +1147,7 @@ def shell_main():
                 indicates if a valid command has been found
                 and executed
             """
-            if cmd[:1] != command_prefix:
+            if not cmd.startswith(command_prefix):
                 return False
             line_split = shlex.split(cmd[1:])
             self.last_cmd = line_split[0]
