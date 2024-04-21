@@ -5,7 +5,7 @@
       <img src="https://static.pepy.tech/personalized-badge/cat-win?period=total&units=international_system&left_color=grey&right_color=blue&left_text=Downloads" align="right">
    </a>
    <a href="https://pypi.org/project/cat-win/" alt="Visitors">
-      <img src="https://visitor-badge.laobi.icu/badge?page_id=SilenZcience.cat_win&right_color=orange" align="right">
+      <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FSilenZcience%2Fcat_win&count_bg=%23FF7700&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=Visitors&edge_flat=false" align="right">
    </a>
    <a href="https://github.com/SilenZcience/cat_win/tree/main/cat_win" alt="CodeSize">
       <img src="https://img.shields.io/github/languages/code-size/SilenZcience/cat_win?color=purple" align="right">
