@@ -65,7 +65,7 @@ from cat_win import __project__, __version__, __sysversion__, __author__, __url_
 
 
 coloramaInit(strip=False)
-working_dir = os.path.dirname(os.path.realpath(__file__))
+working_dir = os.path.abspath(os.path.join(os.path.realpath(__file__), os.pardir, os.pardir))
 
 on_windows_os = platform.system() == 'Windows'
 file_uri_prefix = 'file://' + '/' * on_windows_os
