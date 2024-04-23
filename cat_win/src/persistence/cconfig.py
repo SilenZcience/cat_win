@@ -199,7 +199,7 @@ class CConfig:
             the value to write
         """
         if keyword is not None:
-            self.config_parser.set('COLORS', keyword, f'"{value}"')
+            self.config_parser.set('COLORS', keyword, f"{value}")
         try:
             with open(self.config_file, 'w', encoding='utf-8') as conf:
                 self.config_parser.write(conf)
