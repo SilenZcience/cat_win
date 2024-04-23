@@ -27,7 +27,6 @@ If applicable, add the files used (or a simplistic variant of them) to help expl
 
 **Desktop (please complete the following information):**
  - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
  - Version [e.g. 22]
 
 **Additional context**
