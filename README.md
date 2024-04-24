@@ -22,7 +22,7 @@
    <p align="center">
       Simple Command-line Tool made in Python
       <br/>
-      <a href="https://github.com/SilenZcience/cat_win/blob/main/cat_win/cat.py">
+      <a href="https://github.com/SilenZcience/cat_win/blob/main/cat_win/src/cat.py">
          <strong>Explore the code »</strong>
       </a>
       <br/>
@@ -140,7 +140,7 @@ It is recommended to add the file path(s) to your system-environment `PATH`-vari
 
 > ⚠️ **You should never trust any executable file!** Feel free to compile the package yourself (e.g. using [PyInstaller](https://pyinstaller.org/en/stable/)).
 
-> You can verify the creation of the executable files yourself by reading the [source code](https://github.com/SilenZcience/cat_win/blob/main/cat_win/cat.py), checking the [origin](https://github.com/SilenZcience/cat_win/tree/main/bin) of the file and validating the corresponding [workflow](https://github.com/SilenZcience/cat_win/blob/main/.github/workflows/build_executable.yml) used.
+> You can verify the creation of the executable files yourself by reading the [source code](https://github.com/SilenZcience/cat_win/blob/main/cat_win/src/cat.py), checking the [origin](https://github.com/SilenZcience/cat_win/tree/binaries/bin) of the file and validating the corresponding [workflow](https://github.com/SilenZcience/cat_win/blob/main/.github/workflows/build_executable.yml) used.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 <div id="usage"></div>
