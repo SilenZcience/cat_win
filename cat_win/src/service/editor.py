@@ -25,7 +25,7 @@ import signal
 import sys
 
 from cat_win.src.service.helper.editorhelper import History, Position, UNIFY_HOTKEYS, \
-    KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS
+    KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
 from cat_win.src.service.rawviewer import SPECIAL_CHARS
 
@@ -97,11 +97,13 @@ class Editor:
             for line in _f_content.split('\n'):
                 self.window_content.append(line)
             self.unsaved_progress = False
+            self.error_bar = ''
+            self.status_bar_size = 1
         except (OSError, UnicodeError) as exc:
             self.window_content.append('')
             self.unsaved_progress = True
-            self.status_bar_size = 2
             self.error_bar = str(exc)
+            self.status_bar_size = 2
             if self.debug_mode:
                 err_print(self.error_bar)
 
@@ -419,8 +421,8 @@ class Editor:
             self.status_bar_size = 1
         except (OSError, UnicodeError) as exc:
             self.unsaved_progress = True
-            self.status_bar_size = 2
             self.error_bar = str(exc)
+            self.status_bar_size = 2
             if self.debug_mode:
                 err_print(self.error_bar)
         return True
@@ -523,7 +525,7 @@ class Editor:
         curses.curs_set(0)
 
         wchar = ''
-        while str(wchar).upper() != '\x1b':
+        while str(wchar).upper() != ['\x1b', 'N']:
             self._action_render_scr('Reload File? [y]es, [n]o; Abort? ESC')
             wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
@@ -737,11 +739,11 @@ class Editor:
                 status_bar = f"File: ...{self.display_name[-necc_space:] * bool(necc_space)} "
                 status_bar += f"| Exit: ^q | Save: {save_hotkey} | "
                 status_bar += f"Ln {self.cpos.row+1}, Col {self.cpos.col+1} "
-                status_bar += f"| {'NOT ' * self.unsaved_progress}Saved!"[:max_x]
+                status_bar += f"| {'NOT ' * self.unsaved_progress}Saved!"
                 if self.debug_mode:
                     status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x}"
             # this throws an error (should be max_x-1), but looks better:
-            status_bar = status_bar.ljust(max_x)
+            status_bar = status_bar[:max_x].ljust(max_x)
             self.curse_window.addstr(max_y + self.status_bar_size - 1, 0,
                                      status_bar, self._get_color(1))
         except curses.error:
@@ -797,13 +799,13 @@ class Editor:
                                 indent_offset += len(self.special_indentation)
                     # actions like search, jump, quit, save, resize:
                     elif key in ACTION_HOTKEYS:
-                        running &= getattr(self, key.decode(), lambda *_: False)()
+                        running &= getattr(self, key.decode(), lambda *_: True)()
                     # scrolling via alt + ...
                     elif key in SCROLL_HOTKEYS:
                         self.scrolling = True
                         getattr(self, key.decode(), lambda *_: None)()
                     # moving the cursor:
-                    else:
+                    elif key in MOVE_HOTKEYS:
                         getattr(self, key.decode(), lambda *_: None)()
                     self.curse_window.nodelay(True)
                     force_render += 1

@@ -154,6 +154,7 @@ UNIFY_HOTKEYS = {
 KEY_HOTKEYS    = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_key'   ))
 ACTION_HOTKEYS = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_action'))
 SCROLL_HOTKEYS = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_scroll'))
+MOVE_HOTKEYS   = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_move'  ))
 
 REVERSE_ACTION = {
     b'_key_dc'           : b'_key_string',
