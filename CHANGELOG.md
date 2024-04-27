@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.7.8] - TBA
+
+### Bugfixes
+
+- fixed Bug where the Editor would behave unintended when reloading the file.
+
+
 ## [1.7.7] - 2024-04-23
 
 ### Bugfixes
