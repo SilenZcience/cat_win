@@ -388,33 +388,33 @@ class TestEditor(TestCase):
         editor = Editor(test_file_path, '')
         exc = OSError('TestError')
         error_def = ErrorDefGen.get_def(exc)
-        with patch('sys.stderr', new=StdOutMock()) as fake_out:
-            self.assertEqual(editor._action_save(error_def), True)
+        with patch('cat_win.src.service.helper.iohelper.IoHelper.write_file', new=error_def), patch('sys.stderr', new=StdOutMock()) as fake_out:
+            self.assertEqual(editor._action_save(), True)
             self.assertEqual(editor.error_bar, 'TestError')
             self.assertEqual('TestError\n', fake_out.getvalue())
 
-        no_error_def = lambda *_: None
-        self.assertEqual(editor._action_save(no_error_def), True)
-        self.assertEqual(editor.error_bar, '')
+        with patch('cat_win.src.service.helper.iohelper.IoHelper.write_file', new=lambda *_: None):
+            self.assertEqual(editor._action_save(), True)
+            self.assertEqual(editor.error_bar, '')
         Editor.debug_mode = False
 
     def test_editor_action_quit(self):
         editor = Editor(test_file_path, '')
-        self.assertEqual(editor._action_quit(None), False)
+        self.assertEqual(editor._action_quit(), False)
 
     def test_editor_interrupt(self):
         Editor.debug_mode = True
         editor = Editor(test_file_path_oneline, '')
         with self.assertRaises(KeyboardInterrupt):
             with patch('sys.stderr', new=StdOutMock()) as fake_out:
-                editor._action_interrupt(None)
+                editor._action_interrupt()
                 self.assertEqual('Interrupting...\n', fake_out.getvalue())
         Editor.debug_mode = False
 
     @patch('cat_win.src.service.editor.CURSES_MODULE_ERROR', new=True)
     def test_editor_no_curses_error(self):
         with patch('sys.stderr', new=StdOutMock()) as fake_out:
-            self.assertEqual(Editor.open('', '', None, True), False)
+            self.assertEqual(Editor.open('', '', True), False)
             self.assertIn('could not be loaded', fake_out.getvalue())
             self.assertIn('windows-curses', fake_out.getvalue())
 
