@@ -33,6 +33,7 @@ ARGS_WWORDCOUNT, ARGS_DIRECTORIES, ARGS_DDIRECTORIES = range(50, 53)
 ARGS_SPECIFIC_FORMATS, ARGS_CONFIG = range(53, 55)
 ARGS_CHARCOUNT, ARGS_CCHARCOUNT, ARGS_STRINGS, ARGS_MORE, ARGS_RAW = range(55, 60)
 ARGS_CONFIG_FLUSH, ARGS_CCONFIG_FLUSH, ARGS_CONFIG_REMOVE = range(60, 63)
+ARGS_HEX_EDITOR, = range(63, 64)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -148,6 +149,8 @@ ALL_ARGS = [
 
     ArgConstant('-!', '--edit', 'open each file in a simple editor',
 				ARGS_EDITOR, show_arg_on_shell=False, section=10),
+    ArgConstant('-#', '--hexedit', 'open each file in a simple hex editor',
+				ARGS_HEX_EDITOR, show_arg_on_shell=False, section=10),
     ArgConstant('-c', '--clip', 'copy output to clipboard',
 				ARGS_CLIP, section=10),
     ArgConstant('-M', '--more', 'page through the file step by step',
