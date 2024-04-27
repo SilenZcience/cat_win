@@ -87,7 +87,7 @@ class IoHelper:
 
     @staticmethod
     def read_file(src_file: str, binary: bool = False,
-                  file_encoding: str = 'utf-8', errors: str = 'replace') -> str:
+                  file_encoding: str = 'utf-8', errors: str = 'replace'):
         """
         Reades content from a given file.
         
@@ -102,7 +102,7 @@ class IoHelper:
             the type of error handling when opening the file
         
         Returns:
-        src_content (str):
+        src_content (str|bytes):
             the content of the given file
         """
         src_content = None
