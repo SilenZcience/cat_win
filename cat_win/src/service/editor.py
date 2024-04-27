@@ -96,6 +96,7 @@ class Editor:
             _f_content = IoHelper.read_file(self.file, file_encoding=self.file_encoding)
             for line in _f_content.split('\n'):
                 self.window_content.append(line)
+            self.unsaved_progress = False
         except (OSError, UnicodeError) as exc:
             self.window_content.append('')
             self.unsaved_progress = True
@@ -400,13 +401,9 @@ class Editor:
             pass
         self.curse_window.refresh()
 
-    def _action_save(self, write_func) -> bool:
+    def _action_save(self) -> bool:
         """
         handle the save file action.
-        
-        Parameters:
-        write_func (function):
-            the function to use for saving the file
         
         Returns
         (bool):
@@ -415,7 +412,7 @@ class Editor:
         content = self.line_sep.join(self.window_content)
         try:
             # encode here to potentially trigger the unicodeerror event
-            write_func(self.file, content.encode(self.file_encoding), self.file_encoding)
+            IoHelper.write_file(self.file, content.encode(self.file_encoding), self.file_encoding)
             self.changes_made = True
             self.unsaved_progress = False
             self.error_bar = ''
@@ -428,12 +425,9 @@ class Editor:
                 err_print(self.error_bar)
         return True
 
-    def _action_jump(self, _) -> bool:
+    def _action_jump(self) -> bool:
         """
         handles the jump to line action.
-        
-        Parameters:
-        _ (Any):
         
         Returns:
         (bool):
@@ -449,9 +443,9 @@ class Editor:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
                 if key == b'_action_background':
-                    getattr(self, key.decode(), lambda *_: False)(None)
+                    getattr(self, key.decode(), lambda *_: False)()
                 if key == b'_action_resize':
-                    getattr(self, key.decode(), lambda *_: False)(None)
+                    getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
                     curses.curs_set(0)
             if key == b'_key_string' and wchar.isdigit():
@@ -463,12 +457,9 @@ class Editor:
                 break
         return True
 
-    def _action_find(self, _) -> bool:
+    def _action_find(self) -> bool:
         """
         handles the find in editor action.
-        
-        Parameters:
-        _ (Any):
         
         Returns:
         (bool):
@@ -485,9 +476,9 @@ class Editor:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
                 if key == b'_action_background':
-                    getattr(self, key.decode(), lambda *_: False)(None)
+                    getattr(self, key.decode(), lambda *_: False)()
                 if key == b'_action_resize':
-                    getattr(self, key.decode(), lambda *_: False)(None)
+                    getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
                     curses.curs_set(0)
             if key == b'_key_backspace':
@@ -513,7 +504,7 @@ class Editor:
                 break
         return True
 
-    def _action_background(self, _) -> bool:
+    def _action_background(self) -> bool:
         # only callable on UNIX
         curses.endwin()
         os.kill(os.getpid(), signal.SIGSTOP)
@@ -521,12 +512,9 @@ class Editor:
         self.get_char = self._get_new_char()
         return True
 
-    def _action_reload(self, _) -> bool:
+    def _action_reload(self) -> bool:
         """
         prompt to reload the file.
-        
-        Parameters:
-        _ (Any):
         
         Returns:
         (bool):
@@ -542,9 +530,9 @@ class Editor:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
                 if key == b'_action_background':
-                    getattr(self, key.decode(), lambda *_: False)(None)
+                    getattr(self, key.decode(), lambda *_: False)()
                 if key == b'_action_resize':
-                    getattr(self, key.decode(), lambda *_: False)(None)
+                    getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
                     curses.curs_set(0)
             elif wchar.upper() in ['Y', 'J']:
@@ -555,13 +543,9 @@ class Editor:
 
         return True
 
-    def _action_quit(self, write_func) -> bool:
+    def _action_quit(self) -> bool:
         """
         handles the quit editor action.
-        
-        Parameters:
-        write_func (function):
-            the function to use for possibly saving the file
         
         Returns:
         (bool):
@@ -580,21 +564,21 @@ class Editor:
                     if key == b'_action_interrupt':
                         return True
                     if key == b'_action_background':
-                        getattr(self, key.decode(), lambda *_: False)(None)
+                        getattr(self, key.decode(), lambda *_: False)()
                     if key == b'_action_save':
-                        getattr(self, key.decode(), lambda *_: False)(write_func)
+                        getattr(self, key.decode(), lambda *_: False)()
                     if key == b'_action_resize':
-                        getattr(self, key.decode(), lambda *_: False)(None)
+                        getattr(self, key.decode(), lambda *_: False)()
                         self._render_scr()
                         curses.curs_set(0)
                 elif wchar.upper() in ['Y', 'J']:
-                    self._action_save(write_func)
+                    self._action_save()
                 elif wchar == '\x1b': # ESC
                     return True
 
         return False
 
-    def _action_interrupt(self, _) -> bool:
+    def _action_interrupt(self) -> bool:
         """
         handles the interrupt action.
         
@@ -606,7 +590,7 @@ class Editor:
             err_print('Interrupting...')
         raise KeyboardInterrupt
 
-    def _action_resize(self, _) -> bool:
+    def _action_resize(self) -> bool:
         """
         handles the resizing of the (terminal) window.
         
@@ -782,13 +766,9 @@ class Editor:
         self.scrolling = False
         self.curse_window.refresh()
 
-    def _run(self, write_func) -> None:
+    def _run(self) -> None:
         """
         main loop for the editor.
-        
-        Parameters:
-        write_func (function):
-            a function to write a file
         """
         running = True
 
@@ -817,7 +797,7 @@ class Editor:
                                 indent_offset += len(self.special_indentation)
                     # actions like search, jump, quit, save, resize:
                     elif key in ACTION_HOTKEYS:
-                        running &= getattr(self, key.decode(), lambda *_: False)(write_func)
+                        running &= getattr(self, key.decode(), lambda *_: False)()
                     # scrolling via alt + ...
                     elif key in SCROLL_HOTKEYS:
                         self.scrolling = True
@@ -875,22 +855,18 @@ class Editor:
         curses.raw()
         self.curse_window.nodelay(False)
 
-    def _open(self, write_func) -> None:
+    def _open(self) -> None:
         """
         init, run, deinit
-        
-        Parameters:
-        write_func (function):
-            a function to write a file
         """
         try:
             self._init_screen()
-            self._run(write_func)
+            self._run()
         finally:
             curses.endwin()
 
     @classmethod
-    def open(cls, file: str, display_name: str, write_func, on_windows_os: bool,
+    def open(cls, file: str, display_name: str, on_windows_os: bool,
              skip_binary: bool = False) -> bool:
         """
         simple editor to change the contents of any provided file.
@@ -900,8 +876,6 @@ class Editor:
             a string representing a file(-path)
         display_name (str):
             the display name for the current file
-        write_func (method):
-            iohelper.write_file [simply writes a file]
         on_windows_os (bool):
             indicates if the user is on windows OS using platform.system() == 'Windows'
         skip_binary (bool):
@@ -931,12 +905,12 @@ class Editor:
 
         if on_windows_os:
             # disable background feature on windows
-            editor._action_background =  lambda *_: True
+            editor._action_background = lambda *_: True
         else:
             # ignore background signals on UNIX, since a custom background implementation exists
             signal.signal(signal.SIGTSTP, signal.SIG_IGN)
 
-        editor._open(write_func)
+        editor._open()
         return editor.changes_made
 
     @staticmethod
