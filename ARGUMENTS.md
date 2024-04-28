@@ -32,7 +32,8 @@
                   <li><a href="#meta">Meta Information</a></li>
                   <li><a href="#mathematical">Mathematical</a></li>
                   <li><a href="#byteview">Byte Representation</a></li>
-                  <li><a href="#settings">Settings</a></li>
+                  <li><a href="#edit">Editor</a></li>
+                  <li><a href="#settings">Settings/Behaviour</a></li>
                   <li><a href="#configuration">Configuration</a></li>
                   <li><a href="#encoding">Text Encoding</a></li>
                </ul>
@@ -79,9 +80,10 @@
                   <li><a href="#binview">--binview, --binview</a></li>
                   <li><a href="#hexview">--hexview, --HEXVIEW</a></li>
                   <li><a href="#editor">-!, --edit</a></li>
-                  <li><a href="#clip">-c, --clip</a></li>
+                  <li><a href="#hexeditor">-#, --hexedit</a></li>
                   <li><a href="#more">-M, --more</a></li>
                   <li><a href="#raw">-B, --raw</a></li>
+                  <li><a href="#clip">-c, --clip</a></li>
                   <li><a href="#dot">--dot, --dotfiles</a></li>
                   <li><a href="#plain">--plain, --plain-only</a></li>
                   <li><a href="#nocolor">--nc, --nocolor</a></li>
@@ -168,10 +170,11 @@
 | *<a href="#hexview">--hexview, --HEXVIEW</a>* | display the raw byte representation in hexadecimal |❌|
 ||||
 | *<a href="#editor">-!, --edit</a>* | open each file in a simple editor |❌|
-| *<a href="#clip">-c, --clip</a>* | copy output to clipboard |✔|
+| *<a href="#hexeditor">-#, --hexedit</a>* | open each file in a simple hex-editor |❌|
 | *<a href="#more">-M, --more</a>* | page through the file step by step |❌|
-||||
 | *<a href="#raw">-B, --raw</a>* | open the file as raw bytes |❌|
+||||
+| *<a href="#clip">-c, --clip</a>* | copy output to clipboard |✔|
 | *<a href="#dot">--dot, --dotfiles</a>* | additionally query and edit dotfiles |❌|
 | *<a href="#plain">--plain, --plain-only</a>* | ignore non-plaintext files automatically |❌|
 | *<a href="#nocolor">--nc, --nocolor</a>* | disable colored output |✔|
@@ -883,7 +886,7 @@ Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text
 00000010 20 43 61 74 21 0A                               #   C a t ! ␤
 ```
 
-<a id="settings"></a>
+<a id="edit"></a>
 ### <a id="editor">-!, --edit</a>
 
 Opens a simple Editor to write/edit the Content of any provided File one by one.
@@ -902,7 +905,7 @@ The currently supported Key bindings are as follows:
 | <kbd>Page Up/Down</kbd> | move cursor by page | move cursor by page | move cursor by page | scroll window by page |
 | <kbd>Home/Pos</kbd> | move cursor to start of line | move cursor to start of line | move cursor to start of file | scroll window to start of file |
 | <kbd>End</kbd> | move cursor to end of line | move cursor to end of line | move cursor to end of file | scroll window to end of file |
-|<kbd>Tab</kbd> | insert a tab or </br> indent on empty line | decrease indent | - | - |
+| <kbd>Tab</kbd> | insert a tab or </br> indent on empty line | decrease indent | - | - |
 ||||||
 | <kbd>Enter</kbd> | write newline | write newline | write newline | - |
 | <kbd>Backspace</kbd> | delete char on the left | delete char on the left | delete word on the left | delete char on the left |
@@ -919,9 +922,30 @@ The currently supported Key bindings are as follows:
 | <kbd>Close/^Q</kbd> | - | - | close editor</br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^C</kbd> | - | - | interrupt program | - |
 
-### <a id="clip">-c, --clip</a>
+### <a id="hexeditor">-#, --hexedit</a>
 
-Copies the entire Output to the Clipboard additionally to printing it to the Stdout Stream.
+Opens a simple Hex-Editor to write/edit the Content of any provided File one by one.
+Not-existing Files will be opened first and existing Ones will be able to be edited after that.
+The Editor will not save Changes automatically.
+Note that ^c (Ctrl-c) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
+The displayed Columns per Row can be configured in the config menu (<a href="#config">--config, --config</a>) using `hex_editor_columns`.
+On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module.
+The currently supported Key bindings are as follows:
+
+| Key(s) | default behaviour | shift click | control click | alt click |
+|--------|:-----------------:|:-----------:|:-------------:|:---------:|
+| <kbd>Arrows</kbd> | move cursor by byte | move cursor by byte | move cursor multiple bytes | - |
+||||||
+| <kbd>Backspace</kbd> | reset current byte | reset current byte | remove current byte | reset current byte |
+| <kbd>Delete</kbd> | reset current byte | reset current byte | remove current byte | reset current byte |
+||||||
+| <kbd>Save/^S</kbd> | - | - | save changes | save changes |
+| <kbd>Jump/^E</kbd> | - | - | prompt to jump to a specific byte | - |
+| <kbd>Find/^F</kbd> | - | - | prompt to search a byte in the file | - |
+| <kbd>Background/^B</kbd> | - | - | put the hex-editor in the background</br>(UNIX only) | - |
+| <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
+| <kbd>Close/^Q</kbd> | - | - | close hex-editor</br>(prompt to save, if neccessary) | - |
+| <kbd>Interrupt/^C</kbd> | - | - | interrupt program | - |
 
 ### <a id="more">-M, --more</a>
 
@@ -976,6 +1000,11 @@ UnicodeEncodeError: 'charmap' codec can't encode character '\ufffd' in position 
 > catw img.png --b64e --raw | catw - --b64d --raw > copy.png
 ```
 
+<a id="settings"></a>
+### <a id="clip">-c, --clip</a>
+
+Copies the entire Output to the Clipboard additionally to printing it to the Stdout Stream.
+
 ### <a id="dot">--dot, --dotfiles</a>
 
 When providing file Patterns or entire Directories cat_win will find every File including those set to hidden (e.g. on Windows OS).
@@ -1029,13 +1058,14 @@ Valid Options are:
 | strip_color_on_pipe | indicate if the Output should be stripped of any Color | no | True |
 | ignore_unknown_bytes | ignore unknown bytes instead of replacing them with � | true | False |
 | peek_size | define the amount of lines shown by <a href="#peek">-p, --peek</a> | 10 | 5 |
-| editor_indentation | set the Indentation used in the <a href="#editor">Editor</a> </br> when pressing ↹ on an empty Line | <b>␣ ␣ ␣ ␣</b> | ↹ |
-| editor_auto_indent | set whether the <a href="#editor">Editor</a> should auto indent or not | 1 | False |
 | strings_minimum_sequence_length | set the minimum Length of a String </br> (for the <a href="#strings">--strings</a> Parameter) | 2 | 4 |
 | strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the <a href="#strings">--strings</a> Parameter) | \| | \\n |
+| editor_indentation | set the Indentation used in the <a href="#editor">Editor</a> </br> when pressing ↹ on an empty Line | <b>␣ ␣ ␣ ␣</b> | ↹ |
+| editor_auto_indent | set whether the <a href="#editor">Editor</a> should auto indent or not | 1 | False |
+| hex_editor_columns | set the amount of columns per row in the <a href="#hexeditor">HexEditor</a> | 8 | 16 |
+| more_step_length | define the Step Length used by <a href="#more">-M</a></br>a Value of 0 is equivalent to the Size/Height of the Terminal Window | 5 | 0 |
 | unicode_escaped_find | unicode-escape the queried Substring when using <a href="#find">find=</a> | false | True |
 | unicode_escaped_replace | unicode-escape a and b when using <a href="#replace">[a,b]</a> | false | True |
-| more_step_length | define the Step Length used by <a href="#more">-M</a></br>a Value of 0 is equivalent to the Size/Height of the Terminal Window | 5 | 0 |
 
 Accepted Input for enabling a Setting:  `true, yes, y, 1`
 </br>
