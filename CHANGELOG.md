@@ -5,9 +5,16 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ## [1.7.8] - TBA
 
+### Minor Changes
+
+- added -`#`, --`hexedit` parameter to open a simple hex-editor to write/edit any provided File.
+- added `hex_editor_columns` option to the config menu to define the amount of columns in the hex-editor.
+
 ### Bugfixes
 
 - fixed Bug where the Editor would behave unintended when reloading the file.
+- fixed Bug where the Editor would display an error message even when the error was resolved in rare cases.
+- fixed Bug where the Editor would not recognize the user input in the reload-file prompt.
 
 
 ## [1.7.7] - 2024-04-23
