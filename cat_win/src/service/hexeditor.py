@@ -160,6 +160,26 @@ class HexEditor:
         if self.cpos.row < len(self.hex_array)-1:
             self.cpos.row += 1
 
+    def _move_key_ctl_left(self) -> None:
+        self.cpos.col = 0
+
+    def _move_key_ctl_right(self) -> None:
+        self.cpos.col = max(len(self.hex_array[self.cpos.row])-1, 0)
+
+    def _move_key_ctl_up(self) -> None:
+        if self.cpos.row >= 10:
+            self.cpos.row -= 10
+        else:
+            self.cpos.row = 0
+            self.cpos.col = 0
+
+    def _move_key_ctl_down(self) -> None:
+        if self.cpos.row < len(self.hex_array)-10:
+            self.cpos.row += 10
+        else:
+            self.cpos.row = len(self.hex_array)-1
+            self.cpos.col = len(self.hex_array[self.cpos.row])
+
     def _key_string(self, wchar) -> None:
         """
         tries to replace a byte on the screen.
