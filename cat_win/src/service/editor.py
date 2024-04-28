@@ -716,7 +716,10 @@ class Editor:
                     self.curse_window.addch(row, col, cur_char,
                                             self._get_color(3))
                 else:
-                    self.curse_window.addch(row, col, cur_char)
+                    try:
+                        self.curse_window.addch(row, col, cur_char)
+                    except TypeError:
+                        self.curse_window.addch(row, col, '�')
             self.curse_window.clrtoeol()
             self.curse_window.move(row+1, 0)
 
