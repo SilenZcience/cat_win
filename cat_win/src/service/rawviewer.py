@@ -43,6 +43,49 @@ SPECIAL_CHARS = [
 # (ord[dec],char,symbol,use in --chr)
 
 
+def get_display_char_gen(file_encoding: str = 'utf-8', base: int = 16):
+    """
+    generate a function to decode bytes
+    
+    Parmameters:
+    file_encoding (str):
+        the file encoding to test with if the resulting char can be displayed
+    base (int):
+        the base number in case a string is given, to calculate the byte-int.
+    
+    Returns:
+    get_display_char (function):
+        the function to decode any byte/int/str
+    """
+    special_chars = dict(map(lambda x: (x[0], x[2]), SPECIAL_CHARS))
+    special_chars[-1] = '·' # default fallback symbol
+    try:
+        if len(special_chars[0].encode(file_encoding)) != 3:
+            raise UnicodeEncodeError('', '', -1, -1, '')
+    except UnicodeEncodeError:
+        special_chars = dict.fromkeys(special_chars, '.')
+
+    def get_display_char(byte) -> str:
+        """
+        
+        Parameters:
+        byte (int|str)
+        """
+        if isinstance(byte, str):
+            try:
+                byte = int(byte, base)
+            except ValueError:
+                return special_chars[-1]
+        # 32 - 126 => ' ' - '~' (ASCII)
+        if 32 <= byte <= 126:
+            return chr(byte)
+        if byte in special_chars.keys():
+            return special_chars[byte]
+        return special_chars[-1]
+
+    return get_display_char
+
+
 def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors: list = None,
                            file_encoding: str = 'utf-8'):
     """
@@ -72,21 +115,7 @@ def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors: list = None,
     if not (mode and mode in 'xXb'):
         mode = 'X'
 
-    special_chars = dict(map(lambda x: (x[0], x[2]), SPECIAL_CHARS))
-    special_chars[-1] = '·' # default fallback symbol
-    try:
-        if len(special_chars[0].encode(file_encoding)) != 3:
-            raise UnicodeEncodeError('', '', -1, -1, '')
-    except UnicodeEncodeError:
-        special_chars = dict.fromkeys(special_chars, '.')
-
-    def get_display_char(byte: int) -> str:
-        # 32 - 126 => ' ' - '~' (ASCII)
-        if 32 <= byte <= 126:
-            return chr(byte)
-        if byte in special_chars.keys():
-            return special_chars[byte]
-        return special_chars[-1]
+    get_display_char = get_display_char_gen(file_encoding)
 
     try:
         raw_file_content = IoHelper.read_file(file, True)
