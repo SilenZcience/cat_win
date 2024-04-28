@@ -63,13 +63,14 @@ class Config:
         DKW.STRIP_COLOR_ON_PIPE: True,
         DKW.IGNORE_UNKNOWN_BYTES: False,
         DKW.PEEK_SIZE: 5,
-        DKW.EDITOR_INDENTATION: '\t',
-        DKW.EDITOR_AUTO_INDENT: False,
         DKW.STRINGS_MIN_SEQUENCE_LENGTH: 4,
         DKW.STRINGS_DELIMETER: '\n',
+        DKW.EDITOR_INDENTATION: '\t',
+        DKW.EDITOR_AUTO_INDENT: False,
+        DKW.HEX_EDITOR_COLUMNS: 16,
+        DKW.MORE_STEP_LENGTH: 0,
         DKW.UNICODE_ESCAPED_FIND: True,
         DKW.UNICODE_ESCAPED_REPLACE: True,
-        DKW.MORE_STEP_LENGTH: 0,
     }
 
     v_validation = {
@@ -79,13 +80,14 @@ class Config:
         DKW.STRIP_COLOR_ON_PIPE: validator_bool,
         DKW.IGNORE_UNKNOWN_BYTES: validator_bool,
         DKW.PEEK_SIZE: validator_int_pos,
-        DKW.EDITOR_INDENTATION: validator_string,
-        DKW.EDITOR_AUTO_INDENT: validator_bool,
         DKW.STRINGS_MIN_SEQUENCE_LENGTH: validator_int_pos,
         DKW.STRINGS_DELIMETER: validator_string,
+        DKW.EDITOR_INDENTATION: validator_string,
+        DKW.EDITOR_AUTO_INDENT: validator_bool,
+        DKW.HEX_EDITOR_COLUMNS: validator_int_pos,
+        DKW.MORE_STEP_LENGTH: validator_int,
         DKW.UNICODE_ESCAPED_FIND: validator_bool,
         DKW.UNICODE_ESCAPED_REPLACE: validator_bool,
-        DKW.MORE_STEP_LENGTH: validator_int,
     }
 
     elements = list(default_dic.keys())

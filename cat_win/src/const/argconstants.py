@@ -149,7 +149,7 @@ ALL_ARGS = [
 
     ArgConstant('-!', '--edit', 'open each file in a simple editor',
 				ARGS_EDITOR, show_arg_on_shell=False, section=10),
-    ArgConstant('-#', '--hexedit', 'open each file in a simple hex editor',
+    ArgConstant('-#', '--hexedit', 'open each file in a simple hex-editor',
 				ARGS_HEX_EDITOR, show_arg_on_shell=False, section=10),
     ArgConstant('-c', '--clip', 'copy output to clipboard',
 				ARGS_CLIP, section=10),
