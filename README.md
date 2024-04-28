@@ -244,9 +244,9 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 [OS-Linux]: https://img.shields.io/badge/os-linux-green
 [OS-MacOS]: https://img.shields.io/badge/os-macOS-green
 
-[Unittests]: https://github.com/SilenZcience/cat_win/actions/workflows/unit_test.yml/badge.svg
-[Build-and-Check]: https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml/badge.svg
-[Compile-and-Push]: https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml/badge.svg
+[Unittests]: https://github.com/SilenZcience/cat_win/actions/workflows/unit_test.yml/badge.svg?branch=dev
+[Build-and-Check]: https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml/badge.svg?branch=dev
+[Compile-and-Push]: https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml/badge.svg?branch=dev
 
 [Coverage]: https://raw.githubusercontent.com/SilenZcience/cat_win/badges/badges/badge-coverage.svg
 [Tests]: https://raw.githubusercontent.com/SilenZcience/cat_win/badges/badges/badge-tests.svg
