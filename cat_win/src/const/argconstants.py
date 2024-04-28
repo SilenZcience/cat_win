@@ -151,14 +151,14 @@ ALL_ARGS = [
 				ARGS_EDITOR, show_arg_on_shell=False, section=10),
     ArgConstant('-#', '--hexedit', 'open each file in a simple hex-editor',
 				ARGS_HEX_EDITOR, show_arg_on_shell=False, section=10),
-    ArgConstant('-c', '--clip', 'copy output to clipboard',
-				ARGS_CLIP, section=10),
     ArgConstant('-M', '--more', 'page through the file step by step',
                 ARGS_MORE, show_arg_on_shell=False, section=10),
+    ArgConstant('-B', '--raw', 'open the file as raw bytes',
+                ARGS_RAW, show_arg_on_shell=False, section=10),
 
     # behavioural
-    ArgConstant('-B', '--raw', 'open the file as raw bytes',
-                ARGS_RAW, show_arg_on_shell=False, section=11),
+    ArgConstant('-c', '--clip', 'copy output to clipboard',
+				ARGS_CLIP, section=11),
     ArgConstant('--dot', '--dotfiles', 'additionally query and edit dotfiles',
 				ARGS_DOTFILES, show_arg_on_shell=False, section=11),
     ArgConstant('--plain', '--plain-only', 'ignore non-plaintext files automatically',
