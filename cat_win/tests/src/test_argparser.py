@@ -166,7 +166,7 @@ class TestArgParser(TestCase):
         self.assertCountEqual(arg_parser._unknown_args, ['--test-file.txt'])
 
     def test_get_arguments_echo_args(self):
-        arg_parser = ArgParser()
+        arg_parser = ArgParser(unicode_echo=False)
         args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(
             ['CAT', '-n', '--echo', '-n', 'random', test_text_file_dir])
         known_files = arg_parser.get_files()

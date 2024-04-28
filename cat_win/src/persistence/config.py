@@ -69,6 +69,7 @@ class Config:
         DKW.EDITOR_AUTO_INDENT: False,
         DKW.HEX_EDITOR_COLUMNS: 16,
         DKW.MORE_STEP_LENGTH: 0,
+        DKW.UNICODE_ESCAPED_ECHO: True,
         DKW.UNICODE_ESCAPED_FIND: True,
         DKW.UNICODE_ESCAPED_REPLACE: True,
     }
@@ -86,6 +87,7 @@ class Config:
         DKW.EDITOR_AUTO_INDENT: validator_bool,
         DKW.HEX_EDITOR_COLUMNS: validator_int_pos,
         DKW.MORE_STEP_LENGTH: validator_int,
+        DKW.UNICODE_ESCAPED_ECHO: validator_bool,
         DKW.UNICODE_ESCAPED_FIND: validator_bool,
         DKW.UNICODE_ESCAPED_REPLACE: validator_bool,
     }

@@ -58,12 +58,13 @@ class ArgParser:
     SIMILARITY_LIMIT = 50.0
 
     def __init__(self, default_file_encoding: str = 'utf-8',
+                 unicode_echo: bool = True,
                  unicode_find: bool = True,
                  unicode_replace: bool = True) -> None:
         self.default_file_encoding: str = default_file_encoding
+        self.unicode_echo: bool = unicode_echo
         self.unicode_find = unicode_find
         self.unicode_replace = unicode_replace
-        self.unicode_echo: bool = False
         self._clear_values()
         self.reset_values()
 
@@ -277,10 +278,7 @@ class ArgParser:
         for arg in ALL_ARGS:
             if param in (arg.short_form, arg.long_form):
                 self._args.append((arg.arg_id, param))
-                if arg.arg_id == ARGS_ECHO:
-                    self.unicode_echo = param.isupper()
-                    return True
-                return False
+                return arg.arg_id == ARGS_ECHO
         possible_path = os.path.realpath(param)
         if os.path.isfile(possible_path):
             self._known_file_structures.append((IS_FILE, possible_path))
