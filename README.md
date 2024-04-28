@@ -20,7 +20,7 @@
 <div align="center">
 <h2 align="center">cat_win</h2>
    <p align="center">
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/example1.png/cat_win.logo.png" width="25%"/>
+      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/cat_win.logo.png" width="25%"/>
    </p>
    <p align="center">
       Simple Command-line Tool made in Python
