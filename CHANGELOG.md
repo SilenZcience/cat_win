@@ -9,6 +9,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - added -`#`, --`hexedit` parameter to open a simple hex-editor to write/edit any provided File.
 - added `hex_editor_columns` option to the config menu to define the amount of columns in the hex-editor.
+- when using the uppercase variant -`E` (of -`E`, --`echo`) the input will no longer be unicode-escaped.
+- added `unicode_escaped_echo` option to the config menu to unicode-escape the input using -`E`, --`echo`.
 
 ### Bugfixes
 
