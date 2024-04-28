@@ -169,7 +169,7 @@ Read about specific **Arguments & Options** [here](https://github.com/SilenZcien
 ### Examples
 
 <details>
-	<summary><b>📂 Images 📂</b></summary>
+   <summary><b>📂 Images 📂</b></summary>
    </br>
 
    <p float="left">

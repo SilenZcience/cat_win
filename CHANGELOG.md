@@ -15,6 +15,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fixed Bug where the Editor would behave unintended when reloading the file.
 - fixed Bug where the Editor would display an error message even when the error was resolved in rare cases.
 - fixed Bug where the Editor would not recognize the user input in the reload-file prompt.
+- fixed Bug where the Editor would crash on special characters like emojis (displays `�` now).
 
 
 ## [1.7.7] - 2024-04-23
