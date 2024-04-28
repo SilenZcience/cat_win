@@ -28,9 +28,12 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: Implementation :: PyPy",
     "Environment :: Console",
+    "Environment :: Console :: Curses",
     "Operating System :: OS Independent",
     "Topic :: Terminals",
-    "Topic :: Text Processing :: Linguistic",
+    "Topic :: Text Editors",
+    "Topic :: Text Editors :: Text Processing",
+    "Topic :: Text Processing",
 ]
 dynamic = [
     "version",
