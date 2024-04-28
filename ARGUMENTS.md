@@ -328,7 +328,7 @@ Note that the special Char ␛ will not be displayed as ^ESC because it is neede
 
 ```console
 > catw test.txt
-      
+    
 ```
 ```console
 > catw test.txt --chr
@@ -512,7 +512,7 @@ When not providing a raw Data URL the Content will include the HTML Elements.
 ### <a id="files">-f, --files</a>
 
 Displays a small Summary at the End of Code execution showing every File used and their file Size.
-Using this Argument in uppercase (-F, --FILES) will ONLY display the Summary and stop Code execution. 
+Using this Argument in uppercase (-F, --FILES) will ONLY display the Summary and stop Code execution.
 
 ```console
 > catw test.txt -f
@@ -961,11 +961,11 @@ line 1
 line 2
 ...
 line 29
-> -- More ( 6%) -- 
+> -- More ( 6%) --
 line 30
 ...
 > -- More (11%) --
-... 
+...
 ```
 ```console
 > catw file -M
@@ -1054,7 +1054,7 @@ Valid Options are:
 |--------|-------------|---------|---------|
 | default_command_line | custom Command Line containing Parameters </br> used additionally to the specific Parameters </br> of the Program Call | -n 'find= ' | |
 | default_file_encoding | the File Encoding used by Default | utf-16 | utf-8 |
-| large_file_size | the Size (Bytes) at which a Warning occurs. | 1024 | 104857600 (100Mb) |
+| large_file_size | the Size (Bytes) at which a Warning occurs | 1024 | 104857600 (100Mb) |
 | strip_color_on_pipe | indicate if the Output should be stripped of any Color | no | True |
 | ignore_unknown_bytes | ignore unknown bytes instead of replacing them with � | true | False |
 | peek_size | define the amount of lines shown by <a href="#peek">-p, --peek</a> | 10 | 5 |
