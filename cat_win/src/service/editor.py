@@ -82,9 +82,7 @@ class Editor:
         self.special_chars = special_chars
 
     def _get_special_char(self, char: str) -> str:
-        if char in self.special_chars.keys():
-            return self.special_chars[char]
-        return '?'
+        return self.special_chars.get(char, '?')
 
     def _setup_file(self) -> None:
         """
@@ -850,7 +848,7 @@ class Editor:
                 curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
                 # error_bar
                 curses.init_pair(2, curses.COLOR_RED  , curses.COLOR_WHITE)
-                # special char (not printable or ws) & quit-prompt
+                # special char (not printable or ws) & prompts
                 curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_RED  )
                 # tab-char
                 curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_GREEN)
