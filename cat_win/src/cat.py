@@ -32,6 +32,7 @@ from cat_win.src.const.argconstants import ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARG
 from cat_win.src.const.argconstants import ARGS_DIRECTORIES, ARGS_DDIRECTORIES, ARGS_SPECIFIC_FORMATS
 from cat_win.src.const.argconstants import ARGS_CHARCOUNT, ARGS_CCHARCOUNT, ARGS_STRINGS, ARGS_MORE
 from cat_win.src.const.argconstants import ARGS_CONFIG_FLUSH, ARGS_CCONFIG_FLUSH, ARGS_CONFIG_REMOVE
+from cat_win.src.const.argconstants import ARGS_HEX_EDITOR
 from cat_win.src.const.colorconstants import CKW
 from cat_win.src.const.defaultconstants import DKW
 from cat_win.src.const.regex import ANSI_CSI_RE
@@ -54,6 +55,7 @@ from cat_win.src.service.editor import Editor
 from cat_win.src.service.fileattributes import get_file_size, get_file_mtime, print_meta
 from cat_win.src.service.fileattributes import _convert_size
 from cat_win.src.service.formatter import Formatter
+from cat_win.src.service.hexeditor import HexEditor
 from cat_win.src.service.more import More
 from cat_win.src.service.rawviewer import SPECIAL_CHARS, get_raw_view_lines_gen
 from cat_win.src.service.stringfinder import StringFinder
@@ -968,6 +970,8 @@ def init(shell: bool = False) -> tuple:
     Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
     Editor.set_flags(u_args[ARGS_STDIN] and on_windows_os,
                      u_args[ARGS_DEBUG], arg_parser.file_encoding)
+    HexEditor.set_flags(u_args[ARGS_STDIN] and on_windows_os,
+                        u_args[ARGS_DEBUG], 16)
 
     return (known_files, unknown_files, echo_args, valid_urls)
 
@@ -1009,8 +1013,11 @@ def main():
         u_files.set_temp_file_stdin(temp_file)
     elif u_args[ARGS_EDITOR]:
         unknown_files = [file for file in unknown_files if Editor.open(
-            file, u_files.get_file_display_name(file), IoHelper.write_file,
-            on_windows_os, u_args[ARGS_PLAIN_ONLY])]
+            file, u_files.get_file_display_name(file), on_windows_os,
+            u_args[ARGS_PLAIN_ONLY])]
+    elif u_args[ARGS_HEX_EDITOR]:
+        unknown_files = [file for file in unknown_files if HexEditor.open(
+            file, u_files.get_file_display_name(file), on_windows_os)]
     else:
         unknown_files = IoHelper.read_write_files_from_stdin(
             unknown_files, arg_parser.file_encoding, on_windows_os,
@@ -1019,8 +1026,13 @@ def main():
     if u_args[ARGS_EDITOR]:
         with IoHelper.dup_stdin(on_windows_os, u_args[ARGS_STDIN]):
             for file in known_files:
-                Editor.open(file, u_files.get_file_display_name(file), IoHelper.write_file,
+                Editor.open(file, u_files.get_file_display_name(file),
                             on_windows_os, u_args[ARGS_PLAIN_ONLY])
+    elif u_args[ARGS_HEX_EDITOR]:
+        with IoHelper.dup_stdin(on_windows_os, u_args[ARGS_STDIN]):
+            for file in known_files:
+                HexEditor.open(file, u_files.get_file_display_name(file),
+                            on_windows_os)
 
     if len(known_files) + len(unknown_files) == 0:
         return
