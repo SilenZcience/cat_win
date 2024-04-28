@@ -457,7 +457,7 @@ Currently supported are .json and .xml.
 
 Everything passed in after this Argument will be handled as its own File.
 It is not possible to break out of this state therefor this Parameter must be used last.
-When using the one-letter Variant of this Parameter the following Input will be unicode-escaped instead of parsed as a raw String.
+The Input is unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_echo` is set but in Case of an unicode-error the Input will simply be used literally.
 This way it is possible to define new lines (\\n) or other special characters.
 
 ```console
@@ -1055,17 +1055,18 @@ Valid Options are:
 | default_command_line | custom Command Line containing Parameters </br> used additionally to the specific Parameters </br> of the Program Call | -n 'find= ' | |
 | default_file_encoding | the File Encoding used by Default | utf-16 | utf-8 |
 | large_file_size | the Size (Bytes) at which a Warning occurs | 1024 | 104857600 (100Mb) |
-| strip_color_on_pipe | indicate if the Output should be stripped of any Color | no | True |
-| ignore_unknown_bytes | ignore unknown bytes instead of replacing them with � | true | False |
+| strip_color_on_pipe | indicate if the Output should be stripped of any Color | false | true |
+| ignore_unknown_bytes | ignore unknown bytes instead of replacing them with � | true | false |
 | peek_size | define the amount of lines shown by <a href="#peek">-p, --peek</a> | 10 | 5 |
 | strings_minimum_sequence_length | set the minimum Length of a String </br> (for the <a href="#strings">--strings</a> Parameter) | 2 | 4 |
 | strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the <a href="#strings">--strings</a> Parameter) | \| | \\n |
 | editor_indentation | set the Indentation used in the <a href="#editor">Editor</a> </br> when pressing ↹ on an empty Line | <b>␣ ␣ ␣ ␣</b> | ↹ |
-| editor_auto_indent | set whether the <a href="#editor">Editor</a> should auto indent or not | 1 | False |
+| editor_auto_indent | set whether the <a href="#editor">Editor</a> should auto indent or not | true | false |
 | hex_editor_columns | set the amount of columns per row in the <a href="#hexeditor">HexEditor</a> | 8 | 16 |
 | more_step_length | define the Step Length used by <a href="#more">-M</a></br>a Value of 0 is equivalent to the Size/Height of the Terminal Window | 5 | 0 |
-| unicode_escaped_find | unicode-escape the queried Substring when using <a href="#find">find=</a> | false | True |
-| unicode_escaped_replace | unicode-escape a and b when using <a href="#replace">[a,b]</a> | false | True |
+| unicode_escaped_echo | unicode-escape the input when using <a href="#echo">-E, --echo</a> | false | true |
+| unicode_escaped_find | unicode-escape the queried Substring when using <a href="#find">find=</a> | false | true |
+| unicode_escaped_replace | unicode-escape a and b when using <a href="#replace">[a,b]</a> | false | true |
 
 Accepted Input for enabling a Setting:  `true, yes, y, 1`
 </br>
