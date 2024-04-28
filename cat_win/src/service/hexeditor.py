@@ -329,7 +329,7 @@ class HexEditor:
                     self._render_scr()
             if key == b'_key_backspace':
                 sub_s = sub_s[:-1]
-            if key == b'_key_string' and wchar in HEX_BYTE_KEYS:
+            if key == b'_key_string' and wchar.upper() in HEX_BYTE_KEYS:
                 sub_s += wchar
             elif key == b'_key_enter':
                 self.search = sub_s if sub_s else self.search
