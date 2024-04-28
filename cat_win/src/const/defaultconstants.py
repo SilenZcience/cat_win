@@ -19,5 +19,6 @@ class DKW:
     EDITOR_AUTO_INDENT = 'editor_auto_indent'
     HEX_EDITOR_COLUMNS = 'hex_editor_columns'
     MORE_STEP_LENGTH = 'more_step_length'
+    UNICODE_ESCAPED_ECHO = 'unicode_escaped_echo'
     UNICODE_ESCAPED_FIND = 'unicode_escaped_find'
     UNICODE_ESCAPED_REPLACE = 'unicode_escaped_replace'

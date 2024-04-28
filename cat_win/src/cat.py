@@ -92,6 +92,7 @@ def setup():
     const_dic = config.load_config()
 
     arg_parser = ArgParser(const_dic[DKW.DEFAULT_FILE_ENCODING],
+                           const_dic[DKW.UNICODE_ESCAPED_ECHO],
                            const_dic[DKW.UNICODE_ESCAPED_FIND],
                            const_dic[DKW.UNICODE_ESCAPED_REPLACE])
     u_args = Arguments()
