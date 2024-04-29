@@ -203,7 +203,7 @@ class HexEditor:
             self.edited_byte_pos = (self.edited_byte_pos+1)%2
 
             self.unsaved_progress = True
-        elif wchar in '<> +':
+        elif wchar in '<> ':
             self.hex_array[self.cpos.row].insert(self.cpos.col+(wchar!='<'), '--')
             self.hex_array_edit[self.cpos.row].insert(self.cpos.col+(wchar!='<'), '--')
             for i in range(self.cpos.row+1, len(self.hex_array)):

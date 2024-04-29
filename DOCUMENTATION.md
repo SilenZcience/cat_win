@@ -936,6 +936,9 @@ The currently supported Key bindings are as follows:
 |--------|:-----------------:|:-----------:|:-------------:|:---------:|
 | <kbd>Arrows</kbd> | move cursor by byte | move cursor by byte | move cursor multiple bytes | - |
 ||||||
+| <kbd>0-9 & A-F</kbd> | edit the current byte | - | - | - |
+| <kbd><</kbd> | insert a new byte to the left | - | - | - |
+| <kbd>> & ␣</kbd> | insert a new byte to the right | - | - | - |
 | <kbd>Backspace</kbd> | reset current byte | reset current byte | remove current byte | reset current byte |
 | <kbd>Delete</kbd> | reset current byte | reset current byte | remove current byte | reset current byte |
 ||||||
