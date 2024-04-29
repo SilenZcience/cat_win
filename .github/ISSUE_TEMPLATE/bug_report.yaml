@@ -1,0 +1,50 @@
+name: Bug Report
+description: Problems, Issues, Unexpected Behaviour
+title: "🐛 Bug Report: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: "
+        <img src='https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/cat_win.logo.png' align='left' width='80' height='80'>
+        Thank you for finding the time to report the problem!"
+  - type: textarea
+    attributes:
+      label: Describe the Bug
+      description: A clear and concise description of what the bug is.
+      placeholder: >
+        Please provide the context in which the problem occurred and explain what happened
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+      placeholder: "
+        Please explain why you think the behaviour is erroneous. \n
+        If applicable, add the files used (or a simplistic variant of them) to help explain your problem. \n
+        If applicable, add screenshots to help explain your problem. \n
+        (You can include files by dragging and dropping them here.)"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: To Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: "
+        1. Use the command '...' \n
+        2. Use the command on the file '...' \n
+        3. See error"
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: cat_win Version
+      description: >
+        What cat_win version are you using?
+  - type: textarea
+    attributes:
+      label: Environment
+      description: In which environment does the problem occur?
+      placeholder: >
+        OS: [e.g. Windows]

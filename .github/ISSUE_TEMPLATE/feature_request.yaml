@@ -1,0 +1,19 @@
+name: Feature Request
+description: Submit a proposal for a new feature
+labels: ["feature"]
+body:
+  - type: markdown
+    attributes:
+      value: "
+        <img src='https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/cat_win.logo.png' align='left' width='80' height='80'>
+        Thank you for finding the time to propose a new feature!"
+  - type: textarea
+    attributes:
+      label: Feature Description
+      description: Describe your feature proposal
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Use Case
+      description: Describe what you are trying to achieve

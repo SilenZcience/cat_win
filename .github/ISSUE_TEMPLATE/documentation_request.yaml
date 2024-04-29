@@ -1,0 +1,37 @@
+name: Documentation Request
+description: Missing, Incorrect, Misleading Documentation
+title: "📖 Documentation: "
+labels: ["docs"]
+body:
+  - type: markdown
+    attributes:
+      value: "
+        <img src='https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/cat_win.logo.png' align='left' width='80' height='80'>
+        Thank you for finding the time to report the problem!"
+  - type: textarea
+    attributes:
+      label: Feature Description
+      description: "
+        Use this section to provide an overview of the feature being described.
+        If it is an update to an existing feature, describe what has changed."
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Documentation Problem
+      description: "
+        In what way is the current Documentation incorrect or misleading? If the Documentation is missing explain why it is needed."
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to showcase this feature.
+  - type: textarea
+    attributes:
+      label: Prompt Samples
+      description: Add any prompt examples that are relevant to the user or give a good overview over the behaviour.
+  - type: textarea
+    attributes:
+      label: Additional Information
+      description: Include any information or links that might help with writing the Docs article.
