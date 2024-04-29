@@ -30,9 +30,11 @@
       </a>
       <br/>
       <br/>
+      <a href="https://github.com/SilenZcience/cat_win/issues">Request Feature</a>
+      ·
       <a href="https://github.com/SilenZcience/cat_win/issues">Report Bug</a>
       ·
-      <a href="https://github.com/SilenZcience/cat_win/issues">Request Feature</a>
+      <a href="https://github.com/SilenZcience/cat_win/issues">Request Documentation</a>
    </p>
 </div>
 
@@ -55,6 +57,7 @@
       </li>
       <li><a href="#usage">Usage</a>
          <ul>
+         <li><a href="#documentation">Documentation</a></li>
          <li><a href="#examples">Examples</a></li>
          </ul>
       </li>
@@ -66,7 +69,7 @@
 
 <div id="about-the-project"></div>
 
-## About The Project
+## 🔥 About The Project
 
 [![Unittests]](https://github.com/SilenZcience/cat_win/actions/workflows/unit_test.yml)
 [![Build-and-Check]](https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml)
@@ -74,9 +77,9 @@
 [![Tests]](https://raw.githubusercontent.com/SilenZcience/cat_win/badges/badges/badge-tests.svg)
 <!-- [![Compile-and-Push]](https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml/badge.svg) -->
 
-This project copies the fundamental framework of the cat command-line tool from Linux and translates its features to an OS Independent program using Python. </br> Over time the project evolved in subject areas of other tools like 'echo', 'grep', 'ls', 'base64'.
+This project copies the fundamental framework of the cat command-line tool from Unix and translates its features to an OS Independent program using Python. </br> Over time the project evolved in subject areas of other tools like 'echo', 'grep', 'ls', 'base64'...
 
-Additionally it includes the feature to strip and reverse the content of any given file, make use of the standard-input, which enables cat piping into each other, generating the checksum of any file, converting decimal, hexadecimal and binary numbers within any text, and much <a href="#usage">more</a> ...
+Additionally it includes the feature to strip and reverse the content of any given file, make use of the standard-input, which enables cat piping into each other, generating the checksum of any file, converting decimal, hexadecimal and binary numbers within any text, and much *much* <a href="#usage">more</a> ...
 
 It is of course possible to use cat_win on Linux or MacOS, aswell as Windows!
 
@@ -86,20 +89,18 @@ It is of course possible to use cat_win on Linux or MacOS, aswell as Windows!
 [![MadeWith-Python]](https://www.python.org/)
 [![Python][Python-Version]](https://www.python.org/)
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
 <div id="getting-started"></div>
 
-## Getting Started
+## ⚡️ Getting Started
 
 <div id="prerequisites"></div>
 
 ### Prerequisites
 
-`Python Package` </br>
-Using cat_win as a Python-Package demands a Python-Interpreter (>= 3.7).
+Using cat_win as a `Python Package` demands a Python-Interpreter (>= 3.7).
 
-`Binary Executable` </br>
-Using cat_win as a binary executable demands no prerequisites, hereby the stand-alone executables are sufficient.
+Using cat_win as a `Binary Executable` demands no prerequisites, hereby the stand-alone executables are sufficient.
 
 <div id="installation"></div>
 
@@ -141,14 +142,14 @@ Direct Download:
 (compiled using PyInstaller) </br>
 It is recommended to add the file path(s) to your system-environment `PATH`-variables.
 
-> ⚠️ **You should never trust any executable file!** Feel free to compile the package yourself (e.g. using [PyInstaller](https://pyinstaller.org/en/stable/)).
+> ❗️ **You should never trust any executable file!** Feel free to compile the package yourself (e.g. using [PyInstaller](https://pyinstaller.org/en/stable/)).
 
-> You can verify the creation of the executable files yourself by reading the [source code](https://github.com/SilenZcience/cat_win/blob/main/cat_win/src/cat.py), checking the [origin](https://github.com/SilenZcience/cat_win/tree/binaries/bin) of the file and validating the corresponding [workflow](https://github.com/SilenZcience/cat_win/blob/main/.github/workflows/build_executable.yml) used.
+> ⚠️ You can verify the creation of the executable files yourself by reading the [source code](https://github.com/SilenZcience/cat_win/blob/main/cat_win/src/cat.py), checking the [origin](https://github.com/SilenZcience/cat_win/tree/binaries/bin) of the file and validating the corresponding [workflow](https://github.com/SilenZcience/cat_win/blob/main/.github/workflows/build_executable.yml) used.
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
 <div id="usage"></div>
 
-## Usage
+## ⚙️ Usage
 
 ```console
 > catw [FILE]... [OPTION]...
@@ -163,6 +164,10 @@ Concatenate FILE(s) to standard output.
 Interactively manipulate standard input.
 ...
 ```
+
+<div id="documentation"></div>
+
+### Documentation
 
 👉 A detailed [Documentation🖺](https://github.com/SilenZcience/cat_win/blob/main/DOCUMENTATION.md) of all **Parameters** has moved to another File.
 Read about specific **Arguments & Options** [here](https://github.com/SilenZcience/cat_win/blob/main/DOCUMENTATION.md).
@@ -223,22 +228,25 @@ $ cats --eval --dec -nl
 > >>> ...
 ```
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
 <div id="changelog"></div>
 
-## Changelog
+## 📋 Changelog
 
 Take a look at the [Changelog](https://github.com/SilenZcience/cat_win/blob/main/CHANGELOG.md) file.
 
 <div id="license"></div>
 
-## License
+## 📜 License
+<a href="https://github.com/SilenZcience/cat_win/blob/main/LICENSE" alt="License">
+   <img src="https://img.shields.io/pypi/l/cat_win" align="right">
+</a>
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/SilenZcience/cat_win/blob/main/LICENSE) file for details
 
 <div id="contact"></div>
 
-## Contact
+## ⭐️ Contact
 
 > **SilenZcience** <br/>
 [![GitHub-SilenZcience][GitHub-SilenZcience]](https://github.com/SilenZcience)
@@ -259,5 +267,7 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 <!-- https://img.shields.io/badge/Python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%20pypy--3.7%20%7C%20pypy--3.8%20%7C%20pypy--3.9%20%7C%20pypy--3.10-blue -->
 
 [CurrentVersion]: https://img.shields.io/pypi/v/cat_win.svg
+
+[License]: https://img.shields.io/pypi/l/cat_win
 
 [GitHub-SilenZcience]: https://img.shields.io/badge/GitHub-SilenZcience-orange
