@@ -30,11 +30,11 @@
       </a>
       <br/>
       <br/>
-      <a href="https://github.com/SilenZcience/cat_win/issues">Request Feature</a>
+      <a href="https://github.com/SilenZcience/cat_win/issues/new?assignees=&labels=feature&projects=&template=feature_request.yaml">Request Feature</a>
       ·
-      <a href="https://github.com/SilenZcience/cat_win/issues">Report Bug</a>
+      <a href="https://github.com/SilenZcience/cat_win/issues/new?assignees=&labels=bug&projects=&template=bug_report.yaml&title=%F0%9F%90%9B+Bug+Report%3A+">Report Bug</a>
       ·
-      <a href="https://github.com/SilenZcience/cat_win/issues">Request Documentation</a>
+      <a href="https://github.com/SilenZcience/cat_win/issues/new?assignees=&labels=docs&projects=&template=documentation_request.yaml&title=%F0%9F%93%96+Documentation%3A+">Request Documentation</a>
    </p>
 </div>
 
