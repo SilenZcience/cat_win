@@ -112,13 +112,12 @@ Simply install the python package (via [PyPI-cat_win](https://pypi.org/project/c
 ```console
 python -m pip install --upgrade cat_win[clip]
 ```
-cat_win uses the [pyperclip](https://pypi.org/project/pyperclip/) module by default. Should any problems occur, you can also use
-the [pyperclip3](https://pypi.org/project/pyperclip3/) or [pyclip](https://pypi.org/project/pyclip/) module.
-In this case simply run:
 ```console
 python -m pip install --upgrade cat_win
 ```
-and manually install the desired module yourself.
+cat_win uses the [pyperclip](https://pypi.org/project/pyperclip/) module by default. Should any problems occur, you can also use
+the [pyperclip3](https://pypi.org/project/pyperclip3/) or [pyclip](https://pypi.org/project/pyclip/) module.
+In this case simply don't install with `[clip]` and manually install the desired module yourself.
 
 On older Windows systems colored output may not be displayed correctly.
 In this case you can try to fix the problem by installing the cat_win-package with the optional color-fix `[cfix]` dependency.
