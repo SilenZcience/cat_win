@@ -1,5 +1,4 @@
-colorama~=0.4.5; python_version<='3.6'
-colorama>=0.4.6; python_version>'3.6'
+colorama~=0.4.0
 pyperclip~=1.8.0
 pyperclip3~=0.4.0
 pyclip~=0.7.0
