@@ -1009,9 +1009,9 @@ def main():
         temp_file = IoHelper.write_file(tmp_file_helper.generate_temp_file_name(), piped_input,
                                         arg_parser.file_encoding)
         known_files.append(temp_file)
+        u_files.set_temp_file_stdin(temp_file)
         unknown_files = IoHelper.write_files(unknown_files, piped_input,
                                                 arg_parser.file_encoding)
-        u_files.set_temp_file_stdin(temp_file)
     elif u_args[ARGS_EDITOR]:
         unknown_files = [file for file in unknown_files if Editor.open(
             file, u_files.get_file_display_name(file), on_windows_os,
@@ -1024,32 +1024,11 @@ def main():
             unknown_files, arg_parser.file_encoding, on_windows_os,
             u_args[ARGS_ONELINE])
 
-    if u_args[ARGS_EDITOR]:
-        with IoHelper.dup_stdin(on_windows_os, u_args[ARGS_STDIN]):
-            for file in known_files:
-                Editor.open(file, u_files.get_file_display_name(file),
-                            on_windows_os, u_args[ARGS_PLAIN_ONLY])
-    elif u_args[ARGS_HEX_EDITOR]:
-        with IoHelper.dup_stdin(on_windows_os, u_args[ARGS_STDIN]):
-            for file in known_files:
-                HexEditor.open(file, u_files.get_file_display_name(file),
-                            on_windows_os)
-
     if len(known_files) + len(unknown_files) == 0:
         return
 
     # fill holder object with neccessary values
     u_files.set_files([*known_files, *unknown_files])
-
-    if u_args[ARGS_FFILES]:
-        Summary.show_files(u_args[ARGS_FFILES], u_files.files)
-        return
-    if u_args[ARGS_DDIRECTORIES]:
-        Summary.show_dirs(arg_parser.get_dirs())
-        return
-    if u_args[ARGS_DATA] or u_args[ARGS_CHECKSUM]:
-        _print_meta_and_checksum(u_args[ARGS_DATA], u_args[ARGS_CHECKSUM])
-        return
 
     file_size_sum = 0
     for file in u_files:
@@ -1061,6 +1040,27 @@ def main():
             err_print('This may require a lot of time and resources.', end='')
             err_print(color_dic[CKW.RESET_ALL])
             break
+
+    if u_args[ARGS_EDITOR]:
+        with IoHelper.dup_stdin(on_windows_os, u_args[ARGS_STDIN]):
+            for file in known_files:
+                Editor.open(file, u_files.get_file_display_name(file),
+                            on_windows_os, u_args[ARGS_PLAIN_ONLY])
+    elif u_args[ARGS_HEX_EDITOR]:
+        with IoHelper.dup_stdin(on_windows_os, u_args[ARGS_STDIN]):
+            for file in known_files:
+                HexEditor.open(file, u_files.get_file_display_name(file),
+                            on_windows_os)
+
+    if u_args[ARGS_FFILES]:
+        Summary.show_files(u_args[ARGS_FFILES], u_files.files)
+        return
+    if u_args[ARGS_DDIRECTORIES]:
+        Summary.show_dirs(arg_parser.get_dirs())
+        return
+    if u_args[ARGS_DATA] or u_args[ARGS_CHECKSUM]:
+        _print_meta_and_checksum(u_args[ARGS_DATA], u_args[ARGS_CHECKSUM])
+        return
 
     if u_args[ARGS_B64D]:
         decode_files_base64(tmp_file_helper)
