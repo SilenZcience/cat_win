@@ -168,7 +168,7 @@ Interactively manipulate standard input.
 
 ### Documentation
 
-👉 A detailed [Documentation🖺](https://github.com/SilenZcience/cat_win/blob/main/DOCUMENTATION.md) of all **Parameters** has moved to another File.
+👉 A detailed [💡Documentation💡](https://github.com/SilenZcience/cat_win/blob/main/DOCUMENTATION.md) of all **Parameters** has moved to another File.
 Read about specific **Arguments & Options** [here](https://github.com/SilenZcience/cat_win/blob/main/DOCUMENTATION.md).
 
 <div id="examples"></div>
