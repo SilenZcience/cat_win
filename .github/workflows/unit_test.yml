@@ -27,6 +27,8 @@ jobs:
             os: macos-latest
           - python-version: 'pypy-3.7'
             os: macos-latest
+          - python-version: '3.6'
+            os: ubuntu-latest
         include:
           - python-version: '3.6'
             os: macos-13
@@ -34,6 +36,8 @@ jobs:
             os: macos-13
           - python-version: 'pypy-3.7'
             os: macos-13
+          - python-version: '3.6'
+            os: ubuntu-20.04
     steps:
       - name: Set Windows Line Ending
         run: |
