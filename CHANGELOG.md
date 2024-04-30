@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.7.9] - TBA
+
+### Minor Changes
+
+- the hex-editor now loads lazily to improve loading time on large files.
+- when searching in the hex-editor it is now possible to search for byte-sequences.
+
+### Bugfixes
+
+- fixed Bug where the hex-editor would not find searched-for bytes.
+
+
 ## [1.7.8] - 2024-04-29
 
 ### Minor Changes
