@@ -47,6 +47,7 @@ class HexEditor:
 
         self.file = file
         self.display_name = display_name
+        self._f_content = b''
         self.hex_array = []
         self.hex_array_edit = []
 
@@ -74,6 +75,16 @@ class HexEditor:
 
         self._setup_file()
 
+    def _build_file_upto(self, to_row: int):
+        _start = len(self.hex_array) * HexEditor.columns
+        _end   = to_row              * HexEditor.columns
+        for i, byte_ in enumerate(self._f_content[_start:_end], start=_start):
+            if not i % HexEditor.columns:
+                self.hex_array.append([])
+            self.hex_array[-1].append(f"{byte_:02X}")
+        for row in self.hex_array[len(self.hex_array_edit):]:
+            self.hex_array_edit.append([None] * len(row))
+
     def _setup_file(self) -> None:
         """
         setup the editor content screen by reading the given file.
@@ -81,11 +92,8 @@ class HexEditor:
         self.hex_array = []
         self.hex_array_edit = []
         try:
-            _f_content = IoHelper.read_file(self.file, True)
-            for i, byte_ in enumerate(_f_content):
-                if not i % HexEditor.columns:
-                    self.hex_array.append([])
-                self.hex_array[-1].append(f"{byte_:02X}")
+            self._f_content = IoHelper.read_file(self.file, True)
+            self._build_file_upto(30)
             self.unsaved_progress = False
             self.error_bar = ''
             self.status_bar_size = 1
@@ -97,8 +105,6 @@ class HexEditor:
                 err_print(self.error_bar)
         if not self.hex_array:
             self.hex_array.append([])
-        for row in self.hex_array:
-            self.hex_array_edit.append([None] * len(row))
 
     def getxymax(self) -> tuple:
         """
@@ -139,46 +145,28 @@ class HexEditor:
         self._move_key_left()
 
     def _move_key_left(self) -> None:
-        if self.cpos.col:
-            self.cpos.col -= 1
-        elif self.cpos.row:
-            self.cpos.row -= 1
-            self.cpos.col = HexEditor.columns-1
+        self.cpos.col -= 1
 
     def _move_key_right(self) -> None:
-        if self.cpos.col < len(self.hex_array[self.cpos.row])-1:
-            self.cpos.col += 1
-        elif self.cpos.row < len(self.hex_array)-1:
-            self.cpos.row += 1
-            self.cpos.col = 0
+        self.cpos.col += 1
 
     def _move_key_up(self) -> None:
-        if self.cpos.row:
-            self.cpos.row -= 1
+        self.cpos.row -= 1
 
     def _move_key_down(self) -> None:
-        if self.cpos.row < len(self.hex_array)-1:
-            self.cpos.row += 1
+        self.cpos.row += 1
 
     def _move_key_ctl_left(self) -> None:
-        self.cpos.col = 0
+        self.cpos.col -= HexEditor.columns//2
 
     def _move_key_ctl_right(self) -> None:
-        self.cpos.col = max(len(self.hex_array[self.cpos.row])-1, 0)
+        self.cpos.col += HexEditor.columns//2
 
     def _move_key_ctl_up(self) -> None:
-        if self.cpos.row >= 10:
-            self.cpos.row -= 10
-        else:
-            self.cpos.row = 0
-            self.cpos.col = 0
+        self.cpos.row -= 10
 
     def _move_key_ctl_down(self) -> None:
-        if self.cpos.row < len(self.hex_array)-10:
-            self.cpos.row += 10
-        else:
-            self.cpos.row = len(self.hex_array)-1
-            self.cpos.col = len(self.hex_array[self.cpos.row])
+        self.cpos.row += 10
 
     def _key_string(self, wchar) -> None:
         """
@@ -247,6 +235,9 @@ class HexEditor:
         (bool):
             indicates if the editor should keep running
         """
+        bytes_loaded = len(self.hex_array)*HexEditor.columns
+        bytes_loaded-= HexEditor.columns
+        bytes_loaded+= len(self.hex_array[-1])
         content = b''
         for i, row in enumerate(self.hex_array):
             for j, byte in enumerate(row):
@@ -257,6 +248,7 @@ class HexEditor:
                     content += bytes.fromhex(hex_byte)
                 except ValueError:
                     pass
+        content += self._f_content[bytes_loaded:]
         try:
             IoHelper.write_file(self.file, content)
             self.changes_made = True
@@ -284,7 +276,7 @@ class HexEditor:
         wchar, l_jmp = '', ''
         while str(wchar).upper() not in ['\x1b', 'N']:
             self._action_render_scr(f"Confirm: [y]es, [n]o - Jump to byte: 0x{l_jmp}␣")
-            wchar, key = self._get_new_char()
+            wchar, key = self._get_next_char()
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
@@ -299,10 +291,8 @@ class HexEditor:
                 key == b'_key_enter':
                 if l_jmp:
                     l_jmp_int = int(l_jmp, 16)
-                    l_jmp_row = l_jmp_int // HexEditor.columns
-                    l_jmp_col = l_jmp_int %  HexEditor.columns
-                    self.cpos.row = min(l_jmp_row, len(self.hex_array               )-1)
-                    self.cpos.col = min(l_jmp_col, len(self.hex_array[self.cpos.row])-1)
+                    self.cpos.row = l_jmp_int // HexEditor.columns
+                    self.cpos.col = l_jmp_int %  HexEditor.columns
                 break
         return True
 
@@ -314,11 +304,28 @@ class HexEditor:
         (bool):
             indicates if the editor should keep running
         """
+        def find_bytes(row: int, col: int = 0) -> int:
+            search_in = ''.join(self.hex_array[row][col:])
+            search_wrap = ''
+            while len(self.search)-1 > len(search_wrap) and row < len(self.hex_array)-1:
+                row += 1
+                search_wrap += ''.join(self.hex_array[row])
+            search_in += search_wrap[:len(self.search)-1]
+
+            found_pos = search_in.find(self.search)
+            while found_pos >= 0:
+                if found_pos % 2:
+                    search_in = search_in[found_pos+1:]
+                    found_pos = search_in.find(self.search)
+                    continue
+                break
+            return found_pos//2
+
         wchar, sub_s = '', ''
         while str(wchar).upper() != '\x1b':
             pre_s = f" [0x{repr(self.search)[1:-1]}]" if self.search else ''
             self._action_render_scr(f"Confirm: 'ENTER' - Search for{pre_s}: 0x{sub_s}␣")
-            wchar, key = self._get_new_char()
+            wchar, key = self._get_next_char()
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
@@ -330,18 +337,27 @@ class HexEditor:
             if key == b'_key_backspace':
                 sub_s = sub_s[:-1]
             if key == b'_key_string' and wchar.upper() in HEX_BYTE_KEYS:
-                sub_s += wchar
+                sub_s += wchar.upper()
             elif key == b'_key_enter':
                 self.search = sub_s if sub_s else self.search
-                f_len = len(self.hex_array)
-                if self.search in self.hex_array[self.cpos.row][self.cpos.col+1:]:
-                    self.cpos.col += \
-                        self.hex_array[self.cpos.row][self.cpos.col+1:].index(self.search)+1
+                if not self.search:
                     break
-                for i in range(self.cpos.row+1, self.cpos.row+f_len+1):
-                    if self.search in self.hex_array[i%f_len]:
-                        self.cpos.row = i%f_len
-                        self.cpos.col = self.hex_array[i%f_len].index(self.search)
+                # check current line
+                search_result = find_bytes(self.cpos.row, self.cpos.col+1)
+                if search_result >= 0:
+                    self.cpos.col += search_result+1
+                    break
+                # check rest of file until back at current line
+                c_row = self.cpos.row
+                while c_row < self.cpos.row+len(self.hex_array):
+                    if c_row+1 >= len(self.hex_array):
+                        self._build_file_upto(c_row+30)
+                    c_row += 1
+                    c_row_wrapped = c_row%len(self.hex_array)
+                    search_result = find_bytes(c_row_wrapped)
+                    if search_result >= 0:
+                        self.cpos.row = c_row_wrapped
+                        self.cpos.col = search_result
                         break
                 break
         return True
@@ -364,7 +380,7 @@ class HexEditor:
         wchar = ''
         while str(wchar).upper() not in ['\x1b', 'N']:
             self._action_render_scr('Reload File? [y]es, [n]o; Abort? ESC')
-            wchar, key = self._get_new_char()
+            wchar, key = self._get_next_char()
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
@@ -393,7 +409,7 @@ class HexEditor:
             wchar = ''
             while self.unsaved_progress and str(wchar).upper() != 'N':
                 self._action_render_scr('Save changes? [y]es, [n]o; Abort? ESC')
-                wchar, key = self._get_new_char()
+                wchar, key = self._get_next_char()
                 if key in ACTION_HOTKEYS:
                     if key == b'_action_quit':
                         break
@@ -440,7 +456,7 @@ class HexEditor:
         self.curse_window.clear()
         return True
 
-    def _get_new_char(self):
+    def _get_next_char(self):
         """
         get next char
         
@@ -476,19 +492,20 @@ class HexEditor:
             return 0
         return curses.color_pair(c_id)
 
-    def _render_scr(self) -> None:
-        """
-        render the curses window.
-        """
-        max_y, max_x = self.getxymax()
-
+    def _fix_cursor_position(self, max_y: int) -> None:
         # fix cursor position (makes movement hotkeys easier)
-        if self.cpos.row >= len(self.hex_array):
-            self.cpos.row = len(self.hex_array)-1
-        row = self.hex_array[self.cpos.row] if (
-            self.cpos.row < len(self.hex_array)) else None
-        rowlen = len(row)-1 if row is not None else 0
-        self.cpos.col = min(self.cpos.col, max(rowlen, 0))
+        # since it would be unusual for a hexeditor to paste large amount of key-strokes into
+        # at once, rendering is allowed to be slower here ...
+        self.cpos.row = min(len(self.hex_array)-1, max(self.cpos.row, 0))
+        while self.cpos.row and self.cpos.col < 0:
+            self.cpos.col += HexEditor.columns
+            self.cpos.row -= 1
+        while self.cpos.row < len(self.hex_array)-1 and \
+            self.cpos.col >= len(self.hex_array[self.cpos.row]):
+            self.cpos.col -= len(self.hex_array[self.cpos.row])
+            self.cpos.row += 1
+        self.cpos.col = min(self.cpos.col, len(self.hex_array[self.cpos.row])-1)
+        self.cpos.col = max(self.cpos.col, 0)
 
         if self.cpos.row < self.wpos.row:
             self.wpos.row = self.cpos.row
@@ -499,10 +516,12 @@ class HexEditor:
         # elif self.cpos.col >= self.wpos.col + max_x:
         #     self.wpos.col = self.cpos.col - max_x + 1
 
+    def _render_title_offset(self, max_x: int) -> None:
         # Draw Title:
         self.curse_window.addstr(0, 0, self.top_offset[:max_x])
         self.curse_window.addstr(1, 0, self.top_line[:max_x])
 
+    def _render_draw_rows(self, max_y: int, max_x: int) -> None:
         # Draw Rows
         hex_section = self.hex_array[self.wpos.row:self.wpos.row + max_y]
         hex_offset = [f"{byte_*HexEditor.columns:08X}" for byte_ in range(
@@ -521,6 +540,7 @@ class HexEditor:
             self.curse_window.addstr(len(hex_section)+2, 0, self.bot_line[:max_x])
         self.curse_window.clrtobot()
 
+    def _render_highlight_selection(self) -> None:
         # Highlight Selection
         cursor_y= self.cpos.row-self.wpos.row+2
         if self.hex_array[self.cpos.row]:
@@ -533,6 +553,7 @@ class HexEditor:
             except curses.error:
                 pass
 
+    def _render_highlight_edits(self, max_y: int) -> None:
         # Highlight Edits
         hex_section_edit = self.hex_array_edit[self.wpos.row:self.wpos.row + max_y]
         selected_byte = (self.cpos.row-self.wpos.row, self.cpos.col)
@@ -549,6 +570,7 @@ class HexEditor:
                 except curses.error:
                     pass
 
+    def _render_status_bar(self, max_y: int, max_x: int) -> None:
         # Draw status/error_bar
         try:
             if self.error_bar:
@@ -574,6 +596,21 @@ class HexEditor:
         except curses.error:
             pass
 
+    def _render_scr(self) -> None:
+        """
+        render the curses window.
+        """
+        max_y, max_x = self.getxymax()
+        self._build_file_upto(max_y+self.cpos.row+1)
+
+        self._fix_cursor_position(max_y)
+
+        self._render_title_offset(max_x)
+        self._render_draw_rows(max_y, max_x)
+        self._render_highlight_selection()
+        self._render_highlight_edits(max_y)
+        self._render_status_bar(max_y, max_x)
+
         self.curse_window.refresh()
 
     def _run(self) -> None:
@@ -584,7 +621,7 @@ class HexEditor:
 
         while running:
             self._render_scr()
-            wchar, key = self._get_new_char()
+            wchar, key = self._get_next_char()
             if key != b'_key_string':
                 self.edited_byte_pos = 0
 
