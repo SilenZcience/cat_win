@@ -98,7 +98,7 @@ It is of course possible to use cat_win on Linux or MacOS, aswell as Windows!
 
 ### Prerequisites
 
-Using cat_win as a `Python Package` demands a Python-Interpreter (>= 3.7).
+Using cat_win as a `Python Package` demands a Python-Interpreter (>= 3.6).
 
 Using cat_win as a `Binary Executable` demands no prerequisites, hereby the stand-alone executables are sufficient.
 
@@ -262,7 +262,7 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 [Tests]: https://raw.githubusercontent.com/SilenZcience/cat_win/badges/badges/badge-tests.svg
 
 [MadeWith-Python]: https://img.shields.io/badge/Made%20with-Python-brightgreen
-[Python-Version]: https://img.shields.io/badge/Python-3.7%20--%203.12%20%7C%20pypy--3.7%20--%20pypy--3.10-blue
+[Python-Version]: https://img.shields.io/badge/Python-3.6%20--%203.12%20%7C%20pypy--3.7%20--%20pypy--3.10-blue
 <!-- https://img.shields.io/badge/Python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%20pypy--3.7%20%7C%20pypy--3.8%20%7C%20pypy--3.9%20%7C%20pypy--3.10-blue -->
 
 [CurrentVersion]: https://img.shields.io/pypi/v/cat_win.svg
