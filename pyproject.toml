@@ -49,7 +49,7 @@ clip = [
     "pyperclip~=1.8.0",
 ]
 cfix = [
-    "colorama~=0.4.6; platform_system=='Windows'",
+    "colorama~=0.4.0; platform_system=='Windows'",
 ]
 
 [tool.flit.sdist]
