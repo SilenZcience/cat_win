@@ -189,5 +189,3 @@ ALL_ARGS = [
                 ARGS_RECONFIGURE_ERR, show_arg=False),
     ]
 ALL_ARGS.sort(key=lambda x:x.section)
-
-HIGHEST_ARG_ID = max(arg.arg_id for arg in ALL_ARGS)

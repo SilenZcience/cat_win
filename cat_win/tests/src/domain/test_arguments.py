@@ -1,5 +1,4 @@
 from unittest import TestCase
-import os
 
 from cat_win.src.const.argconstants import ARGS_B64E, ARGS_NOCOL, ARGS_LLENGTH
 from cat_win.src.const.argconstants import ARGS_NUMBER, ARGS_ENDS, ARGS_REPLACE
@@ -12,33 +11,33 @@ class TestArguments(TestCase):
     def test_setargbase64(self):
         u_args = Arguments()
         u_args.set_args([(ARGS_B64E, '--b64e')])
-        self.assertEqual(u_args.args_id[ARGS_B64E], True)
-        self.assertEqual(u_args.args_id[ARGS_NOCOL], True)
-        self.assertEqual(u_args.args_id[ARGS_LLENGTH], False)
-        self.assertEqual(u_args.args_id[ARGS_NUMBER], False)
+        self.assertEqual(u_args[ARGS_B64E], True)
+        self.assertEqual(u_args[ARGS_NOCOL], True)
+        self.assertEqual(u_args[ARGS_LLENGTH], False)
+        self.assertEqual(u_args[ARGS_NUMBER], False)
 
     def test_add_args(self):
         u_args = Arguments()
         u_args.set_args([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
         u_args.add_args([(ARGS_NUMBER, 'x'), (ARGS_LLENGTH, 'b')])
         self.assertListEqual(u_args.args, [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
-        self.assertEqual(u_args.args_id.count(True), 2)
+        self.assertEqual(len(u_args.args_id), 2)
 
         u_args.add_args([(ARGS_ENDS, 'c')])
         self.assertListEqual(u_args.args,
                              [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_ENDS, 'c')])
-        self.assertEqual(u_args.args_id.count(True), 3)
+        self.assertEqual(len(u_args.args_id), 3)
 
     def test_delete_args(self):
         u_args = Arguments()
         u_args.set_args([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
         u_args.delete_args([(ARGS_ENDS, 'a'), (ARGS_NUMBER, 'x')])
         self.assertListEqual(u_args.args, [(ARGS_LLENGTH, 'b')])
-        self.assertEqual(u_args.args_id.count(True), 1)
+        self.assertEqual(len(u_args.args_id), 1)
 
         u_args.delete_args([(ARGS_NUMBER, 'x'), (ARGS_LLENGTH, 'b')])
         self.assertListEqual(u_args.args, [])
-        self.assertEqual(u_args.args_id.count(True), 0)
+        self.assertEqual(len(u_args.args_id), 0)
 
     def test_reduce_list(self):
         test_list = [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')]
