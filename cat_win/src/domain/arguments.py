@@ -2,8 +2,7 @@
 arguments
 """
 
-from cat_win.src.const.argconstants import HIGHEST_ARG_ID, DIFFERENTIABLE_ARGS
-from cat_win.src.const.argconstants import ARGS_NOCOL, ARGS_B64E
+from cat_win.src.const.argconstants import DIFFERENTIABLE_ARGS, ARGS_NOCOL, ARGS_B64E
 
 
 def reduce_list(args: list) -> list:
@@ -75,7 +74,7 @@ class Arguments:
     """
     def __init__(self) -> None:
         self.args: list = []  # list of all used parameters: format [[id, param]]
-        self.args_id: list = [False] * (HIGHEST_ARG_ID + 1)
+        self.args_id: dict = {}
 
     def set_args(self, args: list) -> None:
         """
@@ -84,25 +83,25 @@ class Arguments:
         self.args = reduce_list(args)
         for arg_id, _ in self.args:
             self.args_id[arg_id] = True
-        if self.args_id[ARGS_B64E]:
+        if self.args_id.get(ARGS_B64E, False):
             self.args_id[ARGS_NOCOL] = True
 
     def add_args(self, args: list) -> None:
         """
         add args to use from now on.
         """
-        self.args_id = [False] * (HIGHEST_ARG_ID + 1)
+        self.args_id = {}
         self.set_args(self.args + args)
 
     def delete_args(self, args: list) -> None:
         """
         delete (some) args to longer use them from now on.
         """
-        self.args_id = [False] * (HIGHEST_ARG_ID + 1)
+        self.args_id = {}
         self.set_args(diff_list(self.args, args))
 
     def __getitem__(self, o: int) -> bool:
-        return self.args_id[o]
+        return self.args_id.get(o, False)
 
     def __iter__(self):
         return iter(self.args)
