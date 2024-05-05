@@ -75,7 +75,7 @@ class HexEditor:
 
         self._setup_file()
 
-    def _build_file_upto(self, to_row: int):
+    def _build_file_upto(self, to_row: int) -> None:
         _start = len(self.hex_array) * HexEditor.columns
         _end   = to_row              * HexEditor.columns
         for i, byte_ in enumerate(self._f_content[_start:_end], start=_start):
@@ -456,12 +456,12 @@ class HexEditor:
         self.curse_window.clear()
         return True
 
-    def _get_next_char(self):
+    def _get_next_char(self) -> tuple:
         """
         get next char
         
-        Yields
-        (tuple):
+        Returns
+        (wchar, key) (tuple):
             the char received and the possible action it means.
         """
         def debug_out(wchar_, key__, key_) -> None:
@@ -632,7 +632,7 @@ class HexEditor:
             elif key in MOVE_HOTKEYS:
                 getattr(self, key.decode(), lambda *_: None)()
 
-    def _init_screen(self):
+    def _init_screen(self) -> None:
         """
         init and define curses
         """
