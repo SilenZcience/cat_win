@@ -16,23 +16,7 @@ import shlex
 import sys
 
 from cat_win.src.argparser import ArgParser
-from cat_win.src.const.argconstants import ALL_ARGS, ARGS_EDITOR, ARGS_WORDCOUNT, ARGS_WWORDCOUNT
-from cat_win.src.const.argconstants import ARGS_HELP, ARGS_NUMBER, ARGS_ENDS, ARGS_SQUEEZE
-from cat_win.src.const.argconstants import ARGS_REVERSE, ARGS_SUM, ARGS_BLANK, ARGS_FILES, ARGS_RAW
-from cat_win.src.const.argconstants import ARGS_STDIN, ARGS_NOCOL, ARGS_BINVIEW, ARGS_FILE_PREFIX
-from cat_win.src.const.argconstants import ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN
-from cat_win.src.const.argconstants import ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA
-from cat_win.src.const.argconstants import ARGS_CCONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK
-from cat_win.src.const.argconstants import ARGS_CHR, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP
-from cat_win.src.const.argconstants import ARGS_NOBREAK, ARGS_ECHO, ARGS_SSUM, ARGS_HEXVIEW
-from cat_win.src.const.argconstants import ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN
-from cat_win.src.const.argconstants import ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR, ARGS_CONFIG
-from cat_win.src.const.argconstants import ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY
-from cat_win.src.const.argconstants import ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI
-from cat_win.src.const.argconstants import ARGS_DIRECTORIES, ARGS_DDIRECTORIES, ARGS_SPECIFIC_FORMATS
-from cat_win.src.const.argconstants import ARGS_CHARCOUNT, ARGS_CCHARCOUNT, ARGS_STRINGS, ARGS_MORE
-from cat_win.src.const.argconstants import ARGS_CONFIG_FLUSH, ARGS_CCONFIG_FLUSH, ARGS_CONFIG_REMOVE
-from cat_win.src.const.argconstants import ARGS_HEX_EDITOR
+from cat_win.src.const.argconstants import *
 from cat_win.src.const.colorconstants import CKW
 from cat_win.src.const.defaultconstants import DKW
 from cat_win.src.const.regex import ANSI_CSI_RE
@@ -727,8 +711,8 @@ def edit_file(file_index: int = 0) -> None:
     try:
         file_content = IoHelper.read_file(u_files[file_index].path, False,
                                           arg_parser.file_encoding, 'strict')
-        # splitlines() gives a slight inaccuracy, in case the last line is empty.
-        # (it also splits on other bytes than \r and \n ...)
+        # splitlines() gives a slight inaccuracy, because
+        # it also splits on other bytes than \r and \n ...
         # the alternative would be worse: split('\n') would increase the linecount each
         # time catw touches a file.
         if not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]:
