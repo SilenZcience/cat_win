@@ -25,7 +25,7 @@ class TestLevenshtein(TestCase):
         self.assertAlmostEqual(levenshtein('--hecksview', '--hexview'), 66.6666, 3)
 
     def test_calculate_suggestions(self):
-        result = [('--sord', [('--sort', 75.0)]),
+        result = [('--sord', [('--sort', 75.0), ('--sortl', 60.0)]),
                   ('--b64', [('--b64d', 75.0), ('--b64e',  75.0)]),
                   ('--blq4k', [('--blank', 60.0)]),
                   ('--UNIQUE', [('--unique', 100.0)])]
