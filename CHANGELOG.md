@@ -7,8 +7,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ### Minor Changes
 
+- the editor now loads lazily to improve loading time on large files.
 - the hex-editor now loads lazily to improve loading time on large files.
 - when searching in the hex-editor it is now possible to search for byte-sequences.
+- changed the parameter --`sort`, --`SORT` to two different parameters --`sort`, --`sort` and --`sortl`, --`sortlength`.
 
 ### Bugfixes
 
