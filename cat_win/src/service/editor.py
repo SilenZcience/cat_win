@@ -706,7 +706,6 @@ class Editor:
 
         # set/enforce the boundaries
         self.curse_window.move(0, 0)
-        curses.curs_set(0)
 
         if not self.scrolling:
             if self.cpos.row < self.wpos.row:
