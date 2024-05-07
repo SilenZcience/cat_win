@@ -53,7 +53,8 @@
                   <li><a href="#peek">-p, --peek</a></li>
                   <li><a href="#reverse">-r, --reverse</a></li>
                   <li><a href="#unique">-u, --unique</a></li>
-                  <li><a href="#sort">--sort, --SORT</a></li>
+                  <li><a href="#sort">--sort, --sort</a></li>
+                  <li><a href="#sortl">--sortl, --sortlength</a></li>
                   <li><a href="#format">--sf, --specific-format</a></li>
                   <li><a href="#echo">-E, --echo</a></li>
                   <li><a href="#stdin">-, --stdin</a></li>
@@ -136,7 +137,8 @@
 | *<a href="#peek">-p, --peek</a>* | only print the first and last lines |❌|
 | *<a href="#reverse">-r, --reverse</a>* | reverse output |❌|
 | *<a href="#unique">-u, --unique</a>* | suppress repeated output lines |❌|
-| *<a href="#sort">--sort, --SORT</a>* | sort all lines alphabetically or by length |❌|
+| *<a href="#sort">--sort, --sort</a>* | sort all lines alphabetically |❌|
+| *<a href="#sortl">--sortl, --sortlength</a>* | sort all lines by length |❌|
 | *<a href="#format">--sf, --specific-format</a>* | automatically format specific file types |❌|
 ||||
 | *<a href="#echo">-E, --echo</a>* | handle every following parameter as stdin |❌|
@@ -403,18 +405,22 @@ This is also a line!
 This is a line!
 ```
 
-### <a id="sort">--sort, --SORT</a>
+### <a id="sort">--sort, --sort</a>
 
-Sorts the Output alphabetically without case sensitivity when using the Lowercase Variant of the Parameter.
-When using the Uppercase Variant the Output will be sorted by Line Length.
+Sorts the Output alphabetically without case sensitivity.
 
 ```console
 > catw test.txt --sort -n
 2) A line that has been sorted to the top!
 1) This line was originally at the top!
 ```
+
+### <a id="sortl">--sortl, --sortlength</a>
+
+Sorts the Output by Line Length.
+
 ```console
-> catw test.txt --SORT -l
+> catw test.txt --sortl -l
 [13] A short line!
 [21] This line was on top!
 ```
