@@ -641,8 +641,9 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
         elif arg == ARGS_REVERSE:
             content.reverse()
         elif arg == ARGS_SORT:
-            sort_method = len if param.isupper() else str.casefold
-            content.sort(key = lambda l: sort_method(l[1]))
+            content.sort(key = lambda l: l[1].casefold())
+        elif arg == ARGS_SSORT:
+            content.sort(key = lambda l: len(l[1]))
         elif arg == ARGS_BLANK:
             content = [c for c in content if c[1]]
         elif arg == ARGS_EVAL:

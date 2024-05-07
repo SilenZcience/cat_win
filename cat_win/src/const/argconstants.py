@@ -33,7 +33,7 @@ ARGS_WWORDCOUNT, ARGS_DIRECTORIES, ARGS_DDIRECTORIES = range(50, 53)
 ARGS_SPECIFIC_FORMATS, ARGS_CONFIG = range(53, 55)
 ARGS_CHARCOUNT, ARGS_CCHARCOUNT, ARGS_STRINGS, ARGS_MORE, ARGS_RAW = range(55, 60)
 ARGS_CONFIG_FLUSH, ARGS_CCONFIG_FLUSH, ARGS_CONFIG_REMOVE = range(60, 63)
-ARGS_HEX_EDITOR, = range(63, 64)
+ARGS_HEX_EDITOR, ARGS_SSORT = range(63, 65)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -70,8 +70,10 @@ ALL_ARGS = [
 				ARGS_REVERSE, show_arg_on_shell=False, section=3),
     ArgConstant('-u', '--unique', 'suppress repeated output lines',
 				ARGS_SQUEEZE, show_arg_on_shell=False, section=3),
-    ArgConstant('--sort', '--SORT', 'sort all lines alphabetically or by length',
+    ArgConstant('--sort', '--sort', 'sort all lines alphabetically',
 				ARGS_SORT, show_arg_on_shell=False, section=3),
+    ArgConstant('--sortl', '--sortlength', 'sort all lines by length',
+				ARGS_SSORT, show_arg_on_shell=False, section=3),
     ArgConstant('--sf', '--specific-format', 'automatically format specific file types',
                 ARGS_SPECIFIC_FORMATS, show_arg_on_shell=False, section=3),
 
