@@ -87,7 +87,7 @@ class IoHelper:
 
     @staticmethod
     def read_file(src_file: str, binary: bool = False,
-                  file_encoding: str = 'utf-8', errors: str = 'replace'):
+                  file_encoding: str = 'utf-8', errors: str = 'strict'):
         """
         Reades content from a given file.
         
@@ -97,7 +97,7 @@ class IoHelper:
         binary (bool):
             indicates if the file should be opened in binary mode
         file_encoding (str):
-            an encoding the open the file with
+            an encoding to open the file with
         errors (str):
             the type of error handling when opening the file
         
@@ -115,6 +115,38 @@ class IoHelper:
             src_content = file.read()
         return src_content
 
+
+    @staticmethod
+    def yield_file(src_file: str, file_encoding: str = 'utf-8',
+                   errors: str = 'strict'):
+        """
+        Yields content from a given file. Appends an empty line if the last
+        line ends with a newline, so the lines can be joined.
+        
+        Parameters:
+        src_file (str):
+            a string representation of a file (-path)
+        file_encoding (str):
+            an encoding to open the file with
+        errors (str):
+            the type of error handling when opening the file
+        
+        Yields:
+        line (str):
+            the content of the given file
+        """
+        last_line = None
+        file = open(src_file, 'r', encoding=file_encoding, errors=errors, newline='')
+        try:
+            for line in file:
+                last_line = line
+                yield line.rstrip('\n').rstrip('\r')
+            if last_line is not None and last_line.endswith('\n'):
+                yield ''
+        except StopIteration:
+            pass
+        finally:
+            file.close()
 
     @staticmethod
     def get_newline(file: str) -> str:
@@ -141,7 +173,7 @@ class IoHelper:
 
     @staticmethod
     def write_file(src_file: str, content,
-                   file_encoding: str = 'utf-8', errors: str = 'replace') -> str:
+                   file_encoding: str = 'utf-8', errors: str = 'strict') -> str:
         """
         Writes content into a given file.
         
@@ -151,7 +183,7 @@ class IoHelper:
         src_file (str):
             a string representation of a file (-path)
         file_encoding (str):
-            an encoding the open the file with
+            an encoding to open the file with
         errors (str):
             the type of error handling when opening the file
         
@@ -160,7 +192,7 @@ class IoHelper:
             the path to the temporary file written
         """
         if isinstance(content, str):
-            with open(src_file, 'w', encoding=file_encoding, errors=errors) as file:
+            with open(src_file, 'w', encoding=file_encoding, errors=errors, newline='') as file:
                 file.write(content)
             return src_file
         # in case the content is of types bytes:
