@@ -12,51 +12,10 @@ from cat_win.src.const.regex import RE_ENCODING, RE_MATCH, RE_FIND, RE_TRUNC, RE
 IS_FILE, IS_DIR, IS_PATTERN = range(0, 3)
 
 
-def levenshtein(str_a: str, str_b: str) -> float:
-    """
-    Calculate the levenshtein distance (similarity) between
-    two strings and return the result as a percentage value.
-    char case is ignored such that uppercase letters match their
-    lowercase counterparts perfectly.
-    
-    Parameters:
-    str_a (str):
-        the first string to compare
-    str_b (str):
-        the second string to compare
-        
-    Returns:
-    (float):
-        the similarity of the two strings as a percentage between 0.0 and 100.0
-    """
-    str_a, str_b = str_a.lstrip('-'), str_b.lstrip('-')
-    len_a, len_b = len(str_a), len(str_b)
-    max_len = max(len_a, len_b)
-    if len_a*len_b == 0:
-        return (100 if max_len == 0 else (1 - (len_a+len_b)/max_len) * 100)
-
-    d_arr = [[i] + ([0] * len_b) for i in range(len_a+1)]
-    d_arr[0] = list(range(len_b+1))
-
-    for i in range(1, len_a+1):
-        str_a_i = str_a[i-1:i]
-
-        for j in range(1, len_b+1):
-            str_b_j = str_b[j-1:j]
-
-            d_arr[i][j] = min(d_arr[i-1][j]+1,
-                              d_arr[i][j-1]+1,
-                              d_arr[i-1][j-1]+int(str_a_i.lower() != str_b_j.lower()))
-
-    return (1 - d_arr[len_a][len_b]/max_len) * 100
-
-
 class ArgParser:
     """
     defines the ArgParser
     """
-    SIMILARITY_LIMIT = 50.0
-
     def __init__(self, default_file_encoding: str = 'utf-8',
                  unicode_echo: bool = True,
                  unicode_find: bool = True,
@@ -110,39 +69,6 @@ class ArgParser:
             the list of directories
         """
         return self._known_directories
-
-    def check_unknown_args(self, shell_arg: bool = False) -> list:
-        """
-        Calculate the suggestions for each unknown argument passed in
-        using the levenshtein distance to all known/possible arguments
-        
-        Parameters:
-        shell_arg (bool):
-            indicates whether of not the shell has been used
-            
-        Returns:
-        possible_arg_replacements (list):
-            a list of the structure [(arg1, [suggestions]), (arg2, [suggestions]), ...]
-        """
-        possible_arg_replacements = []
-
-        for u_arg in self._unknown_args:
-            possible_arg_replacement = (u_arg, [])
-            for arg in ALL_ARGS:
-                if shell_arg and not arg.show_arg_on_shell:
-                    continue
-                leven_short = levenshtein(arg.short_form, u_arg)
-                leven_long = levenshtein(arg.long_form, u_arg)
-# print(leven_short.__round__(3), leven_long.__round__(3),
-#       max(leven_short, leven_long).__round__(3), u_arg, arg.long_form, sep="\t") # DEBUG
-                if max(leven_short, leven_long) > self.SIMILARITY_LIMIT:
-                    if leven_short >= leven_long:
-                        possible_arg_replacement[1].append((arg.short_form, leven_short))
-                    else:
-                        possible_arg_replacement[1].append((arg.long_form, leven_long))
-            possible_arg_replacements.append(possible_arg_replacement)
-
-        return possible_arg_replacements
 
     def get_arguments(self, argv: list, delete: bool = False) -> tuple:
         """
