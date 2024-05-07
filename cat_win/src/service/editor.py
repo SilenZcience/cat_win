@@ -59,6 +59,7 @@ class Editor:
 
         self.file = file
         self.display_name = display_name
+        self._f_content_gen = None
         self.line_sep = '\n'
         self.window_content = []
 
@@ -70,6 +71,7 @@ class Editor:
         self.unsaved_progress = False
         self.changes_made = False
         self.scrolling = False
+        self.deleted_line = False
 
         # current cursor position
         self.cpos = Position(0, 0)
@@ -84,6 +86,20 @@ class Editor:
     def _get_special_char(self, char: str) -> str:
         return self.special_chars.get(char, '?')
 
+    def _build_file(self) -> None:
+        for line in self._f_content_gen:
+            self.window_content.append(line)
+
+    def _build_file_upto(self, to_row: int = None) -> None:
+        if to_row is None:
+            to_row = self.getxymax()[0]+max(self.cpos.row, self.wpos.row)+1
+        if len(self.window_content) >= to_row:
+            return
+        for line in self._f_content_gen:
+            self.window_content.append(line)
+            if len(self.window_content) >= to_row:
+                break
+
     def _setup_file(self) -> None:
         """
         setup the editor content screen by reading the given file.
@@ -91,19 +107,19 @@ class Editor:
         self.window_content = []
         try:
             self.line_sep = IoHelper.get_newline(self.file)
-            _f_content = IoHelper.read_file(self.file, file_encoding=self.file_encoding)
-            for line in _f_content.split('\n'):
-                self.window_content.append(line)
+            self._f_content_gen = IoHelper.yield_file(self.file, self.file_encoding)
+            self._build_file_upto(30)
             self.unsaved_progress = False
             self.error_bar = ''
             self.status_bar_size = 1
         except (OSError, UnicodeError) as exc:
-            self.window_content.append('')
             self.unsaved_progress = True
             self.error_bar = str(exc)
             self.status_bar_size = 2
             if self.debug_mode:
                 err_print(self.error_bar)
+        if not self.window_content:
+            self.window_content.append('')
 
     def getxymax(self) -> tuple:
         """
@@ -138,17 +154,13 @@ class Editor:
             self.window_content[self.cpos.row] += self.window_content[self.cpos.row+1]
             del self.window_content[self.cpos.row+1]
             self.unsaved_progress = True
+            self.deleted_line = True
             return ''
         return None
 
     def _key_dl(self, _) -> str:
-        if self.cpos.col == len(self.window_content[self.cpos.row])-1:
-            deleted = self.window_content[self.cpos.row][-1]
-            self.window_content[self.cpos.row] = self.window_content[self.cpos.row][:-1]
-            self.unsaved_progress = True
-            return deleted
-        if self.cpos.col < len(self.window_content[self.cpos.row])-1:
-            cur_col = self.cpos.col+1
+        if self.cpos.col < len(self.window_content[self.cpos.row]):
+            cur_col = self.cpos.col
             t_p = self.window_content[self.cpos.row][cur_col].isalnum()
             while cur_col < len(self.window_content[self.cpos.row]) and \
                 t_p == self.window_content[self.cpos.row][cur_col].isalnum():
@@ -163,6 +175,7 @@ class Editor:
             self.window_content[self.cpos.row] += self.window_content[self.cpos.row+1]
             del self.window_content[self.cpos.row+1]
             self.unsaved_progress = True
+            self.deleted_line = True
             return ''
         return None
 
@@ -185,25 +198,18 @@ class Editor:
             self.cpos.col = len(self.window_content[self.cpos.row])
             self.window_content[self.cpos.row] += line
             self.unsaved_progress = True
+            self.deleted_line = True
             return wchars
         return None
 
     def _key_ctl_backspace(self, _) -> str:
-        if self.cpos.col == 1: # delete char
-            self.cpos.col = 0
-            deleted = self.window_content[self.cpos.row][self.cpos.col]
-            self.window_content[self.cpos.row] = self.window_content[self.cpos.row][1:]
-            self.unsaved_progress = True
-            return deleted
-        if self.cpos.col > 1:
+        if self.cpos.col:
             old_col = self.cpos.col
-            self.cpos.col -= 2
+            self.cpos.col -= 1
             t_p = self.window_content[self.cpos.row][self.cpos.col].isalnum()
             while self.cpos.col > 0 and \
-                t_p == self.window_content[self.cpos.row][self.cpos.col].isalnum():
+                t_p == self.window_content[self.cpos.row][self.cpos.col-1].isalnum():
                 self.cpos.col -= 1
-            if self.cpos.col:
-                self.cpos.col += 1
             deleted = self.window_content[self.cpos.row][self.cpos.col:old_col]
             self.window_content[self.cpos.row] = \
                 self.window_content[self.cpos.row][:self.cpos.col] + \
@@ -217,6 +223,7 @@ class Editor:
             self.cpos.col = len(self.window_content[self.cpos.row])
             self.window_content[self.cpos.row] += line
             self.unsaved_progress = True
+            self.deleted_line = True
             return ''
         return None
 
@@ -306,8 +313,11 @@ class Editor:
 
     def _move_key_page_down(self) -> None:
         max_y, _ = self.getxymax()
-        self.wpos.row = max(min(self.wpos.row+max_y, len(self.window_content)-max_y), 0)
-        self.cpos.row = min(self.cpos.row+max_y, len(self.window_content)-1)
+        self.wpos.row += max_y
+        self.cpos.row += max_y
+        self._build_file_upto()
+        self.wpos.row = max(min(self.wpos.row, len(self.window_content)-max_y), 0)
+        self.cpos.row = min(self.cpos.row, len(self.window_content)-1)
 
     def _scroll_key_page_up(self) -> None:
         max_y, _ = self.getxymax()
@@ -315,16 +325,20 @@ class Editor:
 
     def _scroll_key_page_down(self) -> None:
         max_y, _ = self.getxymax()
-        self.wpos.row = max(min(self.wpos.row+max_y, len(self.window_content)-max_y), 0)
+        self.wpos.row += max_y
+        self._build_file_upto()
+        self.wpos.row = max(min(self.wpos.row, len(self.window_content)-max_y), 0)
 
     def _move_key_end(self) -> None:
         self.cpos.col = len(self.window_content[self.cpos.row])
 
     def _move_key_ctl_end(self) -> None:
+        self._build_file()
         self.cpos.row = len(self.window_content)-1
         self.cpos.col = len(self.window_content[-1])
 
     def _scroll_key_end(self) -> None:
+        self._build_file()
         max_y, max_x = self.getxymax()
         self.wpos.row = max(len(self.window_content)-max_y, 0)
         max_line = max(map(len,self.window_content[-max_y:]))
@@ -409,10 +423,11 @@ class Editor:
         (bool):
             indicates if the editor should keep running
         """
+        self._build_file()
         content = self.line_sep.join(self.window_content)
         try:
-            # encode here to potentially trigger the unicodeerror event
-            IoHelper.write_file(self.file, content.encode(self.file_encoding), self.file_encoding)
+            # encode here to potentially trigger the unicodeerror event before erasing the file
+            IoHelper.write_file(self.file, content.encode(self.file_encoding))
             self.changes_made = True
             self.unsaved_progress = False
             self.error_bar = ''
@@ -453,7 +468,9 @@ class Editor:
             elif (key == b'_key_string' and wchar.upper() in ['Y', 'J']) or \
                 key == b'_key_enter':
                 if l_jmp:
-                    self.cpos.row = min(max(int(l_jmp)-1, 0), len(self.window_content)-1)
+                    self.cpos.row = max(int(l_jmp)-1, 0)
+                    self._build_file_upto()
+                    self.cpos.row = min(self.cpos.row, len(self.window_content)-1)
                 break
         return True
 
@@ -491,15 +508,21 @@ class Editor:
                 sub_s += wchar
             elif key == b'_key_enter':
                 self.search = sub_s if sub_s else self.search
-                f_len = len(self.window_content)
+                # check current line
                 if self.search in self.window_content[self.cpos.row][self.cpos.col+1:]:
                     self.cpos.col += \
                         self.window_content[self.cpos.row][self.cpos.col+1:].find(self.search)+1
                     break
-                for i in range(self.cpos.row+1, self.cpos.row+f_len+1):
-                    if self.search in self.window_content[i%f_len]:
-                        self.cpos.row = i%f_len
-                        self.cpos.col = self.window_content[i%f_len].find(self.search)
+                # check rest of file until back at current line
+                c_row = self.cpos.row
+                while c_row < self.cpos.row+len(self.window_content):
+                    if c_row+1 >= len(self.window_content):
+                        self._build_file_upto(c_row+30)
+                    c_row += 1
+                    c_row_wrapped = c_row%len(self.window_content)
+                    if self.search in self.window_content[c_row_wrapped]:
+                        self.cpos.row = c_row_wrapped
+                        self.cpos.col = self.window_content[c_row_wrapped].find(self.search)
                         break
                 break
         return True
@@ -610,7 +633,7 @@ class Editor:
         get next char
         
         Yields
-        (tuple):
+        (wchar, key) (tuple):
             the char received and the possible action it means.
         """
         def debug_out(wchar_, key__, key_) -> None:
@@ -779,23 +802,24 @@ class Editor:
             self._render_scr()
             force_render = 0
             while True:
+                self._build_file_upto()
                 try:
                     wchar, key = next(self.get_char)
 
                     # handle new wchar
+                    self.deleted_line = False
                     if key in KEY_HOTKEYS:
-                        f_len = len(self.window_content)
                         pre_pos = self.cpos.get_pos()
                         action_text = getattr(self, key.decode(), lambda *_: None)(wchar)
-                        self.history.add(key, action_text, f_len, pre_pos, self.cpos.get_pos())
+                        self.history.add(key, action_text, self.deleted_line,
+                                         pre_pos, self.cpos.get_pos())
                         if Editor.auto_indent and key == b'_key_enter':
                             indent_offset = 0
                             while self.window_content[self.cpos.row-1][indent_offset:].startswith(
                                 self.special_indentation):
-                                f_len = len(self.window_content)
                                 pre_pos = self.cpos.get_pos()
                                 action_text = self._key_string(self.special_indentation)
-                                self.history.add(b'_key_string', action_text, f_len,
+                                self.history.add(b'_key_string', action_text, self.deleted_line,
                                                  pre_pos, self.cpos.get_pos())
                                 indent_offset += len(self.special_indentation)
                     # actions like search, jump, quit, save, resize:
@@ -817,7 +841,7 @@ class Editor:
                     self.get_char = self._get_new_char()
                     break
 
-    def _init_screen(self):
+    def _init_screen(self) -> None:
         """
         init and define curses
         """
@@ -864,8 +888,13 @@ class Editor:
         """
         try:
             self._init_screen()
+            self._build_file_upto()
             self._run()
         finally:
+            try: # cleanup - close file
+                self._f_content_gen.throw(StopIteration)
+            except StopIteration:
+                pass
             curses.endwin()
 
     @classmethod

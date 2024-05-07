@@ -710,7 +710,7 @@ def edit_file(file_index: int = 0) -> None:
     content = []
     try:
         file_content = IoHelper.read_file(u_files[file_index].path, False,
-                                          arg_parser.file_encoding, 'strict')
+                                          arg_parser.file_encoding)
         # splitlines() gives a slight inaccuracy, because
         # it also splits on other bytes than \r and \n ...
         # the alternative would be worse: split('\n') would increase the linecount each
@@ -832,7 +832,8 @@ def decode_files_base64(tmp_file_helper: TmpFileHelper) -> None:
     for i, file in enumerate(u_files):
         try:
             tmp_file_path = tmp_file_helper.generate_temp_file_name()
-            f_read_content = IoHelper.read_file(file.path, file_encoding=arg_parser.file_encoding)
+            f_read_content = IoHelper.read_file(file.path, file_encoding=arg_parser.file_encoding,
+                                                errors='replace')
             if u_args[ARGS_RAW]:
                 IoHelper.write_file(tmp_file_path,
                                     decode_base64(f_read_content))

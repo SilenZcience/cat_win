@@ -89,13 +89,13 @@ class TestEditor(TestCase):
         self.assertListEqual(editor.window_content, ['line 1', 'line 2'])
         editor._move_key_ctl_end()
         editor._key_ctl_backspace(None)
-        self.assertListEqual(editor.window_content, ['line 1', 'line'])
+        self.assertListEqual(editor.window_content, ['line 1', 'line '])
         editor._move_key_home()
         editor._move_key_right()
         editor._key_ctl_backspace(None)
-        self.assertListEqual(editor.window_content, ['line 1', 'ine'])
+        self.assertListEqual(editor.window_content, ['line 1', 'ine '])
         editor._key_ctl_backspace(None)
-        self.assertListEqual(editor.window_content, ['line 1ine'])
+        self.assertListEqual(editor.window_content, ['line 1ine '])
 
     def test_editor_move_key_left(self):
         editor = Editor(test_file_path_editor, '')

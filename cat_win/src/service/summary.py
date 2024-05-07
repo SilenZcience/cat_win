@@ -137,7 +137,8 @@ class Summary:
 
         for hfile in files:
             try:
-                f_content = IoHelper.read_file(hfile.path, file_encoding=file_encoding)
+                f_content = IoHelper.read_file(hfile.path, file_encoding=file_encoding,
+                                               errors='replace')
                 for token in TOKENIZER.findall(f_content):
                     word_count[token] = word_count.get(token, 0)+1
                 used_files.append(hfile.displayname)
@@ -183,7 +184,8 @@ class Summary:
 
         for hfile in files:
             try:
-                f_content = IoHelper.read_file(hfile.path, file_encoding=file_encoding)
+                f_content = IoHelper.read_file(hfile.path, file_encoding=file_encoding,
+                                               errors='replace')
                 for char in list(f_content):
                     char_count[char] = char_count.get(char, 0)+1
                 used_files.append(hfile.displayname)

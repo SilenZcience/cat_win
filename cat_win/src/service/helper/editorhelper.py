@@ -163,15 +163,15 @@ REVERSE_ACTION = {
     b'_key_ctl_backspace': b'_key_string',
     b'_key_string'       : b'_key_backspace',
     b'_key_btab'         : b'_key_btab_reverse',
-} # defines the counter action if the file has the same amount of lines
-
-REVERSE_ACTION_SIZE_CHANGE = {
     b'_key_enter'        : b'_key_backspace',
+} # defines the counter action if no line was deleted
+
+REVERSE_ACTION_LINE_DELETED = {
     b'_key_dc'           : b'_key_enter',
     b'_key_dl'           : b'_key_enter',
     b'_key_backspace'    : b'_key_enter',
     b'_key_ctl_backspace': b'_key_enter',
-} # defines the counter action if the file has a different amount of lines
+} # defines the counter action if a line was deleted
 
 ACTION_STACKABLE = [
     b'_key_dc',
@@ -209,7 +209,7 @@ class Position:
 
 
 class _Action:
-    def __init__(self, key_action: bytes, action_text: str, file_len: int,
+    def __init__(self, key_action: bytes, action_text: str, size_change: bool,
                  pre_pos: tuple, post_pos: tuple) -> None:
         """
         defines an action.
@@ -219,8 +219,8 @@ class _Action:
             the action taken as defined by UNIFY_HOTKEYS
         action_text (str):
             the text added/removed by the action
-        file_len (int)
-            the amount of lines the file had before the action
+        size_change (bool)
+            indicates if the size of the file changed because of this action
         pre_pos (tuple):
             the cursor position before the action
         post_pos (tuple):
@@ -228,13 +228,13 @@ class _Action:
         """
         self.key_action: bytes = key_action
         self.action_text: str  = action_text
-        self.file_len: int     = file_len
+        self.size_change: bool = size_change
         self.pre_pos: tuple    = pre_pos
         self.post_pos: tuple   = post_pos
 
     def __str__(self) -> str:
         s_self = f"{self.key_action}|{repr(self.action_text)}|"
-        s_self+= f"{self.file_len}{self.pre_pos}{self.post_pos}"
+        s_self+= f"{self.size_change}{self.pre_pos}{self.post_pos}"
         return s_self
 
 class History:
@@ -273,7 +273,7 @@ class History:
             del _stack[0]
         _stack.append(action)
 
-    def add(self, key_action: bytes, action_text: str, file_len: int, pre_pos: tuple,
+    def add(self, key_action: bytes, action_text: str, size_change: bool, pre_pos: tuple,
             post_pos: tuple, stack_type: str = 'undo') -> None:
         """
         Add an action to the stack.
@@ -284,7 +284,7 @@ class History:
         stack_type (str):
             defines the stack to use
         """
-        if key_action not in REVERSE_ACTION and key_action not in REVERSE_ACTION_SIZE_CHANGE:
+        if key_action not in REVERSE_ACTION and key_action not in REVERSE_ACTION_LINE_DELETED:
             return
         if action_text is None:
             # no edit has been made (e.g. invalid edit (backspace in top left))
@@ -293,17 +293,17 @@ class History:
         if stack_type == 'undo':
             self._stack_redo.clear()
 
-        action = _Action(key_action, action_text, file_len, pre_pos, post_pos)
+        action = _Action(key_action, action_text, size_change, pre_pos, post_pos)
         self._add(action, stack_type)
         # print('Added', list(map(str, self._stack_undo)))
         # print('     ', list(map(str, self._stack_redo)))
 
     def _undo(self, editor: object, action: _Action) -> None:
         self._add(action, 'redo')
-        if len(editor.window_content) == action.file_len:
-            reverse_action = REVERSE_ACTION.get(action.key_action)
+        if action.size_change:
+            reverse_action = REVERSE_ACTION_LINE_DELETED.get(action.key_action)
         else:
-            reverse_action = REVERSE_ACTION_SIZE_CHANGE.get(action.key_action)
+            reverse_action = REVERSE_ACTION.get(action.key_action)
         if reverse_action is None:
             assert False, 'unreachable.'
         reverse_action_method = getattr(editor, reverse_action.decode(), lambda *_: None)
