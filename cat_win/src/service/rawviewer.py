@@ -124,7 +124,7 @@ def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors: list = None,
         yield type(exc).__name__
         return ''
 
-    repr_length = 2 * (mode.upper() == 'X') + 8 * (mode == 'b')
+    repr_length = 2 * (mode in 'xX') + 8 * (mode == 'b')
 
     current_line = f"{colors[0]}Address  "
     for i in range(16):

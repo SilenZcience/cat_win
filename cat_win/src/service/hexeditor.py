@@ -322,7 +322,7 @@ class HexEditor:
             return found_pos//2
 
         wchar, sub_s = '', ''
-        while str(wchar).upper() != '\x1b':
+        while str(wchar) != '\x1b':
             pre_s = f" [0x{repr(self.search)[1:-1]}]" if self.search else ''
             self._action_render_scr(f"Confirm: 'ENTER' - Search for{pre_s}: 0x{sub_s}␣")
             wchar, key = self._get_next_char()

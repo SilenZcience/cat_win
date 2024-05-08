@@ -60,5 +60,5 @@ def comp_conv(converter: Converter, content: list, param: str, cleaner: object):
         cleaned = cleaner(line)
         if cleaned and method_is_convertable(cleaned):
             new_content.append((prefix, line + \
-                f" {method_convert(cleaned, (param.islower()))}"))
+                f" {method_convert(cleaned, param.islower())}"))
     return new_content
