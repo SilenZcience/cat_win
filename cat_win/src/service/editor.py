@@ -106,14 +106,13 @@ class Editor:
         """
         self.window_content = []
         try:
+            self.unsaved_progress = False
             self.line_sep = IoHelper.get_newline(self.file)
             self._f_content_gen = IoHelper.yield_file(self.file, self.file_encoding)
             self._build_file_upto(30)
-            self.unsaved_progress = False
             self.error_bar = ''
             self.status_bar_size = 1
         except (OSError, UnicodeError) as exc:
-            self.unsaved_progress = True
             self.error_bar = str(exc)
             self.status_bar_size = 2
             if self.debug_mode:
