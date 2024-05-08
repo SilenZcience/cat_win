@@ -369,7 +369,7 @@ class Editor:
         self.cpos.col += len(tab)
         return tab
 
-    def _key_string(self, wchars) -> str:
+    def _key_string(self, wchars_) -> str:
         """
         tries to append (a) char(s) to the screen.
         
@@ -377,8 +377,15 @@ class Editor:
         wchars (int|str):
             given by curses get_wch()
         """
-        if not isinstance(wchars, str) or not wchars:
+        if not isinstance(wchars_, str) or not wchars_:
             return ''
+
+        # windows-curses sometimes returns characters like '\ud83e\udd23' (e.g. emojis)
+        # we can fix these with the utf-16 surrogatepass error-handler
+        wchars = wchars_.encode('utf-16', 'surrogatepass').decode('utf-16')
+        if self.debug_mode and wchars != wchars_:
+            err_print(f"__DEBUG__: Changed {wchars_} to {wchars}", end=' ')
+            err_print(f"Length: {len(wchars)} Ord: {ord(wchars[0])}")
         # in case the line has no text yet and tab is pressed, we indent with
         # the custom indentation
         if self.special_indentation != '\t' == wchars and \
