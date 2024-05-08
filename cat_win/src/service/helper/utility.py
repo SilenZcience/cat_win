@@ -51,6 +51,6 @@ def comp_conv(converter: Converter, content: list, param: str, cleaner: object):
     method_is_convertable = getattr(converter, 'is_' + base, lambda _: False)
     method_convert = getattr(converter, 'c_from_' + base, lambda x: x)
 
-    return [(prefix, f"{line} {method_convert(cleaned, (param.islower()))}")
+    return [(prefix, f"{line} {method_convert(cleaned, param.islower())}")
             for prefix, line in content if (cleaned := cleaner(line)) \
                 and method_is_convertable(cleaned)]

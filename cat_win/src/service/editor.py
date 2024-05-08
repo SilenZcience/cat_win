@@ -485,7 +485,7 @@ class Editor:
         curses.curs_set(0)
 
         wchar, sub_s = '', ''
-        while str(wchar).upper() != '\x1b':
+        while str(wchar) != '\x1b':
             pre_s = f" [{repr(self.search)[1:-1]}]" if self.search else ''
             self._action_render_scr(f"Confirm: 'ENTER' - Search for{pre_s}: {sub_s}␣")
             wchar, key = next(self.get_char)
