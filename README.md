@@ -43,31 +43,31 @@
    <summary>Table of Contents</summary>
    <ol>
       <li>
-         <a href="#about-the-project">About The Project</a>
+         <a href="#-about-the-project">About The Project</a>
          <ul>
             <li><a href="#made-with">Made With</a></li>
          </ul>
       </li>
       <li>
-         <a href="#getting-started">Getting Started</a>
+         <a href="#-getting-started">Getting Started</a>
          <ul>
             <li><a href="#prerequisites">Prerequisites</a></li>
             <li><a href="#installation">Installation</a></li>
          </ul>
       </li>
-      <li><a href="#usage">Usage</a>
+      <li><a href="#-usage">Usage</a>
          <ul>
          <li><a href="#documentation">Documentation</a></li>
          <li><a href="#examples">Examples</a></li>
          </ul>
       </li>
-      <li><a href="#changelog">Changelog</a></li>
-      <li><a href="#license">License</a></li>
-      <li><a href="#contact">Contact</a></li>
+      <li><a href="#-changelog">Changelog</a></li>
+      <li><a href="#-license">License</a></li>
+      <li><a href="#-contact">Contact</a></li>
    </ol>
 </details>
 
-<div id="about-the-project"></div>
+<div id="-about-the-project"></div>
 
 ## 🔥 About The Project
 
@@ -90,9 +90,9 @@ It is of course possible to use cat_win on Linux or MacOS, aswell as Windows!
 [![Python][Python-Version]](https://www.python.org/)
 
 <p align="right">(<a href="#top">↑back to top↑</a>)</p>
-<div id="getting-started"></div>
+<div id="-getting-started"></div>
 
-## ⚡️ Getting Started
+## 🚀 Getting Started
 
 <div id="prerequisites"></div>
 
@@ -146,9 +146,9 @@ It is recommended to add the file path(s) to your system-environment `PATH`-vari
 > ⚠️ You can verify the creation of the executable files yourself by reading the [source code](https://github.com/SilenZcience/cat_win/blob/main/cat_win/src/cat.py), checking the [origin](https://github.com/SilenZcience/cat_win/tree/binaries/bin) of the file and validating the corresponding [workflow](https://github.com/SilenZcience/cat_win/blob/main/.github/workflows/build_executable.yml) used.
 
 <p align="right">(<a href="#top">↑back to top↑</a>)</p>
-<div id="usage"></div>
+<div id="-usage"></div>
 
-## ⚙️ Usage
+## 🔧 Usage
 
 ```console
 > catw [FILE]... [OPTION]...
@@ -228,13 +228,13 @@ $ cats --eval --dec -nl
 ```
 
 <p align="right">(<a href="#top">↑back to top↑</a>)</p>
-<div id="changelog"></div>
+<div id="-changelog"></div>
 
 ## 📋 Changelog
 
 Take a look at the [Changelog](https://github.com/SilenZcience/cat_win/blob/main/CHANGELOG.md) file.
 
-<div id="license"></div>
+<div id="-license"></div>
 
 ## 📜 License
 <a href="https://github.com/SilenZcience/cat_win/blob/main/LICENSE" alt="License">
@@ -243,9 +243,9 @@ Take a look at the [Changelog](https://github.com/SilenZcience/cat_win/blob/main
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/SilenZcience/cat_win/blob/main/LICENSE) file for details
 
-<div id="contact"></div>
+<div id="-contact"></div>
 
-## ⭐️ Contact
+## 💫 Contact
 
 > **SilenZcience** <br/>
 [![GitHub-SilenZcience][GitHub-SilenZcience]](https://github.com/SilenZcience)
