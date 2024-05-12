@@ -90,8 +90,11 @@ class TestFiles(TestCase):
         u_files = Files()
         u_files.set_temp_file_stdin('STDINFILE')
         u_files.set_temp_file_echo('TEMPFILEECHO')
+        u_files.set_temp_files_url({'TEMPFILEURL1': 'www.example.com',
+                                    'TEMPFILEURL2': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'})
         u_files.set_files([test_file_edge_case_3, 'STDINFILE',
-                          test_file_edge_case_4, 'TEMPFILEECHO'])
+                          test_file_edge_case_4, 'TEMPFILEECHO',
+                          'TEMPFILEURL1', 'TEMPFILEURL2'])
 
         self.assertEqual(
             u_files.get_file_display_name('STDINFILE'), '<STDIN>')
@@ -101,3 +104,7 @@ class TestFiles(TestCase):
             u_files.get_file_display_name(test_file_edge_case_3), test_file_edge_case_3)
         self.assertEqual(
             u_files.get_file_display_name(test_file_edge_case_4), test_file_edge_case_4)
+        self.assertEqual(
+            u_files.get_file_display_name('TEMPFILEURL1'), '<URL www.example.com>')
+        self.assertEqual(
+            u_files.get_file_display_name('TEMPFILEURL2'), '<URL abcdefghijklmnopqrst...0123456789>')
