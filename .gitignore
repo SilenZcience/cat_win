@@ -70,5 +70,6 @@ MANIFEST
 reports/
 
 # development files
+debug/*
 debug.*
 .dev*
