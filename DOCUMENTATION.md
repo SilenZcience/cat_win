@@ -875,7 +875,7 @@ Displays a BinaryViewer for each File passed in.
 Special Characters like NewLine or BackSpace will be displayed as specific readable Chars if the Font and the Encoding do support that Behaviour.
 
 ```console
-> catw test.txt --hexview
+> catw test.txt --binview
 <Path>\test.txt:
 Address  00       01       02       03       04       05       06       07       08       ... # Decoded Text
 00000000 01000011 01100001 01110100 01011111 01010111 01101001 01101110 00100001 00001010 ... # C a t _ W i n ! ␤
