@@ -1,6 +1,8 @@
 from unittest import TestCase
+from unittest.mock import patch
 
-from cat_win.src.service.fileattributes import _convert_size, get_file_meta_data, get_file_size
+from cat_win.tests.mocks.std import StdOutMock
+from cat_win.src.service.fileattributes import _convert_size, get_file_meta_data, get_file_size, print_meta
 # import sys
 # sys.path.append('../cat_win')
 
@@ -52,3 +54,11 @@ class TestFileAttributes(TestCase):
         self.assertGreater(get_file_size(__file__), 0)
         self.assertEqual(get_file_size(
             'randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|'), 0)
+
+    def test_print_meta(self):
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            print_meta(__file__, False, ['A', 'B', 'C', 'D'])
+            self.assertIn('Size:', fake_out.getvalue())
+            self.assertIn('ATime:', fake_out.getvalue())
+            self.assertIn('MTime:', fake_out.getvalue())
+            self.assertIn('CTime:', fake_out.getvalue())
