@@ -18,7 +18,7 @@
    <summary>Table of Contents</summary>
    <ol>
       <li>
-         <a href="#arguments">Arguments & Options</a>
+         <a href="#arguments--options">Arguments & Options</a>
          <ul>
             <li>
                <a href="#general-information">Quick-Find Headers</a>
@@ -41,65 +41,65 @@
             <li>
                <a href="#general-information">General Information</a>
                <ul>
-                  <li><a href="#help">-h, --help</a></li>
-                  <li><a href="#version">-v, --version</a></li>
-                  <li><a href="#debug">--debug, --debug</a></li>
-                  <li><a href="#number">-n, --number</a></li>
-                  <li><a href="#length">-l, --linelength</a></li>
-                  <li><a href="#fileprefix">--fp, --file-prefix</a></li>
-                  <li><a href="#ends">-e, --ends</a></li>
-                  <li><a href="#chr">--chr, --char</a></li>
-                  <li><a href="#blank">-b, --blank</a></li>
-                  <li><a href="#peek">-p, --peek</a></li>
-                  <li><a href="#reverse">-r, --reverse</a></li>
-                  <li><a href="#unique">-u, --unique</a></li>
-                  <li><a href="#sort">--sort, --sort</a></li>
-                  <li><a href="#sortl">--sortl, --sortlength</a></li>
-                  <li><a href="#format">--sf, --specific-format</a></li>
-                  <li><a href="#echo">-E, --echo</a></li>
-                  <li><a href="#stdin">-, --stdin</a></li>
-                  <li><a href="#oneline">-o, --oneline</a></li>
-                  <li><a href="#url">-U, --url</a></li>
-                  <li><a href="#files">-f, --files</a></li>
-                  <li><a href="#dirs">-d, --dirs</a></li>
-                  <li><a href="#sum">-s, --sum</a></li>
-                  <li><a href="#wordcount">-w, --wordcount</a></li>
-                  <li><a href="#charcount">--cc, --charcount</a></li>
-                  <li><a href="#grep">-g, --grep</a></li>
-                  <li><a href="#nokeyword">--nk, --nokeyword</a></li>
-                  <li><a href="#nobreak">--nb, --nobreak</a></li>
-                  <li><a href="#attributes">-a, --attributes</a></li>
-                  <li><a href="#checksum">-m, --checksum</a></li>
-                  <li><a href="#strings">--strings, --strings</a></li>
-                  <li><a href="#b64d">--b64d, --b64d</a></li>
-                  <li><a href="#b64e">--b64e, --b64e</a></li>
-                  <li><a href="#eval">--eval, --EVAL</a></li>
-                  <li><a href="#hex">--hex, --HEX</a></li>
-                  <li><a href="#dec">--dec, --DEC</a></li>
-                  <li><a href="#oct">--oct, --OCT</a></li>
-                  <li><a href="#bin">--bin, --BIN</a></li>
-                  <li><a href="#binview">--binview, --binview</a></li>
-                  <li><a href="#hexview">--hexview, --HEXVIEW</a></li>
-                  <li><a href="#editor">-!, --edit</a></li>
-                  <li><a href="#hexeditor">-#, --hexedit</a></li>
-                  <li><a href="#more">-M, --more</a></li>
-                  <li><a href="#raw">-B, --raw</a></li>
-                  <li><a href="#clip">-c, --clip</a></li>
-                  <li><a href="#dot">--dot, --dotfiles</a></li>
-                  <li><a href="#plain">--plain, --plain-only</a></li>
-                  <li><a href="#nocolor">--nc, --nocolor</a></li>
-                  <li><a href="#config">--config, --config</a></li>
-                  <li><a href="#cconfig">--cconfig, --cconfig</a></li>
-                  <li><a href="#configreset">--config-clear, --config-reset</a></li>
-                  <li><a href="#cconfigreset">--cconfig-clear, --cconfig-reset</a></li>
-                  <li><a href="#configremove">--config-remove, --cconfig-remove</a></li>
-                  <li><a href="#stream">-R, --R&ltstream&gt</a></li>
-                  <li><a href="#enc">enc=X, enc&#42889;X</a></li>
-                  <li><a href="#find">find=X, find&#42889;X</a></li>
-                  <li><a href="#match">match=X, match&#42889;X</a></li>
-                  <li><a href="#trunc">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a></li>
-                  <li><a href="#replace">[a,b]</a></li>
-                  <li><a href="#cut">[a&#42889;b&#42889;c]</a></li>
+                  <li><a href="#-h---help">-h, --help</a></li>
+                  <li><a href="#-v---version">-v, --version</a></li>
+                  <li><a href="#--debug---debug">--debug, --debug</a></li>
+                  <li><a href="#-l---linelength">-l, --linelength</a></li>
+                  <li><a href="#-n---number">-n, --number</a></li>
+                  <li><a href="#--fp---file-prefix">--fp, --file-prefix</a></li>
+                  <li><a href="#-e---ends">-e, --ends</a></li>
+                  <li><a href="#--chr---char">--chr, --char</a></li>
+                  <li><a href="#-b---blank">-b, --blank</a></li>
+                  <li><a href="#-p---peek">-p, --peek</a></li>
+                  <li><a href="#-r---reverse">-r, --reverse</a></li>
+                  <li><a href="#-u---unique">-u, --unique</a></li>
+                  <li><a href="#--sort---sort">--sort, --sort</a></li>
+                  <li><a href="#--sortl---sortlength">--sortl, --sortlength</a></li>
+                  <li><a href="#--sf---specific-format">--sf, --specific-format</a></li>
+                  <li><a href="#-e---echo">-E, --echo</a></li>
+                  <li><a href="#----stdin">-, --stdin</a></li>
+                  <li><a href="#-o---oneline">-o, --oneline</a></li>
+                  <li><a href="#-u---url">-U, --url</a></li>
+                  <li><a href="#-f---files">-f, --files</a></li>
+                  <li><a href="#-d---dirs">-d, --dirs</a></li>
+                  <li><a href="#-s---sum">-s, --sum</a></li>
+                  <li><a href="#-w---wordcount">-w, --wordcount</a></li>
+                  <li><a href="#--cc---charcount">--cc, --charcount</a></li>
+                  <li><a href="#-g---grep">-g, --grep</a></li>
+                  <li><a href="#--nk---nokeyword">--nk, --nokeyword</a></li>
+                  <li><a href="#--nb---nobreak">--nb, --nobreak</a></li>
+                  <li><a href="#-a---attributes">-a, --attributes</a></li>
+                  <li><a href="#-m---checksum">-m, --checksum</a></li>
+                  <li><a href="#--strings---strings">--strings, --strings</a></li>
+                  <li><a href="#--b64d---b64d">--b64d, --b64d</a></li>
+                  <li><a href="#--b64e---b64e">--b64e, --b64e</a></li>
+                  <li><a href="#--eval---eval">--eval, --EVAL</a></li>
+                  <li><a href="#--hex---hex">--hex, --HEX</a></li>
+                  <li><a href="#--dec---dec">--dec, --DEC</a></li>
+                  <li><a href="#--oct---oct">--oct, --OCT</a></li>
+                  <li><a href="#--bin---bin">--bin, --BIN</a></li>
+                  <li><a href="#--binview---binview">--binview, --binview</a></li>
+                  <li><a href="#--hexview---hexview">--hexview, --HEXVIEW</a></li>
+                  <li><a href="#----edit">-!, --edit</a></li>
+                  <li><a href="#----hexedit">-#, --hexedit</a></li>
+                  <li><a href="#-m---more">-M, --more</a></li>
+                  <li><a href="#-b---raw">-B, --raw</a></li>
+                  <li><a href="#-c---clip">-c, --clip</a></li>
+                  <li><a href="#--dot---dotfiles">--dot, --dotfiles</a></li>
+                  <li><a href="#--plain---plain-only">--plain, --plain-only</a></li>
+                  <li><a href="#--nc---nocolor">--nc, --nocolor</a></li>
+                  <li><a href="#--config---config">--config, --config</a></li>
+                  <li><a href="#--cconfig---cconfig">--cconfig, --cconfig</a></li>
+                  <li><a href="#--config-clear---config-reset">--config-clear, --config-reset</a></li>
+                  <li><a href="#--cconfig-clear---cconfig-reset">--cconfig-clear, --cconfig-reset</a></li>
+                  <li><a href="#--config-remove---cconfig-remove">--config-remove, --cconfig-remove</a></li>
+                  <li><a href="#-r---rstream">-R, --R&ltstream&gt</a></li>
+                  <li><a href="#encx-encx">enc=X, enc&#42889;X</a></li>
+                  <li><a href="#findx-findx">find=X, find&#42889;X</a></li>
+                  <li><a href="#matchx-matchx">match=X, match&#42889;X</a></li>
+                  <li><a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a></li>
+                  <li><a href="#ab">[a,b]</a></li>
+                  <li><a href="#abc">[a&#42889;b&#42889;c]</a></li>
                </ul>
             </li>
          </ul>
@@ -118,84 +118,84 @@
 > cats --help
 ```
 
-# Arguments & Options <a id="arguments"></a>
+# <a id="arguments">Arguments & Options</a>
 
 | Argument / Option | Description | works in shell |
 |-------------------|-------------|:--------------:|
-| *<a href="#help">-h, --help</a>* | show help message and exit |✔|
-| *<a href="#version">-v, --version</a>* | output version information and exit |✔|
-| *<a href="#debug">--debug, --debug</a>* | show debug information |✔|
+| *<a href="#-h---help">-h, --help</a>* | show help message and exit |✔|
+| *<a href="#-v---version">-v, --version</a>* | output version information and exit |✔|
+| *<a href="#--debug---debug">--debug, --debug</a>* | show debug information |✔|
 ||||
-| *<a href="#length">-l, --linelength</a>* | display the length of each line |✔|
-| *<a href="#number">-n, --number</a>* | number all output lines |✔|
-| *<a href="#fileprefix">--fp, --file-prefix</a>* | include the file in every line prefix |❌|
+| *<a href="#-l---linelength">-l, --linelength</a>* | display the length of each line |✔|
+| *<a href="#-n---number">-n, --number</a>* | number all output lines |✔|
+| *<a href="#--fp---file-prefix">--fp, --file-prefix</a>* | include the file in every line prefix |❌|
 ||||
-| *<a href="#ends">-e, --ends</a>* | display $ at the end of each line |✔|
-| *<a href="#chr">--chr, --char</a>* | display special characters |✔|
+| *<a href="#-e---ends">-e, --ends</a>* | display $ at the end of each line |✔|
+| *<a href="#--chr---char">--chr, --char</a>* | display special characters |✔|
 ||||
-| *<a href="#blank">-b, --blank</a>* | hide empty lines |✔|
-| *<a href="#peek">-p, --peek</a>* | only print the first and last lines |❌|
-| *<a href="#reverse">-r, --reverse</a>* | reverse output |❌|
-| *<a href="#unique">-u, --unique</a>* | suppress repeated output lines |❌|
-| *<a href="#sort">--sort, --sort</a>* | sort all lines alphabetically |❌|
-| *<a href="#sortl">--sortl, --sortlength</a>* | sort all lines by length |❌|
-| *<a href="#format">--sf, --specific-format</a>* | automatically format specific file types |❌|
+| *<a href="#-b---blank">-b, --blank</a>* | hide empty lines |✔|
+| *<a href="#-p---peek">-p, --peek</a>* | only print the first and last lines |❌|
+| *<a href="#-r---reverse">-r, --reverse</a>* | reverse output |❌|
+| *<a href="#-u---unique">-u, --unique</a>* | suppress repeated output lines |❌|
+| *<a href="#--sort---sort">--sort, --sort</a>* | sort all lines alphabetically |❌|
+| *<a href="#--sortl---sortlength">--sortl, --sortlength</a>* | sort all lines by length |❌|
+| *<a href="#--sf---specific-format">--sf, --specific-format</a>* | automatically format specific file types |❌|
 ||||
-| *<a href="#echo">-E, --echo</a>* | handle every following parameter as stdin |❌|
-| *<a href="#stdin">-, --stdin</a>* | use stdin |❌|
-| *<a href="#oneline">-o, --oneline</a>* | take only the first stdin-line |✔|
-| *<a href="#url">-U, --url</a>* | display the contents of any provided url |❌|
+| *<a href="#-e---echo">-E, --echo</a>* | handle every following parameter as stdin |❌|
+| *<a href="#----stdin">-, --stdin</a>* | use stdin |❌|
+| *<a href="#-o---oneline">-o, --oneline</a>* | take only the first stdin-line |✔|
+| *<a href="#-u---url">-U, --url</a>* | display the contents of any provided url |❌|
 ||||
-| *<a href="#files">-f, --files</a>* | list applied files and file sizes |❌|
-| *<a href="#dirs">-d, --dirs</a>* | list found directories |❌|
-| *<a href="#sum">-s, --sum</a>* | show sum of lines |❌|
-| *<a href="#wordcount">-w, --wordcount</a>* | display the wordcount |❌|
-| *<a href="#charcount">--cc, --charcount</a>* | display the charcount |❌|
+| *<a href="#-f---files">-f, --files</a>* | list applied files and file sizes |❌|
+| *<a href="#-d---dirs">-d, --dirs</a>* | list found directories |❌|
+| *<a href="#-s---sum">-s, --sum</a>* | show sum of lines |❌|
+| *<a href="#-w---wordcount">-w, --wordcount</a>* | display the wordcount |❌|
+| *<a href="#--cc---charcount">--cc, --charcount</a>* | display the charcount |❌|
 ||||
-| *<a href="#grep">-g, --grep</a>* | only show lines containing queried keywords or patterns |✔|
-| *<a href="#nokeyword">--nk, --nokeyword</a>* | inverse the grep output |✔|
-| *<a href="#nobreak">--nb, --nobreak</a>* | do not interrupt the output |✔|
+| *<a href="#-g---grep">-g, --grep</a>* | only show lines containing queried keywords or patterns |✔|
+| *<a href="#--nk---nokeyword">--nk, --nokeyword</a>* | inverse the grep output |✔|
+| *<a href="#--nb---nobreak">--nb, --nobreak</a>* | do not interrupt the output |✔|
 ||||
-| *<a href="#attributes">-a, --attributes</a>* | show meta-information about the files |❌|
-| *<a href="#checksum">-m, --checksum</a>* | show the checksums of all files |❌|
-| *<a href="#strings">--strings, --strings</a>* | print the sequences of printable characters |✔|
+| *<a href="#-a---attributes">-a, --attributes</a>* | show meta-information about the files |❌|
+| *<a href="#-m---checksum">-m, --checksum</a>* | show the checksums of all files |❌|
+| *<a href="#--strings---strings">--strings, --strings</a>* | print the sequences of printable characters |✔|
 ||||
-| *<a href="#b64d">--b64d, --b64d</a>* | decode the input from base64 |✔|
-| *<a href="#b64e">--b64e, --b64e</a>* | encode the input to base64 |✔|
-| *<a href="#eval">--eval, --EVAL</a>* | evaluate simple mathematical equations |✔|
-| *<a href="#hex">--hex, --HEX</a>* | convert hexadecimal numbers to binary, octal and decimal |✔|
-| *<a href="#dec">--dec, --DEC</a>* | convert decimal numbers to binary, octal and hexadecimal |✔|
-| *<a href="#oct">--oct, --oct</a>* | convert octal numbers to binary, decimal and hexadecimal |✔|
-| *<a href="#bin">--bin, --BIN</a>* | convert binary numbers to octal, decimal and hexadecimal |✔|
+| *<a href="#--b64d---b64d">--b64d, --b64d</a>* | decode the input from base64 |✔|
+| *<a href="#--b64e---b64e">--b64e, --b64e</a>* | encode the input to base64 |✔|
+| *<a href="#--eval---eval">--eval, --EVAL</a>* | evaluate simple mathematical equations |✔|
+| *<a href="#--hex---hex">--hex, --HEX</a>* | convert hexadecimal numbers to binary, octal and decimal |✔|
+| *<a href="#--dec---dec">--dec, --DEC</a>* | convert decimal numbers to binary, octal and hexadecimal |✔|
+| *<a href="#--oct---oct">--oct, --oct</a>* | convert octal numbers to binary, decimal and hexadecimal |✔|
+| *<a href="#--bin---bin">--bin, --BIN</a>* | convert binary numbers to octal, decimal and hexadecimal |✔|
 ||||
-| *<a href="#binview">--binview, --binview</a>* | display the raw byte representation in binary |❌|
-| *<a href="#hexview">--hexview, --HEXVIEW</a>* | display the raw byte representation in hexadecimal |❌|
+| *<a href="#--binview---binview">--binview, --binview</a>* | display the raw byte representation in binary |❌|
+| *<a href="#--hexview---hexview">--hexview, --HEXVIEW</a>* | display the raw byte representation in hexadecimal |❌|
 ||||
-| *<a href="#editor">-!, --edit</a>* | open each file in a simple editor |❌|
-| *<a href="#hexeditor">-#, --hexedit</a>* | open each file in a simple hex-editor |❌|
-| *<a href="#more">-M, --more</a>* | page through the file step by step |❌|
-| *<a href="#raw">-B, --raw</a>* | open the file as raw bytes |❌|
+| *<a href="#----edit">-!, --edit</a>* | open each file in a simple editor |❌|
+| *<a href="#----hexedit">-#, --hexedit</a>* | open each file in a simple hex-editor |❌|
+| *<a href="#-m---more">-M, --more</a>* | page through the file step by step |❌|
+| *<a href="#-b---raw">-B, --raw</a>* | open the file as raw bytes |❌|
 ||||
-| *<a href="#clip">-c, --clip</a>* | copy output to clipboard |✔|
-| *<a href="#dot">--dot, --dotfiles</a>* | additionally query and edit dotfiles |❌|
-| *<a href="#plain">--plain, --plain-only</a>* | ignore non-plaintext files automatically |❌|
-| *<a href="#nocolor">--nc, --nocolor</a>* | disable colored output |✔|
+| *<a href="#-c---clip">-c, --clip</a>* | copy output to clipboard |✔|
+| *<a href="#--dot---dotfiles">--dot, --dotfiles</a>* | additionally query and edit dotfiles |❌|
+| *<a href="#--plain---plain-only">--plain, --plain-only</a>* | ignore non-plaintext files automatically |❌|
+| *<a href="#--nc---nocolor">--nc, --nocolor</a>* | disable colored output |✔|
 ||||
-| *<a href="#config">--config, --config</a>* | change default parameters |✔|
-| *<a href="#cconfig">--cconfig, --cconfig</a>* | change color configuration |✔|
-| *<a href="#configreset">--config-clear, --config-reset</a>* | reset the config to default settings |✔|
-| *<a href="#cconfigreset">--cconfig-clear, --cconfig-reset</a>* | reset the color config to default settings |✔|
-| *<a href="#configremove">--config-remove, --cconfig-remove</a>* | remove the config-file |✔|
+| *<a href="#--config---config">--config, --config</a>* | change default parameters |✔|
+| *<a href="#--cconfig---cconfig">--cconfig, --cconfig</a>* | change color configuration |✔|
+| *<a href="#--config-clear---config-reset">--config-clear, --config-reset</a>* | reset the config to default settings |✔|
+| *<a href="#--cconfig-clear---cconfig-reset">--cconfig-clear, --cconfig-reset</a>* | reset the color config to default settings |✔|
+| *<a href="#--config-remove---cconfig-remove">--config-remove, --cconfig-remove</a>* | remove the config-file |✔|
 ||||
-| *<a href="#stream">-R, --R\<stream\></a>* | reconfigure the std-stream(s) with the parsed encoding </br> \<stream\> = 'in'/'out'/'err' (default is stdin & stdout) | ✔ |
+| *<a href="#-r---rstream">-R, --R\<stream\></a>* | reconfigure the std-stream(s) with the parsed encoding </br> \<stream\> = 'in'/'out'/'err' (default is stdin & stdout) | ✔ |
 ||||
-| *<a href="#enc">enc=X, enc&#42889;X</a>* | set file enconding to X (default is utf-8) |✔|
-| *<a href="#find">find=X, find&#42889;X</a>* | find/query a substring X in the given files |✔|
-| *<a href="#match">match=X, match&#42889;X</a>* | find/query a pattern X in the given files |✔|
-| *<a href="#trunc">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>* | truncate file to lines X and Y (python-like) |❌|
+| *<a href="#encx-encx">enc=X, enc&#42889;X</a>* | set file enconding to X (default is utf-8) |✔|
+| *<a href="#findx-findx">find=X, find&#42889;X</a>* | find/query a substring X in the given files |✔|
+| *<a href="#matchx-matchx">match=X, match&#42889;X</a>* | find/query a pattern X in the given files |✔|
+| *<a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>* | truncate file to lines X and Y (python-like) |❌|
 ||||
-| *<a href="#replace">[a,b]</a>* | replace a with b in every line |✔|
-| *<a href="#cut">[a&#42889;b&#42889;c]</a>* | python-like string indexing syntax (line by line) |✔|
+| *<a href="#ab">[a,b]</a>* | replace a with b in every line |✔|
+| *<a href="#abc">[a&#42889;b&#42889;c]</a>* | python-like string indexing syntax (line by line) |✔|
 
 
 ### General Information
@@ -220,10 +220,11 @@
    - When using the --stdin Parameter unknown Files will be automatically written with the content of StdIn.
 - Coloring
    - The Output will contain Color by Default.
-   - cat_win will not explicitly add Color if the Argument <a href="#nocolor">--nc, --nocolor</a> is used. (The Output may still contain Color if a File itself contains the ANSI-Color-Coding.)
+   - cat_win will not explicitly add Color if the Argument <a href="#--nc---nocolor">--nc, --nocolor</a> is used. (The Output may still contain Color if a File itself contains the ANSI-Color-Coding.)
    - The Output will be stripped of any Color if the Output is piped and the Configuration `strip_color_on_pipe` is set to `true` .
 
-### <a id="help">-h, --help</a>
+- - - -
+### <a id="-h---help">-h, --help</a>
 
 Displays the help Message.
 This Message is for the most part equivalent to the Table above.
@@ -231,7 +232,7 @@ The Code execution will stop after showing this Message.
 This Argument has Priority over all other Arguments, hence the Order of passing this Argument in makes no Difference.
 If no Arguments or Files are provided, the help Parameter will be used by Default.
 
-### <a id="version">-v, --version</a>
+### <a id="-v---version">-v, --version</a>
 
 Displays a short Message containing basic Information about the Code.
 This includes the version Number but also the installation Directory.
@@ -249,13 +250,14 @@ Install time:   YYYY-MM-DD HH:MM:SS
 Author:         Silas A. Kraume
 ```
 
-### <a id="debug">--debug, --debug</a>
+### <a id="--debug---debug">--debug, --debug</a>
 
 Displays debug Information before and after the Code execution.
 This Argument is not shown in the default help Message and is provided for Developers/Development.
 
+- - - -
 <a id="prefix"></a>
-### <a id="length">-l, --linelength</a>
+### <a id="-l---linelength">-l, --linelength</a>
 
 Displays the Length of each Line as a Prefix to the Line itself.
 This Argument will be used at the end such that other Arguments may influence the Length of the Lines beforehand.
@@ -266,7 +268,7 @@ This Argument will be used at the end such that other Arguments may influence th
 [10] long_line!
 ```
 
-### <a id="number">-n, --number</a>
+### <a id="-n---number">-n, --number</a>
 
 Numbers all Lines.
 The Numberisation is done at the Beginning such that different Arguments may disorganize the Numberisation again.
@@ -286,13 +288,13 @@ If multiple Files are provided, the Prefix will also include the Number of the F
 2.2) line 2
 ```
 
-### <a id="fileprefix">--fp, --file-prefix</a>
+### <a id="--fp---file-prefix">--fp, --file-prefix</a>
 
 Shows the Path to the File in each Line prefix.
 This can be useful when querying for Substrings or Patterns such that only a few Lines are being displayed.
 Using this Argument in uppercase (--FP, --FILEPREFIX) will result in the Path being shown as the url file Protocol.
 This can be useful in case the Terminal supports interacting with Links such that the File can be instantly opened.
-Using the lowercase Argument in Combination with the <a href="#number">-n, --number</a> Parameter a GNU-style link format will be displayed.
+Using the lowercase Argument in Combination with the <a href="#-n---number">-n, --number</a> Parameter a GNU-style link format will be displayed.
 
 ```console
 > catw test.txt --fp
@@ -310,8 +312,9 @@ Using the lowercase Argument in Combination with the <a href="#number">-n, --num
 <Path>/test.txt:2 line 2
 ```
 
+- - - -
 <a id="simplereplace"></a>
-### <a id="ends">-e, --ends</a>
+### <a id="-e---ends">-e, --ends</a>
 
 Displays a '$' Character at the End of each Line.
 This can be useful to detect Whitespaces.
@@ -322,7 +325,7 @@ Tab:    $
 line 2$
 ```
 
-### <a id="chr">--chr, --char</a>
+### <a id="--chr---char">--chr, --char</a>
 
 Replaces every special Character with a readable Token.
 Each Token starts with the '^' Character, followed by a short ASCII Descriptor.
@@ -337,8 +340,9 @@ Note that the special Char ␛ will not be displayed as ^ESC because it is neede
 ^SUB^SUB^NUL^SUB^SUB^TAB^BEL
 ```
 
+- - - -
 <a id="linemanipulation"></a>
-### <a id="blank">-b, --blank</a>
+### <a id="-b---blank">-b, --blank</a>
 
 Removes empty Lines from the Output.
 Beware that other Arguments can change a Line to be not empty beforehand.
@@ -349,12 +353,12 @@ Beware that other Arguments can change a Line to be not empty beforehand.
 3) Empty Line just got skipped!
 ```
 
-### <a id="peek">-p, --peek</a>
+### <a id="-p---peek">-p, --peek</a>
 
 Only displays the first and last 5 Lines of each File.
 Between the Beginning and End of the File will be displayed how many Lines have been skipped.
 Useful for getting a quick impression of how data in a given File is structured.
-This Argument is ignored when provided alongside with Queries for Substrings of Patterns or the <a href="#more">-M, --more</a> Parameter.
+This Argument is ignored when provided alongside with Queries for Substrings of Patterns or the <a href="#-m---more">-M, --more</a> Parameter.
 Does nothing when the File has at most 10 Lines.
 
 ```console
@@ -374,7 +378,7 @@ Line 19
 Line 20
 ```
 
-### <a id="reverse">-r, --reverse</a>
+### <a id="-r---reverse">-r, --reverse</a>
 
 Simply reverses the Content of all Files as well as the Ordering of all Files themselves.
 
@@ -386,7 +390,7 @@ Line 2 From Test1
 Line 1 From Test1
 ```
 
-### <a id="unique">-u, --unique</a>
+### <a id="-u---unique">-u, --unique</a>
 
 Suppresses repeated Lines if they occur exactly one after the other.
 
@@ -405,7 +409,7 @@ This is also a line!
 This is a line!
 ```
 
-### <a id="sort">--sort, --sort</a>
+### <a id="--sort---sort">--sort, --sort</a>
 
 Sorts the Output alphabetically without case sensitivity.
 
@@ -415,7 +419,7 @@ Sorts the Output alphabetically without case sensitivity.
 1) This line was originally at the top!
 ```
 
-### <a id="sortl">--sortl, --sortlength</a>
+### <a id="--sortl---sortlength">--sortl, --sortlength</a>
 
 Sorts the Output by Line Length.
 
@@ -425,7 +429,7 @@ Sorts the Output by Line Length.
 [21] This line was on top!
 ```
 
-### <a id="format">--sf, --specific-format</a>
+### <a id="--sf---specific-format">--sf, --specific-format</a>
 
 Automatically format specific File Types.
 Currently supported are .json and .xml.
@@ -458,8 +462,9 @@ Currently supported are .json and .xml.
 </lib>
 ```
 
+- - - -
 <a id="input"></a>
-### <a id="echo">-E, --echo</a>
+### <a id="-e---echo">-E, --echo</a>
 
 Everything passed in after this Argument will be handled as its own File.
 It is not possible to break out of this state therefor this Parameter must be used last.
@@ -477,7 +482,7 @@ This way it is possible to define new lines (\\n) or other special characters.
 [18] This is a newline!
 ```
 
-### <a id="stdin">-, --stdin</a>
+### <a id="----stdin">-, --stdin</a>
 
 Using this Argument allows to pass in Data via the Stdin Stream.
 The Stdin Pipe will be handled as its own File.
@@ -487,10 +492,10 @@ The Stdin Pipe will be handled as its own File.
 1) Hello World!
 ```
 
-### <a id="oneline">-o, --oneline</a>
+### <a id="-o---oneline">-o, --oneline</a>
 
 Limits the Stdin Stream to the first Line.
-Can only be used in Combination with <a href="#stdin">-, --stdin</a>.
+Can only be used in Combination with <a href="#----stdin">-, --stdin</a>.
 
 ```console
 > catw test.txt
@@ -503,7 +508,7 @@ Line 3
 Line 1
 ```
 
-### <a id="url">-U, --url</a>
+### <a id="-u---url">-U, --url</a>
 
 When using this Parameter it is possible to provide URLs as Arguments.
 Should an URL not have a scheme (http(s):// or fttp(s):// ...) the default scheme (https://) is being used.
@@ -514,8 +519,9 @@ When not providing a raw Data URL the Content will include the HTML Elements.
 > catw -U https://github.com/SilenZcience/cat_win > cat.html
 ```
 
+- - - -
 <a id="summary"></a>
-### <a id="files">-f, --files</a>
+### <a id="-f---files">-f, --files</a>
 
 Displays a small Summary at the End of Code execution showing every File used and their file Size.
 Using this Argument in uppercase (-F, --FILES) will ONLY display the Summary and stop Code execution.
@@ -538,7 +544,7 @@ Sum:    13.0 B
 Amount: 1
 ```
 
-### <a id="dirs">-d, --dirs</a>
+### <a id="-d---dirs">-d, --dirs</a>
 
 Displays a small Summary at the End of Code execution showing every Directory found.
 Using this Argument in uppercase (-D, --DIRS) will ONLY display the Summary and stop Code execution.
@@ -566,7 +572,7 @@ found DIR(s):
 Amount: 4
 ```
 
-### <a id="sum">-s, --sum</a>
+### <a id="-s---sum">-s, --sum</a>
 
 Displays a small Message at the End of Code execution showing the Number of the Amount of all Lines received.
 Using this Argument in uppercase (-S, --SUM) will ONLY show this Message as well as a small Summary.
@@ -589,7 +595,7 @@ File             LineCount
 Lines (Sum): 4
 ```
 
-### <a id="wordcount">-w, --wordcount</a>
+### <a id="-w---wordcount">-w, --wordcount</a>
 
 Displays a Summary of all Tokens/Words found in the given Files and how frequent they occured.
 The Output will be sorted by the Frequency of Occurrence starting with the most common Word.
@@ -621,7 +627,7 @@ the: 1
 true: 1
 ```
 
-### <a id="charcount">--cc, --charcount</a>
+### <a id="--cc---charcount">--cc, --charcount</a>
 
 Displays a Summary of all Chars/Letters found in the given Files and how frequent they occured.
 Whitespace Chars like Spaces and Tabs will be wrapped with quotes.
@@ -658,14 +664,15 @@ n: 1
 u: 1
 ```
 
+- - - -
 <a id="search"></a>
-### <a id="grep">-g, --grep</a>
+### <a id="-g---grep">-g, --grep</a>
 
 Skips every Line that does not contain any matched Patterns or queried Substrings.
-Literals or Patterns to look for can be set using the <a href="#find">find=X, find&#42889;X</a> and <a href="#match">match=X, match&#42889;X</a> Keywords.
+Literals or Patterns to look for can be set using the <a href="#findx-findx">find=X, find&#42889;X</a> and <a href="#matchx-matchx">match=X, match&#42889;X</a> Keywords.
 Using this Argument in uppercase (-G, --GREP) will ONLY display the parts of each Line that matched any Pattern or Literal.
 Should multiple Queries be found in the same Line they will be seperated by comma.
-The uppercase Variant of this Parameter has priority (over the lowercase Variant as well as <a href="#nokeyword">--nk, --nokeyword</a>).
+The uppercase Variant of this Parameter has priority (over the lowercase Variant as well as <a href="#--nk---nokeyword">--nk, --nokeyword</a>).
 
 ```console
 > catw test.txt find=cat -gn
@@ -677,11 +684,11 @@ The uppercase Variant of this Parameter has priority (over the lowercase Variant
 4)  cat!, cat!
 ```
 
-### <a id="nokeyword">--nk, --nokeyword</a>
+### <a id="--nk---nokeyword">--nk, --nokeyword</a>
 
-Inverse to the <a href="#grep">-g, --grep</a> Argument.
+Inverse to the <a href="#-g---grep">-g, --grep</a> Argument.
 Skips every Line that does contain any matched Patterns or queried Substrings.
-The Combination of --nokeyword and <a href="#grep">-g, --grep</a> means that no Output will be displayed.
+The Combination of --nokeyword and <a href="#-g---grep">-g, --grep</a> means that no Output will be displayed.
 
 ```console
 > catw test.txt find=cat -n --nk
@@ -690,14 +697,15 @@ The Combination of --nokeyword and <a href="#grep">-g, --grep</a> means that no 
 5) This Line neither
 ```
 
-### <a id="nobreak">--nb, --nobreak</a>
+### <a id="--nb---nobreak">--nb, --nobreak</a>
 
 Using this Argument will open non-plaintext Files automatically without prompting the User.
 In Addition the Output will not stop on queried Substrings or Patterns.
-This Behaviour is included by Default when using <a href="#nokeyword">--nk, --nokeyword</a> or <a href="#grep">-g, --grep</a>.
+This Behaviour is included by Default when using <a href="#--nk---nokeyword">--nk, --nokeyword</a> or <a href="#-g---grep">-g, --grep</a>.
 
+- - - -
 <a id="meta"></a>
-### <a id="attributes">-a, --attributes</a>
+### <a id="-a---attributes">-a, --attributes</a>
 
 Shows meta Information for each File provided and stops Code execution.
 The meta Information includes file Size, Time of Access, -Modified and -Created.
@@ -714,7 +722,7 @@ CTime:          YYYY-MM-DD HH:MM:SS.
 -System, Hidden, Readonly, Compressed, Encrypted
 ```
 
-### <a id="checksum">-m, --checksum</a>
+### <a id="-m---checksum">-m, --checksum</a>
 
 Shows different Checksums for each File provided and stops Code execution.
 The displayed Checksums include CRC32, MD5, SHA1, SHA256 and SHA512.
@@ -729,10 +737,10 @@ Checksum of '<Path>/test.txt':
         SHA512:  db9a71ef22360f171daa4e4aed033337f4f97812baf38a51bdd6ed64b5c2a0d4a5c4152e20b68f881df9e5f1087c1293853eac13f928b845b9b71c3ce517c9e3
 ```
 
-### <a id="strings">--strings, --strings</a>
+### <a id="--strings---strings">--strings, --strings</a>
 
 Only displays Sequences of printable Characters that exceed a certain Length.
-This Length can be configured using the `strings_minimum_sequence_length` element in the config menu (<a href="#config">--config, --config</a>).
+This Length can be configured using the `strings_minimum_sequence_length` element in the config menu (<a href="#--config---config">--config, --config</a>).
 The Delimeter of different Sequences on the same Line can be configured using the `strings_delimeter` element in the config menu.
 
 ```console
@@ -747,8 +755,9 @@ GLIBC_2.34
 ...
 ```
 
+- - - -
 <a id="mathematical"></a>
-### <a id="b64d">--b64d, --b64d</a>
+### <a id="--b64d---b64d">--b64d, --b64d</a>
 
 Decodes a Base64 encoded Input and continues Code execution with the decoded Text.
 This Parameter will be used before most other Arguments such that other Parameters will be used on the decoded Text.
@@ -759,7 +768,7 @@ This means a Base64 encoded Input is expected and neccessary.
 Hello World
 ```
 
-### <a id="b64e">--b64e, --b64e</a>
+### <a id="--b64e---b64e">--b64e, --b64e</a>
 
 Encodes a given Text in Base64.
 This Parameter will be used after most other Arguments such that other Parameter will be used on the plain Text beforehand.
@@ -769,7 +778,7 @@ This Parameter will be used after most other Arguments such that other Parameter
 SGVsbG8gV29ybGQ=
 ```
 
-### <a id="eval">--eval, --EVAL</a>
+### <a id="--eval---eval">--eval, --EVAL</a>
 
 Evaluates simple mathematical Expressions within any given Text.
 The mathematical Expressions may consist of paranthesis, Operators including Modulo (%) and Exponential (**),
@@ -787,7 +796,7 @@ Calculate: 0 !
 0
 ```
 
-### <a id="hex">--hex, --HEX</a>
+### <a id="--hex---hex">--hex, --HEX</a>
 
 If a Line only contains a hexadecimal Number this Parameter will append the equivalent Value in Binary, Octal and Decimal.
 Negative Numbers are allowed.
@@ -805,7 +814,7 @@ FF [Bin: 11111111, Oct: 377, Dec: 255]
 0x610 [Bin: 11000010000, Oct: 3020, Dec: 1552]
 ```
 
-### <a id="dec">--dec, --DEC</a>
+### <a id="--dec---dec">--dec, --DEC</a>
 
 If a Line only contains a decimal Number this Parameter will append the equivalent Value in Binary, Octal and Hexadecimal.
 Negative Numbers are allowed.
@@ -822,7 +831,7 @@ When using the uppercase Variant (--DEC) the Numbers will not include their Pref
 1552 [Bin: 11000010000, Oct: 3020, Hex: 610]
 ```
 
-### <a id="oct">--oct, --OCT</a>
+### <a id="--oct---oct">--oct, --OCT</a>
 
 If a Line only contains an octal Number this Parameter will append the equivalent Value in Binary, Decimal and Hexadecimal.
 Negative Numbers are allowed.
@@ -840,7 +849,7 @@ When using the uppercase Variant (--OCT) the Numbers will not include their Pref
 3020 [Bin: 11000010000, Dec: 1552, Hex: 610]
 ```
 
-### <a id="bin">--bin, --BIN</a>
+### <a id="--bin---bin">--bin, --BIN</a>
 
 If a Line only contains a binary Number this Parameter will append the equivalent Value in Octal, Decimal and Hexadecimal.
 Negative Numbers are allowed.
@@ -858,8 +867,9 @@ When using the uppercase Variant (--BIN) the Numbers will not include their Pref
 0b11000010000 [Oct: 3020, Dec: 1552, Hex: 610]
 ```
 
+- - - -
 <a id="byteview"></a>
-### <a id="binview">--binview, --binview</a>
+### <a id="--binview---binview">--binview, --binview</a>
 
 Displays a BinaryViewer for each File passed in.
 Special Characters like NewLine or BackSpace will be displayed as specific readable Chars if the Font and the Encoding do support that Behaviour.
@@ -871,7 +881,7 @@ Address  00       01       02       03       04       05       06       07      
 00000000 01000011 01100001 01110100 01011111 01010111 01101001 01101110 00100001 00001010 ... # C a t _ W i n ! ␤
 ```
 
-### <a id="hexview">--hexview, --HEXVIEW</a>
+### <a id="--hexview---hexview">--hexview, --HEXVIEW</a>
 
 Displays a Hexviewer for each File passed in.
 Special Characters like NewLine or BackSpace will be displayed as specific readable Chars if the Font and the Encoding do support that Behaviour.
@@ -892,16 +902,17 @@ Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text
 00000010 20 43 61 74 21 0A                               #   C a t ! ␤
 ```
 
+- - - -
 <a id="edit"></a>
-### <a id="editor">-!, --edit</a>
+### <a id="----edit">-!, --edit</a>
 
 Opens a simple Editor to write/edit the Content of any provided File one by one.
 Not-existing Files will be opened first and existing Ones will be able to be edited after that.
 The Editor will not save Changes automatically.
-Files will be saved with the text Encoding defined by <a href="#enc">enc=X, enc&#42889;X</a>.
+Files will be saved with the text Encoding defined by <a href="#encx-encx">enc=X, enc&#42889;X</a>.
 Note that ^c (Ctrl-c) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
 The Auto-Indendation Feature can be turned on in the config menu using the `editor_auto_indent` element.
-The Indendation when using Auto-Indendation can be configured in the config menu (<a href="#config">--config, --config</a>) using `editor_indentation`.
+The Indendation when using Auto-Indendation can be configured in the config menu (<a href="#--config---config">--config, --config</a>) using `editor_indentation`.
 On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module.
 The currently supported Key bindings are as follows:
 
@@ -928,13 +939,13 @@ The currently supported Key bindings are as follows:
 | <kbd>Close/^Q</kbd> | - | - | close editor</br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^C</kbd> | - | - | interrupt program | - |
 
-### <a id="hexeditor">-#, --hexedit</a>
+### <a id="----hexedit">-#, --hexedit</a>
 
 Opens a simple Hex-Editor to write/edit the Content of any provided File one by one.
 Not-existing Files will be opened first and existing Ones will be able to be edited after that.
 The Editor will not save Changes automatically.
 Note that ^c (Ctrl-c) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
-The displayed Columns per Row can be configured in the config menu (<a href="#config">--config, --config</a>) using `hex_editor_columns`.
+The displayed Columns per Row can be configured in the config menu (<a href="#--config---config">--config, --config</a>) using `hex_editor_columns`.
 On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module.
 The currently supported Key bindings are as follows:
 
@@ -956,7 +967,7 @@ The currently supported Key bindings are as follows:
 | <kbd>Close/^Q</kbd> | - | - | close hex-editor</br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^C</kbd> | - | - | interrupt program | - |
 
-### <a id="more">-M, --more</a>
+### <a id="-m---more">-M, --more</a>
 
 Page through the File Contents Step by Step.
 Each Step the Output is paused until User Interaction.
@@ -990,11 +1001,11 @@ J JUMP <x>   jump to line x
 ...
 ```
 
-### <a id="raw">-B, --raw</a>
+### <a id="-b---raw">-B, --raw</a>
 
 Opens the given Files in Binary Mode.
 Prints the Output as Raw Binary to the stdout-Stream.
-The only valid Parameters in Combination to -`b`, --`raw` are <a href="#b64e">--b64e, --b64e</a>, <a href="#b64d">--b64d, --b64d</a> and <a href="#strings">--strings, --strings</a>.
+The only valid Parameters in Combination to -`b`, --`raw` are <a href="#--b64e---b64e">--b64e, --b64e</a>, <a href="#--b64d---b64d">--b64d, --b64d</a> and <a href="#--strings---strings">--strings, --strings</a>.
 
 ```console
 > catw img.png > copy.png
@@ -1009,12 +1020,13 @@ UnicodeEncodeError: 'charmap' codec can't encode character '\ufffd' in position 
 > catw img.png --b64e --raw | catw - --b64d --raw > copy.png
 ```
 
+- - - -
 <a id="settings"></a>
-### <a id="clip">-c, --clip</a>
+### <a id="-c---clip">-c, --clip</a>
 
 Copies the entire Output to the Clipboard additionally to printing it to the Stdout Stream.
 
-### <a id="dot">--dot, --dotfiles</a>
+### <a id="--dot---dotfiles">--dot, --dotfiles</a>
 
 When providing file Patterns or entire Directories cat_win will find every File including those set to hidden (e.g. on Windows OS).
 However Dotfiles, meaning Files that start with a literal Dot, will not be found by Default.
@@ -1038,20 +1050,21 @@ found FILE(s):
 ...
 ```
 
-### <a id="plain">--plain, --plain-only</a>
+### <a id="--plain---plain-only">--plain, --plain-only</a>
 
 By default the User is being prompted when a non-plaintext File is being encountered as to if the File should be opened in Binary or not.
 Using --plain-only these Files will be automaticaly skipped.
 Note that these Prompts are not descriptive enough to say that a File can only be opened in Binary.
-Often the Problem is being fixed by providing another Codepage using the <a href="#enc">enc=X, enc&#42889;X</a> Parameter.
+Often the Problem is being fixed by providing another Codepage using the <a href="#encx-encx">enc=X, enc&#42889;X</a> Parameter.
 
-### <a id="nocolor">--nc, --nocolor</a>
+### <a id="--nc---nocolor">--nc, --nocolor</a>
 
 By default different Colors will be used to better highlight specific Parts of the Output or make original and changed Parts of a Line more distinguishable.
 Using --nocolor will disable all Colors and only display the Output in plain monochrome Text.
 
+- - - -
 <a id="configuration"></a>
-### <a id="config">--config, --config</a>
+### <a id="--config---config">--config, --config</a>
 
 Displays a user interactive config Menu allowing the User to change specific default parameters.
 Stops Code execution after finishing the Configuration.
@@ -1066,16 +1079,16 @@ Valid Options are:
 | large_file_size | the Size (Bytes) at which a Warning occurs | 1024 | 104857600 (100Mb) |
 | strip_color_on_pipe | indicate if the Output should be stripped of any Color | false | true |
 | ignore_unknown_bytes | ignore unknown bytes instead of replacing them with � | true | false |
-| peek_size | define the amount of lines shown by <a href="#peek">-p, --peek</a> | 10 | 5 |
-| strings_minimum_sequence_length | set the minimum Length of a String </br> (for the <a href="#strings">--strings</a> Parameter) | 2 | 4 |
-| strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the <a href="#strings">--strings</a> Parameter) | \| | \\n |
-| editor_indentation | set the Indentation used in the <a href="#editor">Editor</a> </br> when pressing ↹ on an empty Line | <b>␣ ␣ ␣ ␣</b> | ↹ |
-| editor_auto_indent | set whether the <a href="#editor">Editor</a> should auto indent or not | true | false |
-| hex_editor_columns | set the amount of columns per row in the <a href="#hexeditor">HexEditor</a> | 8 | 16 |
-| more_step_length | define the Step Length used by <a href="#more">-M</a></br>a Value of 0 is equivalent to the Size/Height of the Terminal Window | 5 | 0 |
-| unicode_escaped_echo | unicode-escape the input when using <a href="#echo">-E, --echo</a> | false | true |
-| unicode_escaped_find | unicode-escape the queried Substring when using <a href="#find">find=</a> | false | true |
-| unicode_escaped_replace | unicode-escape a and b when using <a href="#replace">[a,b]</a> | false | true |
+| peek_size | define the amount of lines shown by <a href="#-p---peek">-p, --peek</a> | 10 | 5 |
+| strings_minimum_sequence_length | set the minimum Length of a String </br> (for the <a href="#--strings---strings">--strings, --strings</a> Parameter) | 2 | 4 |
+| strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the <a href="#--strings---strings">--strings, --strings</a> Parameter) | \| | \\n |
+| editor_indentation | set the Indentation used in the Editor (<a href="#----edit">-!, --edit</a>)</br> when pressing ↹ on an empty Line | <b>␣ ␣ ␣ ␣</b> | ↹ |
+| editor_auto_indent | set whether the Editor (<a href="#----edit">-!, --edit</a>) should auto indent or not | true | false |
+| hex_editor_columns | set the amount of columns per row in the HexEditor (<a href="#----hexedit">-#, --hexedit</a>) | 8 | 16 |
+| more_step_length | define the Step Length used by <a href="#-m---more">-M, --more</a></br>a Value of 0 is equivalent to the Size/Height of the Terminal Window | 5 | 0 |
+| unicode_escaped_echo | unicode-escape the input when using <a href="#-e---echo">-E, --echo</a> | false | true |
+| unicode_escaped_find | unicode-escape the queried Substring when using <a href="#findx-findx">find=X, find&#42889;X</a> | false | true |
+| unicode_escaped_replace | unicode-escape a and b when using <a href="#ab">[a,b]</a> | false | true |
 
 Accepted Input for enabling a Setting:  `true, yes, y, 1`
 </br>
@@ -1083,7 +1096,7 @@ Accepted Input for disabling a Setting: `false, no, n, 0`
 </br>
 (Input is not case sensitive)
 
-### <a id="cconfig">--cconfig, --cconfig</a>
+### <a id="--cconfig---cconfig">--cconfig, --cconfig</a>
 
 Displays a user interactive config Menu allowing the User to change the Colors for specific Elements and Arguments.
 Stops Code execution after finishing the Configuration.
@@ -1094,41 +1107,31 @@ Valid Options are:
 
 | Option | Description |
 |--------|-------------|
-| line_numbers | the numbering of each line using <a href="#number">-n, --number</a> |
-| line_length | the display of each line length using <a href="#length">-l, --linelength</a> |
-| file_prefix | the file prefix using <a href="#fileprefix">--fp, --file-prefix</a> |
-| line_ends | the end of line marker using <a href="#ends">-e, --ends</a> |
-| special_chars | special chars using <a href="#chr">--chr, --char</a> |
-| number_conversion | the converted values using <a href="#bin">--bin</a>/<a href="#oct">--oct</a>/<a href="#dec">--dec</a>/<a href="#hex">--hex</a> |
-| number_evaluation | the evaluated value using <a href="#eval">--eval, --EVAL</a> |
-| substring_replacement | the replaced string using <a href="#replace">[a,b]</a> |
-| found_keyword | the found substring using <a href="#find">find=X, find&#42889;X</a> |
-| found_keyword_message | the message displayed when using <a href="#find">find=X, find&#42889;X</a> |
-| matched_pattern | the matched pattern using <a href="#match">match=X, match&#42889;X</a> |
-| matched_pattern_message | the message displayed when using <a href="#match">match=X, match&#42889;X</a> |
-| checksum_message | the calculated checksum of a given file using <a href="#checksum">-m, --checksum</a> |
-| summary_message | the message displayed using <a href="#files">-f</a>/<a href="#dirs">-d</a>/<a href="#sum">-s</a>/<a href="#wordcount">-w</a>/<a href="#charcount">--cc</a> |
-| file_attribute_message | the message containing time stamps and file size using <a href="#attributes">-a, --attributes</a> |
-| active_file_attributes | the attributes a file has set using <a href="#attributes">-a, --attributes</a> |
-| missing_file_attributes | the attributes a file has not set using <a href="#attributes">-a, --attributes</a> |
-| raw_viewer | the output using <a href="#hexview">--hexview, --HEXVIEW</a>/<a href="#binview">--binview, --binview</a> |
+| line_numbers | the numbering of each line using <a href="#-n---number">-n, --number</a> |
+| line_length | the display of each line length using <a href="#-l---linelength">-l, --linelength</a> |
+| file_prefix | the file prefix using <a href="#--fp---file-prefix">--fp, --file-prefix</a> |
+| line_ends | the end of line marker using <a href="#-e---ends">-e, --ends</a> |
+| special_chars | special chars using <a href="#--chr---char">--chr, --char</a> |
+| number_conversion | the converted values using <a href="#--bin---bin">--bin</a>/<a href="#--oct---oct">--oct</a>/<a href="#--dec---dec">--dec</a>/<a href="#--hex---hex">--hex</a> |
+| number_evaluation | the evaluated value using <a href="#--eval---eval">--eval, --EVAL</a> |
+| substring_replacement | the replaced string using <a href="#ab">[a,b]</a> |
+| found_keyword | the found substring using <a href="#findx-findx">find=X, find&#42889;X</a> |
+| found_keyword_message | the message displayed when using <a href="#findx-findx">find=X, find&#42889;X</a> |
+| matched_pattern | the matched pattern using <a href="#matchx-matchx">match=X, match&#42889;X</a> |
+| matched_pattern_message | the message displayed when using <a href="#matchx-matchx">match=X, match&#42889;X</a> |
+| checksum_message | the calculated checksum of a given file using <a href="#-m---checksum">-m, --checksum</a> |
+| summary_message | the message displayed using <a href="#-f---files">-f, --files</a>/<a href="#-d---dirs">-d, --dirs</a>/<a href="#-s---sum">-s, --sum</a>/<a href="#-w---wordcount">-w, --wordcount</a>/<a href="#--cc---charcount">--cc, --charcount</a> |
+| file_attribute_message | the message containing time stamps and file size using <a href="#-a---attributes">-a, --attributes</a> |
+| active_file_attributes | the attributes a file has set using <a href="#-a---attributes">-a, --attributes</a> |
+| missing_file_attributes | the attributes a file has not set using <a href="#-a---attributes">-a, --attributes</a> |
+| raw_viewer | the output using <a href="#--hexview---hexview">--hexview, --HEXVIEW</a>/<a href="#--binview---binview">--binview, --binview</a> |
 | message_information | any informational message like update information |
 | message_important | any important message like large file sizes |
 | message_warning | any warning message like overwriting a file with itself |
 
-### <a id="configreset">--config-clear, --config-reset</a>
+### <a id="--config-clear---config-reset">--config-clear, --config-reset</a>
 
-Reset the Configuration (of <a href="#config">--config, --config</a>) to their Default Values.
-
-```console
-> catw --config-clear
-Successfully updated config file:
-   <Path>\cat.config
-```
-
-### <a id="cconfigreset">--cconfig-clear, --cconfig-reset</a>
-
-Reset the Configuration (of <a href="#cconfig">--cconfig, --cconfig</a>) to their Default Values.
+Reset the Configuration (of <a href="#--config---config">--config, --config</a>) to their Default Values.
 
 ```console
 > catw --config-clear
@@ -1136,10 +1139,20 @@ Successfully updated config file:
    <Path>\cat.config
 ```
 
-### <a id="configremove">--config-remove, --cconfig-remove</a>
+### <a id="--cconfig-clear---cconfig-reset">--cconfig-clear, --cconfig-reset</a>
+
+Reset the Configuration (of <a href="#--cconfig---cconfig">--cconfig, --cconfig</a>) to their Default Values.
+
+```console
+> catw --config-clear
+Successfully updated config file:
+   <Path>\cat.config
+```
+
+### <a id="--config-remove---cconfig-remove">--config-remove, --cconfig-remove</a>
 
 Delete the Config File.
-This will reset both <a href="#config">--config, --config</a> and <a href="#cconfig">--cconfig, --cconfig</a> Configurations to their Default Values.
+This will reset both <a href="#--config---config">--config, --config</a> and <a href="#--cconfig---cconfig">--cconfig, --cconfig</a> Configurations to their Default Values.
 The cat.config File will be erased from the System.
 
 ```console
@@ -1149,8 +1162,9 @@ The config file has successfully been removed!
 No active config file has been found.
 ```
 
+- - - -
 <a id="encoding"></a>
-### <a id="stream">-R, --R\<stream\></a>
+### <a id="-r---rstream">-R, --R\<stream\></a>
 
 Python uses Utf-8 to encode the Streams by default.
 On Windows OS the Encoding may even be Cp1252.
@@ -1158,7 +1172,7 @@ The Encoding can be influenced externally by setting the environment Variable PY
 or setting the environment Variable PYTHONUTF8 to 1.
 In any case it is often useful to have the stream Encoding variable if a File for example is written in another Codepage like Utf-16.
 Using this Parameter allows for specific Stream Reconfiguration meaning setting the Encoding for interpreting the Streams.
-The Encoding used is defined by the <a href="#enc">enc=X, enc&#42889;X</a> Argument.
+The Encoding used is defined by the <a href="#encx-encx">enc=X, enc&#42889;X</a> Argument.
 By Default Stdout and Stderr are reconfigured.
 Valid Streams are Stdout (--Rout), Stdin (--Rin) and Stderr (--Rerr).
 When encountering UnicodeErrors the Problem is most likely being fixed by using -R (or --Rout).
@@ -1171,12 +1185,12 @@ UnicodeEncodeError: 'charmap' codec can't encode character ...
 > catw ./CHANGELOG.md --Rout > test.txt
 ```
 
-### <a id="enc">enc=X, enc&#42889;X</a>
+### <a id="encx-encx">enc=X, enc&#42889;X</a>
 
 Sets the text Encoding that is being used to read and write Files.
 Valid Options are defined by the Python Interpreter used (e.g. for [Python3.10](https://docs.python.org/3.8/library/codecs.html#standard-encodings)).
 The default Encoding is Utf-8.
-The default Encoding can be configured using the `default_file_encoding` element in the config menu (<a href="#config">--config, --config</a>).
+The default Encoding can be configured using the `default_file_encoding` element in the config menu (<a href="#--config---config">--config, --config</a>).
 
 ```console
 > catw test.txt
@@ -1189,7 +1203,7 @@ Do you want to open the file as a binary, without parameters?
 This Text is written in Utf-16!
 ```
 
-### <a id="find">find=X, find&#42889;X</a>
+### <a id="findx-findx">find=X, find&#42889;X</a>
 
 Defines a Literal to search for within the Text of any provided File.
 The Substring is unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_find` is set but in Case of an unicode-error the Substring will simply be used literally.
@@ -1212,7 +1226,7 @@ It's raining cats and dogs!
 --------------- Found [('CATS and', [13, 21])] ---------------
 ```
 
-### <a id="match">match=X, match&#42889;X</a>
+### <a id="matchx-matchx">match=X, match&#42889;X</a>
 
 Defines a Pattern to search for within the Text of any provided File.
 It is possible to define multiple Patterns to match for by simply providing the Parameter match=X multiple times.
@@ -1234,7 +1248,7 @@ It's raining cats and dogs!
 --------------- Matched [('CAT.\\s.{3,}', [13, 27])] ---------------
 ```
 
-### <a id="trunc">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>
+### <a id="truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>
 
 Truncates every File by the Specifics defined.
 This Parameter uses the default Python slicing Mechanic and uses it on the Lines of each File.
@@ -1247,7 +1261,7 @@ The Argument is valid by defining trunc=\<start\>\:\<stop\> or trunc=\<start\>\:
 10) there are 5 more Lines following this one
 ```
 
-### <a id="replace">[a,b]</a>
+### <a id="ab">[a,b]</a>
 
 Replaces the Substring defined by a with the Substring b in every Line of Every File.
 The Substrings a and b are unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_replace` is set but in Case of an unicode-error the Substrings will simply be used literally.
@@ -1260,9 +1274,9 @@ This is a comma: X
 This is a Backslash: /
 ```
 
-### <a id="cut">[a&#42889;b&#42889;c]</a>
+### <a id="abc">[a&#42889;b&#42889;c]</a>
 
-Similiar to the <a href="#trunc">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a> parameter this Argument is used on each Line individually.
+Similiar to the <a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a> parameter this Argument is used on each Line individually.
 Every Line is being cut down as specified by the Elements within the Argument [\<start\>\:\<stop\>\:\<step>].
 
 ```console
