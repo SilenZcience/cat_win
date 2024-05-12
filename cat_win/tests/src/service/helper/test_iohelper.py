@@ -1,5 +1,6 @@
 from unittest import TestCase
 from unittest.mock import patch
+import inspect
 import os
 
 from cat_win.tests.mocks.std import StdInMock
@@ -35,9 +36,20 @@ class TestStdInHelper(TestCase):
 
     def test_yield_file_close_early(self):
         gen = IoHelper.yield_file(__file__)
-        with self.assertRaises(RuntimeError) as context:
+        self.assertEqual(inspect.getgeneratorstate(gen), 'GEN_CREATED')
+        next(gen)
+        self.assertEqual(inspect.getgeneratorstate(gen), 'GEN_SUSPENDED')
+        with self.assertRaises((RuntimeError, StopIteration)) as context:
             gen.throw(StopIteration)
-        self.assertEqual(*context.exception.args, 'generator raised StopIteration')
+        self.assertEqual(inspect.getgeneratorstate(gen), 'GEN_CLOSED')
+        self.assertIn(str(*context.exception.args), 'generator raised StopIteration')
+
+        gen = IoHelper.yield_file(__file__)
+        self.assertEqual(inspect.getgeneratorstate(gen), 'GEN_CREATED')
+        with self.assertRaises((RuntimeError, StopIteration)) as context:
+            gen.throw(StopIteration)
+        self.assertEqual(inspect.getgeneratorstate(gen), 'GEN_CLOSED')
+        self.assertIn(str(*context.exception.args), 'generator raised StopIteration')
 
     def test_get_newline(self):
         self.assertEqual(IoHelper.get_newline(test_file_path), '\r\n')
