@@ -67,6 +67,7 @@ def get_display_char_gen(file_encoding: str = 'utf-8', base: int = 16):
 
     def get_display_char(byte) -> str:
         """
+        decode bytes
         
         Parameters:
         byte (int|str)

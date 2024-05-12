@@ -1,7 +1,7 @@
 from unittest import TestCase
 import os
 
-from cat_win.src.service.rawviewer import get_raw_view_lines_gen
+from cat_win.src.service.rawviewer import get_display_char_gen, get_raw_view_lines_gen
 
 
 test_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'texts', 'test.txt')
@@ -9,6 +9,22 @@ test_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'texts', 't
 
 class TestRawViewer(TestCase):
     maxDiff = None
+
+    def test_get_display_char_gen(self):
+        gen_no_encoding_error = get_display_char_gen()
+        self.assertEqual(gen_no_encoding_error(128), '·')
+        self.assertEqual(gen_no_encoding_error(65), 'A')
+        self.assertEqual(gen_no_encoding_error(10), '␤')
+        gen_encoding_error = get_display_char_gen('utf-16')
+        self.assertEqual(gen_encoding_error(128), '.')
+        self.assertEqual(gen_encoding_error(65), 'A')
+        self.assertEqual(gen_encoding_error(10), '.')
+
+    def test_get_display_char_gen_base(self):
+        gen_hex = get_display_char_gen(base=16)
+        self.assertEqual(gen_hex('0A'), '␤')
+        gen_hex = get_display_char_gen(base=8)
+        self.assertEqual(gen_hex('12'), '␤')
 
     def test_mode_x_upper(self):
         expected_result = """\
