@@ -22,6 +22,23 @@ class TestStdInHelper(TestCase):
 
         self.assertIn(path_parts('C:/a/b/c/d.txt'), [expected_output_win, expected_output_unix_mac])
 
+    def test_read_file_text(self):
+        self.assertEqual(IoHelper.read_file(test_file_path_empty, False), '')
+
+    def test_read_file_binary(self):
+        self.assertEqual(IoHelper.read_file(test_file_path_empty, True), b'')
+
+    def test_yield_file(self):
+        gen = IoHelper.yield_file(__file__)
+        for line in gen:
+            self.assertNotIn('\n', line)
+
+    def test_yield_file_close_early(self):
+        gen = IoHelper.yield_file(__file__)
+        with self.assertRaises(RuntimeError) as context:
+            gen.throw(StopIteration)
+        self.assertEqual(*context.exception.args, 'generator raised StopIteration')
+
     def test_get_newline(self):
         self.assertEqual(IoHelper.get_newline(test_file_path), '\r\n')
         self.assertEqual(IoHelper.get_newline(test_file_path_empty), '\n')
@@ -42,3 +59,7 @@ class TestStdInHelper(TestCase):
     def test_get_stdin_content_eof(self):
         stdin_mock.set_content(f"hello\nworld{chr(26)}\n")
         self.assertEqual(''.join(IoHelper.get_stdin_content(False)), 'hello\nworld')
+
+    def test_dup_stdin_do_not_dup(self):
+        with IoHelper.dup_stdin(True, False) as dup:
+            self.assertEqual(dup, None)
