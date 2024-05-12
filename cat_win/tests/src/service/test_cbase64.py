@@ -40,3 +40,8 @@ class TestBase64(TestCase):
         test_input = 'VGVzdAoxMjM0MDQKw4TDlsOcICBURVNU\nVGVzdAoxMjM0MDQKw4TDlsOcICBURVNU'
         expected_output = 'Test\n123404\nÄÖÜ  TESTTest\n123404\nÄÖÜ  TEST'.encode()
         self.assertEqual(decode_base64(test_input), expected_output)
+
+    def test_decode_base64_string_to_string_padding(self):
+        test_input = 'VGVzdAoxMjM0MDQKw4TDlsOcIFRFU1Q='
+        expected_output = 'Test\n123404\nÄÖÜ TEST'
+        self.assertEqual(decode_base64(test_input, True), expected_output)
