@@ -80,6 +80,11 @@ class TestConverter(TestCase):
         self.assertEqual(converter.is_bin('0b0101'), expected_output)
         self.assertEqual(converter.is_bin('-0b0101'), expected_output)
 
+        self.assertEqual(converter.is_oct('1'), expected_output)
+        self.assertEqual(converter.is_oct('-1'), expected_output)
+        self.assertEqual(converter.is_oct('-0o0101'), expected_output)
+        self.assertEqual(converter.is_oct('0o777'), expected_output)
+
     def test_wrong_input(self):
         expected_output = False
         self.assertEqual(converter.is_dec('0x1'), expected_output)
@@ -89,6 +94,9 @@ class TestConverter(TestCase):
         self.assertEqual(converter.is_hex('0x-999'), expected_output)
 
         self.assertEqual(converter.is_bin('2'), expected_output)
+        self.assertEqual(converter.is_bin('0x1'), expected_output)
+
+        self.assertEqual(converter.is_bin('8'), expected_output)
         self.assertEqual(converter.is_bin('0x1'), expected_output)
 
     def test_evaluate_integrated(self):
