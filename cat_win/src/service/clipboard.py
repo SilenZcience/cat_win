@@ -49,8 +49,8 @@ class Clipboard:
                 import pyclip as pc
             elif __dependency == 1:
                 import pyperclip3 as pc
-            pc.copy(content)
             Clipboard.copy_function = pc.copy
+            Clipboard.put(content)
             return
         except ImportError:
             Clipboard._copy(content, __dependency-1, False or __clip_board_error)
