@@ -66,6 +66,9 @@ MANIFEST
 *.config
 
 # Package test (-coverage) metadata
-.dev*
 .coverage
 reports/
+
+# development files
+debug.*
+.dev*
