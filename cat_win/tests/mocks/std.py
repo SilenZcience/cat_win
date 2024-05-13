@@ -68,8 +68,8 @@ class StdInMockIter:
     # def __iter__(self):
     #     return self
 
-    def fileno(self) -> int:
-        return 0
+    # def fileno(self) -> int:
+    #     return 0
 
     def __next__(self) -> str:
         if self.index < len(self.splitted_input_value)-1:
