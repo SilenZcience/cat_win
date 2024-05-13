@@ -1,6 +1,8 @@
 from unittest import TestCase
+from unittest.mock import patch
 import os
 
+from cat_win.tests.mocks.error import ErrorDefGen
 from cat_win.src.service.rawviewer import get_display_char_gen, get_raw_view_lines_gen
 
 
@@ -23,6 +25,7 @@ class TestRawViewer(TestCase):
     def test_get_display_char_gen_base(self):
         gen_hex = get_display_char_gen(base=16)
         self.assertEqual(gen_hex('0A'), '␤')
+        self.assertEqual(gen_hex('GG'), '·')
         gen_hex = get_display_char_gen(base=8)
         self.assertEqual(gen_hex('12'), '␤')
 
@@ -42,7 +45,7 @@ Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text
 000000A0 65 21 0D 0A 54 68 69 73 20 4C 69 6E 65 20 69 73 # e ! ␍ ␤ T h i s   L i n e   i s
 000000B0 20 61 20 44 75 70 6C 69 63 61 74 65 21          #   a   D u p l i c a t e !"""
 
-        self.assertEqual('\n'.join(get_raw_view_lines_gen(test_file_path, 'X')), expected_result)
+        self.assertEqual('\n'.join(get_raw_view_lines_gen(test_file_path, 'ERROR')), expected_result)
 
     def test_mode_x(self):
         expected_result = """\
@@ -98,6 +101,14 @@ Address  00       01       02       03       04       05       06       07      
 
         self.assertEqual('\n'.join(get_raw_view_lines_gen(test_file_path, 'X', ['*', '!'])),
                          expected_result)
+
+    def test_get_raw_view_lines_gen_oserror(self):
+        with patch('cat_win.src.service.helper.iohelper.IoHelper.read_file',
+                   ErrorDefGen.get_def(FileNotFoundError('Test123'))):
+            self.assertEqual('\n'.join(get_raw_view_lines_gen(__file__)), 'FileNotFoundError')
+        with patch('cat_win.src.service.helper.iohelper.IoHelper.read_file',
+                   ErrorDefGen.get_def(PermissionError('Test123'))):
+            self.assertEqual('\n'.join(get_raw_view_lines_gen(__file__)), 'PermissionError')
 
     def test_encoding_error(self):
         result = '\n'.join(get_raw_view_lines_gen(test_file_path, 'X', None, 'utf-16'))
