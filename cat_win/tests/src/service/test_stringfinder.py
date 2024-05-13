@@ -10,21 +10,27 @@ from cat_win.src.service.stringfinder import StringFinder
 class TestStringFinder(TestCase):
     def test_find_literals_true(self):
         string_finder = StringFinder(set(), set())
-        _x = list(string_finder._findliterals('test', 'abctestdef', False))
+        _x = list(string_finder._findliterals('test', 'abctEStdef', True))
         self.assertEqual(_x, [[3, 7]])
 
-        _x = list(string_finder._findliterals('test', 'testabctestdetestf', False))
+        _x = list(string_finder._findliterals('TeSt', 'abctEstdef', True))
+        self.assertEqual(_x, [[3, 7]])
+
+        _x = list(string_finder._findliterals('tesT', 'testabctestdetestf', True))
         self.assertEqual(_x, [[0, 4], [7, 11], [13, 17]])
 
-        _x = list(string_finder._findliterals('', '', False))
+        _x = list(string_finder._findliterals('', '', True))
         self.assertEqual(_x, [[0, 0]])
 
-        _x = list(string_finder._findliterals('', 'x', False))
+        _x = list(string_finder._findliterals('', 'x', True))
         self.assertEqual(_x, [[0, 0], [1, 1]])
 
     def test_find_literals_false(self):
         string_finder = StringFinder(set(), set())
         _x = list(string_finder._findliterals('a', '', False))
+        self.assertEqual(_x, [])
+
+        _x = list(string_finder._findliterals('TeSt', 'abctestdef', False))
         self.assertEqual(_x, [])
 
         _x = list(string_finder._findliterals('test', 'tsetabctesdeestf', False))
