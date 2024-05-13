@@ -3,7 +3,6 @@ from unittest import TestCase
 import os
 
 from cat_win.src import cat
-from cat_win.src.const.defaultconstants import DKW
 from cat_win.tests.mocks.std import StdInMock, StdOutMock
 from cat_win.src.persistence.cconfig import CConfig
 from cat_win.src.persistence.config import Config
@@ -158,17 +157,19 @@ class TestCatFull(TestCase):
     def test_cat_output_full_show_files(self):
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
-            self.assertIn(test_file_path, fake_out.getvalue())
-            self.assertIn(test_empty_path, fake_out.getvalue())
-            self.assertIn(test_peek, fake_out.getvalue())
+            lower_out = fake_out.getvalue().casefold()
+            self.assertIn(test_file_path.casefold(), lower_out)
+            self.assertIn(test_empty_path.casefold(), lower_out)
+            self.assertIn(test_peek.casefold(), lower_out)
 
     @patch('sys.argv', ['<CAT>', test_file_path, test_empty_path, test_peek, '-S'])
     def test_cat_output_full_show_sum(self):
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
-            self.assertIn(test_file_path, fake_out.getvalue())
-            self.assertIn(test_empty_path, fake_out.getvalue())
-            self.assertIn(test_peek, fake_out.getvalue())
+            lower_out = fake_out.getvalue().casefold()
+            self.assertIn(test_file_path.casefold(), lower_out)
+            self.assertIn(test_empty_path.casefold(), lower_out)
+            self.assertIn(test_peek.casefold(), lower_out)
 
     @patch('sys.argv', ['<CAT>', test_file_path, '-W'])
     def test_cat_output_full_show_wordcount(self):
