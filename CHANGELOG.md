@@ -15,6 +15,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Bugfixes
 
 - fixed Bug where the hex-editor would not find searched-for bytes.
+- fixed Bug where the editor would allow opening unreadable files and potentially corrupt them upon saving them.
 
 
 ## [1.7.8] - 2024-04-29
