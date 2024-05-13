@@ -1,12 +1,17 @@
-from unittest.mock import patch
 from unittest import TestCase
+from unittest.mock import patch
+import io
 import random
 
 from cat_win.tests.mocks.error import ErrorDefGen
 from cat_win.src.web.urls import is_valid_uri, sep_valid_urls, read_url
 
 class TestUrls(TestCase):
+    @patch('urllib.parse.urlparse', ErrorDefGen.get_def(ValueError()))
     def test_is_valid_uri_valueerror(self):
+        self.assertEqual(is_valid_uri('invalid uri'), False)
+
+    def test_is_valid_uri_false(self):
         self.assertEqual(is_valid_uri('invalid uri'), False)
 
     def test_sep_valid_urls(self):
@@ -29,6 +34,10 @@ class TestUrls(TestCase):
         valid_output, invalid_output = sep_valid_urls(test_input)
         self.assertCountEqual(valid_expected, valid_output)
         self.assertCountEqual(invalid_expected, invalid_output)
+
+    @patch('urllib.request.urlopen', new=lambda *args, **kwars: io.StringIO('test'))
+    def test_read_url(self):
+        self.assertEqual(read_url('invalid uri', False), 'test')
 
     @patch('urllib.request.urlopen', ErrorDefGen.get_def(ValueError()))
     def test_read_url_valueerror(self):
