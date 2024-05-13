@@ -41,7 +41,7 @@ class TestMore(TestCase):
         with self.assertRaises(SystemExit) as se:
             with patch('builtins.input', input_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
                 more.step_through()
-                self.assertEqual(fake_out.getvalue(), 'line1\n' * 29)
+        self.assertIn('line1\n' * 28 + '\n', fake_out.getvalue())
         self.assertEqual(se.exception.code, 0)
 
     def test_input_triggers_behaviour_n(self):
