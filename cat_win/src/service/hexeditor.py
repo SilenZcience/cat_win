@@ -4,19 +4,6 @@ hexeditor
 
 try:
     import curses
-    def initscr():
-        """
-        fix windows-curses for Python 3.12:
-        https://github.com/zephyrproject-rtos/windows-curses/issues/50
-        """
-        import _curses
-        stdscr = _curses.initscr()
-        for key, value in _curses.__dict__.items():
-            if key[0:4] == 'ACS_' or key in ('LINES', 'COLS'):
-                setattr(curses, key, value)
-
-        return stdscr
-    curses.initscr = initscr
     CURSES_MODULE_ERROR = False
 except ImportError:
     CURSES_MODULE_ERROR = True
@@ -577,14 +564,16 @@ class HexEditor:
                 self.curse_window.addstr(max_y + self.status_bar_size + 1, 0,
                                          self.error_bar[:max_x].ljust(max_x), self._get_color(2))
 
-            status_bar = f"File: {self.display_name} | "
+            save_hotkey = ('alt+' if self.save_with_alt else '^') + 's'
+            status_bar = f"File: {self.display_name} | Exit: ^q | Save: {save_hotkey} | "
             status_bar += f"{self.cpos.row*HexEditor.columns+self.cpos.col:08X}"
             status_bar += f" | {'NOT ' * self.unsaved_progress}Saved!"
             if self.debug_mode:
                 status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x}"
             if len(status_bar) > max_x:
                 necc_space = max(0, max_x - (len(status_bar) - len(self.display_name) + 3))
-                status_bar = f"File: ...{self.display_name[-necc_space:] * bool(necc_space)} | "
+                status_bar = f"File: ...{self.display_name[-necc_space:] * bool(necc_space)} "
+                status_bar += f"| Exit: ^q | Save: {save_hotkey} | "
                 status_bar += f"{self.cpos.row*HexEditor.columns+self.cpos.col:08X}"
                 status_bar += f" | {'NOT ' * self.unsaved_progress}Saved!"
                 if self.debug_mode:
