@@ -33,7 +33,7 @@ try:
     wcwidth = _CalcWidth().wcwidth
     del _CalcWidth
 except ImportError:
-    wc_width = lambda _: 1
+    wcwidth = lambda _: 1
 
 
 UNIFY_HOTKEYS = {
