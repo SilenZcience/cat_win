@@ -4,19 +4,6 @@ editor
 
 try:
     import curses
-    def initscr():
-        """
-        fix windows-curses for Python 3.12:
-        https://github.com/zephyrproject-rtos/windows-curses/issues/50
-        """
-        import _curses
-        stdscr = _curses.initscr()
-        for key, value in _curses.__dict__.items():
-            if key[0:4] == 'ACS_' or key in ('LINES', 'COLS'):
-                setattr(curses, key, value)
-
-        return stdscr
-    curses.initscr = initscr
     CURSES_MODULE_ERROR = False
 except ImportError:
     CURSES_MODULE_ERROR = True
@@ -24,7 +11,7 @@ import os
 import signal
 import sys
 
-from cat_win.src.service.helper.editorhelper import History, Position, UNIFY_HOTKEYS, \
+from cat_win.src.service.helper.editorhelper import History, Position, wcwidth, UNIFY_HOTKEYS, \
     KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
 from cat_win.src.service.rawviewer import SPECIAL_CHARS
@@ -34,6 +21,7 @@ class Editor:
     """
     Editor
     """
+    wc_width = wcwidth
     loading_failed = False
     special_indentation = '\t'
     auto_indent = False
@@ -745,9 +733,14 @@ class Editor:
                                             self._get_color(3))
                 else:
                     try:
+                        if Editor.wc_width(cur_char) != 1:
+                            raise TypeError
+                        # CJK unicode (problems in windows-terminal) fix:
+                        # if 12799 < ord(cur_char) < 65103:
+                        #     raise TypeError
                         self.curse_window.addch(row, col, cur_char)
                     except TypeError:
-                        self.curse_window.addch(row, col, '�')
+                        self.curse_window.addch(row, col, '�', self._get_color(3))
             self.curse_window.clrtoeol()
             self.curse_window.move(row+1, 0)
 
@@ -941,6 +934,7 @@ class Editor:
         editor._set_special_chars(special_chars)
 
         if on_windows_os:
+            Editor.wc_width = lambda _: 1
             # disable background feature on windows
             editor._action_background = lambda *_: True
         else:
