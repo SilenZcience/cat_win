@@ -155,6 +155,29 @@ class HexEditor:
     def _move_key_ctl_down(self) -> None:
         self.cpos.row += 10
 
+    def _insert_byte(self, wchar: str) -> None:
+        pos_offset = int(wchar!='<')
+        self.hex_array[self.cpos.row].insert(self.cpos.col+pos_offset, '--')
+        self.hex_array_edit[self.cpos.row].insert(self.cpos.col+pos_offset, '--')
+        for i in range(self.cpos.row+1, len(self.hex_array)):
+            extracted_byte = self.hex_array[i-1][-1]
+            self.hex_array[i-1] = self.hex_array[i-1][:-1]
+            self.hex_array[i].insert(0, extracted_byte)
+            extracted_byte = self.hex_array_edit[i-1][-1]
+            self.hex_array_edit[i-1] = self.hex_array_edit[i-1][:-1]
+            self.hex_array_edit[i].insert(0, extracted_byte)
+        if len(self.hex_array[-1]) > HexEditor.columns:
+            extracted_byte = self.hex_array[-1][-1]
+            self.hex_array[-1] = self.hex_array[-1][:-1]
+            self.hex_array.append([extracted_byte])
+            extracted_byte = self.hex_array_edit[-1][-1]
+            self.hex_array_edit[-1] = self.hex_array_edit[-1][:-1]
+            self.hex_array_edit.append([extracted_byte])
+        if wchar != '<':
+            self._move_key_right()
+
+        self.unsaved_progress = True
+
     def _key_string(self, wchar) -> None:
         """
         tries to replace a byte on the screen.
@@ -164,7 +187,7 @@ class HexEditor:
             given by curses get_wch()
         """
         if not isinstance(wchar, str) or not wchar:
-            return ''
+            return
         wchar = wchar.upper()
         if wchar in HEX_BYTE_KEYS and self.hex_array_edit[self.cpos.row]:
             if self.hex_array_edit[self.cpos.row][self.cpos.col] is None:
@@ -179,26 +202,7 @@ class HexEditor:
 
             self.unsaved_progress = True
         elif wchar in '<> ':
-            self.hex_array[self.cpos.row].insert(self.cpos.col+(wchar!='<'), '--')
-            self.hex_array_edit[self.cpos.row].insert(self.cpos.col+(wchar!='<'), '--')
-            for i in range(self.cpos.row+1, len(self.hex_array)):
-                extracted_byte = self.hex_array[i-1][-1]
-                self.hex_array[i-1] = self.hex_array[i-1][:-1]
-                self.hex_array[i].insert(0, extracted_byte)
-                extracted_byte = self.hex_array_edit[i-1][-1]
-                self.hex_array_edit[i-1] = self.hex_array_edit[i-1][:-1]
-                self.hex_array_edit[i].insert(0, extracted_byte)
-            if len(self.hex_array[-1]) > HexEditor.columns:
-                extracted_byte = self.hex_array[-1][-1]
-                self.hex_array[-1] = self.hex_array[-1][:-1]
-                self.hex_array.append([extracted_byte])
-                extracted_byte = self.hex_array_edit[-1][-1]
-                self.hex_array_edit[-1] = self.hex_array_edit[-1][:-1]
-                self.hex_array_edit.append([extracted_byte])
-            if wchar != '<':
-                self._move_key_right()
-
-            self.unsaved_progress = True
+            self._insert_byte(wchar)
 
     def _action_render_scr(self, msg) -> None:
         max_y, max_x = self.getxymax()
