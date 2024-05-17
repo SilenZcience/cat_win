@@ -29,6 +29,7 @@ class Editor:
     debug_mode = False
     save_with_alt = False
 
+    unicode_escaped_search = True
     file_encoding = 'utf-8'
 
     def __init__(self, file: str, display_name: str) -> None:
@@ -457,6 +458,8 @@ class Editor:
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
                     curses.curs_set(0)
+            if not isinstance(wchar, str):
+                continue
             if key == b'_key_string' and wchar.isdigit():
                 l_jmp += wchar
             elif (key == b'_key_string' and wchar.upper() in ['Y', 'J']) or \
@@ -492,15 +495,22 @@ class Editor:
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
                     curses.curs_set(0)
+            if not isinstance(wchar, str):
+                continue
             if key == b'_key_backspace':
                 sub_s = sub_s[:-1]
-            if key == b'_key_ctl_backspace':
+            elif key == b'_key_ctl_backspace':
                 t_p = sub_s[-1:].isalnum()
                 while sub_s and sub_s[-1:].isalnum() == t_p:
                     sub_s = sub_s[:-1]
-            if key == b'_key_string':
+            elif key == b'_key_string':
                 sub_s += wchar
             elif key == b'_key_enter':
+                if Editor.unicode_escaped_search and sub_s:
+                    try:
+                        sub_s = sub_s.encode().decode('unicode_escape').encode('latin-1').decode()
+                    except UnicodeError:
+                        pass
                 self.search = sub_s if sub_s else self.search
                 # check current line
                 if self.search in self.window_content[self.cpos.row][self.cpos.col+1:]:
@@ -552,7 +562,9 @@ class Editor:
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
                     curses.curs_set(0)
-            elif wchar.upper() in ['Y', 'J']:
+            if not isinstance(wchar, str):
+                continue
+            if wchar.upper() in ['Y', 'J']:
                 self._setup_file()
                 self.cpos = Position(0, 0)
                 self.wpos = Position(0, 0)
@@ -588,7 +600,9 @@ class Editor:
                         getattr(self, key.decode(), lambda *_: False)()
                         self._render_scr()
                         curses.curs_set(0)
-                elif wchar.upper() in ['Y', 'J']:
+                if not isinstance(wchar, str):
+                    continue
+                if wchar.upper() in ['Y', 'J']:
                     self._action_save()
                 elif wchar == '\x1b': # ESC
                     return True
@@ -960,7 +974,8 @@ class Editor:
         Editor.auto_indent = auto_indent
 
     @staticmethod
-    def set_flags(save_with_alt: bool, debug_mode: bool, file_encoding: str) -> None:
+    def set_flags(save_with_alt: bool, debug_mode: bool, unicode_escaped_search: bool,
+                  file_encoding: str) -> None:
         """
         set the config flags for the Editor
         
@@ -974,4 +989,5 @@ class Editor:
         """
         Editor.save_with_alt = save_with_alt
         Editor.debug_mode = debug_mode
+        Editor.unicode_escaped_search = unicode_escaped_search
         Editor.file_encoding = file_encoding

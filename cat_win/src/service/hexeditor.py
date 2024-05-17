@@ -272,6 +272,8 @@ class HexEditor:
                 if key == b'_action_resize':
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
+            if not isinstance(wchar, str):
+                continue
             if key == b'_key_string' and wchar.upper() in HEX_BYTE_KEYS:
                 l_jmp += wchar
             elif (key == b'_key_string' and wchar.upper() in ['Y', 'J']) or \
@@ -321,9 +323,15 @@ class HexEditor:
                 if key == b'_action_resize':
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
+            if not isinstance(wchar, str):
+                continue
             if key == b'_key_backspace':
                 sub_s = sub_s[:-1]
-            if key == b'_key_string' and wchar.upper() in HEX_BYTE_KEYS:
+            elif key == b'_key_ctl_backspace':
+                t_p = sub_s[-1:].isalpha()
+                while sub_s and sub_s[-1:].isalpha() == t_p:
+                    sub_s = sub_s[:-1]
+            elif key == b'_key_string' and wchar.upper() in HEX_BYTE_KEYS:
                 sub_s += wchar.upper()
             elif key == b'_key_enter':
                 self.search = sub_s if sub_s else self.search
@@ -376,7 +384,9 @@ class HexEditor:
                 if key == b'_action_resize':
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
-            elif wchar.upper() in ['Y', 'J']:
+            if not isinstance(wchar, str):
+                continue
+            if wchar.upper() in ['Y', 'J']:
                 self._setup_file()
                 self.cpos = Position(0, 0)
                 self.wpos = Position(0, 0)
@@ -409,7 +419,9 @@ class HexEditor:
                     if key == b'_action_resize':
                         getattr(self, key.decode(), lambda *_: False)()
                         self._render_scr()
-                elif wchar.upper() in ['Y', 'J']:
+                if not isinstance(wchar, str):
+                    continue
+                if wchar.upper() in ['Y', 'J']:
                     self._action_save()
                 elif wchar == '\x1b': # ESC
                     return True

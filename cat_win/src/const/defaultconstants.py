@@ -20,5 +20,6 @@ class DKW:
     HEX_EDITOR_COLUMNS = 'hex_editor_columns'
     MORE_STEP_LENGTH = 'more_step_length'
     UNICODE_ESCAPED_ECHO = 'unicode_escaped_echo'
+    UNICODE_ESCAPED_EDITOR_SEARCH = 'unicode_escaped_editor_search'
     UNICODE_ESCAPED_FIND = 'unicode_escaped_find'
     UNICODE_ESCAPED_REPLACE = 'unicode_escaped_replace'
