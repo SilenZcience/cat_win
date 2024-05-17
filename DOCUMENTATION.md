@@ -1087,6 +1087,7 @@ Valid Options are:
 | hex_editor_columns | set the amount of columns per row in the HexEditor (<a href="#----hexedit">-#, --hexedit</a>) | 8 | 16 |
 | more_step_length | define the Step Length used by <a href="#-m---more">-M, --more</a></br>a Value of 0 is equivalent to the Size/Height of the Terminal Window | 5 | 0 |
 | unicode_escaped_echo | unicode-escape the input when using <a href="#-e---echo">-E, --echo</a> | false | true |
+| unicode_escaped_editor_search | unicode-escape the Search in the Editor (<a href="#----edit">-!, --edit</a>) | false | true |
 | unicode_escaped_find | unicode-escape the queried Substring when using <a href="#findx-findx">find=X, find&#42889;X</a> | false | true |
 | unicode_escaped_replace | unicode-escape a and b when using <a href="#ab">[a,b]</a> | false | true |
 
