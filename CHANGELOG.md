@@ -11,11 +11,13 @@ Start of documentation: 2023-02-16 / v1.1.0
 - the hex-editor now loads lazily to improve loading time on large files.
 - when searching in the hex-editor it is now possible to search for byte-sequences.
 - changed the parameter --`sort`, --`SORT` to two different parameters --`sort`, --`sort` and --`sortl`, --`sortlength`.
+- added `unicode_escaped_editor_search` option to the config menu to unicode-escape the search in the editor.
 
 ### Bugfixes
 
 - fixed Bug where the hex-editor would not find searched-for bytes.
 - fixed Bug where the editor would allow opening unreadable files and potentially corrupt them upon saving them.
+- fixed Bug where the prompts in the (hex-) editor would crash when inserting certain keys.
 
 
 ## [1.7.8] - 2024-04-29
