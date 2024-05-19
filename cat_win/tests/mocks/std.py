@@ -106,12 +106,18 @@ class StdInMock:
     def __iter__(self) -> StdInMockIter:
         return StdInMockIter(self)
 
-class StdInHelperMock:
+class IoHelperMock:
     """
     helper for stdin mock
     """
     def __init__(self, content: str = '') -> None:
         self.content = content
+
+    @staticmethod
+    def yield_file_gen(content):
+        def _yield_file(*args):
+            yield from content
+        return _yield_file
 
     def set_content(self, content: str) -> None:
         """

@@ -2,12 +2,12 @@ from unittest.mock import patch
 from unittest import TestCase
 
 from cat_win.src import cat
-from cat_win.tests.mocks.std import StdInHelperMock, StdOutMock, StdInMock, OSAttyDefGen
+from cat_win.tests.mocks.std import IoHelperMock, StdOutMock, StdInMock, OSAttyDefGen
 from cat_win.src.persistence.cconfig import CConfig
 from cat_win.src.persistence.config import Config
 # import sys
 # sys.path.append('../cat_win')
-stdinhelpermock = StdInHelperMock()
+stdinhelpermock = IoHelperMock()
 
 
 @patch('sys.argv', ['<CAT>'])
