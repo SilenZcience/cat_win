@@ -34,9 +34,9 @@ class HexEditor:
 
         self.file = file
         self.display_name = display_name
-        self._f_content = b''
-        self.hex_array = []
-        self.hex_array_edit = []
+        self._f_content_gen = None
+        self.hex_array = [[]]
+        self.hex_array_edit = [[]]
 
         self.edited_byte_pos = 0
 
@@ -62,25 +62,33 @@ class HexEditor:
 
         self._setup_file()
 
+    def _yield_next_bytes(self, n: int):
+        for _ in range(n):
+            try:
+                yield f"{next(self._f_content_gen):02X}"
+            except StopIteration:
+                break
+
     def _build_file_upto(self, to_row: int) -> None:
-        _start = len(self.hex_array) * HexEditor.columns
-        _end   = to_row              * HexEditor.columns
-        for i, byte_ in enumerate(self._f_content[_start:_end], start=_start):
-            if not i % HexEditor.columns:
+        if len(self.hex_array) >= to_row:
+            return
+        next_bytes = self._yield_next_bytes((to_row-len(self.hex_array))*HexEditor.columns)
+        for _byte in next_bytes:
+            if len(self.hex_array[-1]) >= HexEditor.columns:
                 self.hex_array.append([])
-            self.hex_array[-1].append(f"{byte_:02X}")
-        for row in self.hex_array[len(self.hex_array_edit):]:
-            self.hex_array_edit.append([None] * len(row))
+                self.hex_array_edit.append([])
+            self.hex_array[-1].append(_byte)
+            self.hex_array_edit[-1].append(None)
 
     def _setup_file(self) -> None:
         """
         setup the editor content screen by reading the given file.
         """
-        self.hex_array = []
-        self.hex_array_edit = []
+        self.hex_array = [[]]
+        self.hex_array_edit = [[]]
         try:
-            self._f_content = IoHelper.read_file(self.file, True)
-            self._build_file_upto(30)
+            self._f_content_gen = IoHelper.yield_file(self.file, True)
+            self._build_file_upto(31)
             self.unsaved_progress = False
             self.error_bar = ''
             self.status_bar_size = 1
@@ -90,8 +98,6 @@ class HexEditor:
             self.status_bar_size = 2
             if self.debug_mode:
                 err_print(self.error_bar)
-        if not self.hex_array:
-            self.hex_array.append([])
 
     def getxymax(self) -> tuple:
         """
@@ -239,7 +245,7 @@ class HexEditor:
                     content += bytes.fromhex(hex_byte)
                 except ValueError:
                     pass
-        content += self._f_content[bytes_loaded:]
+        content += bytes(self._f_content_gen)
         try:
             IoHelper.write_file(self.file, content)
             self.changes_made = True
@@ -350,7 +356,7 @@ class HexEditor:
                 c_row = self.cpos.row
                 while c_row < self.cpos.row+len(self.hex_array):
                     if c_row+1 >= len(self.hex_array):
-                        self._build_file_upto(c_row+30)
+                        self._build_file_upto(c_row+31)
                     c_row += 1
                     c_row_wrapped = c_row%len(self.hex_array)
                     search_result = find_bytes(c_row_wrapped)
@@ -544,17 +550,18 @@ class HexEditor:
         self.curse_window.clrtobot()
 
     def _render_highlight_selection(self) -> None:
+        # only highlight if the file has content
+        if not self.hex_array[self.cpos.row]:
+            return
         # Highlight Selection
-        cursor_y= self.cpos.row-self.wpos.row+2
-        if self.hex_array[self.cpos.row]:
-            # only highlight if the file has content
-            try:
-                self.curse_window.chgat(cursor_y, 13 + self.cpos.col*3,
-                                        2, self._get_color(4))
-                self.curse_window.chgat(cursor_y, 15 + HexEditor.columns*3 + self.cpos.col,
-                                        1, self._get_color(4))
-            except curses.error:
-                pass
+        cursor_y = self.cpos.row-self.wpos.row+2
+        try:
+            self.curse_window.chgat(cursor_y, 13 + self.cpos.col*3,
+                                    2, self._get_color(4))
+            self.curse_window.chgat(cursor_y, 15 + HexEditor.columns*3 + self.cpos.col,
+                                    1, self._get_color(4))
+        except curses.error:
+            pass
 
     def _render_highlight_edits(self, max_y: int) -> None:
         # Highlight Edits
@@ -606,7 +613,7 @@ class HexEditor:
         render the curses window.
         """
         max_y, max_x = self.getxymax()
-        self._build_file_upto(max_y+self.cpos.row+1)
+        self._build_file_upto(max_y+self.cpos.row+2)
 
         self._fix_cursor_position(max_y)
 
@@ -691,7 +698,10 @@ class HexEditor:
             self._init_screen()
             self._run()
         finally:
-            # self.curse_window.erase()
+            try: # cleanup - close file
+                self._f_content_gen.throw(StopIteration)
+            except StopIteration:
+                pass
             curses.endwin()
 
     @classmethod
