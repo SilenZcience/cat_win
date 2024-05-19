@@ -117,8 +117,8 @@ class IoHelper:
 
 
     @staticmethod
-    def yield_file(src_file: str, file_encoding: str = 'utf-8',
-                   errors: str = 'strict'):
+    def yield_file(src_file: str, binary: bool = False,
+                   file_encoding: str = 'utf-8', errors: str = 'strict'):
         """
         Yields content from a given file. Appends an empty line if the last
         line ends with a newline, so the lines can be joined.
@@ -134,15 +134,27 @@ class IoHelper:
         Yields:
         line (str):
             the content of the given file
+        byte (int):
+            the next byte of the binary file
         """
-        last_line = None
-        file = open(src_file, 'r', encoding=file_encoding, errors=errors, newline='')
+        if not binary:
+            last_line = None
+            file = open(src_file, 'r', encoding=file_encoding, errors=errors, newline='')
+            try:
+                for line in file:
+                    last_line = line
+                    yield line.rstrip('\n').rstrip('\r')
+                if last_line is not None and last_line.endswith('\n'):
+                    yield ''
+            except StopIteration:
+                pass
+            finally:
+                file.close()
+            return
+        file = open(src_file, 'rb')
         try:
             for line in file:
-                last_line = line
-                yield line.rstrip('\n').rstrip('\r')
-            if last_line is not None and last_line.endswith('\n'):
-                yield ''
+                yield from line
         except StopIteration:
             pass
         finally:

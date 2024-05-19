@@ -97,7 +97,7 @@ class Editor:
         try:
             self.unsaved_progress = False
             self.line_sep = IoHelper.get_newline(self.file)
-            self._f_content_gen = IoHelper.yield_file(self.file, self.file_encoding)
+            self._f_content_gen = IoHelper.yield_file(self.file, False, self.file_encoding)
             self._build_file_upto(30)
             self.error_bar = ''
             self.status_bar_size = 1
