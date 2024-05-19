@@ -952,6 +952,9 @@ The currently supported Key bindings are as follows:
 | Key(s) | default behaviour | shift click | control click | alt click |
 |--------|:-----------------:|:-----------:|:-------------:|:---------:|
 | <kbd>Arrows</kbd> | move cursor by byte | move cursor by byte | move cursor multiple bytes | - |
+| <kbd>Page Up/Down</kbd> | move cursor by page | move cursor by page | move cursor by page | - |
+| <kbd>Home/Pos</kbd> | move cursor to start of line | move cursor to start of line | move cursor to start of file | - |
+| <kbd>End</kbd> | move cursor to end of line | move cursor to end of line | move cursor to end of file | - |
 ||||||
 | <kbd>0-9 & A-F</kbd> | edit the current byte | - | - | - |
 | <kbd><</kbd> | insert a new byte to the left | - | - | - |
@@ -961,7 +964,7 @@ The currently supported Key bindings are as follows:
 ||||||
 | <kbd>Save/^S</kbd> | - | - | save changes | save changes |
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to a specific byte | - |
-| <kbd>Find/^F</kbd> | - | - | prompt to search a byte in the file | - |
+| <kbd>Find/^F</kbd> | - | - | prompt to search a byte(-sequence) in the file | - |
 | <kbd>Background/^B</kbd> | - | - | put the hex-editor in the background</br>(UNIX only) | - |
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
 | <kbd>Close/^Q</kbd> | - | - | close hex-editor</br>(prompt to save, if neccessary) | - |
