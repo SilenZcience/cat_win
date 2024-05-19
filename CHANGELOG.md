@@ -12,6 +12,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - when searching in the hex-editor it is now possible to search for byte-sequences.
 - changed the parameter --`sort`, --`SORT` to two different parameters --`sort`, --`sort` and --`sortl`, --`sortlength`.
 - added `unicode_escaped_editor_search` option to the config menu to unicode-escape the search in the editor.
+- added the following hotkeys to the hexeditor: `page up`, `page down`, `end`, `ctrl - end`, `home`, `ctrl - home`.
 
 ### Bugfixes
 
