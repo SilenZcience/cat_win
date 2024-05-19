@@ -317,16 +317,16 @@ class TestEditor(TestCase):
 
     def test_editor_scroll_key_page_down(self):
         editor = Editor(test_file_path_editor, '')
-        editor._move_key_page_down()
+        editor._scroll_key_page_down()
         for _ in range(61): # file_len == 63
             editor._key_enter('')
             editor._move_key_up()
         self.assertEqual(editor.wpos.get_pos(), (0,0))
-        editor._move_key_page_down()
+        editor._scroll_key_page_down()
         self.assertEqual(editor.wpos.get_pos(), (30,0))
-        editor._move_key_page_down()
+        editor._scroll_key_page_down()
         self.assertEqual(editor.wpos.get_pos(), (33,0))
-        editor._move_key_page_down()
+        editor._scroll_key_page_down()
         self.assertEqual(editor.wpos.get_pos(), (33,0))
 
     def test_editor_move_key_end(self):
@@ -398,6 +398,19 @@ class TestEditor(TestCase):
         editor._key_btab_reverse(':)')
         self.assertListEqual(editor.window_content, [':)line 1', 'line 2'])
         self.assertEqual(editor.cpos.get_pos(), (0,6))
+
+    def test_editor_key_string_surrogatepass(self):
+        Editor.debug_mode = True
+        editor = Editor('', '')
+        with patch('sys.stderr', StdOutMock()) as fake_out:
+            editor._key_string('\ud83d\ude01')
+            self.assertIn('Changed', fake_out.getvalue())
+            self.assertIn('😁', fake_out.getvalue())
+            self.assertIn('128513', fake_out.getvalue())
+        with patch('sys.stderr', StdOutMock()) as fake_out:
+            editor._key_string('\x1bTEST:)!')
+            self.assertEqual(fake_out.getvalue(), '')
+        Editor.debug_mode = False
 
     @patch('cat_win.src.service.editor.Editor.special_indentation', '!!!')
     def test_editor_key_string(self):
