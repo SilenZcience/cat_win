@@ -62,6 +62,14 @@ class HexEditor:
 
         self._setup_file()
 
+    def _build_file(self):
+        for _byte in self._f_content_gen:
+            if len(self.hex_array[-1]) >= HexEditor.columns:
+                self.hex_array.append([])
+                self.hex_array_edit.append([])
+            self.hex_array[-1].append(f"{_byte:02X}")
+            self.hex_array_edit[-1].append(None)
+
     def _yield_next_bytes(self, n: int):
         for _ in range(n):
             try:
@@ -160,6 +168,31 @@ class HexEditor:
 
     def _move_key_ctl_down(self) -> None:
         self.cpos.row += 10
+
+    def _move_key_page_up(self) -> None:
+        max_y, _ = self.getxymax()
+        self.cpos.row -= max_y
+        self.wpos.row = max(self.wpos.row-max_y, 0)
+
+    def _move_key_page_down(self) -> None:
+        max_y, _ = self.getxymax()
+        self.cpos.row += max_y
+        self._build_file_upto(max_y+self.cpos.row+2)
+
+    def _move_key_end(self) -> None:
+        self.cpos.col = len(self.hex_array[self.cpos.row])-1
+
+    def _move_key_ctl_end(self) -> None:
+        self._build_file()
+        self.cpos.row = len(self.hex_array)-1
+        self.cpos.col = len(self.hex_array[-1])-1
+
+    def _move_key_home(self) -> None:
+        self.cpos.col = 0
+
+    def _move_key_ctl_home(self) -> None:
+        self.cpos.row = 0
+        self.cpos.col = 0
 
     def _insert_byte(self, wchar: str) -> None:
         pos_offset = int(wchar!='<')

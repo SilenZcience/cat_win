@@ -24,6 +24,17 @@ class TestHexEditor(TestCase):
         self.assertCountEqual(editor.hex_array, [[]])
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 723))
+    def test__build_file(self):
+        editor = HexEditor('', '')
+        self.assertSequenceEqual(editor.hex_array, [['40'] * 16] * 30)
+        self.assertSequenceEqual(editor.hex_array_edit, [[None] * 16] * 30)
+        editor.hex_array_edit[15][1] = '00'
+        editor._build_file()
+        self.assertSequenceEqual(editor.hex_array, [['40'] * 16] * 45 + [['40'] * 3])
+        self.assertSequenceEqual(editor.hex_array_edit,
+                                 [[None] * 16] * 15 + [[None, '00', None, None, None, None, None, None, None, None, None, None, None, None, None, None]] + [[None] * 16] * 29 + [[None] * 3])
+
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 723))
     def test__build_file_upto_16(self):
         editor = HexEditor('', '')
         self.assertSequenceEqual(editor.hex_array, [['40'] * 16] * 30)
@@ -201,6 +212,63 @@ class TestHexEditor(TestCase):
         editor._move_key_ctl_down()
         editor._move_key_ctl_down()
         self.assertEqual(editor.cpos.get_pos(), (41, 11))
+
+    def test__move_key_page_up(self):
+        editor = HexEditor('', '')
+        editor.wpos.set_pos((83, 0))
+        editor.cpos.set_pos((93, 11))
+        editor._move_key_page_up()
+        self.assertEqual(editor.cpos.get_pos(), (63, 11))
+        self.assertEqual(editor.wpos.get_pos(), (53, 0))
+        editor._move_key_page_up()
+        self.assertEqual(editor.cpos.get_pos(), (33, 11))
+        self.assertEqual(editor.wpos.get_pos(), (23, 0))
+        editor._move_key_page_up()
+        self.assertEqual(editor.cpos.get_pos(), (3, 11))
+        self.assertEqual(editor.wpos.get_pos(), (0, 0))
+        editor._move_key_page_up()
+        self.assertEqual(editor.cpos.get_pos(), (-27, 11))
+        self.assertEqual(editor.wpos.get_pos(), (0, 0))
+
+    def test__move_key_page_down(self):
+        editor = HexEditor('', '')
+        editor.wpos.set_pos((0, 0))
+        editor.cpos.set_pos((3, 11))
+        editor._move_key_page_down()
+        self.assertEqual(editor.cpos.get_pos(), (33, 11))
+        self.assertEqual(editor.wpos.get_pos(), (0, 0))
+        editor._move_key_page_down()
+        self.assertEqual(editor.cpos.get_pos(), (63, 11))
+        self.assertEqual(editor.wpos.get_pos(), (0, 0))
+
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 20))
+    def test__move_key_end(self):
+        editor = HexEditor('', '')
+        editor.cpos.set_pos((0, 2))
+        editor._move_key_end()
+        self.assertEqual(editor.cpos.get_pos(), (0, 15))
+        editor.cpos.set_pos((1, 1))
+        editor._move_key_end()
+        self.assertEqual(editor.cpos.get_pos(), (1, 3))
+
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 70))
+    def test__move_key_ctl_end(self):
+        editor = HexEditor('', '')
+        editor.cpos.set_pos((1, 1))
+        editor._move_key_ctl_end()
+        self.assertEqual(editor.cpos.get_pos(), (4, 5))
+
+    def test__move_key_home(self):
+        editor = HexEditor('', '')
+        editor.cpos.set_pos((123, 123))
+        editor._move_key_home()
+        self.assertEqual(editor.cpos.get_pos(), (123, 0))
+
+    def test__move_key_ctl_home(self):
+        editor = HexEditor('', '')
+        editor.cpos.set_pos((123, 123))
+        editor._move_key_ctl_home()
+        self.assertEqual(editor.cpos.get_pos(), (0, 0))
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 16))
     def test__insert_byte_left(self):
