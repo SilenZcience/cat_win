@@ -659,6 +659,7 @@ class TestEditor(TestCase):
             self.assertEqual(editor._open(), None)
 
     @patch('cat_win.src.service.editor.CURSES_MODULE_ERROR', new=True)
+    @patch('cat_win.src.service.editor.Editor.on_windows_os', new=True)
     def test_editor_no_curses_error(self):
         with patch('sys.stderr', new=StdOutMock()) as fake_out:
             self.assertEqual(Editor.open('', '', True), False)

@@ -558,6 +558,7 @@ class TestHexEditor(TestCase):
             self.assertEqual(editor._open(), None)
 
     @patch('cat_win.src.service.hexeditor.CURSES_MODULE_ERROR', new=True)
+    @patch('cat_win.src.service.hexeditor.HexEditor.on_windows_os', new=True)
     def test_open_no_curses_error(self):
         with patch('sys.stderr', new=StdOutMock()) as fake_out:
             self.assertEqual(HexEditor.open('', ''), False)
