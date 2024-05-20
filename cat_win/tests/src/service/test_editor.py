@@ -400,8 +400,8 @@ class TestEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (0,6))
 
     def test_editor_key_string_surrogatepass(self):
-        Editor.debug_mode = True
         editor = Editor('', '')
+        editor.debug_mode = True
         with patch('sys.stderr', StdOutMock()) as fake_out:
             editor._key_string('\ud83d\ude01')
             self.assertIn('Changed', fake_out.getvalue())
@@ -410,7 +410,6 @@ class TestEditor(TestCase):
         with patch('sys.stderr', StdOutMock()) as fake_out:
             editor._key_string('\x1bTEST:)!')
             self.assertEqual(fake_out.getvalue(), '')
-        Editor.debug_mode = False
 
     @patch('cat_win.src.service.editor.Editor.special_indentation', '!!!')
     def test_editor_key_string(self):
@@ -436,8 +435,8 @@ class TestEditor(TestCase):
         self.assertEqual(editor._action_render_scr(''), None)
 
     def test_editor_action_save(self):
-        Editor.debug_mode = True
         editor = Editor(test_file_path, '')
+        editor.debug_mode = True
         error_def = ErrorDefGen.get_def(OSError('TestError'))
         with patch('cat_win.src.service.helper.iohelper.IoHelper.write_file', new=error_def), patch('sys.stderr', new=StdOutMock()) as fake_out:
             self.assertEqual(editor._action_save(), True)
@@ -447,7 +446,6 @@ class TestEditor(TestCase):
         with patch('cat_win.src.service.helper.iohelper.IoHelper.write_file', new=lambda *_: None):
             self.assertEqual(editor._action_save(), True)
             self.assertEqual(editor.error_bar, '')
-        Editor.debug_mode = False
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(['@@@'] * 501))
     def test_editor_action_save_correctness(self):
@@ -570,13 +568,12 @@ class TestEditor(TestCase):
             self.assertEqual(editor._action_quit(), False)
 
     def test_editor_interrupt(self):
-        Editor.debug_mode = True
         editor = Editor(test_file_path_oneline, '')
+        editor.debug_mode = True
         with self.assertRaises(KeyboardInterrupt):
             with patch('sys.stderr', new=StdOutMock()) as fake_out:
                 editor._action_interrupt()
                 self.assertEqual('Interrupting...\n', fake_out.getvalue())
-        Editor.debug_mode = False
 
     def test__action_resize(self):
         editor = Editor('', '')
