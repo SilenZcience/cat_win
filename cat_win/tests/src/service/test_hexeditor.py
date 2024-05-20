@@ -437,7 +437,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.hex_array_edit[0][0], '21')
         with patch('cat_win.src.service.hexeditor.HexEditor._get_next_char', lambda *args: next(char_gen_)):
             self.assertEqual(editor._action_reload(), True)
-        self.assertEqual(editor.cpos.get_pos(), (0, 0))
+        self.assertEqual(editor.cpos.get_pos(), (1, 14))
         self.assertEqual(editor.hex_array_edit[0][0], None)
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 32))
@@ -560,19 +560,21 @@ class TestHexEditor(TestCase):
     @patch('cat_win.src.service.hexeditor.CURSES_MODULE_ERROR', new=True)
     def test_open_no_curses_error(self):
         with patch('sys.stderr', new=StdOutMock()) as fake_out:
-            self.assertEqual(HexEditor.open('', '', True), False)
+            self.assertEqual(HexEditor.open('', ''), False)
             self.assertIn('could not be loaded', fake_out.getvalue())
             self.assertIn('windows-curses', fake_out.getvalue())
         with patch('sys.stderr', new=StdOutMock()) as fake_out:
-            self.assertEqual(HexEditor.open('', '', True), False)
+            self.assertEqual(HexEditor.open('', ''), False)
             self.assertEqual('', fake_out.getvalue())
 
     def test_set_flags(self):
         backup_a = HexEditor.save_with_alt
-        backup_b = HexEditor.debug_mode
-        backup_c = HexEditor.columns
-        HexEditor.set_flags(True, True, 1002)
+        backup_b = HexEditor.on_windows_os
+        backup_c = HexEditor.debug_mode
+        backup_d = HexEditor.columns
+        HexEditor.set_flags(True, True, True, 1002)
         self.assertEqual(HexEditor.save_with_alt, True)
+        self.assertEqual(HexEditor.on_windows_os, True)
         self.assertEqual(HexEditor.debug_mode, True)
         self.assertEqual(HexEditor.columns, 1002)
-        HexEditor.set_flags(backup_a, backup_b, backup_c)
+        HexEditor.set_flags(backup_a, backup_b, backup_c, backup_d)

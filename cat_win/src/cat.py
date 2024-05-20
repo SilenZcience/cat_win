@@ -962,10 +962,10 @@ def init(shell: bool = False) -> tuple:
         sys.exit(0)
 
     Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
-    Editor.set_flags(u_args[ARGS_STDIN] and on_windows_os,
+    Editor.set_flags(u_args[ARGS_STDIN] and on_windows_os, on_windows_os,
                      u_args[ARGS_DEBUG], const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
                      arg_parser.file_encoding)
-    HexEditor.set_flags(u_args[ARGS_STDIN] and on_windows_os,
+    HexEditor.set_flags(u_args[ARGS_STDIN] and on_windows_os, on_windows_os,
                         u_args[ARGS_DEBUG], const_dic[DKW.HEX_EDITOR_COLUMNS])
 
     return (known_files, unknown_files, echo_args, valid_urls)
@@ -1008,11 +1008,10 @@ def main():
                                                 arg_parser.file_encoding)
     elif u_args[ARGS_EDITOR]:
         unknown_files = [file for file in unknown_files if Editor.open(
-            file, u_files.get_file_display_name(file), on_windows_os,
-            u_args[ARGS_PLAIN_ONLY])]
+            file, u_files.get_file_display_name(file), u_args[ARGS_PLAIN_ONLY])]
     elif u_args[ARGS_HEX_EDITOR]:
         unknown_files = [file for file in unknown_files if HexEditor.open(
-            file, u_files.get_file_display_name(file), on_windows_os)]
+            file, u_files.get_file_display_name(file))]
     else:
         unknown_files = IoHelper.read_write_files_from_stdin(
             unknown_files, arg_parser.file_encoding, on_windows_os,
@@ -1038,13 +1037,11 @@ def main():
     if u_args[ARGS_EDITOR]:
         with IoHelper.dup_stdin(on_windows_os, u_args[ARGS_STDIN]):
             for file in known_files:
-                Editor.open(file, u_files.get_file_display_name(file),
-                            on_windows_os, u_args[ARGS_PLAIN_ONLY])
+                Editor.open(file, u_files.get_file_display_name(file), u_args[ARGS_PLAIN_ONLY])
     elif u_args[ARGS_HEX_EDITOR]:
         with IoHelper.dup_stdin(on_windows_os, u_args[ARGS_STDIN]):
             for file in known_files:
-                HexEditor.open(file, u_files.get_file_display_name(file),
-                            on_windows_os)
+                HexEditor.open(file, u_files.get_file_display_name(file))
 
     if u_args[ARGS_FFILES]:
         Summary.show_files(u_args[ARGS_FFILES], u_files.files)
