@@ -51,7 +51,7 @@ class HexEditor:
             '─' * (HexEditor.columns + 2) + '┐'
         self.bot_line = '└' + '─' * 10 + '┴' + '─' * (HexEditor.columns * 3 + 1) + '┴' + \
             '─' * (HexEditor.columns + 2) + '┘'
-        self.top_offset = ('   Offset    ' + ' '.join(
+        self.top_offset = ('  Address    ' + ' '.join(
             f"{byte_:02X}" for byte_ in range(HexEditor.columns)
             ) + '   Decoded text')
 
