@@ -348,6 +348,26 @@ class TestHexEditor(TestCase):
         with patch('cat_win.src.service.helper.iohelper.IoHelper.write_file', assertWriteFile):
             editor._action_save()
 
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 500))
+    @patch('cat_win.src.service.hexeditor.HexEditor.columns', 5)
+    def test__action_save_correctness(self):
+        def assertWriteFile(_, _s: str):
+            self.assertEqual(_s, b'@'*6+b'!@!'+b'@'*492)
+        editor = HexEditor('', '')
+        editor.cpos.set_pos((1,1))
+        editor._key_string('2')
+        editor._key_string('1')
+        for _ in range(100):
+            editor._key_string(' ')
+        editor._build_file_upto(editor.cpos.row+32)
+        editor._fix_cursor_position(30)
+        for _ in range(4):
+            editor._move_key_up()
+        editor._key_string('2')
+        editor._key_string('1')
+        with patch('cat_win.src.service.helper.iohelper.IoHelper.write_file', assertWriteFile):
+            editor._action_save()
+
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 496))
     @patch('cat_win.src.service.helper.iohelper.IoHelper.write_file', ErrorDefGen.get_def(PermissionError("validn't")))
     def test__action_save_error(self):

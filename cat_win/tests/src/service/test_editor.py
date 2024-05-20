@@ -449,6 +449,21 @@ class TestEditor(TestCase):
             self.assertEqual(editor.error_bar, '')
         Editor.debug_mode = False
 
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(['@@@'] * 501))
+    def test_editor_action_save_correctness(self):
+        def assertWriteFile(_, _s: str):
+            self.assertEqual(_s, (b'@@@\n@!\n'+b'\n'*99+b'@@\n'+b'@@@\n'*498+b'@@@'))
+        editor = Editor('', '')
+        editor.cpos.set_pos((1,1))
+        editor._key_string('!')
+        for _ in range(100):
+            editor._key_enter(None)
+        self.assertEqual(editor.cpos.get_pos(), (101, 0))
+        self.assertEqual(len(editor.window_content), 130)
+        self.assertEqual(editor.window_content[editor.cpos.row], '@@')
+        with patch('cat_win.src.service.helper.iohelper.IoHelper.write_file', assertWriteFile):
+            editor._action_save()
+
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(['a' * 10] * 50))
     def test__action_save_lazy_load(self):
         def assertWriteFile(_, _s: str):
