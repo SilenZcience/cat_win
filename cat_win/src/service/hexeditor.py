@@ -130,6 +130,7 @@ class HexEditor:
             return
         self.hex_array_edit[self.cpos.row][self.cpos.col] = '--'
         # self.hex_array[self.cpos.row][self.cpos.col] = '--'
+        self.unsaved_progress = True
         self._move_key_right()
 
     def _key_backspace(self, _) -> None:
@@ -143,6 +144,7 @@ class HexEditor:
             return
         self.hex_array_edit[self.cpos.row][self.cpos.col] = '--'
         # self.hex_array[self.cpos.row][self.cpos.col] = '--'
+        self.unsaved_progress = True
         self._move_key_left()
 
     def _move_key_left(self) -> None:
@@ -214,8 +216,6 @@ class HexEditor:
             self.hex_array_edit.append([extracted_byte])
         if wchar != '<':
             self._move_key_right()
-
-        self.unsaved_progress = True
 
     def _key_string(self, wchar) -> None:
         """
@@ -749,8 +749,6 @@ class HexEditor:
             the display name for the current file
         on_windows_os (bool):
             indicates if the user is on windows OS using platform.system() == 'Windows'
-        skip_binary (bool):
-            indicates if the Editor should skip non-plaintext files
         
         Returns:
         (bool):
