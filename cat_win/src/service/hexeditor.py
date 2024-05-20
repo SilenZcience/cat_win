@@ -23,8 +23,9 @@ class HexEditor:
     """
     loading_failed = False
 
-    debug_mode = False
     save_with_alt = False
+    on_windows_os = False
+    debug_mode = False
 
     columns = 16
 
@@ -431,8 +432,6 @@ class HexEditor:
                 continue
             if wchar.upper() in ['Y', 'J']:
                 self._setup_file()
-                self.cpos = Position(0, 0)
-                self.wpos = Position(0, 0)
                 break
 
         return True
@@ -738,7 +737,7 @@ class HexEditor:
             curses.endwin()
 
     @classmethod
-    def open(cls, file: str, display_name: str, on_windows_os: bool) -> bool:
+    def open(cls, file: str, display_name: str) -> bool:
         """
         simple editor to change the contents of any provided file.
         
@@ -747,8 +746,6 @@ class HexEditor:
             a string representing a file(-path)
         display_name (str):
             the display name for the current file
-        on_windows_os (bool):
-            indicates if the user is on windows OS using platform.system() == 'Windows'
         
         Returns:
         (bool):
@@ -759,7 +756,7 @@ class HexEditor:
 
         if CURSES_MODULE_ERROR:
             err_print("The Editor could not be loaded. No Module 'curses' was found.")
-            if on_windows_os:
+            if HexEditor.on_windows_os:
                 err_print('If you are on Windows OS, try pip-installing ', end='')
                 err_print("'windows-curses'.")
             err_print()
@@ -768,7 +765,7 @@ class HexEditor:
 
         editor = cls(file, display_name)
 
-        if on_windows_os:
+        if HexEditor.on_windows_os:
             # disable background feature on windows
             editor._action_background = lambda *_: True
         else:
@@ -779,18 +776,22 @@ class HexEditor:
         return editor.changes_made
 
     @staticmethod
-    def set_flags(save_with_alt: bool, debug_mode: bool, columns: int) -> None:
+    def set_flags(save_with_alt: bool, on_windows_os: bool, debug_mode: bool,
+                  columns: int) -> None:
         """
         set the config flags for the Editor
         
         Parameters:
         save_with_alt (bool):
             indicates whetcher the stdin pipe has been used (and therefor tampered)
+        on_windows_os (bool):
+            indicates if the user is on windows OS using platform.system() == 'Windows'
         debug_mode (bool)
             indicates if debug info should be displayed
         columns (int):
             defines how many columns the editor should have
         """
         HexEditor.save_with_alt = save_with_alt
+        HexEditor.on_windows_os = on_windows_os
         HexEditor.debug_mode = debug_mode
         HexEditor.columns = columns

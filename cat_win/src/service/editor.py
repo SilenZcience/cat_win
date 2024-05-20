@@ -26,8 +26,9 @@ class Editor:
     special_indentation = '\t'
     auto_indent = False
 
-    debug_mode = False
     save_with_alt = False
+    on_windows_os = False
+    debug_mode = False
 
     unicode_escaped_search = True
     file_encoding = 'utf-8'
@@ -566,8 +567,8 @@ class Editor:
                 continue
             if wchar.upper() in ['Y', 'J']:
                 self._setup_file()
-                self.cpos = Position(0, 0)
-                self.wpos = Position(0, 0)
+                self._build_file_upto()
+                self.cpos.row = min(self.cpos.row, len(self.window_content)-1)
                 break
 
         return True
@@ -910,8 +911,7 @@ class Editor:
             curses.endwin()
 
     @classmethod
-    def open(cls, file: str, display_name: str, on_windows_os: bool,
-             skip_binary: bool = False) -> bool:
+    def open(cls, file: str, display_name: str, skip_binary: bool = False) -> bool:
         """
         simple editor to change the contents of any provided file.
         
@@ -920,8 +920,6 @@ class Editor:
             a string representing a file(-path)
         display_name (str):
             the display name for the current file
-        on_windows_os (bool):
-            indicates if the user is on windows OS using platform.system() == 'Windows'
         skip_binary (bool):
             indicates if the Editor should skip non-plaintext files
         
@@ -934,7 +932,7 @@ class Editor:
 
         if CURSES_MODULE_ERROR:
             err_print("The Editor could not be loaded. No Module 'curses' was found.")
-            if on_windows_os:
+            if Editor.on_windows_os:
                 err_print('If you are on Windows OS, try pip-installing ', end='')
                 err_print("'windows-curses'.")
             err_print()
@@ -947,7 +945,7 @@ class Editor:
         special_chars = dict(map(lambda x: (chr(x[0]), x[2]), SPECIAL_CHARS))
         editor._set_special_chars(special_chars)
 
-        if on_windows_os:
+        if Editor.on_windows_os:
             Editor.wc_width = lambda _: 1
             # disable background feature on windows
             editor._action_background = lambda *_: True
@@ -974,20 +972,23 @@ class Editor:
         Editor.auto_indent = auto_indent
 
     @staticmethod
-    def set_flags(save_with_alt: bool, debug_mode: bool, unicode_escaped_search: bool,
-                  file_encoding: str) -> None:
+    def set_flags(save_with_alt: bool, on_windows_os: bool, debug_mode: bool,
+                  unicode_escaped_search: bool, file_encoding: str) -> None:
         """
         set the config flags for the Editor
         
         Parameters:
         save_with_alt (bool):
             indicates whetcher the stdin pipe has been used (and therefor tampered)
+        on_windows_os (bool):
+            indicates if the user is on windows OS using platform.system() == 'Windows'
         debug_mode (bool)
             indicates if debug info should be displayed
         file_encoding (str):
             the file encoding to use when opening a file
         """
         Editor.save_with_alt = save_with_alt
+        Editor.on_windows_os = on_windows_os
         Editor.debug_mode = debug_mode
         Editor.unicode_escaped_search = unicode_escaped_search
         Editor.file_encoding = file_encoding

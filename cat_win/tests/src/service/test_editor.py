@@ -532,7 +532,7 @@ class TestEditor(TestCase):
         editor.cpos.set_pos((1, 14))
         editor.window_content[0] = 'TEST'
         self.assertEqual(editor._action_reload(), True)
-        self.assertEqual(editor.cpos.get_pos(), (0, 0))
+        self.assertEqual(editor.cpos.get_pos(), (1, 14))
         self.assertEqual(editor.window_content[0], 'aaaaaaaaaa')
         def yield_action_quit():
             yield ('', b'_action_quit')
@@ -676,13 +676,15 @@ class TestEditor(TestCase):
         self.assertEqual(Editor.auto_indent, True)
 
     def test_editor_set_flags(self):
-        self.assertEqual(Editor.save_with_alt, False)
-        self.assertEqual(Editor.debug_mode, False)
-        self.assertEqual(Editor.unicode_escaped_search, True)
-        self.assertEqual(Editor.file_encoding, 'utf-8')
-        Editor.set_flags(True, True, False, 'utf-16')
+        backup_a = Editor.save_with_alt
+        backup_b = Editor.on_windows_os
+        backup_c = Editor.debug_mode
+        backup_d = Editor.unicode_escaped_search
+        backup_e = Editor.file_encoding
+        Editor.set_flags(True, True, True, False, 'utf-16')
         self.assertEqual(Editor.save_with_alt, True)
+        self.assertEqual(Editor.on_windows_os, True)
         self.assertEqual(Editor.debug_mode, True)
         self.assertEqual(Editor.unicode_escaped_search, False)
         self.assertEqual(Editor.file_encoding, 'utf-16')
-        Editor.set_flags(False, False, True, 'utf-8')
+        Editor.set_flags(backup_a, backup_b, backup_c, backup_d, backup_e)
