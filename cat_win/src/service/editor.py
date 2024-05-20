@@ -550,7 +550,7 @@ class Editor:
         curses.curs_set(0)
 
         wchar = ''
-        while str(wchar).upper() != ['\x1b', 'N']:
+        while str(wchar).upper() not in ['\x1b', 'N']:
             self._action_render_scr('Reload File? [y]es, [n]o; Abort? ESC')
             wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
