@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
-## [1.7.9] - TBA
+## [1.7.9] - 2024-05-20
 
 ### Minor Changes
 
