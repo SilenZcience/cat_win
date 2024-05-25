@@ -92,7 +92,7 @@ It is of course possible to use cat_win on Linux or MacOS, aswell as Windows!
 <p align="right">(<a href="#top">↑back to top↑</a>)</p>
 <div id="-getting-started"></div>
 
-## ⚡ Getting Started
+## 🚀 Getting Started
 
 <div id="prerequisites"></div>
 
