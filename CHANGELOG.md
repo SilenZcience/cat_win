@@ -5,6 +5,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ## [1.7.10] - TBA
 
+### Minor Changes
+
+- added `^I` hotkey to editor (insert byte sequence) and hexeditor (insert text).
+
 ### Bugfixes
 
 - fixed Bug where the reload-file prompt could not be canceled in the editor.
