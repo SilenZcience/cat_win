@@ -441,6 +441,39 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.hex_array_edit[0][0], None)
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 32))
+    def test__action_insert(self):
+        editor = HexEditor('', '')
+        editor.curse_window = MagicMock()
+        def yield_tuple(a, b):
+            yield (a, b)
+        def char_gen(user_input: list):
+            yield from user_input
+        editor.cpos.set_pos((1, 3))
+        with patch('cat_win.src.service.hexeditor.HexEditor._get_next_char', lambda *args: ('\x1b', b'_key_string')):
+            self.assertEqual(editor._action_insert(), True)
+        with patch('cat_win.src.service.hexeditor.HexEditor._get_next_char', lambda *args: ('', b'_action_quit')):
+            self.assertEqual(editor._action_insert(), True)
+        char_gen_ = char_gen([(9, b'_key_string'), ('\ud83e\udd23', b'_key_string'),
+                              ('', b'_key_enter')])
+        with patch('cat_win.src.service.hexeditor.HexEditor._get_next_char', lambda *args: next(char_gen_)):
+            self.assertEqual(editor._action_insert(), True)
+            self.assertSequenceEqual(editor.hex_array_edit[1], [None, None, None, None,
+                                                                'F0', '9F', 'A4', 'A3',
+                                                                None, None, None, None,
+                                                                None, None, None, None,])
+        char_gen_ = char_gen([('A', b'_key_string'), ('B', b'_key_string'),
+                              ('C', b'_key_string'), ('', b'_key_ctl_backspace'),
+                              ('A', b'_key_string'), ('B', b'_key_string'),
+                              ('C', b'_key_string'), ('', b'_key_backspace'),
+                              ('', b'_key_enter')])
+        with patch('cat_win.src.service.hexeditor.HexEditor._get_next_char', lambda *args: next(char_gen_)):
+            self.assertEqual(editor._action_insert(), True)
+            self.assertSequenceEqual(editor.hex_array_edit[1], [None, None, None, None,
+                                                                'F0', '9F', 'A4', 'A3',
+                                                                '41', '42', None, None,
+                                                                None, None, None, None,])
+
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 32))
     def test__action_quit(self):
         editor = HexEditor('', '')
         editor.curse_window = MagicMock()
