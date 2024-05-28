@@ -6,9 +6,9 @@ from cat_win.tests.mocks.edit import getxymax
 from cat_win.tests.mocks.error import ErrorDefGen
 from cat_win.tests.mocks.std import StdOutMock, IoHelperMock
 
-import cat_win.src.service.editor as editor
-if editor.CURSES_MODULE_ERROR:
-    setattr(editor, 'curses', None)
+import cat_win.src.service.editor as editor_pkg
+if editor_pkg.CURSES_MODULE_ERROR:
+    setattr(editor_pkg, 'curses', None)
 from cat_win.src.service.editor import Editor
 
 mm = MagicMock()
@@ -542,6 +542,38 @@ class TestEditor(TestCase):
         self.assertEqual(editor._action_reload(), True)
         self.assertEqual(editor.cpos.get_pos(), (1, 14))
         self.assertEqual(editor.window_content[0], 'TEST')
+
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(['a' * 10] * 50))
+    def test_editor_action_insert(self):
+        editor = Editor('', '')
+        editor.curse_window = MagicMock()
+        editor.history = MagicMock()
+        def yield_tuple(a, b):
+            yield (a, b)
+        def char_gen(user_input: list):
+            yield from user_input
+        editor.cpos.set_pos((1, 8))
+        editor.get_char = yield_tuple('\x1b', b'_key_string')
+        self.assertEqual(editor._action_insert(), True)
+        editor.get_char = yield_tuple('', b'_action_quit')
+        self.assertEqual(editor._action_insert(), True)
+        editor.get_char = char_gen([(5, b'_key_string'), ('2', b'_key_string'),
+                                    ('G', b'_key_string'), ('X', b'_key_string'),
+                                    ('1', b'_key_string'), ('2', b'_key_string'),
+                                    ('1', b'_key_string'), ('A', b'_key_string'),
+                                    ('A', b'_key_string'), ('', b'_key_ctl_backspace'),
+                                    ('0', b'_key_string'), ('', b'_key_backspace'),
+                                    ('', b'_key_enter')])
+        self.assertEqual(editor._action_insert(), True)
+        self.assertEqual(editor.cpos.get_pos(), (1, 10))
+        self.assertEqual(editor.window_content[1], 'aaaaaaaa!!aa')
+        editor.get_char = char_gen([('2', b'_key_string'), ('3', b'_key_string'),
+                                    ('2', b'_key_string'), ('', b'_key_enter'),
+                                    ('3', b'_key_string'), ('', b'_key_enter'),
+                                    ])
+        self.assertEqual(editor._action_insert(), True)
+        self.assertEqual(editor.cpos.get_pos(), (1, 12))
+        self.assertEqual(editor.window_content[1], 'aaaaaaaa!!##aa')
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(['a' * 10] * 50))
     def test_editor_action_quit(self):
