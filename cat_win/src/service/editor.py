@@ -12,7 +12,7 @@ import signal
 import sys
 
 from cat_win.src.service.helper.editorhelper import History, Position, wcwidth, UNIFY_HOTKEYS, \
-    KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS
+    KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
 from cat_win.src.service.rawviewer import SPECIAL_CHARS
 
@@ -96,13 +96,14 @@ class Editor:
         """
         self.window_content = []
         try:
-            self.unsaved_progress = False
             self.line_sep = IoHelper.get_newline(self.file)
             self._f_content_gen = IoHelper.yield_file(self.file, False, self.file_encoding)
             self._build_file_upto(30)
+            self.unsaved_progress = False
             self.error_bar = ''
             self.status_bar_size = 1
         except (OSError, UnicodeError) as exc:
+            self.unsaved_progress = True
             self.error_bar = str(exc)
             self.status_bar_size = 2
             if self.debug_mode:
@@ -397,8 +398,10 @@ class Editor:
         self.history.redo(self)
         return None
 
-    def _action_render_scr(self, msg) -> None:
+    def _action_render_scr(self, msg: str, tmp_error: str = '') -> None:
         max_y, max_x = self.getxymax()
+        error_bar_backup = self.error_bar
+        self.error_bar = tmp_error if tmp_error else self.error_bar
         try:
             if self.error_bar:
                 self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
@@ -409,6 +412,7 @@ class Editor:
                                         self._get_color(3))
         except curses.error:
             pass
+        self.error_bar = error_bar_backup
         self.curse_window.refresh()
 
     def _action_save(self) -> bool:
@@ -453,6 +457,8 @@ class Editor:
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
+                if key == b'_action_jump':
+                    wchar, key = '', b'_key_enter'
                 if key == b'_action_background':
                     getattr(self, key.decode(), lambda *_: False)()
                 if key == b'_action_resize':
@@ -490,6 +496,8 @@ class Editor:
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
+                if key == b'_action_find':
+                    wchar, key = '', b'_key_enter'
                 if key == b'_action_background':
                     getattr(self, key.decode(), lambda *_: False)()
                 if key == b'_action_resize':
@@ -557,6 +565,8 @@ class Editor:
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
+                if key == b'_action_reload':
+                    wchar = 'Y'
                 if key == b'_action_background':
                     getattr(self, key.decode(), lambda *_: False)()
                 if key == b'_action_resize':
@@ -571,6 +581,52 @@ class Editor:
                 self.cpos.row = min(self.cpos.row, len(self.window_content)-1)
                 break
 
+        return True
+
+    def _action_insert(self) -> bool:
+        """
+        handles the insert bytes action.
+        
+        Returns:
+        (bool):
+            indicates if the editor should keep running
+        """
+        tmp_error_bar = ''
+        wchar, i_bytes = '', ''
+        while str(wchar) != '\x1b':
+            self._action_render_scr(f"Confirm: 'ENTER' - Insert byte(s): 0x{i_bytes}␣", tmp_error_bar)
+            wchar, key = next(self.get_char)
+            if key in ACTION_HOTKEYS:
+                if key in [b'_action_quit', b'_action_interrupt']:
+                    break
+                if key == b'_action_insert':
+                    wchar, key = '', b'_key_enter'
+                if key == b'_action_background':
+                    getattr(self, key.decode(), lambda *_: False)()
+                if key == b'_action_resize':
+                    getattr(self, key.decode(), lambda *_: False)()
+                    self._render_scr()
+            if not isinstance(wchar, str):
+                continue
+            if key == b'_key_backspace':
+                i_bytes = i_bytes[:-1]
+            elif key == b'_key_ctl_backspace':
+                t_p = i_bytes[-1:].isalpha()
+                while i_bytes and i_bytes[-1:].isalpha() == t_p:
+                    i_bytes = i_bytes[:-1]
+            elif key == b'_key_string' and wchar.upper() in HEX_BYTE_KEYS:
+                i_bytes += wchar.upper()
+            elif key == b'_key_enter':
+                try:
+                    i_string = bytes.fromhex(i_bytes).decode(self.file_encoding)
+                except (ValueError, UnicodeError) as exc:
+                    tmp_error_bar = str(exc)
+                    continue
+                pre_pos = self.cpos.get_pos()
+                action_text = self._key_string(i_string)
+                self.history.add(b'_key_string', action_text, False,
+                                 pre_pos, self.cpos.get_pos())
+                break
         return True
 
     def _action_quit(self) -> bool:

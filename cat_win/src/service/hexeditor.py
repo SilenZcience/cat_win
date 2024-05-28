@@ -311,6 +311,8 @@ class HexEditor:
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
+                if key == b'_action_jump':
+                    wchar, key = '', b'_key_enter'
                 if key == b'_action_background':
                     getattr(self, key.decode(), lambda *_: False)()
                 if key == b'_action_resize':
@@ -362,6 +364,8 @@ class HexEditor:
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
+                if key == b'_action_find':
+                    wchar, key = '', b'_key_enter'
                 if key == b'_action_background':
                     getattr(self, key.decode(), lambda *_: False)()
                 if key == b'_action_resize':
@@ -423,6 +427,8 @@ class HexEditor:
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
+                if key == b'_action_reload':
+                    wchar = 'Y'
                 if key == b'_action_background':
                     getattr(self, key.decode(), lambda *_: False)()
                 if key == b'_action_resize':
@@ -434,6 +440,49 @@ class HexEditor:
                 self._setup_file()
                 break
 
+        return True
+
+    def _action_insert(self) -> bool:
+        """
+        handles the insert char action.
+        
+        Returns:
+        (bool):
+            indicates if the editor should keep running
+        """
+        wchar, i_chars = '', ''
+        while str(wchar) != '\x1b':
+            self._action_render_scr(f"Confirm: 'ENTER' - Insert char(s): {i_chars}␣")
+            wchar, key = self._get_next_char()
+            if key in ACTION_HOTKEYS:
+                if key in [b'_action_quit', b'_action_interrupt']:
+                    break
+                if key == b'_action_insert':
+                    wchar, key = '', b'_key_enter'
+                if key == b'_action_background':
+                    getattr(self, key.decode(), lambda *_: False)()
+                if key == b'_action_resize':
+                    getattr(self, key.decode(), lambda *_: False)()
+                    self._render_scr()
+            if not isinstance(wchar, str):
+                continue
+            if key == b'_key_backspace':
+                i_chars = i_chars[:-1]
+            elif key == b'_key_ctl_backspace':
+                t_p = i_chars[-1:].isalnum()
+                while i_chars and i_chars[-1:].isalnum() == t_p:
+                    i_chars = i_chars[:-1]
+            elif key == b'_key_string':
+                i_chars += wchar
+            elif key == b'_key_enter':
+                i_chars = i_chars.encode('utf-16', 'surrogatepass').decode('utf-16')
+                max_y, _ = self.getxymax()
+                for i_char in i_chars:
+                    for byte_ in i_char.encode():
+                        self._insert_byte('>')
+                        self._fix_cursor_position(max_y)
+                        self.hex_array_edit[self.cpos.row][self.cpos.col] = f"{byte_:02X}"
+                break
         return True
 
     def _action_quit(self) -> bool:

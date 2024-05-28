@@ -179,6 +179,7 @@ UNIFY_HOTKEYS = {
     b'^F'           : b'_action_find',
     b'^B'           : b'_action_background',
     b'^R'           : b'_action_reload',
+    b'^I'           : b'_action_insert',
     b'^Q'           : b'_action_quit',
     b'^C'           : b'_action_interrupt',
     b'KEY_RESIZE'   : b'_action_resize',
