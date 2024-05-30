@@ -132,11 +132,11 @@ which can also be installed after the fact to patch the problem.
 Direct Download:
 </br>
 [Windows - __catw.exe__](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/windows/catw.exe) </br>
-[Windows - __cats.exe__ (shell)](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/windows/cats.exe) </br>
+[Windows - __cats.exe__ (REPL)](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/windows/cats.exe) </br>
 [Linux - __catw__](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/linux/catw) </br>
-[Linux - __cats__ (shell)](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/linux/cats) </br>
+[Linux - __cats__ (REPL)](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/linux/cats) </br>
 [MacOS - __catw__](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/darwin/catw) </br>
-[MacOS - __cats__ (shell)](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/darwin/cats) </br>
+[MacOS - __cats__ (REPL)](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/darwin/cats) </br>
 
 (compiled using PyInstaller) </br>
 It is recommended to add the file path(s) to your system-environment `PATH`-variables.

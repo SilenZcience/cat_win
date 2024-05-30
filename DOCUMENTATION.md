@@ -120,7 +120,7 @@
 
 # <a id="arguments">Arguments & Options</a>
 
-| Argument / Option | Description | works in shell |
+| Argument / Option | Description | works in REPL |
 |-------------------|-------------|:--------------:|
 | *<a href="#-h---help">-h, --help</a>* | show help message and exit |✔|
 | *<a href="#-v---version">-v, --version</a>* | output version information and exit |✔|

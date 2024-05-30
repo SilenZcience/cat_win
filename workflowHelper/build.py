@@ -80,7 +80,7 @@ for _ in range(3):
 if status > 0:
     sys.exit(status)
 
-command = f'pyinstaller ./cat_win/shell.py --onefile --clean --dist ./temp/{platform_name} --icon ./temp/cat_icon.ico --version-file ./temp/catsversionfile -n cats'.split(' ')
+command = f'pyinstaller ./cat_win/repl.py --onefile --clean --dist ./temp/{platform_name} --icon ./temp/cat_icon.ico --version-file ./temp/catsversionfile -n cats'.split(' ')
 # try pyinstaller 3 times at most...
 for _ in range(3):
     try:

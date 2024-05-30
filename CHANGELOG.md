@@ -62,7 +62,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - added -`B`, --`raw` parameter to read a file as binary and write raw binary as output.
-- when piping into the shell (cats) the input will also be printed to display a full context.
+- when piping into the repl (cats) the input will also be printed to display a full context.
 - added --`config-clear`, --`config-reset` parameter to reset the config to the default settings.
 - added --`cconfig-clear`, --`cconfig-reset` parameter to reset the color config to the default settings.
 - added --`config-remove`, --`cconfig-remove` parameter to remove/delete the config file.
@@ -70,8 +70,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ### Bugfixes
 
-- fixed Bug where --`b64d` would not work in the shell.
-- fixed Bug where some literals or patterns would not work in the shell (if they included whitespace).
+- fixed Bug where --`b64d` would not work in the repl.
+- fixed Bug where some literals or patterns would not work in the repl (if they included whitespace).
 - fixed Bug where the Editor would always auto indent (even if the config setting was set to False).
 
 
@@ -249,7 +249,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - implemented more exception handling.
 - fix Bug where files would not be processed in the order in which they were provided.
-- fix Bug where the shell would crash in rare cases.
+- fix Bug where the repl would crash in rare cases.
 - fix Bug where the --`files` parameter would display incorrect results.
 - fix Bug where negative hexadecimal and binary numbers would not be recognized using --`eval`.
 
@@ -294,14 +294,14 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - added --`eval`, --`EVAL` parameter to evaluate simple mathematical equations within any text.
 - added --`sort`, --`sort` parameter to sort all lines alphabetically.
-- added `!clear` command to the cat shell, to reset/delete all previously defined parameters.
+- added `!clear` command to the cat repl, to reset/delete all previously defined parameters.
 - added -`G`, --`GREP` parameter to *only* show the substrings found or matching any queried pattern.
 
 ### Bugfixes
 
-- fix Bug where the shell command `!del` would not properly work when using a different command form.
+- fix Bug where the repl command `!del` would not properly work when using a different command form.
 - fix Bug where the `trunc` parameter would crash on not-evaluable inputs.
-- fix Bug where the shell would unnecessarily import the clipboard module for each line again (when using the --`clip` parameter).
+- fix Bug where the repl would unnecessarily import the clipboard module for each line again (when using the --`clip` parameter).
 - fix Bug where the output of `find=` and `match=` was inconsistent and undeterministic.
 - fix Bug where the `slice` and `replace` operators could only be used once per command.
 - fix Bug where you could not `replace` certain substrings (individual chars are now escapable with **`\`**)
@@ -326,10 +326,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 - renamed -`d`, --`debug` to --`debug`, --`debug` and hid it from the help menu.
 - renamed -`R`, --`reconfigure` to -`R`, --`R`
 - added --`Rin`, --`Rout`, --`Rerr` parameters to specificly reconfigure the stdin, stdout or stderr stream to the given encoding.
-- added `!help` command to the cat-shell (cats) in order to see a short help display explaining all other parameters
-- added `!exit` command to the cat-shell (cats) in order to exit shell
-- added `!see` command to the cat-shell (cats) in order to see the currently active parameters within one shell session.
-- added `!add <OPTION>` and `!del <OPTION>` command to the cat-shell (cats) in order to change the parameters within one shell session.
+- added `!help` command to the cat-repl (cats) in order to see a short help display explaining all other parameters
+- added `!exit` command to the cat-repl (cats) in order to exit repl
+- added `!see` command to the cat-repl (cats) in order to see the currently active parameters within one repl session.
+- added `!add <OPTION>` and `!del <OPTION>` command to the cat-repl (cats) in order to change the parameters within one repl session.
 
 ### Bugfixes
 
@@ -340,8 +340,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ### Major Changes
 
-- added `cats` entry point, for a shell version of the programm. This way you can enter and edit custom input line by line, instead of restarting the programm every time. Useful for the number conversion feature or a line by line base64 encoding/decoding (note that some parameters will not work with this entry-point since they will not make any sense in the context).
-- added -`R`, --`reconfigure` parameter to decide if the standard-input (stdin) and standard-output (stdout) should be reconfigured to the parsed encoding parameter. Some shells handle text encoding different than others, so there is no uniform output when using uncommon encoding formats. Using this parameter the users can decide for themselves if the stdout should be encoded. Some users may experience readable console output when using the parameter while others may experience it when not using the argument.
+- added `cats` entry point, for a repl version of the programm. This way you can enter and edit custom input line by line, instead of restarting the programm every time. Useful for the number conversion feature or a line by line base64 encoding/decoding (note that some parameters will not work with this entry-point since they will not make any sense in the context).
+- added -`R`, --`reconfigure` parameter to decide if the standard-input (stdin) and standard-output (stdout) should be reconfigured to the parsed encoding parameter. Some repls handle text encoding different than others, so there is no uniform output when using uncommon encoding formats. Using this parameter the users can decide for themselves if the stdout should be encoded. Some users may experience readable console output when using the parameter while others may experience it when not using the argument.
 
 ### Minor Changes
 
