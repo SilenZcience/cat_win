@@ -433,7 +433,7 @@ def print_file(content: list, stepper: More) -> bool:
         if u_args[ARGS_GREP_ONLY]:
             if intervals:
                 fm_substrings = [(pos[0], f"{color_dic[CKW.FOUND]}" + \
-                    f"{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_FOUND]}") 
+                    f"{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_FOUND]}")
                                  for _, pos in f_keywords]
                 fm_substrings+= [(pos[0], f"{color_dic[CKW.MATCHED]}" + \
                     f"{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_MATCHED]}")
@@ -614,9 +614,9 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
     if u_args[ARGS_NUMBER]:
         content = [(_get_line_prefix(j+line_offset, file_index+1), c[1])
                    for j, c in enumerate(content, start=1)]
-    content = content[
-        arg_parser.file_truncate[0]:arg_parser.file_truncate[1]:arg_parser.file_truncate[2]
-        ]
+
+    content = content.__getitem__(slice(*arg_parser.file_truncate))
+
     if u_args[ARGS_PEEK] and len(content) > 2*const_dic[DKW.PEEK_SIZE]:
         excluded_by_peek = len(content) - 2*const_dic[DKW.PEEK_SIZE]
         content = content[:const_dic[DKW.PEEK_SIZE]] + content[-const_dic[DKW.PEEK_SIZE]:]
@@ -734,9 +734,10 @@ def edit_file(file_index: int = 0) -> None:
         if display_zip(u_files[file_index].path, _convert_size):
             return
         try:
-            file_content = IoHelper.read_file(u_files[file_index].path, False,
-                                              arg_parser.file_encoding,
-                                              'ignore' if const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace')
+            file_content = IoHelper.read_file(
+                u_files[file_index].path, False,
+                arg_parser.file_encoding,
+                'ignore' if const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace')
             if not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]:
                 file_content = remove_ansi_codes_from_line(file_content)
             content = [('', line) for line in file_content.splitlines()]
@@ -1222,7 +1223,7 @@ def shell_main():
 
     print(shell_prefix, end='', flush=True)
     for i, line in enumerate(IoHelper.get_stdin_content(oneline)):
-        stripped_line = line.rstrip('\n')
+        stripped_line = line.rstrip('\r\n')
         if not os.isatty(sys.stdin.fileno()):
             print(stripped_line)
         if cmd.exec(stripped_line):

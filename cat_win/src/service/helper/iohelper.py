@@ -143,7 +143,7 @@ class IoHelper:
             try:
                 for line in file:
                     last_line = line
-                    yield line.rstrip('\n').rstrip('\r')
+                    yield line.rstrip('\r\n')
                 if last_line is not None and last_line.endswith('\n'):
                     yield ''
             except StopIteration:
@@ -230,7 +230,7 @@ class IoHelper:
         """
         s_in = sys.stdin.buffer if raw else sys.stdin
         if one_line:
-            first_line = s_in.readline().rstrip('\n')
+            first_line = s_in.readline().rstrip('\r\n')
             if first_line.endswith(chr(26)):
                 first_line = first_line[:-1]
             yield first_line
