@@ -27,7 +27,7 @@ class TestCat(TestCase):
     def setUp(self):
         """
         the config patches are neccessary for the setup() function.
-        in the other TestCases this function is called indirectly through main() or shell_main()
+        in the other TestCases this function is called indirectly through main() or repl_main()
         in that case the patch can be applied on the class-level (therefor on every test-method)
         in this case only needed in setUp().
         using start and stop to manage the patch lifecycle is not needed, since the test-method
@@ -162,13 +162,13 @@ class TestCat(TestCase):
                     self.assertIn(arg.arg_help, fake_out.getvalue())
 
     @patch('cat_win.src.cat.print_update_information', new=lambda *_: '')
-    def test__show_help_shell(self):
+    def test__show_help_repl(self):
         stdin_mock = StdInMock()
         stdin_mock.set_content('\n\n\n')
         with patch('sys.stdin', new=stdin_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat._show_help(True)
             for arg in cat.ALL_ARGS:
-                if arg.show_arg and arg.show_arg_on_shell:
+                if arg.show_arg and arg.show_arg_on_repl:
                     self.assertIn(arg.short_form, fake_out.getvalue())
                     self.assertIn(arg.long_form, fake_out.getvalue())
                     self.assertIn(arg.arg_help, fake_out.getvalue())

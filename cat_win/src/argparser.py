@@ -80,7 +80,7 @@ class ArgParser:
             the entire sys.argv list
         delete (bool):
             indicates if a parameter should be deleted or added. Needed for
-            the shell when changing file_search, file_match
+            the repl when changing file_search, file_match
         
         Returns:
         (args, unknown_args, unknown_files, echo_args) (tuple):
@@ -140,7 +140,7 @@ class ArgParser:
             the current parameter
         delete (bool):
             indicates if a parameter should be deleted or added. Needed for
-            the shell when changing file_search, file_match
+            the repl when changing file_search, file_match
             
         Returns:
         (bool):
@@ -236,7 +236,7 @@ class ArgParser:
             the entire sys.argv list
         delete (bool):
             indicates if a parameter should be deleted or added. Needed for
-            the shell when changing file_search, file_match
+            the repl when changing file_search, file_match
         """
         input_args = argv[1:]
         self._clear_values()

@@ -1,5 +1,5 @@
 """
-__main__
+repl
 """
 
 import sys
@@ -14,17 +14,11 @@ except Exception as e:
     print(e, file=sys.stderr)
     sys.exit(1)
 
-def repl_entry_point():
+def entry_point():
     """
     run the repl.
     """
     cat.repl_main()
-
-def entry_point():
-    """
-    run the main program.
-    """
-    cat.main()
 
 if __name__ == '__main__':
     entry_point()

@@ -4,9 +4,9 @@ from cat_win.src.const.argconstants import ALL_ARGS
 from cat_win.src.service.helper.levenshtein import levenshtein, calculate_suggestions
 # import sys
 # sys.path.append('../cat_win')
-# if shell:
+# if repl:
 #     arg_options = [(arg.short_form, arg.long_form)
-#                     for arg in ALL_ARGS if arg.show_arg_on_shell]
+#                     for arg in ALL_ARGS if arg.show_arg_on_repl]
 # else:
 #     arg_options = [(arg.short_form, arg.long_form)
 #                     for arg in ALL_ARGS]
@@ -39,5 +39,5 @@ class TestLevenshtein(TestCase):
                   ('--UNIQUE', [])]
         self.assertListEqual(calculate_suggestions(['--sord', '--b64', '--blq4k', '--UNIQUE'],
                                                    [(arg.short_form, arg.long_form)
-                                                    for arg in ALL_ARGS if arg.show_arg_on_shell]),
+                                                    for arg in ALL_ARGS if arg.show_arg_on_repl]),
                              result)
