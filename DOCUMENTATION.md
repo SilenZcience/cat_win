@@ -1113,24 +1113,24 @@ Valid Options are:
 
 | Option | Description |
 |--------|-------------|
-| line_numbers | the numbering of each line using <a href="#-n---number">-n, --number</a> |
 | line_length | the display of each line length using <a href="#-l---linelength">-l, --linelength</a> |
+| line_numbers | the numbering of each line using <a href="#-n---number">-n, --number</a> |
 | file_prefix | the file prefix using <a href="#--fp---file-prefix">--fp, --file-prefix</a> |
 | line_ends | the end of line marker using <a href="#-e---ends">-e, --ends</a> |
 | special_chars | special chars using <a href="#--chr---char">--chr, --char</a> |
-| number_conversion | the converted values using <a href="#--bin---bin">--bin</a>/<a href="#--oct---oct">--oct</a>/<a href="#--dec---dec">--dec</a>/<a href="#--hex---hex">--hex</a> |
+| summary_message | the message displayed using <a href="#-f---files">-f, --files</a>/<a href="#-d---dirs">-d, --dirs</a>/<a href="#-s---sum">-s, --sum</a>/<a href="#-w---wordcount">-w, --wordcount</a>/<a href="#--cc---charcount">--cc, --charcount</a> |
 | number_evaluation | the evaluated value using <a href="#--eval---eval">--eval, --EVAL</a> |
-| substring_replacement | the replaced string using <a href="#ab">[a,b]</a> |
+| number_conversion | the converted values using <a href="#--bin---bin">--bin</a>/<a href="#--oct---oct">--oct</a>/<a href="#--dec---dec">--dec</a>/<a href="#--hex---hex">--hex</a> |
+| file_attribute_message | the message containing time stamps and file size using <a href="#-a---attributes">-a, --attributes</a> |
+| active_file_attributes | the attributes a file has set using <a href="#-a---attributes">-a, --attributes</a> |
+| missing_file_attributes | the attributes a file has not set using <a href="#-a---attributes">-a, --attributes</a> |
+| checksum_message | the calculated checksum of a given file using <a href="#-m---checksum">-m, --checksum</a> |
+| raw_viewer | the output using <a href="#--hexview---hexview">--hexview, --HEXVIEW</a>/<a href="#--binview---binview">--binview, --binview</a> |
 | found_keyword | the found substring using <a href="#findx-findx">find=X, find&#42889;X</a> |
 | found_keyword_message | the message displayed when using <a href="#findx-findx">find=X, find&#42889;X</a> |
 | matched_pattern | the matched pattern using <a href="#matchx-matchx">match=X, match&#42889;X</a> |
 | matched_pattern_message | the message displayed when using <a href="#matchx-matchx">match=X, match&#42889;X</a> |
-| checksum_message | the calculated checksum of a given file using <a href="#-m---checksum">-m, --checksum</a> |
-| summary_message | the message displayed using <a href="#-f---files">-f, --files</a>/<a href="#-d---dirs">-d, --dirs</a>/<a href="#-s---sum">-s, --sum</a>/<a href="#-w---wordcount">-w, --wordcount</a>/<a href="#--cc---charcount">--cc, --charcount</a> |
-| file_attribute_message | the message containing time stamps and file size using <a href="#-a---attributes">-a, --attributes</a> |
-| active_file_attributes | the attributes a file has set using <a href="#-a---attributes">-a, --attributes</a> |
-| missing_file_attributes | the attributes a file has not set using <a href="#-a---attributes">-a, --attributes</a> |
-| raw_viewer | the output using <a href="#--hexview---hexview">--hexview, --HEXVIEW</a>/<a href="#--binview---binview">--binview, --binview</a> |
+| substring_replacement | the replaced string using <a href="#ab">[a,b]</a> |
 | message_information | any informational message like update information |
 | message_important | any important message like large file sizes |
 | message_warning | any warning message like overwriting a file with itself |
