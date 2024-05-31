@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - added `^I` hotkey to editor (insert byte sequence) and hexeditor (insert text).
+- when using `DOWN <x>` in -`M`, --`more` it is now possible to move up by entering a negative number x.
 
 ### Bugfixes
 
