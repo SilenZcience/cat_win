@@ -161,8 +161,16 @@ class More:
                             idown = user_input[4:] if user_input.startswith('DOWN') else user_input[1:]
                             idown = '1' if not idown else idown
                             try:
-                                step_length = int(idown)
-                                first_chunk = True
+                                step_length_tmp = int(idown)
+                                if step_length_tmp >= 0:
+                                    # move downwards
+                                    step_length = step_length_tmp
+                                    first_chunk = True
+                                else:
+                                    # move upwards
+                                    line_index -= (-step_length_tmp+More.t_height)
+                                    line_index = max(line_index, -1) # loop increments by one later
+                                    break_line = True
                             except ValueError:
                                 info = f"invalid input: {idown}"
                                 continue
@@ -195,6 +203,9 @@ class More:
                                 continue
                             break_line = True
                             break
+                        if user_input.strip():
+                            info = f"invalid command: {user_input} - Type 'help'"
+                            continue
                         break
 
                     if break_line:
