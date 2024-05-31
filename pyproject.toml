@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "cat_win"
-requires-python = ">=3.7"
+requires-python = ">=3.6"
 authors = [{name = "Silas A. Kraume", email = "silas.kraume1552@gmail.com"}]
 readme = "README.md"
 license = {file = "LICENSE"}
