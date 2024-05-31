@@ -153,7 +153,32 @@ class TestMore(TestCase):
             more = More(list(map(str, range(1, max(31+n, 31)))))
             with patch('builtins.input', input_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
                 more.step_through()
+                if n < 0:
+                    self.assertIn('\x1b[2K\x1b[1F\x1b[2K' + '\n'.join(list(map(str, range(1, 29)))) + '\n\n-', fake_out.getvalue())
+                    continue
                 self.assertIn('\x1b[2K\x1b[1F\x1b[2K' + '\n'.join(list(map(str, range(29, max(29+n, 30))))) + '\n\n-', fake_out.getvalue())
+
+    def test_unknown_command(self):
+        def input_mock_helper():
+            yield (1, 'X')
+            yield (2, 'DY')
+            yield (3, 'n')
+
+        helper = input_mock_helper()
+        def input_mock(inp: str):
+            c, y = next(helper)
+            if c == 1:
+                self.assertEqual(inp, '-- More (93%) -- ')
+            elif c == 2:
+                self.assertEqual(inp, "-- More (93%)[invalid command: X - Type 'help'] -- ")
+            elif c == 3:
+                self.assertEqual(inp, "-- More (93%)[invalid input: Y] -- ")
+            return y
+
+        more = More(['a'] * 30)
+        with patch('builtins.input', input_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
+            more.step_through()
+            self.assertIn('a\n' * 28 + '\n', fake_out.getvalue())
 
 
 @patch('os.isatty', OSAttyDefGen.get_def({0: True, 1: False}))

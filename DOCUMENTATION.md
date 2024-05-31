@@ -978,7 +978,7 @@ Page through the File Contents Step by Step.
 Each Step the Output is paused until User Interaction.
 The first Step always fills the entire Screen.
 The following Steps have the Size as defined by the config Element `more_step_length`.
-Display the available Commands by entering `?` or `help`.
+Display the available Commands by entering `?` or `h` or `help`.
 
 ```console
 > catw file -M
