@@ -1084,6 +1084,7 @@ Valid Options are:
 | large_file_size | the Size (Bytes) at which a Warning occurs | 1024 | 104857600 (100Mb) |
 | strip_color_on_pipe | indicate if the Output should be stripped of any Color | false | true |
 | ignore_unknown_bytes | ignore unknown bytes instead of replacing them with � | true | false |
+| end_marker_symbol | define the marker that will be displayed at EOL when using <a href="#-e---ends">-e, --ends</a> | ^EOL | $ |
 | peek_size | define the amount of lines shown by <a href="#-p---peek">-p, --peek</a> | 10 | 5 |
 | strings_minimum_sequence_length | set the minimum Length of a String </br> (for the <a href="#--strings---strings">--strings, --strings</a> Parameter) | 2 | 4 |
 | strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the <a href="#--strings---strings">--strings, --strings</a> Parameter) | \| | \\n |
