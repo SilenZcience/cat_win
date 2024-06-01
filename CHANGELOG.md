@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.7.11] - TBA
+
+### Minor Changes
+
+- added `end_marker_symbol` option to the config menu to define the marker that will be displayed when using -`e`, --`ends`.
+
+
 ## [1.7.10] - 2024-05-31
 
 ### Minor Changes
