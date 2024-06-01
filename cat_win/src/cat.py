@@ -201,6 +201,7 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     """
     Print all neccassary debug information
     """
+    err_print(color_dic[CKW.MESSAGE_INFORMATION], end='')
     err_print('================================================ '
         'DEBUG ================================================')
     err_print('sys_args:', sys.argv)
@@ -227,7 +228,8 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     err_print('replace mapping: ', end='')
     err_print(arg_parser.file_replace_mapping)
     err_print('==================================================='
-              '====================================================')
+              '====================================================', end='')
+    err_print(color_dic[CKW.RESET_ALL])
 
 
 def _print_meta_and_checksum(show_meta: bool, show_checksum: bool) -> None:
@@ -1074,6 +1076,7 @@ def main():
 
     # clean-up
     if u_args[ARGS_DEBUG]:
+        err_print(color_dic[CKW.MESSAGE_INFORMATION], end='')
         err_print('================================================ '
             'DEBUG ================================================')
         caches = [
@@ -1107,7 +1110,8 @@ def main():
                 err_print(type(e).__name__, tmp_file)
     if u_args[ARGS_DEBUG]:
         err_print('==================================================='
-            '====================================================')
+            '====================================================', end='')
+        err_print(color_dic[CKW.RESET_ALL])
 
 
 def repl_main(deprecated: bool = False):
