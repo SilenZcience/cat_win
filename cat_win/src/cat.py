@@ -636,8 +636,8 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
 
     for arg, param in u_args:
         if arg == ARGS_ENDS:
-            content = [(prefix, f"{line}{color_dic[CKW.ENDS]}${color_dic[CKW.RESET_ALL]}")
-                        for prefix, line in content]
+            emarker = color_dic[CKW.ENDS]+const_dic[DKW.END_MARKER_SYMBOL]+color_dic[CKW.RESET_ALL]
+            content = [(prefix, line + emarker) for prefix, line in content]
         elif arg == ARGS_SQUEEZE:
             content = [list(group)[0] for _, group in groupby(content, lambda x: x[1])]
         elif arg == ARGS_REVERSE:

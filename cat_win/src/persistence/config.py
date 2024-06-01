@@ -62,6 +62,7 @@ class Config:
         DKW.LARGE_FILE_SIZE: 1024 * 1024 * 100,  # 100 Megabytes
         DKW.STRIP_COLOR_ON_PIPE: True,
         DKW.IGNORE_UNKNOWN_BYTES: False,
+        DKW.END_MARKER_SYMBOL: '$',
         DKW.PEEK_SIZE: 5,
         DKW.STRINGS_MIN_SEQUENCE_LENGTH: 4,
         DKW.STRINGS_DELIMETER: '\n',
@@ -81,6 +82,7 @@ class Config:
         DKW.LARGE_FILE_SIZE: validator_int,
         DKW.STRIP_COLOR_ON_PIPE: validator_bool,
         DKW.IGNORE_UNKNOWN_BYTES: validator_bool,
+        DKW.END_MARKER_SYMBOL: validator_string,
         DKW.PEEK_SIZE: validator_int_pos,
         DKW.STRINGS_MIN_SEQUENCE_LENGTH: validator_int_pos,
         DKW.STRINGS_DELIMETER: validator_string,
