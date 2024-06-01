@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - added `end_marker_symbol` option to the config menu to define the marker that will be displayed when using -`e`, --`ends`.
+- added `blank_remove_ws_lines` option to the config menu to remove whitespace lines with -`b`, --`blank` also.
 
 
 ## [1.7.10] - 2024-05-31
