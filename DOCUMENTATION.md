@@ -318,6 +318,7 @@ Using the lowercase Argument in Combination with the <a href="#-n---number">-n, 
 
 Displays a '$' Character at the End of each Line.
 This can be useful to detect Whitespaces.
+The Character to display can be configured using the `end_marker_symbol` element in the config menu (<a href="#--config---config">--config, --config</a>).
 
 ```console
 > catw test.txt --ends
@@ -346,6 +347,7 @@ Note that the special Char ␛ will not be displayed as ^ESC because it is neede
 
 Removes empty Lines from the Output.
 Beware that other Arguments can change a Line to be not empty beforehand.
+When toggling the `blank_remove_ws_lines` element in the config menu (<a href="#--config---config">--config, --config</a>) also lines which only contain Whitespaces such as Space or Tab will be removed from the Output.
 
 ```console
 > catw test.txt -nb
@@ -360,6 +362,7 @@ Between the Beginning and End of the File will be displayed how many Lines have 
 Useful for getting a quick impression of how data in a given File is structured.
 This Argument is ignored when provided alongside with Queries for Substrings of Patterns or the <a href="#-m---more">-M, --more</a> Parameter.
 Does nothing when the File has at most 10 Lines.
+The `peek_size` element in the config menu (<a href="#--config---config">--config, --config</a>) defines how many Lines to display.
 
 ```console
 > catw test.txt -p
@@ -913,6 +916,7 @@ Files will be saved with the text Encoding defined by <a href="#encx-encx">enc=X
 Note that ^c (Ctrl-c) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
 The Auto-Indendation Feature can be turned on in the config menu using the `editor_auto_indent` element.
 The Indendation when using Auto-Indendation can be configured in the config menu (<a href="#--config---config">--config, --config</a>) using `editor_indentation`.
+The Input inside the Find Prompt (see Key bindings) is unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_editor_search` is set but in Case of an unicode-error the Input will simply be used literally.
 On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module.
 The currently supported Key bindings are as follows:
 
@@ -1083,9 +1087,10 @@ Valid Options are:
 | default_file_encoding | the File Encoding used by Default | utf-16 | utf-8 |
 | large_file_size | the Size (Bytes) at which a Warning occurs | 1024 | 104857600 (100Mb) |
 | strip_color_on_pipe | indicate if the Output should be stripped of any Color | false | true |
-| ignore_unknown_bytes | ignore unknown bytes instead of replacing them with � | true | false |
-| end_marker_symbol | define the marker that will be displayed at EOL when using <a href="#-e---ends">-e, --ends</a> | ^EOL | $ |
-| peek_size | define the amount of lines shown by <a href="#-p---peek">-p, --peek</a> | 10 | 5 |
+| ignore_unknown_bytes | ignore unknown Bytes instead of replacing them with � | true | false |
+| end_marker_symbol | define the Marker that will be displayed at EOL when using <a href="#-e---ends">-e, --ends</a> | ^EOL | $ |
+| blank_remove_ws_lines | additionally remove whitespace Lines when using <a href="#-b---blank">-b, --blank</a> | true | false |
+| peek_size | define the amount of Lines shown by <a href="#-p---peek">-p, --peek</a> | 10 | 5 |
 | strings_minimum_sequence_length | set the minimum Length of a String </br> (for the <a href="#--strings---strings">--strings, --strings</a> Parameter) | 2 | 4 |
 | strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the <a href="#--strings---strings">--strings, --strings</a> Parameter) | \| | \\n |
 | editor_indentation | set the Indentation used in the Editor (<a href="#----edit">-!, --edit</a>)</br> when pressing ↹ on an empty Line | <b>␣ ␣ ␣ ␣</b> | ↹ |
