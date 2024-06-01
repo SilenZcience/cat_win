@@ -12,6 +12,7 @@ class DKW:
     LARGE_FILE_SIZE = 'large_file_size'
     STRIP_COLOR_ON_PIPE = 'strip_color_on_pipe'
     IGNORE_UNKNOWN_BYTES = 'ignore_unknown_bytes'
+    END_MARKER_SYMBOL = 'end_marker_symbol'
     PEEK_SIZE = 'peek_size'
     STRINGS_MIN_SEQUENCE_LENGTH = 'strings_minimum_sequence_length'
     STRINGS_DELIMETER = 'strings_delimeter'
