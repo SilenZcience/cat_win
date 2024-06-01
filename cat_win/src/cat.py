@@ -647,7 +647,8 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
         elif arg == ARGS_SSORT:
             content.sort(key = lambda l: len(l[1]))
         elif arg == ARGS_BLANK:
-            content = [c for c in content if c[1]]
+            content = [c for c in content if c[1].strip(
+                None if const_dic[DKW.BLANK_REMOVE_WS_LINES] else '')]
         elif arg == ARGS_EVAL:
             content = comp_eval(converter, content, param, remove_ansi_codes_from_line)
         elif arg == ARGS_HEX:
