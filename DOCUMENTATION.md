@@ -1226,7 +1226,7 @@ When using this Parameter in Uppercase the Case of the Substring will be ignored
 ```console
 > catw test.txt "find=cats and"
 It's raining cats and dogs!
---------------- Found [('cats and', [13, 21])] ---------------
+---------- Found:   ('cats and' 13-21) ----------
 
 > catw test.txt "find=CATS and"
 It's raining cats and dogs!
@@ -1235,7 +1235,7 @@ It's raining cats and dogs!
 ```console
 > catw test.txt "FIND=CATS and"
 It's raining cats and dogs!
---------------- Found [('CATS and', [13, 21])] ---------------
+---------- Found:   ('CATS and' 13-21) ----------
 ```
 
 ### <a id="matchx-matchx">match=X, match&#42889;X</a>
@@ -1248,7 +1248,7 @@ When using this Parameter in Uppercase the Case of the Pattern will be ignored.
 ```console
 > catw test.txt "match=cat.\s.{3,}"
 It's raining cats and dogs!
---------------- Matched [('cat.\\s.{3,}', [13, 27])] ---------------
+---------- Matched: ('cat.\\s.{3,}' 13-27) ----------
 
 > catw test.txt "match=CAT.\s.{3,}"
 It's raining cats and dogs!
@@ -1257,7 +1257,7 @@ It's raining cats and dogs!
 ```console
 > catw test.txt "MATCH=CAT.\s.{3,}"
 It's raining cats and dogs!
---------------- Matched [('CAT.\\s.{3,}', [13, 27])] ---------------
+---------- Matched: ('CAT.\\s.{3,}' 13-27) ----------
 ```
 
 ### <a id="truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>
