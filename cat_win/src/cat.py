@@ -483,16 +483,22 @@ def print_file(content: list, stepper: More) -> bool:
 
         found_sth = False
         if f_keywords:
-            found_message = f"{color_dic[CKW.FOUND_MESSAGE]}--------------- Found "
-            found_message+= f"{f_keywords} ---------------{color_dic[CKW.RESET_ALL]}"
+            found_message = f"{color_dic[CKW.FOUND_MESSAGE]}---------- Found:   ("
+            found_message+= ') ('.join(
+                [f"'{kw}' {pos_s}-{pos_e}" for kw, (pos_s, pos_e) in f_keywords]
+                )
+            found_message+= f") ----------{color_dic[CKW.RESET_ALL]}"
             if u_args[ARGS_MORE]:
                 stepper.add_line(found_message)
             else:
                 print(found_message)
             found_sth = True
         if m_keywords:
-            matched_message = f"{color_dic[CKW.MATCHED_MESSAGE]}--------------- Matched "
-            matched_message+= f"{m_keywords} ---------------{color_dic[CKW.RESET_ALL]}"
+            matched_message = f"{color_dic[CKW.MATCHED_MESSAGE]}---------- Matched: ("
+            matched_message+= ') ('.join(
+                [f"'{kw}' {pos_s}-{pos_e}" for kw, (pos_s, pos_e) in m_keywords]
+                )
+            matched_message+= f") ----------{color_dic[CKW.RESET_ALL]}"
             if u_args[ARGS_MORE]:
                 stepper.add_line(matched_message)
             else:
