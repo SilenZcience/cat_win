@@ -96,8 +96,8 @@ class TestCatFull(TestCase):
     @patch('sys.argv',
            ['<CAT>', test_file_path, 'enc=utf-8', 'trunc=0:1', 'find=ple ', 'match=:'])
     def test_cat_output_full_find_found(self):
-        expected_output = "Sample Text:\n--------------- Found [('ple ', [3, 7])] ------"
-        expected_output += "---------\n--------------- Matched [(':', [11, 12])] ---------------\n"
+        expected_output = "Sample Text:\n---------- Found:   ('ple ' 3-7) ----------\n"
+        expected_output += "---------- Matched: (':' 11-12) ----------\n"
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
