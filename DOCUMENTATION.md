@@ -130,7 +130,7 @@
 | *<a href="#-n---number">-n, --number</a>* | number all output lines |✔|
 | *<a href="#--fp---file-prefix">--fp, --file-prefix</a>* | include the file in every line prefix |❌|
 ||||
-| *<a href="#-e---ends">-e, --ends</a>* | display $ at the end of each line |✔|
+| *<a href="#-e---ends">-e, --ends</a>* | mark the end of each line |✔|
 | *<a href="#--chr---char">--chr, --char</a>* | display special characters |✔|
 ||||
 | *<a href="#-b---blank">-b, --blank</a>* | hide empty lines |✔|

@@ -56,7 +56,7 @@ ALL_ARGS = [
 				ARGS_FFILE_PREFIX, show_arg=False, section=1),
 
     # simple replacements
-    ArgConstant('-e', '--ends', 'display $ at the end of each line',
+    ArgConstant('-e', '--ends', 'mark the end of each line',
 				ARGS_ENDS, section=2),
     ArgConstant('--chr', '--char', 'display special characters',
 				ARGS_CHR, section=2),
