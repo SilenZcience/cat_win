@@ -311,10 +311,10 @@ class Config:
         """
         try:
             os.remove(self.config_file)
-            print('The config file has successfully been removed!')
+            print(f"Successfully removed config file:\n\t{self.config_file}")
         except FileNotFoundError:
             err_print('No active config file has been found.')
         except PermissionError:
-            err_print('Permission denied! The config file could not be deleted.')
+            err_print(f"Permission denied! Error deleting config file:\n\t{self.config_file}")
         except OSError:
             err_print('An unexpected error occured.')
