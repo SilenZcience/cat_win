@@ -541,7 +541,7 @@ Amount: 1
 ```
 ```console
 > catw test.txt --FILES
-applied FILE(s):
+found FILE(s):
         13.0 B   <Path>/test.txt
 Sum:    13.0 B
 Amount: 1
@@ -1156,7 +1156,7 @@ Successfully updated config file:
 Reset the Configuration (of <a href="#--cconfig---cconfig">--cconfig, --cconfig</a>) to their Default Values.
 
 ```console
-> catw --config-clear
+> catw --cconfig-clear
 Successfully updated config file:
    <Path>\cat.config
 ```
@@ -1169,7 +1169,8 @@ The cat.config File will be erased from the System.
 
 ```console
 > catw --config-remove
-The config file has successfully been removed!
+Successfully removed config file:
+   <Path>\cat.config
 > catw --config-remove
 No active config file has been found.
 ```
@@ -1206,13 +1207,11 @@ The default Encoding can be configured using the `default_file_encoding` element
 
 ```console
 > catw test.txt
-Failed to open: <Path>\test.txt
-Do you want to open the file as a binary, without parameters?
-[Y/⏎] Yes, Continue       [N] No, Abort :
+��This Text is written in Utf-16! d'�
 ```
 ```console
 > catw test.txt enc=utf-16
-This Text is written in Utf-16!
+This Text is written in Utf-16! ❤️
 ```
 
 ### <a id="findx-findx">find=X, find&#42889;X</a>
