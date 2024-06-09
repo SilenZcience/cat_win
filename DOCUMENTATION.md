@@ -922,10 +922,10 @@ The currently supported Key bindings are as follows:
 
 | Key(s) | default behaviour | shift click | control click | alt click |
 |--------|:-----------------:|:-----------:|:-------------:|:---------:|
-| <kbd>Arrows</kbd> | move cursor by char | move cursor by char | move cursor by word | scroll window by char |
-| <kbd>Page Up/Down</kbd> | move cursor by page | move cursor by page | move cursor by page | scroll window by page |
-| <kbd>Home/Pos</kbd> | move cursor to start of line | move cursor to start of line | move cursor to start of file | scroll window to start of file |
-| <kbd>End</kbd> | move cursor to end of line | move cursor to end of line | move cursor to end of file | scroll window to end of file |
+| <kbd>Arrows</kbd> | move cursor by char | select area by char | move cursor by word | scroll window by char |
+| <kbd>Page Up/Down</kbd> | move cursor by page | select area by page | move cursor by page | scroll window by page |
+| <kbd>Home/Pos</kbd> | move cursor to start of line | select area to start of line | move cursor to start of file | scroll window to start of file |
+| <kbd>End</kbd> | move cursor to end of line | select area to end of line | move cursor to end of file | scroll window to end of file |
 | <kbd>Tab</kbd> | insert a tab or </br> indent on empty line | decrease indent | - | - |
 ||||||
 | <kbd>Enter</kbd> | write newline | write newline | write newline | - |
@@ -935,12 +935,14 @@ The currently supported Key bindings are as follows:
 | <kbd>Undo/^Z</kbd> | - | - | undo an action | - |
 | <kbd>Redo/^Y</kbd> | - | - | redo an action | - |
 ||||||
+| <kbd>SelectAll/^A</kbd> | - | - | select the entire file | - |
+| <kbd>Copy/^C</kbd> | - | - | copy selected text | - |
 | <kbd>Save/^S</kbd> | - | - | save changes | save changes |
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to specific line | - |
 | <kbd>Find/^F</kbd> | - | - | prompt to search in the file | - |
-| <kbd>Background/^B</kbd> | - | - | put the editor in the background</br>(UNIX only) | - |
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
 | <kbd>Insert/^N</kbd> | - | - | Insert a Byte Sequence | - |
+| <kbd>Background/^B</kbd> | - | - | put the editor in the background</br>(UNIX only) | - |
 | <kbd>Quit/^Q</kbd> | - | - | close editor</br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^D</kbd> | - | - | interrupt program | - |
 
@@ -956,10 +958,10 @@ The currently supported Key bindings are as follows:
 
 | Key(s) | default behaviour | shift click | control click | alt click |
 |--------|:-----------------:|:-----------:|:-------------:|:---------:|
-| <kbd>Arrows</kbd> | move cursor by byte | move cursor by byte | move cursor multiple bytes | - |
-| <kbd>Page Up/Down</kbd> | move cursor by page | move cursor by page | move cursor by page | - |
-| <kbd>Home/Pos</kbd> | move cursor to start of line | move cursor to start of line | move cursor to start of file | - |
-| <kbd>End</kbd> | move cursor to end of line | move cursor to end of line | move cursor to end of file | - |
+| <kbd>Arrows</kbd> | move cursor by byte | select area by byte | move cursor multiple bytes | - |
+| <kbd>Page Up/Down</kbd> | move cursor by page | select area by page | move cursor by page | - |
+| <kbd>Home/Pos</kbd> | move cursor to start of line | select area to start of line | move cursor to start of file | - |
+| <kbd>End</kbd> | move cursor to end of line | select area to end of line | move cursor to end of file | - |
 ||||||
 | <kbd>0-9 & A-F</kbd> | edit the current byte | - | - | - |
 | <kbd><</kbd> | insert a new byte to the left | - | - | - |
@@ -967,12 +969,14 @@ The currently supported Key bindings are as follows:
 | <kbd>Backspace</kbd> | reset current byte | reset current byte | remove current byte | reset current byte |
 | <kbd>Delete</kbd> | reset current byte | reset current byte | remove current byte | reset current byte |
 ||||||
+| <kbd>SelectAll/^A</kbd> | - | - | select the entire file | - |
+| <kbd>Copy/^C</kbd> | - | - | copy selected bytes | - |
 | <kbd>Save/^S</kbd> | - | - | save changes | save changes |
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to a specific byte | - |
 | <kbd>Find/^F</kbd> | - | - | prompt to search a byte(-sequence) in the file | - |
-| <kbd>Background/^B</kbd> | - | - | put the hex-editor in the background</br>(UNIX only) | - |
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
 | <kbd>Insert/^N</kbd> | - | - | Insert a Text Sequence | - |
+| <kbd>Background/^B</kbd> | - | - | put the hex-editor in the background</br>(UNIX only) | - |
 | <kbd>Quit/^Q</kbd> | - | - | close hex-editor</br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^D</kbd> | - | - | interrupt program | - |
 
