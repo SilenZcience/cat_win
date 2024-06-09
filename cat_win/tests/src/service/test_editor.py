@@ -39,6 +39,19 @@ class TestEditor(TestCase):
         self.assertEqual(editor.error_bar, "[Errno 2] No such file or directory: ''")
         self.assertListEqual(editor.window_content, [''])
 
+    def test_selected_area(self):
+        editor = Editor('', '')
+        self.assertEqual(editor.selected_area, ((0, 0), (0, 0)))
+        editor.cpos.set_pos((5, 4))
+        editor.spos.set_pos((5, 3))
+        self.assertEqual(editor.selected_area, ((5, 3), (5, 4)))
+        editor.cpos.set_pos((5, 4))
+        editor.spos.set_pos((2, 3))
+        self.assertEqual(editor.selected_area, ((2, 3), (5, 4)))
+        editor.cpos.set_pos((3, 4))
+        editor.spos.set_pos((5, 3))
+        self.assertEqual(editor.selected_area, ((3, 4), (5, 3)))
+
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(['a' * 10] * 50))
     def test__build_file(self):
         editor = Editor('', '')
@@ -217,50 +230,86 @@ class TestEditor(TestCase):
         editor._move_key_ctl_down()
         self.assertEqual(editor.cpos.get_pos(), (1,3))
 
-    def test_editor_scroll_key_alt_left(self):
+    def test_editor_select_key_left(self):
+        editor = Editor(test_file_path_editor, '')
+        self.assertEqual(editor._select_key_left(), None)
+        self.assertEqual(editor.cpos.get_pos(), (0,0))
+        editor.cpos.set_pos((1,0))
+        editor._select_key_left()
+        self.assertEqual(editor.cpos.get_pos(), (0,6))
+        editor._select_key_left()
+        self.assertEqual(editor.cpos.get_pos(), (0,5))
+
+    def test_editor_select_key_right(self):
+        editor = Editor(test_file_path_editor, '')
+        editor.cpos.set_pos((1,6))
+        self.assertEqual(editor._select_key_right(), None)
+        self.assertEqual(editor.cpos.get_pos(), (1,6))
+        editor.cpos.set_pos((0,6))
+        editor._select_key_right()
+        self.assertEqual(editor.cpos.get_pos(), (1,0))
+        editor._select_key_right()
+        self.assertEqual(editor.cpos.get_pos(), (1,1))
+
+    def test_editor_select_key_up(self):
+        editor = Editor(test_file_path_editor, '')
+        editor.cpos.set_pos((1,3))
+        editor._select_key_up()
+        self.assertEqual(editor.cpos.get_pos(), (0,3))
+        self.assertEqual(editor._select_key_up(), None)
+        self.assertEqual(editor.cpos.get_pos(), (0,3))
+
+    def test_editor_select_key_down(self):
+        editor = Editor(test_file_path_editor, '')
+        editor._select_key_down()
+        self.assertEqual(editor.cpos.get_pos(), (1,0))
+        self.assertEqual(editor._select_key_down(), None)
+        self.assertEqual(editor.cpos.get_pos(), (1,0))
+
+    def test_editor_scroll_key_left(self):
         editor = Editor(test_file_path_editor, '')
         editor.wpos.set_pos((1,2))
-        editor._scroll_key_alt_left()
+        editor._scroll_key_left()
         self.assertEqual(editor.wpos.get_pos(), (1,1))
-        editor._scroll_key_alt_left()
+        editor._scroll_key_left()
         self.assertEqual(editor.wpos.get_pos(), (1,0))
-        editor._scroll_key_alt_left()
+        editor._scroll_key_left()
         self.assertEqual(editor.wpos.get_pos(), (1,0))
 
-    def test_editor_scroll_key_alt_right(self):
+    def test_editor_scroll_key_right(self):
         editor = Editor(test_file_path_editor, '')
         editor.wpos.set_pos((0,2))
-        editor._scroll_key_alt_right()
+        editor._scroll_key_right()
         self.assertEqual(editor.wpos.get_pos(), (0,0))
         editor._key_string('x' * 115)
-        editor._scroll_key_alt_right()
+        editor._scroll_key_right()
         self.assertEqual(editor.wpos.get_pos(), (0,1))
-        editor._scroll_key_alt_right()
+        editor._scroll_key_right()
         self.assertEqual(editor.wpos.get_pos(), (0,2))
-        editor._scroll_key_alt_right()
+        editor._scroll_key_right()
         self.assertEqual(editor.wpos.get_pos(), (0,2))
 
-    def test_editor_scroll_key_alt_up(self):
+    def test_editor_scroll_key_up(self):
         editor = Editor(test_file_path_editor, '')
         editor.wpos.set_pos((2,0))
-        editor._scroll_key_alt_up()
+        editor._scroll_key_up()
         self.assertEqual(editor.wpos.get_pos(), (1,0))
-        editor._scroll_key_alt_up()
+        editor._scroll_key_up()
         self.assertEqual(editor.wpos.get_pos(), (0,0))
-        editor._scroll_key_alt_up()
+        editor._scroll_key_up()
         self.assertEqual(editor.wpos.get_pos(), (0,0))
 
-    def test_editor_scroll_key_alt_down(self):
+    def test_editor_scroll_key_down(self):
         editor = Editor(test_file_path_editor, '')
-        editor._scroll_key_alt_down()
+        editor._scroll_key_down()
         self.assertEqual(editor.wpos.get_pos(), (0,0))
         for _ in range(30):
             editor._key_enter('')
-        editor._scroll_key_alt_down()
+        editor._scroll_key_down()
         self.assertEqual(editor.wpos.get_pos(), (1,0))
-        editor._scroll_key_alt_down()
+        editor._scroll_key_down()
         self.assertEqual(editor.wpos.get_pos(), (2,0))
-        editor._scroll_key_alt_down()
+        editor._scroll_key_down()
         self.assertEqual(editor.wpos.get_pos(), (2,0))
 
     def test_editor_move_key_page_up(self):
@@ -298,6 +347,44 @@ class TestEditor(TestCase):
         self.assertEqual(editor.wpos.get_pos(), (33,0))
         self.assertEqual(editor.cpos.get_pos(), (61,0))
         editor._move_key_page_down()
+        self.assertEqual(editor.wpos.get_pos(), (33,0))
+        self.assertEqual(editor.cpos.get_pos(), (62,0))
+
+    def test_editor_select_key_page_up(self):
+        editor = Editor(test_file_path_editor, '')
+        editor._select_key_page_up()
+        self.assertEqual(editor.wpos.get_pos(), (0,0))
+        self.assertEqual(editor.cpos.get_pos(), (0,0))
+        for _ in range(61):
+            editor._key_enter('')
+        editor._move_key_right()
+        self.assertEqual(editor.cpos.get_pos(), (61,1))
+        editor.wpos.set_pos(editor.cpos.get_pos())
+        editor._select_key_page_up()
+        self.assertEqual(editor.wpos.get_pos(), (31,1))
+        self.assertEqual(editor.cpos.get_pos(), (31,1))
+        editor._select_key_page_up()
+        self.assertEqual(editor.wpos.get_pos(), (1,1))
+        self.assertEqual(editor.cpos.get_pos(), (1,1))
+        editor._select_key_page_up()
+        self.assertEqual(editor.wpos.get_pos(), (0,1))
+        self.assertEqual(editor.cpos.get_pos(), (0,1))
+
+    def test_editor_select_key_page_down(self):
+        editor = Editor(test_file_path_editor, '')
+        editor._select_key_page_down()
+        for _ in range(61): # file_len == 63
+            editor._key_enter('')
+            editor._move_key_up()
+        self.assertEqual(editor.wpos.get_pos(), (0,0))
+        self.assertEqual(editor.cpos.get_pos(), (1,0))
+        editor._select_key_page_down()
+        self.assertEqual(editor.wpos.get_pos(), (30,0))
+        self.assertEqual(editor.cpos.get_pos(), (31,0))
+        editor._select_key_page_down()
+        self.assertEqual(editor.wpos.get_pos(), (33,0))
+        self.assertEqual(editor.cpos.get_pos(), (61,0))
+        editor._select_key_page_down()
         self.assertEqual(editor.wpos.get_pos(), (33,0))
         self.assertEqual(editor.cpos.get_pos(), (62,0))
 
@@ -343,6 +430,13 @@ class TestEditor(TestCase):
         editor._move_key_ctl_end()
         self.assertEqual(editor.cpos.get_pos(), (1,6))
 
+    def test_editor_select_key_end(self):
+        editor = Editor(test_file_path_editor, '')
+        editor._select_key_end()
+        self.assertEqual(editor.cpos.get_pos(), (0,6))
+        editor._select_key_end()
+        self.assertEqual(editor.cpos.get_pos(), (0,6))
+
     def test_editor_scroll_key_end(self):
         editor = Editor(test_file_path_editor, '')
         for _ in range(61):
@@ -366,6 +460,14 @@ class TestEditor(TestCase):
         editor.cpos.set_pos((1,3))
         editor._move_key_ctl_home()
         self.assertEqual(editor.cpos.get_pos(), (0,0))
+
+    def test_editor_select_key_home(self):
+        editor = Editor(test_file_path_editor, '')
+        editor._select_key_home()
+        self.assertEqual(editor.cpos.get_pos(), (0,0))
+        editor.cpos.set_pos((1,3))
+        editor._select_key_home()
+        self.assertEqual(editor.cpos.get_pos(), (1,0))
 
     def test_editor_scroll_key_home(self):
         editor = Editor(test_file_path_editor, '')
@@ -427,6 +529,24 @@ class TestEditor(TestCase):
         self.assertListEqual(editor.window_content, ['ltest\t', '!!!ine 1', 'line 2'])
         editor._key_string('\t')
         self.assertListEqual(editor.window_content, ['ltest\t', '!!!!!!ine 1', 'line 2'])
+
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(['@@@'] * 4))
+    def test_editor_select_key_all(self):
+        editor = Editor('', '')
+        editor.spos.set_pos((1,1))
+        editor._select_key_all()
+        self.assertEqual(editor.spos.get_pos(), (0, 0))
+        self.assertEqual(editor.cpos.get_pos(), (3, 3))
+
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(['@@@'] * 4))
+    def test__action_copy(self):
+        def assertCopy(_s: str):
+            self.assertEqual(_s, '\n'.join(['@@@'] * 4))
+        editor = Editor('', '')
+        editor.selecting = True
+        editor._select_key_all()
+        with patch('cat_win.src.service.clipboard.Clipboard.put', assertCopy):
+            editor._action_copy()
 
     def test__action_render_scr(self):
         editor = Editor('', '')

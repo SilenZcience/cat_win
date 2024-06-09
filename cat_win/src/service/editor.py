@@ -12,8 +12,9 @@ import signal
 import sys
 
 from cat_win.src.service.helper.editorhelper import History, Position, wcwidth, UNIFY_HOTKEYS, \
-    KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, HEX_BYTE_KEYS
+    KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, SELECT_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
+from cat_win.src.service.clipboard import Clipboard
 from cat_win.src.service.rawviewer import SPECIAL_CHARS
 
 
@@ -61,14 +62,23 @@ class Editor:
         self.unsaved_progress = False
         self.changes_made = False
         self.scrolling = False
+        self.selecting = False
         self.deleted_line = False
 
         # current cursor position
         self.cpos = Position(0, 0)
         # window position (top-left)
         self.wpos = Position(0, 0)
+        # second cursor for selection area
+        self.spos = Position(0, 0)
 
         self._setup_file()
+
+    @property
+    def selected_area(self):
+        if self.spos.get_pos() <= self.cpos.get_pos():
+            return (self.spos.get_pos(), self.cpos.get_pos())
+        return (self.cpos.get_pos(), self.spos.get_pos())
 
     def _set_special_chars(self, special_chars: dict) -> None:
         self.special_chars = special_chars
@@ -281,18 +291,30 @@ class Editor:
             self.cpos.row = len(self.window_content)-1
             self.cpos.col = len(self.window_content[self.cpos.row])
 
-    def _scroll_key_alt_left(self) -> None:
+    def _select_key_left(self) -> None:
+        self._move_key_left()
+
+    def _select_key_right(self) -> None:
+        self._move_key_right()
+
+    def _select_key_up(self) -> None:
+        self._move_key_up()
+
+    def _select_key_down(self) -> None:
+        self._move_key_down()
+
+    def _scroll_key_left(self) -> None:
         self.wpos.col = max(self.wpos.col-1, 0)
 
-    def _scroll_key_alt_right(self) -> None:
+    def _scroll_key_right(self) -> None:
         max_y, max_x = self.getxymax()
         max_line = max(map(len,self.window_content[self.wpos.row:self.wpos.row+max_y]))
         self.wpos.col = max(min(self.wpos.col+1, max_line+1-max_x), 0)
 
-    def _scroll_key_alt_up(self) -> None:
+    def _scroll_key_up(self) -> None:
         self.wpos.row = max(self.wpos.row-1, 0)
 
-    def _scroll_key_alt_down(self) -> None:
+    def _scroll_key_down(self) -> None:
         max_y, _ = self.getxymax()
         self.wpos.row = max(min(self.wpos.row+1, len(self.window_content)-max_y), 0)
 
@@ -308,6 +330,12 @@ class Editor:
         self._build_file_upto()
         self.wpos.row = max(min(self.wpos.row, len(self.window_content)-max_y), 0)
         self.cpos.row = min(self.cpos.row, len(self.window_content)-1)
+
+    def _select_key_page_up(self) -> None:
+        self._move_key_page_up()
+
+    def _select_key_page_down(self) -> None:
+        self._move_key_page_down()
 
     def _scroll_key_page_up(self) -> None:
         max_y, _ = self.getxymax()
@@ -327,6 +355,9 @@ class Editor:
         self.cpos.row = len(self.window_content)-1
         self.cpos.col = len(self.window_content[-1])
 
+    def _select_key_end(self) -> None:
+        self._move_key_end()
+
     def _scroll_key_end(self) -> None:
         self._build_file()
         max_y, max_x = self.getxymax()
@@ -340,6 +371,9 @@ class Editor:
     def _move_key_ctl_home(self) -> None:
         self.cpos.row = 0
         self.cpos.col = 0
+
+    def _select_key_home(self) -> None:
+        self._move_key_home()
 
     def _scroll_key_home(self) -> None:
         self.wpos.row = 0
@@ -397,6 +431,22 @@ class Editor:
     def _key_redo(self, _) -> str:
         self.history.redo(self)
         return None
+
+    def _select_key_all(self) -> None:
+        self._build_file()
+        self.spos.set_pos((0, 0))
+        self.cpos.set_pos((len(self.window_content)-1, len(self.window_content[-1])))
+        return None
+
+    def _action_copy(self) -> bool:
+        if not self.selecting:
+            return True
+        (sel_from_y, sel_from_x), (sel_to_y, sel_to_x) = self.selected_area
+        content_window = self.window_content[sel_from_y:sel_to_y+1]
+        content_window[0] = content_window[0][sel_from_x:]
+        content_window[-1] = content_window[-1][:sel_to_x]
+        Clipboard.put(self.line_sep.join(content_window))
+        return True
 
     def _action_render_scr(self, msg: str, tmp_error: str = '') -> None:
         max_y, max_x = self.getxymax()
@@ -540,14 +590,6 @@ class Editor:
                 break
         return True
 
-    def _action_background(self) -> bool:
-        # only callable on UNIX
-        curses.endwin()
-        os.kill(os.getpid(), signal.SIGSTOP)
-        self._init_screen()
-        self.get_char = self._get_new_char()
-        return True
-
     def _action_reload(self) -> bool:
         """
         prompt to reload the file.
@@ -627,6 +669,14 @@ class Editor:
                 self.history.add(b'_key_string', action_text, False,
                                  pre_pos, self.cpos.get_pos())
                 break
+        return True
+
+    def _action_background(self) -> bool:
+        # only callable on UNIX
+        curses.endwin()
+        os.kill(os.getpid(), signal.SIGSTOP)
+        self._init_screen()
+        self.get_char = self._get_new_char()
         return True
 
     def _action_quit(self) -> bool:
@@ -793,25 +843,29 @@ class Editor:
                 if bcol >= len(self.window_content[brow]):
                     break
                 cur_char = self.window_content[brow][bcol]
+                color = 0
+
                 if cur_char == '\t':
-                    self.curse_window.addch(row, col, '>',
-                                            self._get_color(4))
+                    cur_char = '>'
+                    color = self._get_color(4)
                 elif not cur_char.isprintable():
-                    self.curse_window.addch(row, col, self._get_special_char(cur_char),
-                                            self._get_color(3))
+                    cur_char = self._get_special_char(cur_char)
+                    color = self._get_color(3)
                 elif self.window_content[brow][bcol:].isspace():
-                    self.curse_window.addch(row, col, cur_char,
-                                            self._get_color(3))
-                else:
-                    try:
-                        if Editor.wc_width(cur_char) != 1:
-                            raise TypeError
-                        # CJK unicode (problems in windows-terminal) fix:
-                        # if 12799 < ord(cur_char) < 65103:
-                        #     raise TypeError
-                        self.curse_window.addch(row, col, cur_char)
-                    except TypeError:
-                        self.curse_window.addch(row, col, '�', self._get_color(3))
+                    color = self._get_color(3)
+
+                sel_from, sel_to = self.selected_area
+                if self.selecting and sel_from <= (brow, bcol) < sel_to:
+                    color = self._get_color(5)
+                try:
+                    if Editor.wc_width(cur_char) != 1:
+                        raise TypeError
+                    # CJK unicode (problems in windows-terminal) fix:
+                    # if 12799 < ord(cur_char) < 65103:
+                    #     raise TypeError
+                    self.curse_window.addch(row, col, cur_char, color)
+                except TypeError:
+                    self.curse_window.addch(row, col, '�', self._get_color(3))
             self.curse_window.clrtoeol()
             self.curse_window.move(row+1, 0)
 
@@ -901,6 +955,14 @@ class Editor:
                     # moving the cursor:
                     elif key in MOVE_HOTKEYS:
                         getattr(self, key.decode(), lambda *_: None)()
+                    # select text:
+                    if key in SELECT_HOTKEYS:
+                        if not self.selecting:
+                            self.spos.set_pos(self.cpos.get_pos())
+                        getattr(self, key.decode(), lambda *_: None)()
+                        self.selecting = True
+                    else:
+                        self.selecting = False
                     self.curse_window.nodelay(True)
                     force_render += 1
                     if force_render > 50:
@@ -948,6 +1010,8 @@ class Editor:
                 curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_RED  )
                 # tab-char
                 curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_GREEN)
+                # selection
+                curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_YELLOW)
         curses.raw()
         self.curse_window.nodelay(False)
 

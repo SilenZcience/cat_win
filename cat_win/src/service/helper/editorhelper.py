@@ -93,25 +93,25 @@ UNIFY_HOTKEYS = {
     b'CTL_PAD8'     : b'_move_key_ctl_up',
     b'CTL_PAD2'     : b'_move_key_ctl_down',
     # shift-arrows
-    b'KEY_SLEFT'    : b'_move_key_left', # windows
-    b'KEY_SRIGHT'   : b'_move_key_right',
-    b'KEY_SUP'      : b'_move_key_up',
-    b'KEY_SDOWN'    : b'_move_key_down',
-    b'KEY_SR'       : b'_move_key_up', # xterm
-    b'KEY_SF'       : b'_move_key_down',
+    b'KEY_SLEFT'    : b'_select_key_left', # windows
+    b'KEY_SRIGHT'   : b'_select_key_right',
+    b'KEY_SUP'      : b'_select_key_up',
+    b'KEY_SDOWN'    : b'_select_key_down',
+    b'KEY_SR'       : b'_select_key_up', # xterm
+    b'KEY_SF'       : b'_select_key_down',
     # alt - arrows
-    b'ALT_LEFT'     : b'_scroll_key_alt_left', # windows
-    b'ALT_RIGHT'    : b'_scroll_key_alt_right',
-    b'ALT_UP'       : b'_scroll_key_alt_up',
-    b'ALT_DOWN'     : b'_scroll_key_alt_down',
-    b'kLFT3'        : b'_scroll_key_alt_left', # xterm
-    b'kRIT3'        : b'_scroll_key_alt_right',
-    b'kUP3'         : b'_scroll_key_alt_up',
-    b'kDN3'         : b'_scroll_key_alt_down',
-    b'ALT_PAD4'     : b'_scroll_key_alt_left', # numpad
-    b'ALT_PAD6'     : b'_scroll_key_alt_right',
-    b'ALT_PAD8'     : b'_scroll_key_alt_up',
-    b'ALT_PAD2'     : b'_scroll_key_alt_down',
+    b'ALT_LEFT'     : b'_scroll_key_left', # windows
+    b'ALT_RIGHT'    : b'_scroll_key_right',
+    b'ALT_UP'       : b'_scroll_key_up',
+    b'ALT_DOWN'     : b'_scroll_key_down',
+    b'kLFT3'        : b'_scroll_key_left', # xterm
+    b'kRIT3'        : b'_scroll_key_right',
+    b'kUP3'         : b'_scroll_key_up',
+    b'kDN3'         : b'_scroll_key_down',
+    b'ALT_PAD4'     : b'_scroll_key_left', # numpad
+    b'ALT_PAD6'     : b'_scroll_key_right',
+    b'ALT_PAD8'     : b'_scroll_key_up',
+    b'ALT_PAD2'     : b'_scroll_key_down',
 
     # page
     b'KEY_PPAGE'    : b'_move_key_page_up', # windows & xterm
@@ -125,6 +125,9 @@ UNIFY_HOTKEYS = {
     b'kNXT5'        : b'_move_key_page_down',
     b'CTL_PAD9'     : b'_move_key_page_up', # numpad
     b'CTL_PAD3'     : b'_move_key_page_down',
+    # shift - page
+    b'KEY_SPREVIOUS': b'_select_key_page_up', # windows & xterm
+    b'KEY_SNEXT'    : b'_select_key_page_down',
     # alt - page
     b'ALT_PGUP'     : b'_scroll_key_page_up', # windows
     b'ALT_PGDN'     : b'_scroll_key_page_down',
@@ -132,9 +135,6 @@ UNIFY_HOTKEYS = {
     b'kNXT3'        : b'_scroll_key_page_down',
     b'ALT_PAD9'     : b'_scroll_key_page_up', # numpad
     b'ALT_PAD3'     : b'_scroll_key_page_down',
-    # shift - page
-    b'KEY_SPREVIOUS': b'_move_key_page_up', # windows & xterm
-    b'KEY_SNEXT'    : b'_move_key_page_down',
 
     # end
     b'KEY_END'      : b'_move_key_end', # windows & xterm
@@ -143,12 +143,12 @@ UNIFY_HOTKEYS = {
     b'CTL_END'      : b'_move_key_ctl_end', # windows
     b'kEND5'        : b'_move_key_ctl_end', # xterm
     b'CTL_PAD1'     : b'_move_key_ctl_end', # numpad
+    # shift - end
+    b'KEY_SEND'     : b'_select_key_end', # windows & xterm
     # alt - end
     b'ALT_END'      : b'_scroll_key_end', # windows
     b'kEND3'        : b'_scroll_key_end', # xterm
     b'ALT_PAD1'     : b'_scroll_key_end', # numpad
-    # shift - end
-    b'KEY_SEND'     : b'_move_key_end', # windows & xterm
 
     # pos/home
     b'KEY_HOME'     : b'_move_key_home', # windows & xterm
@@ -157,12 +157,12 @@ UNIFY_HOTKEYS = {
     b'CTL_HOME'     : b'_move_key_ctl_home', # windows
     b'kHOM5'        : b'_move_key_ctl_home', # xterm
     b'CTL_PAD7'     : b'_move_key_ctl_home', # numpad
+    # shift - pos/home
+    b'KEY_SHOME'     : b'_select_key_home', # windows & xterm
     # alt - pos/home
     b'ALT_HOME'     : b'_scroll_key_home', # windows
     b'kHOM3'        : b'_scroll_key_home', # xterm
     b'ALT_PAD7'     : b'_scroll_key_home', # numpad
-    # shift - pos/home
-    b'KEY_SHOME'     : b'_move_key_home', # windows & xterm
 
     # shift + tab
     b'KEY_BTAB'      : b'_key_btab', # windows & xterm
@@ -172,14 +172,17 @@ UNIFY_HOTKEYS = {
     # history
     b'^Z'           : b'_key_undo',
     b'^Y'           : b'_key_redo',
+    # selection
+    b'^A'           : b'_select_key_all',
     # actions
+    b'^C'           : b'_action_copy',
     b'ALT_S'        : b'_action_save',
     b'^S'           : b'_action_save',
     b'^E'           : b'_action_jump',
     b'^F'           : b'_action_find',
-    b'^B'           : b'_action_background',
     b'^R'           : b'_action_reload',
     b'^N'           : b'_action_insert',
+    b'^B'           : b'_action_background',
     b'^Q'           : b'_action_quit',
     b'^D'           : b'_action_interrupt',
     b'KEY_RESIZE'   : b'_action_resize',
@@ -189,6 +192,7 @@ KEY_HOTKEYS    = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_key'  
 ACTION_HOTKEYS = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_action'))
 SCROLL_HOTKEYS = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_scroll'))
 MOVE_HOTKEYS   = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_move'  ))
+SELECT_HOTKEYS = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_select'  ))
 
 REVERSE_ACTION = {
     b'_key_dc'           : b'_key_string',
