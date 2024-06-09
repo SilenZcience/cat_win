@@ -940,7 +940,7 @@ The currently supported Key bindings are as follows:
 | <kbd>Find/^F</kbd> | - | - | prompt to search in the file | - |
 | <kbd>Background/^B</kbd> | - | - | put the editor in the background</br>(UNIX only) | - |
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
-| <kbd>Insert/^I</kbd> | - | - | Insert a Byte Sequence | - |
+| <kbd>Insert/^N</kbd> | - | - | Insert a Byte Sequence | - |
 | <kbd>Quit/^Q</kbd> | - | - | close editor</br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^C</kbd> | - | - | interrupt program | - |
 
@@ -972,7 +972,7 @@ The currently supported Key bindings are as follows:
 | <kbd>Find/^F</kbd> | - | - | prompt to search a byte(-sequence) in the file | - |
 | <kbd>Background/^B</kbd> | - | - | put the hex-editor in the background</br>(UNIX only) | - |
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
-| <kbd>Insert/^I</kbd> | - | - | Insert a Text Sequence | - |
+| <kbd>Insert/^N</kbd> | - | - | Insert a Text Sequence | - |
 | <kbd>Quit/^Q</kbd> | - | - | close hex-editor</br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^C</kbd> | - | - | interrupt program | - |
 
