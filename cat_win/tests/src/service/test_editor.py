@@ -217,50 +217,50 @@ class TestEditor(TestCase):
         editor._move_key_ctl_down()
         self.assertEqual(editor.cpos.get_pos(), (1,3))
 
-    def test_editor_scroll_key_shift_left(self):
+    def test_editor_scroll_key_alt_left(self):
         editor = Editor(test_file_path_editor, '')
         editor.wpos.set_pos((1,2))
-        editor._scroll_key_shift_left()
+        editor._scroll_key_alt_left()
         self.assertEqual(editor.wpos.get_pos(), (1,1))
-        editor._scroll_key_shift_left()
+        editor._scroll_key_alt_left()
         self.assertEqual(editor.wpos.get_pos(), (1,0))
-        editor._scroll_key_shift_left()
+        editor._scroll_key_alt_left()
         self.assertEqual(editor.wpos.get_pos(), (1,0))
 
-    def test_editor_scroll_key_shift_right(self):
+    def test_editor_scroll_key_alt_right(self):
         editor = Editor(test_file_path_editor, '')
         editor.wpos.set_pos((0,2))
-        editor._scroll_key_shift_right()
+        editor._scroll_key_alt_right()
         self.assertEqual(editor.wpos.get_pos(), (0,0))
         editor._key_string('x' * 115)
-        editor._scroll_key_shift_right()
+        editor._scroll_key_alt_right()
         self.assertEqual(editor.wpos.get_pos(), (0,1))
-        editor._scroll_key_shift_right()
+        editor._scroll_key_alt_right()
         self.assertEqual(editor.wpos.get_pos(), (0,2))
-        editor._scroll_key_shift_right()
+        editor._scroll_key_alt_right()
         self.assertEqual(editor.wpos.get_pos(), (0,2))
 
-    def test_editor_scroll_key_shift_up(self):
+    def test_editor_scroll_key_alt_up(self):
         editor = Editor(test_file_path_editor, '')
         editor.wpos.set_pos((2,0))
-        editor._scroll_key_shift_up()
+        editor._scroll_key_alt_up()
         self.assertEqual(editor.wpos.get_pos(), (1,0))
-        editor._scroll_key_shift_up()
+        editor._scroll_key_alt_up()
         self.assertEqual(editor.wpos.get_pos(), (0,0))
-        editor._scroll_key_shift_up()
+        editor._scroll_key_alt_up()
         self.assertEqual(editor.wpos.get_pos(), (0,0))
 
-    def test_editor_scroll_key_shift_down(self):
+    def test_editor_scroll_key_alt_down(self):
         editor = Editor(test_file_path_editor, '')
-        editor._scroll_key_shift_down()
+        editor._scroll_key_alt_down()
         self.assertEqual(editor.wpos.get_pos(), (0,0))
         for _ in range(30):
             editor._key_enter('')
-        editor._scroll_key_shift_down()
+        editor._scroll_key_alt_down()
         self.assertEqual(editor.wpos.get_pos(), (1,0))
-        editor._scroll_key_shift_down()
+        editor._scroll_key_alt_down()
         self.assertEqual(editor.wpos.get_pos(), (2,0))
-        editor._scroll_key_shift_down()
+        editor._scroll_key_alt_down()
         self.assertEqual(editor.wpos.get_pos(), (2,0))
 
     def test_editor_move_key_page_up(self):
@@ -702,11 +702,12 @@ class TestEditor(TestCase):
             self.assertEqual('', fake_out.getvalue())
 
     def test_editor_set_indentation(self):
-        self.assertEqual(Editor.special_indentation, '\t')
-        self.assertEqual(Editor.auto_indent, False)
+        backup_a = Editor.special_indentation
+        backup_b = Editor.auto_indent
         Editor.set_indentation('  ', True)
         self.assertEqual(Editor.special_indentation, '  ')
         self.assertEqual(Editor.auto_indent, True)
+        Editor.set_indentation(backup_a, backup_b)
 
     def test_editor_set_flags(self):
         backup_a = Editor.save_with_alt

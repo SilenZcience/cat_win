@@ -100,18 +100,18 @@ UNIFY_HOTKEYS = {
     b'KEY_SR'       : b'_move_key_up', # xterm
     b'KEY_SF'       : b'_move_key_down',
     # alt - arrows
-    b'ALT_LEFT'     : b'_scroll_key_shift_left', # windows
-    b'ALT_RIGHT'    : b'_scroll_key_shift_right',
-    b'ALT_UP'       : b'_scroll_key_shift_up',
-    b'ALT_DOWN'     : b'_scroll_key_shift_down',
-    b'kLFT3'        : b'_scroll_key_shift_left', # xterm
-    b'kRIT3'        : b'_scroll_key_shift_right',
-    b'kUP3'         : b'_scroll_key_shift_up',
-    b'kDN3'         : b'_scroll_key_shift_down',
-    b'ALT_PAD4'     : b'_scroll_key_shift_left', # numpad
-    b'ALT_PAD6'     : b'_scroll_key_shift_right',
-    b'ALT_PAD8'     : b'_scroll_key_shift_up',
-    b'ALT_PAD2'     : b'_scroll_key_shift_down',
+    b'ALT_LEFT'     : b'_scroll_key_alt_left', # windows
+    b'ALT_RIGHT'    : b'_scroll_key_alt_right',
+    b'ALT_UP'       : b'_scroll_key_alt_up',
+    b'ALT_DOWN'     : b'_scroll_key_alt_down',
+    b'kLFT3'        : b'_scroll_key_alt_left', # xterm
+    b'kRIT3'        : b'_scroll_key_alt_right',
+    b'kUP3'         : b'_scroll_key_alt_up',
+    b'kDN3'         : b'_scroll_key_alt_down',
+    b'ALT_PAD4'     : b'_scroll_key_alt_left', # numpad
+    b'ALT_PAD6'     : b'_scroll_key_alt_right',
+    b'ALT_PAD8'     : b'_scroll_key_alt_up',
+    b'ALT_PAD2'     : b'_scroll_key_alt_down',
 
     # page
     b'KEY_PPAGE'    : b'_move_key_page_up', # windows & xterm
