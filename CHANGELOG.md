@@ -11,6 +11,9 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added `blank_remove_ws_lines` option to the config menu to remove whitespace lines with -`b`, --`blank` also.
 - changed the `^I` hotkey in the editor (insert byte sequence) and hexeditor (insert text) to `^N`.
 - changed the `^C` hotkey in the (hex-)editor (KeyboardInterrupt) to `^D`.
+- added area selection via shift-click in the (hex-)editor.
+- added `^A` hotkey to the (hex-)editor to select everything.
+- added `^C` hotkey to the (hex-)editor to copy selected text to the clipboard.
 
 ### Bugfixes
 
