@@ -281,18 +281,18 @@ class Editor:
             self.cpos.row = len(self.window_content)-1
             self.cpos.col = len(self.window_content[self.cpos.row])
 
-    def _scroll_key_shift_left(self) -> None:
+    def _scroll_key_alt_left(self) -> None:
         self.wpos.col = max(self.wpos.col-1, 0)
 
-    def _scroll_key_shift_right(self) -> None:
+    def _scroll_key_alt_right(self) -> None:
         max_y, max_x = self.getxymax()
         max_line = max(map(len,self.window_content[self.wpos.row:self.wpos.row+max_y]))
         self.wpos.col = max(min(self.wpos.col+1, max_line+1-max_x), 0)
 
-    def _scroll_key_shift_up(self) -> None:
+    def _scroll_key_alt_up(self) -> None:
         self.wpos.row = max(self.wpos.row-1, 0)
 
-    def _scroll_key_shift_down(self) -> None:
+    def _scroll_key_alt_down(self) -> None:
         max_y, _ = self.getxymax()
         self.wpos.row = max(min(self.wpos.row+1, len(self.window_content)-max_y), 0)
 
