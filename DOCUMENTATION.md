@@ -942,7 +942,7 @@ The currently supported Key bindings are as follows:
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
 | <kbd>Insert/^N</kbd> | - | - | Insert a Byte Sequence | - |
 | <kbd>Quit/^Q</kbd> | - | - | close editor</br>(prompt to save, if neccessary) | - |
-| <kbd>Interrupt/^C</kbd> | - | - | interrupt program | - |
+| <kbd>Interrupt/^D</kbd> | - | - | interrupt program | - |
 
 ### <a id="----hexedit">-#, --hexedit</a>
 
@@ -974,7 +974,7 @@ The currently supported Key bindings are as follows:
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
 | <kbd>Insert/^N</kbd> | - | - | Insert a Text Sequence | - |
 | <kbd>Quit/^Q</kbd> | - | - | close hex-editor</br>(prompt to save, if neccessary) | - |
-| <kbd>Interrupt/^C</kbd> | - | - | interrupt program | - |
+| <kbd>Interrupt/^D</kbd> | - | - | interrupt program | - |
 
 ### <a id="-m---more">-M, --more</a>
 

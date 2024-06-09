@@ -10,6 +10,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added `end_marker_symbol` option to the config menu to define the marker that will be displayed when using -`e`, --`ends`.
 - added `blank_remove_ws_lines` option to the config menu to remove whitespace lines with -`b`, --`blank` also.
 - changed the `^I` hotkey in the editor (insert byte sequence) and hexeditor (insert text) to `^N`.
+- changed the `^C` hotkey in the (hex-)editor (KeyboardInterrupt) to `^D`.
 
 ### Bugfixes
 
