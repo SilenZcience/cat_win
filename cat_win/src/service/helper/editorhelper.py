@@ -49,7 +49,7 @@ UNIFY_HOTKEYS = {
 
     # delete
     b'KEY_DC'       : b'_key_dc', # windows & xterm
-    b'^D'           : b'_key_dc', # some unix machines
+    # b'^D'           : b'_key_dc', # some unix machines
     b'PADSTOP'      : b'_key_dc', # numpad
     # shift - delete
     b'KEY_SDC'      : b'_key_dc', # windows & xterm
@@ -181,7 +181,7 @@ UNIFY_HOTKEYS = {
     b'^R'           : b'_action_reload',
     b'^N'           : b'_action_insert',
     b'^Q'           : b'_action_quit',
-    b'^C'           : b'_action_interrupt',
+    b'^D'           : b'_action_interrupt',
     b'KEY_RESIZE'   : b'_action_resize',
 } # translates key-inputs to pre-defined actions/methods
 
