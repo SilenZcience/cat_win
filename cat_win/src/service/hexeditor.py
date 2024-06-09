@@ -11,10 +11,11 @@ import os
 import signal
 import sys
 
-from cat_win.src.service.rawviewer import get_display_char_gen
 from cat_win.src.service.helper.editorhelper import Position, UNIFY_HOTKEYS, \
-    KEY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, HEX_BYTE_KEYS
+    KEY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, SELECT_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
+from cat_win.src.service.clipboard import Clipboard
+from cat_win.src.service.rawviewer import get_display_char_gen
 
 
 class HexEditor:
@@ -47,6 +48,7 @@ class HexEditor:
         self.error_bar = ''
         self.unsaved_progress = False
         self.changes_made = False
+        self.selecting = False
 
         self.top_line = '┌' + '─' * 10 + '┬' + '─' * (HexEditor.columns * 3 + 1) + '┬' + \
             '─' * (HexEditor.columns + 2) + '┐'
@@ -60,8 +62,16 @@ class HexEditor:
         self.cpos = Position(0, 0)
         # window position (top-left)
         self.wpos = Position(0, 0)
+        # second cursor for selection area
+        self.spos = Position(0, 0)
 
         self._setup_file()
+
+    @property
+    def selected_area(self):
+        if self.spos.get_pos() <= self.cpos.get_pos():
+            return (self.spos.get_pos(), self.cpos.get_pos())
+        return (self.cpos.get_pos(), self.spos.get_pos())
 
     def _build_file(self):
         for _byte in self._f_content_gen:
@@ -172,6 +182,18 @@ class HexEditor:
     def _move_key_ctl_down(self) -> None:
         self.cpos.row += 10
 
+    def _select_key_left(self) -> None:
+        self._move_key_left()
+
+    def _select_key_right(self) -> None:
+        self._move_key_right()
+
+    def _select_key_up(self) -> None:
+        self._move_key_up()
+
+    def _select_key_down(self) -> None:
+        self._move_key_down()
+
     def _move_key_page_up(self) -> None:
         max_y, _ = self.getxymax()
         self.cpos.row -= max_y
@@ -182,13 +204,21 @@ class HexEditor:
         self.cpos.row += max_y
         self._build_file_upto(max_y+self.cpos.row+2)
 
+    def _select_key_page_up(self) -> None:
+        self._move_key_page_up()
+
+    def _select_key_page_down(self) -> None:
+        self._move_key_page_down()
+
     def _move_key_end(self) -> None:
         self.cpos.col = len(self.hex_array[self.cpos.row])-1
 
     def _move_key_ctl_end(self) -> None:
         self._build_file()
-        self.cpos.row = len(self.hex_array)-1
-        self.cpos.col = len(self.hex_array[-1])-1
+        self.cpos.set_pos((len(self.hex_array)-1, len(self.hex_array[-1])-1))
+
+    def _select_key_end(self) -> None:
+        self._move_key_end()
 
     def _move_key_home(self) -> None:
         self.cpos.col = 0
@@ -196,6 +226,9 @@ class HexEditor:
     def _move_key_ctl_home(self) -> None:
         self.cpos.row = 0
         self.cpos.col = 0
+
+    def _select_key_home(self) -> None:
+        self._move_key_home()
 
     def _insert_byte(self, wchar: str) -> None:
         pos_offset = int(wchar!='<')
@@ -243,6 +276,27 @@ class HexEditor:
             self.unsaved_progress = True
         elif wchar in '<> ':
             self._insert_byte(wchar)
+
+    def _select_key_all(self) -> None:
+        self._build_file()
+        self.spos.set_pos((0, 0))
+        self.cpos.set_pos((len(self.hex_array)-1, len(self.hex_array[-1])-1))
+        return None
+
+    def _action_copy(self) -> bool:
+        if not self.selecting:
+            return True
+        sel_from, sel_to = self.selected_area
+        sel_bytes = ''
+        for row in range(sel_from[0], sel_to[0]+1):
+            for col in range(HexEditor.columns):
+                if sel_from <= (row, col) <= sel_to:
+                    hex_byte = self.hex_array_edit[row][col]
+                    if hex_byte is None:
+                        hex_byte = self.hex_array[row][col]
+                    sel_bytes += hex_byte
+        Clipboard.put(sel_bytes)
+        return True
 
     def _action_render_scr(self, msg) -> None:
         max_y, max_x = self.getxymax()
@@ -405,13 +459,6 @@ class HexEditor:
                 break
         return True
 
-    def _action_background(self) -> bool:
-        # only callable on UNIX
-        curses.endwin()
-        os.kill(os.getpid(), signal.SIGSTOP)
-        self._init_screen()
-        return True
-
     def _action_reload(self) -> bool:
         """
         prompt to reload the file.
@@ -483,6 +530,13 @@ class HexEditor:
                         self._fix_cursor_position(max_y)
                         self.hex_array_edit[self.cpos.row][self.cpos.col] = f"{byte_:02X}"
                 break
+        return True
+
+    def _action_background(self) -> bool:
+        # only callable on UNIX
+        curses.endwin()
+        os.kill(os.getpid(), signal.SIGSTOP)
+        self._init_screen()
         return True
 
     def _action_quit(self) -> bool:
@@ -661,6 +715,23 @@ class HexEditor:
                 except curses.error:
                     pass
 
+    def _render_highlight_selected_area(self, max_y: int) -> None:
+        if not self.selecting:
+            return
+        # Highlight Selected Area
+        sel_from, sel_to = self.selected_area
+        for row in range(max(sel_from[0], self.wpos.row), min(sel_to[0]+1, self.wpos.row+max_y)):
+            for col in range(HexEditor.columns):
+                if sel_from <= (row, col) < sel_to:
+                    color_id = 7 if self.hex_array_edit[row][col] is None else 8
+                    try:
+                        self.curse_window.chgat(row-self.wpos.row+2, 13 + col*3,
+                                                2, self._get_color(color_id))
+                        self.curse_window.chgat(row-self.wpos.row+2, 15 + HexEditor.columns*3 + col,
+                                                1, self._get_color(color_id))
+                    except curses.error:
+                        pass
+
     def _render_status_bar(self, max_y: int, max_x: int) -> None:
         # Draw status/error_bar
         try:
@@ -702,6 +773,7 @@ class HexEditor:
         self._render_draw_rows(max_y, max_x)
         self._render_highlight_selection()
         self._render_highlight_edits(max_y)
+        self._render_highlight_selected_area(max_y)
         self._render_status_bar(max_y, max_x)
 
         self.curse_window.refresh()
@@ -724,6 +796,14 @@ class HexEditor:
                 running &= getattr(self, key.decode(), lambda *_: True)()
             elif key in MOVE_HOTKEYS:
                 getattr(self, key.decode(), lambda *_: None)()
+            # select bytes:
+            if key in SELECT_HOTKEYS:
+                if not self.selecting:
+                    self.spos.set_pos(self.cpos.get_pos())
+                getattr(self, key.decode(), lambda *_: None)()
+                self.selecting = True
+            else:
+                self.selecting = False
 
     def _init_screen(self) -> None:
         """
@@ -768,6 +848,10 @@ class HexEditor:
                 curses.init_pair(5, curses.COLOR_RED  , curses.COLOR_BLACK)
                 # selected and edited byte
                 curses.init_pair(6, curses.COLOR_RED  , curses.COLOR_WHITE)
+                # selected area
+                curses.init_pair(7, curses.COLOR_BLACK, curses.COLOR_YELLOW)
+                # selected area and edited byte
+                curses.init_pair(8, curses.COLOR_RED, curses.COLOR_YELLOW)
         curses.raw()
         self.curse_window.nodelay(False)
 
