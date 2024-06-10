@@ -1033,17 +1033,6 @@ def main():
     # fill holder object with neccessary values
     u_files.set_files([*known_files, *unknown_files])
 
-    file_size_sum = 0
-    for file in u_files:
-        file.set_file_size(get_file_size(file.path))
-        file_size_sum += file.file_size
-        if file_size_sum >= const_dic[DKW.LARGE_FILE_SIZE]:
-            err_print(color_dic[CKW.MESSAGE_IMPORTANT], end='')
-            err_print('An exceedingly large amount of data is being loaded. ', end='')
-            err_print('This may require a lot of time and resources.', end='')
-            err_print(color_dic[CKW.RESET_ALL])
-            break
-
     if u_args[ARGS_EDITOR]:
         with IoHelper.dup_stdin(on_windows_os, u_args[ARGS_STDIN]):
             for file in known_files:
@@ -1062,6 +1051,17 @@ def main():
     if u_args[ARGS_DATA] or u_args[ARGS_CHECKSUM]:
         _print_meta_and_checksum(u_args[ARGS_DATA], u_args[ARGS_CHECKSUM])
         return
+
+    file_size_sum = 0
+    for file in u_files:
+        file.set_file_size(get_file_size(file.path))
+        file_size_sum += file.file_size
+        if file_size_sum >= const_dic[DKW.LARGE_FILE_SIZE]:
+            err_print(color_dic[CKW.MESSAGE_IMPORTANT], end='')
+            err_print('An exceedingly large amount of data is being loaded. ', end='')
+            err_print('This may require a lot of time and resources.', end='')
+            err_print(color_dic[CKW.RESET_ALL])
+            break
 
     if u_args[ARGS_B64D]:
         decode_files_base64(tmp_file_helper)
