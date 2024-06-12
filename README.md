@@ -77,11 +77,10 @@
 [![Tests]](https://raw.githubusercontent.com/SilenZcience/cat_win/badges/badges/badge-tests.svg)
 <!-- [![Compile-and-Push]](https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml/badge.svg) -->
 
-This project copies the fundamental framework of the cat command-line tool from Unix and translates its features to an OS Independent program using Python. </br> Over time the project evolved in subject areas of other tools like 'echo', 'grep', 'ls', 'base64'...
+This project copies the fundamental framework of the cat command-line tool from Unix and translates its features to an OS Independent program using Python.</br>
+The project has evolved into many other subject areas like 'echo', 'grep', 'ls', 'base64'...
 
-Additionally it includes the feature to strip and reverse the content of any given file, make use of the standard-input, which enables cat piping into each other, generating the checksum of any file, converting decimal, hexadecimal and binary numbers within any text, and much *much* <a href="#usage">more</a> ...
-
-It is of course possible to use cat_win on Linux or MacOS, aswell as Windows!
+Additionally it includes an editor and a hex editor aswell as the feature to manipulate the content of any given file in countless ways, generating the checksum of any file, converting hexadecimal, decimal, octal and binary numbers within any text, and much *much* <a href="#usage">more</a> ...
 
 <div id="made-with"></div>
 
