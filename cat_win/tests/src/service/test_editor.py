@@ -538,6 +538,61 @@ class TestEditor(TestCase):
         self.assertEqual(editor.spos.get_pos(), (0, 0))
         self.assertEqual(editor.cpos.get_pos(), (3, 3))
 
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen([]))
+    def test_full_integration(self):
+        mm_backup1 = mm.error
+        mm_backup2 = mm.keyname
+        mm_backup2 = mm.initscr
+        def char_gen(user_input: list):
+            yield from user_input
+            while True:
+                yield user_input[-1]
+        _keyname_mapping = {
+            '\x11'     : b'^Q',
+            '\x7f'     : b'^?',
+            '\r'       : b'^M',
+            '\t'       : b'^I',
+            'ş'        : b'KEY_BTAB',
+            '\x1a'     : b'^Z',
+            '\x19'     : b'^Y',
+            'ă'        : b'KEY_UP',
+            'ȏ'        : b'CTL_DEL',
+            'Ŋ'        : b'KEY_DC',
+            'Ă'        : b'KEY_DOWN',
+        }
+        def _keyname(x):
+            return _keyname_mapping.get(chr(x), chr(x).encode())
+
+        g = [
+            ['a','b','c','\r','\t','z',351,'\r','\x1a','\x1a','\x1a','\x1a','\x1a','\x19','\x19','\x19','\x19','\x19','\x1a','\x1a','\x1a','\x1a','\x1a','\x1a','\x11','\x11'],
+            ['T','E','S','T','\r','\r','\r','\r',259,259,259,527,330,'\x7f',330,258,'\r','\x11','\x11'],
+        ]
+        r = [
+            [''],
+            ['TEST', '']
+        ]
+        mm.keyname = _keyname
+        for get_wch_, result_ in zip(g, r):
+            char_gen_get_wch = char_gen(get_wch_)
+            def _get_wch():
+                return next(char_gen_get_wch)
+
+            editor = Editor('', '')
+            # editor.debug_mode = True
+
+            curse_window_mock = MagicMock()
+            curse_window_mock.get_wch = _get_wch
+
+            mm.error = KeyboardInterrupt
+            mm.initscr = lambda *args: curse_window_mock
+
+            editor._open()
+            self.assertSequenceEqual(editor.window_content, result_)
+
+        mm.error = mm_backup1
+        mm.keyname = mm_backup2
+        mm.initscr = mm_backup2
+
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(['@@@'] * 4))
     def test__action_copy(self):
         def assertCopy(_s: str):
