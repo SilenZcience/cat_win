@@ -1104,6 +1104,8 @@ class Editor:
             indicates if the user is on windows OS using platform.system() == 'Windows'
         debug_mode (bool)
             indicates if debug info should be displayed
+        unicode_escaped_search (bool):
+            indicates if the search should be unicode escaped
         file_encoding (str):
             the file encoding to use when opening a file
         """

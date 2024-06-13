@@ -976,7 +976,8 @@ def init(repl: bool = False) -> tuple:
                      u_args[ARGS_DEBUG], const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
                      arg_parser.file_encoding)
     HexEditor.set_flags(u_args[ARGS_STDIN] and on_windows_os, on_windows_os,
-                        u_args[ARGS_DEBUG], const_dic[DKW.HEX_EDITOR_COLUMNS])
+                        u_args[ARGS_DEBUG], const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
+                        const_dic[DKW.HEX_EDITOR_COLUMNS])
 
     return (known_files, unknown_files, echo_args, valid_urls)
 
