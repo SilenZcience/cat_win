@@ -28,6 +28,7 @@ class HexEditor:
     on_windows_os = False
     debug_mode = False
 
+    unicode_escaped_search = True
     columns = 16
 
     def __init__(self, file: str, display_name: str) -> None:
@@ -410,16 +411,24 @@ class HexEditor:
                 break
             return found_pos//2
 
+        search_byte_mode, bm_ind = True, '0x'
         wchar, sub_s = '', ''
         while str(wchar) != '\x1b':
-            pre_s = f" [0x{repr(self.search)[1:-1]}]" if self.search else ''
-            self._action_render_scr(f"Confirm: 'ENTER' - Search for{pre_s}: 0x{sub_s}␣")
+            pre_s = ''
+            if self.search and search_byte_mode:
+                pre_s = f" [{bm_ind}{repr(self.search)[1:-1]}]"
+            elif self.search:
+                pre_s = f" [{bm_ind}{repr(bytes.fromhex(self.search))[2:-1]}]"
+            self._action_render_scr(f"Confirm: 'ENTER' - Search for{pre_s}: {bm_ind}{sub_s}␣")
             wchar, key = self._get_next_char()
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
                 if key == b'_action_find':
                     wchar, key = '', b'_key_enter'
+                if key == b'_action_insert':
+                    search_byte_mode = not search_byte_mode
+                    bm_ind = '0x' * search_byte_mode
                 if key == b'_action_background':
                     getattr(self, key.decode(), lambda *_: False)()
                 if key == b'_action_resize':
@@ -433,12 +442,26 @@ class HexEditor:
                 t_p = sub_s[-1:].isalpha()
                 while sub_s and sub_s[-1:].isalpha() == t_p:
                     sub_s = sub_s[:-1]
+            elif key == b'_key_string' and not search_byte_mode:
+                sub_s += wchar
             elif key == b'_key_string' and wchar.upper() in HEX_BYTE_KEYS:
                 sub_s += wchar.upper()
             elif key == b'_key_enter':
                 self.search = sub_s if sub_s else self.search
                 if not self.search:
                     break
+                if not search_byte_mode:
+                    i_chars = self.search.encode('utf-16', 'surrogatepass').decode('utf-16')
+                    if HexEditor.unicode_escaped_search and sub_s:
+                        try:
+                            i_chars = i_chars.encode().decode('unicode_escape').encode('latin-1').decode()
+                        except UnicodeError:
+                            pass
+                    self.search = ''
+                    for i_char in i_chars:
+                        for byte_ in i_char.encode():
+                            self.search += f"{byte_:02X}"
+
                 # check current line
                 search_result = find_bytes(self.cpos.row, self.cpos.col+1)
                 if search_result >= 0:
@@ -910,7 +933,7 @@ class HexEditor:
 
     @staticmethod
     def set_flags(save_with_alt: bool, on_windows_os: bool, debug_mode: bool,
-                  columns: int) -> None:
+                  unicode_escaped_search: bool, columns: int) -> None:
         """
         set the config flags for the Editor
         
@@ -921,10 +944,13 @@ class HexEditor:
             indicates if the user is on windows OS using platform.system() == 'Windows'
         debug_mode (bool)
             indicates if debug info should be displayed
+        unicode_escaped_search (bool):
+            indicates if the search should be unicode escaped
         columns (int):
             defines how many columns the editor should have
         """
         HexEditor.save_with_alt = save_with_alt
         HexEditor.on_windows_os = on_windows_os
         HexEditor.debug_mode = debug_mode
+        HexEditor.unicode_escaped_search = unicode_escaped_search
         HexEditor.columns = columns

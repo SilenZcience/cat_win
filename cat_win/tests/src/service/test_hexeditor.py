@@ -717,10 +717,12 @@ class TestHexEditor(TestCase):
         backup_a = HexEditor.save_with_alt
         backup_b = HexEditor.on_windows_os
         backup_c = HexEditor.debug_mode
-        backup_d = HexEditor.columns
-        HexEditor.set_flags(True, True, True, 1002)
+        backup_d = HexEditor.unicode_escaped_search
+        backup_e = HexEditor.columns
+        HexEditor.set_flags(True, True, True, False, 1002)
         self.assertEqual(HexEditor.save_with_alt, True)
         self.assertEqual(HexEditor.on_windows_os, True)
         self.assertEqual(HexEditor.debug_mode, True)
+        self.assertEqual(HexEditor.unicode_escaped_search, False)
         self.assertEqual(HexEditor.columns, 1002)
-        HexEditor.set_flags(backup_a, backup_b, backup_c, backup_d)
+        HexEditor.set_flags(backup_a, backup_b, backup_c, backup_d, backup_e)
