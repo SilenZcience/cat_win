@@ -175,11 +175,14 @@ def _show_help(repl: bool = False) -> None:
         print_update_information(__project__, __version__, color_dic, on_windows_os)
 
 
-def _show_version() -> None:
+def _show_version(repl: bool = False) -> None:
     """
     Show the Version message and exit.
     """
-    cat_version = f"Catw {__version__} - from {working_dir}\n"
+    cat_version = f"{__project__} "
+    if repl:
+        cat_version += 'REPL '
+    cat_version += f"{__version__} - from {working_dir}\n"
     version_message = '\n'
     version_message += '-' * len(cat_version) + '\n'
     version_message += cat_version
@@ -953,7 +956,7 @@ def init(repl: bool = False) -> tuple:
         _show_help(repl)
         sys.exit(0)
     if u_args[ARGS_VERSION]:
-        _show_version()
+        _show_version(repl)
         sys.exit(0)
     if u_args[ARGS_CONFIG_REMOVE]:
         config.remove_config()

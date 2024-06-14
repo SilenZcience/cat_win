@@ -179,8 +179,14 @@ class TestCat(TestCase):
     def test__show_version(self):
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat._show_version()
-            self.assertIn('Catw', fake_out.getvalue())
+            self.assertIn('cat_win', fake_out.getvalue())
             self.assertIn('Author', fake_out.getvalue())
+            self.assertNotIn('REPL', fake_out.getvalue())
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            cat._show_version(True)
+            self.assertIn('cat_win', fake_out.getvalue())
+            self.assertIn('Author', fake_out.getvalue())
+            self.assertIn('REPL', fake_out.getvalue())
 
     @patch('cat_win.src.cat.arg_parser.file_search', new=set([('hello', False), ('world', True)]))
     def test__show_debug(self):
