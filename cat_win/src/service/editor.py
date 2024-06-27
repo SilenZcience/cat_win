@@ -228,6 +228,8 @@ class Editor:
         return None
 
     def _move_key_left(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[0])
         if self.cpos.col:
             self.cpos.col -= 1
         elif self.cpos.row:
@@ -235,6 +237,8 @@ class Editor:
             self.cpos.col = len(self.window_content[self.cpos.row])
 
     def _move_key_right(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[1])
         if self.cpos.col < len(self.window_content[self.cpos.row]):
             self.cpos.col += 1
         elif self.cpos.row < len(self.window_content)-1:
@@ -242,14 +246,20 @@ class Editor:
             self.cpos.col = 0
 
     def _move_key_up(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[0])
         if self.cpos.row:
             self.cpos.row -= 1
 
     def _move_key_down(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[1])
         if self.cpos.row < len(self.window_content)-1:
             self.cpos.row += 1
 
     def _move_key_ctl_left(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[0])
         if self.cpos.col == 1:
             self.cpos.col = 0
         elif self.cpos.col > 1:
@@ -265,6 +275,8 @@ class Editor:
             self.cpos.col = len(self.window_content[self.cpos.row])
 
     def _move_key_ctl_right(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[1])
         if self.cpos.col == len(self.window_content[self.cpos.row])-1:
             self.cpos.col = len(self.window_content[self.cpos.row])
         elif self.cpos.col < len(self.window_content[self.cpos.row])-1:
@@ -278,6 +290,8 @@ class Editor:
             self.cpos.col = 0
 
     def _move_key_ctl_up(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[0])
         if self.cpos.row >= 10:
             self.cpos.row -= 10
         else:
@@ -285,6 +299,8 @@ class Editor:
             self.cpos.col = 0
 
     def _move_key_ctl_down(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[1])
         if self.cpos.row < len(self.window_content)-10:
             self.cpos.row += 10
         else:
@@ -292,15 +308,19 @@ class Editor:
             self.cpos.col = len(self.window_content[self.cpos.row])
 
     def _select_key_left(self) -> None:
+        self.selecting = False
         self._move_key_left()
 
     def _select_key_right(self) -> None:
+        self.selecting = False
         self._move_key_right()
 
     def _select_key_up(self) -> None:
+        self.selecting = False
         self._move_key_up()
 
     def _select_key_down(self) -> None:
+        self.selecting = False
         self._move_key_down()
 
     def _scroll_key_left(self) -> None:
@@ -319,11 +339,15 @@ class Editor:
         self.wpos.row = max(min(self.wpos.row+1, len(self.window_content)-max_y), 0)
 
     def _move_key_page_up(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[0])
         max_y, _ = self.getxymax()
         self.wpos.row = max(self.wpos.row-max_y, 0)
         self.cpos.row = max(self.cpos.row-max_y, 0)
 
     def _move_key_page_down(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[1])
         max_y, _ = self.getxymax()
         self.wpos.row += max_y
         self.cpos.row += max_y
@@ -332,9 +356,11 @@ class Editor:
         self.cpos.row = min(self.cpos.row, len(self.window_content)-1)
 
     def _select_key_page_up(self) -> None:
+        self.selecting = False
         self._move_key_page_up()
 
     def _select_key_page_down(self) -> None:
+        self.selecting = False
         self._move_key_page_down()
 
     def _scroll_key_page_up(self) -> None:

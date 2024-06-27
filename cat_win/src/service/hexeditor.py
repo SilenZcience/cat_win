@@ -135,7 +135,7 @@ class HexEditor:
         if not self.hex_array_edit[self.cpos.row]:
             return
         self.hex_array_edit[self.cpos.row][self.cpos.col] = None
-        self._move_key_right()
+        self.cpos.col += 1
 
     def _key_dl(self, _) -> str:
         if not self.hex_array_edit[self.cpos.row]:
@@ -143,13 +143,13 @@ class HexEditor:
         self.hex_array_edit[self.cpos.row][self.cpos.col] = '--'
         # self.hex_array[self.cpos.row][self.cpos.col] = '--'
         self.unsaved_progress = True
-        self._move_key_right()
+        self.cpos.col += 1
 
     def _key_backspace(self, _) -> None:
         if not self.hex_array_edit[self.cpos.row]:
             return
         self.hex_array_edit[self.cpos.row][self.cpos.col] = None
-        self._move_key_left()
+        self.cpos.col -= 1
 
     def _key_ctl_backspace(self, _) -> str:
         if not self.hex_array_edit[self.cpos.row]:
@@ -157,58 +157,84 @@ class HexEditor:
         self.hex_array_edit[self.cpos.row][self.cpos.col] = '--'
         # self.hex_array[self.cpos.row][self.cpos.col] = '--'
         self.unsaved_progress = True
-        self._move_key_left()
+        self.cpos.col -= 1
 
     def _move_key_left(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[0])
         self.cpos.col -= 1
 
     def _move_key_right(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[1])
         self.cpos.col += 1
 
     def _move_key_up(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[0])
         self.cpos.row -= 1
 
     def _move_key_down(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[1])
         self.cpos.row += 1
 
     def _move_key_ctl_left(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[0])
         self.cpos.col -= HexEditor.columns//2
 
     def _move_key_ctl_right(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[1])
         self.cpos.col += HexEditor.columns//2
 
     def _move_key_ctl_up(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[0])
         self.cpos.row -= 10
 
     def _move_key_ctl_down(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[1])
         self.cpos.row += 10
 
     def _select_key_left(self) -> None:
+        self.selecting = False
         self._move_key_left()
 
     def _select_key_right(self) -> None:
+        self.selecting = False
         self._move_key_right()
 
     def _select_key_up(self) -> None:
+        self.selecting = False
         self._move_key_up()
 
     def _select_key_down(self) -> None:
+        self.selecting = False
         self._move_key_down()
 
     def _move_key_page_up(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[0])
         max_y, _ = self.getxymax()
         self.cpos.row -= max_y
         self.wpos.row = max(self.wpos.row-max_y, 0)
 
     def _move_key_page_down(self) -> None:
+        if self.selecting:
+            self.cpos.set_pos(self.selected_area[1])
         max_y, _ = self.getxymax()
         self.cpos.row += max_y
         self._build_file_upto(max_y+self.cpos.row+2)
 
     def _select_key_page_up(self) -> None:
+        self.selecting = False
         self._move_key_page_up()
 
     def _select_key_page_down(self) -> None:
+        self.selecting = False
         self._move_key_page_down()
 
     def _move_key_end(self) -> None:
@@ -250,7 +276,7 @@ class HexEditor:
             self.hex_array_edit[-1] = self.hex_array_edit[-1][:-1]
             self.hex_array_edit.append([extracted_byte])
         if wchar != '<':
-            self._move_key_right()
+            self.cpos.col += 1
 
     def _key_string(self, wchar) -> None:
         """
@@ -271,7 +297,7 @@ class HexEditor:
                 self.hex_array_edit[self.cpos.row][self.cpos.col][:self.edited_byte_pos] + \
                 wchar + self.hex_array_edit[self.cpos.row][self.cpos.col][self.edited_byte_pos+1:]
             if self.edited_byte_pos:
-                self._move_key_right()
+                self.cpos.col += 1
             self.edited_byte_pos = (self.edited_byte_pos+1)%2
 
             self.unsaved_progress = True
