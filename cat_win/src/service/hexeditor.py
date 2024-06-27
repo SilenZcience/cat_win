@@ -635,7 +635,7 @@ class HexEditor:
             if self.debug_mode:
                 _debug_info = repr(chr(wchar_)) if isinstance(wchar_, int) else \
                     ord(wchar_) if len(wchar_) == 1 else '-'
-                err_print(f"__DEBUG__: Received  {key_}\t{_debug_info}" + \
+                err_print(f"__DEBUG__: Received  {str(key_):<22}{_debug_info}" + \
                     f"\t{str(key__):<15} \t{repr(wchar_)}")
         wchar = self.curse_window.get_wch()
         _key = curses.keyname(wchar if isinstance(wchar, int) else ord(wchar))
