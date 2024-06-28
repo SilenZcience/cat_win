@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.7.12] - TBA
+
+### Minor Changes
+
+- added the option to search for plain text in the hexeditor by pressing the insert-hotkey while in the search menu.
+
+### Bugfixes
+
+- fixed visual Bug in the hex-editor.
+- fixed Bug where a warning is shown unnecessarily.
+
+
 ## [1.7.11] - 2024-06-10
 
 ### Minor Changes
@@ -192,7 +204,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - renamed --`config`, --`config` to --`cconfig`, --`cconfig`.
 - added --`config`, --`config` parameter to configure default parameters.
 - added Alt-Arrow hotkeys to the editor to scroll through the file without moving the cursor.
-- fix the editor for Python 3.12
+- fix the editor for Python 3.12.
 - added `KEY_BTAB`(Shift+Tab) to the editor to decrease indent of the current line.
 - added functionality to the editor to jump to specific line using `^E`.
 - added functionality to search the file in the editor using `^F`.
@@ -333,8 +345,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ### Bugfixes
 
-- some efficiency improvements
-- fix DeprecationWarning
+- made some efficiency improvements.
+- fixed a DeprecationWarning.
 
 
 ## [1.4.1] - 2023-05-04
@@ -342,9 +354,9 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - renamed -`d`, --`debug` to --`debug`, --`debug` and hid it from the help menu.
-- renamed -`R`, --`reconfigure` to -`R`, --`R`
+- renamed -`R`, --`reconfigure` to -`R`, --`R`.
 - added --`Rin`, --`Rout`, --`Rerr` parameters to specificly reconfigure the stdin, stdout or stderr stream to the given encoding.
-- added `!help` command to the cat-repl (cats) in order to see a short help display explaining all other parameters
+- added `!help` command to the cat-repl (cats) in order to see a short help display explaining all other parameters.
 - added `!exit` command to the cat-repl (cats) in order to exit repl
 - added `!see` command to the cat-repl (cats) in order to see the currently active parameters within one repl session.
 - added `!add <OPTION>` and `!del <OPTION>` command to the cat-repl (cats) in order to change the parameters within one repl session.
@@ -384,8 +396,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ### Major Changes
 
-- renamed -`k`, --`keyword` to -`g`, --`grep`
-- removed `requests` dependency
+- renamed -`k`, --`keyword` to -`g`, --`grep`.
+- removed `requests` dependency.
 
 ### Minor Changes
 
@@ -445,14 +457,14 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - it is now possible to use either the '`pyclip`', '`pyperclip3`', or '`pyperclip`' module in order to use the --`clip` parameter. If none of these options are installed, the --clip parameter will not work yet the programm won't crash. This change was made due to some problems using the --clip parameter on macOS.
 - the `default` clipboard module was changed from '`pyperclip3`' to '`pyperclip`'. This module however is not included in the necessary dependencies. It can be added to the installation dependencies by using 'pip install cat_win<b>[clip]</b>'. This chang was made to ensure compatibility with `pypy-3.8` and `pypy-3.9`.
-- elevated dependency `colorama` from >=0.4.5 to >=0.4.6 (also switched from init() to just_fix_windows_console())
+- elevated dependency `colorama` from >=0.4.5 to >=0.4.6 (also switched from init() to just_fix_windows_console()).
 
 ### Minor Changes
 
 - added appeal to raise official github issue when encountering an exception.
 - added ability to create files in subdirectories that do not yet exist. The path will be created in the process, on error it will be cleaned up again.
-- redesigned --config menu
-- added file sizes to -`F`, --`FILES`
+- redesigned --config menu.
+- added file sizes to -`F`, --`FILES`.
 - added "`NONE`" - option to color --`config`, in order to disable highlighting for specific elements.
 
 ### Bugfixes
@@ -484,7 +496,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - added `message_information`, `message_important` and `message_warning` as customizable colors to the --config menu.
 - added unrecognized parameters to --debug menu.
-- added -`F`, --`FILES` parameter which ONLY shows the found files. (useful when searching files with pattern like "\*\*/\*.txt")
+- added -`F`, --`FILES` parameter which ONLY shows the found files. (useful when searching files with pattern like "\*\*/\*.txt").
 
 ### Bugfixes
 
@@ -500,10 +512,10 @@ This release fully focuses on cleaning up, patching as many Bugs as possible, an
 
 - changed the entrypoint `cat` to `catw`. This change was made to resolve the conflict on various platforms using `cat` natively.
 
-- changed -`x`, --linelength parameter to -`l`, --linelength
-- changed -`s`, --`squeeze` parameter to -`u`, --`unique`
-- changed -`c`, --`count` parameter to -`s`, --`sum`
-- changed -`col`, --nocolor parameter to --`nc`, --nocolor
+- changed -`x`, --linelength parameter to -`l`, --linelength.
+- changed -`s`, --`squeeze` parameter to -`u`, --`unique`.
+- changed -`c`, --`count` parameter to -`s`, --`sum`.
+- changed -`col`, --nocolor parameter to --`nc`, --nocolor.
 
 ### Minor Changes
 
