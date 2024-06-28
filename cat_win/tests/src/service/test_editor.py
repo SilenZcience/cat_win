@@ -21,9 +21,8 @@ test_file_path_editor = os.path.join(test_file_dir, 'test_editor.txt')
 
 
 @patch('cat_win.src.service.editor.Editor.getxymax', getxymax)
-@patch('cat_win.src.service.editor.Editor.wc_width', lambda _: 1)
 @patch('cat_win.src.service.editor.curses', mm)
-@patch('cat_win.src.service.helper.iohelper.IoHelper.get_newline', lambda *args: '\n')
+@patch('cat_win.src.service.helper.iohelper.IoHelper.get_newline', lambda *_: '\n')
 class TestEditor(TestCase):
     maxDiff = None
 

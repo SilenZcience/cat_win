@@ -10,8 +10,9 @@ except ImportError:
 import os
 import signal
 import sys
+import unicodedata
 
-from cat_win.src.service.helper.editorhelper import History, Position, wcwidth, UNIFY_HOTKEYS, \
+from cat_win.src.service.helper.editorhelper import History, Position, UNIFY_HOTKEYS, \
     KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, SELECT_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
 from cat_win.src.service.clipboard import Clipboard
@@ -22,7 +23,6 @@ class Editor:
     """
     Editor
     """
-    wc_width = wcwidth
     loading_failed = False
     special_indentation = '\t'
     auto_indent = False
@@ -884,7 +884,7 @@ class Editor:
                 if self.selecting and sel_from <= (brow, bcol) < sel_to:
                     color = self._get_color(5)
                 try:
-                    if Editor.wc_width(cur_char) != 1:
+                    if unicodedata.east_asian_width(cur_char) in 'WF':
                         raise TypeError
                     # CJK unicode (problems in windows-terminal) fix:
                     # if 12799 < ord(cur_char) < 65103:
@@ -1092,7 +1092,6 @@ class Editor:
         editor._set_special_chars(special_chars)
 
         if Editor.on_windows_os:
-            Editor.wc_width = lambda _: 1
             # disable background feature on windows
             editor._action_background = lambda *_: True
         else:
