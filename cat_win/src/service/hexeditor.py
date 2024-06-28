@@ -773,6 +773,8 @@ class HexEditor:
             for col in range(HexEditor.columns):
                 if sel_from <= (row, col) <= sel_to:
                     color_id = 7 if self.hex_array_edit[row][col] is None else 8
+                    if (row, col) == self.cpos.get_pos():
+                        color_id = 4 if self.hex_array_edit[row][col] is None else 6
                     try:
                         self.curse_window.chgat(row-self.wpos.row+2, 13 + col*3,
                                                 2, self._get_color(color_id))
