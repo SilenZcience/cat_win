@@ -941,7 +941,7 @@ The currently supported Key bindings are as follows:
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to specific line | - |
 | <kbd>Find/^F</kbd> | - | - | prompt to search in the file | - |
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
-| <kbd>Insert/^N</kbd> | - | - | Insert a Byte Sequence | - |
+| <kbd>Insert/^N</kbd> | - | - | Insert a byte sequence | - |
 | <kbd>Background/^B</kbd> | - | - | put the editor in the background</br>(UNIX only) | - |
 | <kbd>Quit/^Q</kbd> | - | - | close editor</br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^D</kbd> | - | - | interrupt program | - |
@@ -975,7 +975,7 @@ The currently supported Key bindings are as follows:
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to a specific byte | - |
 | <kbd>Find/^F</kbd> | - | - | prompt to search a byte(-sequence) in the file | - |
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
-| <kbd>Insert/^N</kbd> | - | - | insert a Text Sequence or toggle the find-menu to plain text | - |
+| <kbd>Insert/^N</kbd> | - | - | insert a text sequence or toggle the find-menu to plain text | - |
 | <kbd>Background/^B</kbd> | - | - | put the hex-editor in the background</br>(UNIX only) | - |
 | <kbd>Quit/^Q</kbd> | - | - | close hex-editor</br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^D</kbd> | - | - | interrupt program | - |
