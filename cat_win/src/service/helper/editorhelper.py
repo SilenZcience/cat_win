@@ -17,23 +17,8 @@ try:
 
         return stdscr
     curses.initscr = initscr
-    from functools import cached_property
-
-    class _CalcWidth:
-        @cached_property
-        def _window(self):
-            return curses.newwin(1, 10)
-
-        def wcwidth(self, c: str) -> int:
-            try:
-                self._window.addstr(0, 0, c)
-            except ValueError:
-                return 1
-            return self._window.getyx()[1]
-    wcwidth = _CalcWidth().wcwidth
-    del _CalcWidth
 except ImportError:
-    wcwidth = lambda _: 1
+    pass
 
 
 UNIFY_HOTKEYS = {
