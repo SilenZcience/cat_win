@@ -771,7 +771,7 @@ class HexEditor:
         sel_from, sel_to = self.selected_area
         for row in range(max(sel_from[0], self.wpos.row), min(sel_to[0]+1, self.wpos.row+max_y)):
             for col in range(HexEditor.columns):
-                if sel_from <= (row, col) < sel_to:
+                if sel_from <= (row, col) <= sel_to:
                     color_id = 7 if self.hex_array_edit[row][col] is None else 8
                     try:
                         self.curse_window.chgat(row-self.wpos.row+2, 13 + col*3,
