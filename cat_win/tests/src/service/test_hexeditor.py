@@ -36,6 +36,12 @@ class TestHexEditor(TestCase):
         editor.spos.set_pos((5, 3))
         self.assertEqual(editor.selected_area, ((3, 4), (5, 3)))
 
+    def test_pos_between(self):
+        with patch('cat_win.src.service.hexeditor.HexEditor.columns', 10):
+            self.assertListEqual(list(HexEditor.pos_between((5,8),(6,4))), [(5,8),(5,9),(6,0),(6,1),(6,2),(6,3),(6,4)])
+        with patch('cat_win.src.service.hexeditor.HexEditor.columns', 3):
+            self.assertListEqual(list(HexEditor.pos_between((2,0),(4,1))), [(2,0),(2,1),(2,2),(3,0),(3,1),(3,2),(4,0),(4,1)])
+
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 723))
     def test__build_file(self):
         editor = HexEditor('', '')
@@ -93,6 +99,23 @@ class TestHexEditor(TestCase):
         self.assertSequenceEqual(editor.hex_array_edit, hex_array_edit)
         self.assertEqual(editor.cpos.get_pos(), (5, 13))
 
+    def test__key_dc_selection(self):
+        editor = HexEditor(__file__, '')
+        hex_array = deepcopy(editor.hex_array)
+        hex_array_edit = deepcopy(editor.hex_array_edit)
+        editor.cpos.set_pos((1,5))
+        editor.spos.set_pos((4,10))
+        editor.selecting = True
+        editor.hex_array_edit[3][1] = '00'
+        editor.hex_array_edit[4][2] = '00'
+        editor.hex_array_edit[4][6] = '00'
+        editor.hex_array_edit[1][5] = '00'
+        editor.hex_array_edit[4][10] = '00'
+        editor._key_dc(None)
+        self.assertSequenceEqual(editor.hex_array, hex_array)
+        self.assertSequenceEqual(editor.hex_array_edit, hex_array_edit)
+        self.assertEqual(editor.cpos.get_pos(), (4, 11))
+
     def test__key_dl_empty(self):
         editor = HexEditor('', '')
         editor._build_file_upto(0)
@@ -109,6 +132,21 @@ class TestHexEditor(TestCase):
         self.assertSequenceEqual(editor.hex_array, hex_array)
         self.assertSequenceEqual(editor.hex_array_edit, hex_array_edit)
         self.assertEqual(editor.cpos.get_pos(), (5, 13))
+
+    def test__key_dl_selection(self):
+        editor = HexEditor(__file__, '')
+        hex_array = deepcopy(editor.hex_array)
+        hex_array_edit = deepcopy(editor.hex_array_edit)
+        editor.cpos.set_pos((3, 15))
+        editor.spos.set_pos((5, 0))
+        editor.selecting = True
+        editor._key_dl(None)
+        hex_array_edit[3][15] = '--'
+        hex_array_edit[4] = ['--'] * 16
+        hex_array_edit[5][0] = '--'
+        self.assertSequenceEqual(editor.hex_array, hex_array)
+        self.assertSequenceEqual(editor.hex_array_edit, hex_array_edit)
+        self.assertEqual(editor.cpos.get_pos(), (5, 1))
 
     def test__key_backspace_empty(self):
         editor = HexEditor('', '')
@@ -128,6 +166,23 @@ class TestHexEditor(TestCase):
         self.assertSequenceEqual(editor.hex_array_edit, hex_array_edit)
         self.assertEqual(editor.cpos.get_pos(), (5, 4))
 
+    def test__key_backspace_selection(self):
+        editor = HexEditor(__file__, '')
+        hex_array = deepcopy(editor.hex_array)
+        hex_array_edit = deepcopy(editor.hex_array_edit)
+        editor.cpos.set_pos((4,10))
+        editor.spos.set_pos((1,5))
+        editor.selecting = True
+        editor.hex_array_edit[3][1] = '00'
+        editor.hex_array_edit[4][2] = '00'
+        editor.hex_array_edit[4][6] = '00'
+        editor.hex_array_edit[1][5] = '00'
+        editor.hex_array_edit[4][10] = '00'
+        editor._key_backspace(None)
+        self.assertSequenceEqual(editor.hex_array, hex_array)
+        self.assertSequenceEqual(editor.hex_array_edit, hex_array_edit)
+        self.assertEqual(editor.cpos.get_pos(), (1, 4))
+
     def test__key_ctl_backspace_empty(self):
         editor = HexEditor('', '')
         editor._build_file_upto(0)
@@ -145,6 +200,21 @@ class TestHexEditor(TestCase):
         self.assertSequenceEqual(editor.hex_array, hex_array)
         self.assertSequenceEqual(editor.hex_array_edit, hex_array_edit)
         self.assertEqual(editor.cpos.get_pos(), (5, 4))
+
+    def test__key_ctl_backspace_selection(self):
+        editor = HexEditor(__file__, '')
+        hex_array = deepcopy(editor.hex_array)
+        hex_array_edit = deepcopy(editor.hex_array_edit)
+        editor.cpos.set_pos((5, 0))
+        editor.spos.set_pos((3, 15))
+        editor.selecting = True
+        editor._key_ctl_backspace(None)
+        hex_array_edit[3][15] = '--'
+        hex_array_edit[4] = ['--'] * 16
+        hex_array_edit[5][0] = '--'
+        self.assertSequenceEqual(editor.hex_array, hex_array)
+        self.assertSequenceEqual(editor.hex_array_edit, hex_array_edit)
+        self.assertEqual(editor.cpos.get_pos(), (3, 14))
 
     def test__move_key_left(self):
         editor = HexEditor('', '')
