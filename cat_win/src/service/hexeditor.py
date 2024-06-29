@@ -74,6 +74,16 @@ class HexEditor:
             return (self.spos.get_pos(), self.cpos.get_pos())
         return (self.cpos.get_pos(), self.spos.get_pos())
 
+    @staticmethod
+    def pos_between(from_pos, to_pos):
+        from_y, from_x = from_pos
+        to_y, to_x = to_pos
+        while from_y < to_y or from_x <= to_x:
+            yield (from_y, from_x)
+            from_x += 1
+            from_y += (from_x // HexEditor.columns)
+            from_x = from_x % HexEditor.columns
+
     def _build_file(self):
         for _byte in self._f_content_gen:
             if len(self.hex_array[-1]) >= HexEditor.columns:
@@ -134,28 +144,52 @@ class HexEditor:
     def _key_dc(self, _) -> None:
         if not self.hex_array_edit[self.cpos.row]:
             return
-        self.hex_array_edit[self.cpos.row][self.cpos.col] = None
+        if self.selecting:
+            sel_from, sel_to = self.selected_area
+            for (pos_y, pos_x) in HexEditor.pos_between(sel_from, sel_to):
+                self.hex_array_edit[pos_y][pos_x] = None
+            self.cpos.set_pos(sel_to)
+        else:
+            self.hex_array_edit[self.cpos.row][self.cpos.col] = None
         self.cpos.col += 1
 
     def _key_dl(self, _) -> str:
         if not self.hex_array_edit[self.cpos.row]:
             return
-        self.hex_array_edit[self.cpos.row][self.cpos.col] = '--'
-        # self.hex_array[self.cpos.row][self.cpos.col] = '--'
+        if self.selecting:
+            sel_from, sel_to = self.selected_area
+            for (pos_y, pos_x) in HexEditor.pos_between(sel_from, sel_to):
+                self.hex_array_edit[pos_y][pos_x] = '--'
+            self.cpos.set_pos(sel_to)
+        else:
+            self.hex_array_edit[self.cpos.row][self.cpos.col] = '--'
+            # self.hex_array[self.cpos.row][self.cpos.col] = '--'
         self.unsaved_progress = True
         self.cpos.col += 1
 
     def _key_backspace(self, _) -> None:
         if not self.hex_array_edit[self.cpos.row]:
             return
-        self.hex_array_edit[self.cpos.row][self.cpos.col] = None
+        if self.selecting:
+            sel_from, sel_to = self.selected_area
+            for (pos_y, pos_x) in HexEditor.pos_between(sel_from, sel_to):
+                self.hex_array_edit[pos_y][pos_x] = None
+            self.cpos.set_pos(sel_from)
+        else:
+            self.hex_array_edit[self.cpos.row][self.cpos.col] = None
         self.cpos.col -= 1
 
     def _key_ctl_backspace(self, _) -> str:
         if not self.hex_array_edit[self.cpos.row]:
             return
-        self.hex_array_edit[self.cpos.row][self.cpos.col] = '--'
-        # self.hex_array[self.cpos.row][self.cpos.col] = '--'
+        if self.selecting:
+            sel_from, sel_to = self.selected_area
+            for (pos_y, pos_x) in HexEditor.pos_between(sel_from, sel_to):
+                self.hex_array_edit[pos_y][pos_x] = '--'
+            self.cpos.set_pos(sel_from)
+        else:
+            self.hex_array_edit[self.cpos.row][self.cpos.col] = '--'
+            # self.hex_array[self.cpos.row][self.cpos.col] = '--'
         self.unsaved_progress = True
         self.cpos.col -= 1
 
