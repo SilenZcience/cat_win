@@ -966,8 +966,8 @@ The currently supported Key bindings are as follows:
 | <kbd>0-9 & A-F</kbd> | edit the current byte | - | - | - |
 | <kbd><</kbd> | insert a new byte to the left | - | - | - |
 | <kbd>> & ␣</kbd> | insert a new byte to the right | - | - | - |
-| <kbd>Backspace</kbd> | reset current byte | reset current byte | remove current byte | reset current byte |
-| <kbd>Delete</kbd> | reset current byte | reset current byte | remove current byte | reset current byte |
+| <kbd>Backspace</kbd> | reset current byte(s) | reset current byte(s) | remove current byte(s) | reset current byte(s) |
+| <kbd>Delete</kbd> | reset current byte(s) | reset current byte(s) | remove current byte(s) | reset current byte(s) |
 ||||||
 | <kbd>SelectAll/^A</kbd> | - | - | select the entire file | - |
 | <kbd>Copy/^C</kbd> | - | - | copy selected bytes | - |
