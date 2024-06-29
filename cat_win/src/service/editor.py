@@ -411,6 +411,7 @@ class Editor:
         if c_row.startswith(self.special_indentation):
             self.window_content[self.cpos.row] = c_row[indent_l:]
             self.cpos.col = max(self.cpos.col-indent_l, 0)
+            self.unsaved_progress = True
             return self.special_indentation
         return None
 
