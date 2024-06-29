@@ -8,11 +8,14 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - added the option to search for plain text in the hexeditor by pressing the insert-hotkey while in the search menu.
+- expanded the selection functionality in the hex-editor. hotkeys will now be applied to the entire selection.
 
 ### Bugfixes
 
 - fixed visual Bug in the hex-editor.
 - fixed Bug where a warning is shown unnecessarily.
+- fixed visual Bug in the editor in case of non-one-width characters. these will now be displayed as unknown symbols.
+- fixed Bug in the (hex-)editor where some actions would not count as the file being changed.
 
 
 ## [1.7.11] - 2024-06-10
