@@ -612,6 +612,7 @@ class HexEditor:
                         self._insert_byte('>')
                         self._fix_cursor_position(max_y)
                         self.hex_array_edit[self.cpos.row][self.cpos.col] = f"{byte_:02X}"
+                self.unsaved_progress = True
                 break
         return True
 
