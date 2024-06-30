@@ -31,7 +31,7 @@ try:
     from cat_win.src.service.helper.utility import comp_eval, comp_conv
 except SyntaxError: # in case of Python 3.7
     from cat_win.src.service.helper.utilityold import comp_eval, comp_conv
-from cat_win.src.service.helper.zipviewer import display_zip
+from cat_win.src.service.helper.zipviewer import display_archive
 from cat_win.src.service.cbase64 import encode_base64, decode_base64
 from cat_win.src.service.checksum import print_checksum
 from cat_win.src.service.clipboard import Clipboard
@@ -743,7 +743,7 @@ def edit_file(file_index: int = 0) -> None:
         u_files[file_index].set_plaintext(plain=False)
         if u_args[ARGS_PLAIN_ONLY]:
             return
-        if display_zip(u_files[file_index].path, _convert_size):
+        if display_archive(u_files[file_index].path, _convert_size):
             return
         try:
             file_content = IoHelper.read_file(
