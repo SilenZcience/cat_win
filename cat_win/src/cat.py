@@ -247,7 +247,7 @@ def _print_meta_and_checksum(show_meta: bool, show_checksum: bool) -> None:
     """
     for file in u_files:
         if show_meta:
-            print_meta(file.path, on_windows_os,
+            print_meta(file.path, os.path.join(working_dir, 'res', 'signatures.json'), on_windows_os,
                         [color_dic[CKW.RESET_ALL],
                         color_dic[CKW.ATTRIB],
                         color_dic[CKW.ATTRIB_POSITIVE],

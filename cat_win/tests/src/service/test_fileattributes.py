@@ -40,14 +40,15 @@ class TestFileAttributes(TestCase):
         self.assertEqual(_convert_size(1024*1024*1024*1024*1024*1024*1024*1024*1024), '1.0 ?')
 
     def test_get_file_meta_data(self):
-        meta_data = get_file_meta_data(__file__, False)
+        meta_data = get_file_meta_data(__file__, '', False)
+        self.assertIn('Signature:', meta_data)
         self.assertIn('Size:', meta_data)
         self.assertIn('ATime:', meta_data)
         self.assertIn('MTime:', meta_data)
         self.assertIn('CTime:', meta_data)
 
         meta_data = get_file_meta_data(
-            'randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|',False)
+            'randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|', '', False)
         self.assertEqual(meta_data, '')
 
     def test_get_file_size(self):
@@ -57,7 +58,8 @@ class TestFileAttributes(TestCase):
 
     def test_print_meta(self):
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            print_meta(__file__, False, ['A', 'B', 'C', 'D'])
+            print_meta(__file__, '', False, ['A', 'B', 'C', 'D'])
+            self.assertIn('Signature:', fake_out.getvalue())
             self.assertIn('Size:', fake_out.getvalue())
             self.assertIn('ATime:', fake_out.getvalue())
             self.assertIn('MTime:', fake_out.getvalue())

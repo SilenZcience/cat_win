@@ -12,17 +12,70 @@ from stat import (
     FILE_ATTRIBUTE_COMPRESSED as C,
     FILE_ATTRIBUTE_ENCRYPTED as E
 )
+import json
 import math
 import os
 
 from cat_win.src.service.helper.winstreams import WinStreams
 
 
+class Signatures:
+    signatures = None
+
+    @staticmethod
+    def read_signature(res_path: str, file: str) -> str:
+        """
+        read a file and compare its signature to known signatures.
+        
+        Parameters:
+        file (str):
+            a string representation of a file (-path)
+            
+        Returns:
+        (str):
+            the possible signatures of the file
+        """
+        file_signature_primary = ''
+        file_signature_secondary = []
+
+        file_ext = os.path.splitext(file)[1][1:]
+        try:
+            with open(file, 'rb') as file_:
+                file_prefix = file_.read(36870)
+
+            if Signatures.signatures is None:
+                # credit: https://gist.github.com/Qti3e/6341245314bf3513abb080677cd1c93b
+                with open(res_path, 'r', encoding='utf-8') as sig:
+                    Signatures.signatures = json.load(sig)
+            signatures_json = Signatures.signatures
+        except OSError:
+            return 'lookup failed!'
+
+        for ext in signatures_json:
+            for sign in signatures_json[ext]['signs']:
+                offset, sig = sign.split(',')
+                offset, sig = int(offset), bytearray.fromhex(sig)
+                if file_prefix[offset:].startswith(sig):
+                    signature_option = f"{signatures_json[ext]['mime']}({ext})"
+                    if ext == file_ext:
+                        file_signature_primary = signature_option
+                    else:
+                        file_signature_secondary.append(signature_option)
+                    break
+
+        if file_signature_primary and file_signature_secondary:
+            return file_signature_primary + ' [' + ';'.join(file_signature_secondary) + ']'
+        if file_signature_primary:
+            return file_signature_primary
+        if file_signature_secondary:
+            return '[' + ';'.join(file_signature_secondary) + ']'
+        return '-'
+
 def _convert_size(size_bytes: int) -> str:
     """
     convert a size value to a more compact representation
     
-    Parameters_
+    Parameters:
     size_bytes (int):
         a size value in bytes
         
@@ -99,7 +152,7 @@ def get_file_mtime(file: str) -> float:
         return 0.0
 
 
-def get_file_meta_data(file: str, on_windows_os: bool, colors = None) -> str:
+def get_file_meta_data(file: str, res_path: str, on_windows_os: bool, colors = None) -> str:
     """
     calculate file metadata information.
     
@@ -125,6 +178,8 @@ def get_file_meta_data(file: str, on_windows_os: bool, colors = None) -> str:
 
         meta_data = colors[1] + file + colors[0] + '\n'
 
+        meta_data += f"{colors[1]}{'Signature:' : <16}"
+        meta_data += f"{Signatures.read_signature(res_path, file)}{colors[0]}\n"
         meta_data += f"{colors[1]}{'Size:' : <16}"
         meta_data += f"{_convert_size(stats.st_size)}{colors[0]}\n"
         meta_data += f"{colors[1]}{'ATime:': <16}"
@@ -155,7 +210,7 @@ def get_file_meta_data(file: str, on_windows_os: bool, colors = None) -> str:
     except OSError:
         return ''
 
-def print_meta(file: str, on_windows_os: bool, colors: list) -> None:
+def print_meta(file: str, res_path: str, on_windows_os: bool, colors: list) -> None:
     """
     print the information retrieved by get_file_meta_data()
     
@@ -167,5 +222,5 @@ def print_meta(file: str, on_windows_os: bool, colors: list) -> None:
     colors (list):
         [reset, attributes, positive_attr, negative_attr] color codes
     """
-    meta_data = get_file_meta_data(file, on_windows_os, colors)
+    meta_data = get_file_meta_data(file, res_path, on_windows_os, colors)
     print(meta_data)
