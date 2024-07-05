@@ -121,7 +121,7 @@
 
 # <a id="arguments">Arguments & Options</a>
 
-| Argument / Option | Description | works in REPL |
+| Argument / Option | Description | REPL supported |
 |-------------------|-------------|:--------------:|
 | *<a href="#-h---help">-h, --help</a>* | show help message and exit |✔|
 | *<a href="#-v---version">-v, --version</a>* | output version information and exit |✔|
@@ -225,8 +225,10 @@
    - The Output will be stripped of any Color if the Output is piped and the Configuration `strip_color_on_pipe` is set to `true`.
 - Archives
    - Archives will not be displayed like regular Files.
-   - When passing in an Archive the contained Files will be displayed along side their File Size instead.
-   - Currently supported Archive Formats are .zip and .tar.
+   - When passing in an Archive the contained Files will be listed along side their File Size instead.
+   - Currently supported Archive Formats are:
+      - Zip Formats and Equivalents: `.zip` `.egg` `.jar`
+      - Tar and compressed Tar Formats: `.tar` `.tar.gz` `.tgz` `.tar.bz2` `.tz2` 
 
 - - - -
 ### <a id="-h---help">-h, --help</a>
