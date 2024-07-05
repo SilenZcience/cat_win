@@ -1,110 +1,111 @@
 <div align="center">
 <h2 align="center">cat_win</h2>
    <p align="center">
-      Simple Command-line Tool made in Python
+      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/cat_win.logo.png" width="25%"/>
+   </p>
+   <p align="center">
+      Simple Text-Processing Command-line Tool made in Python
       <br/>
-      <a href="https://github.com/SilenZcience/cat_win/blob/main/cat_win/cat.py">
+      <a href="https://github.com/SilenZcience/cat_win/blob/main/cat_win/src/cat.py">
          <strong>Explore the code »</strong>
       </a>
       <br/>
       <br/>
-      <a href="https://github.com/SilenZcience/cat_win/issues">Report Bug</a>
+      <a href="https://github.com/SilenZcience/cat_win/issues/new?assignees=&labels=feature&projects=&template=feature_request.yaml">Request Feature</a>
       ·
-      <a href="https://github.com/SilenZcience/cat_win/issues">Request Feature</a>
+      <a href="https://github.com/SilenZcience/cat_win/issues/new?assignees=&labels=bug&projects=&template=bug_report.yaml&title=%F0%9F%90%9B+Bug+Report%3A+">Report Bug</a>
+      ·
+      <a href="https://github.com/SilenZcience/cat_win/issues/new?assignees=&labels=docs&projects=&template=documentation_request.yaml&title=%F0%9F%93%96+Documentation%3A+">Request Documentation</a>
    </p>
 </div>
 
 <details>
    <summary>Table of Contents</summary>
-   <ol>
+   <ul>
+      <li>
+         <a href="#general-information">Quick-Find Headers</a>
+         <ul>
+            <li><a href="#general-information">General Information</a></li>
+            <li><a href="#prefix">Line Prefix</a></li>
+            <li><a href="#simplereplace">Special Characters</a></li>
+            <li><a href="#linemanipulation">Line Manipulation</a></li>
+            <li><a href="#input">Input Types</a></li>
+            <li><a href="#summary">Summaries</a></li>
+            <li><a href="#search">Search and Match</a></li>
+            <li><a href="#meta">Meta Information</a></li>
+            <li><a href="#mathematical">Mathematical</a></li>
+            <li><a href="#byteview">Byte Representation</a></li>
+            <li><a href="#edit">Editor</a></li>
+            <li><a href="#settings">Settings/Behaviour</a></li>
+            <li><a href="#configuration">Configuration</a></li>
+            <li><a href="#encoding">Text Encoding</a></li>
+         </ul>
+      </li>
       <li>
          <a href="#arguments--options">Arguments & Options</a>
          <ul>
-            <li>
-               <a href="#general-information">Quick-Find Headers</a>
-               <ul>
-                  <li><a href="#prefix">Line Prefix</a></li>
-                  <li><a href="#simplereplace">Special Characters</a></li>
-                  <li><a href="#linemanipulation">Line Manipulation</a></li>
-                  <li><a href="#input">Input Types</a></li>
-                  <li><a href="#summary">Summaries</a></li>
-                  <li><a href="#search">Search and Match</a></li>
-                  <li><a href="#meta">Meta Information</a></li>
-                  <li><a href="#mathematical">Mathematical</a></li>
-                  <li><a href="#byteview">Byte Representation</a></li>
-                  <li><a href="#edit">Editor</a></li>
-                  <li><a href="#settings">Settings/Behaviour</a></li>
-                  <li><a href="#configuration">Configuration</a></li>
-                  <li><a href="#encoding">Text Encoding</a></li>
-               </ul>
-            </li>
-            <li>
-               <a href="#general-information">General Information</a>
-               <ul>
-                  <li><a href="#-h---help">-h, --help</a></li>
-                  <li><a href="#-v---version">-v, --version</a></li>
-                  <li><a href="#--debug---debug">--debug, --debug</a></li>
-                  <li><a href="#-l---linelength">-l, --linelength</a></li>
-                  <li><a href="#-n---number">-n, --number</a></li>
-                  <li><a href="#--fp---file-prefix">--fp, --file-prefix</a></li>
-                  <li><a href="#-e---ends">-e, --ends</a></li>
-                  <li><a href="#--chr---char">--chr, --char</a></li>
-                  <li><a href="#-b---blank">-b, --blank</a></li>
-                  <li><a href="#-p---peek">-p, --peek</a></li>
-                  <li><a href="#-r---reverse">-r, --reverse</a></li>
-                  <li><a href="#-u---unique">-u, --unique</a></li>
-                  <li><a href="#--sort---sort">--sort, --sort</a></li>
-                  <li><a href="#--sortl---sortlength">--sortl, --sortlength</a></li>
-                  <li><a href="#--sf---specific-format">--sf, --specific-format</a></li>
-                  <li><a href="#-e---echo">-E, --echo</a></li>
-                  <li><a href="#----stdin">-, --stdin</a></li>
-                  <li><a href="#-o---oneline">-o, --oneline</a></li>
-                  <li><a href="#-u---url">-U, --url</a></li>
-                  <li><a href="#-f---files">-f, --files</a></li>
-                  <li><a href="#-d---dirs">-d, --dirs</a></li>
-                  <li><a href="#-s---sum">-s, --sum</a></li>
-                  <li><a href="#-w---wordcount">-w, --wordcount</a></li>
-                  <li><a href="#--cc---charcount">--cc, --charcount</a></li>
-                  <li><a href="#-g---grep">-g, --grep</a></li>
-                  <li><a href="#--nk---nokeyword">--nk, --nokeyword</a></li>
-                  <li><a href="#--nb---nobreak">--nb, --nobreak</a></li>
-                  <li><a href="#-a---attributes">-a, --attributes</a></li>
-                  <li><a href="#-m---checksum">-m, --checksum</a></li>
-                  <li><a href="#--strings---strings">--strings, --strings</a></li>
-                  <li><a href="#--b64d---b64d">--b64d, --b64d</a></li>
-                  <li><a href="#--b64e---b64e">--b64e, --b64e</a></li>
-                  <li><a href="#--eval---eval">--eval, --EVAL</a></li>
-                  <li><a href="#--hex---hex">--hex, --HEX</a></li>
-                  <li><a href="#--dec---dec">--dec, --DEC</a></li>
-                  <li><a href="#--oct---oct">--oct, --OCT</a></li>
-                  <li><a href="#--bin---bin">--bin, --BIN</a></li>
-                  <li><a href="#--binview---binview">--binview, --binview</a></li>
-                  <li><a href="#--hexview---hexview">--hexview, --HEXVIEW</a></li>
-                  <li><a href="#----edit">-!, --edit</a></li>
-                  <li><a href="#----hexedit">-#, --hexedit</a></li>
-                  <li><a href="#-m---more">-M, --more</a></li>
-                  <li><a href="#-b---raw">-B, --raw</a></li>
-                  <li><a href="#-c---clip">-c, --clip</a></li>
-                  <li><a href="#--dot---dotfiles">--dot, --dotfiles</a></li>
-                  <li><a href="#--plain---plain-only">--plain, --plain-only</a></li>
-                  <li><a href="#--nc---nocolor">--nc, --nocolor</a></li>
-                  <li><a href="#--config---config">--config, --config</a></li>
-                  <li><a href="#--cconfig---cconfig">--cconfig, --cconfig</a></li>
-                  <li><a href="#--config-clear---config-reset">--config-clear, --config-reset</a></li>
-                  <li><a href="#--cconfig-clear---cconfig-reset">--cconfig-clear, --cconfig-reset</a></li>
-                  <li><a href="#--config-remove---cconfig-remove">--config-remove, --cconfig-remove</a></li>
-                  <li><a href="#-r---rstream">-R, --R&ltstream&gt</a></li>
-                  <li><a href="#encx-encx">enc=X, enc&#42889;X</a></li>
-                  <li><a href="#findx-findx">find=X, find&#42889;X</a></li>
-                  <li><a href="#matchx-matchx">match=X, match&#42889;X</a></li>
-                  <li><a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a></li>
-                  <li><a href="#ab">[a,b]</a></li>
-                  <li><a href="#abc">[a&#42889;b&#42889;c]</a></li>
-               </ul>
-            </li>
+            <li><a href="#-h---help">-h, --help</a></li>
+            <li><a href="#-v---version">-v, --version</a></li>
+            <li><a href="#--debug---debug">--debug, --debug</a></li>
+            <li><a href="#-l---linelength">-l, --linelength</a></li>
+            <li><a href="#-n---number">-n, --number</a></li>
+            <li><a href="#--fp---file-prefix">--fp, --file-prefix</a></li>
+            <li><a href="#-e---ends">-e, --ends</a></li>
+            <li><a href="#--chr---char">--chr, --char</a></li>
+            <li><a href="#-b---blank">-b, --blank</a></li>
+            <li><a href="#-p---peek">-p, --peek</a></li>
+            <li><a href="#-r---reverse">-r, --reverse</a></li>
+            <li><a href="#-u---unique">-u, --unique</a></li>
+            <li><a href="#--sort---sort">--sort, --sort</a></li>
+            <li><a href="#--sortl---sortlength">--sortl, --sortlength</a></li>
+            <li><a href="#--sf---specific-format">--sf, --specific-format</a></li>
+            <li><a href="#-e---echo">-E, --echo</a></li>
+            <li><a href="#----stdin">-, --stdin</a></li>
+            <li><a href="#-o---oneline">-o, --oneline</a></li>
+            <li><a href="#-u---url">-U, --url</a></li>
+            <li><a href="#-f---files">-f, --files</a></li>
+            <li><a href="#-d---dirs">-d, --dirs</a></li>
+            <li><a href="#-s---sum">-s, --sum</a></li>
+            <li><a href="#-w---wordcount">-w, --wordcount</a></li>
+            <li><a href="#--cc---charcount">--cc, --charcount</a></li>
+            <li><a href="#-g---grep">-g, --grep</a></li>
+            <li><a href="#--nk---nokeyword">--nk, --nokeyword</a></li>
+            <li><a href="#--nb---nobreak">--nb, --nobreak</a></li>
+            <li><a href="#-a---attributes">-a, --attributes</a></li>
+            <li><a href="#-m---checksum">-m, --checksum</a></li>
+            <li><a href="#--strings---strings">--strings, --strings</a></li>
+            <li><a href="#--b64d---b64d">--b64d, --b64d</a></li>
+            <li><a href="#--b64e---b64e">--b64e, --b64e</a></li>
+            <li><a href="#--eval---eval">--eval, --EVAL</a></li>
+            <li><a href="#--hex---hex">--hex, --HEX</a></li>
+            <li><a href="#--dec---dec">--dec, --DEC</a></li>
+            <li><a href="#--oct---oct">--oct, --OCT</a></li>
+            <li><a href="#--bin---bin">--bin, --BIN</a></li>
+            <li><a href="#--binview---binview">--binview, --binview</a></li>
+            <li><a href="#--hexview---hexview">--hexview, --HEXVIEW</a></li>
+            <li><a href="#----edit">-!, --edit</a></li>
+            <li><a href="#----hexedit">-#, --hexedit</a></li>
+            <li><a href="#-m---more">-M, --more</a></li>
+            <li><a href="#-b---raw">-B, --raw</a></li>
+            <li><a href="#-c---clip">-c, --clip</a></li>
+            <li><a href="#--dot---dotfiles">--dot, --dotfiles</a></li>
+            <li><a href="#--plain---plain-only">--plain, --plain-only</a></li>
+            <li><a href="#--nc---nocolor">--nc, --nocolor</a></li>
+            <li><a href="#--config---config">--config, --config</a></li>
+            <li><a href="#--cconfig---cconfig">--cconfig, --cconfig</a></li>
+            <li><a href="#--config-clear---config-reset">--config-clear, --config-reset</a></li>
+            <li><a href="#--cconfig-clear---cconfig-reset">--cconfig-clear, --cconfig-reset</a></li>
+            <li><a href="#--config-remove---cconfig-remove">--config-remove, --cconfig-remove</a></li>
+            <li><a href="#-r---rstream">-R, --R&ltstream&gt</a></li>
+            <li><a href="#encx-encx">enc=X, enc&#42889;X</a></li>
+            <li><a href="#findx-findx">find=X, find&#42889;X</a></li>
+            <li><a href="#matchx-matchx">match=X, match&#42889;X</a></li>
+            <li><a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a></li>
+            <li><a href="#ab">[a,b]</a></li>
+            <li><a href="#abc">[a&#42889;b&#42889;c]</a></li>
          </ul>
       </li>
-   </ol>
+   </ul>
 </details>
 </br>
 
@@ -221,7 +222,11 @@
 - Coloring
    - The Output will contain Color by Default.
    - cat_win will not explicitly add Color if the Argument <a href="#--nc---nocolor">--nc, --nocolor</a> is used. (The Output may still contain Color if a File itself contains the ANSI-Color-Coding.)
-   - The Output will be stripped of any Color if the Output is piped and the Configuration `strip_color_on_pipe` is set to `true` .
+   - The Output will be stripped of any Color if the Output is piped and the Configuration `strip_color_on_pipe` is set to `true`.
+- Archives
+   - Archives will not be displayed like regular Files.
+   - When passing in an Archive the contained Files will be displayed along side their File Size instead.
+   - Currently supported Archive Formats are .zip and .tar.
 
 - - - -
 ### <a id="-h---help">-h, --help</a>
