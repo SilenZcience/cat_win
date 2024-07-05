@@ -711,12 +711,13 @@ This Behaviour is included by Default when using <a href="#--nk---nokeyword">--n
 ### <a id="-a---attributes">-a, --attributes</a>
 
 Shows meta Information for each File provided and stops Code execution.
-The meta Information includes file Size, Time of Access, -Modified and -Created.
+The meta Information includes file Signature, file Size, Time of Access, -Modified and -Created.
 On Windows OS Systems this Parameter will also display the classic file Attributes.
 
 ```console
 > catw test.txt -a
 <Path>/test.txt
+Signature:      -
 Size:           1.55 KB
 ATime:          YYYY-MM-DD HH:MM:SS.
 MTime:          YYYY-MM-DD HH:MM:SS.
