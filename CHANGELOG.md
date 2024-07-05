@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.7.13] - TBA
+
+### Minor Changes
+
+- cat_win will now detect simple tar-archives and display the contained files.
+- when using the parameter -`a`, --`attributes` the signature of the file will be displayed.
+
+
 ## [1.7.12] - 2024-06-29
 
 ### Minor Changes
