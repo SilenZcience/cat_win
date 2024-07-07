@@ -207,18 +207,18 @@
    - URLs will be used in the Order as they were provided, after all Files have been displayed.
    - Arguments will for the most part be used in the same Order as they were provided, yet there are some Exceptions.
 - Case-Sensitivity
-   - The Arguments are case-sensitive.
-   - Some Arguments have slightly different Behaviour when using upper- or lowercase Letters.
+   - The Arguments are Case sensitive.
+   - Some Arguments have slightly different Behaviour when using Upper- or Lowercase Letters.
 - Chaining
    - One-letter Arguments can be chained together (e.g. `-l -n -c` is equivalent to `-lnc`)
 - Input Order
    - No specific Order for passing in Arguments or Files is neccessary.
    - Arguments, Files and Urls may be passed in without any Rules to ordering (e.g. catw file1 -argument url -argument2 file2).
-   - If the same Argument is passed in multiple times only the first occurence is being counted.
+   - If the same Argument is passed in multiple times only the first Occurence is being counted.
 - Unknown Files
-   - When encountering unknown Files the User is being prompted to write to Stdin.
-   - The Stdin is being used to then write the Files.
-   - When using the --stdin Parameter unknown Files will be automatically written with the content of StdIn.
+   - When encountering unknown Files the User is being prompted to write to StdIn.
+   - The StdIn is being used to then write the Files.
+   - When using the <a href="#----stdin">-, --stdin</a> Parameter unknown Files will be automatically written with the Content of StdIn.
 - Coloring
    - The Output will contain Color by Default.
    - cat_win will not explicitly add Color if the Argument <a href="#--nc---nocolor">--nc, --nocolor</a> is used. (The Output may still contain Color if a File itself contains the ANSI-Color-Coding.)
@@ -235,7 +235,7 @@
 
 Displays the help Message.
 This Message is for the most part equivalent to the Table above.
-The Code execution will stop after showing this Message.
+The Code Execution will stop after showing this Message.
 This Argument has Priority over all other Arguments, hence the Order of passing this Argument in makes no Difference.
 If no Arguments or Files are provided, the help Parameter will be used by Default.
 
@@ -243,7 +243,7 @@ If no Arguments or Files are provided, the help Parameter will be used by Defaul
 
 Displays a short Message containing basic Information about the Code.
 This includes the version Number but also the installation Directory.
-The Code execution will stop after showing this Message.
+The Code Execution will stop after showing this Message.
 
 ```console
 > catw -v
@@ -259,15 +259,15 @@ Author:         Silas A. Kraume
 
 ### <a id="--debug---debug">--debug, --debug</a>
 
-Displays debug Information before and after the Code execution.
-This Argument is not shown in the default help Message and is provided for Developers/Development.
+Displays debug Information before and after the Code Execution.
+This Argument is not shown in the Default Help Message and is provided for Developers/Development.
 
 - - - -
 <a id="prefix"></a>
 ### <a id="-l---linelength">-l, --linelength</a>
 
 Displays the Length of each Line as a Prefix to the Line itself.
-This Argument will be used at the end such that other Arguments may influence the Length of the Lines beforehand.
+This Argument will be used at the End such that other Arguments may influence the Length of the Lines beforehand.
 
 ```console
 > catw test.txt -l
@@ -299,9 +299,9 @@ If multiple Files are provided, the Prefix will also include the Number of the F
 
 Shows the Path to the File in each Line prefix.
 This can be useful when querying for Substrings or Patterns such that only a few Lines are being displayed.
-Using this Argument in uppercase (--FP, --FILEPREFIX) will result in the Path being shown as the url file Protocol.
-This can be useful in case the Terminal supports interacting with Links such that the File can be instantly opened.
-Using the lowercase Argument in Combination with the <a href="#-n---number">-n, --number</a> Parameter a GNU-style link format will be displayed.
+Using this Argument in Uppercase (--FP, --FILEPREFIX) will result in the Path being shown as the URL File Protocol.
+This can be useful in Case the Terminal supports interacting with Links such that the File can be instantly opened.
+Using the Lowercase Argument in Combination with the <a href="#-n---number">-n, --number</a> Parameter a GNU-style link format will be displayed.
 
 ```console
 > catw test.txt --fp
@@ -325,7 +325,7 @@ Using the lowercase Argument in Combination with the <a href="#-n---number">-n, 
 
 Displays a '$' Character at the End of each Line.
 This can be useful to detect Whitespaces.
-The Character to display can be configured using the `end_marker_symbol` element in the config menu (<a href="#--config---config">--config, --config</a>).
+The Character to display can be configured using the `end_marker_symbol` Element in the Config Menu (<a href="#--config---config">--config, --config</a>).
 
 ```console
 > catw test.txt --ends
@@ -335,9 +335,9 @@ line 2$
 
 ### <a id="--chr---char">--chr, --char</a>
 
-Replaces every special Character with a readable Token.
+Replaces most special Characters with a readable Token.
 Each Token starts with the '^' Character, followed by a short ASCII Descriptor.
-Note that the special Char ␛ will not be displayed as ^ESC because it is needed for the colored output.
+Note that the special Char ␛ will not be displayed as ^ESC because it is needed for the colored Output.
 
 ```console
 > catw test.txt
@@ -354,7 +354,7 @@ Note that the special Char ␛ will not be displayed as ^ESC because it is neede
 
 Removes empty Lines from the Output.
 Beware that other Arguments can change a Line to be not empty beforehand.
-When toggling the `blank_remove_ws_lines` element in the config menu (<a href="#--config---config">--config, --config</a>) also lines which only contain Whitespaces such as Space or Tab will be removed from the Output.
+When toggling the `blank_remove_ws_lines` Element in the Config Menu (<a href="#--config---config">--config, --config</a>) also Lines which only contain Whitespaces such as Space or Tab will be removed from the Output.
 
 ```console
 > catw test.txt -nb
@@ -366,10 +366,10 @@ When toggling the `blank_remove_ws_lines` element in the config menu (<a href="#
 
 Only displays the first and last 5 Lines of each File.
 Between the Beginning and End of the File will be displayed how many Lines have been skipped.
-Useful for getting a quick impression of how data in a given File is structured.
+Useful for getting a quick Impression of how Data in a given File is structured.
 This Argument is ignored when provided alongside with Queries for Substrings of Patterns or the <a href="#-m---more">-M, --more</a> Parameter.
 Does nothing when the File has at most 10 Lines.
-The `peek_size` element in the config menu (<a href="#--config---config">--config, --config</a>) defines how many Lines to display.
+The `peek_size` Element in the Config Menu (<a href="#--config---config">--config, --config</a>) defines how many Lines to display.
 
 ```console
 > catw test.txt -p
@@ -421,7 +421,7 @@ This is a line!
 
 ### <a id="--sort---sort">--sort, --sort</a>
 
-Sorts the Output alphabetically without case sensitivity.
+Sorts the Output alphabetically without Case Sensitivity.
 
 ```console
 > catw test.txt --sort -n
@@ -442,7 +442,7 @@ Sorts the Output by Line Length.
 ### <a id="--sf---specific-format">--sf, --specific-format</a>
 
 Automatically format specific File Types.
-Currently supported are .json and .xml.
+Currently supported are `.json` and `.xml`.
 
 ```console
 > catw --sf -E '{"person":{"name":"Alice","age":25,"employees":[{"name":"Bob"},{"name:":"David"}]}}'
@@ -477,9 +477,9 @@ Currently supported are .json and .xml.
 ### <a id="-e---echo">-E, --echo</a>
 
 Everything passed in after this Argument will be handled as its own File.
-It is not possible to break out of this state therefor this Parameter must be used last.
+It is not possible to break out of this State therefor this Parameter must be used last.
 The Input is unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_echo` is set but in Case of an unicode-error the Input will simply be used literally.
-This way it is possible to define new lines (\\n) or other special characters.
+This way it is possible to define new Lines (\\n) or other special Characters.
 
 ```console
 > catw -l --echo -n The last 'Parameter' does not count!\nThis is not a newline!
@@ -494,8 +494,8 @@ This way it is possible to define new lines (\\n) or other special characters.
 
 ### <a id="----stdin">-, --stdin</a>
 
-Using this Argument allows to pass in Data via the Stdin Stream.
-The Stdin Pipe will be handled as its own File.
+Using this Argument allows to pass in Data via the StdIn Stream.
+The StdIn Pipe will be handled as its own File.
 
 ```console
 > echo Hello World! | catw - -n
@@ -504,7 +504,7 @@ The Stdin Pipe will be handled as its own File.
 
 ### <a id="-o---oneline">-o, --oneline</a>
 
-Limits the Stdin Stream to the first Line.
+Limits the StdIn Stream to the first Line.
 Can only be used in Combination with <a href="#----stdin">-, --stdin</a>.
 
 ```console
@@ -521,7 +521,7 @@ Line 1
 ### <a id="-u---url">-U, --url</a>
 
 When using this Parameter it is possible to provide URLs as Arguments.
-Should an URL not have a scheme (http(s):// or fttp(s):// ...) the default scheme (https://) is being used.
+Should an URL not have a Scheme (http(s):// or fttp(s):// ...) the Default Scheme (https://) is being used.
 Provided URLs are simply curl'd and handled as its own File.
 When not providing a raw Data URL the Content will include the HTML Elements.
 
@@ -533,8 +533,8 @@ When not providing a raw Data URL the Content will include the HTML Elements.
 <a id="summary"></a>
 ### <a id="-f---files">-f, --files</a>
 
-Displays a small Summary at the End of Code execution showing every File used and their file Size.
-Using this Argument in uppercase (-F, --FILES) will ONLY display the Summary and stop Code execution.
+Displays a small Summary at the End of Code Execution showing every File used and their File Size.
+Using this Argument in Uppercase (-F, --FILES) will ONLY display the Summary and stop Code Execution.
 
 ```console
 > catw test.txt -f
@@ -556,8 +556,8 @@ Amount: 1
 
 ### <a id="-d---dirs">-d, --dirs</a>
 
-Displays a small Summary at the End of Code execution showing every Directory found.
-Using this Argument in uppercase (-D, --DIRS) will ONLY display the Summary and stop Code execution.
+Displays a small Summary at the End of Code Execution showing every Directory found.
+Using this Argument in Uppercase (-D, --DIRS) will ONLY display the Summary and stop Code Execution.
 
 ```console
 > catw ./** -d
@@ -584,11 +584,11 @@ Amount: 4
 
 ### <a id="-s---sum">-s, --sum</a>
 
-Displays a small Message at the End of Code execution showing the Number of the Amount of all Lines received.
-Using this Argument in uppercase (-S, --SUM) will ONLY show this Message as well as a small Summary.
-This Summary will show the line Sum for each File.
+Displays a small Message at the End of Code Execution showing the Number of the Amount of all Lines received.
+Using this Argument in Uppercase (-S, --SUM) will ONLY show this Message as well as a small Summary.
+This Summary will show the Line Sum for each File.
 Duplicate Files will not be displayed multiple times within the Summary.
-The uppercase version of this Parameter will stop Code execution.
+The Uppercase version of this Parameter will stop Code Execution.
 
 ```console
 > catw test.txt --sum
@@ -610,7 +610,7 @@ Lines (Sum): 4
 Displays a Summary of all Tokens/Words found in the given Files and how frequent they occured.
 The Output will be sorted by the Frequency of Occurrence starting with the most common Word.
 In Addition the used Files will be displayed beforehand.
-Using this Argument in uppercase (-W, --WORDCOUNT) will ONLY display this Message and stop Code execution.
+Using this Argument in Uppercase (-W, --WORDCOUNT) will ONLY display this Message and stop Code Execution.
 
 ```console
 > catw test.txt
@@ -643,7 +643,7 @@ Displays a Summary of all Chars/Letters found in the given Files and how frequen
 Whitespace Chars like Spaces and Tabs will be wrapped with quotes.
 The Output will be sorted by the Frequency of Occurrence starting with the most common Char.
 In Addition the used Files will be displayed beforehand.
-Using this Argument in uppercase (--CC, --CHARCOUNT) will ONLY display this Message and stop Code execution.
+Using this Argument in Uppercase (--CC, --CHARCOUNT) will ONLY display this Message and stop Code Execution.
 
 ```console
 > catw test.txt
@@ -680,9 +680,9 @@ u: 1
 
 Skips every Line that does not contain any matched Patterns or queried Substrings.
 Literals or Patterns to look for can be set using the <a href="#findx-findx">find=X, find&#42889;X</a> and <a href="#matchx-matchx">match=X, match&#42889;X</a> Keywords.
-Using this Argument in uppercase (-G, --GREP) will ONLY display the parts of each Line that matched any Pattern or Literal.
-Should multiple Queries be found in the same Line they will be seperated by comma.
-The uppercase Variant of this Parameter has priority (over the lowercase Variant as well as <a href="#--nk---nokeyword">--nk, --nokeyword</a>).
+Using this Argument in Uppercase (-G, --GREP) will ONLY display the parts of each Line that matched any Pattern or Literal.
+Should multiple Queries be found in the same Line they will be seperated by Comma.
+The Uppercase Variant of this Parameter has Priority (over the Lowercase Variant as well as <a href="#--nk---nokeyword">--nk, --nokeyword</a>).
 
 ```console
 > catw test.txt find=cat -gn
@@ -717,9 +717,9 @@ This Behaviour is included by Default when using <a href="#--nk---nokeyword">--n
 <a id="meta"></a>
 ### <a id="-a---attributes">-a, --attributes</a>
 
-Shows meta Information for each File provided and stops Code execution.
-The meta Information includes file Signature, file Size, Time of Access, -Modified and -Created.
-On Windows OS Systems this Parameter will also display the classic file Attributes.
+Shows meta Information for each File provided and stops Code Execution.
+The meta Information includes file Signature, File Size, Time of Access, -Modified and -Created.
+On Windows OS Systems this Parameter will also display the classic File Attributes.
 
 ```console
 > catw test.txt -a
@@ -735,7 +735,7 @@ CTime:          YYYY-MM-DD HH:MM:SS.
 
 ### <a id="-m---checksum">-m, --checksum</a>
 
-Shows different Checksums for each File provided and stops Code execution.
+Shows different Checksums for each File provided and stops Code Execution.
 The displayed Checksums include CRC32, MD5, SHA1, SHA256 and SHA512.
 
 ```console
@@ -751,8 +751,8 @@ Checksum of '<Path>/test.txt':
 ### <a id="--strings---strings">--strings, --strings</a>
 
 Only displays Sequences of printable Characters that exceed a certain Length.
-This Length can be configured using the `strings_minimum_sequence_length` element in the config menu (<a href="#--config---config">--config, --config</a>).
-The Delimeter of different Sequences on the same Line can be configured using the `strings_delimeter` element in the config menu.
+This Length can be configured using the `strings_minimum_sequence_length` Element in the Config Menu (<a href="#--config---config">--config, --config</a>).
+The Delimeter of different Sequences on the same Line can be configured using the `strings_delimeter` Element in the Config Menu.
 
 ```console
 > catw --strings test.bin
@@ -770,7 +770,7 @@ GLIBC_2.34
 <a id="mathematical"></a>
 ### <a id="--b64d---b64d">--b64d, --b64d</a>
 
-Decodes a Base64 encoded Input and continues Code execution with the decoded Text.
+Decodes a Base64 encoded Input and continues Code Execution with the decoded Text.
 This Parameter will be used before most other Arguments such that other Parameters will be used on the decoded Text.
 This means a Base64 encoded Input is expected and neccessary.
 
@@ -792,10 +792,10 @@ SGVsbG8gV29ybGQ=
 ### <a id="--eval---eval">--eval, --EVAL</a>
 
 Evaluates simple mathematical Expressions within any given Text.
-The mathematical Expressions may consist of paranthesis, Operators including Modulo (%) and Exponential (**),
+The mathematical Expressions may consist of Paranthesis, Operators including Modulo (%) and Exponential (**),
 as well as any Number in Hexadecimal, Decimal, Octal or Binary.
-The evaluated Value of the Expression will by default be inserted back into the Position of the Text where the Expression was found.
-In the uppercase Variant of the Parameter any non-mathematical Text will be stripped thus only evaluated Expressions will remain.
+The evaluated Value of the Expression will by Default be inserted back into the Position of the Text where the Expression was found.
+In the Uppercase Variant of the Parameter any non-mathematical Text will be stripped thus only evaluated Expressions will remain.
 On Error The Expression will evaluate to '???'.
 
 ```console
@@ -812,7 +812,7 @@ Calculate: 0 !
 If a Line only contains a hexadecimal Number this Parameter will append the equivalent Value in Binary, Octal and Decimal.
 Negative Numbers are allowed.
 Numbers are allowed to start with the Prefix 0x.
-When using the uppercase Variant (--HEX) the Numbers will not include their Prefixes (like 0x, 0b or 0o).
+When using the Uppercase Variant (--HEX) the Numbers will not include their Prefixes (like 0x, 0b or 0o).
 
 ```console
 > catw test.txt --hex
@@ -829,7 +829,7 @@ FF [Bin: 11111111, Oct: 377, Dec: 255]
 
 If a Line only contains a decimal Number this Parameter will append the equivalent Value in Binary, Octal and Hexadecimal.
 Negative Numbers are allowed.
-When using the uppercase Variant (--DEC) the Numbers will not include their Prefixes (like 0x, 0b or 0o).
+When using the Uppercase Variant (--DEC) the Numbers will not include their Prefixes (like 0x, 0b or 0o).
 
 ```console
 > catw test.txt --dec
@@ -847,7 +847,7 @@ When using the uppercase Variant (--DEC) the Numbers will not include their Pref
 If a Line only contains an octal Number this Parameter will append the equivalent Value in Binary, Decimal and Hexadecimal.
 Negative Numbers are allowed.
 Numbers are allowed to start with the Prefix 0o.
-When using the uppercase Variant (--OCT) the Numbers will not include their Prefixes (like 0x, 0b or 0o).
+When using the Uppercase Variant (--OCT) the Numbers will not include their Prefixes (like 0x, 0b or 0o).
 
 ```console
 > catw test.txt --oct
@@ -865,7 +865,7 @@ When using the uppercase Variant (--OCT) the Numbers will not include their Pref
 If a Line only contains a binary Number this Parameter will append the equivalent Value in Octal, Decimal and Hexadecimal.
 Negative Numbers are allowed.
 Numbers are allowed to start with the Prefix 0b.
-When using the uppercase Variant (--BIN) the Numbers will not include their Prefixes (like 0x, 0b or 0o).
+When using the Uppercase Variant (--BIN) the Numbers will not include their Prefixes (like 0x, 0b or 0o).
 
 ```console
 > catw test.txt --bin
@@ -882,8 +882,8 @@ When using the uppercase Variant (--BIN) the Numbers will not include their Pref
 <a id="byteview"></a>
 ### <a id="--binview---binview">--binview, --binview</a>
 
-Displays a BinaryViewer for each File passed in.
-Special Characters like NewLine or BackSpace will be displayed as specific readable Chars if the Font and the Encoding do support that Behaviour.
+Displays a Binary View for each File passed in.
+Special Characters like Newline or Backspace will be displayed as specific readable Chars if the Font and the Encoding do support that Behaviour.
 
 ```console
 > catw test.txt --binview
@@ -894,9 +894,9 @@ Address  00       01       02       03       04       05       06       07      
 
 ### <a id="--hexview---hexview">--hexview, --HEXVIEW</a>
 
-Displays a Hexviewer for each File passed in.
-Special Characters like NewLine or BackSpace will be displayed as specific readable Chars if the Font and the Encoding do support that Behaviour.
-When using the uppercase Variant of this Parameter (--HEXVIEW) the hexadecimal Numbers within the Hexviewer will also be uppercase.
+Displays a Hex View for each File passed in.
+Special Characters like Newline or Backspace will be displayed as specific readable Chars if the Font and the Encoding do support that Behaviour.
+When using the Uppercase Variant of this Parameter (--HEXVIEW) the hexadecimal Numbers within the Hex View will also be Uppercase.
 
 ```console
 > catw test.txt --hexview
@@ -920,13 +920,13 @@ Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text
 Opens a simple Editor to write/edit the Content of any provided File one by one.
 Not-existing Files will be opened first and existing Ones will be able to be edited after that.
 The Editor will not save Changes automatically.
-Files will be saved with the text Encoding defined by <a href="#encx-encx">enc=X, enc&#42889;X</a>.
+Files will be saved with the Text Encoding defined by <a href="#encx-encx">enc=X, enc&#42889;X</a>.
 Note that ^c (Ctrl-c) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
-The Auto-Indendation Feature can be turned on in the config menu using the `editor_auto_indent` element.
-The Indendation when using Auto-Indendation can be configured in the config menu (<a href="#--config---config">--config, --config</a>) using `editor_indentation`.
-The Input inside the Find Prompt (see Key bindings) is unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_editor_search` is set but in Case of an unicode-error the Input will simply be used literally.
+The Auto-Indendation Feature can be turned on in the Config Menu using the `editor_auto_indent` Element.
+The Indendation when using Auto-Indendation can be configured in the Config Menu (<a href="#--config---config">--config, --config</a>) using `editor_indentation`.
+The Input inside the Find Prompt (see Key Bindings) is unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_editor_search` is set but in Case of an unicode-error the Input will simply be used literally.
 On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module.
-The currently supported Key bindings are as follows:
+The currently supported Key Bindings are as follows:
 
 | Key(s) | default behaviour | shift click | control click | alt click |
 |--------|:-----------------:|:-----------:|:-------------:|:---------:|
@@ -960,9 +960,9 @@ Opens a simple Hex-Editor to write/edit the Content of any provided File one by 
 Not-existing Files will be opened first and existing Ones will be able to be edited after that.
 The Editor will not save Changes automatically.
 Note that ^c (Ctrl-c) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
-The displayed Columns per Row can be configured in the config menu (<a href="#--config---config">--config, --config</a>) using `hex_editor_columns`.
+The displayed Columns per Row can be configured in the Config Menu (<a href="#--config---config">--config, --config</a>) using `hex_editor_columns`.
 On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module.
-The currently supported Key bindings are as follows:
+The currently supported Key Bindings are as follows:
 
 | Key(s) | default behaviour | shift click | control click | alt click |
 |--------|:-----------------:|:-----------:|:-------------:|:---------:|
@@ -993,7 +993,7 @@ The currently supported Key bindings are as follows:
 Page through the File Contents Step by Step.
 Each Step the Output is paused until User Interaction.
 The first Step always fills the entire Screen.
-The following Steps have the Size as defined by the config Element `more_step_length`.
+The following Steps have the Size as defined by the Config Element `more_step_length`.
 Display the available Commands by entering `?` or `h` or `help`.
 
 ```console
@@ -1025,7 +1025,7 @@ J JUMP <x>   jump to line x
 ### <a id="-b---raw">-B, --raw</a>
 
 Opens the given Files in Binary Mode.
-Prints the Output as Raw Binary to the stdout-Stream.
+Prints the Output as Raw Binary to the StdOut Stream.
 The only valid Parameters in Combination to -`b`, --`raw` are <a href="#--b64e---b64e">--b64e, --b64e</a>, <a href="#--b64d---b64d">--b64d, --b64d</a> and <a href="#--strings---strings">--strings, --strings</a>.
 
 ```console
@@ -1045,11 +1045,11 @@ UnicodeEncodeError: 'charmap' codec can't encode character '\ufffd' in position 
 <a id="settings"></a>
 ### <a id="-c---clip">-c, --clip</a>
 
-Copies the entire Output to the Clipboard additionally to printing it to the Stdout Stream.
+Copies the entire Output to the Clipboard additionally to printing it to the StdOut Stream.
 
 ### <a id="--dot---dotfiles">--dot, --dotfiles</a>
 
-When providing file Patterns or entire Directories cat_win will find every File including those set to hidden (e.g. on Windows OS).
+When providing File Patterns or entire Directories cat_win will find every File including those set to hidden (e.g. on Windows OS).
 However Dotfiles, meaning Files that start with a literal Dot, will not be found by Default.
 Using this Parameter cat_win will also include Dotfiles.
 
@@ -1073,24 +1073,24 @@ found FILE(s):
 
 ### <a id="--plain---plain-only">--plain, --plain-only</a>
 
-By default the User is being prompted when a non-plaintext File is being encountered as to if the File should be opened in Binary or not.
+By Default the User is being prompted when a non-plaintext File is being encountered as to if the File should be opened in Binary or not.
 Using --plain-only these Files will be automaticaly skipped.
 Note that these Prompts are not descriptive enough to say that a File can only be opened in Binary.
 Often the Problem is being fixed by providing another Codepage using the <a href="#encx-encx">enc=X, enc&#42889;X</a> Parameter.
 
 ### <a id="--nc---nocolor">--nc, --nocolor</a>
 
-By default different Colors will be used to better highlight specific Parts of the Output or make original and changed Parts of a Line more distinguishable.
+By Default different Colors will be used to better highlight specific Parts of the Output or make original and changed Parts of a Line more distinguishable.
 Using --nocolor will disable all Colors and only display the Output in plain monochrome Text.
 
 - - - -
 <a id="configuration"></a>
 ### <a id="--config---config">--config, --config</a>
 
-Displays a user interactive config Menu allowing the User to change specific default parameters.
-Stops Code execution after finishing the Configuration.
-The config File will be saved to the installation Directory of cat_win which is by Default the Python directory.
-This means that uninstalling cat_win may result in the config File being left over.
+Displays a User interactive Config Menu allowing the User to change specific Default Parameters.
+Stops Code Execution after finishing the Configuration.
+The Config File will be saved to the installation Directory of cat_win which is by Default the Python Directory.
+This means that uninstalling cat_win may result in the Config File being left over.
 When using the Windows Executables this Parameter will have no (long term) Effect.
 Valid Options are:
 | Option | Description | Example | Default |
@@ -1122,10 +1122,10 @@ Accepted Input for disabling a Setting: `false, no, n, 0`
 
 ### <a id="--cconfig---cconfig">--cconfig, --cconfig</a>
 
-Displays a user interactive config Menu allowing the User to change the Colors for specific Elements and Arguments.
-Stops Code execution after finishing the Configuration.
-The config File will be saved to the installation Directory of cat_win which is by Default the Python directory.
-This means that uninstalling cat_win may result in the config File being left over.
+Displays a User interactive Config Menu allowing the User to change the Colors for specific Elements and Arguments.
+Stops Code Execution after finishing the Configuration.
+The Config File will be saved to the installation Directory of cat_win which is by Default the Python Directory.
+This means that uninstalling cat_win may result in the Config File being left over.
 When using the Windows Executables this Parameter will have no (long term) Effect.
 Valid Options are:
 
@@ -1191,15 +1191,15 @@ No active config file has been found.
 <a id="encoding"></a>
 ### <a id="-r---rstream">-R, --R\<stream\></a>
 
-Python uses Utf-8 to encode the Streams by default.
+Python uses Utf-8 to encode the Streams by Default.
 On Windows OS the Encoding may even be Cp1252.
-The Encoding can be influenced externally by setting the environment Variable PYTHONIOENCODING to the desired Encoding,
-or setting the environment Variable PYTHONUTF8 to 1.
-In any case it is often useful to have the stream Encoding variable if a File for example is written in another Codepage like Utf-16.
+The Encoding can be influenced externally by setting the Environment Variable PYTHONIOENCODING to the desired Encoding,
+or setting the Environment Variable PYTHONUTF8 to 1.
+In any case it is often useful to have the Stream Encoding Variable if a File for Example is written in another Codepage like Utf-16.
 Using this Parameter allows for specific Stream Reconfiguration meaning setting the Encoding for interpreting the Streams.
 The Encoding used is defined by the <a href="#encx-encx">enc=X, enc&#42889;X</a> Argument.
-By Default Stdout and Stderr are reconfigured.
-Valid Streams are Stdout (--Rout), Stdin (--Rin) and Stderr (--Rerr).
+By Default StdOut and StdErr are reconfigured.
+Valid Streams are StdOut (--Rout), StdIn (--Rin) and StdErr (--Rerr).
 When encountering UnicodeErrors the Problem is most likely being fixed by using -R (or --Rout).
 
 ```console
@@ -1212,10 +1212,10 @@ UnicodeEncodeError: 'charmap' codec can't encode character ...
 
 ### <a id="encx-encx">enc=X, enc&#42889;X</a>
 
-Sets the text Encoding that is being used to read and write Files.
+Sets the Text Encoding that is being used to read and write Files.
 Valid Options are defined by the Python Interpreter used (e.g. for [Python3.10](https://docs.python.org/3.8/library/codecs.html#standard-encodings)).
-The default Encoding is Utf-8.
-The default Encoding can be configured using the `default_file_encoding` element in the config menu (<a href="#--config---config">--config, --config</a>).
+The Default Encoding is Utf-8.
+The Default Encoding can be configured using the `default_file_encoding` Element in the Config Menu (<a href="#--config---config">--config, --config</a>).
 
 ```console
 > catw test.txt
@@ -1274,7 +1274,7 @@ It's raining cats and dogs!
 ### <a id="truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>
 
 Truncates every File by the Specifics defined.
-This Parameter uses the default Python slicing Mechanic and uses it on the Lines of each File.
+This Parameter uses the Default Python slicing Mechanic and uses it on the Lines of each File.
 The Argument is valid by defining trunc=\<start\>\:\<stop\> or trunc=\<start\>\:\<stop\>\:\<step\>
 
 ```console
@@ -1299,7 +1299,7 @@ This is a Backslash: /
 
 ### <a id="abc">[a&#42889;b&#42889;c]</a>
 
-Similiar to the <a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a> parameter this Argument is used on each Line individually.
+Similiar to the <a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a> Parameter this Argument is used on each Line individually.
 Every Line is being cut down as specified by the Elements within the Argument [\<start\>\:\<stop\>\:\<step>].
 
 ```console
