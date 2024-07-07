@@ -393,7 +393,7 @@ Line 20
 Simply reverses the Content of all Files as well as the Ordering of all Files themselves.
 
 ```console
-> catw test1.txt test2.txt -p
+> catw test1.txt test2.txt -r
 Line 2 From Test2
 Line 1 From Test2
 Line 2 From Test1
