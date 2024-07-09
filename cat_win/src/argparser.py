@@ -7,7 +7,8 @@ import os
 
 from cat_win.src.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_ECHO
 from cat_win.src.const.regex import compile_re
-from cat_win.src.const.regex import RE_ENCODING, RE_MATCH, RE_FIND, RE_TRUNC, RE_CUT, RE_REPLACE, RE_REPLACE_COMMA
+from cat_win.src.const.regex import RE_ENCODING, RE_MATCH, RE_M_ATCH, RE_FIND, RE_F_IND
+from cat_win.src.const.regex import RE_TRUNC, RE_CUT, RE_REPLACE, RE_REPLACE_COMMA
 
 IS_FILE, IS_DIR, IS_PATTERN = range(0, 3)
 
@@ -152,25 +153,27 @@ class ArgParser:
             self.file_encoding = param[4:]
             return False
         # 'match' + ('=' or ':') + file_match
-        if RE_MATCH.match(param):
+        if RE_MATCH.match(param) or RE_M_ATCH.match(param):
+            p_length = 6 if RE_MATCH.match(param) else 2
             if delete:
-                self.file_match.discard(compile_re(param[6:], param[:5].isupper()))
+                self.file_match.discard(compile_re(param[p_length:], param[:p_length].isupper()))
                 return False
-            self.file_match.add(compile_re(param[6:], param[:5].isupper()))
+            self.file_match.add(compile_re(param[p_length:], param[:p_length].isupper()))
             return False
         # 'find' + ('=' or ':') + file_search
-        if RE_FIND.match(param):
+        if RE_FIND.match(param) or RE_F_IND.match(param):
+            p_length = 5 if RE_FIND.match(param) else 2
+            query = param[p_length:]
             if delete:
-                self.file_search.discard((param[5:], param[:4].isupper()))
+                self.file_search.discard((query, param[:p_length].isupper()))
                 return False
-            query = param[5:]
             try:
                 if self.unicode_find:
                     query = query.encode().decode('unicode_escape').encode('latin-1').decode()
             except UnicodeError:
                 pass
             finally:
-                self.file_search.add((query, param[:4].isupper()))
+                self.file_search.add((query, param[:p_length].isupper()))
             return False
         # 'trunc' + ('='/':') + file_truncate[0] +':'+ file_truncate[1] [+ ':' + file_truncate[2]]
         if RE_TRUNC.match(param):
