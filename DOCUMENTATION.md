@@ -1233,13 +1233,14 @@ The Substring is unicode-escaped (\\n will be interpreted as an actual Newline) 
 When the Literal contains Whitespaces it is neccessary to encase the entire Parameter with Quotes as defined by the Terminal used.
 It is possible to define multiple Substrings to search for by simply providing the Parameter find=X multiple times.
 When using this Parameter in Uppercase the Case of the Substring will be ignored.
+Using the shortened Version f=X or f:X yields the same Result.
 
 ```console
 > catw test.txt "find=cats and"
 It's raining cats and dogs!
 ---------- Found:   ('cats and' 13-21) ----------
 
-> catw test.txt "find=CATS and"
+> catw test.txt "f=CATS and"
 It's raining cats and dogs!
 ```
 
@@ -1255,13 +1256,14 @@ Defines a Pattern to search for within the Text of any provided File.
 It is possible to define multiple Patterns to match for by simply providing the Parameter match=X multiple times.
 The given Patterns is simply treated as a regular Expression.
 When using this Parameter in Uppercase the Case of the Pattern will be ignored.
+Using the shortened Version m=X or m:X yields the same Result.
 
 ```console
 > catw test.txt "match=cat.\s.{3,}"
 It's raining cats and dogs!
 ---------- Matched: ('cat.\\s.{3,}' 13-27) ----------
 
-> catw test.txt "match=CAT.\s.{3,}"
+> catw test.txt "m=CAT.\s.{3,}"
 It's raining cats and dogs!
 ```
 
