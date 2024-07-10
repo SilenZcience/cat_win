@@ -46,6 +46,7 @@ from cat_win.src.service.rawviewer import SPECIAL_CHARS, get_raw_view_lines_gen
 from cat_win.src.service.stringfinder import StringFinder
 from cat_win.src.service.strings import get_strings
 from cat_win.src.service.summary import Summary
+from cat_win.src.service.visualizer import Visualizer
 from cat_win.src.web.updatechecker import print_update_information
 from cat_win.src.web.urls import sep_valid_urls, read_url
 from cat_win import __project__, __version__, __sysversion__, __author__, __url__
@@ -1054,6 +1055,15 @@ def main():
         return
     if u_args[ARGS_DATA] or u_args[ARGS_CHECKSUM]:
         _print_meta_and_checksum(u_args[ARGS_DATA], u_args[ARGS_CHECKSUM])
+        return
+
+    if u_args[ARGS_VISUALIZE_B]:
+        vis = Visualizer([f.path for f in u_files], 'ByteView', arg_parser.file_truncate)
+        vis.visualize_files()
+        return
+    if u_args[ARGS_VISUALIZE_D]:
+        vis = Visualizer([f.path for f in u_files], 'DigraphDotPlotView', arg_parser.file_truncate)
+        vis.visualize_files()
         return
 
     file_size_sum = 0

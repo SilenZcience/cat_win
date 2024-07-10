@@ -33,7 +33,7 @@ ARGS_WWORDCOUNT, ARGS_DIRECTORIES, ARGS_DDIRECTORIES = range(50, 53)
 ARGS_SPECIFIC_FORMATS, ARGS_CONFIG = range(53, 55)
 ARGS_CHARCOUNT, ARGS_CCHARCOUNT, ARGS_STRINGS, ARGS_MORE, ARGS_RAW = range(55, 60)
 ARGS_CONFIG_FLUSH, ARGS_CCONFIG_FLUSH, ARGS_CONFIG_REMOVE = range(60, 63)
-ARGS_HEX_EDITOR, ARGS_SSORT = range(63, 65)
+ARGS_HEX_EDITOR, ARGS_SSORT, ARGS_VISUALIZE_B, ARGS_VISUALIZE_D = range(63, 67)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -158,27 +158,33 @@ ALL_ARGS = [
     ArgConstant('-B', '--raw', 'open the file as raw bytes',
                 ARGS_RAW, show_arg_on_repl=False, section=10),
 
+    # visualize
+    ArgConstant('--visb', '--visualizeb', 'visualize the data using byte view',
+                ARGS_VISUALIZE_B, show_arg_on_repl=False, section=11),
+    ArgConstant('--visd', '--visualized', 'visualize the data using digraph dot plot view',
+                ARGS_VISUALIZE_D, show_arg_on_repl=False, section=11),
+
     # behavioural
     ArgConstant('-c', '--clip', 'copy output to clipboard',
-				ARGS_CLIP, section=11),
+				ARGS_CLIP, section=12),
     ArgConstant('--dot', '--dotfiles', 'additionally query and edit dotfiles',
-				ARGS_DOTFILES, show_arg_on_repl=False, section=11),
+				ARGS_DOTFILES, show_arg_on_repl=False, section=12),
     ArgConstant('--plain', '--plain-only', 'ignore non-plaintext files automatically',
-				ARGS_PLAIN_ONLY, show_arg_on_repl=False, section=11),
+				ARGS_PLAIN_ONLY, show_arg_on_repl=False, section=12),
     ArgConstant('--nc', '--nocolor', 'disable colored output',
-				ARGS_NOCOL, section=11),
+				ARGS_NOCOL, section=12),
 
     # configuration
     ArgConstant('--config', '--config', 'change default parameters',
-				ARGS_CONFIG, section=12),
+				ARGS_CONFIG, section=13),
     ArgConstant('--cconfig', '--cconfig', 'change color configuration',
-				ARGS_CCONFIG, section=12),
+				ARGS_CCONFIG, section=13),
     ArgConstant('--config-clear', '--config-reset', 'reset the config to default settings',
-				ARGS_CONFIG_FLUSH, section=12),
+				ARGS_CONFIG_FLUSH, section=13),
     ArgConstant('--cconfig-clear', '--cconfig-reset', 'reset the color config to default settings',
-				ARGS_CCONFIG_FLUSH, section=12),
+				ARGS_CCONFIG_FLUSH, section=13),
     ArgConstant('--config-remove', '--cconfig-remove', 'remove the config-file',
-				ARGS_CONFIG_REMOVE, section=12),
+				ARGS_CONFIG_REMOVE, section=13),
 
     # streams
     ArgConstant('-R', '--R', 'reconfigure the stdin and stdout with the parsed encoding',
