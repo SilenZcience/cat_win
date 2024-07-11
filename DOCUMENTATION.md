@@ -36,6 +36,7 @@
             <li><a href="#mathematical">Mathematical</a></li>
             <li><a href="#byteview">Byte Representation</a></li>
             <li><a href="#edit">Editor</a></li>
+            <li><a href="#visualizer">Visualization</a></li>
             <li><a href="#settings">Settings/Behaviour</a></li>
             <li><a href="#configuration">Configuration</a></li>
             <li><a href="#encoding">Text Encoding</a></li>
@@ -87,6 +88,8 @@
             <li><a href="#----hexedit">-#, --hexedit</a></li>
             <li><a href="#-m---more">-M, --more</a></li>
             <li><a href="#-b---raw">-B, --raw</a></li>
+            <li><a href="#--visb---visualizeb">--visb, --visualizeb</a></li>
+            <li><a href="#--visd---visualized">--visd, --visualized</a></li>
             <li><a href="#-c---clip">-c, --clip</a></li>
             <li><a href="#--dot---dotfiles">--dot, --dotfiles</a></li>
             <li><a href="#--plain---plain-only">--plain, --plain-only</a></li>
@@ -176,6 +179,9 @@
 | *<a href="#----hexedit">-#, --hexedit</a>* | open each file in a simple hex-editor |❌|
 | *<a href="#-m---more">-M, --more</a>* | page through the file step by step |❌|
 | *<a href="#-b---raw">-B, --raw</a>* | open the file as raw bytes |❌|
+||||
+| *<a href="#--visb---visualizeb">--visb, --visualizeb</a>* | visualize the data using byte view |❌|
+| *<a href="#--visd---visualized">--visd, --visualized</a>* | visualize the data using digraph dot plot view |❌|
 ||||
 | *<a href="#-c---clip">-c, --clip</a>* | copy output to clipboard |✔|
 | *<a href="#--dot---dotfiles">--dot, --dotfiles</a>* | additionally query and edit dotfiles |❌|
@@ -1040,6 +1046,42 @@ UnicodeEncodeError: 'charmap' codec can't encode character '\ufffd' in position 
 ⇕
 > catw img.png --b64e --raw | catw - --b64d --raw > copy.png
 ```
+
+- - - -
+<a id="visualizer"></a>
+### <a id="--visb---visualizeb">--visb, --visualizeb</a>
+
+Display the Data of the given Files using a Byte View (Byte by Byte).
+The Visualization is displayed in a Scan Curve Pattern.
+The Byte View classifies Bytes into a small Number of Categories differentiated by Color:
+
+- ⬛:  0x00
+- 🟩: Low Bytes  / Control Characters
+- 🟦: ASCII Text / Printable Characters
+- 🟥: High Bytes / Extended Codes
+- ⬜:  0xFF
+
+Different File Formats can have different Byte View Characteristics.
+The Data of the Files used can be limited using the <a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a> Parameter. This way only Chunks/Blocks of a File can be visualized.
+
+
+### <a id="--visd---visualized">--visd, --visualized</a>
+
+Display the Data of the given Files using a Digraph Dot Plot View.
+The Visualization is displayed on a Square 2D Coordinate System of Length 256x256.
+The Digraph Dot Plot View visualizes the Byte Distribution by partitioning the Bytes into Pairs with an Offset of One.
+The Pairs are plotted in the System and therefor display the Quantity of Byte Sequences which often appear next to each other.
+The relative Frequences of Byte Pairs are classified in a small Number of Categories differentiated by Shading:
+
+- █ : very high Frequency
+- ▓ : high Frequency
+- ▒ : medium Frequency
+- ░ : low Frequency
+- ␠: very low Frequency
+
+
+Different File Formats can have different Digraph Dot Plot View Characteristics.
+The Data of the Files used can be limited using the <a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a> Parameter. This way only Chunks/Blocks of a File can be visualized.
 
 - - - -
 <a id="settings"></a>
