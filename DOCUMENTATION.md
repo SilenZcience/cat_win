@@ -1053,6 +1053,7 @@ UnicodeEncodeError: 'charmap' codec can't encode character '\ufffd' in position 
 
 Display the Data of the given Files using a Byte View (Byte by Byte).
 The Visualization is displayed in a Scan Curve Pattern.
+The Width of the Pattern is determined by the Terminal Width with a Maximum of 256.
 The Byte View classifies Bytes into a small Number of Categories differentiated by Color:
 
 - ⬛:  0x00
@@ -1073,11 +1074,11 @@ The Digraph Dot Plot View visualizes the Byte Distribution by partitioning the B
 The Pairs are plotted in the System and therefor display the Quantity of Byte Sequences which often appear next to each other.
 The relative Frequences of Byte Pairs are classified in a small Number of Categories differentiated by Shading:
 
-- █ : very high Frequency
-- ▓ : high Frequency
-- ▒ : medium Frequency
-- ░ : low Frequency
-- ␠: very low Frequency
+- ██  : very high Frequency
+- ▓▓  : high Frequency
+- ▒▒  : medium Frequency
+- ░░  : low Frequency
+- ␠␠: very low Frequency
 
 
 Different File Formats can have different Digraph Dot Plot View Characteristics.
