@@ -89,6 +89,9 @@
             <li><a href="#-m---more">-M, --more</a></li>
             <li><a href="#-b---raw">-B, --raw</a></li>
             <li><a href="#--visb---visualizeb">--visb, --visualizeb</a></li>
+            <li><a href="#--visz---visualizez">--visz, --visualizez</a></li>
+            <li><a href="#--vish---visualizeh">--vish, --visualizeh</a></li>
+            <li><a href="#--vise---visualizee">--vise, --visualizee</a></li>
             <li><a href="#--visd---visualized">--visd, --visualized</a></li>
             <li><a href="#-c---clip">-c, --clip</a></li>
             <li><a href="#--dot---dotfiles">--dot, --dotfiles</a></li>
@@ -180,7 +183,10 @@
 | *<a href="#-m---more">-M, --more</a>* | page through the file step by step |❌|
 | *<a href="#-b---raw">-B, --raw</a>* | open the file as raw bytes |❌|
 ||||
-| *<a href="#--visb---visualizeb">--visb, --visualizeb</a>* | visualize the data using byte view |❌|
+| *<a href="#--visb---visualizeb">--visb, --visualizeb</a>* | visualize the data using scan curve byte view |❌|
+| *<a href="#--visz---visualizez">--visz, --visualizez</a>* | visualize the data using z-order curve byte view |❌|
+| *<a href="#--vish---visualizeh">--vish, --visualizeh</a>* | visualize the data using hilbert curve byte view |❌|
+| *<a href="#--vise---visualizee">--vise, --visualizee</a>* | visualize the data using hilbert curve shannon entropy |❌|
 | *<a href="#--visd---visualized">--visd, --visualized</a>* | visualize the data using digraph dot plot view |❌|
 ||||
 | *<a href="#-c---clip">-c, --clip</a>* | copy output to clipboard |✔|
@@ -1052,8 +1058,9 @@ UnicodeEncodeError: 'charmap' codec can't encode character '\ufffd' in position 
 ### <a id="--visb---visualizeb">--visb, --visualizeb</a>
 
 Display the Data of the given Files using a Byte View (Byte by Byte).
-The Visualization is displayed in a Scan Curve Pattern.
-The Width of the Pattern is determined by the Terminal Width with a Maximum of 256.
+The Visualization is displayed in a Scan Curve Pattern or [Boustrophedon Scan](https://en.wikipedia.org/wiki/Boustrophedon), reversing every other line.
+
+The Width of the Pattern is determined by the Terminal Width.
 The Byte View classifies Bytes into a small Number of Categories differentiated by Color:
 
 - ⬛:  0x00
@@ -1065,6 +1072,53 @@ The Byte View classifies Bytes into a small Number of Categories differentiated 
 Different File Formats can have different Byte View Characteristics.
 The Data of the Files used can be limited using the <a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a> Parameter. This way only Chunks/Blocks of a File can be visualized.
 
+### <a id="--visz---visualizez">--visz, --visualizez</a>
+
+Display the Data of the given Files using a Byte View (Byte by Byte).
+The Visualization is displayed in a [Z-Order Curve](https://en.wikipedia.org/wiki/Z-order_curve) Pattern.
+The Width of the Pattern is determined by the Terminal Width.
+The Byte View classifies Bytes into a small Number of Categories differentiated by Color:
+
+- ⬛:  0x00
+- 🟩: Low Bytes  / Control Characters
+- 🟦: ASCII Text / Printable Characters
+- 🟥: High Bytes / Extended Codes
+- ⬜:  0xFF
+
+Different File Formats can have different Byte View Characteristics.
+The Data of the Files used can be limited using the <a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a> Parameter. This way only Chunks/Blocks of a File can be visualized.
+
+### <a id="--vish---visualizeh">--vish, --visualizeh</a>
+
+Display the Data of the given Files using a Byte View (Byte by Byte).
+The Visualization is displayed in a [Hilbert Curve](https://en.wikipedia.org/wiki/Hilbert_curve) Pattern.
+The Width of the Pattern is determined by the Terminal Width.
+The Byte View classifies Bytes into a small Number of Categories differentiated by Color:
+
+- ⬛:  0x00
+- 🟩: Low Bytes  / Control Characters
+- 🟦: ASCII Text / Printable Characters
+- 🟥: High Bytes / Extended Codes
+- ⬜:  0xFF
+
+Different File Formats can have different Byte View Characteristics.
+The Data of the Files used can be limited using the <a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a> Parameter. This way only Chunks/Blocks of a File can be visualized.
+
+### <a id="--vise---visualizee">--vise, --visualizee</a>
+
+Display the Data of the given Files using the Shannon Entropy.
+The Entropy gets calculated for every Byte using the surrounding 128 Bytes as Frame Size.
+The Visualization is displayed in a [Hilbert Curve](https://en.wikipedia.org/wiki/Hilbert_curve) Pattern.
+The Width of the Visualization is determined by the Terminal Width.
+The Entropy classifies a small Number of Categories differentiated by Color:
+
+- ⬛:  Very Low Entropy
+- 🟦: Low Entropy
+- 🟥: Medium Entropy
+- 🟨: High Entropy
+- ⬜:  Very High Entropy
+
+The Data of the Files used can be limited using the <a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a> Parameter. This way only Chunks/Blocks of a File can be visualized.
 
 ### <a id="--visd---visualized">--visd, --visualized</a>
 
