@@ -24,8 +24,8 @@ class Visualizer:
         self.v_type =v_type
         self.truncate = truncate if truncate is not None else [None, None, None]
 
-    @lru_cache(maxsize=256)
     @staticmethod
+    @lru_cache(maxsize=256)
     def get_color_byte_view(byte: int) -> str:
         """
         return a color based on the type of byte given
@@ -47,8 +47,8 @@ class Visualizer:
             return CVis.BYTE_VIEW_PRINTABLE
         return CVis.BYTE_VIEW_CONTROL
 
-    @lru_cache(maxsize=256)
     @staticmethod
+    @lru_cache(maxsize=256)
     def get_color_entropy(entropy: int) -> str:
         """
         return a color based on the value of the entropy given.
