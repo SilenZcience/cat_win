@@ -160,13 +160,13 @@ ALL_ARGS = [
                 ARGS_RAW, show_arg_on_repl=False, section=10),
 
     # visualize
-    ArgConstant('--visb', '--visualizeb', 'visualize the data using byte view',
+    ArgConstant('--visb', '--visualizeb', 'visualize the data using scan curve byte view',
                 ARGS_VISUALIZE_B, show_arg_on_repl=False, section=11),
-    ArgConstant('--visz', '--visualizez', 'visualize the data using z-order curve view',
+    ArgConstant('--visz', '--visualizez', 'visualize the data using z-order curve byte view',
                 ARGS_VISUALIZE_Z, show_arg_on_repl=False, section=11),
-    ArgConstant('--vish', '--visualizeh', 'visualize the data using hilbert curve view',
+    ArgConstant('--vish', '--visualizeh', 'visualize the data using hilbert curve byte view',
                 ARGS_VISUALIZE_H, show_arg_on_repl=False, section=11),
-    ArgConstant('--vise', '--visualizee', 'visualize the data using shannon entropy',
+    ArgConstant('--vise', '--visualizee', 'visualize the data using hilbert curve shannon entropy',
                 ARGS_VISUALIZE_E, show_arg_on_repl=False, section=11),
     ArgConstant('--visd', '--visualized', 'visualize the data using digraph dot plot view',
                 ARGS_VISUALIZE_D, show_arg_on_repl=False, section=11),

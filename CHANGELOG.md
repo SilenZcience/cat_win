@@ -10,8 +10,11 @@ Start of documentation: 2023-02-16 / v1.1.0
 - cat_win will now detect simple tar-archives and display the contained files.
 - when using the parameter -`a`, --`attributes` the signature of the file will be displayed.
 - instead of `find=` and `match=` using `f=` and `m=` yields the same result.
-- added --`visb`, --`visualizeb` to visualize the of the given files using byte view.
-- added --`visd`, --`visualized` to visualize the of the given files using digraph dot plot view.
+- added --`visb`, --`visualizeb` to visualize the given files using scan curve byte view.
+- added --`visz`, --`visualizez` to visualize the given files using z-order curve byte view.
+- added --`vish`, --`visualizeh` to visualize the given files using hilbert curve byte view.
+- added --`vise`, --`visualizee` to visualize the given files using hilbert curve shannon entropy.
+- added --`visd`, --`visualized` to visualize the given files using digraph dot plot byte view.
 
 
 ## [1.7.12] - 2024-06-29
