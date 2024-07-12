@@ -78,6 +78,24 @@ class ColorOptions:
     del __Style
 
 
+class CVis:
+    DIGRAPH_VIEW_CONTROL = ColorOptions.Fore['GREEN']
+
+    BYTE_VIEW_0          = ColorOptions.Fore['BLACK']
+    BYTE_VIEW_CONTROL    = ColorOptions.Fore['GREEN']
+    BYTE_VIEW_PRINTABLE  = ColorOptions.Fore['BLUE']
+    BYTE_VIEW_EXTENDED   = ColorOptions.Fore['RED']
+    BYTE_VIEW_256        = ColorOptions.Fore['WHITE']
+
+    ENTROPY_VERY_HIGH    = ColorOptions.Fore['WHITE']
+    ENTROPY_HIGH         = ColorOptions.Fore['YELLOW']
+    ENTROPY_MEDIUM       = ColorOptions.Fore['RED']
+    ENTROPY_LOW          = ColorOptions.Fore['BLUE']
+    ENTROPY_VERY_LOW     = ColorOptions.Fore['BLACK']
+
+    COLOR_RESET          = ColorOptions.Style['RESET']
+
+
 class CKW:
     """
     The collection of all different color options
