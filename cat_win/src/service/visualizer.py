@@ -2,6 +2,7 @@
 visualizer
 """
 
+from functools import lru_cache
 import os
 
 from cat_win.src.const.colorconstants import CVis
@@ -23,6 +24,7 @@ class Visualizer:
         self.v_type =v_type
         self.truncate = truncate if truncate is not None else [None, None, None]
 
+    @lru_cache(maxsize=256)
     @staticmethod
     def get_color_byte_view(byte: int) -> str:
         """
@@ -45,6 +47,7 @@ class Visualizer:
             return CVis.BYTE_VIEW_PRINTABLE
         return CVis.BYTE_VIEW_CONTROL
 
+    @lru_cache(maxsize=256)
     @staticmethod
     def get_color_entropy(entropy: int) -> str:
         """
