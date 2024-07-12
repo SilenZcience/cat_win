@@ -84,8 +84,6 @@ def setup():
     u_args = Arguments()
     u_files = Files()
     converter = Converter()
-    Summary.setup_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
-    More.setup(on_windows_os, const_dic[DKW.MORE_STEP_LENGTH])
 
 
 def exception_handler(exception_type: type, exception, traceback,
@@ -248,8 +246,9 @@ def _print_meta_and_checksum(show_meta: bool, show_checksum: bool) -> None:
     """
     for file in u_files:
         if show_meta:
-            print_meta(file.path, os.path.join(working_dir, 'res', 'signatures.json'), on_windows_os,
-                        [color_dic[CKW.RESET_ALL],
+            print_meta(file.path, os.path.join(working_dir, 'res', 'signatures.json'),
+                       on_windows_os,
+                       [color_dic[CKW.RESET_ALL],
                         color_dic[CKW.ATTRIB],
                         color_dic[CKW.ATTRIB_POSITIVE],
                         color_dic[CKW.ATTRIB_NEGATIVE]])
@@ -982,6 +981,9 @@ def init(repl: bool = False) -> tuple:
     HexEditor.set_flags(u_args[ARGS_STDIN] and on_windows_os, on_windows_os,
                         u_args[ARGS_DEBUG], const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
                         const_dic[DKW.HEX_EDITOR_COLUMNS])
+    More.setup(on_windows_os, const_dic[DKW.MORE_STEP_LENGTH])
+    Summary.setup_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
+    Visualizer.set_flags(u_args[ARGS_DEBUG])
 
     return (known_files, unknown_files, echo_args, valid_urls)
 
@@ -1059,6 +1061,18 @@ def main():
 
     if u_args[ARGS_VISUALIZE_B]:
         vis = Visualizer([f.path for f in u_files], 'ByteView', arg_parser.file_truncate)
+        vis.visualize_files()
+        return
+    if u_args[ARGS_VISUALIZE_Z]:
+        vis = Visualizer([f.path for f in u_files], 'ZOrderCurveView', arg_parser.file_truncate)
+        vis.visualize_files()
+        return
+    if u_args[ARGS_VISUALIZE_H]:
+        vis = Visualizer([f.path for f in u_files], 'HilbertCurveView', arg_parser.file_truncate)
+        vis.visualize_files()
+        return
+    if u_args[ARGS_VISUALIZE_E]:
+        vis = Visualizer([f.path for f in u_files], 'ShannonEntropy', arg_parser.file_truncate)
         vis.visualize_files()
         return
     if u_args[ARGS_VISUALIZE_D]:

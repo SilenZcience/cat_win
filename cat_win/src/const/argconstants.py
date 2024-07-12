@@ -33,7 +33,8 @@ ARGS_WWORDCOUNT, ARGS_DIRECTORIES, ARGS_DDIRECTORIES = range(50, 53)
 ARGS_SPECIFIC_FORMATS, ARGS_CONFIG = range(53, 55)
 ARGS_CHARCOUNT, ARGS_CCHARCOUNT, ARGS_STRINGS, ARGS_MORE, ARGS_RAW = range(55, 60)
 ARGS_CONFIG_FLUSH, ARGS_CCONFIG_FLUSH, ARGS_CONFIG_REMOVE = range(60, 63)
-ARGS_HEX_EDITOR, ARGS_SSORT, ARGS_VISUALIZE_B, ARGS_VISUALIZE_D = range(63, 67)
+ARGS_HEX_EDITOR, ARGS_SSORT, ARGS_VISUALIZE_B, ARGS_VISUALIZE_Z = range(63, 67)
+ARGS_VISUALIZE_H, ARGS_VISUALIZE_E, ARGS_VISUALIZE_D = range(67, 70)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -161,6 +162,12 @@ ALL_ARGS = [
     # visualize
     ArgConstant('--visb', '--visualizeb', 'visualize the data using byte view',
                 ARGS_VISUALIZE_B, show_arg_on_repl=False, section=11),
+    ArgConstant('--visz', '--visualizez', 'visualize the data using z-order curve view',
+                ARGS_VISUALIZE_Z, show_arg_on_repl=False, section=11),
+    ArgConstant('--vish', '--visualizeh', 'visualize the data using hilbert curve view',
+                ARGS_VISUALIZE_H, show_arg_on_repl=False, section=11),
+    ArgConstant('--vise', '--visualizee', 'visualize the data using shannon entropy',
+                ARGS_VISUALIZE_E, show_arg_on_repl=False, section=11),
     ArgConstant('--visd', '--visualized', 'visualize the data using digraph dot plot view',
                 ARGS_VISUALIZE_D, show_arg_on_repl=False, section=11),
 
