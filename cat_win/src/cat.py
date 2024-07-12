@@ -180,6 +180,9 @@ def _show_help(repl: bool = False) -> None:
         help_message += 'while numerating and showing the end of lines\n'
         help_message += f"\t{'catw f trunc=a:b:c': <35}"
         help_message += "Output f's content starting at line a, ending at line b, stepping c\n"
+    help_message += '\n'
+    help_message += 'Documentation:\n'
+    help_message += f"\t{__url__}/blob/main/DOCUMENTATION.md"
     try:
         (More(help_message.splitlines())).step_through()
     finally:
