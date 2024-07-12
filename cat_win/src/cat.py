@@ -988,11 +988,10 @@ def init(repl: bool = False) -> tuple:
     return (known_files, unknown_files, echo_args, valid_urls)
 
 
-def main():
+def handle_args(tmp_file_helper: TmpFileHelper) -> None:
     """
-    main function
+    init, handle args, print
     """
-    tmp_file_helper = TmpFileHelper()
     piped_input = temp_file = ''
     known_files, unknown_files, echo_args, valid_urls = init(repl=False)
 
@@ -1109,7 +1108,11 @@ def main():
 
     edit_files()  # print the cat-output
 
-    # clean-up
+
+def cleanup(tmp_file_helper: TmpFileHelper) -> None:
+    """
+    clean up everything
+    """
     if u_args[ARGS_DEBUG]:
         err_print(color_dic[CKW.MESSAGE_INFORMATION], end='')
         err_print('================================================ '
@@ -1120,6 +1123,8 @@ def main():
             _calculate_line_length_prefix_spacing,
             u_files._get_file_lines_sum_,
             u_files._calc_max_line_length_,
+            Visualizer.get_color_byte_view,
+            Visualizer.get_color_entropy,
             ]
         caches_info = [(cache.__name__,
                         str(cache.cache_info().hits),
@@ -1147,6 +1152,15 @@ def main():
         err_print('==================================================='
             '====================================================', end='')
         err_print(color_dic[CKW.RESET_ALL])
+
+
+def main():
+    """
+    main function
+    """
+    tmp_file_helper = TmpFileHelper()
+    handle_args(tmp_file_helper)
+    cleanup(tmp_file_helper)
 
 
 def repl_main(deprecated: bool = False):
