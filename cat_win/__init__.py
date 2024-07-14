@@ -1,4 +1,4 @@
-"""Simple OS Independent 'cat' Command-line Tool made in Python."""
+"""Simple Text-Processing Command-line Tool made in Python."""
 
 __project__ = 'cat_win'
 __version__ = '1.7.12'
