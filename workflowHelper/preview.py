@@ -14,7 +14,9 @@ COLOR_TEXT = ImageColor.getcolor('#D3D7CF', mode = 'RGB')
 KEYWORDS = [
     ('cat', ImageColor.getcolor('#CC0000', mode = 'RGB')),
     ('SilenZcience', ImageColor.getcolor('#CC00AB', mode = 'RGB')),
-    ('Python', ImageColor.getcolor('#3e6cd6', mode = 'RGB'))
+    ('Python', ImageColor.getcolor('#3e6cd6', mode = 'RGB')),
+    ('Text-Processing', ImageColor.getcolor('#ffa500', mode = 'RGB')),
+    ('-Analytics', ImageColor.getcolor('#ffa500', mode = 'RGB')),
 ]
 
 
