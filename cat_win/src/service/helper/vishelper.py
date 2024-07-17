@@ -4,6 +4,8 @@ vishelper
 
 import math
 
+from cat_win.src.service.helper.progressbar import PBar
+
 
 def get_fit_terminal_square(length: int, width: int) -> int:
     """
@@ -176,29 +178,36 @@ class SpaceFilling:
 class Entropy:
     @staticmethod
     def normalized_shannon_entropy(data: bytes) -> int:
+        data_length = len(data)
         frame_window = 128
         fmin1 = frame_window-1
-        data = list(data) + [0]*(frame_window-1)
 
-        if len(data) < frame_window:
-            return []
+        data = list(data + data[:fmin1]) # try wrap around
+        data += [0]*(fmin1+data_length-len(data)) # otherwise add 0 bytes
 
         counter = dict(zip(range(256), [0]*256))
 
-        # first frame:
-        for i in range(frame_window):
-            counter[data[i]] += 1
-        probabilities = [count / frame_window for count in counter.values()]
-        entropy = -sum(p * math.log2(p) for p in probabilities if p > 0) * 14.286
+        with PBar(data_length, prefix='Calculating Entropy:',
+                  length=50, fill_l='━', fill_r='╺', erase=True).init() as p_bar:
 
-        # rest frames
-        for i in range(1, len(data)-fmin1):
-            counter[data[i-    1]] -= 1
-            counter[data[i+fmin1]] += 1
-            probabilities[data[i-    1]] = counter[data[i-    1]] / 128
-            probabilities[data[i+fmin1]] = counter[data[i+fmin1]] / 128
-            data[i-1] = int(entropy)
+            # first frame:
+            for i in range(frame_window):
+                counter[data[i]] += 1
+            probabilities = [count / frame_window for count in counter.values()]
             entropy = -sum(p * math.log2(p) for p in probabilities if p > 0) * 14.286
-        data[len(data)-frame_window] = int(entropy)
+            p_bar(0)
+
+            # rest of frames
+            for i in range(1, data_length):
+                # sleep(0.01)
+                counter[data[i-    1]] -= 1
+                counter[data[i+fmin1]] += 1
+                probabilities[data[i-    1]] = counter[data[i-    1]] / 128
+                probabilities[data[i+fmin1]] = counter[data[i+fmin1]] / 128
+                data[i-1] = int(entropy)
+                entropy = -sum(p * math.log2(p) for p in probabilities if p > 0) * 14.286
+                p_bar(i)
+            data[len(data)-frame_window] = int(entropy)
+            p_bar(data_length)
 
         return data[:-fmin1]
