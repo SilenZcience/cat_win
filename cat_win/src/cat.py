@@ -85,18 +85,6 @@ def setup():
     u_files = Files()
     converter = Converter()
 
-    # these need to be here in case something gets called prematurely (e.g. more in help())
-    Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
-    Editor.set_flags(u_args[ARGS_STDIN] and on_windows_os, on_windows_os,
-                     u_args[ARGS_DEBUG], const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
-                     arg_parser.file_encoding)
-    HexEditor.set_flags(u_args[ARGS_STDIN] and on_windows_os, on_windows_os,
-                        u_args[ARGS_DEBUG], const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
-                        const_dic[DKW.HEX_EDITOR_COLUMNS])
-    More.setup(on_windows_os, const_dic[DKW.MORE_STEP_LENGTH])
-    Summary.setup_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
-    Visualizer.set_flags(u_args[ARGS_DEBUG])
-
 
 def exception_handler(exception_type: type, exception, traceback,
                       debug_hook=sys.excepthook) -> None:
@@ -988,6 +976,17 @@ def init(repl: bool = False) -> tuple:
     if u_args[ARGS_CCONFIG]:
         cconfig.save_config()
         sys.exit(0)
+
+    Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
+    Editor.set_flags(u_args[ARGS_STDIN] and on_windows_os, on_windows_os,
+                     u_args[ARGS_DEBUG], const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
+                     arg_parser.file_encoding)
+    HexEditor.set_flags(u_args[ARGS_STDIN] and on_windows_os, on_windows_os,
+                        u_args[ARGS_DEBUG], const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
+                        const_dic[DKW.HEX_EDITOR_COLUMNS])
+    More.set_flags(on_windows_os, const_dic[DKW.MORE_STEP_LENGTH])
+    Summary.setup_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
+    Visualizer.set_flags(u_args[ARGS_DEBUG])
 
     return (known_files, unknown_files, echo_args, valid_urls)
 

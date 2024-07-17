@@ -18,7 +18,7 @@ class More:
     t_height = 28
 
     @staticmethod
-    def setup(on_windows_os: bool, step_length: int = 0) -> None:
+    def set_flags(on_windows_os: bool, step_length: int = 0) -> None:
         """
         setup the configuration
         
@@ -224,6 +224,9 @@ class More:
         if not os.isatty(sys.stdout.fileno()):
             print(*self.lines, sep='\n')
             return
+
+        # in case the terminal size is used
+        More.set_flags(More.on_windows_os, More.step_length)
 
         with IoHelper.dup_stdin(More.on_windows_os, dup_needed):
             self._step_through()
