@@ -79,6 +79,9 @@ class ColorOptions:
 
 
 class CVis:
+    """
+    the colors for the visualizer
+    """
     DIGRAPH_VIEW_CONTROL = ColorOptions.Fore['GREEN']
 
     BYTE_VIEW_0          = ColorOptions.Fore['BLACK']
@@ -94,6 +97,16 @@ class CVis:
     ENTROPY_VERY_LOW     = ColorOptions.Fore['BLACK']
 
     COLOR_RESET          = ColorOptions.Style['RESET']
+
+
+class CPB:
+    """
+    the colors for the progress bar
+    """
+    COLOR_FULL  = ColorOptions.Fore['LIGHTGREEN']
+    COLOR_EMPTY = ColorOptions.Fore['LIGHTMAGENTA']
+    # COLOR_EMPTY = '\x1b[38;2;255;71;156m'
+    COLOR_RESET = ColorOptions.Style['RESET']
 
 
 class CKW:
