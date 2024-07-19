@@ -16,6 +16,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added --`vise`, --`visualizee` to visualize the given files using hilbert curve shannon entropy.
 - added --`visd`, --`visualized` to visualize the given files using digraph dot plot byte view.
 
+### Bugfixes
+
+- fixed Bug where cat_win would crash in certain situations when piping the output.
+
 
 ## [1.7.12] - 2024-06-29
 
