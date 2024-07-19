@@ -17,7 +17,7 @@ import sys
 
 from cat_win.src.argparser import ArgParser
 from cat_win.src.const.argconstants import *
-from cat_win.src.const.colorconstants import CKW
+from cat_win.src.const.colorconstants import CKW, CVis
 from cat_win.src.const.defaultconstants import DKW
 from cat_win.src.const.regex import ANSI_CSI_RE
 from cat_win.src.domain.arguments import Arguments
@@ -905,6 +905,7 @@ def init_colors() -> None:
     if u_args[ARGS_NOCOL] or sys.stdout.closed or \
         (not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]):
         color_dic = dict.fromkeys(color_dic, '')
+        CVis.remove_colors()
     else:
         color_dic = default_color_dic.copy()
 
