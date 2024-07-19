@@ -188,7 +188,7 @@ class Entropy:
         counter = dict(zip(range(256), [0]*256))
 
         with PBar(data_length, prefix='Calculating Entropy:',
-                  length=50, fill_l='━', fill_r='╺', erase=True).init() as p_bar:
+                  length=50, fill_l='━', fill_r='╺').init() as p_bar:
 
             # first frame:
             for i in range(frame_window):
@@ -199,7 +199,6 @@ class Entropy:
 
             # rest of frames
             for i in range(1, data_length):
-                # sleep(0.01)
                 counter[data[i-    1]] -= 1
                 counter[data[i+fmin1]] += 1
                 probabilities[data[i-    1]] = counter[data[i-    1]] / 128
