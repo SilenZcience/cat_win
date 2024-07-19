@@ -93,7 +93,7 @@ class CVis:
     ENTROPY_VERY_HIGH    = ColorOptions.Fore['WHITE']
     ENTROPY_HIGH         = ColorOptions.Fore['YELLOW']
     ENTROPY_MEDIUM       = ColorOptions.Fore['RED']
-    ENTROPY_LOW          = ColorOptions.Fore['BLUE']
+    ENTROPY_LOW          = ColorOptions.Fore['MAGENTA']
     ENTROPY_VERY_LOW     = ColorOptions.Fore['BLACK']
 
     COLOR_RESET          = ColorOptions.Style['RESET']
