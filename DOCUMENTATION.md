@@ -1113,7 +1113,7 @@ The Width of the Visualization is determined by the Terminal Width.
 The Entropy classifies a small Number of Categories differentiated by Color:
 
 - ⬛:  Very Low Entropy
-- 🟦: Low Entropy
+- 🟪: Low Entropy
 - 🟥: Medium Entropy
 - 🟨: High Entropy
 - ⬜:  Very High Entropy
