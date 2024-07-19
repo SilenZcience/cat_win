@@ -22,15 +22,16 @@ class PBar:
     @contextlib.contextmanager
     def init(self):
         try:
-            print('\x1b[?25l', end='')
             if os.isatty(sys.stdout.fileno()):
+                print('\x1b[?25l', end='')
                 yield self.print_progress_bar
             else:
                 yield lambda _: None
         finally:
-            if self.erase:
-                self.erase_progress_bar()
-            print('\x1b[?25h', end='\n'*(not self.erase))
+            if os.isatty(sys.stdout.fileno()):
+                if self.erase:
+                    self.erase_progress_bar()
+                print('\x1b[?25h', end='\n'*(not self.erase))
 
     def print_progress_bar(self, iteration: int) -> None:
         if iteration < 0:
