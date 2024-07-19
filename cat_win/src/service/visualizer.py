@@ -3,7 +3,7 @@ visualizer
 """
 
 from functools import lru_cache
-import os
+import shutil
 
 from cat_win.src.const.colorconstants import CVis
 from cat_win.src.service.helper.iohelper import IoHelper
@@ -108,7 +108,7 @@ class Visualizer:
         file_p (str):
             a string representation of a file (-path)
         """
-        width = os.get_terminal_size()[0] // 2
+        width = shutil.get_terminal_size()[0] // 2
         bin_content = IoHelper.read_file(file_p, True).__getitem__(slice(*self.truncate))
         Visualizer.display_data(SpaceFilling.get_scan_curve(bin_content, width),
                                 Visualizer.get_color_byte_view)
@@ -122,7 +122,7 @@ class Visualizer:
         file_p (str):
             a string representation of a file (-path)
         """
-        width = os.get_terminal_size()[0] // 2
+        width = shutil.get_terminal_size()[0] // 2
         bin_content = IoHelper.read_file(file_p, True).__getitem__(slice(*self.truncate))
         Visualizer.display_data(SpaceFilling.get_zorder_curve(bin_content, width),
                                 Visualizer.get_color_byte_view)
@@ -136,7 +136,7 @@ class Visualizer:
         file_p (str):
             a string representation of a file (-path)
         """
-        width = os.get_terminal_size()[0] // 2
+        width = shutil.get_terminal_size()[0] // 2
         bin_content = IoHelper.read_file(file_p, True).__getitem__(slice(*self.truncate))
         Visualizer.display_data(SpaceFilling.get_hilbert_curve(bin_content, width),
                                 Visualizer.get_color_byte_view)
@@ -150,7 +150,7 @@ class Visualizer:
         file_p (str):
             a string representation of a file (-path)
         """
-        width = os.get_terminal_size()[0] // 2
+        width = shutil.get_terminal_size()[0] // 2
         bin_content = IoHelper.read_file(file_p, True).__getitem__(slice(*self.truncate))
         bin_content = Entropy.normalized_shannon_entropy(bin_content)
         Visualizer.display_data(SpaceFilling.get_hilbert_curve(bin_content, width),

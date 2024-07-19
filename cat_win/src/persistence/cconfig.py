@@ -4,6 +4,7 @@ cconfig
 
 import configparser
 import os
+import shutil
 
 from cat_win.src.const.colorconstants import ColorOptions, CKW
 from cat_win.src.service.helper.iohelper import err_print
@@ -107,7 +108,7 @@ class CConfig:
         back_options = list(ColorOptions.Back.items())
         back_options = [(k, v) for k, v in back_options if k != 'RESET']
 
-        h_width, _ = os.get_terminal_size()
+        h_width, _ = shutil.get_terminal_size()
         index_offset = max(len(str(len(fore_options) + len(back_options))),
                            len(str(len(self.elements))))
 
@@ -160,7 +161,7 @@ class CConfig:
         """
         print('Here is a list of all available elements you may change:')
 
-        h_width, _ = os.get_terminal_size()
+        h_width, _ = shutil.get_terminal_size()
         index_offset = len(str(len(self.elements)))
 
         longest_char_count = max(map(len, self.elements))

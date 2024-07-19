@@ -3,6 +3,7 @@ more
 """
 
 import os
+import shutil
 import sys
 
 from cat_win.src.service.helper.iohelper import IoHelper
@@ -32,7 +33,7 @@ class More:
         More.on_windows_os = on_windows_os
         More.step_length = step_length
         try:
-            t_width, t_height = os.get_terminal_size()
+            t_width, t_height = shutil.get_terminal_size()
             More.t_width, More.t_height = max(t_width, 1), max(t_height-2, 1)
         except OSError: # PyPy-Error: "Inappropriate ioctl for device"
             pass

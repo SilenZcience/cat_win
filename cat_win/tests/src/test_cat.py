@@ -18,7 +18,7 @@ with open(test_file_path, 'r', encoding='utf-8') as f:
     test_file_content = f.read().split('\n')
 
 
-@patch('os.get_terminal_size', lambda: (120, 30))
+@patch('shutil.get_terminal_size', lambda: (120, 30))
 class TestCat(TestCase):
     maxDiff = None
 
