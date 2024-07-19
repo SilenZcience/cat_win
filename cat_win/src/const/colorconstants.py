@@ -98,6 +98,12 @@ class CVis:
 
     COLOR_RESET          = ColorOptions.Style['RESET']
 
+    @staticmethod
+    def remove_colors() -> None:
+        for attr in dir(CVis):
+            if not callable(getattr(CVis, attr)) and not attr.startswith("__"):
+                setattr(CVis, attr, '')
+
 
 class CPB:
     """
@@ -107,6 +113,12 @@ class CPB:
     COLOR_EMPTY = ColorOptions.Fore['LIGHTMAGENTA']
     # COLOR_EMPTY = '\x1b[38;2;255;71;156m'
     COLOR_RESET = ColorOptions.Style['RESET']
+
+    @staticmethod
+    def remove_colors() -> None:
+        for attr in dir(CPB):
+            if not callable(getattr(CPB, attr)) and not attr.startswith("__"):
+                setattr(CPB, attr, '')
 
 
 class CKW:
