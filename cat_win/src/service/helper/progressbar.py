@@ -1,6 +1,7 @@
 
 import contextlib
-
+import os
+import sys
 from cat_win.src.const.colorconstants import CPB
 
 
@@ -22,7 +23,10 @@ class PBar:
     def init(self):
         try:
             print('\x1b[?25l', end='')
-            yield self.print_progress_bar
+            if os.isatty(sys.stdout.fileno()):
+                yield self.print_progress_bar
+            else:
+                yield lambda _: None
         finally:
             if self.erase:
                 self.erase_progress_bar()
