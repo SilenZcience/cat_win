@@ -6,6 +6,7 @@ import codecs
 import configparser
 import os
 import shlex
+import shutil
 import sys
 
 from cat_win.src.const.defaultconstants import DKW
@@ -215,7 +216,7 @@ class Config:
         """
         print('Here is a list of all available elements you may change:')
 
-        h_width, _ = os.get_terminal_size()
+        h_width, _ = shutil.get_terminal_size()
         index_offset = len(str(len(self.elements)))
 
         longest_char_count = max(map(len, self.elements))
