@@ -180,20 +180,22 @@ MOVE_HOTKEYS   = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_move' 
 SELECT_HOTKEYS = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_select'  ))
 
 REVERSE_ACTION = {
-    b'_key_dc'           : b'_key_string',
-    b'_key_dl'           : b'_key_string',
-    b'_key_backspace'    : b'_key_string',
-    b'_key_ctl_backspace': b'_key_string',
-    b'_key_string'       : b'_key_backspace',
-    b'_key_btab'         : b'_key_btab_reverse',
-    b'_key_enter'        : b'_key_backspace',
+    b'_key_dc'             : b'_key_string',
+    b'_key_dl'             : b'_key_string',
+    b'_key_backspace'      : b'_key_string',
+    b'_key_ctl_backspace'  : b'_key_string',
+    b'_key_string'         : b'_key_backspace',
+    b'_key_btab'           : b'_key_btab_reverse',
+    b'_key_enter'          : b'_key_backspace',
+    b'_key_remove_selected': b'_key_add_selected',
 } # defines the counter action if no line was deleted
 
 REVERSE_ACTION_LINE_DELETED = {
-    b'_key_dc'           : b'_key_enter',
-    b'_key_dl'           : b'_key_enter',
-    b'_key_backspace'    : b'_key_enter',
-    b'_key_ctl_backspace': b'_key_enter',
+    b'_key_dc'             : b'_key_enter',
+    b'_key_dl'             : b'_key_enter',
+    b'_key_backspace'      : b'_key_enter',
+    b'_key_ctl_backspace'  : b'_key_enter',
+    b'_key_remove_selected': b'_key_add_selected',
 } # defines the counter action if a line was deleted
 
 ACTION_STACKABLE = [
@@ -233,7 +235,7 @@ class Position:
 
 class _Action:
     def __init__(self, key_action: bytes, action_text: str, size_change: bool,
-                 pre_pos: tuple, post_pos: tuple) -> None:
+                 pre_pos: tuple, post_pos: tuple, sel_pos: tuple) -> None:
         """
         defines an action.
         
@@ -254,6 +256,7 @@ class _Action:
         self.size_change: bool = size_change
         self.pre_pos: tuple    = pre_pos
         self.post_pos: tuple   = post_pos
+        self.sel_pos: tuple = sel_pos
 
     def __str__(self) -> str:
         s_self = f"{self.key_action}|{repr(self.action_text)}|"
@@ -297,7 +300,7 @@ class History:
         _stack.append(action)
 
     def add(self, key_action: bytes, action_text: str, size_change: bool, pre_pos: tuple,
-            post_pos: tuple, stack_type: str = 'undo') -> None:
+            post_pos: tuple, sel_pos: tuple, stack_type: str = 'undo') -> None:
         """
         Add an action to the stack.
         
@@ -316,7 +319,7 @@ class History:
         if stack_type == 'undo':
             self._stack_redo.clear()
 
-        action = _Action(key_action, action_text, size_change, pre_pos, post_pos)
+        action = _Action(key_action, action_text, size_change, pre_pos, post_pos, sel_pos)
         self._add(action, stack_type)
         # print('Added', list(map(str, self._stack_undo)))
         # print('     ', list(map(str, self._stack_redo)))
@@ -331,6 +334,7 @@ class History:
             assert False, 'unreachable.'
         reverse_action_method = getattr(editor, reverse_action.decode(), lambda *_: None)
         editor.cpos.set_pos(action.post_pos)
+        editor.spos.set_pos(action.sel_pos)
         reverse_action_method(action.action_text)
         editor.cpos.set_pos(action.pre_pos)
 
@@ -367,6 +371,7 @@ class History:
         self._add(action, 'undo')
         reverse_action_method = getattr(editor, action.key_action.decode(), lambda *_: None)
         editor.cpos.set_pos(action.pre_pos)
+        editor.spos.set_pos(action.sel_pos)
         reverse_action_method(action.action_text)
         editor.cpos.set_pos(action.post_pos)
 

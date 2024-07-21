@@ -143,6 +143,8 @@ class Editor:
         return ''
 
     def _key_dc(self, _) -> str:
+        if self.selecting:
+            return None
         if self.cpos.col < len(self.window_content[self.cpos.row]):
             deleted = self.window_content[self.cpos.row][self.cpos.col]
             self.window_content[self.cpos.row] = \
@@ -159,6 +161,8 @@ class Editor:
         return None
 
     def _key_dl(self, _) -> str:
+        if self.selecting:
+            return None
         if self.cpos.col < len(self.window_content[self.cpos.row]):
             cur_col = self.cpos.col
             t_p = self.window_content[self.cpos.row][cur_col].isalnum()
@@ -180,6 +184,8 @@ class Editor:
         return None
 
     def _key_backspace(self, wchars) -> str:
+        if self.selecting:
+            return None
         # usually wchars has len() == 1
         # generic backspace handling in case of auto indent
         wchar_l = len(wchars) if isinstance(wchars, str) else 1
@@ -203,6 +209,8 @@ class Editor:
         return None
 
     def _key_ctl_backspace(self, _) -> str:
+        if self.selecting:
+            return None
         if self.cpos.col:
             old_col = self.cpos.col
             self.cpos.col -= 1
@@ -405,21 +413,78 @@ class Editor:
         self.wpos.row = 0
         self.wpos.col = 0
 
-    def _key_btab(self, _) -> str:
-        c_row = self.window_content[self.cpos.row]
+    def _key_btab(self, indentation_) -> str:
+        sel_from_y = sel_to_y = self.cpos.row
+        if isinstance(indentation_, str) and '\0' in indentation_ or self.selecting:
+            (sel_from_y, _), (sel_to_y, _) = self.selected_area
         indent_l = len(self.special_indentation)
-        if c_row.startswith(self.special_indentation):
-            self.window_content[self.cpos.row] = c_row[indent_l:]
-            self.cpos.col = max(self.cpos.col-indent_l, 0)
-            self.unsaved_progress = True
-            return self.special_indentation
+        changed_indent = []
+        for row in range(sel_from_y, sel_to_y+1):
+            c_row = self.window_content[row]
+            if c_row.startswith(self.special_indentation):
+                self.window_content[row] = c_row[indent_l:]
+                if row == self.cpos.row:
+                    self.cpos.col = max(self.cpos.col-indent_l, 0)
+                self.unsaved_progress = True
+                changed_indent.append(self.special_indentation)
+            else:
+                changed_indent.append('')
+        if self.special_indentation in changed_indent:
+            return '\0'.join(changed_indent)
         return None
 
-    def _key_btab_reverse(self, tab) -> str:
-        c_row = self.window_content[self.cpos.row]
-        self.window_content[self.cpos.row] = tab + c_row
-        self.cpos.col += len(tab)
-        return tab
+    def _key_btab_reverse(self, indentation_: str) -> str:
+        indentation = indentation_.split('\0')
+        (sel_from_y, _), (sel_to_y, _) = self.selected_area
+        if len(indentation) == 1:
+            sel_from_y = sel_to_y = self.cpos.row
+        for row, indent in zip(range(sel_from_y, sel_to_y+1), indentation):
+            c_row = self.window_content[row]
+            self.window_content[row] = indent + c_row
+            if row == self.cpos.row:
+                self.cpos.col += len(indent)
+        return indentation_
+
+    def _key_remove_selected(self, _) -> str:
+        (sel_from_y, sel_from_x), (sel_to_y, sel_to_x) = self.selected_area
+        self.cpos.set_pos((sel_from_y, sel_from_x))
+        if sel_from_y == sel_to_y:
+            deleted = self.window_content[sel_from_y][sel_from_x:sel_to_x]
+            self.window_content[sel_from_y] = \
+                self.window_content[sel_from_y][:sel_from_x] + \
+                self.window_content[sel_from_y][sel_to_x:]
+            return deleted
+        deleted = self.window_content[sel_from_y][sel_from_x:]
+        self.window_content[sel_from_y] = self.window_content[sel_from_y][:sel_from_x]
+        deleted_middle = ''
+        for row in range(sel_to_y-1, sel_from_y, -1):
+            deleted_middle = self.window_content[row] + '\n' + deleted_middle
+            del self.window_content[row]
+        deleted += '\n' + deleted_middle + self.window_content[sel_from_y+1][:sel_to_x]
+        self.window_content[sel_from_y] += self.window_content[sel_from_y+1][sel_to_x:]
+        del self.window_content[sel_from_y+1]
+        return deleted
+
+    def _key_add_selected(self, wchars_: str) -> str:
+        segments = wchars_.split('\n')
+        segments.reverse()
+        end_segment = self.window_content[self.cpos.row][self.cpos.col:]
+        self.window_content[self.cpos.row] = \
+            self.window_content[self.cpos.row][:self.cpos.col] + segments[-1]
+        if len(segments) == 1:
+            self.window_content[self.cpos.row] += end_segment
+            return wchars_
+        self.window_content.insert(self.cpos.row+1, segments[0] + end_segment)
+        for row in segments[1:-1]:
+            self.window_content.insert(self.cpos.row+1, row)
+        return wchars_
+
+    def _remove_selection(self) -> None:
+        pre_pos = self.cpos.get_pos()
+        action_text = self._key_remove_selected(None)
+        self.history.add(b'_key_remove_selected', action_text, '\n' in action_text,
+                            pre_pos, self.cpos.get_pos(), self.spos.get_pos())
+
 
     def _key_string(self, wchars_) -> str:
         """
@@ -694,7 +759,7 @@ class Editor:
                 pre_pos = self.cpos.get_pos()
                 action_text = self._key_string(i_string)
                 self.history.add(b'_key_string', action_text, False,
-                                 pre_pos, self.cpos.get_pos())
+                                 pre_pos, self.cpos.get_pos(), self.spos.get_pos())
                 break
         return True
 
@@ -959,10 +1024,12 @@ class Editor:
                     # handle new wchar
                     self.deleted_line = False
                     if key in KEY_HOTKEYS:
+                        if self.selecting and key not in [b'_key_btab']:
+                            self._remove_selection()
                         pre_pos = self.cpos.get_pos()
                         action_text = getattr(self, key.decode(), lambda *_: None)(wchar)
                         self.history.add(key, action_text, self.deleted_line,
-                                         pre_pos, self.cpos.get_pos())
+                                         pre_pos, self.cpos.get_pos(), self.spos.get_pos())
                         if Editor.auto_indent and key == b'_key_enter':
                             indent_offset = 0
                             while self.window_content[self.cpos.row-1][indent_offset:].startswith(
@@ -970,7 +1037,7 @@ class Editor:
                                 pre_pos = self.cpos.get_pos()
                                 action_text = self._key_string(self.special_indentation)
                                 self.history.add(b'_key_string', action_text, self.deleted_line,
-                                                 pre_pos, self.cpos.get_pos())
+                                                 pre_pos, self.cpos.get_pos(), self.spos.get_pos())
                                 indent_offset += len(self.special_indentation)
                     # actions like search, jump, quit, save, resize:
                     elif key in ACTION_HOTKEYS:
