@@ -109,10 +109,10 @@ Using cat_win as a `Binary Executable` demands no prerequisites, hereby the stan
 `Python Package` </br>
 Simply install the python package (via [PyPI-cat_win](https://pypi.org/project/cat-win/)):
 ```console
-python -m pip install --upgrade cat_win[clip]
+python -m pip install -U cat_win[clip]
 ```
 ```console
-python -m pip install --upgrade cat_win
+python -m pip install -U cat_win
 ```
 cat_win uses the [pyperclip](https://pypi.org/project/pyperclip/) module by default. Should any problems occur, you can also use
 the [pyperclip3](https://pypi.org/project/pyperclip3/) or [pyclip](https://pypi.org/project/pyclip/) module.
