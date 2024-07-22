@@ -419,11 +419,17 @@ class Editor:
         (sel_from_y, _), (sel_to_y, _) = self.selected_area
         if indentation_.count('\0') == 1:
             sel_from_y = sel_to_y = self.cpos.row
-        for row in range(sel_from_y, sel_to_y+1):
+        if '\0' not in indentation_:
+            indentation_ = self.special_indentation
+        changed_indent = indentation_.split('\0')
+        changed_indent += [self.special_indentation] * (sel_to_y-sel_from_y+1-len(changed_indent))
+        for row, indent in zip(range(sel_from_y, sel_to_y+1), changed_indent):
             c_row = self.window_content[row]
-            self.window_content[row] = self.special_indentation + c_row
+            self.window_content[row] = indent + c_row
             if row == self.cpos.row:
                 self.cpos.col += len(self.special_indentation)
+            if row == self.spos.row:
+                self.spos.col += len(self.special_indentation)
         self.unsaved_progress = True
         self.deleted_line = True
         return '\0'.join([self.special_indentation] * (sel_to_y-sel_from_y+1)) + '\0'
@@ -441,6 +447,8 @@ class Editor:
                 self.window_content[row] = c_row[indent_l:]
                 if row == self.cpos.row:
                     self.cpos.col = max(self.cpos.col-indent_l, 0)
+                if row == self.spos.row:
+                    self.spos.col = max(self.spos.col-indent_l, 0)
                 self.unsaved_progress = True
                 changed_indent.append(self.special_indentation)
             else:
@@ -1015,6 +1023,7 @@ class Editor:
         """
         main loop for the editor.
         """
+        special_keys = [b'_key_tab', b'_key_btab', b'_key_undo', b'_key_redo']
         running = True
 
         while running:
@@ -1028,7 +1037,7 @@ class Editor:
                     # handle new wchar
                     self.deleted_line = False
                     if key in KEY_HOTKEYS:
-                        if self.selecting and key not in [b'_key_tab', b'_key_btab']:
+                        if self.selecting and key not in special_keys:
                             self._remove_selection()
                         pre_pos = self.cpos.get_pos()
                         action_text = getattr(self, key.decode(), lambda *_: None)(wchar)
@@ -1059,7 +1068,7 @@ class Editor:
                             self.spos.set_pos(self.cpos.get_pos())
                         getattr(self, key.decode(), lambda *_: None)()
                         self.selecting = True
-                    else:
+                    elif key not in special_keys:
                         self.selecting = False
                     self.curse_window.nodelay(True)
                     force_render += 1
