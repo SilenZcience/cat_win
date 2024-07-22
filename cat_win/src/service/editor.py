@@ -1023,7 +1023,6 @@ class Editor:
         """
         main loop for the editor.
         """
-        special_keys = [b'_key_tab', b'_key_btab', b'_key_undo', b'_key_redo']
         running = True
 
         while running:
@@ -1037,7 +1036,7 @@ class Editor:
                     # handle new wchar
                     self.deleted_line = False
                     if key in KEY_HOTKEYS:
-                        if self.selecting and key not in special_keys:
+                        if self.selecting and key not in [b'_key_tab', b'_key_btab', b'_key_undo', b'_key_redo']:
                             self._remove_selection()
                         pre_pos = self.cpos.get_pos()
                         action_text = getattr(self, key.decode(), lambda *_: None)(wchar)
@@ -1068,7 +1067,7 @@ class Editor:
                             self.spos.set_pos(self.cpos.get_pos())
                         getattr(self, key.decode(), lambda *_: None)()
                         self.selecting = True
-                    elif key not in special_keys:
+                    elif key not in [b'_key_tab', b'_key_btab']:
                         self.selecting = False
                     self.curse_window.nodelay(True)
                     force_render += 1

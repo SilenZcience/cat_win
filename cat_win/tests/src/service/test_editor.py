@@ -647,6 +647,8 @@ class TestEditor(TestCase):
         self.assertEqual(editor.spos.get_pos(), (0, 0))
         self.assertEqual(editor.cpos.get_pos(), (3, 3))
 
+    @patch('cat_win.src.service.editor.Editor.auto_indent', True)
+    @patch('cat_win.src.service.editor.Editor.special_indentation', '$')
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen([]))
     def test_full_integration(self):
         mm_backup1 = mm.error
@@ -664,10 +666,12 @@ class TestEditor(TestCase):
             'ş'        : b'KEY_BTAB',
             '\x1a'     : b'^Z',
             '\x19'     : b'^Y',
-            'ă'        : b'KEY_UP',
-            'ȏ'        : b'CTL_DEL',
             'Ŋ'        : b'KEY_DC',
+            'ȏ'        : b'CTL_DEL',
+            'Ą'        : b'KEY_LEFT',
+            'ă'        : b'KEY_UP',
             'Ă'        : b'KEY_DOWN',
+            'Ƈ'        : b'KEY_SLEFT',
         }
         def _keyname(x):
             return _keyname_mapping.get(chr(x), chr(x).encode())
@@ -675,10 +679,20 @@ class TestEditor(TestCase):
         g = [
             ['a','b','c','\r','\t','z',351,'\r','\x1a','\x1a','\x1a','\x1a','\x1a','\x19','\x19','\x19','\x19','\x19','\x1a','\x1a','\x1a','\x1a','\x1a','\x1a','\x11','\x11'],
             ['T','E','S','T','\r','\r','\r','\r',259,259,259,527,330,'\x7f',330,258,'\r','\x11','\x11'],
+            ['a', 'a', 'a', 'a', 'a', '\r', 'b', 'b', 'b', 'b', 'b', 260, 547, '\t', '\t', 351, '\x1a', '\x1a', '\x1a', '\x1a', '\x1a','\x11','\x11'],
+            ['\t', '\r', '\x11', '\x11'],
+            ['\t', 'a', '\t', 'b', 391, '\t', '\t', 351, '\x1a', '\x1a', '\x1a', '\x1a', '\x1a', '\x1a', '\x1a', '\x19', '\x19', '\x19', '\x19', '\x19', '\x19', '\x19', '\x19', '\x11', '\x11'],
+            ['\t', 'a', '\t', 'b', 391, '\t', 351, '\x1a', '\x1a', '\x1a', '\x1a', '\x1a', '\x1a', '\x19', '\x19', '\x19', '\x19', '\x19', '\x11', '\x11'],
+            ['\t', 'a', '\r', 'b', 391, '\t', '\r', 'c', '\x1a', '\x1a', '\x1a', '\x1a', '\x1a', '\x1a', '\x19', '\x19', '\x19', '\x19', '\x19', '\x19', '\x11', '\x11'],
         ]
         r = [
             [''],
-            ['TEST', '']
+            ['TEST', ''],
+            ['aaaaa'],
+            ['$', '$'],
+            ['$$a\tb'],
+            ['$$a\tb'],
+            ['$a', '$$', '$$c'],
         ]
         mm.keyname = _keyname
         for get_wch_, result_ in zip(g, r):
