@@ -413,9 +413,25 @@ class Editor:
         self.wpos.row = 0
         self.wpos.col = 0
 
+    def _key_tab(self, indentation_: str) -> str:
+        if not self.selecting and '\0' not in indentation_:
+            return self._key_string(indentation_)
+        (sel_from_y, _), (sel_to_y, _) = self.selected_area
+        if indentation_.count('\0') == 1:
+            sel_from_y = sel_to_y = self.cpos.row
+        for row in range(sel_from_y, sel_to_y+1):
+            c_row = self.window_content[row]
+            self.window_content[row] = self.special_indentation + c_row
+            if row == self.cpos.row:
+                self.cpos.col += len(self.special_indentation)
+        self.unsaved_progress = True
+        self.deleted_line = True
+        return '\0'.join([self.special_indentation] * (sel_to_y-sel_from_y+1)) + '\0'
+
     def _key_btab(self, indentation_) -> str:
         sel_from_y = sel_to_y = self.cpos.row
-        if isinstance(indentation_, str) and '\0' in indentation_ or self.selecting:
+        if isinstance(indentation_, str) and indentation_.count('\0') > 1 \
+            or self.selecting:
             (sel_from_y, _), (sel_to_y, _) = self.selected_area
         indent_l = len(self.special_indentation)
         changed_indent = []
@@ -430,20 +446,8 @@ class Editor:
             else:
                 changed_indent.append('')
         if self.special_indentation in changed_indent:
-            return '\0'.join(changed_indent)
+            return '\0'.join(changed_indent) + '\0'
         return None
-
-    def _key_btab_reverse(self, indentation_: str) -> str:
-        indentation = indentation_.split('\0')
-        (sel_from_y, _), (sel_to_y, _) = self.selected_area
-        if len(indentation) == 1:
-            sel_from_y = sel_to_y = self.cpos.row
-        for row, indent in zip(range(sel_from_y, sel_to_y+1), indentation):
-            c_row = self.window_content[row]
-            self.window_content[row] = indent + c_row
-            if row == self.cpos.row:
-                self.cpos.col += len(indent)
-        return indentation_
 
     def _key_remove_selected(self, _) -> str:
         (sel_from_y, sel_from_x), (sel_to_y, sel_to_x) = self.selected_area
@@ -1024,7 +1028,7 @@ class Editor:
                     # handle new wchar
                     self.deleted_line = False
                     if key in KEY_HOTKEYS:
-                        if self.selecting and key not in [b'_key_btab']:
+                        if self.selecting and key not in [b'_key_tab', b'_key_btab']:
                             self._remove_selection()
                         pre_pos = self.cpos.get_pos()
                         action_text = getattr(self, key.decode(), lambda *_: None)(wchar)
