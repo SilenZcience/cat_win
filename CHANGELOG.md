@@ -15,6 +15,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added --`vish`, --`visualizeh` to visualize the given files using hilbert curve byte view.
 - added --`vise`, --`visualizee` to visualize the given files using hilbert curve shannon entropy.
 - added --`visd`, --`visualized` to visualize the given files using digraph dot plot byte view.
+- expanded the selection functionality in the editor. hotkeys will now be applied to the entire selection.
 
 ### Bugfixes
 
