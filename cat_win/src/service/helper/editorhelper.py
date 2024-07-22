@@ -149,7 +149,8 @@ UNIFY_HOTKEYS = {
     b'kHOM3'        : b'_scroll_key_home', # xterm
     b'ALT_PAD7'     : b'_scroll_key_home', # numpad
 
-    # shift + tab
+    # (shift +) tab
+    b'^I'            : b'_key_tab',
     b'KEY_BTAB'      : b'_key_btab', # windows & xterm
 
     # default alnum key
@@ -185,16 +186,18 @@ REVERSE_ACTION = {
     b'_key_backspace'      : b'_key_string',
     b'_key_ctl_backspace'  : b'_key_string',
     b'_key_string'         : b'_key_backspace',
-    b'_key_btab'           : b'_key_btab_reverse',
+    b'_key_tab'            : b'_key_backspace',
+    b'_key_btab'           : b'_key_tab',
     b'_key_enter'          : b'_key_backspace',
     b'_key_remove_selected': b'_key_add_selected',
 } # defines the counter action if no line was deleted
 
-REVERSE_ACTION_LINE_DELETED = {
+REVERSE_ACTION_MULTI_LINE = {
     b'_key_dc'             : b'_key_enter',
     b'_key_dl'             : b'_key_enter',
     b'_key_backspace'      : b'_key_enter',
     b'_key_ctl_backspace'  : b'_key_enter',
+    b'_key_tab'            : b'_key_btab',
     b'_key_remove_selected': b'_key_add_selected',
 } # defines the counter action if a line was deleted
 
@@ -310,7 +313,7 @@ class History:
         stack_type (str):
             defines the stack to use
         """
-        if key_action not in REVERSE_ACTION and key_action not in REVERSE_ACTION_LINE_DELETED:
+        if key_action not in REVERSE_ACTION and key_action not in REVERSE_ACTION_MULTI_LINE:
             return
         if action_text is None:
             # no edit has been made (e.g. invalid edit (backspace in top left))
@@ -327,7 +330,7 @@ class History:
     def _undo(self, editor: object, action: _Action) -> None:
         self._add(action, 'redo')
         if action.size_change:
-            reverse_action = REVERSE_ACTION_LINE_DELETED.get(action.key_action)
+            reverse_action = REVERSE_ACTION_MULTI_LINE.get(action.key_action)
         else:
             reverse_action = REVERSE_ACTION.get(action.key_action)
         if reverse_action is None:
