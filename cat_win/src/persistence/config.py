@@ -18,11 +18,11 @@ BOOL_NEG_RESPONSE = ['FALSE','NO','N','0']
 BOOL_RESPONSE = BOOL_POS_RESPONSE + BOOL_NEG_RESPONSE
 
 
-def validator_string(value: str, d_h: bool=False):
+def validator_string(_, d_h: bool=False):
     if d_h:
         err_print('Any UTF-8 String (unicode-escaped) without Nullbytes')
         return False
-    return '\\0' not in value
+    return True
 
 def validator_int(value: str, d_h: bool=False):
     if d_h:
@@ -173,7 +173,8 @@ class Config:
             return False
 
         try:
-            value.encode().decode('unicode_escape')
+            if '\0' in value.encode().decode('unicode_escape'):
+                return False
         except UnicodeError:
             return False
         return self.v_validation[element](value)
