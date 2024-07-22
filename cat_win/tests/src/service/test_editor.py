@@ -83,7 +83,7 @@ class TestEditor(TestCase):
 
     def test_editor_key_dc(self):
         editor = Editor(test_file_path_editor, '')
-        editor._key_dc(None)
+        self.assertEqual(editor._key_dc(None), 'l')
         self.assertListEqual(editor.window_content, ['ine 1', 'line 2'])
         editor._move_key_right()
         editor._key_dc(None)
@@ -94,10 +94,14 @@ class TestEditor(TestCase):
         editor._move_key_end()
         editor._key_dc(None)
         self.assertListEqual(editor.window_content, ['ie 1line 2'])
+        editor.selecting = True
+        editor.cpos.set_pos((0, 3))
+        self.assertEqual(editor._key_dc(None), None)
+        self.assertListEqual(editor.window_content, ['ie 1line 2'])
 
     def test_editor_key_dl(self):
         editor = Editor(test_file_path_editor, '')
-        editor._key_dl(None)
+        self.assertEqual(editor._key_dl(None), 'line')
         self.assertListEqual(editor.window_content, [' 1', 'line 2'])
         editor._move_key_right()
         editor._key_dl(None)
@@ -107,19 +111,27 @@ class TestEditor(TestCase):
         editor._move_key_end()
         editor._key_dl(None)
         self.assertListEqual(editor.window_content, [' line 2'])
+        editor.selecting = True
+        editor.cpos.set_pos((0, 3))
+        self.assertEqual(editor._key_dl(None), None)
+        self.assertListEqual(editor.window_content, [' line 2'])
 
     def test_editor_key_backspace(self):
         editor = Editor(test_file_path_editor, '')
-        editor._key_backspace('\b')
+        self.assertEqual(editor._key_backspace('\b'), None)
         self.assertListEqual(editor.window_content, ['line 1', 'line 2'])
         editor._move_key_ctl_end()
-        editor._key_backspace('\b')
+        self.assertEqual(editor._key_backspace('\b'), '2')
         self.assertListEqual(editor.window_content, ['line 1', 'line '])
         editor._move_key_left()
         editor._key_backspace('\b')
         self.assertListEqual(editor.window_content, ['line 1', 'lin '])
         editor._move_key_home()
         editor._key_backspace('\b')
+        self.assertListEqual(editor.window_content, ['line 1lin '])
+        editor.selecting = True
+        editor.cpos.set_pos((0, 4))
+        self.assertEqual(editor._key_backspace('\b'), None)
         self.assertListEqual(editor.window_content, ['line 1lin '])
 
     def test_editor_key_ctl_backspace(self):
@@ -139,7 +151,11 @@ class TestEditor(TestCase):
         self.assertListEqual(editor.window_content, ['line ine '])
         editor._key_ctl_backspace(None)
         self.assertListEqual(editor.window_content, ['lineine '])
-        editor._key_ctl_backspace(None)
+        self.assertEqual(editor._key_ctl_backspace(None), 'line')
+        self.assertListEqual(editor.window_content, ['ine '])
+        editor.selecting = True
+        editor.cpos.set_pos((0, 2))
+        self.assertEqual(editor._key_ctl_backspace(None), None)
         self.assertListEqual(editor.window_content, ['ine '])
 
     def test_editor_move_key_left(self):
@@ -548,6 +564,51 @@ class TestEditor(TestCase):
         self.assertListEqual(editor.window_content, ['line 1', ':)line 2'])
         self.assertEqual(editor._key_btab(':)\0:)\0'), '\0:)\0')
         self.assertListEqual(editor.window_content, ['line 1', 'line 2'])
+
+    def test_editor_key_remove_add_selected(self):
+        editor = Editor(test_file_path, '')
+        editor.spos.set_pos((4,8))
+        editor.cpos.set_pos((6,2))
+        self.assertEqual(editor._key_remove_selected(None),
+                         'owing Line is Empty:\n\nTh')
+        self.assertListEqual(editor.window_content,
+                             [
+                                 'Sample Text:',
+                                 'This is a Tab-Character: >\t<',
+                                 'These are Special Chars: äöüÄÖÜ',
+                                 'N-Ary Summation: ∑',
+                                 'The follis Line is a Duplicate!',
+                                 'This Line is a Duplicate!'
+                                 ])
+        self.assertEqual(editor.cpos.get_pos(), (4,8))
+        self.assertEqual(editor._key_add_selected('owing Line is Empty:\n\nTh'),
+                         'owing Line is Empty:\n\nTh')
+        self.assertEqual(editor.window_content,
+                         [
+                             'Sample Text:',
+                             'This is a Tab-Character: >\t<',
+                             'These are Special Chars: äöüÄÖÜ',
+                             'N-Ary Summation: ∑',
+                             'The following Line is Empty:',
+                             '',
+                             'This Line is a Duplicate!',
+                             'This Line is a Duplicate!'
+                             ])
+
+    def test_editor_remove_selection(self):
+        editor = Editor(test_file_path, '')
+        editor.spos.set_pos((4,8))
+        editor.cpos.set_pos((6,2))
+        self.assertEqual(len(editor.history._stack_undo), 0)
+        editor._remove_selection()
+        self.assertEqual(len(editor.history._stack_undo), 1)
+        action = editor.history._stack_undo[0]
+        self.assertEqual(action.key_action,       b'_key_remove_selected')
+        self.assertEqual(action.action_text, 'owing Line is Empty:\n\nTh')
+        self.assertEqual(action.size_change, True)
+        self.assertEqual(action.pre_pos,    (6,2))
+        self.assertEqual(action.post_pos,   (4,8))
+        self.assertEqual(action.sel_pos,    (4,8))
 
     def test_editor_key_string_surrogatepass(self):
         editor = Editor('', '')
