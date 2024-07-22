@@ -18,11 +18,11 @@ BOOL_NEG_RESPONSE = ['FALSE','NO','N','0']
 BOOL_RESPONSE = BOOL_POS_RESPONSE + BOOL_NEG_RESPONSE
 
 
-def validator_string(_, d_h: bool=False):
+def validator_string(value: str, d_h: bool=False):
     if d_h:
-        err_print('Any UTF-8 String (unicode-escaped)')
+        err_print('Any UTF-8 String (unicode-escaped) without Nullbytes')
         return False
-    return True
+    return '\\0' not in value
 
 def validator_int(value: str, d_h: bool=False):
     if d_h:
