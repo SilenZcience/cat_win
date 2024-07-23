@@ -494,56 +494,56 @@ class TestEditor(TestCase):
         self.assertEqual(editor.wpos.get_pos(), (0,0))
 
     @patch('cat_win.src.service.editor.Editor.special_indentation', ':)')
-    def test_editor_key_tab(self):
+    def test_editor_indent_tab(self):
         editor = Editor(test_file_path_editor, '')
         editor._key_string('TEST')
         self.assertListEqual(editor.window_content, ['TESTline 1', 'line 2'])
         editor._move_key_ctl_right()
-        self.assertEqual(editor._key_tab('\t'), '\t')
+        self.assertEqual(editor._indent_tab('\t'), '\t')
         self.assertListEqual(editor.window_content, ['TESTline\t 1', 'line 2'])
         editor._move_key_home()
-        self.assertEqual(editor._key_tab('\t'), ':)')
+        self.assertEqual(editor._indent_tab('\t'), ':)')
         self.assertListEqual(editor.window_content, [':)TESTline\t 1', 'line 2'])
 
     @patch('cat_win.src.service.editor.Editor.special_indentation', ':)')
-    def test_editor_key_tab_select(self):
+    def test_editor_indent_tab_select(self):
         editor = Editor(test_file_path_editor, '')
         editor.selecting = True
         editor.spos.set_pos((0,2))
         editor.cpos.set_pos((0,4))
-        self.assertEqual(editor._key_tab('\t'), ':)\0')
+        self.assertEqual(editor._indent_tab('\t'), ':)\0')
         self.assertListEqual(editor.window_content, [':)line 1', 'line 2'])
         editor.spos.set_pos((0,2))
         editor.cpos.set_pos((1,4))
-        self.assertEqual(editor._key_tab('\t'), ':)\0:)\0')
+        self.assertEqual(editor._indent_tab('\t'), ':)\0:)\0')
         self.assertListEqual(editor.window_content, [':):)line 1', ':)line 2'])
-        self.assertEqual(editor._key_tab(':)\0'), ':)\0')
+        self.assertEqual(editor._indent_tab(':)\0'), ':)\0')
         self.assertListEqual(editor.window_content, [':):)line 1', ':):)line 2'])
-        self.assertEqual(editor._key_tab(':)\0:)\0'), ':)\0:)\0')
+        self.assertEqual(editor._indent_tab(':)\0:)\0'), ':)\0:)\0')
         self.assertListEqual(editor.window_content, [':):):)line 1', ':):):)line 2'])
 
     @patch('cat_win.src.service.editor.Editor.special_indentation', ':)')
-    def test_editor_key_btab(self):
+    def test_editor_indent_btab(self):
         editor = Editor(test_file_path_editor, '')
         editor._key_string(':):):)')
         self.assertListEqual(editor.window_content, [':):):)line 1', 'line 2'])
         editor._move_key_ctl_right()
-        self.assertEqual(editor._key_btab(''), ':)\0')
+        self.assertEqual(editor._indent_btab(''), ':)\0')
         self.assertListEqual(editor.window_content, [':):)line 1', 'line 2'])
-        self.assertEqual(editor._key_btab(''), ':)\0')
+        self.assertEqual(editor._indent_btab(''), ':)\0')
         self.assertListEqual(editor.window_content, [':)line 1', 'line 2'])
-        self.assertEqual(editor._key_btab(''), ':)\0')
+        self.assertEqual(editor._indent_btab(''), ':)\0')
         self.assertListEqual(editor.window_content, ['line 1', 'line 2'])
-        self.assertEqual(editor._key_btab(''), None)
+        self.assertEqual(editor._indent_btab(''), None)
         self.assertListEqual(editor.window_content, ['line 1', 'line 2'])
 
     @patch('cat_win.src.service.editor.Editor.special_indentation', ':)')
-    def test_editor_key_btab_select(self):
+    def test_editor_indent_btab_select(self):
         editor = Editor(test_file_path_editor, '')
         editor.selecting = True
         editor.spos.set_pos((0,2))
         editor.cpos.set_pos((0,4))
-        self.assertEqual(editor._key_btab(351), None)
+        self.assertEqual(editor._indent_btab(351), None)
         self.assertListEqual(editor.window_content, ['line 1', 'line 2'])
         editor.cpos.set_pos((0,0))
         editor._key_string(':):):)')
@@ -552,17 +552,17 @@ class TestEditor(TestCase):
         self.assertListEqual(editor.window_content, [':):):)line 1', ':):):):)line 2'])
         editor.spos.set_pos((0,2))
         editor.cpos.set_pos((0,4))
-        self.assertEqual(editor._key_btab(351), ':)\0')
+        self.assertEqual(editor._indent_btab(351), ':)\0')
         self.assertListEqual(editor.window_content, [':):)line 1', ':):):):)line 2'])
         editor.cpos.set_pos((1,3))
-        self.assertEqual(editor._key_btab(351), ':)\0:)\0')
+        self.assertEqual(editor._indent_btab(351), ':)\0:)\0')
         self.assertListEqual(editor.window_content, [':)line 1', ':):):)line 2'])
         editor.selecting = False
-        self.assertEqual(editor._key_btab(351), ':)\0')
+        self.assertEqual(editor._indent_btab(351), ':)\0')
         self.assertListEqual(editor.window_content, [':)line 1', ':):)line 2'])
-        self.assertEqual(editor._key_btab(':)\0:)\0'), ':)\0:)\0')
+        self.assertEqual(editor._indent_btab(':)\0:)\0'), ':)\0:)\0')
         self.assertListEqual(editor.window_content, ['line 1', ':)line 2'])
-        self.assertEqual(editor._key_btab(':)\0:)\0'), '\0:)\0')
+        self.assertEqual(editor._indent_btab(':)\0:)\0'), '\0:)\0')
         self.assertListEqual(editor.window_content, ['line 1', 'line 2'])
 
     def test_editor_key_remove_add_selected(self):
@@ -606,8 +606,8 @@ class TestEditor(TestCase):
         self.assertEqual(action.key_action,       b'_key_remove_selected')
         self.assertEqual(action.action_text, 'owing Line is Empty:\n\nTh')
         self.assertEqual(action.size_change, True)
-        self.assertEqual(action.pre_pos,    (6,2))
-        self.assertEqual(action.post_pos,   (4,8))
+        self.assertEqual(action.pre_cpos,    (6,2))
+        self.assertEqual(action.post_cpos,   (4,8))
         self.assertEqual(action.sel_pos,    (4,8))
 
     def test_editor_key_string_surrogatepass(self):
