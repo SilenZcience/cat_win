@@ -14,6 +14,7 @@ stdinhelpermock = IoHelperMock()
 @patch('cat_win.src.service.helper.iohelper.IoHelper.get_stdin_content', stdinhelpermock.get_stdin_content)
 @patch('cat_win.src.cat.cconfig.load_config', lambda: dict.fromkeys(CConfig.default_dic, ''))
 @patch('cat_win.src.cat.config.load_config', lambda: Config.default_dic.copy())
+@patch('cat_win.src.const.colorconstants.CVis.remove_colors', lambda: None)
 @patch('sys.stdin', StdInMock())
 @patch('os.isatty', OSAttyDefGen.get_def({0: True}))
 class Testrepl(TestCase):

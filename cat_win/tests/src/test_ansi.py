@@ -29,6 +29,7 @@ load_strip_color_dic_false = lambda: strip_color_dic_false
 
 
 @patch('cat_win.src.cat.cconfig.load_config', lambda: CConfig.default_dic.copy())
+@patch('cat_win.src.const.colorconstants.CVis.remove_colors', lambda: None)
 @patch('os.isatty', OSAttyDefGen.get_def({1: False}))
 class TestAnsiPiped(TestCase):
     maxDiff = None
@@ -66,6 +67,7 @@ class TestAnsiPiped(TestCase):
             self.assertEqual(fake_out.getvalue(), ansi_pos_file_content)
 
 @patch('cat_win.src.cat.cconfig.load_config', lambda: CConfig.default_dic.copy())
+@patch('cat_win.src.const.colorconstants.CVis.remove_colors', lambda: None)
 @patch('os.isatty', OSAttyDefGen.get_def({1: True}))
 class TestAnsiNotPiped(TestCase):
     maxDiff = None
