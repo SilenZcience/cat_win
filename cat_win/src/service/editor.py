@@ -13,7 +13,8 @@ import sys
 import unicodedata
 
 from cat_win.src.service.helper.editorhelper import History, Position, UNIFY_HOTKEYS, \
-    KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, SELECT_HOTKEYS, HEX_BYTE_KEYS
+    KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, SELECT_HOTKEYS, \
+        HISTORY_HOTKEYS, INDENT_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
 from cat_win.src.service.clipboard import Clipboard
 from cat_win.src.service.rawviewer import SPECIAL_CHARS
@@ -413,7 +414,7 @@ class Editor:
         self.wpos.row = 0
         self.wpos.col = 0
 
-    def _key_tab(self, indentation_: str) -> str:
+    def _indent_tab(self, indentation_: str) -> str:
         if not self.selecting and '\0' not in indentation_:
             return self._key_string(indentation_)
         (sel_from_y, _), (sel_to_y, _) = self.selected_area
@@ -434,7 +435,7 @@ class Editor:
         self.deleted_line = True
         return '\0'.join([self.special_indentation] * (sel_to_y-sel_from_y+1)) + '\0'
 
-    def _key_btab(self, indentation_) -> str:
+    def _indent_btab(self, indentation_) -> str:
         sel_from_y = sel_to_y = self.cpos.row
         if isinstance(indentation_, str) and indentation_.count('\0') > 1 \
             or self.selecting:
@@ -492,10 +493,10 @@ class Editor:
         return wchars_
 
     def _remove_selection(self) -> None:
-        pre_pos = self.cpos.get_pos()
+        pre_cpos = self.cpos.get_pos()
         action_text = self._key_remove_selected(None)
         self.history.add(b'_key_remove_selected', action_text, '\n' in action_text,
-                            pre_pos, self.cpos.get_pos(), self.spos.get_pos())
+                            pre_cpos, self.cpos.get_pos(), self.spos.get_pos())
 
 
     def _key_string(self, wchars_) -> str:
@@ -528,13 +529,11 @@ class Editor:
         self.cpos.col += len(wchars)
         return wchars
 
-    def _key_undo(self, _) -> str:
+    def _history_undo(self) -> None:
         self.history.undo(self)
-        return None
 
-    def _key_redo(self, _) -> str:
+    def _history_redo(self) -> None:
         self.history.redo(self)
-        return None
 
     def _select_key_all(self) -> None:
         self._build_file()
@@ -768,10 +767,10 @@ class Editor:
                 except (ValueError, UnicodeError) as exc:
                     tmp_error_bar = str(exc)
                     continue
-                pre_pos = self.cpos.get_pos()
+                pre_cpos = self.cpos.get_pos()
                 action_text = self._key_string(i_string)
                 self.history.add(b'_key_string', action_text, False,
-                                 pre_pos, self.cpos.get_pos(), self.spos.get_pos())
+                                 pre_cpos, self.cpos.get_pos(), self.spos.get_pos())
                 break
         return True
 
@@ -1039,22 +1038,26 @@ class Editor:
                     # handle new wchar
                     self.deleted_line = False
                     if key in KEY_HOTKEYS:
-                        if self.selecting and key not in [b'_key_tab', b'_key_btab',
-                                                          b'_key_undo', b'_key_redo']:
+                        if self.selecting:
                             self._remove_selection()
-                        pre_pos = self.cpos.get_pos()
+                        pre_cpos = self.cpos.get_pos()
                         action_text = getattr(self, key.decode(), lambda *_: None)(wchar)
                         self.history.add(key, action_text, self.deleted_line,
-                                         pre_pos, self.cpos.get_pos(), self.spos.get_pos())
+                                         pre_cpos, self.cpos.get_pos(), self.spos.get_pos())
                         if Editor.auto_indent and key == b'_key_enter':
                             indent_offset = 0
                             while self.window_content[self.cpos.row-1][indent_offset:].startswith(
                                 self.special_indentation):
-                                pre_pos = self.cpos.get_pos()
+                                pre_cpos = self.cpos.get_pos()
                                 action_text = self._key_string(self.special_indentation)
                                 self.history.add(b'_key_string', action_text, self.deleted_line,
-                                                 pre_pos, self.cpos.get_pos(), self.spos.get_pos())
+                                                 pre_cpos, self.cpos.get_pos(), self.spos.get_pos())
                                 indent_offset += len(self.special_indentation)
+                    elif key in INDENT_HOTKEYS:
+                        pre_cpos = self.cpos.get_pos()
+                        action_text = getattr(self, key.decode(), lambda *_: None)(wchar)
+                        self.history.add(key, action_text, self.deleted_line,
+                                         pre_cpos, self.cpos.get_pos(), self.spos.get_pos())
                     # actions like search, jump, quit, save, resize:
                     elif key in ACTION_HOTKEYS:
                         running &= getattr(self, key.decode(), lambda *_: True)()
@@ -1063,7 +1066,7 @@ class Editor:
                         self.scrolling = True
                         getattr(self, key.decode(), lambda *_: None)()
                     # moving the cursor:
-                    elif key in MOVE_HOTKEYS:
+                    elif key in MOVE_HOTKEYS | HISTORY_HOTKEYS:
                         getattr(self, key.decode(), lambda *_: None)()
                     # select text:
                     if key in SELECT_HOTKEYS:
@@ -1071,7 +1074,7 @@ class Editor:
                             self.spos.set_pos(self.cpos.get_pos())
                         getattr(self, key.decode(), lambda *_: None)()
                         self.selecting = True
-                    elif key not in [b'_key_tab', b'_key_btab']:
+                    elif key not in INDENT_HOTKEYS:
                         self.selecting = False
 
                     self._enforce_boundaries()
