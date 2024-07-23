@@ -25,6 +25,7 @@ test_binary     = os.path.join(test_res_dir, 'test.bin')
 @patch('sys.stdin', StdInMock())
 @patch('cat_win.src.cat.cconfig.load_config', lambda: dict.fromkeys(CConfig.default_dic, ''))
 @patch('cat_win.src.cat.config.load_config', lambda: Config.default_dic.copy())
+@patch('cat_win.src.const.colorconstants.CVis.remove_colors', lambda: None)
 class TestCatFull(TestCase):
     maxDiff = None
 
