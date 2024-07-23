@@ -494,9 +494,13 @@ class Editor:
 
     def _remove_selection(self) -> None:
         pre_cpos = self.cpos.get_pos()
+        pre_spos = self.spos.get_pos()
+        pre_selecting = self.selecting
         action_text = self._key_remove_selected(None)
         self.history.add(b'_key_remove_selected', action_text, '\n' in action_text,
-                            pre_cpos, self.cpos.get_pos(), self.spos.get_pos())
+                            pre_cpos, self.cpos.get_pos(),
+                            pre_spos, self.spos.get_pos(),
+                            pre_selecting, self.selecting)
 
 
     def _key_string(self, wchars_) -> str:
@@ -768,9 +772,13 @@ class Editor:
                     tmp_error_bar = str(exc)
                     continue
                 pre_cpos = self.cpos.get_pos()
+                pre_spos = self.spos.get_pos()
+                pre_selecting = self.selecting
                 action_text = self._key_string(i_string)
                 self.history.add(b'_key_string', action_text, False,
-                                 pre_cpos, self.cpos.get_pos(), self.spos.get_pos())
+                                    pre_cpos, self.cpos.get_pos(),
+                                    pre_spos, self.spos.get_pos(),
+                                    pre_selecting, self.selecting)
                 break
         return True
 
@@ -1037,27 +1045,19 @@ class Editor:
 
                     # handle new wchar
                     self.deleted_line = False
+                    pre_cpos = self.cpos.get_pos()
+                    pre_spos = self.spos.get_pos()
+                    pre_selecting = self.selecting
+                    action_text = None
                     if key in KEY_HOTKEYS:
                         if self.selecting:
                             self._remove_selection()
-                        pre_cpos = self.cpos.get_pos()
+                            pre_cpos = self.cpos.get_pos()
+                            pre_spos = self.spos.get_pos()
+                            # pre_selecting = False
                         action_text = getattr(self, key.decode(), lambda *_: None)(wchar)
-                        self.history.add(key, action_text, self.deleted_line,
-                                         pre_cpos, self.cpos.get_pos(), self.spos.get_pos())
-                        if Editor.auto_indent and key == b'_key_enter':
-                            indent_offset = 0
-                            while self.window_content[self.cpos.row-1][indent_offset:].startswith(
-                                self.special_indentation):
-                                pre_cpos = self.cpos.get_pos()
-                                action_text = self._key_string(self.special_indentation)
-                                self.history.add(b'_key_string', action_text, self.deleted_line,
-                                                 pre_cpos, self.cpos.get_pos(), self.spos.get_pos())
-                                indent_offset += len(self.special_indentation)
                     elif key in INDENT_HOTKEYS:
-                        pre_cpos = self.cpos.get_pos()
                         action_text = getattr(self, key.decode(), lambda *_: None)(wchar)
-                        self.history.add(key, action_text, self.deleted_line,
-                                         pre_cpos, self.cpos.get_pos(), self.spos.get_pos())
                     # actions like search, jump, quit, save, resize:
                     elif key in ACTION_HOTKEYS:
                         running &= getattr(self, key.decode(), lambda *_: True)()
@@ -1074,10 +1074,33 @@ class Editor:
                             self.spos.set_pos(self.cpos.get_pos())
                         getattr(self, key.decode(), lambda *_: None)()
                         self.selecting = True
-                    elif key not in INDENT_HOTKEYS:
+                    elif key not in INDENT_HOTKEYS | HISTORY_HOTKEYS:
                         self.selecting = False
 
                     self._enforce_boundaries()
+
+                    self.history.add(key, action_text, self.deleted_line,
+                                        pre_cpos, self.cpos.get_pos(),
+                                        pre_spos, self.spos.get_pos(),
+                                        pre_selecting, self.selecting)
+
+                    if Editor.auto_indent and key == b'_key_enter':
+                        pre_cpos = self.cpos.get_pos()
+                        pre_spos = self.spos.get_pos()
+                        pre_selecting = self.selecting
+                        indent_offset = 0
+                        while self.window_content[self.cpos.row-1][indent_offset:].startswith(
+                            self.special_indentation):
+                            indent_offset += len(self.special_indentation)
+                        action_text = self._key_string(
+                            (indent_offset//len(self.special_indentation)) * self.special_indentation
+                            )
+                        if indent_offset > 0:
+                            self.history.add(b'_key_string', action_text, False,
+                                                pre_cpos, self.cpos.get_pos(),
+                                                pre_spos, self.spos.get_pos(),
+                                                pre_selecting, self.selecting)
+
                     self.curse_window.nodelay(True)
                     force_render += 1
                     if force_render > 50:
