@@ -911,10 +911,8 @@ class Editor:
             return 0
         return curses.color_pair(c_id)
 
-    def _render_scr(self) -> None:
-        """
-        render the curses window.
-        """
+    def _enforce_boundaries(self) -> None:
+        # set/enforce the boundaries
         max_y, max_x = self.getxymax()
 
         # fix cursor position (makes movement hotkeys easier)
@@ -922,9 +920,6 @@ class Editor:
             self.cpos.row < len(self.window_content)) else None
         rowlen = len(row) if row is not None else 0
         self.cpos.col = min(self.cpos.col, rowlen)
-
-        # set/enforce the boundaries
-        self.curse_window.move(0, 0)
 
         if not self.scrolling:
             if self.cpos.row < self.wpos.row:
@@ -936,7 +931,15 @@ class Editor:
             elif self.cpos.col >= self.wpos.col + max_x:
                 self.wpos.col = self.cpos.col - max_x + 1
 
+    def _render_scr(self) -> None:
+        """
+        render the curses window.
+        """
+        max_y, max_x = self.getxymax()
+        # self._enforce_boundaries()
+
         # display screen
+        self.curse_window.move(0, 0)
         for row in range(max_y):
             brow = row + self.wpos.row
             if brow >= len(self.window_content):
@@ -1036,7 +1039,8 @@ class Editor:
                     # handle new wchar
                     self.deleted_line = False
                     if key in KEY_HOTKEYS:
-                        if self.selecting and key not in [b'_key_tab', b'_key_btab', b'_key_undo', b'_key_redo']:
+                        if self.selecting and key not in [b'_key_tab', b'_key_btab',
+                                                          b'_key_undo', b'_key_redo']:
                             self._remove_selection()
                         pre_pos = self.cpos.get_pos()
                         action_text = getattr(self, key.decode(), lambda *_: None)(wchar)
@@ -1069,6 +1073,8 @@ class Editor:
                         self.selecting = True
                     elif key not in [b'_key_tab', b'_key_btab']:
                         self.selecting = False
+
+                    self._enforce_boundaries()
                     self.curse_window.nodelay(True)
                     force_render += 1
                     if force_render > 50:

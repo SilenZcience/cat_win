@@ -669,9 +669,12 @@ class TestEditor(TestCase):
             'Ŋ'        : b'KEY_DC',
             'ȏ'        : b'CTL_DEL',
             'Ą'        : b'KEY_LEFT',
+            'ą'        : b'KEY_RIGHT',
             'ă'        : b'KEY_UP',
             'Ă'        : b'KEY_DOWN',
             'Ƈ'        : b'KEY_SLEFT',
+            'ȣ'        : b'KEY_SUP',
+            'Ȥ'        : b'KEY_SDOWN',
         }
         def _keyname(x):
             return _keyname_mapping.get(chr(x), chr(x).encode())
@@ -684,6 +687,8 @@ class TestEditor(TestCase):
             ['\t', 'a', '\t', 'b', 391, '\t', '\t', 351, '\x1a', '\x1a', '\x1a', '\x1a', '\x1a', '\x1a', '\x1a', '\x19', '\x19', '\x19', '\x19', '\x19', '\x19', '\x19', '\x19', '\x11', '\x11'],
             ['\t', 'a', '\t', 'b', 391, '\t', 351, '\x1a', '\x1a', '\x1a', '\x1a', '\x1a', '\x1a', '\x19', '\x19', '\x19', '\x19', '\x19', '\x11', '\x11'],
             ['\t', 'a', '\r', 'b', 391, '\t', '\r', 'c', '\x1a', '\x1a', '\x1a', '\x1a', '\x1a', '\x1a', '\x19', '\x19', '\x19', '\x19', '\x19', '\x19', '\x11', '\x11'],
+            ['a', 'b', '\r', '\t', 'c', 'd', '\r', '\t', 'e', 'f', 259, 259, 'x', 258, 548, '\t', 261, '\x1a', '\x1a', '\x11', '\x11'],
+            # ['a', '\r', 'b', '\r', 'c', 259, 547, '\t', '\x1a','\x1a', '\x11', '\x11']
         ]
         r = [
             [''],
@@ -693,6 +698,8 @@ class TestEditor(TestCase):
             ['$$a\tb'],
             ['$$a\tb'],
             ['$a', '$$', '$$c'],
+            ['ab', '$cd', '$$ef'],
+            # ['$a', '$b', 'c'],
         ]
         mm.keyname = _keyname
         for get_wch_, result_ in zip(g, r):
@@ -935,40 +942,49 @@ class TestEditor(TestCase):
             self.assertIn("b'^M'", fake_out.getvalue())
             self.assertIn("'\\r'", fake_out.getvalue())
 
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(['a' * 200] * 50))
+    def test__enforce_boundaries(self):
+        editor = Editor('', 'X' * 300)
+        editor.cpos.set_pos((4, 205))
+        self.assertEqual(editor._enforce_boundaries(), None)
+        self.assertEqual(editor.cpos.get_pos(), (4, 200))
+
+        editor.cpos.set_pos((4, 0))
+        editor.wpos.set_pos((6, 0))
+        self.assertEqual(editor._enforce_boundaries(), None)
+        self.assertEqual(editor.cpos.get_pos(), (4, 0))
+        self.assertEqual(editor.wpos.get_pos(), (4, 0))
+
+        editor.cpos.set_pos((34, 0))
+        editor.wpos.set_pos((0, 0))
+        self.assertEqual(editor._enforce_boundaries(), None)
+        self.assertEqual(editor.cpos.get_pos(), (34, 0))
+        self.assertEqual(editor.wpos.get_pos(), (5, 0))
+
+        editor.cpos.set_pos((7, 4))
+        editor.wpos.set_pos((5, 6))
+        self.assertEqual(editor._enforce_boundaries(), None)
+        self.assertEqual(editor.cpos.get_pos(), (7, 4))
+        self.assertEqual(editor.wpos.get_pos(), (5, 4))
+
+        editor.cpos.set_pos((7, 180))
+        editor.wpos.set_pos((5, 0))
+        self.assertEqual(editor._enforce_boundaries(), None)
+        self.assertEqual(editor.cpos.get_pos(), (7, 180))
+        self.assertEqual(editor.wpos.get_pos(), (5, 61))
+
     # NOTE: DEBUG: this test has bad performance due to *many* magicmock calls
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(['a' * 200] * 50))
-    def test__render_scr(self):
+    def test__enforce_boundaries(self):
         editor = Editor('', 'X' * 300)
         editor.curse_window = MagicMock()
         editor.error_bar = ':)'
         editor.debug_mode = True
         editor.cpos.set_pos((4, 205))
         self.assertEqual(editor._render_scr(), None)
-        self.assertEqual(editor.cpos.get_pos(), (4, 200))
-
-        editor.cpos.set_pos((4, 0))
-        editor.wpos.set_pos((6, 0))
-        self.assertEqual(editor._render_scr(), None)
-        self.assertEqual(editor.cpos.get_pos(), (4, 0))
-        self.assertEqual(editor.wpos.get_pos(), (4, 0))
-
         editor.cpos.set_pos((34, 0))
         editor.wpos.set_pos((0, 0))
         self.assertEqual(editor._render_scr(), None)
-        self.assertEqual(editor.cpos.get_pos(), (34, 0))
-        self.assertEqual(editor.wpos.get_pos(), (5, 0))
-
-        editor.cpos.set_pos((7, 4))
-        editor.wpos.set_pos((5, 6))
-        self.assertEqual(editor._render_scr(), None)
-        self.assertEqual(editor.cpos.get_pos(), (7, 4))
-        self.assertEqual(editor.wpos.get_pos(), (5, 4))
-
-        editor.cpos.set_pos((7, 180))
-        editor.wpos.set_pos((5, 0))
-        self.assertEqual(editor._render_scr(), None)
-        self.assertEqual(editor.cpos.get_pos(), (7, 180))
-        self.assertEqual(editor.wpos.get_pos(), (5, 61))
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(['a' * 10] * 50))
     def test__run(self):
