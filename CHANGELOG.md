@@ -20,6 +20,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Bugfixes
 
 - fixed Bug where cat_win would crash in certain situations when piping the output.
+- fixed Bug where the editor would be in an invalid state when pasting certain command chains in the keystroke buffer.
 
 
 ## [1.7.12] - 2024-06-29
