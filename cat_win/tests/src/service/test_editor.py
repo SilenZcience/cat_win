@@ -608,7 +608,7 @@ class TestEditor(TestCase):
         self.assertEqual(action.size_change, True)
         self.assertEqual(action.pre_cpos,    (6,2))
         self.assertEqual(action.post_cpos,   (4,8))
-        self.assertEqual(action.sel_pos,    (4,8))
+        self.assertEqual(action.pre_spos,    (4,8))
 
     def test_editor_key_string_surrogatepass(self):
         editor = Editor('', '')

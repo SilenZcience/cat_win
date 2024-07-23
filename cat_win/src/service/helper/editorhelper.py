@@ -240,7 +240,9 @@ class Position:
 
 class _Action:
     def __init__(self, key_action: bytes, action_text: str, size_change: bool,
-                 pre_cpos: tuple, post_cpos: tuple, sel_pos: tuple) -> None:
+                 pre_cpos: tuple, post_cpos: tuple,
+                 pre_spos: tuple, post_spos: tuple,
+                 pre_selecting: bool, post_selecting: bool) -> None:
         """
         defines an action.
         
@@ -256,12 +258,15 @@ class _Action:
         post_cpos (tuple):
             the cursor position after the action        
         """
-        self.key_action: bytes = key_action
-        self.action_text: str  = action_text
-        self.size_change: bool = size_change
-        self.pre_cpos: tuple    = pre_cpos
-        self.post_cpos: tuple   = post_cpos
-        self.sel_pos: tuple = sel_pos
+        self.key_action: bytes    = key_action
+        self.action_text: str     = action_text
+        self.size_change: bool    = size_change
+        self.pre_cpos:  tuple     = pre_cpos
+        self.post_cpos: tuple     = post_cpos
+        self.pre_spos:  tuple     = pre_spos
+        self.post_spos: tuple     = post_spos
+        self.pre_selecting: bool  = pre_selecting
+        self.post_selecting: bool = post_selecting
 
     def __str__(self) -> str:
         s_self = f"{self.key_action}|{repr(self.action_text)}|"
@@ -304,8 +309,11 @@ class History:
             del _stack[0]
         _stack.append(action)
 
-    def add(self, key_action: bytes, action_text: str, size_change: bool, pre_cpos: tuple,
-            post_cpos: tuple, sel_pos: tuple, stack_type: str = 'undo') -> None:
+    def add(self, key_action: bytes, action_text: str, size_change: bool,
+            pre_cpos: tuple, post_cpos: tuple,
+            pre_spos: tuple, post_spos: tuple,
+            pre_selecting: bool, post_selecting: bool,
+            stack_type: str = 'undo') -> None:
         """
         Add an action to the stack.
         
@@ -324,7 +332,10 @@ class History:
         if stack_type == 'undo':
             self._stack_redo.clear()
 
-        action = _Action(key_action, action_text, size_change, pre_cpos, post_cpos, sel_pos)
+        action = _Action(key_action, action_text, size_change,
+                         pre_cpos, post_cpos,
+                         pre_spos, post_spos,
+                         pre_selecting, post_selecting)
         self._add(action, stack_type)
         # print('Added', list(map(str, self._stack_undo)))
         # print('     ', list(map(str, self._stack_redo)))
@@ -339,9 +350,12 @@ class History:
             assert False, 'unreachable.'
         reverse_action_method = getattr(editor, reverse_action.decode(), lambda *_: None)
         editor.cpos.set_pos(action.post_cpos)
-        editor.spos.set_pos(action.sel_pos)
+        editor.spos.set_pos(action.post_spos)
+        editor.selecting = action.post_selecting
         reverse_action_method(action.action_text)
         editor.cpos.set_pos(action.pre_cpos)
+        editor.spos.set_pos(action.pre_spos)
+        editor.selecting = action.pre_selecting
 
     def undo(self, editor: object) -> None:
         """
@@ -376,9 +390,12 @@ class History:
         self._add(action, 'undo')
         reverse_action_method = getattr(editor, action.key_action.decode(), lambda *_: None)
         editor.cpos.set_pos(action.pre_cpos)
-        editor.spos.set_pos(action.sel_pos)
+        editor.spos.set_pos(action.pre_spos)
+        editor.selecting = action.pre_selecting
         reverse_action_method(action.action_text)
         editor.cpos.set_pos(action.post_cpos)
+        editor.spos.set_pos(action.post_spos)
+        editor.selecting = action.post_selecting
 
     def redo(self, editor: object) -> None:
         """
