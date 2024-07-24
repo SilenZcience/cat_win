@@ -919,7 +919,9 @@ class Editor:
         return curses.color_pair(c_id)
 
     def _enforce_boundaries(self) -> None:
-        # set/enforce the boundaries
+        """
+        set/enforce the boundaries
+        """
         max_y, max_x = self.getxymax()
 
         # fix cursor position (makes movement hotkeys easier)

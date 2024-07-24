@@ -256,7 +256,15 @@ class _Action:
         pre_cpos (tuple):
             the cursor position before the action
         post_cpos (tuple):
-            the cursor position after the action        
+            the cursor position after the action
+        pre_spos (tuple):
+            the selection position before the action
+        post_spos (tuple):
+            the selection position after the action
+        pre_selecting (bool):
+            the selecting indicator before the action
+        post_selecting (bool):
+            the selecting indicator after the action
         """
         self.key_action: bytes    = key_action
         self.action_text: str     = action_text
