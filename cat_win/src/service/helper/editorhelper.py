@@ -403,7 +403,7 @@ class History:
         reverse_action_method(action.action_text)
         editor.cpos.set_pos(action.post_cpos)
         editor.spos.set_pos(action.post_spos)
-        editor.selecting = action.post_selecting
+        editor.selecting = action.post_selecting # neccessary because selecting can flip spos and cpos
 
     def redo(self, editor: object) -> None:
         """
