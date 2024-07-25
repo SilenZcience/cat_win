@@ -162,6 +162,7 @@ UNIFY_HOTKEYS = {
     b'^A'           : b'_select_key_all',
     # actions
     b'^C'           : b'_action_copy',
+    b'^X'           : b'_action_cut',
     b'ALT_S'        : b'_action_save',
     b'^S'           : b'_action_save',
     b'^E'           : b'_action_jump',
@@ -401,9 +402,10 @@ class History:
         editor.spos.set_pos(action.pre_spos)
         editor.selecting = action.pre_selecting
         reverse_action_method(action.action_text)
+        # neccessary because selecting can flip spos and cpos
         editor.cpos.set_pos(action.post_cpos)
         editor.spos.set_pos(action.post_spos)
-        editor.selecting = action.post_selecting # neccessary because selecting can flip spos and cpos
+        editor.selecting = action.post_selecting
 
     def redo(self, editor: object) -> None:
         """

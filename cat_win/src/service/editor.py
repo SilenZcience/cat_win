@@ -555,6 +555,12 @@ class Editor:
         Clipboard.put(self.line_sep.join(content_window))
         return True
 
+    def _action_cut(self) -> bool:
+        self._action_copy()
+        if self.selecting:
+            self._remove_selection()
+        return True
+
     def _action_render_scr(self, msg: str, tmp_error: str = '') -> None:
         max_y, max_x = self.getxymax()
         error_bar_backup = self.error_bar
@@ -743,7 +749,8 @@ class Editor:
         tmp_error_bar = ''
         wchar, i_bytes = '', ''
         while str(wchar) != '\x1b':
-            self._action_render_scr(f"Confirm: 'ENTER' - Insert byte(s): 0x{i_bytes}␣", tmp_error_bar)
+            self._action_render_scr(f"Confirm: 'ENTER' - Insert byte(s): 0x{i_bytes}␣",
+                                    tmp_error_bar)
             wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
@@ -1095,7 +1102,8 @@ class Editor:
                             self.special_indentation):
                             indent_offset += len(self.special_indentation)
                         action_text = self._key_string(
-                            (indent_offset//len(self.special_indentation)) * self.special_indentation
+                            (indent_offset//len(self.special_indentation)) * \
+                                self.special_indentation
                             )
                         if indent_offset > 0:
                             self.history.add(b'_key_string', action_text, False,

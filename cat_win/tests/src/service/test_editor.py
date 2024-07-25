@@ -733,6 +733,18 @@ class TestEditor(TestCase):
         with patch('cat_win.src.service.clipboard.Clipboard.put', assertCopy):
             editor._action_copy()
 
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(['@@@'] * 4))
+    def test__action_cut(self):
+        def assertCopy(_s: str):
+            self.assertEqual(_s, '\n'.join(['@@', '@@@', '@@@', '@@']))
+        editor = Editor('', '')
+        editor.selecting = True
+        editor.cpos.set_pos((0, 1))
+        editor.spos.set_pos((3, 2))
+        with patch('cat_win.src.service.clipboard.Clipboard.put', assertCopy):
+            editor._action_cut()
+        self.assertListEqual(editor.window_content, ['@@'])
+
     def test__action_render_scr(self):
         editor = Editor('', '')
         editor.curse_window = MagicMock()

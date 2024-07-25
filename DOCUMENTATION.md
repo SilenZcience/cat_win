@@ -957,6 +957,7 @@ The currently supported Key Bindings are as follows:
 ||||||
 | <kbd>SelectAll/^A</kbd> | - | - | select the entire file | - |
 | <kbd>Copy/^C</kbd> | - | - | copy selected text | - |
+| <kbd>Cut/^X</kbd> | - | - | cut selected text | - |
 | <kbd>Save/^S</kbd> | - | - | save changes | save changes |
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to specific line | - |
 | <kbd>Find/^F</kbd> | - | - | prompt to search in the file | - |
