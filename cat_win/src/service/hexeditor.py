@@ -77,8 +77,7 @@ class HexEditor:
     @staticmethod
     def pos_between(from_pos, to_pos):
         from_y, from_x = from_pos
-        to_y, to_x = to_pos
-        while from_y < to_y or from_x <= to_x:
+        while (from_y, from_x) <= to_pos:
             yield (from_y, from_x)
             from_x += 1
             from_y += (from_x // HexEditor.columns)
@@ -345,9 +344,9 @@ class HexEditor:
         return None
 
     def _action_copy(self) -> bool:
-        if not self.selecting:
-            return True
         sel_from, sel_to = self.selected_area
+        if not self.selecting:
+            sel_from = sel_to = self.cpos.get_pos()
         sel_bytes = ''
         for row in range(sel_from[0], sel_to[0]+1):
             for col in range(HexEditor.columns):
@@ -357,6 +356,13 @@ class HexEditor:
                         hex_byte = self.hex_array[row][col]
                     sel_bytes += hex_byte
         Clipboard.put(sel_bytes)
+        return True
+
+    def _action_cut(self) -> bool:
+        cpos = self.cpos.get_pos()
+        self._action_copy()
+        self._key_ctl_backspace(None)
+        self.cpos.set_pos(cpos)
         return True
 
     def _action_render_scr(self, msg) -> None:
