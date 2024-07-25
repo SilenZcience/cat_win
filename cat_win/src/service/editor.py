@@ -497,6 +497,7 @@ class Editor:
         pre_spos = self.spos.get_pos()
         pre_selecting = self.selecting
         action_text = self._key_remove_selected(None)
+        self.selecting = False
         self.history.add(b'_key_remove_selected', action_text, '\n' in action_text,
                             pre_cpos, self.cpos.get_pos(),
                             pre_spos, self.spos.get_pos(),
