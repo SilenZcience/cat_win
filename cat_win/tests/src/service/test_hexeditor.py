@@ -513,6 +513,39 @@ class TestHexEditor(TestCase):
         with patch('cat_win.src.service.clipboard.Clipboard.put', assertCopy):
             editor._action_copy()
 
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 21))
+    def test__action_copy_single(self):
+        def assertCopy(_s: str):
+            self.assertEqual(_s, '21')
+        editor = HexEditor('', '')
+        editor.hex_array_edit[0][10] = '21'
+        editor.cpos.set_pos((0, 10))
+        with patch('cat_win.src.service.clipboard.Clipboard.put', assertCopy):
+            editor._action_copy()
+
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 21))
+    def test__action_cut(self):
+        def assertCopy(_s: str):
+            self.assertEqual(_s, '40' * 10 + '21' + '40' * 10)
+        editor = HexEditor('', '')
+        editor.selecting = True
+        editor.hex_array_edit[0][10] = '21'
+        editor._select_key_all()
+        with patch('cat_win.src.service.clipboard.Clipboard.put', assertCopy):
+            editor._action_cut()
+        self.assertListEqual(editor.hex_array_edit, [['--'] * 16, ['--'] * 5])
+
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 21))
+    def test__action_cut_single(self):
+        def assertCopy(_s: str):
+            self.assertEqual(_s, '21')
+        editor = HexEditor('', '')
+        editor.hex_array_edit[0][10] = '21'
+        editor.cpos.set_pos((0, 10))
+        with patch('cat_win.src.service.clipboard.Clipboard.put', assertCopy):
+            editor._action_cut()
+        self.assertListEqual(editor.hex_array_edit, [[None] * 10 + ['--'] + [None] * 5, [None] * 5])
+
     def test__action_render_scr(self):
         editor = HexEditor('', '')
         editor.curse_window = MagicMock()
