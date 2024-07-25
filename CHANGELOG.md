@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.8.1] - TBA
+
+### Minor Changes
+
+- added `^X` hotkey to the (hex-)editor to cut the selected text/bytes.
+
+### Bugfixes
+
+- fixed Bug where the hex-editor would crash when performing certain actions of byte selections.
+- fixed Bug where the hex-editor would not correctly copy the selection when using `^C`.
+
+
 ## [1.8.0] - 2024-07-24
 
 ### Minor Changes
