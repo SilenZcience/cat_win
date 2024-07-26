@@ -239,7 +239,7 @@
    - Archives will not be displayed like regular Files.
    - When passing in an Archive the contained Files will be listed along side their File Size instead.
    - Currently supported Archive Formats are:
-      - Zip Formats and Equivalents: `.zip` `.egg` `.jar`
+      - Zip Formats and Equivalents: `.zip` `.egg` `.jar` `.whl`
       - Tar and compressed Tar Formats: `.tar` `.tar.gz` `.tgz` `.tar.bz2` `.tz2` 
 
 - - - -
@@ -992,6 +992,7 @@ The currently supported Key Bindings are as follows:
 ||||||
 | <kbd>SelectAll/^A</kbd> | - | - | select the entire file | - |
 | <kbd>Copy/^C</kbd> | - | - | copy selected bytes | - |
+| <kbd>Cut/^X</kbd> | - | - | cut selected bytes | - |
 | <kbd>Save/^S</kbd> | - | - | save changes | save changes |
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to a specific byte | - |
 | <kbd>Find/^F</kbd> | - | - | prompt to search a byte(-sequence) in the file | - |
