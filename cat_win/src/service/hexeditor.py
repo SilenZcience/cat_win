@@ -365,8 +365,10 @@ class HexEditor:
         self.cpos.set_pos(cpos)
         return True
 
-    def _action_render_scr(self, msg) -> None:
+    def _action_render_scr(self, msg: str, tmp_error: str = '') -> None:
         max_y, max_x = self.getxymax()
+        error_bar_backup = self.error_bar
+        self.error_bar = tmp_error if tmp_error else self.error_bar
         try:
             if self.error_bar:
                 self.curse_window.addstr(max_y + self.status_bar_size + 1, 0,
@@ -377,6 +379,7 @@ class HexEditor:
                                         self._get_color(3))
         except curses.error:
             pass
+        self.error_bar = error_bar_backup
         self.curse_window.refresh()
 
     def _action_save(self) -> bool:
@@ -468,24 +471,25 @@ class HexEditor:
                 search_wrap += ''.join(self.hex_array[row])
             search_in += search_wrap[:len(self.search)-1]
 
-            found_pos = search_in.find(self.search)
-            while found_pos >= 0:
-                if found_pos % 2:
-                    search_in = search_in[found_pos+1:]
-                    found_pos = search_in.find(self.search)
-                    continue
-                break
-            return found_pos//2
+            for i in range(0, len(search_in), 2):
+                if search_in[i:].startswith(self.search):
+                    return i//2
+            return -1
 
         search_byte_mode, bm_ind = True, '0x'
-        wchar, sub_s = '', ''
+        sub_s_encoded = self.search
+        wchar, sub_s, tmp_error= '', '', ''
         while str(wchar) != '\x1b':
             pre_s = ''
-            if self.search and search_byte_mode:
+            if self.search:
                 pre_s = f" [{bm_ind}{repr(self.search)[1:-1]}]"
-            elif self.search:
-                pre_s = f" [{bm_ind}{repr(bytes.fromhex(self.search))[2:-1]}]"
-            self._action_render_scr(f"Confirm: 'ENTER' - Search for{pre_s}: {bm_ind}{sub_s}␣")
+                if not search_byte_mode:
+                    try:
+                        pre_s = f" [{bm_ind}{repr(bytes.fromhex(self.search))[2:-1]}]"
+                    except ValueError:
+                        pass
+            self._action_render_scr(f"Confirm: 'ENTER' - Search for{pre_s}: {bm_ind}{sub_s}␣",
+                                    tmp_error)
             wchar, key = self._get_next_char()
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
@@ -495,6 +499,9 @@ class HexEditor:
                 if key == b'_action_insert':
                     search_byte_mode = not search_byte_mode
                     bm_ind = '0x' * search_byte_mode
+                    self.search = self.search[:-1] if len(self.search) % 2 else self.search
+                    sub_s_encoded = self.search
+                    sub_s = ''
                 if key == b'_action_background':
                     getattr(self, key.decode(), lambda *_: False)()
                 if key == b'_action_resize':
@@ -516,7 +523,7 @@ class HexEditor:
                 self.search = sub_s if sub_s else self.search
                 if not self.search:
                     break
-                if not search_byte_mode:
+                if not search_byte_mode and self.search != sub_s_encoded:
                     i_chars = self.search.encode('utf-16', 'surrogatepass').decode('utf-16')
                     if HexEditor.unicode_escaped_search and sub_s:
                         try:
@@ -527,6 +534,7 @@ class HexEditor:
                     for i_char in i_chars:
                         for byte_ in i_char.encode():
                             self.search += f"{byte_:02X}"
+                sub_s_encoded = self.search
 
                 # check current line
                 search_result = find_bytes(self.cpos.row, self.cpos.col+1)
@@ -545,6 +553,9 @@ class HexEditor:
                         self.cpos.row = c_row_wrapped
                         self.cpos.col = search_result
                         break
+                else:
+                    tmp_error = 'no matches were found!'
+                    continue
                 break
         return True
 
