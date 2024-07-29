@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.8.2] - TBA
+
+### Minor Changes
+
+- the (hex-)editor now displays a message when search queries do not yield any result.
+
+### Bugfixes
+
+- fixed Bug where certain file signatures were not correctly identified.
+- fixed Bug where the hex-editor would display the wrong result when searching for certain bytes.
+- fixed Bug where the hex-editor would allow invalid symbols to be searched for.
+- fixed Bug where the hex-editor would crash when switching to plain text search mode.
+- fixed Bug where the hex-editor would wrongly interpret the search query.
+
+
 ## [1.8.1] - 2024-07-26
 
 ### Minor Changes
