@@ -652,10 +652,10 @@ class Editor:
         """
         curses.curs_set(0)
 
-        wchar, sub_s = '', ''
+        wchar, sub_s, tmp_error = '', '', ''
         while str(wchar) != '\x1b':
             pre_s = f" [{repr(self.search)[1:-1]}]" if self.search else ''
-            self._action_render_scr(f"Confirm: 'ENTER' - Search for{pre_s}: {sub_s}␣")
+            self._action_render_scr(f"Confirm: 'ENTER' - Search for{pre_s}: {sub_s}␣", tmp_error)
             wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
@@ -701,6 +701,9 @@ class Editor:
                         self.cpos.row = c_row_wrapped
                         self.cpos.col = self.window_content[c_row_wrapped].find(self.search)
                         break
+                else:
+                    tmp_error = 'no matches were found!'
+                    continue
                 break
         return True
 

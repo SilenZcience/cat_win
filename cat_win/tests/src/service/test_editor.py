@@ -829,7 +829,7 @@ class TestEditor(TestCase):
         self.assertEqual(editor._action_find(), True)
         self.assertEqual(editor.cpos.get_pos(), (40, 2))
         def char_gen_ctl(user_input: list):
-            yield from zip(user_input + ['', ''], [b'_key_string'] * len(user_input) + [b'_key_ctl_backspace', b'_key_enter'])
+            yield from zip(user_input + ['', '', ''], [b'_key_string'] * len(user_input) + [b'_key_ctl_backspace', b'_key_enter', b'_action_quit'])
         editor.get_char = char_gen_ctl([5, 'a', '\\', 'b',  'a', '1', '2', '3', '4'])
         self.assertEqual(editor._action_find(), True)
         self.assertEqual(editor.cpos.get_pos(), (40, 2))
