@@ -22,8 +22,8 @@ class TestSignatures(TestCase):
         self.assertEqual(Signatures.read_signature(signatures_path, __file__), '-')
 
     def test_read_signatures(self):
-        self.assertEqual(Signatures.read_signature(signatures_path, test_zip_file_path), 'application/zip(zip) [application/oxps(oxps);application/vnd.google-earth.kmz(kmz);application/vnd.kde.kword(kwd);application/vnd.ms-xpsdocument(xps);application/vnd.oasis.opendocument.presentation(odp);application/vnd.oasis.opendocument.text(odt);application/vnd.oasis.opendocument.text-template(ott);application/vnd.sun.xml.calc(sxc);application/vnd.sun.xml.draw(sxd);application/vnd.sun.xml.impress(sxi);application/vnd.sun.xml.writer(sxw);application/x-java-archive(jar);application/x-xpinstall(xpi)]')
-        self.assertEqual(Signatures.read_signature(signatures_path, test_tar_file_path), 'application/gzip(gz) [application/gzip(tgz)]')
+        self.assertEqual(Signatures.read_signature(signatures_path, test_zip_file_path), 'application/x-zip-compressed(zip)')
+        self.assertEqual(Signatures.read_signature(signatures_path, test_tar_file_path), 'application/x-gzip(gz) [application/gzip(tgz)]')
 
 
 class TestFileAttributes(TestCase):

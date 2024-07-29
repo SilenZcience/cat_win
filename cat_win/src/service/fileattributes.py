@@ -23,6 +23,17 @@ class Signatures:
     signatures = None
 
     @staticmethod
+    def match(file_prefix_: str, signature_: str) -> bool:
+        file_prefix = [file_prefix_[i:i+2] for i in range(0, len(signature_), 2)]
+        signature = [signature_[i:i+2] for i in range(0, len(signature_), 2)]
+        for fp, sp in zip(file_prefix, signature):
+            if sp == '??':
+                continue
+            if fp != sp:
+                return False
+        return True
+
+    @staticmethod
     def read_signature(res_path: str, file: str) -> str:
         """
         read a file and compare its signature to known signatures.
@@ -37,32 +48,41 @@ class Signatures:
         """
         file_signature_primary = ''
         file_signature_secondary = []
+        encountered_sig = set()
 
         file_ext = os.path.splitext(file)[1][1:]
         try:
-            with open(file, 'rb') as file_:
-                file_prefix = file_.read(36870)
+            file_ = open(file, 'rb')
+            file_prefix = file_.read(348).hex().upper()
 
             if Signatures.signatures is None:
-                # credit: https://gist.github.com/Qti3e/6341245314bf3513abb080677cd1c93b
                 with open(res_path, 'r', encoding='utf-8') as sig:
                     Signatures.signatures = json.load(sig)
             signatures_json = Signatures.signatures
         except OSError:
             return 'lookup failed!'
-
-        for ext in signatures_json:
-            for sign in signatures_json[ext]['signs']:
+        # l = 0 # NOTE: find the length of the prefix that needs to be read
+        for ext, signature in signatures_json.items():
+            for sign in signature['signs']:
                 offset, sig = sign.split(',')
-                offset, sig = int(offset), bytearray.fromhex(sig)
-                if file_prefix[offset:].startswith(sig):
-                    signature_option = f"{signatures_json[ext]['mime']}({ext})"
+                # if int(offset)+len(sig)//2 > l: # NOTE: prefix
+                #     l = int(offset)+len(sig)//2
+                sig_distance = len(sig) - len(file_prefix) + int(offset)*2
+                if sig_distance > 0: # adjust prefix in case not enough was read
+                    file_prefix += file_.read(sig_distance//2).hex().upper()
+                if Signatures.match(file_prefix[int(offset)*2:], sig):
+                    signature_option = f"{signature['mime']}({ext})"
                     if ext == file_ext:
                         file_signature_primary = signature_option
-                    else:
-                        file_signature_secondary.append(signature_option)
+                    elif sig not in encountered_sig:
+                        file_signature_secondary.append((signature_option, len(sig)))
+                    encountered_sig.add(sig)
                     break
+        # print(l) # NOTE: prefix
+        file_.close()
 
+        file_signature_secondary.sort(key=lambda x: x[1]) # sort by matched signature length
+        file_signature_secondary = [fs for fs, _ in file_signature_secondary]
         if file_signature_primary and file_signature_secondary:
             return file_signature_primary + ' [' + ';'.join(file_signature_secondary) + ']'
         if file_signature_primary:
