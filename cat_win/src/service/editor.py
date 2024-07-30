@@ -32,7 +32,8 @@ class Editor:
     on_windows_os = False
     debug_mode = False
 
-    unicode_escaped_search = True
+    unicode_escaped_search  = True
+    unicode_escaped_replace = True
     file_encoding = 'utf-8'
 
     def __init__(self, file: str, display_name: str) -> None:
@@ -56,7 +57,8 @@ class Editor:
         self.window_content = []
 
         self.special_chars: dict = {}
-        self.search = ''
+        self.search  = ''
+        self.replace = ''
 
         self.status_bar_size = 1
         self.error_bar = ''
@@ -458,6 +460,26 @@ class Editor:
             return '\0'.join(changed_indent) + '\0'
         return None
 
+    def _key_replace_search(self, r_this: str, r_with: str) -> str:
+        self.window_content[self.cpos.row] = self.window_content[self.cpos.row][:self.cpos.col] + \
+            r_with + self.window_content[self.cpos.row][self.cpos.col+len(r_this):]
+        self.cpos.col += len(r_with)
+
+    def _key_replace_search_(self, r_this: str, r_with: str) -> str:
+        self.cpos.col -= len(r_with)
+        return self._key_replace_search(r_this=r_with, r_with=r_this)
+
+    def _replace_search(self, r_this: str, r_with: str) -> None:
+        pre_cpos = self.cpos.get_pos()
+        pre_spos = self.spos.get_pos()
+        pre_selecting = self.selecting
+        self._key_replace_search(r_this, r_with)
+        self.selecting = False
+        self.history.add(b'_key_replace_search', r_this, False,
+                            pre_cpos, self.cpos.get_pos(),
+                            pre_spos, self.spos.get_pos(),
+                            pre_selecting, self.selecting, r_with)
+
     def _key_remove_selected(self, _) -> str:
         (sel_from_y, sel_from_x), (sel_to_y, sel_to_x) = self.selected_area
         self.cpos.set_pos((sel_from_y, sel_from_x))
@@ -502,7 +524,6 @@ class Editor:
                             pre_cpos, self.cpos.get_pos(),
                             pre_spos, self.spos.get_pos(),
                             pre_selecting, self.selecting)
-
 
     def _key_string(self, wchars_) -> str:
         """
@@ -642,6 +663,27 @@ class Editor:
                 break
         return True
 
+    def _jump_to_next_find(self, offset: int = 1) -> bool:
+        # check current line
+        if self.search in self.window_content[self.cpos.row][self.cpos.col+offset:]:
+            self.cpos.col += \
+                self.window_content[self.cpos.row][self.cpos.col+offset:].find(self.search)+offset
+            return True
+        # check rest of file until back at current line
+        c_row = self.cpos.row
+        while c_row < self.cpos.row+len(self.window_content):
+            if c_row+1 >= len(self.window_content):
+                self._build_file_upto(c_row+30)
+            c_row += 1
+            c_row_wrapped = c_row%len(self.window_content)
+            if self.search in self.window_content[c_row_wrapped]:
+                self.cpos.row = c_row_wrapped
+                self.cpos.col = self.window_content[c_row_wrapped].find(self.search)
+                break
+        else:
+            return False
+        return True
+
     def _action_find(self) -> bool:
         """
         handles the find in editor action.
@@ -685,26 +727,76 @@ class Editor:
                     except UnicodeError:
                         pass
                 self.search = sub_s if sub_s else self.search
-                # check current line
-                if self.search in self.window_content[self.cpos.row][self.cpos.col+1:]:
-                    self.cpos.col += \
-                        self.window_content[self.cpos.row][self.cpos.col+1:].find(self.search)+1
+                if self._jump_to_next_find():
                     break
-                # check rest of file until back at current line
-                c_row = self.cpos.row
-                while c_row < self.cpos.row+len(self.window_content):
-                    if c_row+1 >= len(self.window_content):
-                        self._build_file_upto(c_row+30)
-                    c_row += 1
-                    c_row_wrapped = c_row%len(self.window_content)
-                    if self.search in self.window_content[c_row_wrapped]:
-                        self.cpos.row = c_row_wrapped
-                        self.cpos.col = self.window_content[c_row_wrapped].find(self.search)
-                        break
-                else:
-                    tmp_error = 'no matches were found!'
+                tmp_error = 'no matches were found!'
+        return True
+
+    def _action_replace(self) -> bool:
+        """
+        handles the replace in editor action.
+        
+        Returns:
+        (bool):
+            indicates if the editor should keep running
+        """
+        curses.curs_set(0)
+
+        replace_all = False
+        wchar, sub_s, tmp_error = '', '', ''
+        while str(wchar) != '\x1b':
+            pre_s = f" [{repr(self.search)[1:-1]}]" if self.search else '[]'
+            pre_r = f" [{repr(self.replace)[1:-1]}]" if self.replace else ''
+            rep_a = ' ALL' if replace_all else ''
+            self._action_render_scr(
+                f"Confirm: 'ENTER' - Replace{rep_a} {pre_s} with{pre_r}: {sub_s}␣", tmp_error)
+            wchar, key = next(self.get_char)
+            if key in ACTION_HOTKEYS:
+                if key in [b'_action_quit', b'_action_interrupt']:
+                    break
+                if key == b'_action_find':
+                    cpos = self.cpos.get_pos()
+                    getattr(self, key.decode(), lambda *_: False)()
+                    self.cpos.set_pos(cpos)
+                    tmp_error = ''
+                if key == b'_action_replace':
+                    wchar, key = '', b'_key_enter'
+                if key == b'_action_insert':
+                    replace_all = not replace_all
+                if key == b'_action_background':
+                    getattr(self, key.decode(), lambda *_: False)()
+                if key == b'_action_resize':
+                    getattr(self, key.decode(), lambda *_: False)()
+                    self._render_scr()
+                    curses.curs_set(0)
+            if not isinstance(wchar, str):
+                continue
+            if key == b'_key_backspace':
+                sub_s = sub_s[:-1]
+            elif key == b'_key_ctl_backspace':
+                t_p = sub_s[-1:].isalnum()
+                while sub_s and sub_s[-1:].isalnum() == t_p:
+                    sub_s = sub_s[:-1]
+            elif key == b'_key_string':
+                sub_s += wchar
+            elif key == b'_key_enter':
+                if not self.search:
+                    tmp_error = 'unspecified search!'
                     continue
-                break
+                if Editor.unicode_escaped_replace and sub_s:
+                    try:
+                        sub_s = sub_s.encode().decode('unicode_escape').encode('latin-1').decode()
+                    except UnicodeError:
+                        pass
+                self.replace = sub_s if sub_s else self.replace
+                if self._jump_to_next_find(0):
+                    self._replace_search(self.search, self.replace)
+                    if not replace_all:
+                        break
+                    while self._jump_to_next_find(0):
+                        self._replace_search(self.search, self.replace)
+                    break
+                tmp_error = 'no matches were found!'
         return True
 
     def _action_reload(self) -> bool:
@@ -1244,7 +1336,8 @@ class Editor:
 
     @staticmethod
     def set_flags(save_with_alt: bool, on_windows_os: bool, debug_mode: bool,
-                  unicode_escaped_search: bool, file_encoding: str) -> None:
+                  unicode_escaped_search: bool, unicode_escaped_replace: bool,
+                  file_encoding: str) -> None:
         """
         set the config flags for the Editor
         
@@ -1264,4 +1357,5 @@ class Editor:
         Editor.on_windows_os = on_windows_os
         Editor.debug_mode = debug_mode
         Editor.unicode_escaped_search = unicode_escaped_search
+        Editor.unicode_escaped_replace = unicode_escaped_replace
         Editor.file_encoding = file_encoding

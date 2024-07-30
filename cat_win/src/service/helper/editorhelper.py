@@ -167,6 +167,7 @@ UNIFY_HOTKEYS = {
     b'^S'           : b'_action_save',
     b'^E'           : b'_action_jump',
     b'^F'           : b'_action_find',
+    b'^P'           : b'_action_replace',
     b'^R'           : b'_action_reload',
     b'^N'           : b'_action_insert',
     b'^B'           : b'_action_background',
@@ -193,6 +194,7 @@ REVERSE_ACTION = {
     b'_indent_btab'        : b'_indent_tab',
     b'_key_enter'          : b'_key_backspace',
     b'_key_remove_selected': b'_key_add_selected',
+    b'_key_replace_search' : b'_key_replace_search_'
 } # defines the counter action if no line was deleted
 
 REVERSE_ACTION_MULTI_LINE = {
@@ -243,7 +245,8 @@ class _Action:
     def __init__(self, key_action: bytes, action_text: str, size_change: bool,
                  pre_cpos: tuple, post_cpos: tuple,
                  pre_spos: tuple, post_spos: tuple,
-                 pre_selecting: bool, post_selecting: bool) -> None:
+                 pre_selecting: bool, post_selecting: bool,
+                 *action_text_: str) -> None:
         """
         defines an action.
         
@@ -276,6 +279,7 @@ class _Action:
         self.post_spos: tuple     = post_spos
         self.pre_selecting: bool  = pre_selecting
         self.post_selecting: bool = post_selecting
+        self.action_text_: tuple  = action_text_
 
     def __str__(self) -> str:
         s_self = f"{self.key_action}|{repr(self.action_text)}|"
@@ -322,6 +326,7 @@ class History:
             pre_cpos: tuple, post_cpos: tuple,
             pre_spos: tuple, post_spos: tuple,
             pre_selecting: bool, post_selecting: bool,
+            *action_text_: str,
             stack_type: str = 'undo') -> None:
         """
         Add an action to the stack.
@@ -344,7 +349,8 @@ class History:
         action = _Action(key_action, action_text, size_change,
                          pre_cpos, post_cpos,
                          pre_spos, post_spos,
-                         pre_selecting, post_selecting)
+                         pre_selecting, post_selecting,
+                         *action_text_)
         self._add(action, stack_type)
         # print('Added', list(map(str, self._stack_undo)))
         # print('     ', list(map(str, self._stack_redo)))
@@ -361,7 +367,7 @@ class History:
         editor.cpos.set_pos(action.post_cpos)
         editor.spos.set_pos(action.post_spos)
         editor.selecting = action.post_selecting
-        reverse_action_method(action.action_text)
+        reverse_action_method(action.action_text, *action.action_text_)
         editor.cpos.set_pos(action.pre_cpos)
         editor.spos.set_pos(action.pre_spos)
         editor.selecting = action.pre_selecting
@@ -401,7 +407,7 @@ class History:
         editor.cpos.set_pos(action.pre_cpos)
         editor.spos.set_pos(action.pre_spos)
         editor.selecting = action.pre_selecting
-        reverse_action_method(action.action_text)
+        reverse_action_method(action.action_text, *action.action_text_)
         # neccessary because selecting can flip spos and cpos
         editor.cpos.set_pos(action.post_cpos)
         editor.spos.set_pos(action.post_spos)
