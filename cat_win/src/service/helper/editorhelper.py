@@ -242,19 +242,17 @@ class Position:
 
 
 class _Action:
-    def __init__(self, key_action: bytes, action_text: str, size_change: bool,
+    def __init__(self, key_action: bytes, size_change: bool,
                  pre_cpos: tuple, post_cpos: tuple,
                  pre_spos: tuple, post_spos: tuple,
                  pre_selecting: bool, post_selecting: bool,
-                 *action_text_: str) -> None:
+                 *action_text: str) -> None:
         """
         defines an action.
         
         Parameters:
         key_action (bytes):
             the action taken as defined by UNIFY_HOTKEYS
-        action_text (str):
-            the text added/removed by the action
         size_change (bool)
             indicates if the size of the file changed because of this action
         pre_cpos (tuple):
@@ -269,9 +267,10 @@ class _Action:
             the selecting indicator before the action
         post_selecting (bool):
             the selecting indicator after the action
+        action_text* (str):
+            the text added/removed by the action
         """
         self.key_action: bytes    = key_action
-        self.action_text: str     = action_text
         self.size_change: bool    = size_change
         self.pre_cpos:  tuple     = pre_cpos
         self.post_cpos: tuple     = post_cpos
@@ -279,7 +278,7 @@ class _Action:
         self.post_spos: tuple     = post_spos
         self.pre_selecting: bool  = pre_selecting
         self.post_selecting: bool = post_selecting
-        self.action_text_: tuple  = action_text_
+        self.action_text: tuple   = action_text
 
     def __str__(self) -> str:
         s_self = f"{self.key_action}|{repr(self.action_text)}|"
@@ -322,12 +321,11 @@ class History:
             del _stack[0]
         _stack.append(action)
 
-    def add(self, key_action: bytes, action_text: str, size_change: bool,
+    def add(self, key_action: bytes, size_change: bool,
             pre_cpos: tuple, post_cpos: tuple,
             pre_spos: tuple, post_spos: tuple,
             pre_selecting: bool, post_selecting: bool,
-            *action_text_: str,
-            stack_type: str = 'undo') -> None:
+            *action_text: str, stack_type: str = 'undo') -> None:
         """
         Add an action to the stack.
         
@@ -339,18 +337,18 @@ class History:
         """
         if key_action not in REVERSE_ACTION and key_action not in REVERSE_ACTION_MULTI_LINE:
             return
-        if action_text is None:
+        if not action_text or action_text[0] is None:
             # no edit has been made (e.g. invalid edit (backspace in top left))
             return
 
         if stack_type == 'undo':
             self._stack_redo.clear()
 
-        action = _Action(key_action, action_text, size_change,
+        action = _Action(key_action, size_change,
                          pre_cpos, post_cpos,
                          pre_spos, post_spos,
                          pre_selecting, post_selecting,
-                         *action_text_)
+                         *action_text)
         self._add(action, stack_type)
         # print('Added', list(map(str, self._stack_undo)))
         # print('     ', list(map(str, self._stack_redo)))
@@ -367,7 +365,7 @@ class History:
         editor.cpos.set_pos(action.post_cpos)
         editor.spos.set_pos(action.post_spos)
         editor.selecting = action.post_selecting
-        reverse_action_method(action.action_text, *action.action_text_)
+        reverse_action_method(*action.action_text)
         editor.cpos.set_pos(action.pre_cpos)
         editor.spos.set_pos(action.pre_spos)
         editor.selecting = action.pre_selecting
@@ -386,13 +384,13 @@ class History:
             return
 
         self._undo(editor, action)
-        is_space = action.action_text.isspace()
+        is_space = action.action_text[0].isspace()
         while self._stack_undo:
             n_action: _Action = self._stack_undo.pop()
             if action.key_action == n_action.key_action and \
                 action.pre_cpos == n_action.post_cpos and \
                 action.key_action in ACTION_STACKABLE and \
-                is_space == n_action.action_text.isspace():
+                is_space == n_action.action_text[0].isspace():
                 action = n_action
                 self._undo(editor, action)
             else:
@@ -407,7 +405,7 @@ class History:
         editor.cpos.set_pos(action.pre_cpos)
         editor.spos.set_pos(action.pre_spos)
         editor.selecting = action.pre_selecting
-        reverse_action_method(action.action_text, *action.action_text_)
+        reverse_action_method(*action.action_text)
         # neccessary because selecting can flip spos and cpos
         editor.cpos.set_pos(action.post_cpos)
         editor.spos.set_pos(action.post_spos)
@@ -427,13 +425,13 @@ class History:
             return
 
         self._redo(editor, action)
-        is_space = action.action_text.isspace()
+        is_space = action.action_text[0].isspace()
         while self._stack_redo:
             n_action: _Action = self._stack_redo.pop()
             if action.key_action == n_action.key_action and \
                 action.post_cpos == n_action.pre_cpos and \
                 action.key_action in ACTION_STACKABLE and \
-                is_space == n_action.action_text.isspace():
+                is_space == n_action.action_text[0].isspace():
                 action = n_action
                 self._redo(editor, action)
             else:

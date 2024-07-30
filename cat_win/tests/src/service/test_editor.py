@@ -604,7 +604,7 @@ class TestEditor(TestCase):
         self.assertEqual(len(editor.history._stack_undo), 1)
         action = editor.history._stack_undo[0]
         self.assertEqual(action.key_action,       b'_key_remove_selected')
-        self.assertEqual(action.action_text, 'owing Line is Empty:\n\nTh')
+        self.assertEqual(action.action_text, ('owing Line is Empty:\n\nTh',))
         self.assertEqual(action.size_change, True)
         self.assertEqual(action.pre_cpos,    (6,2))
         self.assertEqual(action.post_cpos,   (4,8))
@@ -839,6 +839,30 @@ class TestEditor(TestCase):
         self.assertEqual(editor._action_find(), True)
         self.assertEqual(editor.cpos.get_pos(), (40, 2))
 
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(['a' * 10] * 40 + ['aaa\ba\baa'] + ['a' * 10] * 12))
+    def test__action_replace(self):
+        editor = Editor('', '')
+        editor.curse_window = MagicMock()
+        def char_gen(user_input: list):
+            yield from zip(user_input + ['', ''], [b'_key_string'] * len(user_input) + [b'_key_backspace', b'_key_enter'])
+        editor.search = 'a\baa'
+        editor.get_char = char_gen([5, 't', 'e', 's', 't', 't'])
+        self.assertEqual(editor._action_replace(), True)
+        self.assertEqual(editor.cpos.get_pos(), (40, 8))
+        self.assertEqual(editor.window_content[40], 'aaa\btest')
+        def char_gen_ctl(user_input: list):
+            yield from zip(user_input + ['', '', ''], [b'_key_string'] * len(user_input) + [b'_key_ctl_backspace', b'_key_enter', b'_action_quit'])
+        editor.search = 'a\bte'
+        editor.get_char = char_gen_ctl([5, 'a', '\\', 'b',  'a', '1', '2', '3', '4'])
+        self.assertEqual(editor._action_replace(), True)
+        self.assertEqual(editor.cpos.get_pos(), (40, 4))
+        self.assertEqual(editor.window_content[40], 'aaa\\st')
+        def yield_action_quit():
+            yield ('', b'_action_quit')
+        editor.get_char = yield_action_quit()
+        self.assertEqual(editor._action_replace(), True)
+        self.assertEqual(editor.cpos.get_pos(), (40, 4))
+
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(['a' * 10] * 50))
     def test__action_reload(self):
         editor = Editor('', '')
@@ -987,7 +1011,7 @@ class TestEditor(TestCase):
 
     # NOTE: DEBUG: this test has bad performance due to *many* magicmock calls
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(['a' * 200] * 50))
-    def test__enforce_boundaries(self):
+    def test__render_scr(self):
         editor = Editor('', 'X' * 300)
         editor.curse_window = MagicMock()
         editor.error_bar = ':)'
