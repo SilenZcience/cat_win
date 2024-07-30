@@ -747,11 +747,11 @@ class Editor:
         replace_all = False
         wchar, sub_s, tmp_error = '', '', ''
         while str(wchar) != '\x1b':
-            pre_s = f" [{repr(self.search)[1:-1]}]" if self.search else '[]'
+            pre_s = f"[{repr(self.search)[1:-1]}]" if self.search else '[]'
             pre_r = f" [{repr(self.replace)[1:-1]}]" if self.replace else ''
-            rep_a = ' ALL' if replace_all else ''
+            rep_a = 'ALL ' if replace_all else ''
             self._action_render_scr(
-                f"Confirm: 'ENTER' - Replace{rep_a} {pre_s} with{pre_r}: {sub_s}␣", tmp_error)
+                f"Confirm: 'ENTER' - Replace {rep_a}{pre_s} with{pre_r}: {sub_s}␣", tmp_error)
             wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
