@@ -981,6 +981,7 @@ def init(repl: bool = False) -> tuple:
     Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
     Editor.set_flags(u_args[ARGS_STDIN] and on_windows_os, on_windows_os,
                      u_args[ARGS_DEBUG], const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
+                     const_dic[DKW.UNICODE_ESCAPED_EDITOR_REPLACE],
                      arg_parser.file_encoding)
     HexEditor.set_flags(u_args[ARGS_STDIN] and on_windows_os, on_windows_os,
                         u_args[ARGS_DEBUG], const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
