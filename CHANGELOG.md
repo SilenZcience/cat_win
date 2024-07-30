@@ -18,6 +18,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fixed Bug where the hex-editor would crash when switching to plain text search mode.
 - fixed Bug where the hex-editor would wrongly interpret the search query.
 - fixed Bug where the hex-editor would not correctly search for edited bytes.
+- added `^P` hotkey to the editor to replace searched items.
+- added `unicode_escaped_editor_replace` option to the config menu to unicode-escape the replace in the editor.
 
 
 ## [1.8.1] - 2024-07-26
