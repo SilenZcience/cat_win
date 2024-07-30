@@ -128,6 +128,26 @@ class HexEditor:
             if self.debug_mode:
                 err_print(self.error_bar)
 
+    def _get_current_state_row(self, row: int) -> list:
+        """
+        get the current state of the hex row
+        
+        Parameters:
+        row (int):
+            the row to get
+        
+        Returns:
+        hex_row (list):
+            the row in the current edited state
+        """
+        hex_row = []
+        for j, byte in enumerate(self.hex_array[row]):
+            hex_byte = self.hex_array_edit[row][j]
+            if hex_byte is None:
+                hex_byte = byte
+            hex_row.append(hex_byte)
+        return hex_row
+
     def getxymax(self) -> tuple:
         """
         find the size of the window.
@@ -394,11 +414,8 @@ class HexEditor:
         bytes_loaded-= HexEditor.columns
         bytes_loaded+= len(self.hex_array[-1])
         content = b''
-        for i, row in enumerate(self.hex_array):
-            for j, byte in enumerate(row):
-                hex_byte = self.hex_array_edit[i][j]
-                if hex_byte is None:
-                    hex_byte = byte
+        for i in range(len(self.hex_array)):
+            for hex_byte in self._get_current_state_row(i):
                 try:
                     content += bytes.fromhex(hex_byte)
                 except ValueError:
@@ -464,11 +481,11 @@ class HexEditor:
             indicates if the editor should keep running
         """
         def find_bytes(row: int, col: int = 0) -> int:
-            search_in = ''.join(self.hex_array[row][col:])
+            search_in = ''.join(self._get_current_state_row(row)[col:])
             search_wrap = ''
             while len(self.search)-1 > len(search_wrap) and row < len(self.hex_array)-1:
                 row += 1
-                search_wrap += ''.join(self.hex_array[row])
+                search_wrap += ''.join(self._get_current_state_row(row))
             search_in += search_wrap[:len(self.search)-1]
 
             for i in range(0, len(search_in), 2):

@@ -88,6 +88,18 @@ class TestHexEditor(TestCase):
         editor._key_dc(None)
         self.assertEqual(editor.cpos.get_pos(), (0, 0))
 
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 20))
+    def test__get_current_state_row(self):
+        editor = HexEditor('', '')
+        self.assertListEqual(editor._get_current_state_row(0), ['40'] * 16)
+        self.assertListEqual(editor._get_current_state_row(1), ['40'] * 4)
+        editor.hex_array_edit[1][3] = '--'
+        self.assertListEqual(editor._get_current_state_row(0), ['40'] * 16)
+        self.assertListEqual(editor._get_current_state_row(1), ['40'] * 3 + ['--'])
+        editor.hex_array_edit[0][0] = '21'
+        self.assertListEqual(editor._get_current_state_row(0), ['21'] + ['40'] * 15)
+        self.assertListEqual(editor._get_current_state_row(1), ['40'] * 3 + ['--'])
+
     def test__key_dc(self):
         editor = HexEditor(__file__, '')
         hex_array = deepcopy(editor.hex_array)
