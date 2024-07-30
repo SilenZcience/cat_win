@@ -937,6 +937,7 @@ Note that ^c (Ctrl-c) is reserved for the KeyboardInterrupt meaning that it will
 The Auto-Indendation Feature can be turned on in the Config Menu using the `editor_auto_indent` Element.
 The Indendation when using Auto-Indendation can be configured in the Config Menu (<a href="#--config---config">--config, --config</a>) using `editor_indentation`.
 The Input inside the Find Prompt (see Key Bindings) is unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_editor_search` is set but in Case of an unicode-error the Input will simply be used literally.
+The Input inside the Replace Prompt (see Key Bindings) behaves similiar using the Config Option `unicode_escaped_editor_replace`.
 On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module.
 The currently supported Key Bindings are as follows:
 
@@ -961,8 +962,9 @@ The currently supported Key Bindings are as follows:
 | <kbd>Save/^S</kbd> | - | - | save changes | save changes |
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to specific line | - |
 | <kbd>Find/^F</kbd> | - | - | prompt to search in the file | - |
+| <kbd>Find/^P</kbd> | - | - | prompt to replace a search in the file \| toggle to replace all | - |
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
-| <kbd>Insert/^N</kbd> | - | - | Insert a byte sequence | - |
+| <kbd>Insert/^N</kbd> | - | - | Insert a byte sequence \| toggle action menu switch | - |
 | <kbd>Background/^B</kbd> | - | - | put the editor in the background</br>(UNIX only) | - |
 | <kbd>Quit/^Q</kbd> | - | - | close editor</br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^D</kbd> | - | - | interrupt program | - |
@@ -995,9 +997,9 @@ The currently supported Key Bindings are as follows:
 | <kbd>Cut/^X</kbd> | - | - | cut selected bytes | - |
 | <kbd>Save/^S</kbd> | - | - | save changes | save changes |
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to a specific byte | - |
-| <kbd>Find/^F</kbd> | - | - | prompt to search a byte(-sequence) in the file | - |
+| <kbd>Find/^F</kbd> | - | - | prompt to search a byte(-sequence) in the file \| toggle to search text | - |
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
-| <kbd>Insert/^N</kbd> | - | - | insert a text sequence or toggle the find-menu to plain text | - |
+| <kbd>Insert/^N</kbd> | - | - | insert a text sequence \| toggle action menu switch | - |
 | <kbd>Background/^B</kbd> | - | - | put the hex-editor in the background</br>(UNIX only) | - |
 | <kbd>Quit/^Q</kbd> | - | - | close hex-editor</br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^D</kbd> | - | - | interrupt program | - |
@@ -1210,6 +1212,7 @@ Valid Options are:
 | more_step_length | define the Step Length used by <a href="#-m---more">-M, --more</a></br>a Value of 0 is equivalent to the Size/Height of the Terminal Window | 5 | 0 |
 | unicode_escaped_echo | unicode-escape the input when using <a href="#-e---echo">-E, --echo</a> | false | true |
 | unicode_escaped_editor_search | unicode-escape the Search in the Editor (<a href="#----edit">-!, --edit</a>) | false | true |
+| unicode_escaped_editor_replace | unicode-escape the Replacement in the Editor (<a href="#----edit">-!, --edit</a>) | false | true |
 | unicode_escaped_find | unicode-escape the queried Substring when using <a href="#findx-findx">find=X, find&#42889;X</a> | false | true |
 | unicode_escaped_replace | unicode-escape a and b when using <a href="#ab">[a,b]</a> | false | true |
 
