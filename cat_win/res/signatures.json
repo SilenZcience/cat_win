@@ -243,12 +243,6 @@
         ],
         "mime": "plist"
     },
-    "bz": {
-        "signs": [
-            "0,425A"
-        ],
-        "mime": "application/x-compressed"
-    },
     "bz2": {
         "signs": [
             "0,425A68"
@@ -2090,6 +2084,12 @@
         ],
         "mime": "e57"
     },
+    "bz": {
+        "signs": [
+            "0,425A"
+        ],
+        "mime": "application/x-compressed"
+    },
     "tgz": {
         "signs": [
             "0,1F8B08"
@@ -2545,36 +2545,36 @@
         "signs": [
             "0,474B534D"
         ],
-        "mime": "gks" 
+        "mime": "gks"
     },
     "itc": {
         "signs": [
             "0,F10040BB"
         ],
-        "mime": "itc" 
+        "mime": "itc"
     },
     "nif": {
         "signs": [
             "0,49494E31"
         ],
-        "mime": "nif" 
+        "mime": "nif"
     },
     "pm": {
         "signs": [
             "0,56494557"
         ],
-        "mime": "pm" 
+        "mime": "pm"
     },
     "ras": {
         "signs": [
             "0,59A66A95"
         ],
-        "mime": "ras" 
+        "mime": "ras"
     },
     "fig": {
         "signs": [
             "0,23464947"
         ],
-        "mime": "fig" 
+        "mime": "fig"
     }
 }
