@@ -3,12 +3,14 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
-## [1.8.2] - TBA
+## [1.8.2] - 2024-07-31
 
 ### Minor Changes
 
 - the (hex-)editor now displays a message when search queries do not yield any result.
 - updated the file signature lookup table.
+- added `^P` hotkey to the editor to replace searched items.
+- added `unicode_escaped_editor_replace` option to the config menu to unicode-escape the replace in the editor.
 
 ### Bugfixes
 
@@ -18,8 +20,6 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fixed Bug where the hex-editor would crash when switching to plain text search mode.
 - fixed Bug where the hex-editor would wrongly interpret the search query.
 - fixed Bug where the hex-editor would not correctly search for edited bytes.
-- added `^P` hotkey to the editor to replace searched items.
-- added `unicode_escaped_editor_replace` option to the config menu to unicode-escape the replace in the editor.
 
 
 ## [1.8.1] - 2024-07-26
