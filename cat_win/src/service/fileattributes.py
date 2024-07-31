@@ -61,12 +61,9 @@ class Signatures:
             signatures_json = Signatures.signatures
         except OSError:
             return 'lookup failed!'
-        # l = 0 # NOTE: find the length of the prefix that needs to be read
         for ext, signature in signatures_json.items():
             for sign in signature['signs']:
                 offset, sig = sign.split(',')
-                # if int(offset)+len(sig)//2 > l: # NOTE: prefix
-                #     l = int(offset)+len(sig)//2
                 sig_distance = len(sig) - len(file_prefix) + int(offset)*2
                 if sig_distance > 0: # adjust prefix in case not enough was read
                     file_prefix += file_.read(sig_distance//2).hex().upper()
@@ -78,10 +75,9 @@ class Signatures:
                         file_signature_secondary.append((signature_option, len(sig)))
                     encountered_sig.add(sig)
                     break
-        # print(l) # NOTE: prefix
         file_.close()
-
-        file_signature_secondary.sort(key=lambda x: x[1]) # sort by matched signature length
+        # sort by matched signature length
+        file_signature_secondary.sort(key=lambda x: x[1], reverse=True)
         file_signature_secondary = [fs for fs, _ in file_signature_secondary]
         if file_signature_primary and file_signature_secondary:
             return file_signature_primary + ' [' + ';'.join(file_signature_secondary) + ']'
