@@ -51,6 +51,7 @@ class Signatures:
         encountered_sig = set()
 
         file_ext = os.path.splitext(file)[1][1:]
+        file_ = None
         try:
             file_ = open(file, 'rb')
             file_prefix = file_.read(348).hex().upper()
@@ -60,6 +61,8 @@ class Signatures:
                     Signatures.signatures = json.load(sig)
             signatures_json = Signatures.signatures
         except OSError:
+            if file_ is not None:
+                file_.close()
             return 'lookup failed!'
         for ext, signature in signatures_json.items():
             for sign in signature['signs']:
