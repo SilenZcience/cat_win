@@ -439,3 +439,60 @@ class History:
                 break
         # print('Redo ', list(map(str, self._stack_undo)))
         # print('     ', list(map(str, self._stack_redo)))
+
+
+class _SearchIter:
+    """
+    inspired by:
+    # -------- https://github.com/asottile/babi -------- #
+    """
+    def __init__(self, editor, offset: int) -> None:
+        self.editor = editor
+        self.offset = offset
+        self.wrapped = False
+        self._start_y = editor.cpos.row
+        self._start_x = editor.cpos.col + offset
+        self._offset = 0
+        self.yielded_result = False
+
+    def __iter__(self):
+        return self
+
+    def _stop_if_past_original(self, row: int, f_col: int) -> tuple:
+        if self.wrapped and (
+            row > self._start_y or
+            row == self._start_y and f_col >= self._start_x + self._offset
+            ):
+            raise StopIteration()
+        if self.wrapped and row == self._start_y:
+            self._offset += len(self.editor.replace)-len(self.editor.search)
+        self.yielded_result = True
+        return (row, f_col)
+
+    def __next__(self) -> tuple:
+        row = self.editor.cpos.row
+        col = self.editor.cpos.col + self.offset
+
+        found_pos = self.editor.window_content[row][col:].find(self.editor.search)
+        if found_pos >= 0:
+            return self._stop_if_past_original(row, found_pos+col)
+        if self.wrapped:
+            for line_y in range(row + 1, self._start_y + 1):
+                found_pos = self.editor.window_content[line_y].find(self.editor.search)
+                if found_pos >= 0:
+                    return self._stop_if_past_original(line_y, found_pos)
+        else:
+            content_len = -1
+            while content_len != len(self.editor.window_content):
+                content_len = len(self.editor.window_content)
+                for line_y in range(row + 1, len(self.editor.window_content)):
+                    found_pos = self.editor.window_content[line_y].find(self.editor.search)
+                    if found_pos >= 0:
+                        return self._stop_if_past_original(line_y, found_pos)
+                self.editor._build_file_upto(content_len+30)
+            self.wrapped = True
+            for line_y in range(0, self._start_y + 1):
+                found_pos = self.editor.window_content[line_y].find(self.editor.search)
+                if found_pos >= 0:
+                    return self._stop_if_past_original(line_y, found_pos)
+        raise StopIteration()

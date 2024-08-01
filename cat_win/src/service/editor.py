@@ -12,9 +12,9 @@ import signal
 import sys
 import unicodedata
 
-from cat_win.src.service.helper.editorhelper import History, Position, UNIFY_HOTKEYS, \
-    KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, SELECT_HOTKEYS, \
-        HISTORY_HOTKEYS, INDENT_HOTKEYS, HEX_BYTE_KEYS
+from cat_win.src.service.helper.editorhelper import History, Position, _SearchIter, \
+    UNIFY_HOTKEYS,KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, \
+        SELECT_HOTKEYS, HISTORY_HOTKEYS, INDENT_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
 from cat_win.src.service.clipboard import Clipboard
 from cat_win.src.service.rawviewer import SPECIAL_CHARS
@@ -665,29 +665,6 @@ class Editor:
                 break
         return True
 
-    def _jump_to_next_find(self, offset: int = 1, block: int = None) -> bool:
-        # check current line
-        if self.search in self.window_content[self.cpos.row][self.cpos.col+offset:]:
-            self.cpos.col += \
-                self.window_content[self.cpos.row][self.cpos.col+offset:].find(self.search)+offset
-            return True
-        # check rest of file until back at current line
-        c_row = self.cpos.row
-        while c_row < self.cpos.row+len(self.window_content):
-            if c_row+1 >= len(self.window_content):
-                self._build_file_upto(c_row+30)
-            c_row += 1
-            c_row_wrapped = c_row%len(self.window_content)
-            if block is not None and c_row_wrapped == block:
-                return False
-            if self.search in self.window_content[c_row_wrapped]:
-                self.cpos.row = c_row_wrapped
-                self.cpos.col = self.window_content[c_row_wrapped].find(self.search)
-                break
-        else:
-            return False
-        return True
-
     def _action_find(self) -> bool:
         """
         handles the find in editor action.
@@ -731,9 +708,11 @@ class Editor:
                     except UnicodeError:
                         pass
                 self.search = sub_s if sub_s else self.search
-                if self._jump_to_next_find():
+                try:
+                    self.cpos.set_pos(next(iter(_SearchIter(self, 1))))
                     break
-                tmp_error = 'no matches were found!'
+                except StopIteration:
+                    tmp_error = 'no matches were found!'
         return True
 
     def _action_replace(self) -> bool:
@@ -793,22 +772,13 @@ class Editor:
                     except UnicodeError:
                         pass
                 self.replace = sub_s if sub_s else self.replace
-                len_diff, len_offset = len(self.replace)-len(self.search), 0
-                start_row, start_col = self.cpos.get_pos()
-                if self._jump_to_next_find(0):
+                search = _SearchIter(self, 0)
+                for found_row, found_col in search:
+                    self.cpos.set_pos((found_row,found_col))
                     self._replace_search(self.search, self.replace)
                     if not replace_all:
                         break
-                    while self._jump_to_next_find(0, start_row):
-                        self._replace_search(self.search, self.replace)
-                    current_pos = self.cpos.get_pos()
-                    while self._jump_to_next_find(0, (start_row+1)%len(self.window_content)):
-                        if start_col+len_offset <= self.cpos.col:
-                            self.cpos.set_pos(current_pos)
-                            break
-                        self._replace_search(self.search, self.replace)
-                        current_pos = self.cpos.get_pos()
-                        len_offset += len_diff
+                if search.yielded_result:
                     break
                 tmp_error = 'no matches were found!'
         return True
@@ -1243,7 +1213,8 @@ class Editor:
         curses.noecho()
         curses.cbreak()
 
-        # --------https://github.com/asottile/babi/blob/main/babi/main.py-------- #
+        # inspired by:
+        # -------- https://github.com/asottile/babi -------- #
         # set the escape delay so curses does not pause waiting for sequences
         if (
                 sys.version_info >= (3, 9) and
