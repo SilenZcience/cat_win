@@ -665,7 +665,7 @@ class Editor:
                 break
         return True
 
-    def _jump_to_next_find(self, offset: int = 1) -> bool:
+    def _jump_to_next_find(self, offset: int = 1, block: int = None) -> bool:
         # check current line
         if self.search in self.window_content[self.cpos.row][self.cpos.col+offset:]:
             self.cpos.col += \
@@ -678,6 +678,8 @@ class Editor:
                 self._build_file_upto(c_row+30)
             c_row += 1
             c_row_wrapped = c_row%len(self.window_content)
+            if block is not None and c_row_wrapped == block:
+                return False
             if self.search in self.window_content[c_row_wrapped]:
                 self.cpos.row = c_row_wrapped
                 self.cpos.col = self.window_content[c_row_wrapped].find(self.search)
@@ -791,12 +793,22 @@ class Editor:
                     except UnicodeError:
                         pass
                 self.replace = sub_s if sub_s else self.replace
+                len_diff, len_offset = len(self.replace)-len(self.search), 0
+                start_row, start_col = self.cpos.get_pos()
                 if self._jump_to_next_find(0):
                     self._replace_search(self.search, self.replace)
                     if not replace_all:
                         break
-                    while self._jump_to_next_find(0):
+                    while self._jump_to_next_find(0, start_row):
                         self._replace_search(self.search, self.replace)
+                    current_pos = self.cpos.get_pos()
+                    while self._jump_to_next_find(0, (start_row+1)%len(self.window_content)):
+                        if start_col+len_offset <= self.cpos.col:
+                            self.cpos.set_pos(current_pos)
+                            break
+                        self._replace_search(self.search, self.replace)
+                        current_pos = self.cpos.get_pos()
+                        len_offset += len_diff
                     break
                 tmp_error = 'no matches were found!'
         return True
