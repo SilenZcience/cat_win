@@ -464,6 +464,7 @@ class Editor:
         self.window_content[self.cpos.row] = self.window_content[self.cpos.row][:self.cpos.col] + \
             r_with + self.window_content[self.cpos.row][self.cpos.col+len(r_this):]
         self.cpos.col += len(r_with)
+        self.unsaved_progress = True
 
     def _key_replace_search_(self, r_this: str, r_with: str) -> str:
         self.cpos.col -= len(r_with)
@@ -472,13 +473,11 @@ class Editor:
     def _replace_search(self, r_this: str, r_with: str) -> None:
         pre_cpos = self.cpos.get_pos()
         pre_spos = self.spos.get_pos()
-        pre_selecting = self.selecting
         self._key_replace_search(r_this, r_with)
-        self.selecting = False
         self.history.add(b'_key_replace_search', False,
                             pre_cpos, self.cpos.get_pos(),
                             pre_spos, self.spos.get_pos(),
-                            pre_selecting, self.selecting,
+                            False, False,
                             r_this, r_with)
 
     def _key_remove_selected(self, _) -> str:
@@ -489,6 +488,7 @@ class Editor:
             self.window_content[sel_from_y] = \
                 self.window_content[sel_from_y][:sel_from_x] + \
                 self.window_content[sel_from_y][sel_to_x:]
+            self.unsaved_progress = True
             return deleted
         deleted = self.window_content[sel_from_y][sel_from_x:]
         self.window_content[sel_from_y] = self.window_content[sel_from_y][:sel_from_x]
@@ -499,6 +499,7 @@ class Editor:
         deleted += '\n' + deleted_middle + self.window_content[sel_from_y+1][:sel_to_x]
         self.window_content[sel_from_y] += self.window_content[sel_from_y+1][sel_to_x:]
         del self.window_content[sel_from_y+1]
+        self.unsaved_progress = True
         return deleted
 
     def _key_add_selected(self, wchars_: str) -> str:
@@ -520,7 +521,6 @@ class Editor:
         pre_spos = self.spos.get_pos()
         pre_selecting = self.selecting
         action_text = self._key_remove_selected(None)
-        self.selecting = False
         self.history.add(b'_key_remove_selected', '\n' in action_text,
                             pre_cpos, self.cpos.get_pos(),
                             pre_spos, self.spos.get_pos(),
