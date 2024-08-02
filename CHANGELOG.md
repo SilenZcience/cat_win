@@ -7,7 +7,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ### Bugfixes
 
-- fixed Bug where the editor would get unresponsive.
+- fixed Bug where the editor would get unresponsive when replacing all.
+- fixed Bug where the editor would not count replacing and cutting as making changes.
+- fixed Bug where the editor would perform certain actions twice when in selection mode.
+- fixed Bug where the editor would have the wrong selection position when using undo/redo.
 
 
 ## [1.8.2] - 2024-07-31
