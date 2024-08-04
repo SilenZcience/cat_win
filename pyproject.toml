@@ -10,11 +10,11 @@ readme = "README.md"
 license = {file = "LICENSE"}
 keywords = [
     "cat",
-    "cli",
-    "console",
-    "crossplatform",
-    "python",
-    "terminal",
+    "analytics",
+    "texteditor",
+    "hexeditor",
+    "command-line-tool",
+    "textprocessing"
 ]
 classifiers = [
     "License :: OSI Approved :: MIT License",
@@ -27,6 +27,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
     "Environment :: Console",
     "Environment :: Console :: Curses",
@@ -63,7 +64,8 @@ catw = "cat_win.__main__:entry_point"
 cats = "cat_win.__main__:repl_entry_point"
 
 [project.urls]
-Github = "https://github.com/SilenZcience/cat_win"
+Changelog = "https://github.com/SilenZcience/cat_win/blob/main/CHANGELOG.md#changelog"
 Documentation = "https://github.com/SilenZcience/cat_win/blob/main/DOCUMENTATION.md#cat_win"
 Download = "https://github.com/SilenZcience/cat_win/tarball/master"
+Github = "https://github.com/SilenZcience/cat_win"
 Issues = "https://github.com/SilenZcience/cat_win/issues"
