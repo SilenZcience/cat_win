@@ -202,7 +202,7 @@ def _show_version(repl: bool = False) -> None:
 
 
 def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files: list,
-                echo_args: str, valid_urls: list) -> None:
+                echo_args: str, known_dirs: list, valid_urls: list) -> None:
     """
     Print all neccassary debug information
     """
@@ -220,6 +220,8 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     err_print(unknown_files)
     err_print('echo_args: ', end='')
     err_print(repr(echo_args))
+    err_print('known_directories: ', end='')
+    err_print(known_dirs)
     err_print('valid_urls: ', end='')
     err_print(valid_urls)
     err_print('file encoding: ', end='')
@@ -954,7 +956,8 @@ def init(repl: bool = False) -> tuple:
 
     # check for special cases
     if u_args[ARGS_DEBUG]:
-        _show_debug(u_args.args, arg_suggestions, known_files, unknown_files, echo_args, valid_urls)
+        _show_debug(u_args.args, arg_suggestions, known_files,
+                    unknown_files, echo_args, arg_parser.get_dirs(), valid_urls)
     if (len(known_files) + len(unknown_files) + len(u_args) == 0 and not repl) or \
         u_args[ARGS_HELP]:
         _show_help(repl)
