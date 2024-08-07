@@ -819,12 +819,12 @@ def edit_files() -> None:
             print_raw_view(i, raw_view_mode)
         else:
             edit_file(i)
-    if u_args[ARGS_FILES]:
+    if u_args[ARGS_FILES] or u_args[ARGS_DIRECTORIES]:
         print()
-        Summary.show_files(u_args[ARGS_FFILES], u_files.files)
-    if u_args[ARGS_DIRECTORIES]:
-        print()
-        Summary.show_dirs(arg_parser.get_dirs())
+        if u_args[ARGS_FILES]:
+            Summary.show_files(u_args[ARGS_FFILES], u_files.files)
+        if u_args[ARGS_DIRECTORIES]:
+            Summary.show_dirs(arg_parser.get_dirs())
     if u_args[ARGS_SUM]:
         print()
         Summary.show_sum(u_args[ARGS_SSUM], u_files.all_files_lines,
@@ -1053,11 +1053,11 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
             for file in known_files:
                 HexEditor.open(file, u_files.get_file_display_name(file))
 
-    if u_args[ARGS_FFILES]:
-        Summary.show_files(u_args[ARGS_FFILES], u_files.files)
-        return
-    if u_args[ARGS_DDIRECTORIES]:
-        Summary.show_dirs(arg_parser.get_dirs())
+    if u_args[ARGS_FFILES] or u_args[ARGS_DDIRECTORIES]:
+        if u_args[ARGS_FFILES]:
+            Summary.show_files(u_args[ARGS_FFILES], u_files.files)
+        if u_args[ARGS_DDIRECTORIES]:
+            Summary.show_dirs(arg_parser.get_dirs())
         return
     if u_args[ARGS_DATA] or u_args[ARGS_CHECKSUM]:
         _print_meta_and_checksum(u_args[ARGS_DATA], u_args[ARGS_CHECKSUM])
