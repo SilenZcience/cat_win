@@ -5,7 +5,10 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "cat_win"
 requires-python = ">=3.6"
-authors = [{name = "Silas A. Kraume", email = "silas.kraume1552@gmail.com"}]
+authors = [
+    {name = "Silas A. Kraume"},
+    {email = "silas.kraume1552@gmail.com"}
+]
 readme = "README.md"
 license = {file = "LICENSE"}
 keywords = [
@@ -64,6 +67,7 @@ catw = "cat_win.__main__:entry_point"
 cats = "cat_win.__main__:repl_entry_point"
 
 [project.urls]
+Homepage = "https://github.com/SilenZcience/cat_win"
 Changelog = "https://github.com/SilenZcience/cat_win/blob/main/CHANGELOG.md#changelog"
 Documentation = "https://github.com/SilenZcience/cat_win/blob/main/DOCUMENTATION.md#cat_win"
 Download = "https://github.com/SilenZcience/cat_win/tarball/master"
