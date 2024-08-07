@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.8.4] - TBA
+
+### Minor Changes
+
+- display the size of directories when using -`d`, --`dirs`.
+- allow -`f`, --`files` and -`d`, --`dirs` to be used simultaneously.
+- allow wildcard characters `?` and ranges `[_-_]` to be used in file pattern to provide a full unix style pathname pattern expansion.
+
+
 ## [1.8.3] - 2024-08-02
 
 ### Bugfixes
