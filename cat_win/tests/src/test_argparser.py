@@ -6,9 +6,9 @@ from cat_win.src.argparser import ArgParser
 # import sys
 # sys.path.append('../cat_win')
 
-test_file_dir = os.path.join(os.path.dirname(__file__), '..')
-project_dir = os.path.join(test_file_dir, '..')
-test_text_file_dir = os.path.join(test_file_dir, 'texts')
+test_file_dir = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
+project_dir = os.path.realpath(os.path.join(test_file_dir, '..'))
+test_text_file_dir = os.path.realpath(os.path.join(test_file_dir, 'texts'))
 
 
 class TestArgParser(TestCase):
@@ -50,23 +50,23 @@ class TestArgParser(TestCase):
     def test_get_arguments_concatenated_unknown(self):
         arg_parser = ArgParser()
         args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(
-            ['CAT', '-+abce?fϵg'])
+            ['CAT', '-+abcefϵg'])
         known_files = arg_parser.get_files()
         args = list(map(lambda x: x[1], args))
         self.assertCountEqual(args, ['-a', '-b', '-c', '-e', '-f', '-g'])
-        self.assertCountEqual(unknown_args, ['-+', '-?', '-ϵ'])
+        self.assertCountEqual(unknown_args, ['-+', '-ϵ'])
         self.assertCountEqual(known_files, [])
         self.assertCountEqual(unknown_files, [])
         self.assertCountEqual(echo_args, [])
 
-    def test_get_arguments_concatenated_invalid(self):
+    def test_get_arguments_invalid(self):
         arg_parser = ArgParser()
         args, unknown_args, unknown_files, echo_args = arg_parser.get_arguments(
-            ['CAT', '--abcde?fg'])
+            ['CAT', '--abcdefg'])
         known_files = arg_parser.get_files()
         args = list(map(lambda x: x[1], args))
         self.assertCountEqual(args, [])
-        self.assertCountEqual(unknown_args, ['--abcde?fg'])
+        self.assertCountEqual(unknown_args, ['--abcdefg'])
         self.assertCountEqual(known_files, [])
         self.assertCountEqual(unknown_files, [])
         self.assertCountEqual(echo_args, [])
@@ -216,6 +216,7 @@ class TestArgParser(TestCase):
         inside_project_dirs = [
             'src',
             'tests',
+            'res',
         ]
         inside_test_dirs = [
             'mocks',
@@ -225,14 +226,19 @@ class TestArgParser(TestCase):
         ]
 
         arg_parser = ArgParser()
-        arg_parser._add_argument(test_file_dir)
+        arg_parser._add_argument(test_file_dir + '/*')
         arg_parser.get_files()
         dirs = '\n'.join(map(os.path.basename, arg_parser.get_dirs()))
         for _dir in inside_test_dirs:
             self.assertIn(_dir, dirs)
 
         arg_parser = ArgParser()
-        arg_parser._add_argument(project_dir)
+        arg_parser._add_argument(test_file_dir)
+        arg_parser.get_files()
+        self.assertListEqual([test_file_dir], arg_parser.get_dirs())
+
+        arg_parser = ArgParser()
+        arg_parser._add_argument(project_dir + '/*')
         arg_parser.get_files()
         dirs = '\n'.join(map(os.path.basename, arg_parser.get_dirs()))
         for _dir in inside_project_dirs:
