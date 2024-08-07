@@ -138,7 +138,6 @@ def read_attribs(file: str) -> list:
          ['Encrypted', bool(attrs & E)]]
     )
 
-
 def get_file_size(file: str) -> int:
     """
     calculate the size of a file
@@ -156,6 +155,29 @@ def get_file_size(file: str) -> int:
     except OSError:
         return 0
 
+def get_dir_size(directory: str) -> int:
+    """
+    calculate the size of a directory
+    
+    Parameters:
+    directory (str):
+        a string representation of a dir (-path)
+        
+    Returns:
+    total (int):
+        the size in bytes or 0 if an (OS-)error occurs
+    """
+    total = 0
+    try:
+        with os.scandir(directory) as it:
+            for entry in it:
+                if entry.is_file():
+                    total += entry.stat().st_size
+                elif entry.is_dir():
+                    total += get_dir_size(entry.path)
+    except OSError:
+        pass
+    return total
 
 def get_file_mtime(file: str) -> float:
     """
@@ -169,7 +191,6 @@ def get_file_mtime(file: str) -> float:
         return os.stat(file).st_mtime
     except OSError:
         return 0.0
-
 
 def get_file_meta_data(file: str, res_path: str, on_windows_os: bool, colors = None) -> str:
     """
