@@ -5,7 +5,7 @@ summary
 from itertools import groupby
 
 from cat_win.src.const.regex import TOKENIZER
-from cat_win.src.service.fileattributes import get_file_size, _convert_size
+from cat_win.src.service.fileattributes import get_file_size, get_dir_size, _convert_size
 from cat_win.src.service.helper.iohelper import IoHelper
 
 
@@ -80,16 +80,21 @@ class Summary:
             print('No directores have been found!', end='')
             print(Summary.color_reset)
             return
+        dir_sizes = []
         print(Summary.color, end='')
         print('found DIR(s):', end='')
         print(Summary.color_reset)
         for directory in known_directories:
+            dir_sizes.append(get_dir_size(directory))
             print(f"     {Summary.color}" + \
-                f"{directory}{Summary.color_reset}")
+                f"{str(_convert_size(dir_sizes[-1]).rjust(9))}", end='')
+            print(f"  {directory}{Summary.color_reset}")
+        print(Summary.color, end='')
+        print(f"Sum: {str(_convert_size(sum(dir_sizes))).rjust(9)}", end='')
+        print(Summary.color_reset)
         print(Summary.color, end='')
         print(f"Amount:\t{len(known_directories)}", end='')
         print(Summary.color_reset)
-
 
     @staticmethod
     def show_sum(detailed: bool, all_files_lines: dict, all_line_number_place_holder: int,
