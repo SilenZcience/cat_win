@@ -205,7 +205,7 @@ following: 1
             self.assertIn(contains, fake_out.getvalue())
 
     @patch('sys.argv',
-           ['<CAT>', test_file_path, 'trunc=0:0', '--UNIQUE', '--b64', '-?'])
+           ['<CAT>', test_file_path, 'trunc=0:0', '--UNIQUE', '--b64', '-+'])
     def test_cat_output_suggestions(self):
         with patch('sys.stderr', new=StdOutMock()) as fake_out:
             cat.main()
@@ -213,7 +213,7 @@ following: 1
             self.assertIn("Did you mean --unique", fake_out.getvalue())
             self.assertIn("Unknown argument: '--b64'", fake_out.getvalue())
             self.assertIn("Did you mean --b64d or --b64e", fake_out.getvalue())
-            self.assertIn("Unknown argument: '-?'", fake_out.getvalue())
+            self.assertIn("Unknown argument: '-+'", fake_out.getvalue())
 
     @patch('sys.argv', ['<CAT>', test_file_path, '--GREP', 'find=T'])
     def test_cat_output_grep_upper(self):

@@ -10,7 +10,7 @@ from cat_win.src.const.regex import compile_re
 from cat_win.src.const.regex import RE_ENCODING, RE_MATCH, RE_M_ATCH, RE_FIND, RE_F_IND
 from cat_win.src.const.regex import RE_TRUNC, RE_CUT, RE_REPLACE, RE_REPLACE_COMMA
 
-IS_FILE, IS_DIR, IS_PATTERN = range(0, 3)
+IS_FILE, IS_DIR, IS_DIR_CONTENT, IS_PATTERN = range(0, 4)
 
 
 class ArgParser:
@@ -117,11 +117,11 @@ class ArgParser:
             if struct_type == IS_FILE:
                 self._known_files.append(structure)
             elif struct_type == IS_DIR:
+                self._known_directories.append(structure)
+            elif struct_type == IS_DIR_CONTENT:
                 for filename in glob.iglob(structure):
                     if os.path.isfile(filename):
                         self._known_files.append(os.path.realpath(filename))
-                    else:
-                        self._known_directories.append(filename)
             elif struct_type == IS_PATTERN:
                 for _filename in glob.iglob(structure, recursive=True):
                     filename = os.path.realpath(_filename)
@@ -212,8 +212,9 @@ class ArgParser:
         if os.path.isfile(possible_path):
             self._known_file_structures.append((IS_FILE, possible_path))
         elif os.path.isdir(possible_path):
-            self._known_file_structures.append((IS_DIR, possible_path + '/**'))
-        elif '*' in param:
+            self._known_file_structures.append((IS_DIR, possible_path))
+            self._known_file_structures.append((IS_DIR_CONTENT, possible_path + '/*'))
+        elif '*' in param or '?' in param or '[' in param:
             # matches file-patterns, not directories (e.g. *.txt)
             self._known_file_structures.append((IS_PATTERN, param))
         elif len(param) > 2 and param[0] == '-' != param[1]:
