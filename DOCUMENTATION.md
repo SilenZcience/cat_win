@@ -568,7 +568,7 @@ Amount: 1
 
 ### <a id="-d---dirs">-d, --dirs</a>
 
-Displays a small Summary at the End of Code Execution showing every Directory found.
+Displays a small Summary at the End of Code Execution showing every Directory found and their Folder Size.
 Using this Argument in Uppercase (-D, --DIRS) will ONLY display the Summary and stop Code Execution.
 
 ```console
