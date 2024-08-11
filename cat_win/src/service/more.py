@@ -40,6 +40,25 @@ class More:
 
     def __init__(self, lines: list = None) -> None:
         self.lines = lines if lines else []
+        self._f_content_gen = None
+        self.lazy_load = False
+
+    def lazy_load_file(self, file: str, file_encoding: str = 'utf-8',
+                       errors: str = 'strict') -> None:
+        """
+        setup necessary data for lazy loading a file
+        
+        Parameters
+        file (str):
+            a file path
+        file_encoding (str):
+            the encoding to use
+        errors (str):
+            the error setting to open the file with
+        """
+        self.lazy_load = True
+        self._f_content_gen = IoHelper.yield_file(file, False, file_encoding, errors)
+        self._build_file_upto(More.t_height)
 
     def add_line(self, line: str) -> None:
         """
@@ -60,6 +79,20 @@ class More:
             the list of lines to append
         """
         self.lines += lines
+
+    def _build_file_upto(self, to_row: int) -> int:
+        if not self.lazy_load:
+            return len(self.lines)
+        if to_row < 0:
+            self.lines += list(self._f_content_gen)
+            return len(self.lines)
+        if len(self.lines) >= to_row:
+            return len(self.lines)
+        for line in self._f_content_gen:
+            self.lines.append(line)
+            if len(self.lines) >= to_row:
+                break
+        return len(self.lines)
 
     @staticmethod
     def _pause_output(percentage: int, info: str, clear_size: int = 0) -> str:
@@ -198,7 +231,8 @@ class More:
                                 # map negative numbers to positive ones, so the
                                 # percentage is correct
                                 elif line_index < -2:
-                                    line_index = i_length+line_index+1
+                                    i_length = self._build_file_upto(-1)
+                                    line_index = max(i_length+line_index+1, -1)
                             except ValueError:
                                 info = f"invalid input: {ijump}"
                                 continue
@@ -213,6 +247,7 @@ class More:
                         break
 
             line_index += 1
+            i_length = self._build_file_upto(line_index+max(More.t_height, step_length))
 
     def step_through(self, dup_needed: bool = False) -> None:
         """
