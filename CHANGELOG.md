@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.8.5] - TBA
+
+### Minor Changes
+
+- added -`L`, --`less` parameter to lazily page through a file step by step and pause output each step.
+
+### Bugfixes
+
+- fixed Bug where -`M`, --`more` would crash when jumping out of bounds.
+
+
 ## [1.8.4] - 2024-08-08
 
 ### Minor Changes
