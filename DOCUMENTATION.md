@@ -87,6 +87,7 @@
             <li><a href="#----edit">-!, --edit</a></li>
             <li><a href="#----hexedit">-#, --hexedit</a></li>
             <li><a href="#-m---more">-M, --more</a></li>
+            <li><a href="#-l---less">-L, --less</a></li>
             <li><a href="#-b---raw">-B, --raw</a></li>
             <li><a href="#--visb---visualizeb">--visb, --visualizeb</a></li>
             <li><a href="#--visz---visualizez">--visz, --visualizez</a></li>
@@ -181,6 +182,7 @@
 | *<a href="#----edit">-!, --edit</a>* | open each file in a simple editor |❌|
 | *<a href="#----hexedit">-#, --hexedit</a>* | open each file in a simple hex-editor |❌|
 | *<a href="#-m---more">-M, --more</a>* | page through the file step by step |❌|
+| *<a href="#-l---less">-L, --less</a>* | page through the file step by step (lazy)|❌|
 | *<a href="#-b---raw">-B, --raw</a>* | open the file as raw bytes |❌|
 ||||
 | *<a href="#--visb---visualizeb">--visb, --visualizeb</a>* | visualize the data using scan curve byte view |❌|
@@ -1011,6 +1013,41 @@ Each Step the Output is paused until User Interaction.
 The first Step always fills the entire Screen.
 The following Steps have the Size as defined by the Config Element `more_step_length`.
 Display the available Commands by entering `?` or `h` or `help`.
+
+```console
+> catw file -M
+line 1
+line 2
+...
+line 29
+> -- More ( 6%) --
+line 30
+...
+> -- More (11%) --
+...
+```
+```console
+> catw file -M
+...
+> --More (10%) -- ?
+H HELP       display this help message
+Q QUIT       quit
+N NEXT       skip to next file
+L LINE       display current line number
+D DOWN <x>   step x lines down
+S SKIP <x>   skip x lines
+J JUMP <x>   jump to line x
+...
+```
+
+### <a id="-l---less">-L, --less</a>
+
+Page through the File Contents Step by Step.
+Each Step the Output is paused until User Interaction.
+The first Step always fills the entire Screen.
+The following Steps have the Size as defined by the Config Element `more_step_length`.
+Display the available Commands by entering `?` or `h` or `help`.
+As opposed to the <a href="#-m---more">-M, --more</a> Parameter, every other Argument will be ignored and the File will be loaded lazily, resulting in a very fast loading Time.
 
 ```console
 > catw file -M
