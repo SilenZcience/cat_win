@@ -726,12 +726,6 @@ def edit_file(file_index: int = 0) -> None:
         raw_content = IoHelper.read_file(u_files[file_index].path, True)
         edit_raw_content(raw_content, file_index)
         return
-    if u_args[ARGS_LESS]:
-        stepper = More()
-        stepper.lazy_load_file(u_files[file_index].path, arg_parser.file_encoding,
-                               'ignore' if const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace')
-        stepper.step_through(u_args[ARGS_STDIN])
-        return
     content = []
     try:
         file_content = IoHelper.read_file(u_files[file_index].path, False,
@@ -1091,6 +1085,17 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
     if u_args[ARGS_VISUALIZE_D]:
         vis = Visualizer([f.path for f in u_files], 'DigraphDotPlotView', arg_parser.file_truncate)
         vis.visualize_files()
+        return
+
+    if u_args[ARGS_LESS]:
+        for file in u_files:
+            stepper = More()
+            stepper.lazy_load_file(file.path, arg_parser.file_encoding,
+                                'ignore' if const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace')
+            try:
+                stepper.step_through(u_args[ARGS_STDIN])
+            except SystemExit:
+                break
         return
 
     file_size_sum = 0
