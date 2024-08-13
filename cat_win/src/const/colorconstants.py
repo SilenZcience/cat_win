@@ -2,7 +2,7 @@
 colorconstants
 """
 
-from cat_win.src.const.escapecodes import id_to_color_code
+from cat_win.src.const.escapecodes import color_code_8_16
 
 
 class ColorOptions:
@@ -60,11 +60,11 @@ class ColorOptions:
     Style = {'NONE': ''}
 
     for key, _ in __Fore.items():
-        Fore[key]  = id_to_color_code(__Fore[key])
+        Fore[key]  = color_code_8_16(__Fore[key])
     for key, _ in __Back.items():
-        Back[key]  = id_to_color_code(__Back[key])
+        Back[key]  = color_code_8_16(__Back[key])
     for key, _ in __Style.items():
-        Style[key] = id_to_color_code(__Style[key])
+        Style[key] = color_code_8_16(__Style[key])
 
     del __Fore
     del __Back
@@ -104,7 +104,7 @@ class CPB:
     """
     COLOR_FULL  = ColorOptions.Fore['LIGHTGREEN']
     COLOR_EMPTY = ColorOptions.Fore['LIGHTMAGENTA']
-    # COLOR_EMPTY = '\x1b[38;2;255;71;156m'
+    # COLOR_EMPTY = color_code_truecolor(255, 71, 156)
     COLOR_RESET = ColorOptions.Style['RESET']
 
     @staticmethod

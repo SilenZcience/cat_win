@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from cat_win.src.const.colorconstants import id_to_color_code, ColorOptions, CVis, CPB
+from cat_win.src.const.colorconstants import color_code_8_16, ColorOptions, CVis, CPB
 # import sys
 # sys.path.append('../cat_win')
 
@@ -8,8 +8,8 @@ from cat_win.src.const.colorconstants import id_to_color_code, ColorOptions, CVi
 class TestArgConstants(TestCase):
     maxDiff = None
 
-    def test_id_to_color_code(self):
-        self.assertEqual(id_to_color_code(30), '\x1b[30m')
+    def test_color_code_8_16(self):
+        self.assertEqual(color_code_8_16(30), '\x1b[30m')
 
     def test_unique_colors(self):
         all_colors_keys = list(ColorOptions.Fore.keys()) + \
