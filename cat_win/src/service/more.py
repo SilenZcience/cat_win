@@ -6,6 +6,7 @@ import os
 import shutil
 import sys
 
+from cat_win.src.const.escapecodes import ESC_CODE, LINE_MOVE_UP, LINE_ERASE
 from cat_win.src.service.helper.iohelper import IoHelper
 
 
@@ -103,7 +104,7 @@ class More:
         else:
             padding = '-' * ((More.t_width-7)//2)
             print(padding + 'cat_win' + '-' * (More.t_width-7-len(padding)), end='')
-        print('\x1b[1F', end='', flush=True) # move up to input() line
+        print(LINE_MOVE_UP, end='', flush=True) # move up to input() line
         try:
             user_input = input(
                 f"-- More ({percentage: >2}%){('['+info+']') if info else ''} -- "
@@ -114,8 +115,8 @@ class More:
             user_input = 'INTERRUPT'
         if not os.isatty(sys.stdin.fileno()) or user_input == 'INTERRUPT':
             print() # emulate enter-press on piped input
-        print('\x1b[2K\x1b[1F\x1b[2K', end='') # clear bottom & input() line
-        print('\x1b[1F\x1b[2K' * clear_size, end='', flush=True) # clear lines above
+        print(f"{LINE_ERASE}{LINE_MOVE_UP}{LINE_ERASE}", end='') # clear bottom & input() line
+        print(f"{LINE_MOVE_UP}{LINE_ERASE}" * clear_size, end='', flush=True) # clear lines above
         return user_input
 
     @staticmethod
@@ -131,7 +132,7 @@ class More:
             if escape_sequence:
                 escape_sequence = not char.isalpha()
                 continue
-            if char == '\x1b':
+            if char == ESC_CODE:
                 escape_sequence = True
                 continue
             sub_length += 1

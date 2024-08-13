@@ -11,6 +11,7 @@ import os
 import signal
 import sys
 
+from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.service.helper.editorhelper import Position, UNIFY_HOTKEYS, \
     KEY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, SELECT_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
@@ -446,7 +447,7 @@ class HexEditor:
             indicates if the editor should keep running
         """
         wchar, l_jmp = '', ''
-        while str(wchar).upper() not in ['\x1b', 'N']:
+        while str(wchar).upper() not in [ESC_CODE, 'N']:
             self._action_render_scr(f"Confirm: [y]es, [n]o - Jump to byte: 0x{l_jmp}␣")
             wchar, key = self._get_next_char()
             if key in ACTION_HOTKEYS:
@@ -496,7 +497,7 @@ class HexEditor:
         search_byte_mode, bm_ind = True, '0x'
         sub_s_encoded = self.search
         wchar, sub_s, tmp_error= '', '', ''
-        while str(wchar) != '\x1b':
+        while str(wchar) != ESC_CODE:
             pre_s = ''
             if self.search:
                 pre_s = f" [{bm_ind}{repr(self.search)[1:-1]}]"
@@ -585,7 +586,7 @@ class HexEditor:
             indicates if the editor should keep running
         """
         wchar = ''
-        while str(wchar).upper() not in ['\x1b', 'N']:
+        while str(wchar).upper() not in [ESC_CODE, 'N']:
             self._action_render_scr('Reload File? [y]es, [n]o; Abort? ESC')
             wchar, key = self._get_next_char()
             if key in ACTION_HOTKEYS:
@@ -615,7 +616,7 @@ class HexEditor:
             indicates if the editor should keep running
         """
         wchar, i_chars = '', ''
-        while str(wchar) != '\x1b':
+        while str(wchar) != ESC_CODE:
             self._action_render_scr(f"Confirm: 'ENTER' - Insert char(s): {i_chars}␣")
             wchar, key = self._get_next_char()
             if key in ACTION_HOTKEYS:
@@ -686,7 +687,7 @@ class HexEditor:
                     continue
                 if wchar.upper() in ['Y', 'J']:
                     self._action_save()
-                elif wchar == '\x1b': # ESC
+                elif wchar == ESC_CODE: # ESC
                     return True
 
         return False
