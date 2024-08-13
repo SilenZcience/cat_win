@@ -2,14 +2,7 @@
 colorconstants
 """
 
-ESC_CODE = '\x1b'
-
-
-def id_to_code(code: int) -> str:
-    """
-    converts a color id to a usable escape sequence
-    """
-    return f"{ESC_CODE}[{code}m"
+from cat_win.src.const.escapecodes import id_to_color_code
 
 
 class ColorOptions:
@@ -67,11 +60,11 @@ class ColorOptions:
     Style = {'NONE': ''}
 
     for key, _ in __Fore.items():
-        Fore[key]  = id_to_code(__Fore[key])
+        Fore[key]  = id_to_color_code(__Fore[key])
     for key, _ in __Back.items():
-        Back[key]  = id_to_code(__Back[key])
+        Back[key]  = id_to_color_code(__Back[key])
     for key, _ in __Style.items():
-        Style[key] = id_to_code(__Style[key])
+        Style[key] = id_to_color_code(__Style[key])
 
     del __Fore
     del __Back

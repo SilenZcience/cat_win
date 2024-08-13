@@ -12,6 +12,7 @@ import signal
 import sys
 import unicodedata
 
+from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.service.helper.editorhelper import History, Position, _SearchIter, \
     UNIFY_HOTKEYS,KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, \
         SELECT_HOTKEYS, HISTORY_HOTKEYS, INDENT_HOTKEYS, HEX_BYTE_KEYS
@@ -638,7 +639,7 @@ class Editor:
         curses.curs_set(0)
 
         wchar, l_jmp = '', ''
-        while str(wchar).upper() not in ['\x1b', 'N']:
+        while str(wchar).upper() not in [ESC_CODE, 'N']:
             self._action_render_scr(f"Confirm: [y]es, [n]o - Jump to line: {l_jmp}␣")
             wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
@@ -676,7 +677,7 @@ class Editor:
         curses.curs_set(0)
 
         wchar, sub_s, tmp_error = '', '', ''
-        while str(wchar) != '\x1b':
+        while str(wchar) != ESC_CODE:
             pre_s = f" [{repr(self.search)[1:-1]}]" if self.search else ''
             self._action_render_scr(f"Confirm: 'ENTER' - Search for{pre_s}: {sub_s}␣", tmp_error)
             wchar, key = next(self.get_char)
@@ -727,7 +728,7 @@ class Editor:
 
         replace_all = False
         wchar, sub_s, tmp_error = '', '', ''
-        while str(wchar) != '\x1b':
+        while str(wchar) != ESC_CODE:
             pre_s = f"[{repr(self.search)[1:-1]}]" if self.search else '[]'
             pre_r = f" [{repr(self.replace)[1:-1]}]" if self.replace else ''
             rep_a = 'ALL ' if replace_all else ''
@@ -794,7 +795,7 @@ class Editor:
         curses.curs_set(0)
 
         wchar = ''
-        while str(wchar).upper() not in ['\x1b', 'N']:
+        while str(wchar).upper() not in [ESC_CODE, 'N']:
             self._action_render_scr('Reload File? [y]es, [n]o; Abort? ESC')
             wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
@@ -828,7 +829,7 @@ class Editor:
         """
         tmp_error_bar = ''
         wchar, i_bytes = '', ''
-        while str(wchar) != '\x1b':
+        while str(wchar) != ESC_CODE:
             self._action_render_scr(f"Confirm: 'ENTER' - Insert byte(s): 0x{i_bytes}␣",
                                     tmp_error_bar)
             wchar, key = next(self.get_char)
@@ -910,7 +911,7 @@ class Editor:
                     continue
                 if wchar.upper() in ['Y', 'J']:
                     self._action_save()
-                elif wchar == '\x1b': # ESC
+                elif wchar == ESC_CODE: # ESC
                     return True
 
         return False

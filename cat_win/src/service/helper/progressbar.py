@@ -3,6 +3,7 @@ import contextlib
 import os
 import sys
 from cat_win.src.const.colorconstants import CPB
+from cat_win.src.const.escapecodes import CURSOR_VISIBLE, CURSOR_INVISIBLE
 
 
 class PBar:
@@ -23,7 +24,7 @@ class PBar:
     def init(self):
         try:
             if os.isatty(sys.stdout.fileno()):
-                print('\x1b[?25l', end='')
+                print(CURSOR_INVISIBLE, end='')
                 yield self.print_progress_bar
             else:
                 yield lambda _: None
@@ -31,7 +32,7 @@ class PBar:
             if os.isatty(sys.stdout.fileno()):
                 if self.erase:
                     self.erase_progress_bar()
-                print('\x1b[?25h', end='\n'*(not self.erase))
+                print(CURSOR_VISIBLE, end='\n'*(not self.erase))
 
     def print_progress_bar(self, iteration: int) -> None:
         if iteration < 0:
