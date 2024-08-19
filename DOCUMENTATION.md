@@ -1266,6 +1266,9 @@ Stops Code Execution after finishing the Configuration.
 The Config File will be saved to the installation Directory of cat_win which is by Default the Python Directory.
 This means that uninstalling cat_win may result in the Config File being left over.
 When using the Windows Executables this Parameter will have no (long term) Effect.
+8-bit Colors can be used by entering the corresponding Color IDs (0-255) with the Prefix `f` for Foreground or `b` for Background.
+24-bit Colors (Truecolor) can be used by entering the RGB values seperated by Comma with the Prefix `f` for Foreground or `b` for Background.
+Thus a valid Input would also be defined by the Format `<f/b>[0-255]` or `<f/b>[0-255];[0-255];[0-255]` respectively.
 Valid Options are:
 
 | Option | Description |
