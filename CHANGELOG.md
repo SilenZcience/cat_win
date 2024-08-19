@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - added -`L`, --`less` parameter to lazily page through a file step by step and pause output each step.
+- added the option to use 8-bit or 24-bit (truecolor) colors in the color config.
 
 ### Bugfixes
 
