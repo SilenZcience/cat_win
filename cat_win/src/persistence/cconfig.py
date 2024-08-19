@@ -5,8 +5,11 @@ cconfig
 import configparser
 import os
 import shutil
+import sys
 
 from cat_win.src.const.colorconstants import ColorOptions, CKW
+from cat_win.src.const.escapecodes import ESC_CODE, color_code_256, color_code_truecolor
+from cat_win.src.const.regex import CONFIG_VALID_COLOR, CONFIG_VALID_ANSI
 from cat_win.src.service.helper.iohelper import err_print
 
 
@@ -60,6 +63,36 @@ class CConfig:
         self.config_parser = configparser.ConfigParser()
         self.color_dic = {}
 
+    def convert_config_element(self, value: str, element: str) -> str:
+        """
+        Parameters:
+        value (str):
+            the value to convert
+        element (str):
+            the element of the const_dict
+        
+        Returns:
+        color_code (str):
+            the ansi escape code for the color
+        """
+        if CONFIG_VALID_COLOR.match(value):
+            color_ground = value[0]
+            color_split = value[1:].split(';')
+            if len(color_split) == 1:
+                return color_code_256(int(color_split[0]),
+                                            color_ground == 'f')
+            return color_code_truecolor(*[int(c) for c in color_split],
+                                                  color_ground == 'f')
+        if CONFIG_VALID_ANSI.match(value):
+            return f"{ESC_CODE}{value}"
+        if value.count('.') == 1:
+            color_type, color = value.split('.')
+            return ColorOptions.Fore[color] if color_type == 'Fore' else ColorOptions.Back[color]
+        err_print(f"invalid config value {repr(value)} for '{element}'")
+        err_print(f"resetting to {repr(self.default_dic[element][1:])} ...")
+        self._save_config(element, self.default_dic[element][1:])
+        sys.exit(1)
+
     def load_config(self) -> dict:
         """
         Load the Color Configuration from the config file.
@@ -74,12 +107,11 @@ class CConfig:
             config_colors = dict(self.config_parser.items('COLORS'))
             for element in self.elements:
                 try:
-                    color_type, color = config_colors[element].split('.')
-                    self.color_dic[element] = (
-                        ColorOptions.Fore[color] if color_type == 'Fore'
-                        else ColorOptions.Back[color]
+                    self.color_dic[element] = self.convert_config_element(
+                        config_colors[element],
+                        element
                         )
-                except KeyError:
+                except (KeyError, ValueError):
                     self.color_dic[element] = self.default_dic[element]
         except configparser.NoSectionError:
             self.config_parser.add_section('COLORS')
@@ -101,7 +133,7 @@ class CConfig:
         options (list):
             the same list containing all available colors.
         """
-        print('Here is a list of all available color options you may choose:')
+        print('Here is a list of all available default color options you may choose:')
 
         fore_options = list(ColorOptions.Fore.items())
         fore_options = [(k, v) for k, v in fore_options if k != 'RESET']
@@ -180,7 +212,9 @@ class CConfig:
                 config_menu += f"{element}{ColorOptions.Style['RESET']}"
                 config_menu += f"{' ' * (element_offset-len(element))} "
             else:
-                if self.color_dic[element] in [c for k,c in ColorOptions.Back.items() if k not in ['NONE', 'BLACK']]:
+                if self.color_dic[element] in [
+                    c for k,c in ColorOptions.Back.items() if k not in ['NONE', 'BLACK']
+                    ]:
                     config_menu += f"{ColorOptions.Fore['BLACK']}"
                 config_menu += f"{element: <{element_offset}}"
                 config_menu += f"{ColorOptions.Style['RESET']} "
@@ -232,6 +266,10 @@ class CConfig:
         print(f"[Default: '{self.default_dic[keyword]}{keyword}{ColorOptions.Style['RESET']}']")
 
         color_options = self._print_get_all_available_colors()
+        print('You may enter 8-bit colors using the following format: <f/b>[0-255]')
+        print('You may enter 24-bit (truecolor) colors using the following format: ', end='')
+        print('<f/b>[0-255];[0-255];[0-255]')
+        higher_bit_color, custom_ansi_color = False, False
         color = ''
         while color not in color_options:
             if color != '':
@@ -244,18 +282,47 @@ class CConfig:
             if color.isdigit():
                 color = color_options[int(color)-1] if (
                     0 < int(color) <= len(color_options)) else color
+                continue
+            if CONFIG_VALID_COLOR.match(color):
+                higher_bit_color = True
+                color = color.lower()
+                break
+            if CONFIG_VALID_ANSI.match(color):
+                custom_ansi_color = True
+                break
 
-        if keyword in self.exclusive_definitions['Fore'] and color.startswith('Back'):
+        if keyword in self.exclusive_definitions['Fore'] and (
+            color.startswith('Back') or
+            (higher_bit_color and color.startswith('b'))
+        ):
             err_print(f"An Error occured: '{keyword}' can only be of style 'Fore'")
             return
-        if keyword in self.exclusive_definitions['Back'] and color.startswith('Fore'):
+        if keyword in self.exclusive_definitions['Back'] and (
+            color.startswith('Fore') or
+            (higher_bit_color and color.startswith('f'))
+        ):
             err_print(f"An Error occured: '{keyword}' can only be of style 'Back'")
             return
 
-        color_split = color.split('.')
-        print('Successfully selected element ', end='')
-        print(f"'{getattr(ColorOptions, color_split[0])[color_split[1]]}", end='')
-        print(f"{color}{ColorOptions.Style['RESET']}'.")
+        if higher_bit_color:
+            color_ground = color[0]
+            color_split = color[1:].split(';')
+            if len(color_split) == 1:
+                color_code = color_code_256(int(color_split[0]),
+                                            color_ground == 'f')
+            else:
+                color_code = color_code_truecolor(*[int(c) for c in color_split],
+                                                  color_ground == 'f')
+            print('Successfully selected element ', end='')
+            print(f"{color_code}{color}{ColorOptions.Style['RESET']}.")
+        elif custom_ansi_color:
+            print('Successfully selected element ', end='')
+            print(f"{ESC_CODE}{color}ESC{color}{ColorOptions.Style['RESET']}.")
+        else:
+            color_split = color.split('.')
+            print('Successfully selected element ', end='')
+            print(f"'{getattr(ColorOptions, color_split[0])[color_split[1]]}", end='')
+            print(f"{color}{ColorOptions.Style['RESET']}'.")
 
         self._save_config(keyword, color)
 
