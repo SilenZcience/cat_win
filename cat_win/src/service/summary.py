@@ -18,7 +18,7 @@ class Summary:
 
 
     @staticmethod
-    def setup_colors(color: str, color_reset: str) -> None:
+    def set_colors(color: str, color_reset: str) -> None:
         """
         setup the colors to use in the summaries.
         

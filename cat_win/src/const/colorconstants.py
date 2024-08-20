@@ -98,49 +98,42 @@ class CVis:
                 setattr(CVis, attr, '')
 
 
-class CPB:
-    """
-    the colors for the progress bar
-    """
-    COLOR_FULL  = ColorOptions.Fore['LIGHTGREEN']
-    COLOR_EMPTY = ColorOptions.Fore['LIGHTMAGENTA']
-    # COLOR_EMPTY = color_code_truecolor(255, 71, 156)
-    COLOR_RESET = ColorOptions.Style['RESET']
-
-    @staticmethod
-    def remove_colors() -> None:
-        for attr in dir(CPB):
-            if not callable(getattr(CPB, attr)) and not attr.startswith("__"):
-                setattr(CPB, attr, '')
-
-
 class CKW:
     """
     The collection of all different color options
     """
-    RESET_ALL = 'reset_all'
-    RESET_FOUND = 'reset_found'
-    RESET_MATCHED = 'reset_matched'
+    RESET_ALL           = 'reset_all'
+    RESET_FOUND         = 'reset_found'
+    RESET_MATCHED       = 'reset_matched'
 
-    LINE_LENGTH = 'line_length'
-    NUMBER = 'line_numbers'
-    FILE_PREFIX = 'file_prefix'
-    ENDS = 'line_ends'
-    CHARS = 'special_chars'
-    SUMMARY = 'summary_message'
-    EVALUATION = 'number_evaluation'
-    CONVERSION = 'number_conversion'
-    ATTRIB = 'file_attribute_message'
-    ATTRIB_POSITIVE = 'active_file_attributes'
-    ATTRIB_NEGATIVE = 'missing_file_attributes'
-    CHECKSUM = 'checksum_message'
-    RAWVIEWER = 'raw_viewer'
-    FOUND = 'found_keyword'
-    FOUND_MESSAGE = 'found_keyword_message'
-    MATCHED = 'matched_pattern'
-    MATCHED_MESSAGE = 'matched_pattern_message'
-    REPLACE = 'substring_replacement'
+    LINE_LENGTH         = 'line_length'
+    NUMBER              = 'line_numbers'
+    FILE_PREFIX         = 'file_prefix'
+
+    ENDS                = 'line_ends'
+    CHARS               = 'special_chars'
+
+    SUMMARY             = 'summary_message'
+
+    ATTRIB              = 'file_attribute_message'
+    ATTRIB_POSITIVE     = 'active_file_attributes'
+    ATTRIB_NEGATIVE     = 'missing_file_attributes'
+    CHECKSUM            = 'checksum_message'
+
+    EVALUATION          = 'number_evaluation'
+    CONVERSION          = 'number_conversion'
+
+    RAWVIEWER           = 'raw_viewer'
+
+    FOUND               = 'found_keyword'
+    FOUND_MESSAGE       = 'found_keyword_message'
+    MATCHED             = 'matched_pattern'
+    MATCHED_MESSAGE     = 'matched_pattern_message'
+    REPLACE             = 'substring_replacement'
+
+    PROGRESSBAR_DONE    = 'progressbar_done'
+    PROGRESSBAR_MISSING = 'progressbar_missing'
 
     MESSAGE_INFORMATION = 'message_information'
-    MESSAGE_IMPORTANT = 'message_important'
-    MESSAGE_WARNING = 'message_warning'
+    MESSAGE_IMPORTANT   = 'message_important'
+    MESSAGE_WARNING     = 'message_warning'

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from cat_win.src.const.colorconstants import color_code_8_16, ColorOptions, CVis, CPB
+from cat_win.src.const.colorconstants import color_code_8_16, ColorOptions, CVis
 # import sys
 # sys.path.append('../cat_win')
 
@@ -29,11 +29,3 @@ class TestArgConstants(TestCase):
         for attr in dir(CVis):
             if not callable(getattr(CVis, attr)) and not attr.startswith("__"):
                 self.assertEqual(getattr(CVis, attr), '')
-
-        for attr in dir(CPB):
-            if not callable(getattr(CPB, attr)) and not attr.startswith("__"):
-                self.assertNotEqual(getattr(CPB, attr), '')
-        CPB.remove_colors()
-        for attr in dir(CPB):
-            if not callable(getattr(CPB, attr)) and not attr.startswith("__"):
-                self.assertEqual(getattr(CPB, attr), '')

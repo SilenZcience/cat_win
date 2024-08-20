@@ -25,6 +25,7 @@ from cat_win.src.domain.files import Files
 from cat_win.src.persistence.cconfig import CConfig
 from cat_win.src.persistence.config import Config
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
+from cat_win.src.service.helper.progressbar import PBar
 from cat_win.src.service.helper.levenshtein import calculate_suggestions
 from cat_win.src.service.helper.tmpfilehelper import TmpFileHelper
 try:
@@ -990,8 +991,10 @@ def init(repl: bool = False) -> tuple:
                         u_args[ARGS_DEBUG], const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
                         const_dic[DKW.HEX_EDITOR_COLUMNS])
     More.set_flags(on_windows_os, const_dic[DKW.MORE_STEP_LENGTH])
-    Summary.setup_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
     Visualizer.set_flags(u_args[ARGS_DEBUG])
+    Summary.set_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
+    PBar.set_colors(color_dic[CKW.PROGRESSBAR_DONE], color_dic[CKW.PROGRESSBAR_MISSING],
+                    color_dic[CKW.RESET_ALL])
 
     return (known_files, unknown_files, echo_args, valid_urls)
 
