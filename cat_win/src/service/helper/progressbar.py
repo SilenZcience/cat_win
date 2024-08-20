@@ -53,10 +53,10 @@ class PBar:
             if os.isatty(sys.stdout.fileno()):
                 if self.erase:
                     self.erase_progress_bar()
-                print(CURSOR_VISIBLE, end='\n'*(not self.erase))
+                print(CURSOR_VISIBLE, end='\n'*(not self.erase), flush=True)
 
     def print_progress_bar(self, iteration: int) -> None:
-        if iteration < 0:
+        if iteration < 0 or iteration > self.total:
             iteration = self.total
         percentage = min(100 * (iteration / float(self.total)), 100.0)
         percent_color = PBar.COLOR_DONE if percentage == 100.0 else PBar.COLOR_MISSING
@@ -64,7 +64,7 @@ class PBar:
         length_l = int(self.length * iteration // self.total)
         bars = f"{PBar.COLOR_DONE}{self.fill_l * length_l}{PBar.COLOR_MISSING}{self.fill_r * (self.length - length_l)}"
         progress = f"\r{self.prefix} {bars} {percent_color}{percent}%{PBar.COLOR_RESET} {self.suffix}"
-        print(progress, end='')
+        print(progress, end='', flush=True)
 
     def erase_progress_bar(self) -> None:
         length = len(self.prefix) + len(self.suffix) + self.length + 9
