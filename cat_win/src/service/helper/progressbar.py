@@ -2,11 +2,32 @@
 import contextlib
 import os
 import sys
-from cat_win.src.const.colorconstants import CPB
+from cat_win.src.const.colorconstants import ColorOptions
 from cat_win.src.const.escapecodes import CURSOR_VISIBLE, CURSOR_INVISIBLE
 
 
 class PBar:
+    COLOR_DONE: str    = ColorOptions.Fore['LIGHTGREEN']
+    COLOR_MISSING: str = ColorOptions.Fore['LIGHTMAGENTA']
+    COLOR_RESET: str   = ColorOptions.Style['RESET']
+
+    @staticmethod
+    def set_colors(color_done: str, color_missing: str, color_reset: str) -> None:
+        """
+        setup the colors to use in the progress bar.
+        
+        Parameters:
+        color_done (str):
+            the color to use for the done progress (ansi escape)
+        color_missing (str):
+            the color to use for the missing progress (ansi escape)
+        color_reset (str)
+            the ansi esacpe to reset the color
+        """
+        PBar.COLOR_DONE = color_done
+        PBar.COLOR_MISSING = color_missing
+        PBar.COLOR_RESET = color_reset
+
     def __init__(self, total: int, prefix: str = '', suffix: str = '',
                     decimals: int = 1, length: int = 100,
                     fill_l: str = '█', fill_r: str = '-', erase: bool = False) -> None:
@@ -38,11 +59,11 @@ class PBar:
         if iteration < 0:
             iteration = self.total
         percentage = min(100 * (iteration / float(self.total)), 100.0)
-        percent_color = CPB.COLOR_FULL if percentage == 100.0 else CPB.COLOR_EMPTY
+        percent_color = PBar.COLOR_DONE if percentage == 100.0 else PBar.COLOR_MISSING
         percent = f"{percentage:5.{self.decimals}f}"
         length_l = int(self.length * iteration // self.total)
-        bars = f"{CPB.COLOR_FULL}{self.fill_l * length_l}{CPB.COLOR_EMPTY}{self.fill_r * (self.length - length_l)}"
-        progress = f"\r{self.prefix} {bars} {percent_color}{percent}%{CPB.COLOR_RESET} {self.suffix}"
+        bars = f"{PBar.COLOR_DONE}{self.fill_l * length_l}{PBar.COLOR_MISSING}{self.fill_r * (self.length - length_l)}"
+        progress = f"\r{self.prefix} {bars} {percent_color}{percent}%{PBar.COLOR_RESET} {self.suffix}"
         print(progress, end='')
 
     def erase_progress_bar(self) -> None:
