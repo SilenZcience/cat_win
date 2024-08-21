@@ -14,6 +14,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Bugfixes
 
 - fixed Bug where -`M`, --`more` would crash when jumping out of bounds.
+- fixed Bug where the progress bar could go above 100%.
 
 
 ## [1.8.4] - 2024-08-08
