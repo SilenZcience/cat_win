@@ -4,8 +4,11 @@ iohelper
 
 import contextlib
 import ctypes
+import io
 import os
 import sys
+
+from cat_win.src.service.helper.progressbar import PBar
 
 
 def err_print(*args, **kwargs):
@@ -87,7 +90,8 @@ class IoHelper:
 
     @staticmethod
     def read_file(src_file: str, binary: bool = False,
-                  file_encoding: str = 'utf-8', errors: str = 'strict'):
+                  file_encoding: str = 'utf-8', errors: str = 'strict',
+                  file_length: int = -1):
         """
         Reades content from a given file.
         
@@ -100,12 +104,30 @@ class IoHelper:
             an encoding to open the file with
         errors (str):
             the type of error handling when opening the file
+        file_length (int):
+            the size of the file for the total value of the progress bar
+            in case the progress bar is being displayed
         
         Returns:
         src_content (str|bytes):
             the content of the given file
         """
-        src_content = None
+        if file_length >= 0 and not binary:
+            src_content, src_length = '', 0
+            with PBar(
+                file_length, 'Reading file',
+                length=50, fill_l='━', fill_r='╺', erase=True
+                ).init() as p_bar, open(src_file, 'rb') as file:
+                buf_reader = io.BufferedReader(file, buffer_size=262144000) # 250MB
+                while True:
+                    byte_chunk = buf_reader.read(262144000)
+                    src_length += 262144000
+                    if not byte_chunk:
+                        break
+                    p_bar(src_length)
+                    src_content += byte_chunk.decode(file_encoding, errors)
+                p_bar(file_length)
+            return src_content
         if not binary:
             with open(src_file, 'r', encoding=file_encoding, errors=errors) as file:
                 src_content = file.read()

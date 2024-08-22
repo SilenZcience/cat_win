@@ -728,9 +728,14 @@ def edit_file(file_index: int = 0) -> None:
         edit_raw_content(raw_content, file_index)
         return
     content = []
+    file_size = -1 if (
+        u_files[file_index].file_size < const_dic[DKW.LARGE_FILE_SIZE]//len(u_files)
+    ) else u_files[file_index].file_size
     try:
-        file_content = IoHelper.read_file(u_files[file_index].path, False,
-                                          arg_parser.file_encoding)
+        file_content = IoHelper.read_file(
+            u_files[file_index].path,
+            file_encoding=arg_parser.file_encoding,
+            file_length=file_size)
         # splitlines() gives a slight inaccuracy, because
         # it also splits on other bytes than \r and \n ...
         # the alternative would be worse: split('\n') would increase the linecount each
@@ -753,9 +758,10 @@ def edit_file(file_index: int = 0) -> None:
             return
         try:
             file_content = IoHelper.read_file(
-                u_files[file_index].path, False,
-                arg_parser.file_encoding,
-                'ignore' if const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace')
+                u_files[file_index].path,
+                file_encoding=arg_parser.file_encoding,
+                errors='ignore' if const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace',
+                file_length=file_size)
             if not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]:
                 file_content = remove_ansi_codes_from_line(file_content)
             content = [('', line) for line in file_content.splitlines()]
@@ -1105,12 +1111,11 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
     for file in u_files:
         file.set_file_size(get_file_size(file.path))
         file_size_sum += file.file_size
-        if file_size_sum >= const_dic[DKW.LARGE_FILE_SIZE]:
-            err_print(color_dic[CKW.MESSAGE_IMPORTANT], end='')
-            err_print('An exceedingly large amount of data is being loaded. ', end='')
-            err_print('This may require a lot of time and resources.', end='')
-            err_print(color_dic[CKW.RESET_ALL])
-            break
+    if file_size_sum >= const_dic[DKW.LARGE_FILE_SIZE]:
+        err_print(color_dic[CKW.MESSAGE_IMPORTANT], end='')
+        err_print('An exceedingly large amount of data is being loaded. ', end='')
+        err_print('This may require a lot of time and resources.', end='')
+        err_print(color_dic[CKW.RESET_ALL])
 
     if u_args[ARGS_B64D]:
         decode_files_base64(tmp_file_helper)
