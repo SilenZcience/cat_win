@@ -48,7 +48,7 @@ class Visualizer:
         return CVis.BYTE_VIEW_CONTROL
 
     @staticmethod
-    @lru_cache(maxsize=256)
+    @lru_cache(maxsize=100)
     def get_color_entropy(entropy: int) -> str:
         """
         return a color based on the value of the entropy given.
