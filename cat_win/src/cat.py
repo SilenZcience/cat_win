@@ -1205,7 +1205,7 @@ def repl_main(deprecated: bool = False):
         err_print(color_dic[CKW.RESET_ALL], end='')
 
     command_prefix = '!'
-    repl_prefix = '>>> '
+    repl_prefix = f"{color_dic[CKW.REPL_PREFIX]}>>> {color_dic[CKW.RESET_ALL]}"
     eof_control_char = 'Z' if on_windows_os else 'D'
     oneline = u_args[ARGS_ONELINE]
     repl_session_time_start = monotonic()
