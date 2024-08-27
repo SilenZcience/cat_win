@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.8.6] - TBA
+
+### Minor Changes
+
+- made the color of the cat_win REPL (cats) prefix customizable using the color config.
+
+
 ## [1.8.5] - 2024-08-24
 
 ### Minor Changes
