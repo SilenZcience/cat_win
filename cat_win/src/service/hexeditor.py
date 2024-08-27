@@ -376,7 +376,7 @@ class HexEditor:
                     if hex_byte is None:
                         hex_byte = self.hex_array[row][col]
                     sel_bytes += hex_byte
-        self.error_bar = '' if (
+        self.error_bar = self.error_bar if (
             Clipboard.put(sel_bytes)
         ) else 'An error occured copying the selected bytes to the clipboard!'
         return True
