@@ -577,7 +577,9 @@ class Editor:
         content_window = self.window_content[sel_from_y:sel_to_y+1]
         content_window[0] = content_window[0][sel_from_x:]
         content_window[-1] = content_window[-1][:sel_to_x]
-        Clipboard.put(self.line_sep.join(content_window))
+        self.error_bar = '' if (
+            Clipboard.put(self.line_sep.join(content_window))
+        ) else 'An error occured copying the selected text to the clipboard!'
         return True
 
     def _action_cut(self) -> bool:
