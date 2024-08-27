@@ -134,6 +134,8 @@ class CKW:
     PROGRESSBAR_DONE    = 'progressbar_done'
     PROGRESSBAR_MISSING = 'progressbar_missing'
 
+    REPL_PREFIX         = 'repl_prefix'
+
     MESSAGE_INFORMATION = 'message_information'
     MESSAGE_IMPORTANT   = 'message_important'
     MESSAGE_WARNING     = 'message_warning'
