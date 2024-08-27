@@ -17,7 +17,14 @@ class Clipboard:
     copy_function = None
 
     @staticmethod
-    def _copy(content: str, __dependency: int = 3, __clip_board_error: bool = False) -> None:
+    def clear() -> None:
+        """
+        clear the clipboard
+        """
+        Clipboard.clipboard = ''
+
+    @staticmethod
+    def _copy(content: str, __dependency: int = 3, __clip_board_error: bool = False) -> bool:
         """
         import the clipboard by recursively checking which module exists and
         could be used, this function should only be called by Clipboard.put() and will only
@@ -30,6 +37,10 @@ class Clipboard:
             do not change!
         __clip_board_error (bool):
             do not change!
+        
+        Returns:
+        (bool):
+            indicates if the clipboard function went successfull
         """
         if __dependency == 0:
             if __clip_board_error:
@@ -41,7 +52,8 @@ class Clipboard:
             error_msg += 'Should you have any problem with either module, '
             error_msg += 'try to install a different one using '
             error_msg += f"'{os.path.basename(sys.executable)} -m pip install ...'"
-            return err_print('\n', error_msg, sep='')
+            err_print('\n', error_msg, sep='')
+            return False
         try:
             if __dependency == 3:
                 import pyperclip as pc
@@ -51,23 +63,27 @@ class Clipboard:
                 import pyperclip3 as pc
             Clipboard.copy_function = pc.copy
             Clipboard.put(content)
-            return
+            return True
         except ImportError:
             Clipboard._copy(content, __dependency-1, False or __clip_board_error)
         except Exception:
             Clipboard._copy(content, __dependency-1, True or __clip_board_error)
 
     @staticmethod
-    def put(content: str) -> None:
+    def put(content: str) -> bool:
         """
         entry point to recursive function _copy_to_clipboard()
         
         Parameters:
         content (str):
             the string to copy
+        
+        Returns:
+        (bool):
+            indicates if the clipboard function went successfull
         """
         if Clipboard.copy_function is not None:
             Clipboard.copy_function(content)
-            return
+            return True
 
-        Clipboard._copy(content)
+        return Clipboard._copy(content)

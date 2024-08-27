@@ -1326,7 +1326,7 @@ def repl_main(deprecated: bool = False):
                 edit_content([('', stripped_line)], -1, i-command_count)
                 if u_args[ARGS_CLIP]:
                     Clipboard.put(remove_ansi_codes_from_line(Clipboard.clipboard))
-                    Clipboard.clipboard = ''
+                    Clipboard.clear()
         if not oneline:
             print(repl_prefix, end='', flush=True)
 
