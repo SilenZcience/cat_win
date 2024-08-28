@@ -217,16 +217,16 @@ Read about specific **Arguments & Options** [here](https://github.com/SilenZcien
 </br>
 
 ```py
-$ echo "Hello World :)" | catw - [6:] | catw - [::-1] -ln
-> 1) [8] ): dlroW
+> echo "Hello World :)" | catw - [6:] | catw - [::-1] -ln
+1) [8] ): dlroW
 ```
 
 - - - -
 
 ```py
-$ cats --eval --dec -nl
+> cats --eval --dec
 > >>> 0xF * 5
-1) [42] 75 [Bin: 0b1001011, Oct: 0o113, Hex: 0x4b]
+75 [Bin: 0b1001011, Oct: 0o113, Hex: 0x4b]
 > >>> ...
 ```
 
