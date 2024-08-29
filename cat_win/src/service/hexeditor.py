@@ -556,10 +556,20 @@ class HexEditor:
                             self.search += f"{byte_:02X}"
                 sub_s_encoded = self.search
 
+                cpos_tmp, spos_tmp = self.cpos.get_pos(), self.spos.get_pos()
+                sel_pos_a, sel_pos_b = self.selected_area
+                if self.selecting and self.cpos.get_pos() == sel_pos_b:
+                    self.cpos.set_pos(sel_pos_a)
+                    self.spos.set_pos(sel_pos_b)
                 # check current line
-                search_result = find_bytes(self.cpos.row, self.cpos.col+1)
+                search_result = find_bytes(self.cpos.row, self.cpos.col+1-self.selecting)
+                if self.selecting and (self.cpos.row, self.cpos.col+search_result) > sel_pos_b:
+                    self.cpos.set_pos(cpos_tmp)
+                    self.spos.set_pos(spos_tmp)
+                    tmp_error = 'no matches were found within the selection!'
+                    continue
                 if search_result >= 0:
-                    self.cpos.col += search_result+1
+                    self.cpos.col += search_result+1-self.selecting
                     break
                 # check rest of file until back at current line
                 c_row = self.cpos.row
@@ -569,12 +579,19 @@ class HexEditor:
                     c_row += 1
                     c_row_wrapped = c_row%len(self.hex_array)
                     search_result = find_bytes(c_row_wrapped)
+                    if self.selecting and (c_row, search_result) > sel_pos_b:
+                        break
                     if search_result >= 0:
                         self.cpos.row = c_row_wrapped
                         self.cpos.col = search_result
                         break
                 else:
                     tmp_error = 'no matches were found!'
+                    continue
+                if self.selecting and (c_row, search_result) > sel_pos_b:
+                    self.cpos.set_pos(cpos_tmp)
+                    self.spos.set_pos(spos_tmp)
+                    tmp_error = 'no matches were found within the selection!'
                     continue
                 break
         return True
