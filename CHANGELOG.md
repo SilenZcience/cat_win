@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - made the color of the cat_win REPL (cats) prefix customizable using the color config.
+- when selecting an area in the (hex-)editor the search and replace functionality will only be applied to that region.
 
 
 ## [1.8.5] - 2024-08-24
