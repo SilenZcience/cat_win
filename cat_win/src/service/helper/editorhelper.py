@@ -464,6 +464,10 @@ class _SearchIter:
             row == self._start_y and f_col >= self._start_x + self._offset
             ):
             raise StopIteration()
+        if self.editor.selecting and (
+            (row, f_col) >= self.editor.spos.get_pos()
+        ):
+            raise StopIteration()
         if self.wrapped and row == self._start_y:
             self._offset += len(self.editor.replace)-len(self.editor.search)
         self.yielded_result = True
@@ -490,6 +494,8 @@ class _SearchIter:
                     if found_pos >= 0:
                         return self._stop_if_past_original(line_y, found_pos)
                 self.editor._build_file_upto(content_len+30)
+            if self.editor.selecting:
+                raise StopIteration()
             self.wrapped = True
             for line_y in range(0, self._start_y + 1):
                 found_pos = self.editor.window_content[line_y].find(self.editor.search)

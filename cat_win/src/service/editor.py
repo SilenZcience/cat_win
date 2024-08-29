@@ -711,10 +711,18 @@ class Editor:
                     except UnicodeError:
                         pass
                 self.search = sub_s if sub_s else self.search
+                cpos_tmp, spos_tmp = self.cpos.get_pos(), self.spos.get_pos()
                 try:
-                    self.cpos.set_pos(next(iter(_SearchIter(self, 1))))
+                    sel_pos_a, sel_pos_b = self.selected_area
+                    if self.selecting and self.cpos.get_pos() == sel_pos_b:
+                        self.cpos.set_pos(sel_pos_a)
+                        self.spos.set_pos(sel_pos_b)
+                    self.cpos.set_pos(next(iter(_SearchIter(self, 1-self.selecting))))
                     break
                 except StopIteration:
+                    if self.selecting:
+                        self.cpos.set_pos(cpos_tmp)
+                        self.spos.set_pos(spos_tmp)
                     tmp_error = 'no matches were found!'
         return True
 
@@ -741,9 +749,10 @@ class Editor:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
                 if key == b'_action_find':
-                    cpos = self.cpos.get_pos()
+                    cpos_tmp, spos_tmp = self.cpos.get_pos(), self.spos.get_pos()
                     getattr(self, key.decode(), lambda *_: False)()
-                    self.cpos.set_pos(cpos)
+                    self.cpos.set_pos(cpos_tmp)
+                    self.spos.set_pos(spos_tmp)
                     tmp_error = ''
                 if key == b'_action_replace':
                     wchar, key = '', b'_key_enter'
@@ -775,12 +784,20 @@ class Editor:
                     except UnicodeError:
                         pass
                 self.replace = sub_s if sub_s else self.replace
+                cpos_tmp, spos_tmp = self.cpos.get_pos(), self.spos.get_pos()
+                sel_pos_a, sel_pos_b = self.selected_area
+                if self.selecting and self.cpos.get_pos() == sel_pos_b:
+                    self.cpos.set_pos(sel_pos_a)
+                    self.spos.set_pos(sel_pos_b)
                 search = _SearchIter(self, 0)
                 for found_row, found_col in search:
                     self.cpos.set_pos((found_row,found_col))
                     self._replace_search(self.search, self.replace)
                     if not replace_all:
                         break
+                if self.selecting:
+                    self.cpos.set_pos(cpos_tmp)
+                    self.spos.set_pos(spos_tmp)
                 if search.yielded_result:
                     break
                 tmp_error = 'no matches were found!'
