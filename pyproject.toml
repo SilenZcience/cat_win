@@ -73,3 +73,9 @@ Documentation = "https://github.com/SilenZcience/cat_win/blob/main/DOCUMENTATION
 Download = "https://github.com/SilenZcience/cat_win/tarball/master"
 Github = "https://github.com/SilenZcience/cat_win"
 Issues = "https://github.com/SilenZcience/cat_win/issues"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning ",
+]
