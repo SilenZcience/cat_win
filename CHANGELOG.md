@@ -13,6 +13,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ## Bugfixes
 
 - added missing error message in (hex-)editor for clipboard errors.
+- added compatibility with python version pypy-3.6
 
 
 ## [1.8.5] - 2024-08-24
@@ -556,7 +557,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Major Changes
 
 - it is now possible to use either the '`pyclip`', '`pyperclip3`', or '`pyperclip`' module in order to use the --`clip` parameter. If none of these options are installed, the --clip parameter will not work yet the programm won't crash. This change was made due to some problems using the --clip parameter on macOS.
-- the `default` clipboard module was changed from '`pyperclip3`' to '`pyperclip`'. This module however is not included in the necessary dependencies. It can be added to the installation dependencies by using 'pip install cat_win<b>[clip]</b>'. This chang was made to ensure compatibility with `pypy-3.8` and `pypy-3.9`.
+- the `default` clipboard module was changed from '`pyperclip3`' to '`pyperclip`'. This module however is not included in the necessary dependencies. It can be added to the installation dependencies by using 'pip install cat_win<b>[clip]</b>'. This chang was made to ensure compatibility with pypy-3.8 and pypy-3.9.
 - elevated dependency `colorama` from >=0.4.5 to >=0.4.6 (also switched from init() to just_fix_windows_console()).
 
 ### Minor Changes
