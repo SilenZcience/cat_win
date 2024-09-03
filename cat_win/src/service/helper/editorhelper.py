@@ -19,6 +19,9 @@ try:
     curses.initscr = initscr
 except ImportError:
     pass
+import re
+
+from cat_win.src.const.regex import compile_re
 
 
 UNIFY_HOTKEYS = {
@@ -452,16 +455,44 @@ class _SearchIter:
         self.wrapped = False
         self._start_y = editor.cpos.row
         self._start_x = editor.cpos.col + offset
-        self._offset = 0
         self.yielded_result = False
+        self.search = self.editor.search
+        self.s_len = len(self.search)
+        self.replace = self.editor.replace
+        self.r_len = len(self.replace)
+        self._get_search()
+
+    def _get_search(self):
+        if self.search.startswith('\\'):
+            self.search = self.search[1:]
+        if self.search.startswith('re:'):
+            try:
+                self.search = compile_re(self.search[3:], True)
+            except re.error as exc:
+                raise ValueError('invalid regular expression: ' + str(exc)) from exc
 
     def __iter__(self):
         return self
 
+    def _get_next_pos(self, line: str):
+        if isinstance(self.search, str):
+            return line.find(self.search)
+        match_ = self.search.search(line)
+        if match_ is None:
+            return -1
+        self.s_len = match_.end() - match_.start()
+        try:
+            self.replace = self.search.sub(self.replace, line[match_.start():match_.end()])
+            self.r_len = len(self.replace)
+        except re.error:
+            self.replace = self.editor.replace
+            self.r_len = len(self.replace)
+        return match_.start()
+
     def _stop_if_past_original(self, row: int, f_col: int) -> tuple:
         if self.wrapped and (
             row > self._start_y or
-            row == self._start_y and f_col >= self._start_x + self._offset
+            row == self._start_y and f_col >= self._start_x
             ):
             raise StopIteration()
         if self.editor.selecting and (
@@ -469,7 +500,7 @@ class _SearchIter:
         ):
             raise StopIteration()
         if self.wrapped and row == self._start_y:
-            self._offset += len(self.editor.replace)-len(self.editor.search)
+            self._start_x += self.r_len-self.s_len
         self.yielded_result = True
         return (row, f_col)
 
@@ -477,12 +508,12 @@ class _SearchIter:
         row = self.editor.cpos.row
         col = self.editor.cpos.col + self.offset
 
-        found_pos = self.editor.window_content[row][col:].find(self.editor.search)
+        found_pos = self._get_next_pos(self.editor.window_content[row][col:])
         if found_pos >= 0:
             return self._stop_if_past_original(row, found_pos+col)
         if self.wrapped:
             for line_y in range(row + 1, self._start_y + 1):
-                found_pos = self.editor.window_content[line_y].find(self.editor.search)
+                found_pos = self._get_next_pos(self.editor.window_content[line_y])
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
         else:
@@ -490,7 +521,7 @@ class _SearchIter:
             while content_len != len(self.editor.window_content):
                 content_len = len(self.editor.window_content)
                 for line_y in range(row + 1, len(self.editor.window_content)):
-                    found_pos = self.editor.window_content[line_y].find(self.editor.search)
+                    found_pos = self._get_next_pos(self.editor.window_content[line_y])
                     if found_pos >= 0:
                         return self._stop_if_past_original(line_y, found_pos)
                 self.editor._build_file_upto(content_len+30)
@@ -498,7 +529,7 @@ class _SearchIter:
                 raise StopIteration()
             self.wrapped = True
             for line_y in range(0, self._start_y + 1):
-                found_pos = self.editor.window_content[line_y].find(self.editor.search)
+                found_pos = self._get_next_pos(self.editor.window_content[line_y])
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
         raise StopIteration()
