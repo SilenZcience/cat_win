@@ -1190,19 +1190,11 @@ def main():
     cleanup(tmp_file_helper)
 
 
-def repl_main(deprecated: bool = False):
+def repl_main():
     """
     run the repl.
     """
     init(True)
-
-    if deprecated:
-        err_print(color_dic[CKW.MESSAGE_WARNING], end='')
-        err_print('Deprecation Warning!')
-        err_print(color_dic[CKW.RESET_ALL], end='')
-        err_print(color_dic[CKW.MESSAGE_IMPORTANT], end='')
-        err_print("The 'shell' entry point is deprecated! Use 'repl' instead.")
-        err_print(color_dic[CKW.RESET_ALL], end='')
 
     command_prefix = '!'
     repl_prefix = f"{color_dic[CKW.REPL_PREFIX]}>>> {color_dic[CKW.RESET_ALL]}"
@@ -1329,10 +1321,6 @@ def repl_main(deprecated: bool = False):
                     Clipboard.clear()
         if not oneline:
             print(repl_prefix, end='', flush=True)
-
-
-def shell_main():
-    repl_main(deprecated=True)
 
 
 if __name__ == '__main__':
