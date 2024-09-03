@@ -1172,9 +1172,9 @@ def cleanup(tmp_file_helper: TmpFileHelper) -> None:
             err_print('Cleaning', tmp_file)
         try:
             os.remove(tmp_file)
-        except OSError as e:
+        except OSError as exc:
             if u_args[ARGS_DEBUG]:
-                err_print(type(e).__name__, tmp_file)
+                err_print(type(exc).__name__, tmp_file)
     if u_args[ARGS_DEBUG]:
         err_print('==================================================='
             '====================================================', end='')
