@@ -60,6 +60,7 @@ class Editor:
         self.special_chars: dict = {}
         self.search  = ''
         self.replace = ''
+        self.search_items = []
 
         self.status_bar_size = 1
         self.error_bar = ''
@@ -471,9 +472,12 @@ class Editor:
         self.cpos.col -= len(r_with)
         return self._key_replace_search(r_this=r_with, r_with=r_this)
 
-    def _replace_search(self, r_this: str, r_with: str) -> None:
+    def _replace_search(self, r_this: str, r_with: str, search_: _SearchIter) -> None:
         pre_cpos = self.cpos.get_pos()
         pre_spos = self.spos.get_pos()
+        if not isinstance(search_.search, str):
+            r_this = self.window_content[self.cpos.row][self.cpos.col:self.cpos.col+search_.s_len]
+            r_with = search_.replace
         self._key_replace_search(r_this, r_with)
         self.history.add(b'_key_replace_search', False,
                             pre_cpos, self.cpos.get_pos(),
@@ -590,7 +594,10 @@ class Editor:
 
     def _action_render_scr(self, msg: str, tmp_error: str = '') -> None:
         max_y, max_x = self.getxymax()
+        msg = msg.replace('\0', '')
         error_bar_backup = self.error_bar
+        if self.debug_mode and tmp_error:
+            err_print(tmp_error)
         self.error_bar = tmp_error if tmp_error else self.error_bar
         try:
             if self.error_bar:
@@ -717,7 +724,15 @@ class Editor:
                     if self.selecting and self.cpos.get_pos() == sel_pos_b:
                         self.cpos.set_pos(sel_pos_a)
                         self.spos.set_pos(sel_pos_b)
-                    self.cpos.set_pos(next(iter(_SearchIter(self, 1-self.selecting))))
+                    try:
+                        search = _SearchIter(self, 1-self.selecting)
+                    except ValueError as exc:
+                        tmp_error = str(exc)
+                        continue
+                    self.cpos.set_pos(next(search))
+                    self.search_items.append((self.cpos.row-self.wpos.row,
+                                              self.cpos.col-self.wpos.col,
+                                              search.s_len))
                     break
                 except StopIteration:
                     if self.selecting:
@@ -789,10 +804,17 @@ class Editor:
                 if self.selecting and self.cpos.get_pos() == sel_pos_b:
                     self.cpos.set_pos(sel_pos_a)
                     self.spos.set_pos(sel_pos_b)
-                search = _SearchIter(self, 0)
+                try:
+                    search = _SearchIter(self, 0)
+                except ValueError as exc:
+                    tmp_error = str(exc)
+                    continue
                 for found_row, found_col in search:
                     self.cpos.set_pos((found_row,found_col))
-                    self._replace_search(self.search, self.replace)
+                    self.search_items.append((self.cpos.row-self.wpos.row,
+                                              self.cpos.col-self.wpos.col,
+                                              search.r_len))
+                    self._replace_search(self.search, self.replace, search)
                     if not replace_all:
                         break
                 if self.selecting:
@@ -1092,6 +1114,9 @@ class Editor:
                     self.curse_window.addch(row, col, '�', self._get_color(3))
             self.curse_window.clrtoeol()
             self.curse_window.move(row+1, 0)
+        for row, col, length in self.search_items:
+            self.curse_window.chgat(row, col, length, self._get_color(6))
+        self.search_items.clear()
 
         # display status/error_bar
         try:
@@ -1254,15 +1279,17 @@ class Editor:
         finally:
             if curses.can_change_color():
                 # status_bar
-                curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+                curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE )
                 # error_bar
-                curses.init_pair(2, curses.COLOR_RED  , curses.COLOR_WHITE)
+                curses.init_pair(2, curses.COLOR_RED  , curses.COLOR_WHITE )
                 # special char (not printable or ws) & prompts
-                curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_RED  )
+                curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_RED   )
                 # tab-char
-                curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_GREEN)
+                curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_GREEN )
                 # selection
                 curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_YELLOW)
+                # find & replace
+                curses.init_pair(6, curses.COLOR_WHITE, curses.COLOR_BLUE  )
         curses.raw()
         self.curse_window.nodelay(False)
 

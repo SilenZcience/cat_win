@@ -40,8 +40,8 @@ CONFIG_VALID_COLOR = re.compile(
 CONFIG_VALID_ANSI  = re.compile(r"\[(?:\d|;)*m") # custom ansi escape code
 
 # matches a mathematical expression consisting of
-# either hex-numbers = (0x...), binary-numbers (0b...) or
-# default decimal numbers
+# either hex-numbers = (0x...), octal-numbers (0o...),
+# binary-numbers (0b...) or default decimal numbers
 # (these are not allowed to have a leading zero
 # before the decimal point, yet something like "-.06" is allowed).
 # between every number has to be a valid operator (*,/,+,-,%,**,//)
