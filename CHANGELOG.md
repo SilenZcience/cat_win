@@ -3,17 +3,25 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
-## [1.8.6] - TBA
+## [1.9.0] - TBA
+
+### Major Changes
+
+- the `shell` entrypoint is now deprecated and fully replaced by the `repl` entrypoint.
 
 ### Minor Changes
 
 - made the color of the cat_win REPL (cats) prefix customizable using the color config.
 - when selecting an area in the (hex-)editor the search and replace functionality will only be applied to that region.
+- the find and replace in the editor is now escaped using `\`.
+- using the prefix `re:` in the find menu within the editor allows for search of regular expressions.
+- the find and replace in the editor is now shortly highlighted.
 
 ## Bugfixes
 
 - added missing error message in (hex-)editor for clipboard errors.
 - added compatibility with python version pypy-3.6
+- fixed Bug where the action-hotkeys in the editor would crash when inserting certain chars.
 
 
 ## [1.8.5] - 2024-08-24
