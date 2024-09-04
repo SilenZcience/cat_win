@@ -8,11 +8,13 @@ try:
 except ImportError:
     CURSES_MODULE_ERROR = True
 import os
+import re
 import signal
 import sys
 import unicodedata
 
 from cat_win.src.const.escapecodes import ESC_CODE
+from cat_win.src.const.regex import compile_re
 from cat_win.src.service.helper.editorhelper import History, Position, _SearchIter, \
     UNIFY_HOTKEYS,KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, \
         SELECT_HOTKEYS, HISTORY_HOTKEYS, INDENT_HOTKEYS, HEX_BYTE_KEYS
@@ -58,7 +60,7 @@ class Editor:
         self.window_content = []
 
         self.special_chars: dict = {}
-        self.search  = ''
+        self.search  = '' # str | re.Pattern
         self.replace = ''
         self.search_items = []
 
@@ -472,10 +474,10 @@ class Editor:
         self.cpos.col -= len(r_with)
         return self._key_replace_search(r_this=r_with, r_with=r_this)
 
-    def _replace_search(self, r_this: str, r_with: str, search_: _SearchIter) -> None:
+    def _replace_search(self, r_this, r_with: str, search_: _SearchIter) -> None:
         pre_cpos = self.cpos.get_pos()
         pre_spos = self.spos.get_pos()
-        if not isinstance(search_.search, str):
+        if not isinstance(r_this, str):
             r_this = self.window_content[self.cpos.row][self.cpos.col:self.cpos.col+search_.s_len]
             r_with = search_.replace
         self._key_replace_search(r_this, r_with)
@@ -685,16 +687,25 @@ class Editor:
         """
         curses.curs_set(0)
 
+        search_regex = not isinstance(self.search, str)
         wchar, sub_s, tmp_error = '', '', ''
         while str(wchar) != ESC_CODE:
-            pre_s = f" [{repr(self.search)[1:-1]}]" if self.search else ''
-            self._action_render_scr(f"Confirm: 'ENTER' - Search for{pre_s}: {sub_s}␣", tmp_error)
+            pre_s = ''
+            if self.search and isinstance(self.search, str):
+                pre_s = f" [{repr(self.search)[1:-1]}]"
+            elif self.search:
+                pre_s = f" re:[{self.search.pattern}]"
+            rep_r = 'Match' if search_regex else 'Search for'
+            self._action_render_scr(f"Confirm: 'ENTER' - {rep_r}{pre_s}: {sub_s}␣", tmp_error)
             wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
                 if key == b'_action_find':
                     wchar, key = '', b'_key_enter'
+                if key == b'_action_insert':
+                    search_regex = not search_regex
+                    self.search = ''
                 if key == b'_action_background':
                     getattr(self, key.decode(), lambda *_: False)()
                 if key == b'_action_resize':
@@ -718,6 +729,12 @@ class Editor:
                     except UnicodeError:
                         pass
                 self.search = sub_s if sub_s else self.search
+                if search_regex and isinstance(self.search, str):
+                    try:
+                        self.search = compile_re(self.search, True)
+                    except re.error as exc:
+                        tmp_error = 'invalid regular expression: ' + str(exc)
+                        continue
                 cpos_tmp, spos_tmp = self.cpos.get_pos(), self.spos.get_pos()
                 try:
                     sel_pos_a, sel_pos_b = self.selected_area
@@ -754,7 +771,11 @@ class Editor:
         replace_all = False
         wchar, sub_s, tmp_error = '', '', ''
         while str(wchar) != ESC_CODE:
-            pre_s = f"[{repr(self.search)[1:-1]}]" if self.search else '[]'
+            pre_s = '[]'
+            if self.search and isinstance(self.search, str):
+                pre_s = f"[{repr(self.search)[1:-1]}]"
+            elif self.search:
+                pre_s = f"re:[{self.search.pattern}]"
             pre_r = f" [{repr(self.replace)[1:-1]}]" if self.replace else ''
             rep_a = 'ALL ' if replace_all else ''
             self._action_render_scr(
