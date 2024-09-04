@@ -21,8 +21,6 @@ except ImportError:
     pass
 import re
 
-from cat_win.src.const.regex import compile_re
-
 
 UNIFY_HOTKEYS = {
     # (shift -) newline
@@ -452,24 +450,15 @@ class _SearchIter:
     def __init__(self, editor, offset: int) -> None:
         self.editor = editor
         self.offset = offset
+        self.empty_match_offset = 0
         self.wrapped = False
         self._start_y = editor.cpos.row
         self._start_x = editor.cpos.col + offset
         self.yielded_result = False
         self.search = self.editor.search
-        self.s_len = len(self.search)
+        self.s_len = len(self.search) if isinstance(self.search, str) else 0
         self.replace = self.editor.replace
         self.r_len = len(self.replace)
-        self._get_search()
-
-    def _get_search(self):
-        if self.search.startswith('\\'):
-            self.search = self.search[1:]
-        if self.search.startswith('re:'):
-            try:
-                self.search = compile_re(self.search[3:], True)
-            except re.error as exc:
-                raise ValueError('invalid regular expression: ' + str(exc)) from exc
 
     def __iter__(self):
         return self
@@ -477,12 +466,15 @@ class _SearchIter:
     def _get_next_pos(self, line: str):
         if isinstance(self.search, str):
             return line.find(self.search)
+        if len(line) == 0:
+            return -1
         match_ = self.search.search(line)
         if match_ is None:
             return -1
         self.s_len = match_.end() - match_.start()
+        self.empty_match_offset = int(self.s_len == 0 == self.offset)
         try:
-            self.replace = self.search.sub(self.replace, line[match_.start():match_.end()])
+            self.replace = self.search.sub(self.editor.replace, line[match_.start():match_.end()])
             self.r_len = len(self.replace)
         except re.error:
             self.replace = self.editor.replace
@@ -506,7 +498,7 @@ class _SearchIter:
 
     def __next__(self) -> tuple:
         row = self.editor.cpos.row
-        col = self.editor.cpos.col + self.offset
+        col = self.editor.cpos.col + self.offset + self.empty_match_offset
 
         found_pos = self._get_next_pos(self.editor.window_content[row][col:])
         if found_pos >= 0:
