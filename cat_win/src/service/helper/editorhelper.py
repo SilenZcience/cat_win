@@ -492,6 +492,11 @@ class _SearchIter:
         ):
             raise StopIteration()
         if self.wrapped and row == self._start_y:
+            # offset highlights and start positions
+            self.editor.search_items = [
+                (r, c+self.r_len-self.s_len, l) if r == row and c >= self._start_x else (r, c, l)
+                for r, c, l in self.editor.search_items
+            ]
             self._start_x += self.r_len-self.s_len
         self.yielded_result = True
         return (row, f_col)
