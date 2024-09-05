@@ -988,9 +988,9 @@ The currently supported Key Bindings are as follows:
 | <kbd>Home/Pos</kbd> | move cursor to start of line | select area to start of line | move cursor to start of file | - |
 | <kbd>End</kbd> | move cursor to end of line | select area to end of line | move cursor to end of file | - |
 ||||||
-| <kbd>0-9 & A-F</kbd> | edit the current byte | - | - | - |
+| <kbd>0-9</kbd> <kbd>A-F</kbd> | edit the current byte | - | - | - |
 | <kbd><</kbd> | insert a new byte to the left | - | - | - |
-| <kbd>></kbd> & <kbd>␣</kbd> | insert a new byte to the right | - | - | - |
+| <kbd>></kbd> <kbd>␣</kbd> | insert a new byte to the right | - | - | - |
 | <kbd>Backspace</kbd> | reset current byte(s) | reset current byte(s) | remove current byte(s) | reset current byte(s) |
 | <kbd>Delete</kbd> | reset current byte(s) | reset current byte(s) | remove current byte(s) | reset current byte(s) |
 ||||||
