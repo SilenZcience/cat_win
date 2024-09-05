@@ -990,7 +990,7 @@ The currently supported Key Bindings are as follows:
 ||||||
 | <kbd>0-9 & A-F</kbd> | edit the current byte | - | - | - |
 | <kbd><</kbd> | insert a new byte to the left | - | - | - |
-| <kbd>> & ␣</kbd> | insert a new byte to the right | - | - | - |
+| <kbd>></kbd> & <kbd>␣</kbd> | insert a new byte to the right | - | - | - |
 | <kbd>Backspace</kbd> | reset current byte(s) | reset current byte(s) | remove current byte(s) | reset current byte(s) |
 | <kbd>Delete</kbd> | reset current byte(s) | reset current byte(s) | remove current byte(s) | reset current byte(s) |
 ||||||
@@ -1147,7 +1147,7 @@ The Data of the Files used can be limited using the <a href="#truncxy-truncxy">t
 
 ### <a id="--vise---visualizee">--vise, --visualizee</a>
 
-Display the Data of the given Files using the Shannon Entropy.
+Display the Data of the given Files using the [Shannon Entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)).
 The Entropy gets calculated for every Byte using the surrounding 128 Bytes as Frame Size.
 The Visualization is displayed in a [Hilbert Curve](https://en.wikipedia.org/wiki/Hilbert_curve) Pattern.
 The Width of the Visualization is determined by the Terminal Width.
