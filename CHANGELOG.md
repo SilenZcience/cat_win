@@ -14,6 +14,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - made the color of the cat_win REPL (cats) prefix customizable using the color config.
 - when selecting an area in the (hex-)editor the search and replace functionality will only be applied to that region.
 - toggling the find menu within the editor allows for search of regular expressions.
+- when matching regular expressions in the editor the replace can be used for pattern substitutions.
 - the find and replace in the editor is now shortly highlighted.
 
 ## Bugfixes
