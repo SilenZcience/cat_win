@@ -58,6 +58,20 @@ class Files:
             return f"<URL {display_url}>"
         return file
 
+    def is_temp_file(self, file_index: int) -> bool:
+        """
+        determine if a file is a temporary file.
+        
+        Parameters_
+        file_index (int):
+            the index of the file in self.files
+            
+        Returns:
+        (bool):
+            indicates if the file is a temp_file.
+        """
+        return self.files[file_index].path in self.temp_files.values()
+
     def set_files(self, files: list) -> None:
         """
         set the files to display.
