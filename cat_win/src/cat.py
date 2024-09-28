@@ -602,10 +602,17 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
     line_offset (int):
         the offset for counting the line numbers (used in the repl)
     """
-    if not (content or os.isatty(sys.stdout.fileno()) or file_index < 0):
+    if not (
+        content or
+        os.isatty(sys.stdout.fileno()) or
+        file_index < 0 or
+        u_files.is_temp_file(file_index)
+        ):
         # if the content of the file is empty, we check if maybe the file is its own pipe-target.
-        # an indicator would be if the file has just been modified to be empty (by the repl).
-        # also the stdout cannot be atty.
+        # in this case the stdout cannot be atty.
+        # also the repl would not produce this problem.
+        # also the temp-files (stdin, echo, url, ...) are (most likely) safe.
+        # an indicator would be if the file has just been modified to be empty (by the shell).
         # checking if the file is an _unknown_file is not valid, because by using '--stdin'
         # the stdin will be used to write the file
         file_mtime = get_file_mtime(u_files[file_index].path)
