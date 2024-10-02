@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.9.1] - TBA
+
+## Bugfixes
+
+- fixed Bug where a false warning would be displayed when using the stdin.
+
+
 ## [1.9.0] - 2024-09-05
 
 ### Major Changes
