@@ -639,7 +639,7 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
         content = [(_get_line_prefix(j+line_offset, file_index+1), c[1])
                    for j, c in enumerate(content, start=1)]
 
-    content = content.__getitem__(slice(*arg_parser.file_truncate))
+    content = content[slice(*arg_parser.file_truncate)]
 
     if u_args[ARGS_PEEK] and len(content) > 2*const_dic[DKW.PEEK_SIZE]:
         excluded_by_peek = len(content) - 2*const_dic[DKW.PEEK_SIZE]
@@ -948,7 +948,7 @@ def init(repl: bool = False) -> tuple:
     setup()
 
     # read parameter-args
-    args, _, unknown_files, echo_args = arg_parser.get_arguments(sys.argv + config.get_cmd())
+    args, _, unknown_files, echo_args = arg_parser.get_arguments(config.get_args(sys.argv[:]))
 
     u_args.set_args(args)
 

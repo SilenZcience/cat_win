@@ -9,6 +9,7 @@ import shlex
 import shutil
 import sys
 
+from cat_win.src.const.argconstants import ALL_ARGS
 from cat_win.src.const.defaultconstants import DKW
 from cat_win.src.service.helper.iohelper import err_print
 
@@ -18,31 +19,31 @@ BOOL_NEG_RESPONSE = ['FALSE','NO','N','0']
 BOOL_RESPONSE = BOOL_POS_RESPONSE + BOOL_NEG_RESPONSE
 
 
-def validator_string(_, d_h: bool=False):
+def validator_string(_, d_h: bool=False) -> bool:
     if d_h:
         err_print('Any UTF-8 String (unicode-escaped) without Nullbytes')
         return False
     return True
 
-def validator_int(value: str, d_h: bool=False):
+def validator_int(value: str, d_h: bool=False) -> bool:
     if d_h:
         err_print('Integers greater than Zero or Zero')
         return False
     return value.isdigit() and int(value) >= 0
 
-def validator_int_pos(value: str, d_h: bool=False):
+def validator_int_pos(value: str, d_h: bool=False) -> bool:
     if d_h:
         err_print('Integers greater than Zero')
         return False
     return value.isdigit() and int(value) > 0
 
-def validator_bool(value: str, d_h: bool=False):
+def validator_bool(value: str, d_h: bool=False) -> bool:
     if d_h:
         err_print(BOOL_RESPONSE, '(not case sensitive)')
         return False
     return value.upper() in BOOL_RESPONSE
 
-def validator_encoding(value: str, d_h: bool=False):
+def validator_encoding(value: str, d_h: bool=False) -> bool:
     if d_h:
         err_print('Valid Encoding Formats defined by the current Python Interpreter')
         return False
@@ -117,6 +118,7 @@ class Config:
 
         self.config_parser = configparser.ConfigParser()
         self.const_dic = {}
+        self.custom_commands = {}
 
     def convert_config_element(self, value: str, element: str):
         """
@@ -187,6 +189,27 @@ class Config:
         """
         return shlex.split(self.const_dic.get(DKW.DEFAULT_COMMAND_LINE, ''))
 
+    def get_args(self, argv: list) -> list:
+        """
+        modifies the sys.argv parameter list depending on the custom commands and config settings.
+        
+        Parameters:
+        argv (list):
+            sys.argv
+        
+        Returns
+        new_argv (list):
+            the modified sys.argv to use
+        """
+        argv += self.get_cmd()
+        new_argv = []
+        for arg in argv:
+            if arg in self.custom_commands:
+                new_argv += self.custom_commands[arg][:]
+                continue
+            new_argv.append(arg)
+        return new_argv
+
     def load_config(self) -> dict:
         """
         Load the Const Configuration from the config file.
@@ -196,8 +219,15 @@ class Config:
             a dictionary translating from DKW-keywords to values
         On Error: Return the default const config
         """
+        self.config_parser.read(self.config_file, encoding='utf-8')
         try:
-            self.config_parser.read(self.config_file, encoding='utf-8')
+            self.custom_commands = dict(
+                (k, shlex.split(v[1:-1])) for k, v in self.config_parser.items('COMMANDS')
+                )
+        except configparser.NoSectionError:
+            self.config_parser.add_section('COMMANDS')
+            self.custom_commands = {}
+        try:
             config_consts = dict(self.config_parser.items('CONSTS'))
             for element in self.elements:
                 try:
@@ -229,7 +259,6 @@ class Config:
             (h_width - columns * column_width) // columns,
             1
         )
-
         config_menu = ''
         for index, element in enumerate(self.elements):
             config_menu += f"{index+1: <{index_offset}}: "
@@ -239,7 +268,21 @@ class Config:
 
         print(config_menu)
 
-    def _save_config(self, keyword: str, value: str = ''):
+        print('-' * columns * (index_offset+element_offset))
+
+        config_menu = ''
+        for c_index, (command, value) in enumerate(self.custom_commands.items()):
+            config_menu += f"{c_index+len(self.elements)+1: <{index_offset}}: "
+            element = f"{command} = {' '.join(value)}"
+            config_menu += f"{element: <{element_offset}}"
+            if c_index % columns == columns-1:
+                config_menu += '\n'
+        if config_menu:
+            print(config_menu)
+        print(f"{len(self.elements)+len(self.custom_commands)+1: <{index_offset}}: ", end='')
+        print('<NEW CUSTOM COMMAND>')
+
+    def _save_config(self, keyword: str, value: str = '', section: str = 'CONSTS'):
         """
         write the value to the config-file
         
@@ -250,7 +293,7 @@ class Config:
             the value to write
         """
         if keyword is not None:
-            self.config_parser.set('CONSTS', keyword, f'"{value}"')
+            self.config_parser.set(section, keyword, f'"{value}"')
         try:
             with open(self.config_file, 'w', encoding='utf-8') as conf:
                 self.config_parser.write(conf)
@@ -258,26 +301,7 @@ class Config:
         except OSError:
             err_print(f"Could not write to config file:\n\t{self.config_file}")
 
-
-    def save_config(self) -> None:
-        """
-        Guide the User through the configuration options and save the changes.
-        Assume, that the current config is already loaded/
-        the method load_config() was already called.
-        """
-        self._print_all_available_elements()
-        keyword = ''
-        while keyword not in self.elements:
-            if keyword != '':
-                err_print(f"Something went wrong. Unknown keyword '{keyword}'")
-            try:
-                keyword = input('Input name or id of keyword to change: ')
-            except EOFError:
-                err_print('\nAborting due to End-of-File character...')
-                return
-            if keyword.isdigit():
-                keyword = self.elements[int(keyword)-1] if (
-                    0 < int(keyword) <= len(self.elements)) else keyword
+    def _save_config_element(self, keyword: str) -> None:
         print(f"Successfully selected element '{keyword}'")
         c_value_rep = repr(self.const_dic[keyword])
         if c_value_rep[0] not in ['"', "'"]:
@@ -301,6 +325,96 @@ class Config:
                 return
 
         self._save_config(keyword, value)
+
+    def _save_config_custom_command(self, keyword: str, forwarded: bool = False) -> None:
+        if not forwarded:
+            print(f"Successfully selected custom command '{keyword}'")
+            c_value_rep = repr(' '.join(self.custom_commands[keyword]))
+            if c_value_rep[0] not in ['"', "'"]:
+                c_value_rep = f"'{c_value_rep}'"
+            print(f"The current value of '{keyword}' is {c_value_rep}", end=' ')
+
+        value = None
+        try:
+            value = input('Input new value: ')
+        except EOFError:
+            err_print('\nAborting due to End-of-File character...')
+            return
+
+        if not value:
+            self.config_parser.remove_option('COMMANDS', keyword)
+            self._save_config(None)
+            return
+
+        self._save_config(keyword, value, 'COMMANDS')
+
+    def _save_config_add_custom_command(self) -> None:
+        def validator_custom_command(value: str, d_h: bool=False) -> bool:
+            if d_h:
+                err_print("The command needs to start with a '-' ")
+                err_print('and cannot be a duplicate of an existing command')
+                return False
+            if not value:
+                return False
+            if not value.startswith('-'):
+                return False
+            if value in self.custom_commands:
+                return False
+            if value in [x.short_form for x in ALL_ARGS] + [x.long_form for x in ALL_ARGS]:
+                return False
+            return True
+
+        value = None
+        while not validator_custom_command(value):
+            if value is not None:
+                err_print(f"Something went wrong. Invalid option: '{value}'.")
+                validator_custom_command(None, True)
+            try:
+                value = input('Input new custom command: ')
+            except EOFError:
+                err_print('\nAborting due to End-of-File character...')
+                return
+
+        print(f"Successfully added new custom command '{value}'")
+        self._save_config_custom_command(value, True)
+
+    def save_config(self) -> None:
+        """
+        Guide the User through the configuration options and save the changes.
+        Assume, that the current config is already loaded/
+        the method load_config() was already called.
+        """
+        self._print_all_available_elements()
+        keyword = ''
+        while True:
+            if keyword in self.elements:
+                return self._save_config_element(keyword)
+            if keyword in self.custom_commands:
+                return self._save_config_custom_command(keyword)
+            if keyword == '<NEW CUSTOM COMMAND>':
+                return self._save_config_add_custom_command()
+            if keyword != '':
+                err_print(f"Something went wrong. Unknown keyword '{keyword}'")
+            try:
+                keyword = input('Input name or id of keyword to change: ')
+            except EOFError:
+                err_print('\nAborting due to End-of-File character...')
+                return
+            if keyword.isdigit():
+                if (
+                    len(self.elements) < int(keyword) and
+                    int(keyword) <= len(self.elements)+len(self.custom_commands)
+                ):
+                    for index, key in enumerate(self.custom_commands, start=1):
+                        if len(self.elements)+index == int(keyword):
+                            keyword = key
+                            break
+                    continue
+                if int(keyword) == len(self.elements)+len(self.custom_commands)+1:
+                    keyword = '<NEW CUSTOM COMMAND>'
+                    continue
+                keyword = self.elements[int(keyword)-1] if (
+                    0 < int(keyword) <= len(self.elements)) else keyword
 
     def reset_config(self) -> None:
         """
