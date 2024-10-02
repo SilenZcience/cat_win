@@ -5,6 +5,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ## [1.9.1] - TBA
 
+### Minor Changes
+
+- added feature to define custom commands in the config menu.
+
 ## Bugfixes
 
 - fixed Bug where a false warning would be displayed when using the stdin.
