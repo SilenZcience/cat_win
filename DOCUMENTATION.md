@@ -1252,6 +1252,8 @@ Valid Options are:
 | unicode_escaped_editor_replace | unicode-escape the Replacement in the Editor (<a href="#----edit">-!, --edit</a>) | false | true |
 | unicode_escaped_find | unicode-escape the queried Substring when using <a href="#findx-findx">find=X, find&#42889;X</a> | false | true |
 | unicode_escaped_replace | unicode-escape a and b when using <a href="#ab">[a,b]</a> | false | true |
+|||||
+| \<NEW CUSTOM COMMAND\> | define a custom command/parameter |||
 
 Accepted Input for enabling a Setting:  `true, yes, y, 1`
 </br>
