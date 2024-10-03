@@ -1241,6 +1241,7 @@ Valid Options are:
 | end_marker_symbol | define the Marker that will be displayed at EOL when using <a href="#-e---ends">-e, --ends</a> | ^EOL | $ |
 | blank_remove_ws_lines | additionally remove whitespace Lines when using <a href="#-b---blank">-b, --blank</a> | true | false |
 | peek_size | define the amount of Lines shown by <a href="#-p---peek">-p, --peek</a> | 10 | 5 |
+| summary_unique_elements | display only unique elements in summary overviews | true | false |
 | strings_minimum_sequence_length | set the minimum Length of a String </br> (for the <a href="#--strings---strings">--strings, --strings</a> Parameter) | 2 | 4 |
 | strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the <a href="#--strings---strings">--strings, --strings</a> Parameter) | \| | \\n |
 | editor_indentation | set the Indentation used in the Editor (<a href="#----edit">-!, --edit</a>)</br> when pressing ↹ on an empty Line | <b>␣ ␣ ␣ ␣</b> | ↹ |
