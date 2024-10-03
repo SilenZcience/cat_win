@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - added feature to define custom commands in the config menu.
+- added `summary_unique_elements` option to the config menu to only display unique elements in summary overviews.
 
 ## Bugfixes
 
