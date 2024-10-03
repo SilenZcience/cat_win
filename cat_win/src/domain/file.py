@@ -30,3 +30,9 @@ class File:
         set the file size
         """
         self.file_size = file_size
+
+    def __hash__(self) -> int:
+        return hash(self.path)
+
+    def __eq__(self, value: object) -> bool:
+        return self.path == value.path
