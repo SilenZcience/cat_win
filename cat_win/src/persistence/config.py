@@ -16,7 +16,6 @@ from cat_win.src.service.helper.iohelper import err_print
 
 BOOL_POS_RESPONSE = ['TRUE','YES','Y','1']
 BOOL_NEG_RESPONSE = ['FALSE','NO','N','0']
-BOOL_RESPONSE = BOOL_POS_RESPONSE + BOOL_NEG_RESPONSE
 
 
 def validator_string(_, d_h: bool=False) -> bool:
@@ -39,9 +38,9 @@ def validator_int_pos(value: str, d_h: bool=False) -> bool:
 
 def validator_bool(value: str, d_h: bool=False) -> bool:
     if d_h:
-        err_print(BOOL_RESPONSE, '(not case sensitive)')
+        err_print(BOOL_POS_RESPONSE, '&', BOOL_NEG_RESPONSE, '(not case sensitive)')
         return False
-    return value.upper() in BOOL_RESPONSE
+    return value.upper() in BOOL_POS_RESPONSE + BOOL_NEG_RESPONSE
 
 def validator_encoding(value: str, d_h: bool=False) -> bool:
     if d_h:
@@ -353,7 +352,7 @@ class Config:
     def _save_config_add_custom_command(self) -> None:
         def validator_custom_command(value: str, d_h: bool=False) -> bool:
             if d_h:
-                err_print("The command needs to start with a '-' ")
+                err_print("The command needs to start with a '-' ", end='')
                 err_print('and cannot be a duplicate of an existing command')
                 return False
             if not value:
