@@ -843,8 +843,8 @@ def edit_files() -> None:
             Summary.show_dirs(arg_parser.get_dirs())
     if u_args[ARGS_SUM]:
         print()
-        Summary.show_sum(u_args[ARGS_SSUM], u_files.all_files_lines,
-                         u_files.all_line_number_place_holder, u_files.all_files_lines_sum)
+        Summary.show_sum(u_files.files, u_args[ARGS_SSUM], u_files.all_files_lines,
+                         u_files.all_line_number_place_holder)
     if u_args[ARGS_WORDCOUNT]:
         print()
         Summary.show_wordcount(u_files.files, arg_parser.file_encoding)
@@ -1005,6 +1005,7 @@ def init(repl: bool = False) -> tuple:
                         const_dic[DKW.HEX_EDITOR_COLUMNS])
     More.set_flags(on_windows_os, const_dic[DKW.MORE_STEP_LENGTH])
     Visualizer.set_flags(u_args[ARGS_DEBUG])
+    Summary.set_flags(const_dic[DKW.SUMMARY_UNIQUE_ELEMENTS])
     Summary.set_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
     PBar.set_colors(color_dic[CKW.PROGRESSBAR_DONE], color_dic[CKW.PROGRESSBAR_MISSING],
                     color_dic[CKW.RESET_ALL])
@@ -1130,8 +1131,8 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
                             u_args[ARGS_LLENGTH])
 
     if u_args[ARGS_SSUM]:
-        Summary.show_sum(u_args[ARGS_SSUM], u_files.all_files_lines,
-                         u_files.all_line_number_place_holder, u_files.all_files_lines_sum)
+        Summary.show_sum(u_files.files, u_args[ARGS_SSUM], u_files.all_files_lines,
+                         u_files.all_line_number_place_holder)
         return
     if u_args[ARGS_WWORDCOUNT]:
         Summary.show_wordcount(u_files.files, arg_parser.file_encoding)

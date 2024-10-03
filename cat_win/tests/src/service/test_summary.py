@@ -23,17 +23,18 @@ class TestSummary(TestCase):
 
     def test_show_sum(self):
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            Summary.show_sum(False, None, None, 15)
+            Summary.show_sum([File('1', '1'), File('2', '2')], False,
+                             {'1': 8, '2': 7}, 0)
             self.assertEqual(fake_out.getvalue(), "Lines (Sum): 15\n")
 
     def test_show_sum_detailed(self):
         output = r"""File LineCount
 test 111
 
-Lines (Sum): 11
+Lines (Sum): 111
 """
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            Summary.show_sum(True, {'test': 111}, 0, 11)
+            Summary.show_sum([File('test', '')], True, {'test': 111}, 0)
             self.assertEqual(fake_out.getvalue(), output)
 
     def test_show_wordcount(self):
