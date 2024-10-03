@@ -15,7 +15,19 @@ class Summary:
     """
     color: str = ''
     color_reset: str = ''
+    unique: bool = False
 
+
+    @staticmethod
+    def set_flags(unique: bool) -> None:
+        """
+        setup the flags to use in the summaries.
+        
+        Parameters:
+        unique (bool):
+            indicates if the listed summary should only display the elements once
+        """
+        Summary.unique = unique
 
     @staticmethod
     def set_colors(color: str, color_reset: str) -> None:
@@ -33,6 +45,15 @@ class Summary:
 
 
     @staticmethod
+    def _unique_list(_l: list) -> list:
+        unique_elements = []
+        for _i in _l:
+            if _i in unique_elements:
+                continue
+            unique_elements.append(_i)
+        return unique_elements
+
+    @staticmethod
     def show_files(detailed: bool, files: list) -> None:
         """
         displays u_files.files including their size and calculates
@@ -46,6 +67,9 @@ class Summary:
         """
         if not files:
             return
+        if Summary.unique:
+            files = Summary._unique_list(files)
+
         file_sizes = []
         msg = 'found' if detailed else 'applied'
         print(Summary.color, end='')
@@ -80,6 +104,9 @@ class Summary:
             print('No directores have been found!', end='')
             print(Summary.color_reset)
             return
+        if Summary.unique:
+            known_directories = Summary._unique_list(known_directories)
+
         dir_sizes = []
         print(Summary.color, end='')
         print('found DIR(s):', end='')
@@ -97,13 +124,15 @@ class Summary:
         print(Summary.color_reset)
 
     @staticmethod
-    def show_sum(detailed: bool, all_files_lines: dict, all_line_number_place_holder: int,
-                 all_files_lines_sum: int) -> None:
+    def show_sum(files: list, detailed: bool, all_files_lines: dict,
+                 all_line_number_place_holder: int) -> None:
         """
         display the line sum of each file individually if
         detailed is specified.
         display the line sum of all files.
 
+        files (list):
+            the fies to summarize.
         detailed (bool):
             indicates if the detailed summary should be displayed.
         all_files_lines (dict):
@@ -111,20 +140,22 @@ class Summary:
         all_line_number_place_holder (int):
             the amount of chars neccessary to display the last line (breaks on base64 decoding)
             (see files)
-        all_files_lines_sum (int):
-            the sum of all lines of all files (see files)
         """
+        if Summary.unique:
+            files = Summary._unique_list(files)
+
         if detailed:
             longest_file_name = max(map(len, all_files_lines.keys())) + 1
             print(f"{Summary.color}{'File': <{longest_file_name}}{Summary.color_reset}"
                 f"{Summary.color}LineCount{Summary.color_reset}")
-            for file, _ in all_files_lines.items():
-                print(f"{Summary.color}{file: <{longest_file_name}}" + \
-                    f"{all_files_lines[file]: >{all_line_number_place_holder}}" + \
+            for file in files:
+                print(f"{Summary.color}{file.path: <{longest_file_name}}" + \
+                    f"{all_files_lines[file.path]: >{all_line_number_place_holder}}" + \
                         f"{Summary.color_reset}")
             print()
+
         print(f"{Summary.color}Lines (Sum): " + \
-            f"{all_files_lines_sum}{Summary.color_reset}")
+            f"{sum(all_files_lines[f.path] for f in files)}{Summary.color_reset}")
 
     @staticmethod
     def show_wordcount(files: list, file_encoding: str) -> None:
@@ -137,6 +168,9 @@ class Summary:
         file_encoding (str):
             the encoding to use when opening the files
         """
+        if Summary.unique:
+            files = Summary._unique_list(files)
+
         word_count = {}
         used_files = []
 
@@ -184,6 +218,9 @@ class Summary:
         file_encoding (str):
             the encoding to use when opening the files
         """
+        if Summary.unique:
+            files = Summary._unique_list(files)
+
         char_count = {}
         used_files = []
 

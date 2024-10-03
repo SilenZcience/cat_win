@@ -24,8 +24,6 @@ class Files:
 
         # the amount of chars neccessary to display the last file
         self.file_number_place_holder = 0
-        # the sum of all lines of all files
-        self.all_files_lines_sum = 0
         # the sum of lines for each file individually
         self.all_files_lines = {}
         # the amount of chars neccessary to display the last line (breaks on base64 decoding)
@@ -130,7 +128,6 @@ class Files:
             file_line_sum = self._get_file_lines_sum_(file.path)
             file_lines.append(file_line_sum)
             self.all_files_lines[file.path] = file_line_sum
-        self.all_files_lines_sum = sum(file_lines)
         self.all_line_number_place_holder = len(str(max(file_lines)))
 
     @lru_cache(maxsize=10)

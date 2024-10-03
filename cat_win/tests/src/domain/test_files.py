@@ -44,16 +44,6 @@ class TestFiles(TestCase):
         u_files = Files()
         self.assertEqual(u_files._calc_max_line_length_(test_file_empty), 0)
 
-    def test_all_files_lines_sum(self):
-        u_files = Files()
-        u_files.set_files([test_file_path, test_file_edge_case_1])
-        u_files._calc_place_holder_()
-        self.assertEqual(u_files.all_files_lines_sum, 10)
-
-        u_files.set_files([test_file_path] * 13)
-        u_files._calc_place_holder_()
-        self.assertEqual(u_files.all_files_lines_sum, 104)
-
     def test_all_line_number_place_holder(self):
         u_files = Files()
         u_files.set_files([test_file_path])
