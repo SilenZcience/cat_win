@@ -15,6 +15,7 @@ class DKW:
     END_MARKER_SYMBOL = 'end_marker_symbol'
     BLANK_REMOVE_WS_LINES = 'blank_remove_ws_lines'
     PEEK_SIZE = 'peek_size'
+    SUMMARY_UNIQUE_ELEMENTS = 'summary_unique_elements'
     STRINGS_MIN_SEQUENCE_LENGTH = 'strings_minimum_sequence_length'
     STRINGS_DELIMETER = 'strings_delimeter'
     EDITOR_INDENTATION = 'editor_indentation'
