@@ -1108,7 +1108,7 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
         for file in u_files:
             stepper = More()
             stepper.lazy_load_file(file.path, arg_parser.file_encoding,
-                                'ignore' if const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace')
+                                   'ignore' if const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace')
             try:
                 stepper.step_through(u_args[ARGS_STDIN])
             except SystemExit:
