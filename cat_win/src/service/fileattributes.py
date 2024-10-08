@@ -235,9 +235,8 @@ def get_file_meta_data(file: str, res_path: str, on_windows_os: bool, colors = N
                 ['ls', '-l', file],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                text=True,
             ) as process:
-                meta_data += f"{colors[1]}{process.stdout.read()}{colors[0]}"
+                meta_data += f"{colors[1]}{process.stdout.read().decode()}{colors[0]}"
             return meta_data
 
         file_handle = WinStreams(file)
