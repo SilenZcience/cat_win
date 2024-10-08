@@ -12,6 +12,7 @@ from stat import (
     FILE_ATTRIBUTE_COMPRESSED as C,
     FILE_ATTRIBUTE_ENCRYPTED as E
 )
+import subprocess
 import json
 import math
 import os
@@ -230,7 +231,13 @@ def get_file_meta_data(file: str, res_path: str, on_windows_os: bool, colors = N
         meta_data += f"{datetime.fromtimestamp(stats.st_ctime)}{colors[0]}\n"
 
         if not on_windows_os:
-            meta_data += '\n'
+            result = subprocess.run(
+                ['ls', '-l', file],
+                capture_output = True,
+                text = True,
+                check = False,
+            )
+            meta_data += f"{colors[1]}{result.stdout}{colors[0]}"
             return meta_data
 
         file_handle = WinStreams(file)
