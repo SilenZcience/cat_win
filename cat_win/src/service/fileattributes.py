@@ -231,16 +231,12 @@ def get_file_meta_data(file: str, res_path: str, on_windows_os: bool, colors = N
         meta_data += f"{datetime.fromtimestamp(stats.st_ctime)}{colors[0]}\n"
 
         if not on_windows_os:
-            try:
-                result = subprocess.run(
-                    ['ls', '-l', file],
-                    capture_output = True,
-                    text = True,
-                    check = False,
-                )
-                meta_data += f"{colors[1]}{result.stdout}{colors[0]}"
-            except (TypeError, FileNotFoundError, subprocess.CalledProcessError):
-                pass
+            with subprocess.Popen(
+                ['ls', '-l', file],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            ) as process:
+                meta_data += f"{colors[1]}{process.stdout.read().decode()}{colors[0]}"
             return meta_data
 
         file_handle = WinStreams(file)
