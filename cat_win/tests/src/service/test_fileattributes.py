@@ -3,6 +3,7 @@ from unittest.mock import patch
 import os
 
 from cat_win.tests.mocks.std import StdOutMock
+from cat_win.src.cat import on_windows_os
 from cat_win.src.service.fileattributes import _convert_size, get_file_meta_data, get_file_size, print_meta, Signatures
 # import sys
 # sys.path.append('../cat_win')
@@ -59,12 +60,28 @@ class TestFileAttributes(TestCase):
         self.assertEqual(_convert_size(1024*1024*1024*1024*1024*1024*1024*1024*1024), '1.0 ?')
 
     def test_get_file_meta_data(self):
-        meta_data = get_file_meta_data(__file__, '', False)
+        meta_data = get_file_meta_data(__file__, '', on_windows_os)
         self.assertIn('Signature:', meta_data)
         self.assertIn('Size:', meta_data)
         self.assertIn('ATime:', meta_data)
         self.assertIn('MTime:', meta_data)
         self.assertIn('CTime:', meta_data)
+        if on_windows_os:
+            self.assertIn('Archive', meta_data)
+            self.assertIn('System', meta_data)
+            self.assertIn('Hidden', meta_data)
+            self.assertIn('Readonly', meta_data)
+            self.assertIn('Indexed', meta_data)
+            self.assertIn('Compressed', meta_data)
+            self.assertIn('Encrypted', meta_data)
+        else:
+            self.assertNotIn('Archive', meta_data)
+            self.assertNotIn('System', meta_data)
+            self.assertNotIn('Hidden', meta_data)
+            self.assertNotIn('Readonly', meta_data)
+            self.assertNotIn('Indexed', meta_data)
+            self.assertNotIn('Compressed', meta_data)
+            self.assertNotIn('Encrypted', meta_data)
 
         meta_data = get_file_meta_data(
             'randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|', '', False)
@@ -77,7 +94,7 @@ class TestFileAttributes(TestCase):
 
     def test_print_meta(self):
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            print_meta(__file__, '', False, ['A', 'B', 'C', 'D'])
+            print_meta(__file__, '', on_windows_os, ['A', 'B', 'C', 'D'])
             self.assertIn('Signature:', fake_out.getvalue())
             self.assertIn('Size:', fake_out.getvalue())
             self.assertIn('ATime:', fake_out.getvalue())

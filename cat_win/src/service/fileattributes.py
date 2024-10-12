@@ -10,12 +10,26 @@ from stat import (
     FILE_ATTRIBUTE_READONLY as R,
     FILE_ATTRIBUTE_NOT_CONTENT_INDEXED as I,
     FILE_ATTRIBUTE_COMPRESSED as C,
-    FILE_ATTRIBUTE_ENCRYPTED as E
+    FILE_ATTRIBUTE_ENCRYPTED as E,
+    S_IRUSR,
+    S_IWUSR,
+    S_IXUSR,
+    S_IRGRP,
+    S_IWGRP,
+    S_IXGRP,
+    S_IROTH,
+    S_IWOTH,
+    S_IXOTH,
+    S_ISDIR,
 )
-import subprocess
 import json
 import math
 import os
+try:
+    from pwd import getpwuid
+    from grp import getgrgid
+except ImportError:
+    pass
 
 from cat_win.src.service.helper.winstreams import WinStreams
 
@@ -222,7 +236,7 @@ def get_file_meta_data(file: str, res_path: str, on_windows_os: bool, colors = N
         meta_data += f"{colors[1]}{'Signature:' : <16}"
         meta_data += f"{Signatures.read_signature(res_path, file)}{colors[0]}\n"
         meta_data += f"{colors[1]}{'Size:' : <16}"
-        meta_data += f"{_convert_size(stats.st_size)}{colors[0]}\n"
+        meta_data += f"{_convert_size(stats.st_size)} ({stats.st_size}){colors[0]}\n"
         meta_data += f"{colors[1]}{'ATime:': <16}"
         meta_data += f"{datetime.fromtimestamp(stats.st_atime)}{colors[0]}\n"
         meta_data += f"{colors[1]}{'MTime:': <16}"
@@ -231,15 +245,16 @@ def get_file_meta_data(file: str, res_path: str, on_windows_os: bool, colors = N
         meta_data += f"{datetime.fromtimestamp(stats.st_ctime)}{colors[0]}\n"
 
         if not on_windows_os:
-            try:
-                with subprocess.Popen(
-                    ['ls', '-l', file],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                ) as process:
-                    meta_data += f"{colors[1]}{process.stdout.read().decode()}{colors[0]}"
-            except (TypeError, FileNotFoundError, subprocess.CalledProcessError):
-                pass
+            perms = [
+                (S_IRUSR, 'r'), (S_IWUSR, 'w'), (S_IXUSR, 'x'),  # User
+                (S_IRGRP, 'r'), (S_IWGRP, 'w'), (S_IXGRP, 'x'),  # Group
+                (S_IROTH, 'r'), (S_IWOTH, 'w'), (S_IXOTH, 'x'),  # Others
+            ]
+            meta_data += f"{colors[1]}{'d' if S_ISDIR(stats.st_mode) else '-'}"
+            meta_data += f"{''.join([per if stats.st_mode & bit else '-' for bit, per in perms])} "
+            meta_data += f"{stats.st_nlink} {getpwuid(stats.st_uid).pw_name} "
+            meta_data += f"{getgrgid(stats.st_gid).gr_name}{colors[0]}\n"
+
             return meta_data
 
         file_handle = WinStreams(file)
@@ -249,12 +264,8 @@ def get_file_meta_data(file: str, res_path: str, on_windows_os: bool, colors = N
                 meta_data += f"\t{colors[1]}- {stream}{colors[0]}\n"
 
         attribs = read_attribs(file)
-        meta_data += colors[2]
-        meta_data += '+' + ", ".join(x for x, y in attribs if y)
-        meta_data += colors[0] + '\n'
-        meta_data += colors[3]
-        meta_data += '-' + ", ".join(x for x, y in attribs if not y)
-        meta_data += colors[0] + '\n'
+        meta_data += f"{colors[2]}+{', '.join(x for x, y in attribs if y)}{colors[0]}\n"
+        meta_data += f"{colors[3]}-{', '.join(x for x, y in attribs if not y)}{colors[0]}\n"
         return meta_data
     except OSError:
         return ''
