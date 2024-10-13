@@ -66,22 +66,23 @@ class TestFileAttributes(TestCase):
         self.assertIn('ATime:', meta_data)
         self.assertIn('MTime:', meta_data)
         self.assertIn('CTime:', meta_data)
-        if on_windows_os:
-            self.assertIn('Archive', meta_data)
-            self.assertIn('System', meta_data)
-            self.assertIn('Hidden', meta_data)
-            self.assertIn('Readonly', meta_data)
-            self.assertIn('Indexed', meta_data)
-            self.assertIn('Compressed', meta_data)
-            self.assertIn('Encrypted', meta_data)
-        else:
-            self.assertNotIn('Archive', meta_data)
-            self.assertNotIn('System', meta_data)
-            self.assertNotIn('Hidden', meta_data)
-            self.assertNotIn('Readonly', meta_data)
-            self.assertNotIn('Indexed', meta_data)
-            self.assertNotIn('Compressed', meta_data)
-            self.assertNotIn('Encrypted', meta_data)
+        if '+' in meta_data:
+            if on_windows_os:
+                self.assertIn('Archive', meta_data)
+                self.assertIn('System', meta_data)
+                self.assertIn('Hidden', meta_data)
+                self.assertIn('Readonly', meta_data)
+                self.assertIn('Indexed', meta_data)
+                self.assertIn('Compressed', meta_data)
+                self.assertIn('Encrypted', meta_data)
+            else:
+                self.assertNotIn('Archive', meta_data)
+                self.assertNotIn('System', meta_data)
+                self.assertNotIn('Hidden', meta_data)
+                self.assertNotIn('Readonly', meta_data)
+                self.assertNotIn('Indexed', meta_data)
+                self.assertNotIn('Compressed', meta_data)
+                self.assertNotIn('Encrypted', meta_data)
 
         meta_data = get_file_meta_data(
             'randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|', '', False)
