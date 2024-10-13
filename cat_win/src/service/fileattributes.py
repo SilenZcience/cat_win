@@ -140,7 +140,10 @@ def read_attribs(file: str) -> list:
         boolean value describing if it is set
         [[ATTRIBUTE, True/False], ...]
     """
-    attrs = os.stat(file, follow_symlinks=False).st_file_attributes
+    try:
+        attrs = os.stat(file, follow_symlinks=False).st_file_attributes
+    except AttributeError:
+        return []
 
     return (
         [['Archive', bool(attrs & A)],
@@ -264,8 +267,9 @@ def get_file_meta_data(file: str, res_path: str, on_windows_os: bool, colors = N
                 meta_data += f"\t{colors[1]}- {stream}{colors[0]}\n"
 
         attribs = read_attribs(file)
-        meta_data += f"{colors[2]}+{', '.join(x for x, y in attribs if y)}{colors[0]}\n"
-        meta_data += f"{colors[3]}-{', '.join(x for x, y in attribs if not y)}{colors[0]}\n"
+        if attribs:
+            meta_data += f"{colors[2]}+{', '.join(x for x, y in attribs if y)}{colors[0]}\n"
+            meta_data += f"{colors[3]}-{', '.join(x for x, y in attribs if not y)}{colors[0]}\n"
         return meta_data
     except OSError:
         return ''
