@@ -8,6 +8,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 ## Bugfixes
 
 - fixed Bug where certain arguments could not be removed when using the repl.
+- fixed Bug where the editor would crash whentrying to find literals or patterns.
+- fixed Bug where found patterns were incorrectly colored.
 
 
 ## [1.9.1] - 2024-10-10
