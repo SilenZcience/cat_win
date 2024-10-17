@@ -747,9 +747,7 @@ class Editor:
                         tmp_error = str(exc)
                         continue
                     self.cpos.set_pos(next(search))
-                    self.search_items.append((self.cpos.row-self.wpos.row,
-                                              self.cpos.col-self.wpos.col,
-                                              search.s_len))
+                    self.search_items.append((self.cpos.row, self.cpos.col, search.s_len))
                     break
                 except StopIteration:
                     if self.selecting:
@@ -786,7 +784,9 @@ class Editor:
                     break
                 if key == b'_action_find':
                     cpos_tmp, spos_tmp = self.cpos.get_pos(), self.spos.get_pos()
+                    search_items_tmp = self.search_items.copy()
                     getattr(self, key.decode(), lambda *_: False)()
+                    self.search_items = search_items_tmp
                     self.cpos.set_pos(cpos_tmp)
                     self.spos.set_pos(spos_tmp)
                     tmp_error = ''
@@ -832,9 +832,7 @@ class Editor:
                     continue
                 for found_row, found_col in search:
                     self.cpos.set_pos((found_row,found_col))
-                    self.search_items.append((self.cpos.row-self.wpos.row,
-                                              self.cpos.col-self.wpos.col,
-                                              search.r_len))
+                    self.search_items.append((self.cpos.row, self.cpos.col, search.r_len))
                     self._replace_search(self.search, self.replace, search)
                     if not replace_all:
                         break
@@ -1136,7 +1134,8 @@ class Editor:
             self.curse_window.clrtoeol()
             self.curse_window.move(row+1, 0)
         for row, col, length in self.search_items:
-            self.curse_window.chgat(row, col, length, self._get_color(6))
+            self.curse_window.chgat(row-self.wpos.row, col-self.wpos.col,
+                                    length, self._get_color(6))
         self.search_items.clear()
 
         # display status/error_bar
