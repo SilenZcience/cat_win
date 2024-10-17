@@ -9,7 +9,7 @@ from cat_win.src.service.stringfinder import StringFinder
 
 class TestStringFinder(TestCase):
     def test_find_literals_true(self):
-        string_finder = StringFinder(set(), set())
+        string_finder = StringFinder([])
         _x = list(string_finder._findliterals('test', 'abctEStdef', True))
         self.assertEqual(_x, [[3, 7]])
 
@@ -26,7 +26,7 @@ class TestStringFinder(TestCase):
         self.assertEqual(_x, [[0, 0], [1, 1]])
 
     def test_find_literals_false(self):
-        string_finder = StringFinder(set(), set())
+        string_finder = StringFinder([])
         _x = list(string_finder._findliterals('a', '', False))
         self.assertEqual(_x, [])
 
@@ -37,12 +37,12 @@ class TestStringFinder(TestCase):
         self.assertEqual(_x, [])
 
     def test_find_regex_true(self):
-        string_finder = StringFinder(set(), set())
+        string_finder = StringFinder([])
         _x = list(string_finder._findregex(re.compile(r"test", re.DOTALL | re.IGNORECASE), 'TeSt'))
         self.assertEqual(_x, [[0, 4]])
 
     def test_find_regex_false(self):
-        string_finder = StringFinder(set(), set())
+        string_finder = StringFinder([])
         _x = list(string_finder._findregex(re.compile(r"[A-Z]{1}[a-z]+\s?.*\.+\s", re.DOTALL), 'silas A. Kraume'))
         self.assertEqual(_x, [])
         _x = list(string_finder._findregex(re.compile(r"[0-9]{2}", re.DOTALL), '123'))
@@ -61,7 +61,7 @@ class TestStringFinder(TestCase):
         self.assertEqual(_x, [])
 
     def test_optimize_intervals(self):
-        string_finder = StringFinder(set(), set())
+        string_finder = StringFinder([])
         _x = string_finder._optimize_intervals([[1, 3], [3, 5]])
         self.assertEqual(_x, [[1, 5]])
 
@@ -75,15 +75,15 @@ class TestStringFinder(TestCase):
         self.assertEqual(_x, [[-5, 3]])
 
     def test_optimize_intervals_empty(self):
-        string_finder = StringFinder(set(), set())
+        string_finder = StringFinder([])
         _x = string_finder._optimize_intervals([])
         self.assertEqual(_x, [])
 
     def test_find_keywords(self):
-        string_finder = StringFinder(set([('Is', False),
-                                          ('Test', False),
-                                          ('Not', False)]),
-                                     set([re.compile(r"[0-9]\!", re.DOTALL)]))
+        string_finder = StringFinder([('Is', False),
+                                      ('Test', False),
+                                      ('Not', False),
+                                      (re.compile(r"[0-9]\!", re.DOTALL), False)])
         line = 'ThisIsATest!1!'
         intervals, f_keywords, m_keywords = string_finder.find_keywords(line)
 

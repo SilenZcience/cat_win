@@ -75,7 +75,7 @@ class Testrepl(TestCase):
     def test_cat_repl_see_param(self):
         stdinhelpermock.set_content('!add -ln FIND=test match=[0-9]\n!see')
         expected_output = ["successfully added ['-l', '-n'].", "Active Args: ['-l', '-n']",
-                           "Literals:    [('test', 'CI')]", "Matches:     {re.compile('[0-9]', re.DOTALL)}"]
+                           "Queries:     str(CI):test,re.compile('[0-9]', re.DOTALL)"]
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.repl_main()
             fake_output = [line.lstrip('>>> ') for line in fake_out.getvalue().splitlines()[2:-1]]
@@ -84,7 +84,7 @@ class Testrepl(TestCase):
     def test_cat_repl_clear_param(self):
         stdinhelpermock.set_content('!add -ln find=test match=[0-9]\n!see\n!clear\n!see')
         expected_output = ["successfully added ['-l', '-n'].", "Active Args: ['-l', '-n']",
-                           "Literals:    [('test', 'CS')]", "Matches:     {re.compile('[0-9]', re.DOTALL)}",
+                           "Queries:     str(CS):test,re.compile('[0-9]', re.DOTALL)",
                            "successfully removed ['-l', '-n'].", 'Active Args: []']
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.repl_main()

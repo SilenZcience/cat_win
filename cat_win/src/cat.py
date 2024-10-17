@@ -227,10 +227,11 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     err_print(valid_urls)
     err_print('file encoding: ', end='')
     err_print(arg_parser.file_encoding)
-    err_print('search keyword(s): ', end='')
-    err_print([(v, 'CI' if c else 'CS') for v, c in arg_parser.file_search])
-    err_print('search match(es): ', end='')
-    err_print(arg_parser.file_match)
+    err_print('search queries: ', end='')
+    err_print(','.join(
+        ('str(' + ('CI' if c else 'CS') + '):' if isinstance(v, str) else 're:') + str(v)
+        for v, c in arg_parser.file_queries
+        ))
     err_print('truncate file: ', end='')
     err_print(arg_parser.file_truncate)
     err_print('replace mapping: ', end='')
@@ -421,8 +422,7 @@ def print_file(content: list, stepper: More) -> bool:
     """
     if not content:
         return False
-    if not any([arg_parser.file_search, arg_parser.file_match,
-                u_args[ARGS_GREP], u_args[ARGS_GREP_ONLY]]):
+    if not any([arg_parser.file_queries, u_args[ARGS_GREP], u_args[ARGS_GREP_ONLY]]):
         if u_args[ARGS_MORE]:
             stepper.add_lines([prefix + line for prefix, line in content])
             return False
@@ -430,8 +430,7 @@ def print_file(content: list, stepper: More) -> bool:
         return False
 
     contains_queried = False
-    string_finder = StringFinder(arg_parser.file_search,
-                                 arg_parser.file_match)
+    string_finder = StringFinder(arg_parser.file_queries)
 
     for line_prefix, line in content:
         cleaned_line = remove_ansi_codes_from_line(line)
@@ -1292,11 +1291,11 @@ def repl_main():
 
         def _command_see(self, _) -> None:
             print(f"{'Active Args:': <12} {[arg for _, arg in u_args]}")
-            if arg_parser.file_search:
-                file_search = [(v, 'CI' if c else 'CS') for v, c in arg_parser.file_search]
-                print(f"{'Literals:':<12} {file_search}")
-            if arg_parser.file_match:
-                print(f"{'Matches:': <12} {arg_parser.file_match}")
+            if arg_parser.file_queries:
+                print(f"{'Queries:':<12}", ','.join(
+                    ('str(' + ('CI' if c else 'CS') + '):' if isinstance(v, str) else '') + str(v)
+                    for v, c in arg_parser.file_queries
+                    ))
 
         def _command_exit(self, _) -> None:
             self.exit_repl = True
