@@ -9,9 +9,8 @@ class StringFinder:
     """
     defines a stringfinder
     """
-    def __init__(self, literals: set = None, regex: set = None) -> None:
-        self.kw_literals = literals if literals is not None else {}
-        self.kw_regex = regex if regex is not None else {}
+    def __init__(self, queries: set = None) -> None:
+        self.kw_queries = queries
 
     def _findliterals(self, sub: str, _s: str, ignore_case: bool):
         """
@@ -112,18 +111,17 @@ class StringFinder:
         matched_list = []
         matched_position = []
 
-        for keyword, ignore_case in self.kw_literals:
-            for _f in self._findliterals(keyword, line, ignore_case):
-                found_position.append(_f[:])
-                found_list.append((keyword, _f))
+        for query, ignore_case in self.kw_queries:
+            if isinstance(query, str):
+                for _f in self._findliterals(query, line, ignore_case):
+                    found_position.append(_f[:])
+                    found_list.append((query, _f))
+            else:
+                for _m in self._findregex(query, line):
+                    matched_position.append(_m[:])
+                    matched_list.append((query.pattern, _m))
         # sort by start position (necessary for a deterministic output)
         found_list.sort(key = lambda x: x[1][0])
-
-        for pattern in self.kw_regex:
-            for _m in self._findregex(pattern, line):
-                matched_position.append(_m[:])
-                matched_list.append((pattern.pattern, _m))
-        # sort by start position (necessary for a deterministic output)
         matched_list.sort(key = lambda x: x[1][0])
 
         return (self._merge_keyword_intervals(found_position, matched_position),

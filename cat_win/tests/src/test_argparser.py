@@ -81,16 +81,16 @@ class TestArgParser(TestCase):
     def test_get_arguments_match(self):
         arg_parser = ArgParser()
         arg_parser.get_arguments(['CAT', 'match:\\Atest\\Z'])
-        self.assertCountEqual([p.pattern for p in arg_parser.file_match], ['\\Atest\\Z'])
+        self.assertCountEqual([p.pattern for p, _ in arg_parser.file_queries], ['\\Atest\\Z'])
         arg_parser.get_arguments(['CAT', 'match=\\Atest\\Z'])
-        self.assertCountEqual([p.pattern for p in arg_parser.file_match], ['\\Atest\\Z'])
+        self.assertCountEqual([p.pattern for p, _ in arg_parser.file_queries], ['\\Atest\\Z'] * 2)
 
     def test_get_arguments_find(self):
         arg_parser = ArgParser()
         arg_parser.get_arguments(['CAT', 'find=Test123'])
-        self.assertCountEqual(arg_parser.file_search, set([('Test123', False)]))
+        self.assertCountEqual(arg_parser.file_queries, [('Test123', False)])
         arg_parser.get_arguments(['CAT', 'FIND:Test123'])
-        self.assertCountEqual(arg_parser.file_search, set([('Test123', False), ('Test123', True)]))
+        self.assertCountEqual(arg_parser.file_queries, [('Test123', False), ('Test123', True)])
 
     def test_get_arguments_trunc(self):
         arg_parser = ArgParser()
@@ -200,17 +200,17 @@ class TestArgParser(TestCase):
         arg_parser = ArgParser()
         arg_parser._add_argument('find=hello')
         arg_parser._add_argument('find=world')
-        self.assertSetEqual(arg_parser.file_search, set([('hello', False), ('world', False)]))
+        self.assertCountEqual(arg_parser.file_queries, [('hello', False), ('world', False)])
         arg_parser._add_argument('find=hello', True)
-        self.assertSetEqual(arg_parser.file_search, set([('world', False)]))
+        self.assertCountEqual(arg_parser.file_queries, [('world', False)])
 
         arg_parser._add_argument('match=[a-z]')
         arg_parser._add_argument('match=[0-9]')
-        self.assertEqual(len(arg_parser.file_match), 2)
-        self.assertCountEqual([p.pattern for p in arg_parser.file_match], ['[a-z]', '[0-9]'])
+        self.assertEqual(len(arg_parser.file_queries), 3)
+        self.assertCountEqual([p.pattern for p, _ in arg_parser.file_queries if not isinstance(p, str)], ['[a-z]', '[0-9]'])
         arg_parser._add_argument('match=[0-9]', True)
-        self.assertEqual(len(arg_parser.file_match), 1)
-        self.assertCountEqual([p.pattern for p in arg_parser.file_match], ['[a-z]'])
+        self.assertEqual(len(arg_parser.file_queries), 2)
+        self.assertCountEqual([p.pattern for p, _ in arg_parser.file_queries if not isinstance(p, str)], ['[a-z]'])
 
     def test_known_directories(self):
         inside_project_dirs = [

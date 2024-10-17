@@ -188,7 +188,7 @@ class TestCat(TestCase):
             self.assertIn('Author', fake_out.getvalue())
             self.assertIn('REPL', fake_out.getvalue())
 
-    @patch('cat_win.src.cat.arg_parser.file_search', new=set([('hello', False), ('world', True)]))
+    @patch('cat_win.src.cat.arg_parser.file_queries', new=[('hello', False), ('world', True)])
     def test__show_debug(self):
         with patch('sys.stderr', new=StdOutMock()) as fake_out:
             cat._show_debug([], ['test'], [], [], [], [], [])

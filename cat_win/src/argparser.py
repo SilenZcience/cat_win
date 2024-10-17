@@ -46,8 +46,7 @@ class ArgParser:
         The here defined variables may be accessed from the outside.
         """
         self.file_encoding = self.default_file_encoding
-        self.file_search = set()
-        self.file_match = set()
+        self.file_queries = []
         self.file_replace_mapping = {}
         self.file_truncate = [None, None, None]
 
@@ -81,7 +80,7 @@ class ArgParser:
             the entire sys.argv list
         delete (bool):
             indicates if a parameter should be deleted or added. Needed for
-            the repl when changing file_search, file_match
+            the repl when changing file_queries
         
         Returns:
         (args, unknown_args, unknown_files, echo_args) (tuple):
@@ -141,7 +140,7 @@ class ArgParser:
             the current parameter
         delete (bool):
             indicates if a parameter should be deleted or added. Needed for
-            the repl when changing file_search, file_match
+            the repl when changing file_queries
             
         Returns:
         (bool):
@@ -155,25 +154,28 @@ class ArgParser:
         # 'match' + ('=' or ':') + file_match
         if RE_MATCH.match(param) or RE_M_ATCH.match(param):
             p_length = 6 if RE_MATCH.match(param) else 2
+            query_element = (compile_re(param[p_length:], param[:p_length].isupper()),
+                             param[:p_length].isupper())
             if delete:
-                self.file_match.discard(compile_re(param[p_length:], param[:p_length].isupper()))
+                if query_element in self.file_queries:
+                    self.file_queries.remove(query_element)
                 return False
-            self.file_match.add(compile_re(param[p_length:], param[:p_length].isupper()))
+            self.file_queries.append(query_element)
             return False
         # 'find' + ('=' or ':') + file_search
         if RE_FIND.match(param) or RE_F_IND.match(param):
             p_length = 5 if RE_FIND.match(param) else 2
             query = param[p_length:]
-            if delete:
-                self.file_search.discard((query, param[:p_length].isupper()))
-                return False
             try:
                 if self.unicode_find:
                     query = query.encode().decode('unicode_escape').encode('latin-1').decode()
             except UnicodeError:
                 pass
-            finally:
-                self.file_search.add((query, param[:p_length].isupper()))
+            query_element = (query, param[:p_length].isupper())
+            if delete:
+                self.file_queries.remove(query_element)
+                return False
+            self.file_queries.append(query_element)
             return False
         # 'trunc' + ('='/':') + file_truncate[0] +':'+ file_truncate[1] [+ ':' + file_truncate[2]]
         if RE_TRUNC.match(param):
@@ -240,7 +242,7 @@ class ArgParser:
             the entire sys.argv list
         delete (bool):
             indicates if a parameter should be deleted or added. Needed for
-            the repl when changing file_search, file_match
+            the repl when changing file_queries
         """
         input_args = argv[1:]
         self._clear_values()
