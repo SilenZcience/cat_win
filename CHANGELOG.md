@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.9.2] - TBA
+
+## Bugfixes
+
+- fixed Bug where certain arguments could not be removed when using the repl.
+
+
 ## [1.9.1] - 2024-10-10
 
 ### Minor Changes
