@@ -16,11 +16,13 @@ DJANGO_VALID_URL_PATTERN = re.compile(
     r"(?::\d+)?" # optional port
     r"(?:/?|[/?]\S+)$", re.IGNORECASE)
 
-RE_ENCODING      = re.compile(r"\Aenc[\=\:].+\Z",   re.IGNORECASE)
-RE_MATCH         = re.compile(r"\Amatch[\=\:].+\Z", re.IGNORECASE)
-RE_M_ATCH        = re.compile(r"\Am[\=\:].+\Z",     re.IGNORECASE)
-RE_FIND          = re.compile(r"\Afind[\=\:].*\Z",  re.IGNORECASE)
-RE_F_IND         = re.compile(r"\Af[\=\:].*\Z",     re.IGNORECASE)
+RE_ENCODING      = re.compile(r"\Aenc[\=\:].+\Z",     re.IGNORECASE)
+RE_Q_MATCH       = re.compile(r"\Amatch[\=\:].+\Z",   re.IGNORECASE)
+RE_M_ATCH        = re.compile(r"\Am[\=\:].+\Z",       re.IGNORECASE)
+RE_Q_FIND        = re.compile(r"\Afind[\=\:].*\Z",    re.IGNORECASE)
+RE_F_IND         = re.compile(r"\Af[\=\:].*\Z",       re.IGNORECASE)
+RE_Q_REPLACE     = re.compile(r"\Areplace[\=\:].*\Z", re.IGNORECASE)
+RE_R_EPLACE      = re.compile(r"\Ar[\=\:].*\Z",       re.IGNORECASE)
 RE_TRUNC         = re.compile(r"\Atrunc[\=\:][0-9\(\)\+\-\*\/]*"
                               r"\:[0-9\(\)\+\-\*\/]*\:?"
                               r"[0-9\(\)\+\-\*\/]*\Z")
