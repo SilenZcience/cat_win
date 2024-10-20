@@ -232,6 +232,8 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
         ('str(' + ('CI' if c else 'CS') + '):' if isinstance(v, str) else 're:') + str(v)
         for v, c in arg_parser.file_queries
         ))
+    err_print('replace queries: ', end='')
+    err_print(repr(arg_parser.file_queries_replacement))
     err_print('truncate file: ', end='')
     err_print(arg_parser.file_truncate)
     err_print('replace mapping: ', end='')
@@ -429,8 +431,35 @@ def print_file(content: list, stepper: More) -> bool:
         print(*[prefix + line for prefix, line in content], sep='\n')
         return False
 
-    contains_queried = False
     string_finder = StringFinder(arg_parser.file_queries)
+
+    contains_queried = False
+    if arg_parser.file_queries and arg_parser.file_queries_replacement:
+        for line_prefix, line in content:
+            cleaned_line = remove_ansi_codes_from_line(line)
+            for query, ignore_case in arg_parser.file_queries:
+                contains_queried = True
+                if isinstance(query, str):
+                    for f_s, f_e in string_finder.findLiterals(query, cleaned_line, ignore_case):
+                        cleaned_line = (
+                            cleaned_line[:f_s] + \
+                                color_dic[CKW.REPLACE] + \
+                                    arg_parser.file_queries_replacement + \
+                                        color_dic[CKW.RESET_ALL] + \
+                                            cleaned_line[f_e:]
+                                            )
+                else:
+                    cleaned_line = query.sub(
+                        color_dic[CKW.REPLACE] + \
+                            arg_parser.file_queries_replacement + \
+                                color_dic[CKW.RESET_ALL],
+                                cleaned_line
+                                )
+            if u_args[ARGS_MORE]:
+                stepper.add_line(line_prefix + cleaned_line)
+            else:
+                print(line_prefix + cleaned_line)
+        return contains_queried
 
     for line_prefix, line in content:
         cleaned_line = remove_ansi_codes_from_line(line)
@@ -1296,6 +1325,8 @@ def repl_main():
                     ('str(' + ('CI' if c else 'CS') + '):' if isinstance(v, str) else '') + str(v)
                     for v, c in arg_parser.file_queries
                     ))
+            if arg_parser.file_queries_replacement:
+                print(f"{'Replacement:':<12} {repr(arg_parser.file_queries_replacement)}")
 
         def _command_exit(self, _) -> None:
             self.exit_repl = True
