@@ -7,7 +7,8 @@ import os
 
 from cat_win.src.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_ECHO
 from cat_win.src.const.regex import compile_re
-from cat_win.src.const.regex import RE_ENCODING, RE_MATCH, RE_M_ATCH, RE_FIND, RE_F_IND
+from cat_win.src.const.regex import RE_ENCODING, RE_Q_MATCH, RE_M_ATCH, RE_Q_FIND, RE_F_IND
+from cat_win.src.const.regex import RE_Q_REPLACE, RE_R_EPLACE
 from cat_win.src.const.regex import RE_TRUNC, RE_CUT, RE_REPLACE, RE_REPLACE_COMMA
 
 IS_FILE, IS_DIR, IS_DIR_CONTENT, IS_PATTERN = range(0, 4)
@@ -47,6 +48,7 @@ class ArgParser:
         """
         self.file_encoding = self.default_file_encoding
         self.file_queries = []
+        self.file_queries_replacement = None
         self.file_replace_mapping = {}
         self.file_truncate = [None, None, None]
 
@@ -151,9 +153,9 @@ class ArgParser:
         if RE_ENCODING.match(param):
             self.file_encoding = param[4:]
             return False
-        # 'match' + ('=' or ':') + file_match
-        if RE_MATCH.match(param) or RE_M_ATCH.match(param):
-            p_length = 6 if RE_MATCH.match(param) else 2
+        # 'match' + ('=' or ':') + file_queries pattern
+        if RE_Q_MATCH.match(param) or RE_M_ATCH.match(param):
+            p_length = 6 if RE_Q_MATCH.match(param) else 2
             query_element = (compile_re(param[p_length:], param[:p_length].isupper()),
                              param[:p_length].isupper())
             if delete:
@@ -162,9 +164,9 @@ class ArgParser:
                 return False
             self.file_queries.append(query_element)
             return False
-        # 'find' + ('=' or ':') + file_search
-        if RE_FIND.match(param) or RE_F_IND.match(param):
-            p_length = 5 if RE_FIND.match(param) else 2
+        # 'find' + ('=' or ':') + file_queries literal
+        if RE_Q_FIND.match(param) or RE_F_IND.match(param):
+            p_length = 5 if RE_Q_FIND.match(param) else 2
             query = param[p_length:]
             try:
                 if self.unicode_find:
@@ -176,6 +178,20 @@ class ArgParser:
                 self.file_queries.remove(query_element)
                 return False
             self.file_queries.append(query_element)
+            return False
+        # 'replace + ('=' or ':') + file_queries_replacement
+        if RE_Q_REPLACE.match(param) or RE_R_EPLACE.match(param):
+            p_length = 8 if RE_Q_REPLACE.match(param) else 2
+            query = param[p_length:]
+            try:
+                if self.unicode_replace:
+                    query = query.encode().decode('unicode_escape').encode('latin-1').decode()
+            except UnicodeError:
+                pass
+            if delete:
+                self.file_queries_replacement = None
+                return False
+            self.file_queries_replacement = query
             return False
         # 'trunc' + ('='/':') + file_truncate[0] +':'+ file_truncate[1] [+ ':' + file_truncate[2]]
         if RE_TRUNC.match(param):
