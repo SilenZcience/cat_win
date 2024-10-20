@@ -1045,7 +1045,23 @@ class HexEditor:
             # ignore background signals on UNIX, since a custom background implementation exists
             signal.signal(signal.SIGTSTP, signal.SIG_IGN)
 
-        editor._open()
+        try:
+            editor._open()
+        except Exception as e:
+            if not editor.unsaved_progress:
+                raise e
+            err_print('Oops..! Something went wrong.')
+            user_input = ''
+            while user_input not in ['Y', 'J', 'N']:
+                user_input = input('Do you want to save the changes? [Y/N]').upper()
+            if user_input == 'N':
+                raise e
+            editor._action_save()
+            if editor.unsaved_progress:
+                err_print('Oops..! Something went wrong. The file could not be saved.')
+            else:
+                err_print('The file has been successfully saved.')
+            raise e
         return editor.changes_made
 
     @staticmethod
