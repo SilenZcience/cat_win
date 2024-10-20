@@ -107,6 +107,7 @@
             <li><a href="#encx-encx">enc=X, enc&#42889;X</a></li>
             <li><a href="#findx-findx">find=X, find&#42889;X</a></li>
             <li><a href="#matchx-matchx">match=X, match&#42889;X</a></li>
+            <li><a href="#replacex-replacex">replace=X, replace&#42889;X</a></li>
             <li><a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a></li>
             <li><a href="#ab">[a,b]</a></li>
             <li><a href="#abc">[a&#42889;b&#42889;c]</a></li>
@@ -207,6 +208,7 @@
 | *<a href="#encx-encx">enc=X, enc&#42889;X</a>* | set file enconding to X (default is utf-8) |✔|
 | *<a href="#findx-findx">find=X, find&#42889;X</a>* | find/query a substring X in the given files |✔|
 | *<a href="#matchx-matchx">match=X, match&#42889;X</a>* | find/query a pattern X in the given files |✔|
+| *<a href="#replacex-replacex">replace=X, replace&#42889;X</a>* | replace queried substring(s)/pattern(s) in the given files |✔|
 | *<a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>* | truncate file to lines X and Y (python-like) |❌|
 ||||
 | *<a href="#ab">[a,b]</a>* | replace a with b in every line |✔|
@@ -1252,7 +1254,7 @@ Valid Options are:
 | unicode_escaped_editor_search | unicode-escape the Search in the Editor (<a href="#----edit">-!, --edit</a>) | false | true |
 | unicode_escaped_editor_replace | unicode-escape the Replacement in the Editor (<a href="#----edit">-!, --edit</a>) | false | true |
 | unicode_escaped_find | unicode-escape the queried Substring when using <a href="#findx-findx">find=X, find&#42889;X</a> | false | true |
-| unicode_escaped_replace | unicode-escape a and b when using <a href="#ab">[a,b]</a> | false | true |
+| unicode_escaped_replace | unicode-escape a and b when using <a href="#ab">[a,b]</a> or <a href="#replacex-replacex">replace=X, replace&#42889;X</a> | false | true |
 |||||
 | \<NEW CUSTOM COMMAND\> | define a custom command/parameter |||
 
@@ -1293,7 +1295,7 @@ Valid Options are:
 | found_keyword_message | the message displayed when using <a href="#findx-findx">find=X, find&#42889;X</a> |
 | matched_pattern | the matched pattern using <a href="#matchx-matchx">match=X, match&#42889;X</a> |
 | matched_pattern_message | the message displayed when using <a href="#matchx-matchx">match=X, match&#42889;X</a> |
-| substring_replacement | the replaced string using <a href="#ab">[a,b]</a> |
+| substring_replacement | the replaced string using <a href="#ab">[a,b]</a> or <a href="#replacex-replacex">replace=X, replace&#42889;X</a> |
 | progressbar_done | the progress that is already done (displayed when using <a href="#--vise---visualizee">--vise, --visualizee</a> or reading large files) |
 | progressbar_missing | the progress that is still missing (displayed when using <a href="#--vise---visualizee">--vise, --visualizee</a> or reading large files) |
 | repl_prefix | the prefix displayed when using the cat_win REPL (cats) |
@@ -1419,6 +1421,26 @@ It's raining cats and dogs!
 > catw test.txt "MATCH=CAT.\s.{3,}"
 It's raining cats and dogs!
 ---------- Matched: ('CAT.\\s.{3,}' 13-27) ----------
+```
+
+### <a href="#replacex-replacex">replace=X, replace&#42889;X</a>
+
+Defines a Replacement for queried Literals and Patterns given by <a href="#findx-findx">find=X, find&#42889;X</a> and <a href="#matchx-matchx">match=X, match&#42889;X</a>.
+When defining multiple Replacements only the last one will be used.
+The Interpretation of the Replacement is dependent on the queried Literal or Pattern.
+This way regular Expressions can be substituted.
+
+```console
+> catw test.txt "m:([a-z]{3})s" "replace=\\1\\1"
+It's raining catcat and dogdog!
+
+> catw test.txt f:and r=or
+It's raining cats or dogs!
+```
+
+```console
+> catw test.txt "m:([a-z]{3})s" f:and "replace=\\1\\1"
+It's raining catcat \1\1 dogdog!
 ```
 
 ### <a id="truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>
