@@ -147,6 +147,7 @@ def _show_help(repl: bool = False) -> None:
     help_message += f"\t{'enc=X, enc:X'    : <35}set file encoding to X (default is utf-8)\n"
     help_message += f"\t{'find=X, find:X'  : <35}find/query a substring X in the given files\n"
     help_message += f"\t{'match=X, match:X': <35}find/query a pattern X in the given files\n"
+    help_message += f"\t{'replace=X, replace:X': <35}replace queried substring(s)/pattern(s) in the given files\n"
     if not repl:
         help_message += f"\t{'trunc=X:Y, trunc:X:Y': <35}"
         help_message += 'truncate file to lines X and Y (python-like)\n'
