@@ -25,7 +25,7 @@ RE_Q_REPLACE     = re.compile(r"\Areplace[\=\:].*\Z", re.IGNORECASE)
 RE_R_EPLACE      = re.compile(r"\Ar[\=\:].*\Z",       re.IGNORECASE)
 RE_TRUNC         = re.compile(r"\Atrunc[\=\:][0-9\(\)\+\-\*\/]*"
                               r"\:[0-9\(\)\+\-\*\/]*\:?"
-                              r"[0-9\(\)\+\-\*\/]*\Z")
+                              r"[0-9\(\)\+\-\*\/]*\Z",re.IGNORECASE)
 RE_CUT           = re.compile(r"\A\[[0-9\(\)\+\-\*\/]*\:"
                               r"[0-9\(\)\+\-\*\/]*\:?"
                               r"[0-9\(\)\+\-\*\/]*\]\Z")

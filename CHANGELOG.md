@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - added `replace=`, `replace:` parameter to replace queried Literals and substitute queried Patterns.
+- the `trunc=`, `trunc:` parameter is no longer case sensitive.
 
 ## Bugfixes
 
