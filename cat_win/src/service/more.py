@@ -1,6 +1,7 @@
 """
 more
 """
+from pathlib import Path
 
 import os
 import shutil
@@ -44,13 +45,13 @@ class More:
         self._f_content_gen = None
         self.lazy_load = False
 
-    def lazy_load_file(self, file: str, file_encoding: str = 'utf-8',
+    def lazy_load_file(self, file: Path, file_encoding: str = 'utf-8',
                        errors: str = 'strict') -> None:
         """
         setup necessary data for lazy loading a file
         
         Parameters
-        file (str):
+        file (Path):
             a file path
         file_encoding (str):
             the encoding to use

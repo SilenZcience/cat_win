@@ -2,16 +2,17 @@
 zipviewer & tarviewer
 """
 
+from pathlib import Path
 import zipfile
 import tarfile
 
 from cat_win.src.service.helper.iohelper import err_print
 
 
-def display_archive(file: str, size_converter) -> bool:
+def display_archive(file: Path, size_converter) -> bool:
     """
     Parameters:
-    file (str):
+    file (Path):
         a string representation of a file (-path)
     size_converter (method)
         a method to convert bytes to more readable size values

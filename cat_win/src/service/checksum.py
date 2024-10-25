@@ -2,16 +2,18 @@
 checksum
 """
 
+from pathlib import Path
 import hashlib
 import zlib
 
-def get_checksum_from_file(file: str, colors = None) -> str:
+
+def get_checksum_from_file(file: Path, colors = None) -> str:
     """
     Calculates and returns the CRC32, MD5, SHA1, SHA256, SHA512
     hashes of a file.
     
     Parameters:
-    file (str):
+    file (Path):
         a string representation of a file (-path)
     colors (list):
         a list with 2 elements like [COLOR_CHECKSUM, COLOR_RESET]
@@ -53,12 +55,12 @@ def get_checksum_from_file(file: str, colors = None) -> str:
     checksum += f"\t{colors[0]}{'SHA512:': <9}{str(sha512.hexdigest())}{colors[1]}\n"
     return checksum
 
-def print_checksum(file: str, color: str, color_reset: str) -> None:
+def print_checksum(file: Path, color: str, color_reset: str) -> None:
     """
     print the information retrieved by get_checksum_from_file()
     
     Parameters:
-    file (str):
+    file (Path):
         a string representation of a file (-path)
     color (str):
         the color to use

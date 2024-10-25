@@ -51,8 +51,8 @@ def sep_valid_urls(to_check: list) -> tuple:
     """
     valid_urls, not_valid_urls = [], []
     for url in to_check:
-        if is_valid_uri(url):
-            valid_urls.append(url)
+        if is_valid_uri(str(url)):
+            valid_urls.append(str(url))
         else:
             not_valid_urls.append(url)
 

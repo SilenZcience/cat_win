@@ -4,6 +4,7 @@ converter
 
 from cat_win.src.const.regex import RE_EVAL
 
+
 class Converter:
     """
     converts a binary, octal, decimal or hex number

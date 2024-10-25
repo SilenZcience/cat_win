@@ -157,8 +157,8 @@ class TestArgParser(TestCase):
         self.assertCountEqual(known_files, [])
         self.assertCountEqual(echo_args, [])
         self.assertEqual(len(unknown_files), 2)
-        self.assertIn('testTesttest', ''.join(unknown_files))
-        self.assertIn('test-file.txt', ''.join(unknown_files))
+        self.assertIn('testTesttest', ''.join(map(str,unknown_files)))
+        self.assertIn('test-file.txt', ''.join(map(str,unknown_files)))
 
     def test_get_arguments_unknown_args(self):
         arg_parser = ArgParser()
@@ -235,7 +235,7 @@ class TestArgParser(TestCase):
         arg_parser = ArgParser()
         arg_parser._add_argument(test_file_dir)
         arg_parser.get_files()
-        self.assertListEqual([test_file_dir], arg_parser.get_dirs())
+        self.assertListEqual([test_file_dir], list(map(str,arg_parser.get_dirs())))
 
         arg_parser = ArgParser()
         arg_parser._add_argument(project_dir + '/*')

@@ -2,6 +2,8 @@
 rawviewer
 """
 
+from pathlib import Path
+
 from cat_win.src.service.helper.iohelper import IoHelper
 
 
@@ -87,14 +89,14 @@ def get_display_char_gen(file_encoding: str = 'utf-8', base: int = 16):
     return get_display_char
 
 
-def get_raw_view_lines_gen(file: str = '', mode: str = 'X', colors: list = None,
+def get_raw_view_lines_gen(file: Path, mode: str = 'X', colors: list = None,
                            file_encoding: str = 'utf-8'):
     """
     return the raw byte representation of a file in hexadecimal or binary
     line by line
     
     Parameters:
-    file (str):
+    file (Path):
         the file to use
     mode (str):
         either 'x', 'X' for hexadecimal (lower- or upper case letters),

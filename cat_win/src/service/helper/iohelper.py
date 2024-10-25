@@ -2,6 +2,7 @@
 iohelper
 """
 
+from pathlib import Path
 import contextlib
 import ctypes
 import io
@@ -37,13 +38,13 @@ def path_parts(path: str) -> list:
     return path_parts(_p) + [_f] if _f and _p else [_p] if _p else []
 
 
-def create_file(file: str, content: str, file_encoding: str) -> bool:
+def create_file(file: Path, content: str, file_encoding: str) -> bool:
     """
     create the directory path to a file, and the file itself.
     on error: cleanup all created subdirectories
     
     Parameters:
-    file (str):
+    file (Path):
         a string representation of a file (-path)
     content (str):
         the content to write into the files
@@ -89,14 +90,14 @@ class IoHelper:
     """
 
     @staticmethod
-    def read_file(src_file: str, binary: bool = False,
+    def read_file(src_file: Path, binary: bool = False,
                   file_encoding: str = 'utf-8', errors: str = 'strict',
                   file_length: int = -1):
         """
         Reades content from a given file.
         
         Parameters:
-        src_file (str):
+        src_file (Path):
             a string representation of a file (-path)
         binary (bool):
             indicates if the file should be opened in binary mode
@@ -139,14 +140,14 @@ class IoHelper:
 
 
     @staticmethod
-    def yield_file(src_file: str, binary: bool = False,
+    def yield_file(src_file: Path, binary: bool = False,
                    file_encoding: str = 'utf-8', errors: str = 'strict'):
         """
         Yields content from a given file. Appends an empty line if the last
         line ends with a newline, so the lines can be joined.
         
         Parameters:
-        src_file (str):
+        src_file (Path):
             a string representation of a file (-path)
         file_encoding (str):
             an encoding to open the file with
@@ -183,12 +184,12 @@ class IoHelper:
             file.close()
 
     @staticmethod
-    def get_newline(file: str) -> str:
+    def get_newline(file: Path) -> str:
         """
         determines the line ending of a given file.
         
         Parameters:
-        file (str):
+        file (Path):
             a file (-path) as string representation
             
         Returns:
@@ -206,15 +207,15 @@ class IoHelper:
 
 
     @staticmethod
-    def write_file(src_file: str, content,
-                   file_encoding: str = 'utf-8', errors: str = 'strict') -> str:
+    def write_file(src_file: Path, content,
+                   file_encoding: str = 'utf-8', errors: str = 'strict') -> Path:
         """
         Writes content into a given file.
         
         Parameters:
         content (str|bytes):
             the content to write in a file
-        src_file (str):
+        src_file (Path):
             a string representation of a file (-path)
         file_encoding (str):
             an encoding to open the file with
@@ -222,7 +223,7 @@ class IoHelper:
             the type of error handling when opening the file
         
         Returns:
-        src_file (str):
+        src_file (Path):
             the path to the temporary file written
         """
         if isinstance(content, str):
@@ -316,7 +317,6 @@ class IoHelper:
         success_file_list = []
 
         for file in file_list:
-            file = os.path.realpath(file)
             try:
                 IoHelper.write_file(file, content, file_encoding)
                 success_file_list.append(file)
