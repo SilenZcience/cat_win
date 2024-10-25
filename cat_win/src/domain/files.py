@@ -69,7 +69,8 @@ class Files:
         (bool):
             indicates if the file is a temp_file.
         """
-        return self.files[file_index].path in self.temp_files.values()
+        return self.files[file_index].path in self.temp_files.values() or \
+               self.files[file_index].path in self.temp_files['url']
 
     def set_files(self, files: list) -> None:
         """
