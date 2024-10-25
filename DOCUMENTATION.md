@@ -1423,7 +1423,7 @@ It's raining cats and dogs!
 ---------- Matched: ('CAT.\\s.{3,}' 13-27) ----------
 ```
 
-### <a href="#replacex-replacex">replace=X, replace&#42889;X</a>
+### <a id="replacex-replacex">replace=X, replace&#42889;X</a>
 
 Defines a Replacement for queried Literals and Patterns given by <a href="#findx-findx">find=X, find&#42889;X</a> and <a href="#matchx-matchx">match=X, match&#42889;X</a>.
 When defining multiple Replacements only the last one will be used.
