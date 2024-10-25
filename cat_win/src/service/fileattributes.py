@@ -3,6 +3,7 @@ fileattributes
 """
 
 from datetime import datetime
+from pathlib import Path
 from stat import (
     FILE_ATTRIBUTE_ARCHIVE as A,
     FILE_ATTRIBUTE_SYSTEM as S,
@@ -49,12 +50,14 @@ class Signatures:
         return True
 
     @staticmethod
-    def read_signature(res_path: str, file: str) -> str:
+    def read_signature(res_path: str, file: Path) -> str:
         """
         read a file and compare its signature to known signatures.
         
         Parameters:
-        file (str):
+        res_path (str):
+            the path to the signatures database
+        file (Path):
             a string representation of a file (-path)
             
         Returns:
@@ -126,12 +129,12 @@ def _convert_size(size_bytes: int) -> str:
     return f"{size} {size_name[i] if i < len(size_name) else '?'}"
 
 
-def read_attribs(file: str) -> list:
+def read_attribs(file: Path) -> list:
     """
     check which attributes a file has set.
     
     Parameters:
-    file (str):
+    file (Path):
         a string representation of a file (-path)
         
     Returns:
@@ -156,12 +159,12 @@ def read_attribs(file: str) -> list:
          ['Encrypted', bool(attrs & E)]]
     )
 
-def get_file_size(file: str) -> int:
+def get_file_size(file: Path) -> int:
     """
     calculate the size of a file
     
     Parameters:
-    file (str):
+    file (Path):
         a string representation of a file (-path)
         
     Returns:
@@ -197,10 +200,14 @@ def get_dir_size(directory: str) -> int:
         pass
     return total
 
-def get_file_mtime(file: str) -> float:
+def get_file_mtime(file: Path) -> float:
     """
     get the modified time of a file
-    
+
+    Parameters:
+    file (Path):
+        a string representation of a file (-path)
+
     Returns:
     (float):
         the modified time of a file
@@ -210,13 +217,15 @@ def get_file_mtime(file: str) -> float:
     except OSError:
         return 0.0
 
-def get_file_meta_data(file: str, res_path: str, on_windows_os: bool, colors = None) -> str:
+def get_file_meta_data(file: Path, res_path: str, on_windows_os: bool, colors = None) -> str:
     """
     calculate file metadata information.
     
     Parameters:
-    file (str):
+    file (Path):
         a string representation of a file (-path)
+    res_path (str);
+        the path to the signatures database
     on_windows_os (bool):
         indicates if the user is on windows OS using
         platform.system() == 'Windows'
@@ -234,7 +243,7 @@ def get_file_meta_data(file: str, res_path: str, on_windows_os: bool, colors = N
     try:
         stats = os.stat(file)
 
-        meta_data = colors[1] + file + colors[0] + '\n'
+        meta_data = f"{colors[1]}{file}{colors[0]}\n"
 
         meta_data += f"{colors[1]}{'Signature:' : <16}"
         meta_data += f"{Signatures.read_signature(res_path, file)}{colors[0]}\n"
@@ -274,12 +283,12 @@ def get_file_meta_data(file: str, res_path: str, on_windows_os: bool, colors = N
     except OSError:
         return ''
 
-def print_meta(file: str, res_path: str, on_windows_os: bool, colors: list) -> None:
+def print_meta(file: Path, res_path: str, on_windows_os: bool, colors: list) -> None:
     """
     print the information retrieved by get_file_meta_data()
     
     Parameters:
-    file (str):
+    file (Path):
         a string representation of a file (-path)
     on_windows_os (bool):
         indicates if the current system is Windows

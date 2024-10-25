@@ -149,13 +149,14 @@ class Summary:
             print(f"{Summary.color}{'File': <{longest_file_name}}{Summary.color_reset}"
                 f"{Summary.color}LineCount{Summary.color_reset}")
             for file in files:
-                print(f"{Summary.color}{file.path: <{longest_file_name}}" + \
-                    f"{all_files_lines[file.path]: >{all_line_number_place_holder}}" + \
+                file_path = str(file.path)
+                print(f"{Summary.color}{file_path: <{longest_file_name}}" + \
+                    f"{all_files_lines[file_path]: >{all_line_number_place_holder}}" + \
                         f"{Summary.color_reset}")
             print()
 
         print(f"{Summary.color}Lines (Sum): " + \
-            f"{sum(all_files_lines[f.path] for f in files)}{Summary.color_reset}")
+            f"{sum(all_files_lines[str(f.path)] for f in files)}{Summary.color_reset}")
 
     @staticmethod
     def show_wordcount(files: list, file_encoding: str) -> None:

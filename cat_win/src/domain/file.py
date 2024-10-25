@@ -2,11 +2,14 @@
 file
 """
 
+from pathlib import Path
+
+
 class File:
     """
     defines a file.
     """
-    def __init__(self, path: str, display_name: str) -> None:
+    def __init__(self, path: Path, display_name: str) -> None:
         self.path = path
         self.displayname = display_name
         self.file_size = -1

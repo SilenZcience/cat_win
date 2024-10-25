@@ -2,6 +2,7 @@
 editor
 """
 
+from pathlib import Path
 try:
     import curses
     CURSES_MODULE_ERROR = False
@@ -39,7 +40,7 @@ class Editor:
     unicode_escaped_replace = True
     file_encoding = 'utf-8'
 
-    def __init__(self, file: str, display_name: str) -> None:
+    def __init__(self, file: Path, display_name: str) -> None:
         """
         defines an Editor object.
         
@@ -1329,12 +1330,12 @@ class Editor:
             curses.endwin()
 
     @classmethod
-    def open(cls, file: str, display_name: str, skip_binary: bool = False) -> bool:
+    def open(cls, file: Path, display_name: str, skip_binary: bool = False) -> bool:
         """
         simple editor to change the contents of any provided file.
         
         Parameters:
-        file (str):
+        file (Path):
             a string representing a file(-path)
         display_name (str):
             the display name for the current file

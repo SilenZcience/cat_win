@@ -78,7 +78,8 @@ def setup():
     color_dic = default_color_dic.copy()
     const_dic = config.load_config()
 
-    arg_parser = ArgParser(const_dic[DKW.DEFAULT_FILE_ENCODING],
+    arg_parser = ArgParser(on_windows_os,
+                           const_dic[DKW.DEFAULT_FILE_ENCODING],
                            const_dic[DKW.UNICODE_ESCAPED_ECHO],
                            const_dic[DKW.UNICODE_ESCAPED_FIND],
                            const_dic[DKW.UNICODE_ESCAPED_REPLACE])
@@ -217,13 +218,13 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     err_print('unknown_args: ', end='')
     err_print(unknown_args)
     err_print('known_files: ', end='')
-    err_print(known_files)
+    err_print(list(map(str, known_files)))
     err_print('unknown_files: ', end='')
-    err_print(unknown_files)
+    err_print(list(map(str, unknown_files)))
     err_print('echo_args: ', end='')
     err_print(repr(echo_args))
     err_print('known_directories: ', end='')
-    err_print(known_dirs)
+    err_print(list(map(str, known_dirs)))
     err_print('valid_urls: ', end='')
     err_print(valid_urls)
     err_print('file encoding: ', end='')
@@ -402,7 +403,7 @@ def _get_file_prefix(prefix: str, file_index: int, hyper: bool = False) -> str:
     """
     if file_index < 0:
         return prefix
-    file = file_uri_prefix * hyper + u_files[file_index].displayname
+    file = f"{file_uri_prefix * hyper}{u_files[file_index].displayname}"
     if hyper:
         file = file.replace('\\', '/')
     if not u_args[ARGS_NUMBER] or hyper:

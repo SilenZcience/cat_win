@@ -2,6 +2,7 @@
 hexeditor
 """
 
+from pathlib import Path
 try:
     import curses
     CURSES_MODULE_ERROR = False
@@ -32,7 +33,7 @@ class HexEditor:
     unicode_escaped_search = True
     columns = 16
 
-    def __init__(self, file: str, display_name: str) -> None:
+    def __init__(self, file: Path, display_name: str) -> None:
         self.curse_window = None
         self.decode_char = get_display_char_gen()
 
@@ -1010,12 +1011,12 @@ class HexEditor:
             curses.endwin()
 
     @classmethod
-    def open(cls, file: str, display_name: str) -> bool:
+    def open(cls, file: Path, display_name: str) -> bool:
         """
         simple editor to change the contents of any provided file.
         
         Parameters:
-        file (str):
+        file (Path):
             a string representing a file(-path)
         display_name (str):
             the display name for the current file

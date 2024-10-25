@@ -2,6 +2,7 @@
 argparser
 """
 
+from pathlib import Path
 import glob
 import os
 
@@ -11,17 +12,19 @@ from cat_win.src.const.regex import RE_ENCODING, RE_Q_MATCH, RE_M_ATCH, RE_Q_FIN
 from cat_win.src.const.regex import RE_Q_REPLACE, RE_R_EPLACE
 from cat_win.src.const.regex import RE_TRUNC, RE_CUT, RE_REPLACE, RE_REPLACE_COMMA
 
-IS_FILE, IS_DIR, IS_DIR_CONTENT, IS_PATTERN = range(0, 4)
+IS_FILE, IS_DIR, IS_PATTERN = range(0, 3)
 
 
 class ArgParser:
     """
     defines the ArgParser
     """
-    def __init__(self, default_file_encoding: str = 'utf-8',
+    def __init__(self, on_windows_os: bool = None,
+                 default_file_encoding: str = 'utf-8',
                  unicode_echo: bool = True,
                  unicode_find: bool = True,
                  unicode_replace: bool = True) -> None:
+        self.win_prefix_no_normalization = '\\\\?\\' * bool(on_windows_os)
         self.default_file_encoding: str = default_file_encoding
         self.unicode_echo: bool = unicode_echo
         self.unicode_find = unicode_find
@@ -119,19 +122,50 @@ class ArgParser:
                 self._known_files.append(structure)
             elif struct_type == IS_DIR:
                 self._known_directories.append(structure)
-            elif struct_type == IS_DIR_CONTENT:
-                for filename in glob.iglob(structure):
-                    if os.path.isfile(filename):
-                        self._known_files.append(os.path.realpath(filename))
+                for filename in structure.glob('*'):
+                    filename = Path(filename)
+                    if not filename.is_file():
+                        filename = Path(f"{self.win_prefix_no_normalization}{filename}")
+                    if filename.is_file():
+                        self._known_files.append(filename)
             elif struct_type == IS_PATTERN:
                 for _filename in glob.iglob(structure, recursive=True):
-                    filename = os.path.realpath(_filename)
-                    if os.path.isfile(filename):
-                        self._known_files.append(os.path.realpath(filename))
+                    filename = Path(os.path.realpath(_filename))
+                    if not filename.is_file():
+                        filename = Path(f"{self.win_prefix_no_normalization}{filename}")
+                    if filename.is_file():
+                        self._known_files.append(filename)
                     else:
                         self._known_directories.append(filename)
 
         return self._known_files
+
+    def _add_path_struct(self, param: str) -> bool:
+        realpath, is_struct = os.path.realpath(param), True
+        possible_paths  = [
+            Path(realpath),
+            Path(f"{self.win_prefix_no_normalization}{realpath}")
+        ]
+
+        for possible_path in possible_paths:
+            try:
+                if possible_path.is_file():
+                    self._known_file_structures.append((IS_FILE, possible_path))
+                    break
+                if possible_path.is_dir():
+                    self._known_file_structures.append((IS_DIR, possible_path))
+                    break
+            except OSError:
+                pass
+        else:
+            is_struct = False
+
+        if any(c in param for c in '*?['):
+            # matches file-patterns, not directories (e.g. *.txt)
+            self._known_file_structures.append((IS_PATTERN, param))
+            is_struct = True
+
+        return is_struct
 
     def _add_argument(self, param: str, delete: bool = False) -> bool:
         """
@@ -226,23 +260,18 @@ class ArgParser:
             if param in (arg.short_form, arg.long_form):
                 self._args.append((arg.arg_id, param))
                 return arg.arg_id == ARGS_ECHO
-        possible_path = os.path.realpath(param)
-        if os.path.isfile(possible_path):
-            self._known_file_structures.append((IS_FILE, possible_path))
-        elif os.path.isdir(possible_path):
-            self._known_file_structures.append((IS_DIR, possible_path))
-            self._known_file_structures.append((IS_DIR_CONTENT, possible_path + '/*'))
-        elif '*' in param or '?' in param or '[' in param:
-            # matches file-patterns, not directories (e.g. *.txt)
-            self._known_file_structures.append((IS_PATTERN, param))
-        elif len(param) > 2 and param[0] == '-' != param[1]:
+
+        if self._add_path_struct(param):
+            return False
+
+        if len(param) > 2 and param[0] == '-' != param[1]:
             for i in range(1, len(param)):
                 if self._add_argument('-' + param[i], delete):
                     return True
         # out of bound is not possible, in case of length 0 param, possible_path would have
         # become the working-path and therefor handled the param as a directory
         elif param[0] != '-':
-            self._unknown_files.append(param)
+            self._unknown_files.append(Path(param))
         else:
             self._unknown_args.append(param)
         return False

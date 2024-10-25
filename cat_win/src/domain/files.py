@@ -3,6 +3,7 @@ files
 """
 
 from functools import lru_cache
+from pathlib import Path
 import heapq
 
 from cat_win.src.domain.file import File
@@ -32,7 +33,7 @@ class Files:
         # (breaks on base64 decoding)
         self.file_line_length_place_holder = 0
 
-    def get_file_display_name(self, file: str) -> str:
+    def get_file_display_name(self, file: Path) -> str:
         """
         return the display name of a file. Expects self.temp_files to be set already.
         
@@ -54,7 +55,7 @@ class Files:
             if len(display_url) > 30:
                 display_url = f"{display_url[:20]}...{display_url[-10:]}"
             return f"<URL {display_url}>"
-        return file
+        return str(file)
 
     def is_temp_file(self, file_index: int) -> bool:
         """
@@ -113,7 +114,7 @@ class Files:
             byt = reader(1024 * 1024)
 
     @lru_cache(maxsize=10)
-    def _get_file_lines_sum_(self, file: str) -> int:
+    def _get_file_lines_sum_(self, file: Path) -> int:
         try:
             with open(file, 'rb') as raw_f:
                 c_generator = self._count_generator_(raw_f.raw.read)
@@ -127,16 +128,16 @@ class Files:
         for file in self.files:
             file_line_sum = self._get_file_lines_sum_(file.path)
             file_lines.append(file_line_sum)
-            self.all_files_lines[file.path] = file_line_sum
+            self.all_files_lines[str(file.path)] = file_line_sum
         self.all_line_number_place_holder = len(str(max(file_lines)))
 
     @lru_cache(maxsize=10)
-    def _calc_max_line_length_(self, file: str) -> int:
+    def _calc_max_line_length_(self, file: Path) -> int:
         """
         Calculate self.file_line_length_place_holder for a single file.
         
         Parameters:
-        file (str):
+        file (Path):
             a string representation of a file (-path)
             
         Returns:

@@ -5,8 +5,12 @@ from cat_win.src.service.helper.tmpfilehelper import TmpFileHelper
 # import sys
 # sys.path.append('../cat_win')
 
+mm = MagicMock()
+mock_file = MagicMock()
+mock_file.name = "magic"
+mm.return_value = mock_file
 
-@patch('tempfile.NamedTemporaryFile', MagicMock())
+@patch('tempfile.NamedTemporaryFile', mm)
 class TestTmpFileHelper(TestCase):
     maxDiff = None
 

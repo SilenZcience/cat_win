@@ -3,6 +3,7 @@ visualizer
 """
 
 from functools import lru_cache
+from pathlib import Path
 import shutil
 
 from cat_win.src.const.colorconstants import CVis
@@ -99,13 +100,13 @@ class Visualizer:
                 vis_row = ''
         print(CVis.COLOR_RESET)
 
-    def visualize_byte_view(self, file_p: str) -> None:
+    def visualize_byte_view(self, file_p: Path) -> None:
         """
         visualize all bytes in a given file.
         display the visualization using the scan curve.
 
         Parameters:
-        file_p (str):
+        file_p (Path):
             a string representation of a file (-path)
         """
         width = shutil.get_terminal_size()[0] // 2
@@ -113,13 +114,13 @@ class Visualizer:
         Visualizer.display_data(SpaceFilling.get_scan_curve(bin_content, width),
                                 Visualizer.get_color_byte_view)
 
-    def visualize_zorder_curve_view(self, file_p: str) -> None:
+    def visualize_zorder_curve_view(self, file_p: Path) -> None:
         """
         visualize all bytes in a given file.
         display the visualization using a z-order curve view.
 
         Parameters:
-        file_p (str):
+        file_p (Path):
             a string representation of a file (-path)
         """
         width = shutil.get_terminal_size()[0] // 2
@@ -127,13 +128,13 @@ class Visualizer:
         Visualizer.display_data(SpaceFilling.get_zorder_curve(bin_content, width),
                                 Visualizer.get_color_byte_view)
 
-    def visualize_hilbert_curve_view(self, file_p: str) -> None:
+    def visualize_hilbert_curve_view(self, file_p: Path) -> None:
         """
         visualize all bytes in a given file.
         display the visualization using a hilbert curve view.
 
         Parameters:
-        file_p (str):
+        file_p (Path):
             a string representation of a file (-path)
         """
         width = shutil.get_terminal_size()[0] // 2
@@ -141,13 +142,13 @@ class Visualizer:
         Visualizer.display_data(SpaceFilling.get_hilbert_curve(bin_content, width),
                                 Visualizer.get_color_byte_view)
 
-    def visualize_shannon_entropy(self, file_p: str) -> None:
+    def visualize_shannon_entropy(self, file_p: Path) -> None:
         """
         visualize all bytes in a given file.
         display the visualization using the shannon entropy.
 
         Parameters:
-        file_p (str):
+        file_p (Path):
             a string representation of a file (-path)
         """
         width = shutil.get_terminal_size()[0] // 2
@@ -156,13 +157,13 @@ class Visualizer:
         Visualizer.display_data(SpaceFilling.get_hilbert_curve(bin_content, width),
                                 Visualizer.get_color_entropy)
 
-    def visualize_digraph_dot_plot(self, file_p: str) -> None:
+    def visualize_digraph_dot_plot(self, file_p: Path) -> None:
         """
         visualize all bytes in a given file.
         display the visualization using a digraph dot plot view.
 
         Parameters:
-        file_p (str):
+        file_p (Path):
             a string representation of a file (-path)
         """
         bin_content = IoHelper.read_file(file_p, True).__getitem__(slice(*self.truncate))
@@ -233,6 +234,7 @@ class Visualizer:
         """
         visualize all initialized files by the defined method.
         """
+        visualizer = lambda _: None
         if self.v_type == 'ByteView':
             visualizer = self.visualize_byte_view
         if self.v_type == 'ZOrderCurveView':

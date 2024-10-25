@@ -2,6 +2,7 @@
 tmpfilehelper
 """
 
+from pathlib import Path
 import tempfile
 
 
@@ -19,15 +20,15 @@ class TmpFileHelper:
         """
         return self.tmp_files
 
-    def generate_temp_file_name(self) -> str:
+    def generate_temp_file_name(self) -> Path:
         """
         generate a new temp-file.
         
         Returns:
-        (str):
+        (Path):
             the path to the new file
         """
-        tmp_file = tempfile.NamedTemporaryFile(delete=False).name
+        tmp_file = Path(tempfile.NamedTemporaryFile(delete=False).name)
         self.tmp_files.append(tmp_file)
         self.tmp_count += 1
         return tmp_file

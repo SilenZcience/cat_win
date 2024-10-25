@@ -3,6 +3,7 @@ winstreams
 credit: https://github.com/RobinDavid/pyADS
 """
 
+from pathlib import Path
 try:
     import ctypes
 
@@ -32,8 +33,8 @@ except AttributeError:
 
 
 class WinStreams:
-    def __init__(self, filename: str):
-        self.filename = filename
+    def __init__(self, filename: Path):
+        self.filename = str(filename)
         self.streams = self.init_streams()
 
     def init_streams(self):
