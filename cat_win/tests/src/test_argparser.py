@@ -235,7 +235,9 @@ class TestArgParser(TestCase):
         arg_parser = ArgParser()
         arg_parser._add_argument(test_file_dir)
         arg_parser.get_files()
-        self.assertListEqual([test_file_dir], list(map(str,arg_parser.get_dirs())))
+        dirs = '\n'.join(map(os.path.basename, arg_parser.get_dirs()))
+        for _dir in inside_test_dirs:
+            self.assertIn(_dir, dirs)
 
         arg_parser = ArgParser()
         arg_parser._add_argument(project_dir + '/*')
