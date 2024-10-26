@@ -24,7 +24,7 @@ class ArgParser:
                  unicode_echo: bool = True,
                  unicode_find: bool = True,
                  unicode_replace: bool = True) -> None:
-        self.win_prefix_no_normalization = '\\\\?\\' * bool(on_windows_os)
+        self.win_prefix_lit = '\\\\?\\' * bool(on_windows_os)
         self.default_file_encoding: str = default_file_encoding
         self.unicode_echo: bool = unicode_echo
         self.unicode_find = unicode_find
@@ -127,10 +127,8 @@ class ArgParser:
                                                                             recursive=True)
             for _filename in path_gen:
                 norm_path = Path(os.path.realpath(_filename))
-                lit_path  = Path(
-                    f"{self.win_prefix_no_normalization}{Path(_filename).absolute()}"
-                )
-                p_equal = str(lit_path).endswith(str(norm_path))
+                lit_path  = Path(f"{self.win_prefix_lit}{norm_path.parent}/{Path(_filename).name}")
+                p_equal = lit_path.stem == norm_path.stem
                 norm_exists, lit_exists = False, False
                 try:
                     if norm_path.is_file():
@@ -169,8 +167,8 @@ class ArgParser:
 
     def _add_path_struct(self, param: str) -> bool:
         norm_path = Path(os.path.realpath(param))
-        lit_path  = Path(f"{self.win_prefix_no_normalization}{Path(param).absolute()}")
-        p_equal = str(lit_path).endswith(str(norm_path))
+        lit_path  = Path(f"{self.win_prefix_lit}{norm_path.parent}/{Path(param).name}")
+        p_equal = lit_path.stem == norm_path.stem
         norm_exists, lit_exists = False, False
         try:
             if norm_path.is_file():
