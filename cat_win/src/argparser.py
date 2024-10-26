@@ -182,9 +182,9 @@ class ArgParser:
                 lit_exists = True
         except OSError:
             pass
-        if norm_exists:
+        if norm_exists and not (lit_exists and not p_equal):
             self._known_file_structures.append((IS_FILE, norm_path))
-        if lit_exists and (not norm_exists or not p_equal):
+        elif lit_exists:
             self._known_file_structures.append((IS_FILE, lit_path))
 
         is_struct = norm_exists or lit_exists
@@ -199,9 +199,9 @@ class ArgParser:
                 lit_exists = True
         except OSError:
             pass
-        if norm_exists:
+        if norm_exists and not (lit_exists and not p_equal):
             self._known_file_structures.append((IS_DIR, norm_path))
-        if lit_exists and (not norm_exists or not p_equal):
+        elif lit_exists:
             self._known_file_structures.append((IS_DIR, lit_path))
         is_struct |= norm_exists or lit_exists
 
