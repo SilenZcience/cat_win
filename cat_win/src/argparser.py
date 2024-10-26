@@ -120,45 +120,90 @@ class ArgParser:
         for struct_type, structure in self._known_file_structures:
             if struct_type == IS_FILE:
                 self._known_files.append(structure)
-            elif struct_type == IS_DIR:
+                continue
+            if struct_type == IS_DIR:
                 self._known_directories.append(structure)
-                for filename in structure.glob('*'):
-                    filename = Path(filename)
-                    if not filename.is_file():
-                        filename = Path(f"{self.win_prefix_no_normalization}{filename}")
-                    if filename.is_file():
-                        self._known_files.append(filename)
-            elif struct_type == IS_PATTERN:
-                for _filename in glob.iglob(structure, recursive=True):
-                    filename = Path(os.path.realpath(_filename))
-                    if not filename.is_file():
-                        filename = Path(f"{self.win_prefix_no_normalization}{filename}")
-                    if filename.is_file():
-                        self._known_files.append(filename)
-                    else:
-                        self._known_directories.append(filename)
+            path_gen = structure.glob('*') if struct_type == IS_DIR else glob.iglob(structure,
+                                                                            recursive=True)
+            for _filename in path_gen:
+                norm_path = Path(os.path.realpath(_filename))
+                lit_path  = Path(
+                    f"{self.win_prefix_no_normalization}{Path(_filename).absolute()}"
+                )
+                p_equal = str(lit_path).endswith(str(norm_path))
+                norm_exists, lit_exists = False, False
+                try:
+                    if norm_path.is_file():
+                        norm_exists = True
+                except OSError:
+                    pass
+                try:
+                    if lit_path.is_file():
+                        lit_exists = True
+                except OSError:
+                    pass
+                path_name = norm_path
+                if not norm_exists or (lit_exists and not p_equal):
+                    path_name = lit_path
+                if norm_exists or lit_exists:
+                    self._known_files.append(path_name)
+                    continue
+                norm_exists, lit_exists = False, False
+                try:
+                    if norm_path.is_dir():
+                        norm_exists = True
+                except OSError:
+                    pass
+                try:
+                    if lit_path.is_dir():
+                        lit_exists = True
+                except OSError:
+                    pass
+                path_name = norm_path
+                if not norm_exists or (lit_exists and not p_equal):
+                    path_name = lit_path
+                if norm_exists or lit_exists:
+                    self._known_directories.append(path_name)
 
         return self._known_files
 
     def _add_path_struct(self, param: str) -> bool:
-        realpath, is_struct = os.path.realpath(param), True
-        possible_paths  = [
-            Path(realpath),
-            Path(f"{self.win_prefix_no_normalization}{realpath}")
-        ]
+        norm_path = Path(os.path.realpath(param))
+        lit_path  = Path(f"{self.win_prefix_no_normalization}{Path(param).absolute()}")
+        p_equal = str(lit_path).endswith(str(norm_path))
+        norm_exists, lit_exists = False, False
+        try:
+            if norm_path.is_file():
+                norm_exists = True
+        except OSError:
+            pass
+        try:
+            if lit_path.is_file():
+                lit_exists = True
+        except OSError:
+            pass
+        if norm_exists:
+            self._known_file_structures.append((IS_FILE, norm_path))
+        if lit_exists and (not norm_exists or not p_equal):
+            self._known_file_structures.append((IS_FILE, lit_path))
 
-        for possible_path in possible_paths:
-            try:
-                if possible_path.is_file():
-                    self._known_file_structures.append((IS_FILE, possible_path))
-                    break
-                if possible_path.is_dir():
-                    self._known_file_structures.append((IS_DIR, possible_path))
-                    break
-            except OSError:
-                pass
-        else:
-            is_struct = False
+        is_struct = norm_exists or lit_exists
+        norm_exists, lit_exists = False, False
+        try:
+            if norm_path.is_dir():
+                norm_exists = True
+        except OSError:
+            pass
+        try:
+            if lit_path.is_dir():
+                lit_exists = True
+        except OSError:
+            pass
+        if norm_exists:
+            self._known_file_structures.append((IS_DIR, norm_path))
+        if lit_exists and (not norm_exists or not p_equal):
+            self._known_file_structures.append((IS_DIR, lit_path))
+        is_struct |= norm_exists or lit_exists
 
         if any(c in param for c in '*?['):
             # matches file-patterns, not directories (e.g. *.txt)
