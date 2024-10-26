@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.9.3] - TBA
+
+### Minor Changes
+
+- on Windows the dependency to `windows_curses` has been significantly loosened.
+- cat_win is now able to recognize literal paths on Windows (without path normalization) allowing the handling of obscure (and natively invalid) path names.
+
+## Bugfixes
+
+- fixed Bug where a false warning might be displayed when using the stdin in combination to using -`U`, --`url`.
+
+
 ## [1.9.2] - 2024-10-21
 
 ### Minor Changes
