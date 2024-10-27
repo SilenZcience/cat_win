@@ -24,6 +24,8 @@ class Converter:
         set the colors to use.
         
         Parameters:
+        debug (bool):
+            indicates if debug output should be displayed
         colors (list[str]):
             the colors to use, 3 elements needed:
             Index 0 -> EVALULATION
@@ -109,6 +111,7 @@ class Converter:
             the string to check
             
         Returns:
+        (bool):
             True if v is a Hexadecimal number.
             False if it is not.
         """
@@ -125,6 +128,7 @@ class Converter:
             the string to check
             
         Returns:
+        (bool):
             True if v is a Decimal number.
             False if it is not.
         """
@@ -139,6 +143,7 @@ class Converter:
             the string to check
             
         Returns:
+        (bool):
             True if v is a Octal number.
             False if it is not.
         """
@@ -155,6 +160,7 @@ class Converter:
             the string to check
             
         Returns:
+        (bool):
             True if v is a Binary number.
             False if it is not.
         """
@@ -178,6 +184,16 @@ class Converter:
         """
         returns a String representation of a Hexadecimal String including the corresponding
         Binary, Octal and Decimal number.
+        
+        Parameters:
+        value (str):
+            the value to convert to hex
+        leading (bool):
+            should prefix be displayed
+        
+        Returns:
+        (str):
+            the converted string
         """
         return f"{self.colors[1]}[Bin: {self.__hex_to_bin__(value, leading)}, Oct: " + \
             f"{self.__hex_to_oct__(value, leading)}, Dec: {self.__hex_to_dec__(value)}]" + \
@@ -197,6 +213,16 @@ class Converter:
         """
         returns a String representation of a Decimal Int including the corresponding
         Binary, Octal and Hexadecimal number.
+
+        Parameters:
+        value (str):
+            the value to convert to dec
+        leading (bool):
+            should prefix be displayed
+        
+        Returns:
+        (str):
+            the converted string
         """
         value = int(value)
         return f"{self.colors[1]}[Bin: {self.__dec_to_bin__(value, leading)}, Oct: " + \
@@ -217,6 +243,16 @@ class Converter:
         """
         returns a String representation of an Octal String including the corresponding
         Binary, Decimal and Hexadecimal number.
+
+        Parameters:
+        value (str):
+            the value to convert to oct
+        leading (bool):
+            should prefix be displayed
+        
+        Returns:
+        (str):
+            the converted string
         """
         return f"{self.colors[1]}[Bin: {self.__oct_to_bin__(value, leading)}, Dec: " + \
             f"{self.__oct_to_dec__(value)}, Hex: {self.__oct_to_hex__(value, leading)}]" + \
@@ -236,6 +272,16 @@ class Converter:
         """
         returns a String representation of a Binary String including the corresponding
         Octal, Decimal and Hexadecimal number.
+
+        Parameters:
+        value (str):
+            the value to convert to bin
+        leading (bool):
+            should prefix be displayed
+        
+        Returns:
+        (str):
+            the converted string
         """
         return f"{self.colors[1]}[Oct: {self.__bin_to_oct__(value, leading)}, Dec: " + \
             f"{self.__bin_to_dec__(value)}, Hex: {self.__bin_to_hex__(value, leading)}]" + \

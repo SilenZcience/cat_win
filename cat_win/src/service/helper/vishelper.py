@@ -18,6 +18,7 @@ def get_fit_terminal_square(length: int, width: int) -> int:
         the max width displayable on the console window
 
     Returns:
+    w (int):
         largest fitting power of two
     """
     w = 1
@@ -28,6 +29,9 @@ def get_fit_terminal_square(length: int, width: int) -> int:
     return w
 
 class SpaceFilling:
+    """
+    SpaceFilling curves
+    """
     @staticmethod
     def get_scan_curve(_list: bytes, width: int):
         """
@@ -176,8 +180,22 @@ class SpaceFilling:
 
 
 class Entropy:
+    """
+    Entropy
+    """
     @staticmethod
-    def normalized_shannon_entropy(data: bytes) -> int:
+    def normalized_shannon_entropy(data: bytes) -> list:
+        """
+        calculate the normalized shannon entropy
+        
+        Parameters:
+        data (bytes):
+            the data to calculate
+        
+        Returns:
+        (list):
+            the calculated shannony entropy data
+        """
         data_length = len(data)
         frame_window = 128
         fmin1 = frame_window-1

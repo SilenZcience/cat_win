@@ -17,6 +17,10 @@ class TmpFileHelper:
     def get_generated_temp_files(self) -> list:
         """
         get all generated files.
+        
+        Returns:
+        (list):
+            the active temporary files
         """
         return self.tmp_files
 

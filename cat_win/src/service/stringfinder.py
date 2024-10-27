@@ -12,7 +12,7 @@ class StringFinder:
     def __init__(self, queries: set = None) -> None:
         self.kw_queries = queries
 
-    def findLiterals(self, sub: str, _s: str, ignore_case: bool):
+    def find_literals(self, sub: str, _s: str, ignore_case: bool):
         """
         Generate lists containing the position of sub in s.
         
@@ -34,7 +34,7 @@ class StringFinder:
             yield [i, i+_l]
             i = _s.find(sub, i+1)
 
-    def findregex(self, pattern, _s: str):
+    def find_regex(self, pattern, _s: str):
         """
         Generate lists containing the position of pattern in s.
         
@@ -113,11 +113,11 @@ class StringFinder:
 
         for query, ignore_case in self.kw_queries:
             if isinstance(query, str):
-                for _f in self.findLiterals(query, line, ignore_case):
+                for _f in self.find_literals(query, line, ignore_case):
                     found_position.append(_f[:])
                     found_list.append((query, _f))
             else:
-                for _m in self.findregex(query, line):
+                for _m in self.find_regex(query, line):
                     matched_position.append(_m[:])
                     matched_list.append((query.pattern, _m))
         # sort by start position (necessary for a deterministic output)

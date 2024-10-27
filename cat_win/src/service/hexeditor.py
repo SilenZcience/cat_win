@@ -77,7 +77,20 @@ class HexEditor:
         return (self.cpos.get_pos(), self.spos.get_pos())
 
     @staticmethod
-    def pos_between(from_pos, to_pos):
+    def pos_between(from_pos: tuple, to_pos: tuple):
+        """
+        every position between two positions
+        
+        Parameters:
+        from_pos (tuple):
+            the start pos
+        to_pos (tuple):
+            the end pos
+        
+        Yields:
+        (tuple):
+            a position between start and end
+        """
         from_y, from_x = from_pos
         while (from_y, from_x) <= to_pos:
             yield (from_y, from_x)

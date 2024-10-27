@@ -116,8 +116,10 @@ class More:
             user_input = 'INTERRUPT'
         if not os.isatty(sys.stdin.fileno()) or user_input == 'INTERRUPT':
             print() # emulate enter-press on piped input
-        print(f"{ERASE_LINE}{CURSOR_START_ABOVE_1}{ERASE_LINE}", end='') # clear bottom & input() line
-        print(f"{CURSOR_START_ABOVE_1}{ERASE_LINE}" * clear_size, end='', flush=True) # clear lines above
+        # clear bottom & input() line
+        print(f"{ERASE_LINE}{CURSOR_START_ABOVE_1}{ERASE_LINE}", end='')
+        # clear lines above
+        print(f"{CURSOR_START_ABOVE_1}{ERASE_LINE}" * clear_size, end='', flush=True)
         return user_input
 
     @staticmethod

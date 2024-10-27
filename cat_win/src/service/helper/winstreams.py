@@ -33,11 +33,17 @@ except AttributeError:
 
 
 class WinStreams:
+    """
+    WinStreams
+    """
     def __init__(self, filename: Path):
         self.filename = str(filename)
         self.streams = self.init_streams()
 
     def init_streams(self):
+        """
+        find the winstreams
+        """
         if WINSTREAMS_MODULE_ERROR:
             return []
 

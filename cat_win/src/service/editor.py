@@ -542,6 +542,10 @@ class Editor:
         Parameters:
         wchars (int|str):
             given by curses get_wch()
+            
+        Returns:
+        (str):
+            wchars_
         """
         if not isinstance(wchars_, str) or not wchars_:
             return ''

@@ -12,7 +12,7 @@ import sys
 from cat_win.src.service.helper.progressbar import PBar
 
 
-def err_print(*args, **kwargs):
+def err_print(*args, **kwargs) -> None:
     """
     print to stderr.
     """
@@ -149,6 +149,8 @@ class IoHelper:
         Parameters:
         src_file (Path):
             a string representation of a file (-path)
+        binary (bool):
+            indicates if the file should be opened in binary mode
         file_encoding (str):
             an encoding to open the file with
         errors (str):
@@ -213,10 +215,10 @@ class IoHelper:
         Writes content into a given file.
         
         Parameters:
-        content (str|bytes):
-            the content to write in a file
         src_file (Path):
             a string representation of a file (-path)
+        content (str|bytes):
+            the content to write in a file
         file_encoding (str):
             an encoding to open the file with
         errors (str):
@@ -245,6 +247,8 @@ class IoHelper:
         Parameters:
         one_line (bool):
             determines if only the first stdin line should be read
+        raw (bool):
+            indicates if the raw stdin buffer should be read
             
         Yields:
         line (str):

@@ -70,5 +70,18 @@ RE_EVAL = re.compile(
     r"(?:\s*\))*"
     )
 
-def compile_re(pattern: str, ignore_case: bool):
+def compile_re(pattern: str, ignore_case: bool) -> re.Pattern:
+    """
+    compile a regular expression
+    
+    Parameters:
+    pattern (str):
+        the pattern to compile
+    ignore_case (bool):
+        indicates if the case should be ignored
+    
+    Returns:
+    (re.Pattern)
+        the compiled Pattern
+    """
     return re.compile(pattern, (re.IGNORECASE if ignore_case else 0) | re.DOTALL)
