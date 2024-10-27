@@ -70,7 +70,7 @@ RE_EVAL = re.compile(
     r"(?:\s*\))*"
     )
 
-def compile_re(pattern: str, ignore_case: bool) -> re.Pattern:
+def compile_re(pattern: str, ignore_case: bool):
     """
     compile a regular expression
     
