@@ -13,6 +13,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ## Bugfixes
 
 - fixed Bug where a false warning might be displayed when using the stdin in combination to using -`U`, --`url`.
+- compatibility for Python v3.13.
 
 
 ## [1.9.2] - 2024-10-21
