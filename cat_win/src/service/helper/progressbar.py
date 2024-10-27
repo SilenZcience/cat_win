@@ -10,6 +10,9 @@ from cat_win.src.const.escapecodes import CURSOR_VISIBLE, CURSOR_INVISIBLE
 
 
 class PBar:
+    """
+    ProgressBar
+    """
     COLOR_DONE: str    = ColorOptions.Fore['LIGHTGREEN']
     COLOR_MISSING: str = ColorOptions.Fore['LIGHTMAGENTA']
     COLOR_RESET: str   = ColorOptions.Style['RESET']
@@ -46,6 +49,9 @@ class PBar:
 
     @contextlib.contextmanager
     def init(self):
+        """
+        initialize the progress bar
+        """
         try:
             if os.isatty(sys.stdout.fileno()):
                 print(CURSOR_INVISIBLE, end='')
@@ -59,6 +65,13 @@ class PBar:
                 print(CURSOR_VISIBLE, end='\n'*(not self.erase), flush=True)
 
     def print_progress_bar(self, iteration: int) -> None:
+        """
+        print the current state of the progress bar
+        
+        Parameters:
+        iteration (int):
+            the current progress iteration
+        """
         if iteration < 0 or iteration > self.total:
             iteration = self.total
         percentage = min(100 * (iteration / float(self.total)), 100.0)
@@ -70,5 +83,8 @@ class PBar:
         print(progress, end='', flush=True)
 
     def erase_progress_bar(self) -> None:
+        """
+        erase the progress bar from screen
+        """
         length = len(self.prefix) + len(self.suffix) + self.length + 9
         print('\b \b' * length, end='')

@@ -36,10 +36,26 @@ from cat_win.src.service.helper.winstreams import WinStreams
 
 
 class Signatures:
+    """
+    Signatures
+    """
     signatures = None
 
     @staticmethod
     def match(file_prefix_: str, signature_: str) -> bool:
+        """
+        check if a signature (magic number) matches
+        
+        Parameters:
+        file_prefix_ (str):
+            the prefix of the current file
+        signature_ (str):
+            the signature to compare
+        
+        Returns:
+        (bool):
+            indicates if the signature matches
+        """
         file_prefix = [file_prefix_[i:i+2] for i in range(0, len(signature_), 2)]
         signature = [signature_[i:i+2] for i in range(0, len(signature_), 2)]
         for fp, sp in zip(file_prefix, signature):

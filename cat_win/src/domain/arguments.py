@@ -79,6 +79,10 @@ class Arguments:
     def set_args(self, args: list) -> None:
         """
         set the args to use.
+        
+        Parameters:
+        args (list):
+            the args to set
         """
         self.args = reduce_list(args)
         for arg_id, _ in self.args:
@@ -89,6 +93,10 @@ class Arguments:
     def add_args(self, args: list) -> None:
         """
         add args to use from now on.
+        
+        Parameters:
+        args (list):
+            the args to add
         """
         self.args_id = {}
         self.set_args(self.args + args)
@@ -96,6 +104,10 @@ class Arguments:
     def delete_args(self, args: list) -> None:
         """
         delete (some) args to longer use them from now on.
+        
+        Parameters:
+        args (list):
+            the list of args to delete
         """
         self.args_id = {}
         self.set_args(diff_list(self.args, args))

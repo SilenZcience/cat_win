@@ -232,17 +232,28 @@ class Position:
         """
         return a tuple that defines the position.
         this makes comparison easier.
+        
+        Returns:
+        (tuple):
+            the position
         """
         return (self.row, self.col)
 
     def set_pos(self, new_pos: tuple) -> None:
         """
         setter for row and column of position
+        
+        Parameters:
+        new_pos (tuple):
+            the position
         """
         self.row, self.col = new_pos
 
 
 class _Action:
+    """
+    _Action
+    """
     def __init__(self, key_action: bytes, size_change: bool,
                  pre_cpos: tuple, post_cpos: tuple,
                  pre_spos: tuple, post_spos: tuple,

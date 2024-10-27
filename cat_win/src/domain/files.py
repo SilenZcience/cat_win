@@ -75,24 +75,40 @@ class Files:
     def set_files(self, files: list) -> None:
         """
         set the files to display.
+        
+        Parameters:
+        files (list):
+            the files to set
         """
         self.files = [File(path, self.get_file_display_name(path)) for path in files]
 
     def set_temp_file_stdin(self, file: str) -> None:
         """
         set the tempfile used for stdin.
+        
+        Parameters:
+        file (str):
+            the file used for stdin
         """
         self.temp_files['stdin'] = file
 
     def set_temp_file_echo(self, file: str) -> None:
         """
         set the tempfile used for the echo arg.
+
+        Parameters:
+        file (str):
+            the file used for echo
         """
         self.temp_files['echo'] = file
 
     def set_temp_files_url(self, files: dict) -> None:
         """
         set the tempfiles used for urls.
+
+        Parameters:
+        files (dict):
+            the files used for URLs
         """
         self.temp_files['url'] = files
 
@@ -162,6 +178,12 @@ class Files:
     def generate_values(self, calc_l_: bool, calc_ll_: bool) -> None:
         """
         generate the metadata for all files
+        
+        Parameters:
+        calc_l_ (bool):
+            calculate the place holders
+        calc_ll_ (bool):
+            calculate the file line length place holder
         """
         self._calc_file_number_place_holder_()
         if calc_l_:

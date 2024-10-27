@@ -93,6 +93,9 @@ class CVis:
 
     @staticmethod
     def remove_colors() -> None:
+        """
+        set all class attributes to empty strings
+        """
         for attr in dir(CVis):
             if not callable(getattr(CVis, attr)) and not attr.startswith("__"):
                 setattr(CVis, attr, '')

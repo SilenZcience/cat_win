@@ -36,6 +36,7 @@ class Visualizer:
             the byte to check
         
         Returns:
+        (str):
             ansi color code
         """
         if byte == 0:
@@ -60,6 +61,7 @@ class Visualizer:
             the entropy to classify
         
         Returns:
+        (str):
             ansi color code
         """
         if entropy > 80:

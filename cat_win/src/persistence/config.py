@@ -187,6 +187,10 @@ class Config:
     def get_cmd(self) -> list:
         """
         split the default command line string correctly into a parameter list
+        
+        Returns
+        (list):
+            the default command line splitted using shell like syntax
         """
         return shlex.split(self.const_dic.get(DKW.DEFAULT_COMMAND_LINE, ''))
 

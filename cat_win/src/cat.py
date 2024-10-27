@@ -418,6 +418,8 @@ def print_file(content: list, stepper: More) -> bool:
     Parameters:
     content (list):
         the content of a file like [(prefix, line), ...]
+    stepper (More):
+        the stepper to step through the file
         
     Returns:
     (bool):
@@ -442,7 +444,7 @@ def print_file(content: list, stepper: More) -> bool:
             for query, ignore_case in arg_parser.file_queries:
                 contains_queried = True
                 if isinstance(query, str):
-                    for f_s, f_e in string_finder.findLiterals(query, cleaned_line, ignore_case):
+                    for f_s, f_e in string_finder.find_literals(query, cleaned_line, ignore_case):
                         cleaned_line = (
                             cleaned_line[:f_s] + \
                                 color_dic[CKW.REPLACE] + \
@@ -1046,6 +1048,10 @@ def init(repl: bool = False) -> tuple:
 def handle_args(tmp_file_helper: TmpFileHelper) -> None:
     """
     init, handle args, print
+    
+    Parameters:
+    tmp_file_helper (TmpFileHelper):
+        the temporary file helper to stdin, echo etc. ...
     """
     piped_input = temp_file = ''
     known_files, unknown_files, echo_args, valid_urls = init(repl=False)
@@ -1177,6 +1183,10 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
 def cleanup(tmp_file_helper: TmpFileHelper) -> None:
     """
     clean up everything
+    
+    Parameters:
+    tmp_file_helper (TmpFileHelper):
+        the temporary file helper to clean up the files
     """
     if u_args[ARGS_DEBUG]:
         err_print(color_dic[CKW.MESSAGE_INFORMATION], end='')
