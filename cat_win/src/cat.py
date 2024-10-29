@@ -657,7 +657,7 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
         # in any case we have nothing to do and can return
         return
 
-    if u_args[ARGS_STRINGS]:
+    if u_args[ARGS_STRINGS] and not u_args[ARGS_RAW]:
         content = get_strings(content,
                               const_dic[DKW.STRINGS_MIN_SEQUENCE_LENGTH],
                               const_dic[DKW.STRINGS_DELIMETER])
