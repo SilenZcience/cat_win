@@ -612,12 +612,12 @@ def edit_raw_content(content: bytes, file_index: int = 0) -> None:
         the repl mode
     """
     if u_args[ARGS_STRINGS]:
-        content = get_strings([(b'', content)],
-                              const_dic[DKW.STRINGS_MIN_SEQUENCE_LENGTH],
-                              const_dic[DKW.STRINGS_DELIMETER])
-        return edit_content(content, file_index)
+        return edit_content([('', content)], file_index)
     if u_args[ARGS_B64E]:
-        content = encode_base64(content)
+        content = encode_base64(content, True)
+        if u_args[ARGS_CLIP]:
+            Clipboard.clipboard += content
+        return print(content)
     sys.stdout.buffer.write(content)
 
 def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> None:
@@ -657,7 +657,7 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
         # in any case we have nothing to do and can return
         return
 
-    if u_args[ARGS_STRINGS] and not u_args[ARGS_RAW]:
+    if u_args[ARGS_STRINGS]:
         content = get_strings(content,
                               const_dic[DKW.STRINGS_MIN_SEQUENCE_LENGTH],
                               const_dic[DKW.STRINGS_DELIMETER])
