@@ -2,7 +2,7 @@
 arguments
 """
 
-from cat_win.src.const.argconstants import DIFFERENTIABLE_ARGS, ARGS_NOCOL, ARGS_B64E
+from cat_win.src.const.argconstants import DIFFERENTIABLE_ARGS
 
 
 def reduce_list(args: list) -> list:
@@ -87,8 +87,6 @@ class Arguments:
         self.args = reduce_list(args)
         for arg_id, _ in self.args:
             self.args_id[arg_id] = True
-        if self.args_id.get(ARGS_B64E, False):
-            self.args_id[ARGS_NOCOL] = True
 
     def add_args(self, args: list) -> None:
         """

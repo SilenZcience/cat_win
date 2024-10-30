@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from cat_win.src.const.argconstants import ARGS_B64E, ARGS_NOCOL, ARGS_LLENGTH
+from cat_win.src.const.argconstants import ARGS_B64E, ARGS_LLENGTH
 from cat_win.src.const.argconstants import ARGS_NUMBER, ARGS_ENDS, ARGS_REPLACE
 from cat_win.src.domain.arguments import Arguments, reduce_list, diff_list
 # import sys
@@ -12,7 +12,6 @@ class TestArguments(TestCase):
         u_args = Arguments()
         u_args.set_args([(ARGS_B64E, '--b64e')])
         self.assertEqual(u_args[ARGS_B64E], True)
-        self.assertEqual(u_args[ARGS_NOCOL], True)
         self.assertEqual(u_args[ARGS_LLENGTH], False)
         self.assertEqual(u_args[ARGS_NUMBER], False)
 
