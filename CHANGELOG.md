@@ -3,17 +3,24 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
-## [1.9.3] - TBA
+## [1.10.0] - TBA
+
+### Major Changes
+
+- cat_win is now able to recognize literal paths on Windows (without path normalization) allowing the handling of obscure (and natively invalid) path names.
+  (this may result in a different behaviour when finding files e.g. when using a file pattern.)
+- when using --`b64e`, --`b64e` cat_win will no longer disregard colors by default. (users will have to make use of the --`nc`, --`nocolor` parameter or `strip_color_on_pipe` config option manually.)
 
 ### Minor Changes
 
 - on Windows the dependency to `windows_curses` has been significantly loosened.
-- cat_win is now able to recognize literal paths on Windows (without path normalization) allowing the handling of obscure (and natively invalid) path names.
+- when using -`B`, --`raw` in combination with --`b64e`, --`b64e` it is now possible to copy the base64 encoded file to the clipboard using -`c`, --`clip`.
 
 ## Bugfixes
 
 - fixed Bug where a false warning might be displayed when using the stdin in combination to using -`U`, --`url`.
 - compatibility for Python v3.13.
+- fixed small Bug where --`strings`, --`strings` were calculated twice when using the -`B`, --`raw` parameter.
 
 
 ## [1.9.2] - 2024-10-21
