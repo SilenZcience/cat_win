@@ -678,6 +678,7 @@ class TestEditor(TestCase):
             '\x10'     : b'^P',
             '\x06'     : b'^F',
             '\x0e'     : b'^N',
+            '\x14'     : b'^T',
         }
         def _keyname(x):
             return _keyname_mapping.get(chr(x), chr(x).encode())
@@ -693,6 +694,7 @@ class TestEditor(TestCase):
             ['a', 'b', '\r', '\t', 'c', 'd', '\r', '\t', 'e', 'f', 259, 259, 'x', 258, 548, '\t', 261, '\x1a', '\x1a', '\x11'],
             ['a', '\r', 'b', '\r', 'c', 259, 547, '\t', '\x1a','\x1a', '\x11'],
             ['a', 'a', 'b', 'a', '\x10', '\x06', 'a', '\r', 'X', '\r', '\x10', 'Y', '\x0e', '\r', '\x1a', '\x1a', '\x1a', '\x19', '\x19', '\x11'],
+            ['a', 'b', 'c', '\r', 'd', 'e', 'f', 260, 547, '\x14', 'u', 'p', 'p', 'e', 'r', '\r', '\x1a', '\x19', '\x11', '\x11'],
         ]
         r = [
             [''],
@@ -705,6 +707,7 @@ class TestEditor(TestCase):
             ['ab', '$cd', '$$ef'],
             ['a', 'b', ''],
             ['XYba'],
+            ['abC', 'DEf'],
         ]
         mm.keyname = _keyname
         for get_wch_, result_ in zip(g, r):
