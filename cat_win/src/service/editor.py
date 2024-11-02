@@ -535,6 +535,17 @@ class Editor:
                             pre_selecting, self.selecting,
                             action_text)
 
+    def _add_selection(self, wchars_: str) -> None:
+        pre_cpos = self.cpos.get_pos()
+        pre_spos = self.spos.get_pos()
+        pre_selecting = self.selecting
+        action_text = self._key_add_selected(wchars_)
+        self.history.add(b'_key_add_selected', '\n' in action_text,
+                            pre_cpos, self.cpos.get_pos(),
+                            pre_spos, self.spos.get_pos(),
+                            pre_selecting, self.selecting,
+                            action_text)
+
     def _key_string(self, wchars_) -> str:
         """
         tries to append (a) char(s) to the screen.
@@ -586,16 +597,16 @@ class Editor:
             return True
         (sel_from_y, sel_from_x), (sel_to_y, sel_to_x) = self.selected_area
         content_window = self.window_content[sel_from_y:sel_to_y+1]
-        content_window[0] = content_window[0][sel_from_x:]
         content_window[-1] = content_window[-1][:sel_to_x]
+        content_window[0] = content_window[0][sel_from_x:]
         self.error_bar = self.error_bar if (
             Clipboard.put(self.line_sep.join(content_window))
         ) else 'An error occured copying the selected text to the clipboard!'
         return True
 
     def _action_cut(self) -> bool:
-        self._action_copy()
         if self.selecting:
+            self._action_copy()
             self._remove_selection()
         return True
 
@@ -642,6 +653,91 @@ class Editor:
             self.status_bar_size = 2
             if self.debug_mode:
                 err_print(self.error_bar)
+        return True
+
+    def _action_transpose(self) -> bool:
+        """
+        handles the _ action.
+        
+        Returns:
+        (bool):
+            indicates if the editor should keep running
+        """
+        bool_expressions = {
+            'isalnum': str.isalnum,
+            'isalpha': str.isalpha,
+            'isascii': str.isascii,
+            'isdecimal': str.isdecimal,
+            'isdigit': str.isdigit,
+            'isidentifier': str.isidentifier,
+            'islower': str.islower,
+            'isnumeric': str.isnumeric,
+            'isprintable': str.isprintable,
+            'isspace': str.isspace,
+            'istitle': str.istitle,
+            'isupper': str.isupper,
+        }
+        string_expressions = {
+            'capitalize': str.capitalize,
+            'casefold': str.casefold,
+            'lower': str.lower,
+            'lstrip': str.lstrip,
+            'rstrip': str.rstrip,
+            'strip': str.strip,
+            'swapcase': str.swapcase,
+            'title': str.title,
+            'upper': str.upper,
+        }
+        curses.curs_set(0)
+
+        wchar, w_query, query_result = '', '', ''
+        while str(wchar).upper() != ESC_CODE:
+            self._action_render_scr(f"Query: {w_query}␣", query_result)
+            wchar, key = next(self.get_char)
+            if key in ACTION_HOTKEYS:
+                if key in [b'_action_quit', b'_action_interrupt']:
+                    break
+                if key == b'_action_transpose':
+                    wchar, key = '', b'_key_enter'
+                if key == b'_action_background':
+                    getattr(self, key.decode(), lambda *_: False)()
+                if key == b'_action_resize':
+                    getattr(self, key.decode(), lambda *_: False)()
+                    self._render_scr()
+                    curses.curs_set(0)
+            if not isinstance(wchar, str):
+                continue
+            if key == b'_key_string':
+                w_query += wchar
+            elif key == b'_key_backspace':
+                w_query = w_query[:-1]
+            elif key == b'_key_ctl_backspace':
+                t_p = w_query[-1:].isalnum()
+                while w_query and w_query[-1:].isalnum() == t_p:
+                    w_query = w_query[:-1]
+            elif key == b'_key_enter':
+                w_query = w_query.casefold()
+                if w_query == 'exit':
+                    break
+                (sel_from_y, sel_from_x), (sel_to_y, sel_to_x) = self.selected_area
+                content_window = self.window_content[sel_from_y:sel_to_y+1]
+                content_window[-1] = content_window[-1][:sel_to_x]
+                content_window[0] = content_window[0][sel_from_x:]
+                if w_query in bool_expressions:
+                    joined_content = '\n'.join(content_window)
+                    query_result = f"{w_query}? {bool_expressions[w_query](joined_content)}"
+                    query_result+= f" ({repr(joined_content)})"
+                elif w_query in string_expressions:
+                    new_content = [string_expressions[w_query](line) for line in content_window]
+                    joined_content = '\n'.join(new_content)
+                    _, end_pos = self.selected_area
+                    self._remove_selection()
+                    self.spos.set_pos((end_pos[0],
+                                       end_pos[1]+len(new_content)-len(content_window[-1])))
+                    self._add_selection(joined_content)
+                    break
+                else:
+                    query_result = f"'{w_query}' not found!"
         return True
 
     def _action_jump(self) -> bool:

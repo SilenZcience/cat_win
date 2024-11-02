@@ -166,6 +166,7 @@ UNIFY_HOTKEYS = {
     b'^X'           : b'_action_cut',
     b'ALT_S'        : b'_action_save',
     b'^S'           : b'_action_save',
+    b'^T'           : b'_action_transpose', 
     b'^E'           : b'_action_jump',
     b'^F'           : b'_action_find',
     b'^P'           : b'_action_replace',
@@ -195,6 +196,7 @@ REVERSE_ACTION = {
     b'_indent_btab'        : b'_indent_tab',
     b'_key_enter'          : b'_key_backspace',
     b'_key_remove_selected': b'_key_add_selected',
+    b'_key_add_selected'   : b'_key_remove_selected',
     b'_key_replace_search' : b'_key_replace_search_'
 } # defines the counter action if no line was deleted
 
@@ -205,13 +207,16 @@ REVERSE_ACTION_MULTI_LINE = {
     b'_key_ctl_backspace'  : b'_key_enter',
     b'_indent_tab'         : b'_indent_btab',
     b'_key_remove_selected': b'_key_add_selected',
+    b'_key_add_selected'   : b'_key_remove_selected',
 } # defines the counter action if a line was deleted
 
-ACTION_STACKABLE = [
-    b'_key_dc',
-    b'_key_backspace',
-    b'_key_string',
-]
+ACTION_STACKABLE = {
+    b'_key_dc'             : [b'_key_dc'],
+    b'_key_backspace'      : [b'_key_backspace'],
+    b'_key_string'         : [b'_key_string'],
+    b'_key_remove_selected': [b'_key_add_selected'],
+    b'_key_add_selected'   : [b'_key_remove_selected'],
+}
 # these actions will be chained
 # (e.g. when writing a word, the entire word should be undone/redone)
 
@@ -399,9 +404,8 @@ class History:
         is_space = action.action_text[0].isspace()
         while self._stack_undo:
             n_action: _Action = self._stack_undo.pop()
-            if action.key_action == n_action.key_action and \
-                action.pre_cpos == n_action.post_cpos and \
-                action.key_action in ACTION_STACKABLE and \
+            if action.pre_cpos == n_action.post_cpos and \
+                n_action.key_action in ACTION_STACKABLE.get(action.key_action, []) and \
                 is_space == n_action.action_text[0].isspace():
                 action = n_action
                 self._undo(editor, action)
@@ -440,9 +444,8 @@ class History:
         is_space = action.action_text[0].isspace()
         while self._stack_redo:
             n_action: _Action = self._stack_redo.pop()
-            if action.key_action == n_action.key_action and \
-                action.post_cpos == n_action.pre_cpos and \
-                action.key_action in ACTION_STACKABLE and \
+            if action.post_cpos == n_action.pre_cpos and \
+                action.key_action in ACTION_STACKABLE.get(n_action.key_action, []) and \
                 is_space == n_action.action_text[0].isspace():
                 action = n_action
                 self._redo(editor, action)
