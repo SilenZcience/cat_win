@@ -15,12 +15,14 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - on Windows the dependency to `windows_curses` has been significantly loosened.
 - when using -`B`, --`raw` in combination with --`b64e`, --`b64e` it is now possible to copy the base64 encoded file to the clipboard using -`c`, --`clip`.
+- added `^T` hotkey to the editor to transpose or question the selected text in various ways.
 
 ## Bugfixes
 
 - fixed Bug where a false warning might be displayed when using the stdin in combination to using -`U`, --`url`.
 - compatibility for Python v3.13.
 - fixed small Bug where --`strings`, --`strings` were calculated twice when using the -`B`, --`raw` parameter.
+- fixed Bug where the copy action (`^C`) in the editor would copy the wrong text in certain scenarios.
 
 
 ## [1.9.2] - 2024-10-21
