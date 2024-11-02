@@ -745,7 +745,7 @@ class Editor:
                     _, end_pos = self.selected_area
                     self._remove_selection()
                     self.spos.set_pos((end_pos[0],
-                                       end_pos[1]+len(new_content)-len(content_window[-1])))
+                                       end_pos[1]+len(new_content[-1])-len(content_window[-1])))
                     self._add_selection(joined_content)
                     break
                 else:
