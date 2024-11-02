@@ -666,7 +666,6 @@ class Editor:
         bool_expressions = {
             'isalnum': str.isalnum,
             'isalpha': str.isalpha,
-            'isascii': str.isascii,
             'isdecimal': str.isdecimal,
             'isdigit': str.isdigit,
             'isidentifier': str.isidentifier,
@@ -677,6 +676,19 @@ class Editor:
             'istitle': str.istitle,
             'isupper': str.isupper,
         }
+        try:
+            bool_expressions.update(
+                {
+                    'isascii': str.isascii,
+                }
+            )
+        except AttributeError: # Python 3.6 does not have str.isascii
+            bool_expressions.update(
+                {
+                    'isascii': lambda x: all(ord(c) < 128 for c in x),
+                }
+            )
+
         string_expressions = {
             'capitalize': str.capitalize,
             'casefold': str.casefold,
