@@ -679,10 +679,13 @@ class TestEditor(TestCase):
             '\x06'     : b'^F',
             '\x0e'     : b'^N',
             '\x14'     : b'^T',
+            '\x01'     : b'^A',
         }
         def _keyname(x):
             return _keyname_mapping.get(chr(x), chr(x).encode())
 
+        # note that _get_new_char() buffers the input, so the test behaves different than manual input
+        # e.g. the test inserts an entire string at once meaning that undo and redo will do the same
         g = [
             ['a','b','c','\r','\t','z',351,'\r','\x1a','\x1a','\x1a','\x1a','\x1a','\x19','\x19','\x19','\x19','\x19','\x1a','\x1a','\x1a','\x1a','\x1a','\x1a','\x11'],
             ['T','E','S','T','\r','\r','\r','\r',259,259,259,527,330,'\x7f',330,258,'\r','\x11','\x11'],
@@ -695,6 +698,7 @@ class TestEditor(TestCase):
             ['a', '\r', 'b', '\r', 'c', 259, 547, '\t', '\x1a','\x1a', '\x11'],
             ['a', 'a', 'b', 'a', '\x10', '\x06', 'a', '\r', 'X', '\r', '\x10', 'Y', '\x0e', '\r', '\x1a', '\x1a', '\x1a', '\x19', '\x19', '\x11'],
             ['a', 'b', 'c', '\r', 'd', 'e', 'f', 260, 547, '\x14', 'u', 'p', 'p', 'e', 'r', '\r', '\x1a', '\x19', '\x11', '\x11'],
+            ['A', 'B', 'C', 'D', 'E', 'F', '\r', ' ', ' ', 'X', 'X', ' ', ' ', '\x01', '\x14', 's', 't', 'r', 'i', 'p', '\r', '\x1a', '\x19', '\x1a', '\x19', '\x14', 'l', 'o', 'w', 'e', 'r', '\r', '\x1a', '\x1a', '\x11', '\x11'],
         ]
         r = [
             [''],
@@ -708,6 +712,7 @@ class TestEditor(TestCase):
             ['a', 'b', ''],
             ['XYba'],
             ['abC', 'DEf'],
+            ['ABCDEF', ''],
         ]
         mm.keyname = _keyname
         for get_wch_, result_ in zip(g, r):
