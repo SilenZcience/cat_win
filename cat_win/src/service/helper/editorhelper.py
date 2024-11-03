@@ -166,7 +166,7 @@ UNIFY_HOTKEYS = {
     b'^X'           : b'_action_cut',
     b'ALT_S'        : b'_action_save',
     b'^S'           : b'_action_save',
-    b'^T'           : b'_action_transpose', 
+    b'^T'           : b'_action_transform', 
     b'^E'           : b'_action_jump',
     b'^F'           : b'_action_find',
     b'^P'           : b'_action_replace',

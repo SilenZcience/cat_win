@@ -655,7 +655,7 @@ class Editor:
                 err_print(self.error_bar)
         return True
 
-    def _action_transpose(self) -> bool:
+    def _action_transform(self) -> bool:
         """
         handles the _ action.
         
@@ -709,7 +709,7 @@ class Editor:
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
-                if key == b'_action_transpose':
+                if key == b'_action_transform':
                     wchar, key = '', b'_key_enter'
                 if key == b'_action_background':
                     getattr(self, key.decode(), lambda *_: False)()
