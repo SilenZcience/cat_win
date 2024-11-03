@@ -195,8 +195,8 @@ REVERSE_ACTION = {
     b'_indent_tab'         : b'_key_backspace',
     b'_indent_btab'        : b'_indent_tab',
     b'_key_enter'          : b'_key_backspace',
-    b'_key_remove_selected': b'_key_add_selected',
-    b'_key_add_selected'   : b'_key_remove_selected',
+    b'_key_remove_chunk'   : b'_key_add_chunk',
+    b'_key_add_chunk'      : b'_key_remove_chunk',
     b'_key_replace_search' : b'_key_replace_search_'
 } # defines the counter action if no line was deleted
 
@@ -206,16 +206,16 @@ REVERSE_ACTION_MULTI_LINE = {
     b'_key_backspace'      : b'_key_enter',
     b'_key_ctl_backspace'  : b'_key_enter',
     b'_indent_tab'         : b'_indent_btab',
-    b'_key_remove_selected': b'_key_add_selected',
-    b'_key_add_selected'   : b'_key_remove_selected',
+    b'_key_remove_chunk'   : b'_key_add_chunk',
+    b'_key_add_chunk'      : b'_key_remove_chunk',
 } # defines the counter action if a line was deleted
 
 ACTION_STACKABLE = {
     b'_key_dc'             : [b'_key_dc'],
     b'_key_backspace'      : [b'_key_backspace'],
     b'_key_string'         : [b'_key_string'],
-    b'_key_remove_selected': [b'_key_add_selected'],
-    b'_key_add_selected'   : [b'_key_remove_selected'],
+    b'_key_remove_chunk'   : [b'_key_add_chunk'],
+    b'_key_add_chunk'      : [b'_key_remove_chunk'],
 }
 # these actions will be chained
 # (e.g. when writing a word, the entire word should be undone/redone)

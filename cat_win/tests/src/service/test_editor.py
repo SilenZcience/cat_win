@@ -569,7 +569,7 @@ class TestEditor(TestCase):
         editor = Editor(test_file_path, '')
         editor.spos.set_pos((4,8))
         editor.cpos.set_pos((6,2))
-        self.assertEqual(editor._key_remove_selected(None),
+        self.assertEqual(editor._key_remove_chunk(None),
                          'owing Line is Empty:\n\nTh')
         self.assertListEqual(editor.window_content,
                              [
@@ -581,7 +581,7 @@ class TestEditor(TestCase):
                                  'This Line is a Duplicate!'
                                  ])
         self.assertEqual(editor.cpos.get_pos(), (4,8))
-        self.assertEqual(editor._key_add_selected('owing Line is Empty:\n\nTh'),
+        self.assertEqual(editor._key_add_chunk('owing Line is Empty:\n\nTh'),
                          'owing Line is Empty:\n\nTh')
         self.assertEqual(editor.window_content,
                          [
@@ -595,15 +595,15 @@ class TestEditor(TestCase):
                              'This Line is a Duplicate!'
                              ])
 
-    def test_editor_remove_selection(self):
+    def test_editor_remove_chunk(self):
         editor = Editor(test_file_path, '')
         editor.spos.set_pos((4,8))
         editor.cpos.set_pos((6,2))
         self.assertEqual(len(editor.history._stack_undo), 0)
-        editor._remove_selection()
+        editor._remove_chunk()
         self.assertEqual(len(editor.history._stack_undo), 1)
         action = editor.history._stack_undo[0]
-        self.assertEqual(action.key_action,       b'_key_remove_selected')
+        self.assertEqual(action.key_action,       b'_key_remove_chunk')
         self.assertEqual(action.action_text, ('owing Line is Empty:\n\nTh',))
         self.assertEqual(action.size_change, True)
         self.assertEqual(action.pre_cpos,    (6,2))

@@ -488,7 +488,7 @@ class Editor:
                             False, False,
                             r_this, r_with)
 
-    def _key_remove_selected(self, _) -> str:
+    def _key_remove_chunk(self, _) -> str:
         (sel_from_y, sel_from_x), (sel_to_y, sel_to_x) = self.selected_area
         self.cpos.set_pos((sel_from_y, sel_from_x))
         if sel_from_y == sel_to_y:
@@ -510,7 +510,7 @@ class Editor:
         self.unsaved_progress = True
         return deleted
 
-    def _key_add_selected(self, wchars_: str) -> str:
+    def _key_add_chunk(self, wchars_: str) -> str:
         segments = wchars_.split('\n')
         segments.reverse()
         end_segment = self.window_content[self.cpos.row][self.cpos.col:]
@@ -524,23 +524,23 @@ class Editor:
             self.window_content.insert(self.cpos.row+1, row)
         return wchars_
 
-    def _remove_selection(self) -> None:
+    def _remove_chunk(self) -> None:
         pre_cpos = self.cpos.get_pos()
         pre_spos = self.spos.get_pos()
         pre_selecting = self.selecting
-        action_text = self._key_remove_selected(None)
-        self.history.add(b'_key_remove_selected', '\n' in action_text,
+        action_text = self._key_remove_chunk(None)
+        self.history.add(b'_key_remove_chunk', '\n' in action_text,
                             pre_cpos, self.cpos.get_pos(),
                             pre_spos, self.spos.get_pos(),
                             pre_selecting, self.selecting,
                             action_text)
 
-    def _add_selection(self, wchars_: str) -> None:
+    def _add_chunk(self, wchars_: str) -> None:
         pre_cpos = self.cpos.get_pos()
         pre_spos = self.spos.get_pos()
         pre_selecting = self.selecting
-        action_text = self._key_add_selected(wchars_)
-        self.history.add(b'_key_add_selected', '\n' in action_text,
+        action_text = self._key_add_chunk(wchars_)
+        self.history.add(b'_key_add_chunk', '\n' in action_text,
                             pre_cpos, self.cpos.get_pos(),
                             pre_spos, self.spos.get_pos(),
                             pre_selecting, self.selecting,
@@ -607,7 +607,7 @@ class Editor:
     def _action_cut(self) -> bool:
         if self.selecting:
             self._action_copy()
-            self._remove_selection()
+            self._remove_chunk()
         return True
 
     def _action_render_scr(self, msg: str, tmp_error: str = '') -> None:
@@ -743,10 +743,10 @@ class Editor:
                     new_content = [string_expressions[w_query](line) for line in content_window]
                     joined_content = '\n'.join(new_content)
                     _, end_pos = self.selected_area
-                    self._remove_selection()
+                    self._remove_chunk()
                     self.spos.set_pos((end_pos[0],
                                        end_pos[1]+len(new_content[-1])-len(content_window[-1])))
-                    self._add_selection(joined_content)
+                    self._add_chunk(joined_content)
                     break
                 else:
                     query_result = f"'{w_query}' not found!"
@@ -1319,7 +1319,7 @@ class Editor:
                     action_text = None
                     if key in KEY_HOTKEYS:
                         if self.selecting:
-                            self._remove_selection()
+                            self._remove_chunk()
                             pre_cpos = self.cpos.get_pos()
                             pre_spos = self.spos.get_pos()
                         action_text = getattr(self, key.decode(), lambda *_: None)(wchar)
