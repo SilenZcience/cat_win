@@ -807,7 +807,7 @@ class Editor:
             if self.search and isinstance(self.search, str):
                 pre_s = f" [{repr(self.search)[1:-1]}]"
             elif self.search:
-                pre_s = f" re:[{self.search.pattern}]"
+                pre_s = f" re:[{repr(self.search.pattern)[1:-1]}]"
             rep_r = 'Match' if search_regex else 'Search for'
             self._action_render_scr(f"Confirm: 'ENTER' - {rep_r}{pre_s}: {sub_s}␣", tmp_error)
             wchar, key = next(self.get_char)
@@ -836,12 +836,12 @@ class Editor:
             elif key == b'_key_string':
                 sub_s += wchar
             elif key == b'_key_enter':
+                self.search = sub_s if sub_s else self.search
                 if Editor.unicode_escaped_search and sub_s:
                     try:
-                        sub_s = sub_s.encode().decode('unicode_escape').encode('latin-1').decode()
+                        self.search = sub_s.encode().decode('unicode_escape').encode('latin-1').decode()
                     except UnicodeError:
                         pass
-                self.search = sub_s if sub_s else self.search
                 if search_regex and isinstance(self.search, str):
                     try:
                         self.search = compile_re(self.search, True)
@@ -886,7 +886,7 @@ class Editor:
             if self.search and isinstance(self.search, str):
                 pre_s = f"[{repr(self.search)[1:-1]}]"
             elif self.search:
-                pre_s = f"re:[{self.search.pattern}]"
+                pre_s = f"re:[{repr(self.search.pattern)[1:-1]}]"
             pre_r = f" [{repr(self.replace)[1:-1]}]" if self.replace else ''
             rep_a = 'ALL ' if replace_all else ''
             self._action_render_scr(
@@ -927,12 +927,12 @@ class Editor:
                 if not self.search:
                     tmp_error = 'unspecified search!'
                     continue
+                self.replace = sub_s if sub_s else self.replace
                 if Editor.unicode_escaped_replace and sub_s:
                     try:
-                        sub_s = sub_s.encode().decode('unicode_escape').encode('latin-1').decode()
+                        self.replace = sub_s.encode().decode('unicode_escape').encode('latin-1').decode()
                     except UnicodeError:
                         pass
-                self.replace = sub_s if sub_s else self.replace
                 cpos_tmp, spos_tmp = self.cpos.get_pos(), self.spos.get_pos()
                 sel_pos_a, sel_pos_b = self.selected_area
                 if self.selecting and self.cpos.get_pos() == sel_pos_b:
