@@ -15,7 +15,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - on Windows the dependency to `windows_curses` has been significantly loosened.
 - when using -`B`, --`raw` in combination with --`b64e`, --`b64e` it is now possible to copy the base64 encoded file to the clipboard using -`c`, --`clip`.
-- added `^T` hotkey to the editor to transpose or question the selected text in various ways.
+- added `^T` hotkey to the editor to transform or question the selected text in various ways.
 
 ## Bugfixes
 

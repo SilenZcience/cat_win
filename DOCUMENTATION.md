@@ -964,7 +964,7 @@ The currently supported Key Bindings are as follows:
 | <kbd>Copy/^C</kbd> | - | - | copy selected text | - |
 | <kbd>Cut/^X</kbd> | - | - | cut selected text | - |
 | <kbd>Save/^S</kbd> | - | - | save changes | save changes |
-| <kbd>Transpose/^T</kbd> | - | - | <a href="#transpose-selected-text">transpose</a> or <a href="#question-selected-text">question</a> the selected text | - |
+| <kbd>Transform/^T</kbd> | - | - | <a href="#transform-selected-text">transform</a> or <a href="#question-selected-text">question</a> the selected text | - |
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to specific line | - |
 | <kbd>Find/^F</kbd> | - | - | prompt to search in the file \| toggle to search regular expressions | - |
 | <kbd>Find/^P</kbd> | - | - | prompt to replace a search in the file \| toggle to replace all | - |
@@ -974,7 +974,7 @@ The currently supported Key Bindings are as follows:
 | <kbd>Quit/^Q</kbd> | - | - | close editor</br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^D</kbd> | - | - | interrupt program | - |
 
-<a id="transpose-selected-text">Transpose</a> in the following ways:
+<a id="transform-selected-text">Transform</a> in the following ways:
 
 - `capitalize`
 - `casefold`
