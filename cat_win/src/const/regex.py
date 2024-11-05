@@ -14,7 +14,9 @@ DJANGO_VALID_URL_PATTERN = re.compile(
     r"localhost|" #localhost...
     r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})" # ...or ip
     r"(?::\d+)?" # optional port
-    r"(?:/?|[/?]\S+)$", re.IGNORECASE)
+    r"(?:/?|[/?]\S+)$",
+    re.IGNORECASE
+)
 
 RE_ENCODING      = re.compile(r"\Aenc[\=\:].+\Z",     re.IGNORECASE)
 RE_Q_MATCH       = re.compile(r"\Amatch[\=\:].+\Z",   re.IGNORECASE)
@@ -38,7 +40,9 @@ TOKENIZER = re.compile(r"\w+|[^\s\w]")
 CONFIG_VALID_COLOR = re.compile(
     r"\A(?:f|b)"
     r"(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])"
-    r"(?:(?:\;(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])){2})?\Z", re.IGNORECASE)
+    r"(?:(?:\;(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])){2})?\Z",
+    re.IGNORECASE
+)
 CONFIG_VALID_ANSI  = re.compile(r"\[(?:\d|;)*m") # custom ansi escape code
 
 # matches a mathematical expression consisting of
@@ -68,7 +72,7 @@ RE_EVAL = re.compile(
         r"|b[01]+)"
     r"|(?:\-?(?:(?:0|[1-9][0-9]*)\.[0-9]*|\.[0-9]+|0|[1-9][0-9]*)))"
     r"(?:\s*\))*"
-    )
+)
 
 def compile_re(pattern: str, ignore_case: bool):
     """

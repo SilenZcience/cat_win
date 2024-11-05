@@ -113,7 +113,7 @@ class CConfig:
                     self.color_dic[element] = self.convert_config_element(
                         config_colors[element],
                         element
-                        )
+                    )
                 except (KeyError, ValueError):
                     self.color_dic[element] = self.default_dic[element]
         except configparser.NoSectionError:
@@ -217,7 +217,7 @@ class CConfig:
             else:
                 if self.color_dic[element] in [
                     c for k,c in ColorOptions.Back.items() if k not in ['NONE', 'BLACK']
-                    ]:
+                ]:
                     config_menu += f"{ColorOptions.Fore['BLACK']}"
                 config_menu += f"{element: <{element_offset}}"
                 config_menu += f"{ColorOptions.Style['RESET']} "
@@ -263,7 +263,8 @@ class CConfig:
                 return
             if keyword.isdigit():
                 keyword = self.elements[int(keyword)-1] if (
-                    0 < int(keyword) <= len(self.elements)) else keyword
+                    0 < int(keyword) <= len(self.elements)
+                ) else keyword
         print('Successfully selected element ', end='')
         print(f"'{self.color_dic[keyword]}{keyword}{ColorOptions.Style['RESET']}'", end=' ')
         print(f"[Default: '{self.default_dic[keyword]}{keyword}{ColorOptions.Style['RESET']}']")
@@ -284,7 +285,8 @@ class CConfig:
                 return
             if color.isdigit():
                 color = color_options[int(color)-1] if (
-                    0 < int(color) <= len(color_options)) else color
+                    0 < int(color) <= len(color_options)
+                ) else color
                 continue
             if CONFIG_VALID_COLOR.match(color):
                 higher_bit_color = True

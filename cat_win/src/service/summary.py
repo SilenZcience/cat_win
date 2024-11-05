@@ -195,7 +195,7 @@ class Summary:
         print(Summary.color_reset, end='\n\t')
         print('\n\t'.join(map(
             lambda f: f"{Summary.color}{f}{Summary.color_reset}", used_files
-            )))
+        )))
         sorted_word_count = sorted(word_count.items(), key=lambda token: token[1], reverse=True)
         format_delimeter = f"{Summary.color_reset}:{Summary.color} "
         for _, group in groupby(sorted_word_count, lambda token: token[1]):
@@ -204,7 +204,7 @@ class Summary:
                 lambda x: f"{Summary.color}{x[0]}"
                 f"{format_delimeter}{x[1]}{Summary.color_reset}",
                 sorted_group
-                )
+            )
             print('\n' + '\n'.join(formatted_word_count), end='')
         print(Summary.color_reset)
 
@@ -245,7 +245,7 @@ class Summary:
         print(Summary.color_reset, end='\n\t')
         print('\n\t'.join(map(
             lambda f: f"{Summary.color}{f}{Summary.color_reset}", used_files
-            )))
+        )))
         sorted_char_count = sorted(char_count.items(), key=lambda token: token[1], reverse=True)
         format_delimeter = f"{Summary.color_reset}:{Summary.color} "
         for _, group in groupby(sorted_char_count, lambda token: token[1]):
@@ -254,6 +254,6 @@ class Summary:
                 lambda x: f"{Summary.color}{repr(x[0]) if x[0].isspace() else x[0]}"
                 f"{format_delimeter}{x[1]}{Summary.color_reset}",
                 sorted_group
-                )
+            )
             print('\n' + '\n'.join(formatted_char_count), end='')
         print(Summary.color_reset)

@@ -21,7 +21,7 @@ class Files:
             'stdin': None,
             'echo' : None,
             'url'  : {}  ,
-            }
+        }
 
         # the amount of chars neccessary to display the last file
         self.file_number_place_holder = 0

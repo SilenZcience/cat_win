@@ -59,7 +59,7 @@ class HexEditor:
             '─' * (HexEditor.columns + 2) + '┘'
         self.top_offset = ('  Address    ' + ' '.join(
             f"{byte_:02X}" for byte_ in range(HexEditor.columns)
-            ) + '   Decoded text')
+        ) + '   Decoded text')
 
         # current cursor position
         self.cpos = Position(0, 0)
@@ -821,10 +821,14 @@ class HexEditor:
         # Draw Rows
         hex_section = self.hex_array[self.wpos.row:self.wpos.row + max_y]
         hex_offset = [f"{byte_*HexEditor.columns:08X}" for byte_ in range(
-            self.wpos.row, self.wpos.row + max_y)]
+            self.wpos.row, self.wpos.row + max_y
+        )]
         encoded_section = [' '.join(line).ljust(HexEditor.columns*3-1) for line in hex_section]
-        decoded_section = [''.join(self.decode_char(obj) for obj in line).ljust(
-            HexEditor.columns) for line in hex_section]
+        decoded_section = [
+            ''.join(self.decode_char(obj) for obj in line).ljust(
+                HexEditor.columns
+            ) for line in hex_section
+        ]
         for row_id, row in enumerate(
             map(' │ '.join, zip(hex_offset, encoded_section, decoded_section)),
             start=2

@@ -228,7 +228,7 @@ class Config:
         try:
             self.custom_commands = dict(
                 (k, shlex.split(v[1:-1])) for k, v in self.config_parser.items('COMMANDS')
-                )
+            )
         except configparser.NoSectionError:
             self.config_parser.add_section('COMMANDS')
             self.custom_commands = {}
@@ -238,7 +238,8 @@ class Config:
                 try:
                     self.const_dic[element] = self.convert_config_element(
                         config_consts[element],
-                        element)
+                        element
+                    )
                 except KeyError:
                     self.const_dic[element] = self.default_dic[element]
         except configparser.NoSectionError:
@@ -419,7 +420,8 @@ class Config:
                     keyword = '<NEW CUSTOM COMMAND>'
                     continue
                 keyword = self.elements[int(keyword)-1] if (
-                    0 < int(keyword) <= len(self.elements)) else keyword
+                    0 < int(keyword) <= len(self.elements)
+                ) else keyword
 
     def reset_config(self) -> None:
         """

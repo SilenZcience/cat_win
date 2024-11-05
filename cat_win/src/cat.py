@@ -233,7 +233,7 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     err_print(','.join(
         ('str(' + ('CI' if c else 'CS') + '):' if isinstance(v, str) else 're:') + str(v)
         for v, c in arg_parser.file_queries
-        ))
+    ))
     err_print('replace queries: ', end='')
     err_print(repr(arg_parser.file_queries_replacement))
     err_print('truncate file: ', end='')
@@ -451,14 +451,14 @@ def print_file(content: list, stepper: More) -> bool:
                                     arg_parser.file_queries_replacement + \
                                         color_dic[CKW.RESET_ALL] + \
                                             cleaned_line[f_e:]
-                                            )
+                        )
                 else:
                     cleaned_line = query.sub(
                         color_dic[CKW.REPLACE] + \
                             arg_parser.file_queries_replacement + \
                                 color_dic[CKW.RESET_ALL],
                                 cleaned_line
-                                )
+                    )
             if u_args[ARGS_MORE]:
                 stepper.add_line(line_prefix + cleaned_line)
             else:
@@ -527,7 +527,7 @@ def print_file(content: list, stepper: More) -> bool:
             found_message = f"{color_dic[CKW.FOUND_MESSAGE]}---------- Found:   ("
             found_message+= ') ('.join(
                 [f"'{kw}' {pos_s}-{pos_e}" for kw, (pos_s, pos_e) in f_keywords]
-                )
+            )
             found_message+= f") ----------{color_dic[CKW.RESET_ALL]}"
             if u_args[ARGS_MORE]:
                 stepper.add_line(found_message)
@@ -538,7 +538,7 @@ def print_file(content: list, stepper: More) -> bool:
             matched_message = f"{color_dic[CKW.MATCHED_MESSAGE]}---------- Matched: ("
             matched_message+= ') ('.join(
                 [f"'{kw}' {pos_s}-{pos_e}" for kw, (pos_s, pos_e) in m_keywords]
-                )
+            )
             matched_message+= f") ----------{color_dic[CKW.RESET_ALL]}"
             if u_args[ARGS_MORE]:
                 stepper.add_line(matched_message)
@@ -639,7 +639,7 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
         os.isatty(sys.stdout.fileno()) or
         file_index < 0 or
         u_files.is_temp_file(file_index)
-        ):
+    ):
         # if the content of the file is empty, we check if maybe the file is its own pipe-target.
         # in this case the stdout cannot be atty.
         # also the repl would not produce this problem.
@@ -702,7 +702,8 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
             content.sort(key = lambda l: len(l[1]))
         elif arg == ARGS_BLANK:
             content = [c for c in content if c[1].strip(
-                None if const_dic[DKW.BLANK_REMOVE_WS_LINES] else '')]
+                None if const_dic[DKW.BLANK_REMOVE_WS_LINES] else ''
+            )]
         elif arg == ARGS_EVAL:
             content = comp_eval(converter, content, param, remove_ansi_codes_from_line)
         elif arg == ARGS_HEX:
@@ -722,9 +723,12 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
             for c_id, char, _, possible in SPECIAL_CHARS:
                 if not possible:
                     continue
-                content = [(prefix, line.replace(
-                    chr(c_id), f"{color_dic[CKW.CHARS]}^{char}{color_dic[CKW.RESET_ALL]}"
-                    )) for prefix, line in content]
+                content = [
+                    (prefix, line.replace(
+                        chr(c_id), f"{color_dic[CKW.CHARS]}^{char}{color_dic[CKW.RESET_ALL]}"
+                    ))
+                    for prefix, line in content
+                ]
 
     if u_args[ARGS_LLENGTH]:
         content = [(_get_line_length_prefix(prefix, line), line) for prefix, line in content]
@@ -774,7 +778,8 @@ def edit_file(file_index: int = 0) -> None:
         file_content = IoHelper.read_file(
             u_files[file_index].path,
             file_encoding=arg_parser.file_encoding,
-            file_length=file_size)
+            file_length=file_size
+        )
         # splitlines() gives a slight inaccuracy, because
         # it also splits on other bytes than \r and \n ...
         # the alternative would be worse: split('\n') would increase the linecount each
@@ -800,7 +805,8 @@ def edit_file(file_index: int = 0) -> None:
                 u_files[file_index].path,
                 file_encoding=arg_parser.file_encoding,
                 errors='ignore' if const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace',
-                file_length=file_size)
+                file_length=file_size
+            )
             if not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]:
                 file_content = remove_ansi_codes_from_line(file_content)
             content = [('', line) for line in file_content.splitlines()]
@@ -1067,7 +1073,8 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
         temp_files = dict([
             (IoHelper.write_file(tmp_file_helper.generate_temp_file_name(), read_url(valid_url),
                                  arg_parser.file_encoding), valid_url)
-            for valid_url in valid_urls])
+            for valid_url in valid_urls
+        ])
         known_files.extend(list(temp_files.keys()))
         u_files.set_temp_files_url(temp_files)
     if u_args[ARGS_STDIN]:
@@ -1075,8 +1082,8 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
             IoHelper.get_stdin_content(
                 u_args[ARGS_ONELINE],
                 u_args[ARGS_RAW]
-                )
             )
+        )
         temp_file = IoHelper.write_file(tmp_file_helper.generate_temp_file_name(), piped_input,
                                         arg_parser.file_encoding)
         known_files.append(temp_file)
@@ -1085,14 +1092,17 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
                                                 arg_parser.file_encoding)
     elif u_args[ARGS_EDITOR]:
         unknown_files = [file for file in unknown_files if Editor.open(
-            file, u_files.get_file_display_name(file), u_args[ARGS_PLAIN_ONLY])]
+            file, u_files.get_file_display_name(file), u_args[ARGS_PLAIN_ONLY]
+        )]
     elif u_args[ARGS_HEX_EDITOR]:
         unknown_files = [file for file in unknown_files if HexEditor.open(
-            file, u_files.get_file_display_name(file))]
+            file, u_files.get_file_display_name(file)
+        )]
     else:
         unknown_files = IoHelper.read_write_files_from_stdin(
             unknown_files, arg_parser.file_encoding, on_windows_os,
-            u_args[ARGS_ONELINE])
+            u_args[ARGS_ONELINE]
+        )
 
     if len(known_files) + len(unknown_files) == 0:
         return
@@ -1200,7 +1210,7 @@ def cleanup(tmp_file_helper: TmpFileHelper) -> None:
             u_files._calc_max_line_length_,
             Visualizer.get_color_byte_view,
             Visualizer.get_color_entropy,
-            ]
+        ]
         caches_info = [(cache.__name__,
                         str(cache.cache_info().hits),
                         str(cache.cache_info().misses),
@@ -1336,7 +1346,7 @@ def repl_main():
                 print(f"{'Queries:':<12}", ','.join(
                     ('str(' + ('CI' if c else 'CS') + '):' if isinstance(v, str) else '') + str(v)
                     for v, c in arg_parser.file_queries
-                    ))
+                ))
             if arg_parser.file_queries_replacement:
                 print(f"{'Replacement:':<12} {repr(arg_parser.file_queries_replacement)}")
 

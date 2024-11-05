@@ -109,7 +109,7 @@ class More:
         try:
             user_input = input(
                 f"-- More ({percentage: >2}%){('['+info+']') if info else ''} -- "
-                ).strip().upper()
+            ).strip().upper()
         except EOFError:
             user_input = ''
         except KeyboardInterrupt:
