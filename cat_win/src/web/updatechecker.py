@@ -49,6 +49,37 @@ def get_latest_package_version(package: str) -> str:
         return '0.0.0'
 
 
+def get_latest_stable_package_version(package: str) -> str:
+    """
+    retrieve the official PythonPackageIndex information regarding
+    a package.
+    
+    Parameters:
+    package (str):
+        the package name to check
+        
+    Returns:
+    (str):
+        a version representation (without letters)
+        on Error: a zero version '0.0.0
+    """
+    try:
+        with urllib.request.urlopen(f"https://pypi.org/pypi/{package}/json",
+                                    timeout=2) as _response:
+            response = _response.read()
+        for version, meta in sorted(
+            json.loads(response)['releases'].items(),
+            key=lambda x: x[1][0]['upload_time'] if x[1] else '1970-01-01T00:00:00',
+            reverse=True
+        ):
+            print(version, meta[0]['upload_time'])
+            if version.replace('.', '').isdigit():
+                return version
+        return '0.0.0'
+    except (ValueError, OSError):
+        return '0.0.0'
+
+
 def only_numeric(_s: str) -> int:
     """
     strips every non-numeric character of a string.
@@ -170,7 +201,13 @@ def print_update_information(package: str, current_version: str, color_dic: dict
     elif ' ' in py_executable:
         py_executable = f'"{py_executable}"' if on_windows_os else py_executable.replace(' ', '\\ ')
 
+    recommend_not_latest_version = False
     latest_version = get_latest_package_version(package)
+    if not latest_version.replace('.', '').isdigit(): # pre-release
+        latest_stable_version = get_latest_stable_package_version(package)
+        if '0.0.0' != latest_stable_version != current_version:
+            latest_version = latest_stable_version
+            recommend_not_latest_version = True
     status = new_version_available(current_version, latest_version)
 
     if status == STATUS_UP_TO_DATE:
@@ -185,6 +222,8 @@ def print_update_information(package: str, current_version: str, color_dic: dict
         message += 'To update, run:'
         message += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_IMPORTANT]}"
         message += f"{py_executable} -m pip install --upgrade {package}"
+        if recommend_not_latest_version:
+            message += f"=={latest_version}"
     elif abs(status) == STATUS_PRE_RELEASE_AVAILABLE:
         message += f"{color_dic[CKW.MESSAGE_INFORMATION]}"
         message += f"A new pre-release of {package} is available: v{latest_version}"
