@@ -205,5 +205,5 @@ ALL_ARGS = [
                 ARGS_RECONFIGURE_OUT, show_arg=False),
     ArgConstant('--Rerr', '--Rerr', 'reconfigure the stderr with the parsed encoding',
                 ARGS_RECONFIGURE_ERR, show_arg=False),
-    ]
+]
 ALL_ARGS.sort(key=lambda x:x.section)

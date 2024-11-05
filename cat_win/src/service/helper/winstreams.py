@@ -12,20 +12,20 @@ try:
         _fields_ = [
             ("LowPart", ctypes.c_ulong),
             ("HighPart", ctypes.c_ulong),
-            ]
+        ]
 
     class LARGE_INTEGER(ctypes.Union):
         _fields_ = [
             ("large1", LARGE_INTEGER_UNION),
             ("large2", LARGE_INTEGER_UNION),
             ("QuadPart",    ctypes.c_longlong),
-            ]
+        ]
 
     class WIN32_FIND_STREAM_DATA(ctypes.Structure):
         _fields_ = [
             ("StreamSize", LARGE_INTEGER),
             ("cStreamName", ctypes.c_wchar * 296),
-            ]
+        ]
 
     WINSTREAMS_MODULE_ERROR = False
 except AttributeError:

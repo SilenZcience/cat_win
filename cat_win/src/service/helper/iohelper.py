@@ -118,7 +118,7 @@ class IoHelper:
             with PBar(
                 file_length, 'Reading file',
                 length=50, fill_l='━', fill_r='╺', erase=True
-                ).init() as p_bar, open(src_file, 'rb') as file:
+            ).init() as p_bar, open(src_file, 'rb') as file:
                 buf_reader = io.BufferedReader(file, buffer_size=262144000) # 250MB
                 while True:
                     byte_chunk = buf_reader.read(262144000)
@@ -394,7 +394,7 @@ class IoHelper:
     # None security, OPEN_EXISTING, 0 flags, None template
                 conin_handle = ctypes.windll.kernel32.CreateFileW(
                     "CONIN$", 0x80000000, 3, None, 3, 0, None
-                    ) # os.dup2 does not work on pyinstaller
+                ) # os.dup2 does not work on pyinstaller
                 ctypes.windll.kernel32.SetStdHandle(-10, conin_handle) # -10 = stdin
                 # if this fails it is better to let the exception raise than to be stuck
                 # without user interaction being recognized

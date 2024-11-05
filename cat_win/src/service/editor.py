@@ -180,7 +180,8 @@ class Editor:
             deleted = self.window_content[self.cpos.row][self.cpos.col:cur_col]
             self.window_content[self.cpos.row] = (
                 self.window_content[self.cpos.row][:self.cpos.col] + \
-                self.window_content[self.cpos.row][cur_col:])
+                self.window_content[self.cpos.row][cur_col:]
+            )
             self.unsaved_progress = True
             return deleted
         if self.cpos.row < len(self.window_content)-1:
@@ -571,7 +572,8 @@ class Editor:
         # the custom indentation
         if self.special_indentation != '\t' == wchars and \
             (self.window_content[self.cpos.row][:self.cpos.col].replace(
-                self.special_indentation, '') + ' ').isspace():
+                self.special_indentation, ''
+            ) + ' ').isspace():
             return self._key_string(self.special_indentation)
         self.unsaved_progress = True
         self.window_content[self.cpos.row] = \
@@ -677,17 +679,13 @@ class Editor:
             'isupper': str.isupper,
         }
         try:
-            bool_expressions.update(
-                {
-                    'isascii': str.isascii,
-                }
-            )
+            bool_expressions.update({
+                'isascii': str.isascii,
+            })
         except AttributeError: # Python 3.6 does not have str.isascii
-            bool_expressions.update(
-                {
-                    'isascii': lambda x: all(ord(c) < 128 for c in x),
-                }
-            )
+            bool_expressions.update({
+                'isascii': lambda x: all(ord(c) < 128 for c in x),
+            })
 
         string_expressions = {
             'capitalize': str.capitalize,
@@ -890,7 +888,8 @@ class Editor:
             pre_r = f" [{repr(self.replace)[1:-1]}]" if self.replace else ''
             rep_a = 'ALL ' if replace_all else ''
             self._action_render_scr(
-                f"Confirm: 'ENTER' - Replace {rep_a}{pre_s} with{pre_r}: {sub_s}␣", tmp_error)
+                f"Confirm: 'ENTER' - Replace {rep_a}{pre_s} with{pre_r}: {sub_s}␣", tmp_error
+            )
             wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
@@ -1147,15 +1146,13 @@ class Editor:
                     try:
                         nchar = self.curse_window.get_wch()
                         if UNIFY_HOTKEYS.get(curses.keyname(
-                                        nchar if isinstance(nchar, int) else ord(nchar)
-                                        ), b'_key_string') == b'_key_string':
+                            nchar if isinstance(nchar, int) else ord(nchar)
+                        ), b'_key_string') == b'_key_string':
                             wchar += nchar
                         else:
-                            buffer = (nchar,
-                                    curses.keyname(
-                                        nchar if isinstance(nchar, int) else ord(nchar)
-                                        )
-                                    )
+                            buffer = (nchar, curses.keyname(
+                                nchar if isinstance(nchar, int) else ord(nchar)
+                            ))
                             break
                     except curses.error:
                         break
@@ -1188,7 +1185,8 @@ class Editor:
 
         # fix cursor position (makes movement hotkeys easier)
         row = self.window_content[self.cpos.row] if (
-            self.cpos.row < len(self.window_content)) else None
+            self.cpos.row < len(self.window_content)
+        ) else None
         rowlen = len(row) if row is not None else 0
         self.cpos.col = min(self.cpos.col, rowlen)
 
@@ -1286,12 +1284,13 @@ class Editor:
                                    max(self.cpos.col-self.wpos.col, 0))
         except curses.error:
             pass
-        curses.curs_set(not self.scrolling or not (
-                            self.cpos.row < self.wpos.row or \
-                            self.cpos.col < self.wpos.col or \
-                            self.cpos.row >= self.wpos.row+max_y or \
-                            self.cpos.col >= self.wpos.col+max_x
-                        )
+        curses.curs_set(
+            not self.scrolling or not (
+                self.cpos.row < self.wpos.row or \
+                self.cpos.col < self.wpos.col or \
+                self.cpos.row >= self.wpos.row+max_y or \
+                self.cpos.col >= self.wpos.col+max_x
+            )
         )
 
         self.scrolling = False
@@ -1358,12 +1357,13 @@ class Editor:
                         pre_selecting = self.selecting
                         indent_offset = 0
                         while self.window_content[self.cpos.row-1][indent_offset:].startswith(
-                            self.special_indentation):
+                            self.special_indentation
+                        ):
                             indent_offset += len(self.special_indentation)
                         action_text = self._key_string(
                             (indent_offset//len(self.special_indentation)) * \
                                 self.special_indentation
-                            )
+                        )
                         if indent_offset > 0:
                             self.history.add(b'_key_string', False,
                                                 pre_cpos, self.cpos.get_pos(),

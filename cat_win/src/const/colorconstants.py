@@ -29,7 +29,7 @@ class ColorOptions:
         'LIGHTMAGENTA': 95,
         'LIGHTCYAN':    96,
         'LIGHTWHITE':   97
-        }
+    }
     __Back = {
         'RESET': 49,
 
@@ -50,10 +50,10 @@ class ColorOptions:
         'LIGHTMAGENTA': 105,
         'LIGHTCYAN':    106,
         'LIGHTWHITE':   107
-        }
+    }
     __Style = {
         'RESET': 0
-        }
+    }
 
     Fore  = {'NONE': ''}
     Back  = {'NONE': ''}

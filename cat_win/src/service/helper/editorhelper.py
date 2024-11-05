@@ -499,7 +499,7 @@ class _SearchIter:
         if self.wrapped and (
             row > self._start_y or
             row == self._start_y and f_col >= self._start_x
-            ):
+        ):
             raise StopIteration()
         if self.editor.selecting and (
             (row, f_col) >= self.editor.spos.get_pos()
