@@ -26,7 +26,7 @@ STATUS_PRE_RELEASE_AVAILABLE = 2
 STATUS_UNSAFE_PRE_RELEASE_AVAILABLE = -2
 
 
-def get_latest_package_version(package: str) -> str:
+def get_stable_package_version(package: str) -> str:
     """
     retrieve the official PythonPackageIndex information regarding
     a package.
@@ -37,7 +37,7 @@ def get_latest_package_version(package: str) -> str:
         
     Returns:
     (str):
-        a version representation
+        a version representation (latest stable package)
         on Error: a zero version '0.0.0
     """
     try:
@@ -49,7 +49,7 @@ def get_latest_package_version(package: str) -> str:
         return '0.0.0'
 
 
-def get_latest_stable_package_version(package: str) -> str:
+def get_latest_package_version(package: str) -> str:
     """
     retrieve the official PythonPackageIndex information regarding
     a package.
@@ -60,23 +60,19 @@ def get_latest_stable_package_version(package: str) -> str:
         
     Returns:
     (str):
-        a version representation (without letters)
+        a version representation (includes pre-releases)
         on Error: a zero version '0.0.0
     """
     try:
         with urllib.request.urlopen(f"https://pypi.org/pypi/{package}/json",
                                     timeout=2) as _response:
             response = _response.read()
-        for version, meta in sorted(
+        return sorted(
             json.loads(response)['releases'].items(),
             key=lambda x: x[1][0]['upload_time'] if x[1] else '1970-01-01T00:00:00',
             reverse=True
-        ):
-            print(version, meta[0]['upload_time'])
-            if version.replace('.', '').isdigit():
-                return version
-        return '0.0.0'
-    except (ValueError, OSError):
+        )[0][0]
+    except (ValueError, OSError, IndexError):
         return '0.0.0'
 
 
@@ -201,14 +197,12 @@ def print_update_information(package: str, current_version: str, color_dic: dict
     elif ' ' in py_executable:
         py_executable = f'"{py_executable}"' if on_windows_os else py_executable.replace(' ', '\\ ')
 
-    recommend_not_latest_version = False
-    latest_version = get_latest_package_version(package)
-    if not latest_version.replace('.', '').isdigit(): # pre-release
-        latest_stable_version = get_latest_stable_package_version(package)
-        if '0.0.0' != latest_stable_version != current_version:
-            latest_version = latest_stable_version
-            recommend_not_latest_version = True
-    status = new_version_available(current_version, latest_version)
+    latest_stable_version = get_stable_package_version(package)
+    if latest_stable_version == current_version:
+        latest_version = get_latest_package_version(package)
+        if '0.0.0' != latest_version != latest_stable_version:
+            latest_stable_version = latest_version
+    status = new_version_available(current_version, latest_stable_version)
 
     if status == STATUS_UP_TO_DATE:
         return
@@ -217,16 +211,14 @@ def print_update_information(package: str, current_version: str, color_dic: dict
 
     if abs(status) == STATUS_STABLE_RELEASE_AVAILABLE:
         message += f"{color_dic[CKW.MESSAGE_IMPORTANT]}"
-        message += f"A new stable release of {package} is available: v{latest_version}"
+        message += f"A new stable release of {package} is available: v{latest_stable_version}"
         message += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_IMPORTANT]}"
         message += 'To update, run:'
         message += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_IMPORTANT]}"
         message += f"{py_executable} -m pip install --upgrade {package}"
-        if recommend_not_latest_version:
-            message += f"=={latest_version}"
     elif abs(status) == STATUS_PRE_RELEASE_AVAILABLE:
         message += f"{color_dic[CKW.MESSAGE_INFORMATION]}"
-        message += f"A new pre-release of {package} is available: v{latest_version}"
+        message += f"A new pre-release of {package} is available: v{latest_stable_version}"
     message += f"{color_dic[CKW.RESET_ALL]}"
     if status < STATUS_UP_TO_DATE:
         warning += f"{color_dic[CKW.MESSAGE_WARNING]}"
