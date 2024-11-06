@@ -9,15 +9,15 @@ from cat_win.src.web import updatechecker
 
 
 class TestUpdateChecker(TestCase):
-    def test_get_latest_package_version_error(self):
+    def test_get_stable_package_version_error(self):
         with patch('urllib.request.urlopen', ErrorDefGen.get_def(ValueError())):
-            self.assertEqual(updatechecker.get_latest_package_version('cat_win'), '0.0.0')
+            self.assertEqual(updatechecker.get_stable_package_version('cat_win'), '0.0.0')
         with patch('urllib.request.urlopen', ErrorDefGen.get_def(OSError())):
-            self.assertEqual(updatechecker.get_latest_package_version('cat_win'), '0.0.0')
+            self.assertEqual(updatechecker.get_stable_package_version('cat_win'), '0.0.0')
 
     @patch('urllib.request.urlopen', lambda *args, **kwargs: io.StringIO('{"info":{"version":"1.4.5"}}'))
-    def test_get_latest_package_version(self):
-        self.assertEqual(updatechecker.get_latest_package_version('cat_win'), '1.4.5')
+    def test_get_stable_package_version(self):
+        self.assertEqual(updatechecker.get_stable_package_version('cat_win'), '1.4.5')
 
     def test_only_numeric(self):
         self.assertEqual(updatechecker.only_numeric('1nh589h15io125b085218'), 158915125085218)
