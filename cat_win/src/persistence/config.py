@@ -428,6 +428,7 @@ class Config:
         reset the config to default by simply deleting the config section.
         """
         self.config_parser.remove_section('CONSTS')
+        self.config_parser.remove_section('COMMANDS')
         self._save_config(None)
 
     def remove_config(self) -> None:
