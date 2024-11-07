@@ -66,6 +66,9 @@ class Summary:
             the fies to summarize.
         """
         if not files:
+            print(Summary.color, end='')
+            print('No files have been found!', end='')
+            print(Summary.color_reset)
             return
         if Summary.unique:
             files = Summary._unique_list(files)
