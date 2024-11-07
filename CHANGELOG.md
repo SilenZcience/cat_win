@@ -25,6 +25,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fixed Bug where the copy action (`^C`) in the editor would copy the wrong text in certain scenarios.
 - fixed Bug where the editor would glitch visually when searching/replacing special characters.
 - fixed Bug where the `--config-clear`, `--config-reset` parameter would not clear the custom commands.
+- fixed Bug where the found directories were not displayed when using -`D`, --`DIRS` and no files have been found.
 
 
 ## [1.9.2] - 2024-10-21
