@@ -1008,8 +1008,10 @@ def init(repl: bool = False) -> tuple:
 
     # check for special cases
     if u_args[ARGS_DEBUG]:
-        _show_debug(u_args.args, arg_suggestions, known_files,
-                    unknown_files, echo_args, arg_parser.get_dirs(), valid_urls)
+        _show_debug(
+            u_args.args, arg_suggestions, known_files,
+            unknown_files, echo_args, arg_parser.get_dirs(), valid_urls
+        )
     if (len(known_files) + len(unknown_files) + len(u_args) == 0 and not repl) or \
         u_args[ARGS_HELP]:
         _show_help(repl)
@@ -1088,8 +1090,9 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
                                         arg_parser.file_encoding)
         known_files.append(temp_file)
         u_files.set_temp_file_stdin(temp_file)
-        unknown_files = IoHelper.write_files(unknown_files, piped_input,
-                                                arg_parser.file_encoding)
+        unknown_files = IoHelper.write_files(
+            unknown_files, piped_input, arg_parser.file_encoding
+        )
     elif u_args[ARGS_EDITOR]:
         unknown_files = [file for file in unknown_files if Editor.open(
             file, u_files.get_file_display_name(file), u_args[ARGS_PLAIN_ONLY]
@@ -1104,12 +1107,6 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
             u_args[ARGS_ONELINE]
         )
 
-    if len(known_files) + len(unknown_files) == 0:
-        return
-
-    # fill holder object with neccessary values
-    u_files.set_files([*known_files, *unknown_files])
-
     if u_args[ARGS_EDITOR]:
         with IoHelper.dup_stdin(on_windows_os, u_args[ARGS_STDIN]):
             for file in known_files:
@@ -1119,12 +1116,20 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
             for file in known_files:
                 HexEditor.open(file, u_files.get_file_display_name(file))
 
+    # fill holder object with neccessary values
+    u_files.set_files([*known_files, *unknown_files])
+    # -------------- do not use known_files and unknown_files anymore --------------
+
     if u_args[ARGS_FFILES] or u_args[ARGS_DDIRECTORIES]:
         if u_args[ARGS_FFILES]:
             Summary.show_files(u_args[ARGS_FFILES], u_files.files)
         if u_args[ARGS_DDIRECTORIES]:
             Summary.show_dirs(arg_parser.get_dirs())
         return
+
+    if len(u_files) == 0:
+        return
+
     if u_args[ARGS_DATA] or u_args[ARGS_CHECKSUM]:
         _print_meta_and_checksum(u_args[ARGS_DATA], u_args[ARGS_CHECKSUM])
         return
@@ -1173,8 +1178,10 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
 
     if u_args[ARGS_B64D]:
         decode_files_base64(tmp_file_helper)
-    u_files.generate_values(u_args[ARGS_SUM] or u_args[ARGS_SSUM] or u_args[ARGS_NUMBER],
-                            u_args[ARGS_LLENGTH])
+    u_files.generate_values(
+        u_args[ARGS_SUM] or u_args[ARGS_SSUM] or u_args[ARGS_NUMBER],
+        u_args[ARGS_LLENGTH]
+    )
 
     if u_args[ARGS_SSUM]:
         Summary.show_sum(u_files.files, u_args[ARGS_SSUM], u_files.all_files_lines,
