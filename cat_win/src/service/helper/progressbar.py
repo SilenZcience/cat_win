@@ -21,7 +21,7 @@ class PBar:
     def set_colors(color_done: str, color_missing: str, color_reset: str) -> None:
         """
         setup the colors to use in the progress bar.
-        
+
         Parameters:
         color_done (str):
             the color to use for the done progress (ansi escape)
@@ -67,7 +67,7 @@ class PBar:
     def print_progress_bar(self, iteration: int) -> None:
         """
         print the current state of the progress bar
-        
+
         Parameters:
         iteration (int):
             the current progress iteration

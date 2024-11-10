@@ -14,11 +14,11 @@ class Formatter:
     def format_json(content: str) -> tuple:
         """
         format the given content if it contains valid json.
-        
+
         Parameters:
         content (str):
             the read content of a given file like
-        
+
         Returns:
         (tuple):
             the content and an indicator if the content was formatted
@@ -33,11 +33,11 @@ class Formatter:
     def format_xml(content: str) -> tuple:
         """
         format the given content if it contains valid xml.
-        
+
         Parameters:
         content (str):
             the read content of a given file like
-        
+
         Returns:
         (tuple):
             the content and an indicator if the content was formatted
@@ -53,11 +53,11 @@ class Formatter:
     def format(content: list) -> list:
         """
         format the given content.
-        
+
         Parameters:
         content (list):
             the read content of a given file like [(prefix, line), ...]
-        
+
         Returns:
         content (list):
             the content; like [(prefix, line), ...]

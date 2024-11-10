@@ -45,13 +45,13 @@ class Signatures:
     def match(file_prefix_: str, signature_: str) -> bool:
         """
         check if a signature (magic number) matches
-        
+
         Parameters:
         file_prefix_ (str):
             the prefix of the current file
         signature_ (str):
             the signature to compare
-        
+
         Returns:
         (bool):
             indicates if the signature matches
@@ -69,13 +69,13 @@ class Signatures:
     def read_signature(res_path: str, file: Path) -> str:
         """
         read a file and compare its signature to known signatures.
-        
+
         Parameters:
         res_path (str):
             the path to the signatures database
         file (Path):
             a string representation of a file (-path)
-            
+
         Returns:
         (str):
             the possible signatures of the file
@@ -127,11 +127,11 @@ class Signatures:
 def _convert_size(size_bytes: int) -> str:
     """
     convert a size value to a more compact representation
-    
+
     Parameters:
     size_bytes (int):
         a size value in bytes
-        
+
     Returns:
     (str):
         a string representation with a size value suffix
@@ -148,11 +148,11 @@ def _convert_size(size_bytes: int) -> str:
 def read_attribs(file: Path) -> list:
     """
     check which attributes a file has set.
-    
+
     Parameters:
     file (Path):
         a string representation of a file (-path)
-        
+
     Returns:
     (list):
         a list of lists containing attributes and a
@@ -178,11 +178,11 @@ def read_attribs(file: Path) -> list:
 def get_file_size(file: Path) -> int:
     """
     calculate the size of a file
-    
+
     Parameters:
     file (Path):
         a string representation of a file (-path)
-        
+
     Returns:
     (int):
         the size in bytes or 0 if an (OS-)error occurs
@@ -195,11 +195,11 @@ def get_file_size(file: Path) -> int:
 def get_dir_size(directory: str) -> int:
     """
     calculate the size of a directory
-    
+
     Parameters:
     directory (str):
         a string representation of a dir (-path)
-        
+
     Returns:
     total (int):
         the size in bytes or 0 if an (OS-)error occurs
@@ -236,7 +236,7 @@ def get_file_mtime(file: Path) -> float:
 def get_file_meta_data(file: Path, res_path: str, on_windows_os: bool, colors = None) -> str:
     """
     calculate file metadata information.
-    
+
     Parameters:
     file (Path):
         a string representation of a file (-path)
@@ -248,7 +248,7 @@ def get_file_meta_data(file: Path, res_path: str, on_windows_os: bool, colors = 
     colors (list):
         a list containing the ANSI-Colorcodes to display
         the attributes like [RESET_ALL, ATTRIB, +ATTRIB, -ATTRIB]
-    
+
     Returns:
     meta_data (str):
         representation containing file size, creation/modified/accessed time.
@@ -302,7 +302,7 @@ def get_file_meta_data(file: Path, res_path: str, on_windows_os: bool, colors = 
 def print_meta(file: Path, res_path: str, on_windows_os: bool, colors: list) -> None:
     """
     print the information retrieved by get_file_meta_data()
-    
+
     Parameters:
     file (Path):
         a string representation of a file (-path)

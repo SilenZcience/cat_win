@@ -30,11 +30,11 @@ class Visualizer:
     def get_color_byte_view(byte: int) -> str:
         """
         return a color based on the type of byte given
-        
+
         Parameters:
         byte (int):
             the byte to check
-        
+
         Returns:
         (str):
             ansi color code
@@ -55,11 +55,11 @@ class Visualizer:
         """
         return a color based on the value of the entropy given.
         entropy lies between 0 and 100.
-        
+
         Parameters:
         entropy (int):
             the entropy to classify
-        
+
         Returns:
         (str):
             ansi color code
@@ -78,7 +78,7 @@ class Visualizer:
     def display_data(data_generator, color_def) -> None:
         """
         print the visualization to stdout.
-        
+
         Paramaters:
         data_generator (generator [yields partitioned lists]):
             the generator splitting the data into chunks

@@ -80,13 +80,13 @@ class HexEditor:
     def pos_between(from_pos: tuple, to_pos: tuple):
         """
         every position between two positions
-        
+
         Parameters:
         from_pos (tuple):
             the start pos
         to_pos (tuple):
             the end pos
-        
+
         Yields:
         (tuple):
             a position between start and end
@@ -146,11 +146,11 @@ class HexEditor:
     def _get_current_state_row(self, row: int) -> list:
         """
         get the current state of the hex row
-        
+
         Parameters:
         row (int):
             the row to get
-        
+
         Returns:
         hex_row (list):
             the row in the current edited state
@@ -166,7 +166,7 @@ class HexEditor:
     def getxymax(self) -> tuple:
         """
         find the size of the window.
-        
+
         Returns:
         (tuple):
             the size of the display that is free to use
@@ -349,7 +349,7 @@ class HexEditor:
     def _key_string(self, wchar) -> None:
         """
         tries to replace a byte on the screen.
-        
+
         Parameters:
         wchars (int|str):
             given by curses get_wch()
@@ -422,7 +422,7 @@ class HexEditor:
     def _action_save(self) -> bool:
         """
         handle the save file action.
-        
+
         Returns
         (bool):
             indicates if the editor should keep running
@@ -457,7 +457,7 @@ class HexEditor:
     def _action_jump(self) -> bool:
         """
         handles the jump to line action.
-        
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -492,7 +492,7 @@ class HexEditor:
     def _action_find(self) -> bool:
         """
         handles the find in editor action.
-        
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -613,7 +613,7 @@ class HexEditor:
     def _action_reload(self) -> bool:
         """
         prompt to reload the file.
-        
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -643,7 +643,7 @@ class HexEditor:
     def _action_insert(self) -> bool:
         """
         handles the insert char action.
-        
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -694,7 +694,7 @@ class HexEditor:
     def _action_quit(self) -> bool:
         """
         handles the quit editor action.
-        
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -728,7 +728,7 @@ class HexEditor:
     def _action_interrupt(self) -> bool:
         """
         handles the interrupt action.
-        
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -740,7 +740,7 @@ class HexEditor:
     def _action_resize(self) -> bool:
         """
         handles the resizing of the (terminal) window.
-        
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -755,7 +755,7 @@ class HexEditor:
     def _get_next_char(self) -> tuple:
         """
         get next char
-        
+
         Returns
         (wchar, key) (tuple):
             the char received and the possible action it means.
@@ -775,11 +775,11 @@ class HexEditor:
     def _get_color(self, c_id: int) -> int:
         """
         get curses color by id.
-        
+
         Parameter:
         c_id (int):
             the id of the color to grab
-            
+
         Returns
         (int):
             the curses.color
@@ -1031,13 +1031,13 @@ class HexEditor:
     def open(cls, file: Path, display_name: str) -> bool:
         """
         simple editor to change the contents of any provided file.
-        
+
         Parameters:
         file (Path):
             a string representing a file(-path)
         display_name (str):
             the display name for the current file
-        
+
         Returns:
         (bool):
             indicates whether or not the editor has written any content to the provided files
@@ -1087,7 +1087,7 @@ class HexEditor:
                   unicode_escaped_search: bool, columns: int) -> None:
         """
         set the config flags for the Editor
-        
+
         Parameters:
         save_with_alt (bool):
             indicates whetcher the stdin pipe has been used (and therefor tampered)

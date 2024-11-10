@@ -11,14 +11,14 @@ def get_checksum_from_file(file: Path, colors = None) -> str:
     """
     Calculates and returns the CRC32, MD5, SHA1, SHA256, SHA512
     hashes of a file.
-    
+
     Parameters:
     file (Path):
         a string representation of a file (-path)
     colors (list):
         a list with 2 elements like [COLOR_CHECKSUM, COLOR_RESET]
         containing the ANSI-Colorcodes used in the returned string.
-    
+
     Returns:
     checksum (str):
         a formatted string representation of all checksums calculated
@@ -58,7 +58,7 @@ def get_checksum_from_file(file: Path, colors = None) -> str:
 def print_checksum(file: Path, color: str, color_reset: str) -> None:
     """
     print the information retrieved by get_checksum_from_file()
-    
+
     Parameters:
     file (Path):
         a string representation of a file (-path)

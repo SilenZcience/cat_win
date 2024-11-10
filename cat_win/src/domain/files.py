@@ -36,11 +36,11 @@ class Files:
     def get_file_display_name(self, file: Path) -> str:
         """
         return the display name of a file. Expects self.temp_files to be set already.
-        
+
         Parameters_
         file (str):
             a path of a file
-            
+
         Returns:
         (str):
             the display name for the file. Either the path itself
@@ -60,11 +60,11 @@ class Files:
     def is_temp_file(self, file_index: int) -> bool:
         """
         determine if a file is a temporary file.
-        
+
         Parameters_
         file_index (int):
             the index of the file in self.files
-            
+
         Returns:
         (bool):
             indicates if the file is a temp_file.
@@ -75,7 +75,7 @@ class Files:
     def set_files(self, files: list) -> None:
         """
         set the files to display.
-        
+
         Parameters:
         files (list):
             the files to set
@@ -85,7 +85,7 @@ class Files:
     def set_temp_file_stdin(self, file: str) -> None:
         """
         set the tempfile used for stdin.
-        
+
         Parameters:
         file (str):
             the file used for stdin
@@ -120,7 +120,7 @@ class Files:
         Parameters:
         reader (method):
             the method to read from
-        
+
         Yields:
         byt (bytes):
             the bytes in chunks read from the reader
@@ -152,11 +152,11 @@ class Files:
     def _calc_max_line_length_(self, file: Path) -> int:
         """
         Calculate self.file_line_length_place_holder for a single file.
-        
+
         Parameters:
         file (Path):
             a string representation of a file (-path)
-            
+
         Returns:
         (int):
             the length of the placeholder to represent
@@ -178,7 +178,7 @@ class Files:
     def generate_values(self, calc_l_: bool, calc_ll_: bool) -> None:
         """
         generate the metadata for all files
-        
+
         Parameters:
         calc_l_ (bool):
             calculate the place holders

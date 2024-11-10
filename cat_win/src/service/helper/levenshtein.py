@@ -10,13 +10,13 @@ def levenshtein(str_a: str, str_b: str) -> float:
     two strings and return the result as a percentage value.
     char case is ignored such that uppercase letters match their
     lowercase counterparts perfectly.
-    
+
     Parameters:
     str_a (str):
         the first string to compare
     str_b (str):
         the second string to compare
-        
+
     Returns:
     (float):
         the similarity of the two strings as a percentage between 0.0 and 100.0
@@ -46,14 +46,14 @@ def calculate_suggestions(check_these: list, check_against: list) -> list:
     """
     Calculate the suggestions for each given element passed in
     using the levenshtein distance to all valid options.
-    
+
     Parameters:
     check_these (list):
         the elements to find suggestions for
     check_against (list):
         a list of iterables. each iterable holds different variants of the same
         suggestion
-        
+
     Returns:
     element_suggestions (list):
         a list of the structure [(arg1, [suggestions]), (arg2, [suggestions]), ...]

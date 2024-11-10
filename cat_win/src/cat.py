@@ -248,7 +248,7 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
 def _print_meta_and_checksum(show_meta: bool, show_checksum: bool) -> None:
     """
     calls _print_meta() and _print_checksum() on every file.
-    
+
     Parameters:
     show_meta (bool):
         decides if the metadata of the files should be displayed
@@ -272,7 +272,7 @@ def remove_ansi_codes_from_line(line: str) -> str:
     Parameters:
     line (str):
         the string to clean ANSI-Colorcodes from
-        
+
     Returns:
     (str):
         the cleaned string
@@ -296,7 +296,7 @@ def _calculate_line_prefix_spacing(line_char_length: int, file_name_prefix: bool
                                    file_char_length: int = 0) -> str:
     """
     calculate a string template for the line prefix.
-    
+
     Parameters:
     line_char_length (int):
         the length of the line number
@@ -306,7 +306,7 @@ def _calculate_line_prefix_spacing(line_char_length: int, file_name_prefix: bool
         should the file be included in the prefix
     file_char_length (int):
         the length of the file number
-    
+
     Returns:
     (str):
         a non-finished but correctly formatted string template to insert line number
@@ -329,13 +329,13 @@ def _calculate_line_prefix_spacing(line_char_length: int, file_name_prefix: bool
 def _get_line_prefix(line_num: int, index: int) -> str:
     """
     calculates the line prefix in regard to the line number and file count.
-    
+
     Parameters:
     line_num (int):
         the current number identifying the line
     index (int):
         the current number identifying the file
-    
+
     Returns:
     (str):
         the new line prefix including the line number.
@@ -352,11 +352,11 @@ def _get_line_prefix(line_num: int, index: int) -> str:
 def _calculate_line_length_prefix_spacing(line_char_length: int) -> str:
     """
     calculate a string template for the line prefix.
-    
+
     Parameters:
     line_char_length (int):
         the length of the line
-    
+
     Returns:
     (str):
         a non-finished but correctly formatted string template to insert line length into
@@ -368,13 +368,13 @@ def _calculate_line_length_prefix_spacing(line_char_length: int) -> str:
 def _get_line_length_prefix(prefix: str, line) -> str:
     """
     calculates the line prefix in regard to the line length.
-    
+
     Parameters:
     prefix (str):
         the current prefix to append to
     line (str|byte):
         a representation of the current line
-    
+
     Returns:
     (str):
         the new line prefix including the line length.
@@ -387,7 +387,7 @@ def _get_line_length_prefix(prefix: str, line) -> str:
 def _get_file_prefix(prefix: str, file_index: int, hyper: bool = False) -> str:
     """
     append the file to the line prefix.
-    
+
     Parameters:
     prefix (str):
         the current prefix to append to
@@ -396,7 +396,7 @@ def _get_file_prefix(prefix: str, file_index: int, hyper: bool = False) -> str:
     hyper (bool):
         if True the filename will include the file-protocol prefix.
         (this will make the file a link, which are clickable in some terminals)
-    
+
     Returns:
     (str):
         the new line prefix including the file.
@@ -414,13 +414,13 @@ def _get_file_prefix(prefix: str, file_index: int, hyper: bool = False) -> str:
 def print_file(content: list, stepper: More) -> bool:
     """
     print a file and possibly include the substrings and patterns to search for.
-    
+
     Parameters:
     content (list):
         the content of a file like [(prefix, line), ...]
     stepper (More):
         the stepper to step through the file
-        
+
     Returns:
     (bool):
         identifies if the given content parameter contained any
@@ -560,7 +560,7 @@ def print_file(content: list, stepper: More) -> bool:
 def _print_excluded_by_peek(prefix_len: int, excluded_by_peek: int) -> None:
     """
     print a paragraph about how many lines have been excluded.
-    
+
     Parameters:
     prefix_len (int):
         the approximate length of the prefix
@@ -581,7 +581,7 @@ def print_excluded_by_peek(content: list, excluded_by_peek: int) -> None:
     """
     print a paragraph about how many lines have been excluded,
     using the method _print_excluded_by_peek().
-    
+
     Parameters:
     content (list):
         the content of a file like [(prefix, line), ...]
@@ -623,7 +623,7 @@ def edit_raw_content(content: bytes, file_index: int = 0) -> None:
 def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> None:
     """
     apply all parameters to a string (file Content).
-    
+
     Parameters:
     content (list):
         the content of a file like [(prefix, line), ...]
@@ -761,7 +761,7 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
 def edit_file(file_index: int = 0) -> None:
     """
     apply all parameters to a file.
-    
+
     Parameters:
     file_index (int):
         the index regarding which file is currently being edited
@@ -820,7 +820,7 @@ def edit_file(file_index: int = 0) -> None:
 def print_raw_view(file_index: int = 0, mode: str = 'X') -> None:
     """
     print the raw byte representation of a file in hexadecimal or binary
-    
+
     Parameters:
     file_index (int):
         the index regarding which file is currently being edited
@@ -896,7 +896,7 @@ def edit_files() -> None:
 def decode_files_base64(tmp_file_helper: TmpFileHelper) -> None:
     """
     decode all files from base64 and save to temporary file.
-    
+
     Parameters:
     tmp_file_helper (TmpFileHelper):
         the TmpFileHelper to keep track of the used tmp files
@@ -922,15 +922,16 @@ def show_unknown_args_suggestions(repl: bool = False) -> list:
     """
     display the unknown arguments passed in aswell as their suggestions
     if possible
-    
+
     Parameters:
     repl (bool):
         indicates whether or not the repl has been used
-        
+
     Returns:
     arg_suggestions (list):
         the list generated by calculate_suggestion()
     """
+
     if repl:
         arg_options = [(arg.short_form, arg.long_form)
                        for arg in ALL_ARGS if arg.show_arg_on_repl]
@@ -973,12 +974,12 @@ def init(repl: bool = False) -> tuple:
     """
     initiate the code by calling the argparser and handling the default
     parameters: -h, -v, -d, --config.
-    
+
     Parameters:
     repl (bool):
         indicates if the repl entry point was used, and the stdin will therefor
         be used by default
-        
+
     Returns:
     (tuple):
         contains (known_files, unknown_files, echo_args, valid_urls) from the argparser
@@ -1056,7 +1057,7 @@ def init(repl: bool = False) -> tuple:
 def handle_args(tmp_file_helper: TmpFileHelper) -> None:
     """
     init, handle args, print
-    
+
     Parameters:
     tmp_file_helper (TmpFileHelper):
         the temporary file helper to stdin, echo etc. ...
@@ -1200,7 +1201,7 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
 def cleanup(tmp_file_helper: TmpFileHelper) -> None:
     """
     clean up everything
-    
+
     Parameters:
     tmp_file_helper (TmpFileHelper):
         the temporary file helper to clean up the files
@@ -1287,11 +1288,11 @@ def repl_main():
             """
             check if a repl line is an executable command,
             executes it if it is.
-            
+
             Parameters:
             cmd (str):
                 the line entered in the cat repl
-                
+
             Returns:
             (bool):
                 indicates if a valid command has been found

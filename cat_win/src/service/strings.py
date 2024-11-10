@@ -5,7 +5,7 @@ strings
 def get_strings(content: list, min_seq_len: int, delim: str) -> list:
     """
     find all strings in any given file content.
-    
+
     Parameters:
     content (list):
         the file content [('', line), ...]
@@ -13,7 +13,7 @@ def get_strings(content: list, min_seq_len: int, delim: str) -> list:
         the minimum required length of a string
     delim (str):
         the delimeter to display the found strings on the same line
-    
+
     Returns:
     new_content (list):
         the new file content containing all found strings [('', string), ...]

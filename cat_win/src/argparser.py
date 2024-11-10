@@ -58,7 +58,7 @@ class ArgParser:
     def get_args(self) -> list:
         """
         getter of self._args
-        
+
         Returns:
         self._args (list)
             the list of args
@@ -68,7 +68,7 @@ class ArgParser:
     def get_dirs(self) -> list:
         """
         getter of self._known_directories
-        
+
         Returns:
         self._known_directories (list)
             the list of directories
@@ -79,14 +79,14 @@ class ArgParser:
         """
         Read all args to either a valid parameter, an invalid parameter,
         a known file, an unknown file, or an echo parameter to print out.
-        
+
         Parameters:
         argv (list):
             the entire sys.argv list
         delete (bool):
             indicates if a parameter should be deleted or added. Needed for
             the repl when changing file_queries
-        
+
         Returns:
         (args, unknown_args, unknown_files, echo_args) (tuple):
             contains the paramater in a sorted manner
@@ -104,11 +104,11 @@ class ArgParser:
         """
         Collect all files from the given patterns or directories
         provided as an argument.
-        
+
         Parameters:
         dot_files (bool):
             indicates if dotfiles should be included.
-        
+
         Returns:
         self._known_files (list):
             a list containing all found files
@@ -213,14 +213,14 @@ class ArgParser:
     def _add_argument(self, param: str, delete: bool = False) -> bool:
         """
         sorts an argument to either list option, by appending to it.
-        
+
         Parameters:
         param (str):
             the current parameter
         delete (bool):
             indicates if a parameter should be deleted or added. Needed for
             the repl when changing file_queries
-            
+
         Returns:
         (bool):
             True if -E has been called, meaning every following parameter
@@ -324,7 +324,7 @@ class ArgParser:
         """
         Read all args to either a valid parameter, an invalid parameter,
         a known file, an unknown file, or an echo parameter to print out.
-        
+
         Parameters:
         argv (list):
             the entire sys.argv list
