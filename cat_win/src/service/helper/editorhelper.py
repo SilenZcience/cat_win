@@ -166,7 +166,7 @@ UNIFY_HOTKEYS = {
     b'^X'           : b'_action_cut',
     b'ALT_S'        : b'_action_save',
     b'^S'           : b'_action_save',
-    b'^T'           : b'_action_transform', 
+    b'^T'           : b'_action_transform',
     b'^E'           : b'_action_jump',
     b'^F'           : b'_action_find',
     b'^P'           : b'_action_replace',
@@ -237,7 +237,7 @@ class Position:
         """
         return a tuple that defines the position.
         this makes comparison easier.
-        
+
         Returns:
         (tuple):
             the position
@@ -247,7 +247,7 @@ class Position:
     def set_pos(self, new_pos: tuple) -> None:
         """
         setter for row and column of position
-        
+
         Parameters:
         new_pos (tuple):
             the position
@@ -266,7 +266,7 @@ class _Action:
                  *action_text: str) -> None:
         """
         defines an action.
-        
+
         Parameters:
         key_action (bytes):
             the action taken as defined by UNIFY_HOTKEYS
@@ -320,7 +320,7 @@ class History:
     def _add(self, action: _Action, stack_type: str = 'undo') -> None:
         """
         Add an action to the stack.
-        
+
         Parameters:
         action (_Action):
             the action to append
@@ -345,10 +345,10 @@ class History:
             *action_text: str, stack_type: str = 'undo') -> None:
         """
         Add an action to the stack.
-        
+
         Parameters:
         __init__ variables of _Action
-        
+
         stack_type (str):
             defines the stack to use
         """
@@ -390,7 +390,7 @@ class History:
     def undo(self, editor: object) -> None:
         """
         Undo an action taken.
-        
+
         Parameters:
         editor (Editor):
             the editor in use
@@ -430,7 +430,7 @@ class History:
     def redo(self, editor: object) -> None:
         """
         Redo an action taken.
-        
+
         Parameters:
         editor (Editor):
             the editor in use

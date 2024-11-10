@@ -29,7 +29,7 @@ class Clipboard:
         import the clipboard by recursively checking which module exists and
         could be used, this function should only be called by Clipboard.put() and will only
         be called once.
-        
+
         Parameters:
         content (str):
             the content to copy to the clipboard
@@ -37,7 +37,7 @@ class Clipboard:
             do not change!
         __clip_board_error (bool):
             do not change!
-        
+
         Returns:
         (bool):
             indicates if the clipboard function went successfull
@@ -73,11 +73,11 @@ class Clipboard:
     def put(content: str) -> bool:
         """
         entry point to recursive function _copy_to_clipboard()
-        
+
         Parameters:
         content (str):
             the string to copy
-        
+
         Returns:
         (bool):
             indicates if the clipboard function went successfull

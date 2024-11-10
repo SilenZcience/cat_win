@@ -24,7 +24,7 @@ class More:
     def set_flags(on_windows_os: bool, step_length: int = 0) -> None:
         """
         setup the configuration
-        
+
         Parameters:
         on_windows_os (bool):
             indicates if the current system is Windows
@@ -49,7 +49,7 @@ class More:
                        errors: str = 'strict') -> None:
         """
         setup necessary data for lazy loading a file
-        
+
         Parameters
         file (Path):
             a file path
@@ -75,7 +75,7 @@ class More:
     def add_lines(self, lines: list) -> None:
         """
         add multiple lines.
-        
+
         Parameters:
         lines (list):
             the list of lines to append
@@ -256,7 +256,7 @@ class More:
     def step_through(self, dup_needed: bool = False) -> None:
         """
         step through the lines and wait for user input.
-        
+
         Parameters:
         dup_needed (bool):
             indicates if the stdin-dup is needed

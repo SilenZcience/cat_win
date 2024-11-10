@@ -43,7 +43,7 @@ class Editor:
     def __init__(self, file: Path, display_name: str) -> None:
         """
         defines an Editor object.
-        
+
         Parameters:
         file (str):
             a string representation of a file (-path)
@@ -132,7 +132,7 @@ class Editor:
     def getxymax(self) -> tuple:
         """
         find the size of the window.
-        
+
         Returns:
         (tuple):
             the size of the display that is free to use
@@ -550,11 +550,11 @@ class Editor:
     def _key_string(self, wchars_) -> str:
         """
         tries to append (a) char(s) to the screen.
-        
+
         Parameters:
         wchars (int|str):
             given by curses get_wch()
-            
+
         Returns:
         (str):
             wchars_
@@ -635,7 +635,7 @@ class Editor:
     def _action_save(self) -> bool:
         """
         handle the save file action.
-        
+
         Returns
         (bool):
             indicates if the editor should keep running
@@ -660,7 +660,7 @@ class Editor:
     def _action_transform(self) -> bool:
         """
         handles the _ action.
-        
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -753,7 +753,7 @@ class Editor:
     def _action_jump(self) -> bool:
         """
         handles the jump to line action.
-        
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -791,7 +791,7 @@ class Editor:
     def _action_find(self) -> bool:
         """
         handles the find in editor action.
-        
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -870,7 +870,7 @@ class Editor:
     def _action_replace(self) -> bool:
         """
         handles the replace in editor action.
-        
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -959,7 +959,7 @@ class Editor:
     def _action_reload(self) -> bool:
         """
         prompt to reload the file.
-        
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -994,7 +994,7 @@ class Editor:
     def _action_insert(self) -> bool:
         """
         handles the insert bytes action.
-        
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -1054,7 +1054,7 @@ class Editor:
     def _action_quit(self) -> bool:
         """
         handles the quit editor action.
-        
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -1091,7 +1091,7 @@ class Editor:
     def _action_interrupt(self) -> bool:
         """
         handles the interrupt action.
-        
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -1103,7 +1103,7 @@ class Editor:
     def _action_resize(self) -> bool:
         """
         handles the resizing of the (terminal) window.
-        
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -1118,7 +1118,7 @@ class Editor:
     def _get_new_char(self):
         """
         get next char
-        
+
         Yields
         (wchar, key) (tuple):
             the char received and the possible action it means.
@@ -1164,11 +1164,11 @@ class Editor:
     def _get_color(self, c_id: int) -> int:
         """
         get curses color by id.
-        
+
         Parameter:
         c_id (int):
             the id of the color to grab
-            
+
         Returns
         (int):
             the curses.color
@@ -1445,7 +1445,7 @@ class Editor:
     def open(cls, file: Path, display_name: str, skip_binary: bool = False) -> bool:
         """
         simple editor to change the contents of any provided file.
-        
+
         Parameters:
         file (Path):
             a string representing a file(-path)
@@ -1453,7 +1453,7 @@ class Editor:
             the display name for the current file
         skip_binary (bool):
             indicates if the Editor should skip non-plaintext files
-        
+
         Returns:
         (bool):
             indicates whether or not the editor has written any content to the provided files
@@ -1506,7 +1506,7 @@ class Editor:
     def set_indentation(indentation: str = '\t', auto_indent: bool = True) -> None:
         """
         set the indentation when using tab on an empty line
-        
+
         Parameters:
         indentation (str):
             the indentation to use (may be choosen by the user via config)
@@ -1523,7 +1523,7 @@ class Editor:
                   file_encoding: str) -> None:
         """
         set the config flags for the Editor
-        
+
         Parameters:
         save_with_alt (bool):
             indicates whetcher the stdin pipe has been used (and therefor tampered)

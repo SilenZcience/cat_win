@@ -17,7 +17,7 @@ class TmpFileHelper:
     def get_generated_temp_files(self) -> list:
         """
         get all generated files.
-        
+
         Returns:
         (list):
             the active temporary files
@@ -27,7 +27,7 @@ class TmpFileHelper:
     def generate_temp_file_name(self) -> Path:
         """
         generate a new temp-file.
-        
+
         Returns:
         (Path):
             the path to the new file

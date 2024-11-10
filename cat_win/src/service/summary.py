@@ -22,7 +22,7 @@ class Summary:
     def set_flags(unique: bool) -> None:
         """
         setup the flags to use in the summaries.
-        
+
         Parameters:
         unique (bool):
             indicates if the listed summary should only display the elements once
@@ -33,7 +33,7 @@ class Summary:
     def set_colors(color: str, color_reset: str) -> None:
         """
         setup the colors to use in the summaries.
-        
+
         Parameters:
         color (str):
             the color to use (ansi escape)
@@ -58,7 +58,7 @@ class Summary:
         """
         displays u_files.files including their size and calculates
         their size sum.
-        
+
         Parameters:
         detailed (bool):
             indicates if the detailed summary should be displayed.
@@ -98,7 +98,7 @@ class Summary:
     def show_dirs(known_directories: list) -> None:
         """
         displays all found directoies.
-        
+
         known_directories (list):
             the directories to display
         """
@@ -165,7 +165,7 @@ class Summary:
     def show_wordcount(files: list, file_encoding: str) -> None:
         """
         summarize how often each word/token is used in the specifed files.
-        
+
         Parameters:
         files (list):
             the fies to summarize.

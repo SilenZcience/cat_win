@@ -30,11 +30,11 @@ def get_stable_package_version(package: str) -> str:
     """
     retrieve the official PythonPackageIndex information regarding
     a package.
-    
+
     Parameters:
     package (str):
         the package name to check
-        
+
     Returns:
     (str):
         a version representation (latest stable package)
@@ -53,11 +53,11 @@ def get_latest_package_version(package: str) -> str:
     """
     retrieve the official PythonPackageIndex information regarding
     a package.
-    
+
     Parameters:
     package (str):
         the package name to check
-        
+
     Returns:
     (str):
         a version representation (includes pre-releases)
@@ -79,11 +79,11 @@ def get_latest_package_version(package: str) -> str:
 def only_numeric(_s: str) -> int:
     """
     strips every non-numeric character of a string.
-    
+
     Parameters:
     s (str):
         the string to filter.
-        
+
     Returns:
     (int):
         the resulting number of the string containing
@@ -96,11 +96,11 @@ def only_alpha(_s: str) -> str:
     """
     strips every numeric character of a string and
     appends 'z' for comparison.
-    
+
     Parameters:
     s (str):
         the string to filter.
-        
+
     Returns:
     (str):
         the resulting string of the string containing
@@ -113,13 +113,13 @@ def only_alpha(_s: str) -> str:
 def gen_version_tuples(_v: str, _w: str) -> tuple:
     """
     create comparable version tuples.
-    
+
     Parameters:
     v (str):
         a version representation like '1.0.33.0'
     w (str):
         a version representation like '1.1.0a'
-    
+
     Returns:
     (tuple(tuple, tuple)):
         the version tuples of both inputs like
@@ -137,13 +137,13 @@ def gen_version_tuples(_v: str, _w: str) -> tuple:
 def new_version_available(current_version: str, latest_version: str) -> int:
     """
     Checks whether or not a new version is available.
-    
+
     Parameters:
     current_version (str):
         a version representation as string
     latest_version (str):
         a version representation as string
-    
+
     Returns:
     (int):
         a global status code describing the situation
@@ -180,7 +180,7 @@ def print_update_information(package: str, current_version: str, color_dic: dict
                              on_windows_os: bool) -> None:
     """
     prints update information if there are any.
-    
+
     Parameters:
     package (str):
         the package name to check

@@ -53,7 +53,7 @@ class CConfig:
         """
         Initialise the CConfig() object to load and save
         the color configs.
-        
+
         Parameters:
         working_dir (str):
             the working directory path of the package
@@ -73,7 +73,7 @@ class CConfig:
             the value to convert
         element (str):
             the element of the const_dict
-        
+
         Returns:
         color_code (str):
             the ansi escape code for the color
@@ -99,7 +99,7 @@ class CConfig:
     def load_config(self) -> dict:
         """
         Load the Color Configuration from the config file.
-        
+
         Returns:
         color_dic (dict):
             a dictionary translating from CKW-keywords to ANSI-Colorcodes
@@ -131,7 +131,7 @@ class CConfig:
     def _print_get_all_available_colors(self) -> list:
         """
         prints all available color options to choose from.
-        
+
         Returns:
         options (list):
             the same list containing all available colors.
@@ -229,7 +229,7 @@ class CConfig:
     def _save_config(self, keyword: str, value: str = ''):
         """
         write the value to the config-file
-        
+
         Parameters:
         keyword (str):
             the keyword in self.elements

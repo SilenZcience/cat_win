@@ -9,7 +9,7 @@ def encode_base64(content, decode_bytes: bool = False,
                   file_encoding: str = 'utf-8'):
     """
     Encode a string to base64.
-    
+
     Parameters:
     content (bytes|str):
         the content to encode in base64
@@ -18,7 +18,7 @@ def encode_base64(content, decode_bytes: bool = False,
         an decoded string, or as encoded bytes (default)
     file_encoding (str):
         the encoding to use when decoding the bytes to a string
-        
+
     Returns:
     encoded_content (bytes|str):
         the base64 encoded content as string or bytes depending on decode_bytes
@@ -37,7 +37,7 @@ def decode_base64(content: str, decode_bytes: bool = False,
                   file_encoding: str = 'utf-8'):
     """
     Decode a string from base64.
-    
+
     Parameters:
     content (str):
         the string to decode
@@ -46,7 +46,7 @@ def decode_base64(content: str, decode_bytes: bool = False,
         an decoded string, or as encoded bytes (default)
     file_encoding (str):
         the encoding to use when decoding the bytes to a string
-        
+
     Returns:
     decoded_content (bytes|str):
         the base64 decoded content as string or bytes depending on decode_bytes

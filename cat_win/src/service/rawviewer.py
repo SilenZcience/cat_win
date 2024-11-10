@@ -48,13 +48,13 @@ SPECIAL_CHARS = [
 def get_display_char_gen(file_encoding: str = 'utf-8', base: int = 16):
     """
     generate a function to decode bytes
-    
+
     Parmameters:
     file_encoding (str):
         the file encoding to test with if the resulting char can be displayed
     base (int):
         the base number in case a string is given, to calculate the byte-int.
-    
+
     Returns:
     get_display_char (function):
         the function to decode any byte/int/str
@@ -70,7 +70,7 @@ def get_display_char_gen(file_encoding: str = 'utf-8', base: int = 16):
     def get_display_char(byte) -> str:
         """
         decode bytes
-        
+
         Parameters:
         byte (int|str)
         """
@@ -94,7 +94,7 @@ def get_raw_view_lines_gen(file: Path, mode: str = 'X', colors: list = None,
     """
     return the raw byte representation of a file in hexadecimal or binary
     line by line
-    
+
     Parameters:
     file (Path):
         the file to use
@@ -106,7 +106,7 @@ def get_raw_view_lines_gen(file: Path, mode: str = 'X', colors: list = None,
         Index 1 holds the color CKW.RESET_ALL
     file_encoding (str):
         the encoding used (possibly for stdout)
-        
+
     Yields:
     current_line (str):
         a string representation that, when put together, forms the hexviewer

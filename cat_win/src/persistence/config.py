@@ -109,7 +109,7 @@ class Config:
         """
         Initialise the Config() object to load and save
         default parameters..
-        
+
         Parameters:
         working_dir (str):
             the working directory path of the package
@@ -128,7 +128,7 @@ class Config:
             the value to convert
         element (str):
             the element of the const_dict
-        
+
         Returns:
         (element_type):
             whatever the element got converted to
@@ -163,13 +163,13 @@ class Config:
         """
         check if a given value is a valid argument for an element
         in the constant dict.
-        
+
         Parameters:
         value (str):
             the value to check
         element (str):
             the element of the const_dict
-        
+
         Returns
         (bool):
             indicates whether the value is valid.
@@ -187,7 +187,7 @@ class Config:
     def get_cmd(self) -> list:
         """
         split the default command line string correctly into a parameter list
-        
+
         Returns
         (list):
             the default command line splitted using shell like syntax
@@ -197,11 +197,11 @@ class Config:
     def get_args(self, argv: list) -> list:
         """
         modifies the sys.argv parameter list depending on the custom commands and config settings.
-        
+
         Parameters:
         argv (list):
             sys.argv
-        
+
         Returns
         new_argv (list):
             the modified sys.argv to use
@@ -218,7 +218,7 @@ class Config:
     def load_config(self) -> dict:
         """
         Load the Const Configuration from the config file.
-        
+
         Returns:
         const_dic (dict):
             a dictionary translating from DKW-keywords to values
@@ -291,7 +291,7 @@ class Config:
     def _save_config(self, keyword: str, value: str = '', section: str = 'CONSTS'):
         """
         write the value to the config-file
-        
+
         Parameters:
         keyword (str):
             the keyword in self.elements

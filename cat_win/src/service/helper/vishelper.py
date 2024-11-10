@@ -10,7 +10,7 @@ from cat_win.src.service.helper.progressbar import PBar
 def get_fit_terminal_square(length: int, width: int) -> int:
     """
     calculate the best fitting square size.
-    
+
     Parameters:
     length (int):
         the length of the data stream
@@ -37,13 +37,13 @@ class SpaceFilling:
         """
         break a given list into chunks of a given size.
         every other chunk is inverted to generate the scan curve pattern.
-        
+
         Parameters:
         _list (iterable):
             the list or bytearray to put in pattern
         width (int):
             the max displayable width
-        
+
         Yields:
         _list_chunk
             the next chunk to display
@@ -65,13 +65,13 @@ class SpaceFilling:
     def _get_zorder_index(y: int, x: int) -> int:
         """
         calculate the z-order curve index.
-        
+
         Parameters:
         y (int):
             the row
         x (int):
             the column
-        
+
         Returns:
         z (int):
             the z-order index
@@ -85,13 +85,13 @@ class SpaceFilling:
     def get_zorder_curve(_list: bytes, width: int):
         """
         break the given list into chunks of a given size.
-        
+
         Parameters:
         _list (iterable):
             the list or bytearray to put in pattern
         width (int):
             the max displayable width
-        
+
         Yields:
         _list_chunk
             the next chunk to display
@@ -118,7 +118,7 @@ class SpaceFilling:
     def _get_hilbert_index(n: int, y: int, x: int) -> int:
         """
         calculate the hilbert curve index.
-        
+
         Parameters:
         n (int):
             the order of the hilbert curve
@@ -149,13 +149,13 @@ class SpaceFilling:
     def get_hilbert_curve(_list: bytes, width: int):
         """
         break the given list into chunks of a given size.
-        
+
         Parameters:
         _list (iterable):
             the list or bytearray to put in pattern
         width (int):
             the max displayable width
-        
+
         Yields:
         _list_chunk
             the next chunk to display
@@ -187,11 +187,11 @@ class Entropy:
     def normalized_shannon_entropy(data: bytes) -> list:
         """
         calculate the normalized shannon entropy
-        
+
         Parameters:
         data (bytes):
             the data to calculate
-        
+
         Returns:
         (list):
             the calculated shannony entropy data

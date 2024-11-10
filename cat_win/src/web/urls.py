@@ -14,13 +14,13 @@ def is_valid_uri(s_url: str, _rec: bool = False) -> bool:
     """
     check if a string is a valid uri, by matching the general pattern,
     aswell as parsing it.
-    
+
     Parameters:
     s_url (str):
         a possibly valid uri
     _rec (bool):
         indicates recursion depth 0/1
-    
+
     Returns:
     (bool):
         indicates whether or not the url is valid
@@ -39,11 +39,11 @@ def is_valid_uri(s_url: str, _rec: bool = False) -> bool:
 def sep_valid_urls(to_check: list) -> tuple:
     """
     seperates valid from not-valid urls.
-    
+
     Parameters:
     to_check (list):
         a list of possible urls to check
-    
+
     Returns:
     (tuple):
         a tuple containing two lists, the first list contains
@@ -61,12 +61,12 @@ def sep_valid_urls(to_check: list) -> tuple:
 def read_url(url: str, _rec: bool = False) -> bytes:
     """
     Simply reads the contents of an url.
-    
+
     Parameters (str):
         the url to open
     _rec (bool):
         indicates recursion depth 0/1
-        
+
     Returns
     (bytes):
         the contents of the url; on error: a custom error message

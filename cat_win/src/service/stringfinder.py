@@ -15,13 +15,13 @@ class StringFinder:
     def find_literals(self, sub: str, _s: str, ignore_case: bool):
         """
         Generate lists containing the position of sub in s.
-        
+
         Parameters:
         sub (str):
             the substring to search for
         s (str):
             the string to search in
-        
+
         Yields:
         (list):
             containing the start and end indeces like [start, end]
@@ -37,13 +37,13 @@ class StringFinder:
     def find_regex(self, pattern, _s: str):
         """
         Generate lists containing the position of pattern in s.
-        
+
         Parameters:
         pattern (re_pattern):
             the regex pattern to search for
         s (str):
             the string to search in
-        
+
         Yields:
         (list):
             containing the start and end indeces like [start, end]
@@ -56,11 +56,11 @@ class StringFinder:
         optimize/shorten/merge overlapping intervalls for partially
         color encoded lines. Needed when multiple
         search-keywords apply to the same line.
-        
+
         Parameters:
         intervals (list):
             the intervals to optimize like [[start, end], ...]
-            
+
         Returns:
         stack (list)
             the optimized intervals
@@ -93,12 +93,12 @@ class StringFinder:
     def find_keywords(self, line: str) -> tuple:
         """
         calculate the positions for ANSI-ColorCodes.
-        
+
         Parameters:
         line (str):
             the string in which to search for all occurences of
             self.kw_literals and self.kw_regex
-            
+
         Returns:
         (tuple):
             containing three lists:

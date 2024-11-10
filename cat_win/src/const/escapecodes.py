@@ -96,13 +96,13 @@ def cursor_move_x(x: int, direction: str) -> str:
 def cursor_start_x(x: int, direction: str = 'up') -> str:
     """
     move cursor by x to beginning of line
-    
+
     Parameters:
     x (int):
         the amount of lines to move the cursor by
     direction (str):
         the direction to move in
-    
+
     Returns:
     (str):
         the escape code

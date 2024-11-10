@@ -22,7 +22,7 @@ class Converter:
     def set_params(self, debug: bool, colors = None) -> None:
         """
         set the colors to use.
-        
+
         Parameters:
         debug (bool):
             indicates if debug output should be displayed
@@ -53,14 +53,14 @@ class Converter:
     def evaluate(self, _l: str, integrated: bool) -> str:
         """
         evaluate simple mathematical expression within any text
-        
+
         Parameters:
         _l (str):
             the line of content to work with
         integrated (bool):
             indicates whether or not solely the not-matched
             parts should stay within the line
-            
+
         Returns:
         (str):
             the new content line with the evaluated expression
@@ -109,7 +109,7 @@ class Converter:
         Parameters:
         v (str):
             the string to check
-            
+
         Returns:
         (bool):
             True if v is a Hexadecimal number.
@@ -126,7 +126,7 @@ class Converter:
         Parameters:
         v (str):
             the string to check
-            
+
         Returns:
         (bool):
             True if v is a Decimal number.
@@ -141,7 +141,7 @@ class Converter:
         Parameters:
         v (str):
             the string to check
-            
+
         Returns:
         (bool):
             True if v is a Octal number.
@@ -158,7 +158,7 @@ class Converter:
         Parameters:
         v (str):
             the string to check
-            
+
         Returns:
         (bool):
             True if v is a Binary number.
@@ -184,13 +184,13 @@ class Converter:
         """
         returns a String representation of a Hexadecimal String including the corresponding
         Binary, Octal and Decimal number.
-        
+
         Parameters:
         value (str):
             the value to convert to hex
         leading (bool):
             should prefix be displayed
-        
+
         Returns:
         (str):
             the converted string
@@ -219,7 +219,7 @@ class Converter:
             the value to convert to dec
         leading (bool):
             should prefix be displayed
-        
+
         Returns:
         (str):
             the converted string
@@ -249,7 +249,7 @@ class Converter:
             the value to convert to oct
         leading (bool):
             should prefix be displayed
-        
+
         Returns:
         (str):
             the converted string
@@ -278,7 +278,7 @@ class Converter:
             the value to convert to bin
         leading (bool):
             should prefix be displayed
-        
+
         Returns:
         (str):
             the converted string

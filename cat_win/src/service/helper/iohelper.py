@@ -24,11 +24,11 @@ def err_print(*args, **kwargs) -> None:
 def path_parts(path: str) -> list:
     """
     split a path recursively into its parts.
-    
+
     Parameters:
     path (str):
         a file/dir path
-        
+
     Returns:
     (list):
         contains each drive/directory/file in the path seperated
@@ -42,7 +42,7 @@ def create_file(file: Path, content: str, file_encoding: str) -> bool:
     """
     create the directory path to a file, and the file itself.
     on error: cleanup all created subdirectories
-    
+
     Parameters:
     file (Path):
         a string representation of a file (-path)
@@ -50,7 +50,7 @@ def create_file(file: Path, content: str, file_encoding: str) -> bool:
         the content to write into the files
     file_encoding (str):
         the encoding to open the files with
-    
+
     Returns:
     (bool):
         True if the operation was successful.
@@ -95,7 +95,7 @@ class IoHelper:
                   file_length: int = -1):
         """
         Reades content from a given file.
-        
+
         Parameters:
         src_file (Path):
             a string representation of a file (-path)
@@ -108,7 +108,7 @@ class IoHelper:
         file_length (int):
             the size of the file for the total value of the progress bar
             in case the progress bar is being displayed
-        
+
         Returns:
         src_content (str|bytes):
             the content of the given file
@@ -145,7 +145,7 @@ class IoHelper:
         """
         Yields content from a given file. Appends an empty line if the last
         line ends with a newline, so the lines can be joined.
-        
+
         Parameters:
         src_file (Path):
             a string representation of a file (-path)
@@ -155,7 +155,7 @@ class IoHelper:
             an encoding to open the file with
         errors (str):
             the type of error handling when opening the file
-        
+
         Yields:
         line (str):
             the content of the given file
@@ -189,11 +189,11 @@ class IoHelper:
     def get_newline(file: Path) -> str:
         """
         determines the line ending of a given file.
-        
+
         Parameters:
         file (Path):
             a file (-path) as string representation
-            
+
         Returns:
         (str):
             the line ending that the given file is using
@@ -213,7 +213,7 @@ class IoHelper:
                    file_encoding: str = 'utf-8', errors: str = 'strict') -> Path:
         """
         Writes content into a given file.
-        
+
         Parameters:
         src_file (Path):
             a string representation of a file (-path)
@@ -223,7 +223,7 @@ class IoHelper:
             an encoding to open the file with
         errors (str):
             the type of error handling when opening the file
-        
+
         Returns:
         src_file (Path):
             the path to the temporary file written
@@ -243,13 +243,13 @@ class IoHelper:
     def get_stdin_content(one_line: bool = False, raw: bool = False):
         """
         read the stdin.
-        
+
         Parameters:
         one_line (bool):
             determines if only the first stdin line should be read
         raw (bool):
             indicates if the raw stdin buffer should be read
-            
+
         Yields:
         line (str):
             the input (line by line) delivered by stdin
@@ -277,7 +277,7 @@ class IoHelper:
         try to create the path to the files if it does not yet exist.
         delete the created path again (cleanup) if the file still could
         not be written.
-        
+
         Parameters:
         file_list (list):
             all files that should be written
@@ -285,7 +285,7 @@ class IoHelper:
             the content to write into the files
         file_encoding (str):
             the encoding to open the files with
-        
+
         Returns:
         (list):
             containing all files, that could succesfully be written.
@@ -338,7 +338,7 @@ class IoHelper:
                                     one_line: bool = False) -> list:
         """
         Write stdin input to multiple files.
-        
+
         Parameters:
         file_list (list):
             all files that should be written
@@ -349,7 +349,7 @@ class IoHelper:
             platform.system() == 'Windows'
         one_line (bool):
             determines if only the first stdin line should be read
-            
+
         Returns:
         (list):
             containing all files, that could succesfully be written.
@@ -373,7 +373,7 @@ class IoHelper:
     def dup_stdin(on_windows_os: bool, dup: bool = True):
         """
         dup the stdin so the user can interact while also piping into cat.
-        
+
         Parameters:
         on_windows_os (bool):
             indicates if the current system is Windows

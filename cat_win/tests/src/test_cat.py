@@ -31,7 +31,7 @@ class TestCat(TestCase):
         in that case the patch can be applied on the class-level (therefor on every test-method)
         in this case only needed in setUp().
         using start and stop to manage the patch lifecycle is not needed, since the test-method
-        itself does not need the patch, only the setUp()/setup()  call. 
+        itself does not need the patch, only the setUp()/setup()  call.
         """
         cat.setup()
 

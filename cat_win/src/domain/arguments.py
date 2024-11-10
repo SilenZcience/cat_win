@@ -10,11 +10,11 @@ def reduce_list(args: list) -> list:
     remove duplicate args regardless if shortform or
     longform has been used, an exception exists for those
     args that contain different information per parameter.
-    
+
     Parameters:
     args (list):
         the entire list of args, containing possible duplicates
-        
+
     Returns:
     new_args (list):
         the args-list without duplicates
@@ -39,13 +39,13 @@ def diff_list(args: list, to_remove: list) -> list:
     subtract args in to_remove from args in args regardless
     if shortform or longform has been used, an exception exists for those
     args that contain different information per parameter.
-    
+
     Parameters:
     args (list):
         the entire list of args
     to_remove (list):
         the list of args to subtract from the args list
-        
+
     Returns:
     new_args (list):
         the args-list without duplicates
@@ -79,7 +79,7 @@ class Arguments:
     def set_args(self, args: list) -> None:
         """
         set the args to use.
-        
+
         Parameters:
         args (list):
             the args to set
@@ -91,7 +91,7 @@ class Arguments:
     def add_args(self, args: list) -> None:
         """
         add args to use from now on.
-        
+
         Parameters:
         args (list):
             the args to add
@@ -102,7 +102,7 @@ class Arguments:
     def delete_args(self, args: list) -> None:
         """
         delete (some) args to longer use them from now on.
-        
+
         Parameters:
         args (list):
             the list of args to delete

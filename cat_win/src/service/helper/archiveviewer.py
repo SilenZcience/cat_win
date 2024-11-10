@@ -16,7 +16,7 @@ def display_archive(file: Path, size_converter) -> bool:
         a string representation of a file (-path)
     size_converter (method)
         a method to convert bytes to more readable size values
-        
+
     Returns:
     (bool):
         indicates if the given file could successfully be openend as a zip/tar file.

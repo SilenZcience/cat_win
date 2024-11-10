@@ -77,13 +77,13 @@ RE_EVAL = re.compile(
 def compile_re(pattern: str, ignore_case: bool):
     """
     compile a regular expression
-    
+
     Parameters:
     pattern (str):
         the pattern to compile
     ignore_case (bool):
         indicates if the case should be ignored
-    
+
     Returns:
     (re.Pattern)
         the compiled Pattern

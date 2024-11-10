@@ -9,7 +9,7 @@ from cat_win.src.service.converter import Converter
 def comp_eval(converter: Converter, content: list, param: str, cleaner: object) -> list:
     """
     comprehend the content list for the eval parameter
-    
+
     Parameters:
     converter (Converter):
         the converter object instance to use
@@ -19,7 +19,7 @@ def comp_eval(converter: Converter, content: list, param: str, cleaner: object) 
         the parameter used
     cleaner (function):
         the method to call on each line in order to strip ansi color codes
-        
+
     Returns:
     (list):
         the new comprehended content list with all equations evaluated
@@ -30,7 +30,7 @@ def comp_eval(converter: Converter, content: list, param: str, cleaner: object) 
 def comp_conv(converter: Converter, content: list, param: str, cleaner: object):
     """
     comprehend the content list for the dec/hex/bin parameters
-    
+
     Parameters:
     converter (Converter):
         the converter object instance to use
@@ -42,7 +42,7 @@ def comp_conv(converter: Converter, content: list, param: str, cleaner: object):
         the number base to work with, options are 'dec', 'hex' or 'bin'
     cleaner (function):
         the method to call on each line in order to strip ansi color codes
-        
+
     Returns:
     (list):
         the new comprehended content list with all numbers converted
