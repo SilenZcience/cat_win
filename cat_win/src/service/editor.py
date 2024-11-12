@@ -612,7 +612,7 @@ class Editor:
             self._remove_chunk()
         return True
 
-    def _action_render_scr(self, msg: str, tmp_error: str = '') -> None:
+    def _action_render_scr(self, msg: str, tmp_error: str = '', error_color: int = 2) -> None:
         max_y, max_x = self.getxymax()
         msg = msg.replace('\0', '')
         error_bar_backup = self.error_bar
@@ -623,7 +623,7 @@ class Editor:
             if self.error_bar:
                 self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
                                         self.error_bar[:max_x].ljust(max_x),
-                                        self._get_color(2))
+                                        self._get_color(error_color))
             self.curse_window.addstr(max_y + self.status_bar_size - 1, 0,
                                         msg[:max_x].ljust(max_x),
                                         self._get_color(3))
@@ -659,7 +659,7 @@ class Editor:
 
     def _action_transform(self) -> bool:
         """
-        handles the _ action.
+        handles the transform query action.
 
         Returns:
         (bool):
@@ -701,8 +701,9 @@ class Editor:
         curses.curs_set(0)
 
         wchar, w_query, query_result = '', '', ''
+        result_color = 2
         while str(wchar).upper() != ESC_CODE:
-            self._action_render_scr(f"Query: {w_query}␣", query_result)
+            self._action_render_scr(f"Query: {w_query}␣", query_result, result_color)
             wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
@@ -729,15 +730,24 @@ class Editor:
                 w_query = w_query.casefold()
                 if w_query == 'exit':
                     break
+                result_color = 2
                 (sel_from_y, sel_from_x), (sel_to_y, sel_to_x) = self.selected_area
+                if not self.selecting:
+                    sel_from_y, sel_from_x = self.cpos.get_pos()
+                    sel_to_y, sel_to_x = sel_from_y, sel_from_x+1
                 content_window = self.window_content[sel_from_y:sel_to_y+1]
                 content_window[-1] = content_window[-1][:sel_to_x]
                 content_window[0] = content_window[0][sel_from_x:]
                 if w_query in bool_expressions:
                     joined_content = '\n'.join(content_window)
-                    query_result = f"{w_query}? {bool_expressions[w_query](joined_content)}"
+                    query_truthy = bool_expressions[w_query](joined_content)
+                    query_result = f"{w_query}? {query_truthy}"
                     query_result+= f" ({repr(joined_content)})"
+                    result_color = 4 if query_truthy else 2
                 elif w_query in string_expressions:
+                    if not self.selecting:
+                        query_result = 'no area has been selected!'
+                        continue
                     new_content = [string_expressions[w_query](line) for line in content_window]
                     joined_content = '\n'.join(new_content)
                     _, end_pos = self.selected_area
@@ -1423,6 +1433,8 @@ class Editor:
                 curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_YELLOW)
                 # find & replace
                 curses.init_pair(6, curses.COLOR_WHITE, curses.COLOR_BLUE  )
+                # correct transform query
+                curses.init_pair(7, curses.COLOR_GREEN, curses.COLOR_WHITE )
         curses.raw()
         self.curse_window.nodelay(False)
 
