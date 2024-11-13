@@ -77,10 +77,11 @@
 [![Tests]](https://github.com/SilenZcience/cat_win/actions/workflows/coverage.yml)
 <!-- [![Compile-and-Push]](https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml/badge.svg) -->
 
-This project copies the fundamental framework of the cat command-line tool from Unix and translates its features to an OS Independent program using Python.</br>
-The project has evolved into many other subject areas like 'echo', 'grep', 'ls', 'base64'...
+This project copies the fundamental framework of the most essential command-line tools from Unix and translates its features to an OS Independent program using Python.</br>
+The project includes the basic functionality of subject areas like 'echo', 'grep', 'ls', 'base64', 'xxd', ...
 
-Additionally it includes an editor and a hex editor aswell as the feature to manipulate the content of any given file in countless ways, generating the checksum of any file, converting hexadecimal, decimal, octal and binary numbers within any text, and much *much* <a href="#-usage">more</a> ...
+Additionally, it includes an editor and a hex editor, as well as the feature to visualize data in various ways.
+It enables the user to manipulate the content of any given file, generating the checksum of any file, converting hexadecimal, decimal, octal and binary numbers within any text, and much *much* <a href="#-usage">more</a> ...
 
 <div id="made-with"></div>
 
@@ -137,12 +138,12 @@ Direct Download:
 [MacOS - __catw__](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/darwin/catw) </br>
 [MacOS - __cats__ (REPL)](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/darwin/cats) </br>
 
-(compiled using PyInstaller) </br>
+(compiled using PyInstaller)
 It is recommended to add the file path(s) to your system-environment `PATH`-variables.
 
-> ❗️ **You should never trust any executable file!** Feel free to compile the package yourself (e.g. using [PyInstaller](https://pyinstaller.org/en/stable/)).
-
-> ⚠️ You can verify the creation of the executable files yourself by reading the [source code](https://github.com/SilenZcience/cat_win/blob/main/cat_win/src/cat.py), checking the [origin](https://github.com/SilenZcience/cat_win/tree/binaries/bin) of the file and validating the corresponding [workflow](https://github.com/SilenZcience/cat_win/blob/main/.github/workflows/build_executable.yml) used.
+> [!CAUTION]
+> **You should never trust any executable file!** Feel free to compile the package yourself (e.g. using [PyInstaller](https://pyinstaller.org/en/stable/)).\
+> You can verify the creation of the executable files yourself by reading the [source code](https://github.com/SilenZcience/cat_win/blob/main/cat_win/src/cat.py), checking the [origin](https://github.com/SilenZcience/cat_win/tree/binaries/bin) of the file and validating the corresponding [workflow](https://github.com/SilenZcience/cat_win/blob/main/.github/workflows/build_executable.yml) used.
 
 <p align="right">(<a href="#top">↑back to top↑</a>)</p>
 <div id="-usage"></div>
@@ -167,8 +168,9 @@ Interactively manipulate standard input.
 
 ### Documentation
 
-👉 A detailed [💡Documentation💡](https://github.com/SilenZcience/cat_win/blob/main/DOCUMENTATION.md) of all **Parameters** has moved to another File.
-Read about specific **Arguments & Options** [here](https://github.com/SilenZcience/cat_win/blob/main/DOCUMENTATION.md).
+> [!TIP]
+> 👉 A detailed [💡Documentation💡](https://github.com/SilenZcience/cat_win/blob/main/DOCUMENTATION.md) of all **Parameters**, **Configurations** and **General Usage** has moved to another File.\
+> Read about specific **Arguments & Options** [here](https://github.com/SilenZcience/cat_win/blob/main/DOCUMENTATION.md#arguments--options).
 
 <div id="examples"></div>
 
@@ -235,7 +237,8 @@ Read about specific **Arguments & Options** [here](https://github.com/SilenZcien
 
 ## 📋 Changelog
 
-Take a look at the [Changelog](https://github.com/SilenZcience/cat_win/blob/main/CHANGELOG.md) file.
+> [!NOTE]
+> Take a look at the [Changelog](https://github.com/SilenZcience/cat_win/blob/main/CHANGELOG.md) file.
 
 <div id="-license"></div>
 
@@ -244,7 +247,9 @@ Take a look at the [Changelog](https://github.com/SilenZcience/cat_win/blob/main
    <img src="https://img.shields.io/pypi/l/cat_win" align="right">
 </a>
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/SilenZcience/cat_win/blob/main/LICENSE) file for details
+> [!IMPORTANT]
+> This software is provided "as is," **without warranty** of any kind. There are **no guarantees** of its functionality or suitability for any purpose. Use at your own risk—**No responsibility** for any issues, damages, or losses that may arise from using this software are taken.\
+> This project is licensed under the MIT License - see the [LICENSE](https://github.com/SilenZcience/cat_win/blob/main/LICENSE) file for details
 
 <div id="-contact"></div>
 
