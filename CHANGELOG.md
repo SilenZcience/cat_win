@@ -26,6 +26,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fixed Bug where the editor would glitch visually when searching/replacing special characters.
 - fixed Bug where the `--config-clear`, `--config-reset` parameter would not clear the custom commands.
 - fixed Bug where the found directories were not displayed when using -`D`, --`DIRS` and no files have been found.
+- fixed critical Bug where the (hex-)editor failsave would save the file incorrectly on crash.
 
 
 ## [1.9.2] - 2024-10-21
@@ -416,7 +417,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ### Minor Changes
 
-- added -`!`, --`edit` parameter to open a simple editor to write/edit any provided File. 
+- added -`!`, --`edit` parameter to open a simple editor to write/edit any provided File.
 - renamed --`chr`, --`chr` to --`chr`, --`char`.
 - cat_win will now detect simple zip-archives and display the contained files.
 - When using the Parameter Variant -`E` from -`E`, --`echo` the input will be decoded with unicode sequences.
