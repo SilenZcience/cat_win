@@ -17,7 +17,7 @@ import unicodedata
 from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.const.regex import compile_re
 from cat_win.src.service.helper.editorhelper import History, Position, _SearchIter, \
-    UNIFY_HOTKEYS,KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, \
+    UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, \
         SELECT_HOTKEYS, HISTORY_HOTKEYS, INDENT_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
 from cat_win.src.service.clipboard import Clipboard
@@ -1446,6 +1446,23 @@ class Editor:
             self._init_screen()
             self._build_file_upto()
             self._run()
+        except (Exception, KeyboardInterrupt) as e:
+            curses.endwin()
+            if not self.unsaved_progress:
+                raise e
+            if not isinstance(e, KeyboardInterrupt):
+                err_print('Oops..! Something went wrong.')
+            user_input = ''
+            while user_input not in ['Y', 'J', 'N']:
+                user_input = input('Do you want to save the changes? [Y/N]').upper()
+            if user_input == 'N':
+                raise e
+            self._action_save()
+            if self.unsaved_progress:
+                err_print('Oops..! Something went wrong. The file could not be saved.')
+            else:
+                err_print('The file has been successfully saved.')
+            raise e
         finally:
             try: # cleanup - close file
                 self._f_content_gen.throw(StopIteration)
@@ -1495,23 +1512,8 @@ class Editor:
             # ignore background signals on UNIX, since a custom background implementation exists
             signal.signal(signal.SIGTSTP, signal.SIG_IGN)
 
-        try:
-            editor._open()
-        except Exception as e:
-            if not editor.unsaved_progress:
-                raise e
-            err_print('Oops..! Something went wrong.')
-            user_input = ''
-            while user_input not in ['Y', 'J', 'N']:
-                user_input = input('Do you want to save the changes? [Y/N]').upper()
-            if user_input == 'N':
-                raise e
-            editor._action_save()
-            if editor.unsaved_progress:
-                err_print('Oops..! Something went wrong. The file could not be saved.')
-            else:
-                err_print('The file has been successfully saved.')
-            raise e
+        editor._open()
+
         return editor.changes_made
 
     @staticmethod
