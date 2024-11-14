@@ -74,7 +74,7 @@
 
 <h2>
 	<a href="#">&#x200B;</a>
-	<a href="#about-the-project">
+	<a href="#about-the-project" title="Noto Emoji, licensed under CC BY 4.0">
 		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" width="30" />
 	</a>
 	<b>About The Project</b>
@@ -113,7 +113,7 @@ This project does not aim to exactly replicate existing tools or their specific 
 
 <h2>
 	<a href="#">&#x200B;</a>
-	<a href="#getting-started">
+	<a href="#getting-started" title="Noto Emoji, licensed under CC BY 4.0">
 		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f680/512.gif" width="30" />
 	</a>
 	<b>Getting Started</b>
@@ -177,7 +177,7 @@ It is recommended to add the file path(s) to your system-environment `PATH`-vari
 
 <h2>
 	<a href="#">&#x200B;</a>
-	<a href="#usage">
+	<a href="#usage" title="Noto Emoji, licensed under CC BY 4.0">
 		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/2699_fe0f/512.gif" width="30" />
 	</a>
 	<b>Usage</b>
@@ -201,7 +201,7 @@ Interactively manipulate standard input.
 
 <h3>
 	<a href="#">&#x200B;</a>
-	<a href="#documentation">
+	<a href="#documentation" title="Noto Emoji, licensed under CC BY 4.0">
 		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4a1/512.gif" width="25" />
 	</a>
 	<b>Documentation</b>
@@ -276,7 +276,7 @@ Interactively manipulate standard input.
 
 <h2>
 	<a href="#">&#x200B;</a>
-	<a href="#changelog">
+	<a href="#changelog" title="Noto Emoji, licensed under CC BY 4.0">
 		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/270f_fe0f/512.gif" width="30" />
 	</a>
 	<b>Changelog</b>
@@ -289,7 +289,7 @@ Interactively manipulate standard input.
 
 <h2>
 	<a href="#">&#x200B;</a>
-	<a href="#license">
+	<a href="#license" title="Noto Emoji, licensed under CC BY 4.0">
 		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/2757/512.gif" width="30" />
 	</a>
 	<b>License</b>
@@ -307,7 +307,7 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 <h2>
 	<a href="#">&#x200B;</a>
-	<a href="#contact">
+	<a href="#contact" title="Noto Emoji, licensed under CC BY 4.0">
 		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ab/512.gif" width="30" />
 	</a>
 	<b>Contact</b>
