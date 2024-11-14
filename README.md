@@ -69,7 +69,15 @@
 
 <div id="-about-the-project"></div>
 
-## 🔥 About The Project
+## 🔥 **About The Project**
+
+[![GitHub-Last-Commit]](https://github.com/SilenZcience/cat_win/commits/main/)
+[![GitHub-Issues]](https://github.com/SilenZcience/cat_win/issues)
+[![Github-Stars]](https://github.com/SilenZcience/cat_win/stargazers)
+[![Github-Watchers]](https://github.com/SilenZcience/cat_win/watchers)
+[![Github-Forks]](https://github.com/SilenZcience/cat_win/network/members)
+
+---
 
 [![Unittests]](https://github.com/SilenZcience/cat_win/actions/workflows/unit_test.yml)
 [![Build-and-Check]](https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml)
@@ -80,19 +88,21 @@
 This project copies the fundamental framework of the most essential command-line tools from Unix and translates its features to an OS Independent program using Python.</br>
 The project includes the basic functionality of subject areas like 'cat', 'echo', 'grep', 'ls', 'base64', 'xxd', ...
 
-Additionally, it includes an editor and a hex editor, as well as the feature to visualize data in various ways.
+Additionally, it includes an **editor** and a **hex editor**, as well as the feature to visualize data in various ways.
 It enables the user to manipulate the content of any given file, displaying meta-data, calculating checksums, converting hexadecimal, decimal, octal and binary numbers within any text, and much *much* <a href="#-usage">more</a> ...
+
+This project does not aim to exactly replicate existing tools or their specific functionalities but rather to deliver essential core features in a user-friendly manner, providing straightforward access to helpful and valuable tools. It is purposefully designed to be lightweight and offer a streamlined, accessible solution to engage with powerful utilities by providing a practical and effective resource for users seeking core functionality without unnecessary overhead.
 
 <div id="made-with"></div>
 
 ### Made With
 [![MadeWith-Python]](https://www.python.org/)
-[![Python][Python-Version]](https://www.python.org/)
+[![Python-Version]](https://www.python.org/)
 
 <p align="right">(<a href="#top">↑back to top↑</a>)</p>
 <div id="-getting-started"></div>
 
-## 🚀 Getting Started
+## 🚀 **Getting Started**
 
 <div id="prerequisites"></div>
 
@@ -105,7 +115,9 @@ Using cat_win as a `Binary Executable` demands no prerequisites, hereby the stan
 <div id="installation"></div>
 
 ### Installation
-[![Version][CurrentVersion]](https://pypi.org/project/cat-win/)
+[![CurrentVersion]](https://pypi.org/project/cat-win/)
+[![GitHub-Release]](https://img.shields.io/github/v/release/Abblix/Oidc.Server)
+[![GitHub-Release-Date]](https://img.shields.io/github/release-date/Abblix/Oidc.Server)
 
 `Python Package` </br>
 Simply install the python package (via [PyPI-cat_win](https://pypi.org/project/cat-win/)):
@@ -138,7 +150,7 @@ Direct Download:
 [MacOS - __catw__](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/darwin/catw) </br>
 [MacOS - __cats__ (REPL)](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/darwin/cats) </br>
 
-(compiled using PyInstaller)
+(compiled using PyInstaller) </br>
 It is recommended to add the file path(s) to your system-environment `PATH`-variables.
 
 > [!CAUTION]
@@ -148,7 +160,7 @@ It is recommended to add the file path(s) to your system-environment `PATH`-vari
 <p align="right">(<a href="#top">↑back to top↑</a>)</p>
 <div id="-usage"></div>
 
-## 🔧 Usage
+## 🔧 **Usage**
 
 ```console
 > catw [FILE]... [OPTION]...
@@ -235,14 +247,14 @@ Interactively manipulate standard input.
 <p align="right">(<a href="#top">↑back to top↑</a>)</p>
 <div id="-changelog"></div>
 
-## 📋 Changelog
+## 📋 **Changelog**
 
 > [!NOTE]
 > Take a look at the [Changelog](https://github.com/SilenZcience/cat_win/blob/main/CHANGELOG.md) file.
 
 <div id="-license"></div>
 
-## 📜 License
+## 📜 **License**
 <a href="https://github.com/SilenZcience/cat_win/blob/main/LICENSE" alt="License">
    <img src="https://img.shields.io/pypi/l/cat_win" align="right">
 </a>
@@ -253,7 +265,7 @@ Interactively manipulate standard input.
 
 <div id="-contact"></div>
 
-## 💫 Contact
+## 💫 **Contact**
 
 > **SilenZcience** <br/>
 [![GitHub-SilenZcience][GitHub-SilenZcience]](https://github.com/SilenZcience)
@@ -268,6 +280,14 @@ Interactively manipulate standard input.
 
 [Coverage]: https://raw.githubusercontent.com/SilenZcience/cat_win/badges/badges/badge-coverage.svg
 [Tests]: https://raw.githubusercontent.com/SilenZcience/cat_win/badges/badges/badge-tests.svg
+
+[GitHub-Last-Commit]: https://img.shields.io/github/last-commit/SilenZcience/cat_win
+[GitHub-Issues]: https://img.shields.io/github/issues/SilenZcience/cat_win
+[GitHub-Release]: https://img.shields.io/github/v/release/SilenZcience/cat_win?label=github
+[GitHub-Release-Date]: https://img.shields.io/github/release-date/SilenZcience/cat_win
+[Github-Stars]: https://img.shields.io/github/stars/SilenZcience/cat_win?style=flat
+[Github-Forks]: https://img.shields.io/github/forks/SilenZcience/cat_win?style=flat
+[Github-Watchers]: https://img.shields.io/github/watchers/SilenZcience/cat_win?style=flat
 
 [MadeWith-Python]: https://img.shields.io/badge/Made%20with-Python-brightgreen
 [Python-Version]: https://img.shields.io/badge/Python-3.6%20--%203.13%20%7C%20pypy--3.6%20--%20pypy--3.10-blue
