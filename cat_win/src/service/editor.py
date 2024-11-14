@@ -997,6 +997,7 @@ class Editor:
                 self._setup_file()
                 self._build_file_upto()
                 self.cpos.row = min(self.cpos.row, len(self.window_content)-1)
+                self.history = History()
                 break
 
         return True
@@ -1033,7 +1034,7 @@ class Editor:
                 t_p = i_bytes[-1:].isalpha()
                 while i_bytes and i_bytes[-1:].isalpha() == t_p:
                     i_bytes = i_bytes[:-1]
-            elif key == b'_key_string' and wchar.upper() in HEX_BYTE_KEYS:
+            elif key == b'_key_string' and all(wch in HEX_BYTE_KEYS for wch in wchar.upper()):
                 i_bytes += wchar.upper()
             elif key == b'_key_enter':
                 try:
