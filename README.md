@@ -284,13 +284,13 @@ Interactively manipulate standard input.
 [Coverage]: https://raw.githubusercontent.com/SilenZcience/cat_win/badges/badges/badge-coverage.svg
 [Tests]: https://raw.githubusercontent.com/SilenZcience/cat_win/badges/badges/badge-tests.svg
 
-[GitHub-Last-Commit]: https://img.shields.io/github/last-commit/SilenZcience/cat_win
+[GitHub-Last-Commit]: https://img.shields.io/github/last-commit/SilenZcience/cat_win/dev
 [GitHub-Issues]: https://img.shields.io/github/issues/SilenZcience/cat_win
 [GitHub-Release]: https://img.shields.io/github/v/release/SilenZcience/cat_win?label=Github
 [GitHub-Release-Date]: https://img.shields.io/github/release-date/SilenZcience/cat_win?label=Release%20Date
-[Github-Stars]: https://img.shields.io/github/stars/SilenZcience/cat_win?style=flat
-[Github-Forks]: https://img.shields.io/github/forks/SilenZcience/cat_win?style=flat
-[Github-Watchers]: https://img.shields.io/github/watchers/SilenZcience/cat_win?style=flat
+[Github-Stars]: https://img.shields.io/github/stars/SilenZcience/cat_win?style=flat&color=purple
+[Github-Forks]: https://img.shields.io/github/forks/SilenZcience/cat_win?style=flat&color=purple
+[Github-Watchers]: https://img.shields.io/github/watchers/SilenZcience/cat_win?style=flat&color=purple
 
 [MadeWith-Python]: https://img.shields.io/badge/Made%20with-Python-brightgreen
 [Python-Version]: https://img.shields.io/badge/Python-3.6%20--%203.13%20%7C%20pypy--3.6%20--%20pypy--3.10-blue
