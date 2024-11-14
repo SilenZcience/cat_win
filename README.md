@@ -46,33 +46,39 @@
    <summary>Table of Contents</summary>
    <ol>
       <li>
-         <a href="#-about-the-project">About The Project</a>
+         <a href="#about-the-project">About The Project</a>
          <ul>
             <li><a href="#made-with">Made With</a></li>
          </ul>
       </li>
       <li>
-         <a href="#-getting-started">Getting Started</a>
+         <a href="#getting-started">Getting Started</a>
          <ul>
             <li><a href="#prerequisites">Prerequisites</a></li>
             <li><a href="#installation">Installation</a></li>
          </ul>
       </li>
-      <li><a href="#-usage">Usage</a>
+      <li><a href="#usage">Usage</a>
          <ul>
          <li><a href="#documentation">Documentation</a></li>
          <li><a href="#examples">Examples</a></li>
          </ul>
       </li>
-      <li><a href="#-changelog">Changelog</a></li>
-      <li><a href="#-license">License</a></li>
-      <li><a href="#-contact">Contact</a></li>
+      <li><a href="#changelog">Changelog</a></li>
+      <li><a href="#license">License</a></li>
+      <li><a href="#contact">Contact</a></li>
    </ol>
 </details>
 
-<div id="-about-the-project"></div>
+<div id="about-the-project"></div>
 
-## 🔥 **About The Project**
+<h2>
+	<a href="#">&#x200B;</a>
+	<a href="#about-the-project">
+		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" width="30" />
+	</a>
+	<b>About The Project</b>
+</h2>
 
 [![GitHub-Last-Commit]](https://github.com/SilenZcience/cat_win/commits/main/)
 [![GitHub-Issues]](https://github.com/SilenZcience/cat_win/issues)
@@ -92,7 +98,7 @@ This project copies the fundamental framework of the most essential command-line
 The project includes the basic functionality of subject areas like 'cat', 'echo', 'grep', 'ls', 'base64', 'xxd', ...
 
 Additionally, it includes an **editor** and a **hex editor**, as well as the feature to visualize data in various ways.
-It enables the user to manipulate the content of any given file, displaying meta-data, calculating checksums, converting hexadecimal, decimal, octal and binary numbers within any text, and much *much* <a href="#-usage">more</a> ...
+It enables the user to manipulate the content of any given file, displaying meta-data, calculating checksums, converting hexadecimal, decimal, octal and binary numbers within any text, and much *much* <a href="#usage">more</a> ...
 
 This project does not aim to exactly replicate existing tools or their specific functionalities but rather to deliver essential core features in a user-friendly manner, providing straightforward access to helpful and valuable tools. It is purposefully designed to be lightweight and offer a streamlined, accessible solution to engage with powerful utilities by providing a practical and effective resource for users seeking core functionality without unnecessary overhead.
 
@@ -103,9 +109,15 @@ This project does not aim to exactly replicate existing tools or their specific 
 [![Python-Version]](https://www.python.org/)
 
 <p align="right">(<a href="#top">↑back to top↑</a>)</p>
-<div id="-getting-started"></div>
+<div id="getting-started"></div>
 
-## 🚀 **Getting Started**
+<h2>
+	<a href="#">&#x200B;</a>
+	<a href="#getting-started">
+		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f680/512.gif" width="30" />
+	</a>
+	<b>Getting Started</b>
+</h2>
 
 <div id="prerequisites"></div>
 
@@ -161,9 +173,15 @@ It is recommended to add the file path(s) to your system-environment `PATH`-vari
 > You can verify the creation of the executable files yourself by reading the [source code](https://github.com/SilenZcience/cat_win/blob/main/cat_win/src/cat.py), checking the [origin](https://github.com/SilenZcience/cat_win/tree/binaries/bin) of the file and validating the corresponding [workflow](https://github.com/SilenZcience/cat_win/blob/main/.github/workflows/build_executable.yml) used.
 
 <p align="right">(<a href="#top">↑back to top↑</a>)</p>
-<div id="-usage"></div>
+<div id="usage"></div>
 
-## 🔧 **Usage**
+<h2>
+	<a href="#">&#x200B;</a>
+	<a href="#usage">
+		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/2699_fe0f/512.gif" width="30" />
+	</a>
+	<b>Usage</b>
+</h2>
 
 ```console
 > catw [FILE]... [OPTION]...
@@ -181,10 +199,16 @@ Interactively manipulate standard input.
 
 <div id="documentation"></div>
 
-### Documentation
+<h3>
+	<a href="#">&#x200B;</a>
+	<a href="#documentation">
+		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4a1/512.gif" width="25" />
+	</a>
+	<b>Documentation</b>
+</h3>
 
 > [!TIP]
-> 👉 A detailed [💡Documentation💡](https://github.com/SilenZcience/cat_win/blob/main/DOCUMENTATION.md) of all **Parameters**, **Configurations** and **General Usage** has moved to another File.\
+> 👉 A detailed [Documentation](https://github.com/SilenZcience/cat_win/blob/main/DOCUMENTATION.md) of all **Parameters**, **Configurations** and **General Usage** has moved to another File.\
 > Read about specific **Arguments & Options** [here](https://github.com/SilenZcience/cat_win/blob/main/DOCUMENTATION.md#arguments--options).
 
 <div id="examples"></div>
@@ -248,27 +272,46 @@ Interactively manipulate standard input.
 ```
 
 <p align="right">(<a href="#top">↑back to top↑</a>)</p>
-<div id="-changelog"></div>
+<div id="changelog"></div>
 
-## 📋 **Changelog**
+<h2>
+	<a href="#">&#x200B;</a>
+	<a href="#changelog">
+		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/270f_fe0f/512.gif" width="30" />
+	</a>
+	<b>Changelog</b>
+</h2>
 
 > [!NOTE]
 > Take a look at the [Changelog](https://github.com/SilenZcience/cat_win/blob/main/CHANGELOG.md) file.
 
-<div id="-license"></div>
+<div id="license"></div>
 
-## 📜 **License**
+<h2>
+	<a href="#">&#x200B;</a>
+	<a href="#license">
+		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/2757/512.gif" width="30" />
+	</a>
+	<b>License</b>
+</h2>
 <a href="https://github.com/SilenZcience/cat_win/blob/main/LICENSE" alt="License">
    <img src="https://img.shields.io/pypi/l/cat_win" align="right">
 </a>
 
 > [!IMPORTANT]
-> This software is provided "as is," **without warranty** of any kind. There are **no guarantees** of its functionality or suitability for any purpose. Use at your own risk—**No responsibility** for any issues, damages, or losses that may arise from using this software are taken.\
-> This project is licensed under the MIT License - see the [LICENSE](https://github.com/SilenZcience/cat_win/blob/main/LICENSE) file for details
+> This software is provided "as is," **without warranty** of any kind. There are **no guarantees** of its functionality or suitability for any purpose. Use at your own risk—**No responsibility** for any issues, damages, or losses that may arise from using this software are taken.
 
-<div id="-contact"></div>
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/SilenZcience/cat_win/blob/main/LICENSE) file for details
 
-## 💫 **Contact**
+<div id="contact"></div>
+
+<h2>
+	<a href="#">&#x200B;</a>
+	<a href="#contact">
+		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ab/512.gif" width="30" />
+	</a>
+	<b>Contact</b>
+</h2>
 
 > **SilenZcience** <br/>
 [![GitHub-SilenZcience][GitHub-SilenZcience]](https://github.com/SilenZcience)
@@ -288,7 +331,7 @@ Interactively manipulate standard input.
 [GitHub-Issues]: https://img.shields.io/github/issues/SilenZcience/cat_win
 [GitHub-Release]: https://img.shields.io/github/v/release/SilenZcience/cat_win?label=Github
 [GitHub-Release-Date]: https://img.shields.io/github/release-date/SilenZcience/cat_win?label=Release%20Date
-[Github-Stars]: https://img.shields.io/github/stars/SilenZcience/cat_win?style=flat&color=purple
+[Github-Stars]: https://img.shields.io/github/stars/SilenZcience/cat_win?style=flat&color=yellow
 [Github-Forks]: https://img.shields.io/github/forks/SilenZcience/cat_win?style=flat&color=purple
 [Github-Watchers]: https://img.shields.io/github/watchers/SilenZcience/cat_win?style=flat&color=purple
 
@@ -296,7 +339,7 @@ Interactively manipulate standard input.
 [Python-Version]: https://img.shields.io/badge/Python-3.6%20--%203.13%20%7C%20pypy--3.6%20--%20pypy--3.10-blue
 <!-- https://img.shields.io/badge/Python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%20pypy--3.7%20%7C%20pypy--3.8%20%7C%20pypy--3.9%20%7C%20pypy--3.10-blue -->
 
-[CurrentVersion]: https://img.shields.io/pypi/v/cat_win?label=PyPi
+[CurrentVersion]: https://img.shields.io/pypi/v/cat_win?label=PyPI
 
 [License]: https://img.shields.io/pypi/l/cat_win
 
