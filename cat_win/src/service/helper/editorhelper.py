@@ -317,6 +317,13 @@ class History:
         self._stack_undo: list = []
         self._stack_redo: list = []
 
+    def clear(self) -> None:
+        """
+        clear the history
+        """
+        self._stack_undo.clear()
+        self._stack_redo.clear()
+
     def _add(self, action: _Action, stack_type: str = 'undo') -> None:
         """
         Add an action to the stack.

@@ -997,7 +997,7 @@ class Editor:
                 self._setup_file()
                 self._build_file_upto()
                 self.cpos.row = min(self.cpos.row, len(self.window_content)-1)
-                self.history = History()
+                self.history.clear()
                 break
 
         return True
