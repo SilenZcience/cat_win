@@ -4,11 +4,14 @@
    <a href="https://pepy.tech/project/cat-win/" alt="Downloads">
       <img src="https://static.pepy.tech/personalized-badge/cat-win?period=total&units=international_system&left_color=grey&right_color=blue&left_text=Downloads" align="right">
    </a>
+   <a href="https://pepy.tech/project/cat-win/" alt="Github Downloads">
+      <img src="https://img.shields.io/github/downloads/SilenZcience/cat_win/total?color=blue&label=Github%20Downloads" align="right">
+   </a>
    <a href="https://pypi.org/project/cat-win/" alt="Visitors">
       <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FSilenZcience%2Fcat_win&count_bg=%23FF7700&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=Visitors&edge_flat=false" align="right">
    </a>
    <a href="https://github.com/SilenZcience/cat_win/tree/main/cat_win" alt="CodeSize">
-      <img src="https://img.shields.io/github/languages/code-size/SilenZcience/cat_win?color=purple" align="right">
+      <img src="https://img.shields.io/github/languages/code-size/SilenZcience/cat_win?color=purple&label=Code%20Size" align="right">
    </a>
 </p>
 
@@ -18,7 +21,7 @@
 
 <br/>
 <div align="center">
-<h2 align="center">cat_win</h2>
+<h2 align="center"><b>cat_win</b></h2>
    <p align="center">
       <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/cat_win.logo.png" width="25%"/>
    </p>
@@ -83,7 +86,7 @@
 [![Build-and-Check]](https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml)
 [![Coverage]](https://github.com/SilenZcience/cat_win/actions/workflows/coverage.yml)
 [![Tests]](https://github.com/SilenZcience/cat_win/actions/workflows/coverage.yml)
-<!-- [![Compile-and-Push]](https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml/badge.svg) -->
+<!-- [![Compile-and-Push]](https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml) -->
 
 This project copies the fundamental framework of the most essential command-line tools from Unix and translates its features to an OS Independent program using Python.</br>
 The project includes the basic functionality of subject areas like 'cat', 'echo', 'grep', 'ls', 'base64', 'xxd', ...
@@ -270,9 +273,9 @@ Interactively manipulate standard input.
 > **SilenZcience** <br/>
 [![GitHub-SilenZcience][GitHub-SilenZcience]](https://github.com/SilenZcience)
 
-[OS-Windows]: https://img.shields.io/badge/os-windows-green
-[OS-Linux]: https://img.shields.io/badge/os-linux-green
-[OS-MacOS]: https://img.shields.io/badge/os-macOS-green
+[OS-Windows]: https://img.shields.io/badge/os-windows-green?label=OS
+[OS-Linux]: https://img.shields.io/badge/os-linux-green?label=OS
+[OS-MacOS]: https://img.shields.io/badge/os-macOS-green?label=OS
 
 [Unittests]: https://github.com/SilenZcience/cat_win/actions/workflows/unit_test.yml/badge.svg?branch=dev
 [Build-and-Check]: https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml/badge.svg?branch=dev
@@ -283,8 +286,8 @@ Interactively manipulate standard input.
 
 [GitHub-Last-Commit]: https://img.shields.io/github/last-commit/SilenZcience/cat_win
 [GitHub-Issues]: https://img.shields.io/github/issues/SilenZcience/cat_win
-[GitHub-Release]: https://img.shields.io/github/v/release/SilenZcience/cat_win?label=github
-[GitHub-Release-Date]: https://img.shields.io/github/release-date/SilenZcience/cat_win
+[GitHub-Release]: https://img.shields.io/github/v/release/SilenZcience/cat_win?label=Github
+[GitHub-Release-Date]: https://img.shields.io/github/release-date/SilenZcience/cat_win?label=Release%20Date
 [Github-Stars]: https://img.shields.io/github/stars/SilenZcience/cat_win?style=flat
 [Github-Forks]: https://img.shields.io/github/forks/SilenZcience/cat_win?style=flat
 [Github-Watchers]: https://img.shields.io/github/watchers/SilenZcience/cat_win?style=flat
@@ -293,7 +296,7 @@ Interactively manipulate standard input.
 [Python-Version]: https://img.shields.io/badge/Python-3.6%20--%203.13%20%7C%20pypy--3.6%20--%20pypy--3.10-blue
 <!-- https://img.shields.io/badge/Python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%20pypy--3.7%20%7C%20pypy--3.8%20%7C%20pypy--3.9%20%7C%20pypy--3.10-blue -->
 
-[CurrentVersion]: https://img.shields.io/pypi/v/cat_win.svg
+[CurrentVersion]: https://img.shields.io/pypi/v/cat_win?label=PyPi
 
 [License]: https://img.shields.io/pypi/l/cat_win
 
