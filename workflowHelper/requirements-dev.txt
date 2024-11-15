@@ -2,8 +2,8 @@ colorama~=0.4.0
 pyperclip~=1.8.0
 pyperclip3~=0.4.0
 pyclip~=0.7.0
-windows-curses==2.3.0; platform_system=='Windows' and platform_python_implementation!='PyPy' and python_version<='3.10'
-windows-curses~=2.3.0; platform_system=='Windows' and platform_python_implementation!='PyPy' and python_version>'3.10'
+windows-curses!=2.3.1; platform_system=='Windows' and platform_python_implementation!='PyPy'
 coverage
 genbadge[tests,coverage]~=1.1.0
 pytest
+Pillow
