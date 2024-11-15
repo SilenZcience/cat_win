@@ -81,7 +81,6 @@
 </h2>
 
 [![GitHub-Last-Commit]](https://github.com/SilenZcience/cat_win/commits/main/)
-[![GitHub-Issues]](https://github.com/SilenZcience/cat_win/issues)
 [![Github-Stars]](https://github.com/SilenZcience/cat_win/stargazers)
 [![Github-Watchers]](https://github.com/SilenZcience/cat_win/watchers)
 [![Github-Forks]](https://github.com/SilenZcience/cat_win/network/members)
@@ -92,6 +91,7 @@
 [![Build-and-Check]](https://github.com/SilenZcience/cat_win/actions/workflows/package_test.yml)
 [![Coverage]](https://github.com/SilenZcience/cat_win/actions/workflows/coverage.yml)
 [![Tests]](https://github.com/SilenZcience/cat_win/actions/workflows/coverage.yml)
+[![GitHub-Issues]](https://github.com/SilenZcience/cat_win/issues)
 <!-- [![Compile-and-Push]](https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml) -->
 
 This project copies the fundamental framework of the most essential command-line tools from Unix and translates its features to an OS Independent program using Python.</br>

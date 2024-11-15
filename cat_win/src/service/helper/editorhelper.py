@@ -6,7 +6,7 @@ try:
     import curses
     def initscr():
         """
-        fix windows-curses for Python 3.12:
+        fix windows-curses for Python >= 3.12:
         https://github.com/zephyrproject-rtos/windows-curses/issues/50
         """
         import _curses
