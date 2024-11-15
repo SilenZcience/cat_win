@@ -131,8 +131,8 @@ Using cat_win as a `Binary Executable` demands no prerequisites, hereby the stan
 
 ### Installation
 [![CurrentVersion]](https://pypi.org/project/cat-win/)
-[![GitHub-Release]](https://img.shields.io/github/v/release/Abblix/Oidc.Server)
-[![GitHub-Release-Date]](https://img.shields.io/github/release-date/Abblix/Oidc.Server)
+[![GitHub-Release]](https://github.com/SilenZcience/cat_win/releases)
+[![GitHub-Release-Date]](https://github.com/SilenZcience/cat_win/releases)
 
 `Python Package` </br>
 Simply install the python package (via [PyPI-cat_win](https://pypi.org/project/cat-win/)):
