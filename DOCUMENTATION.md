@@ -244,7 +244,7 @@
    - When passing in an Archive the contained Files will be listed along side their File Size instead.
    - Currently supported Archive Formats are:
       - Zip Formats and Equivalents: `.zip` `.egg` `.jar` `.whl`
-      - Tar and compressed Tar Formats: `.tar` `.tar.gz` `.tgz` `.tar.bz2` `.tz2` 
+      - Tar and compressed Tar Formats: `.tar` `.tar.gz` `.tgz` `.tar.bz2` `.tz2`
 
 - - - -
 ### <a id="-h---help">-h, --help</a>
@@ -494,18 +494,12 @@ Currently supported are `.json` and `.xml`.
 
 Everything passed in after this Argument will be handled as its own File.
 It is not possible to break out of this State therefor this Parameter must be used last.
-The Input is unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_echo` is set but in Case of an unicode-error the Input will simply be used literally.
+The Input is unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_echo` is set to `true` but in Case of an unicode-error the Input will simply be used literally.
 This way it is possible to define new Lines (\\n) or other special Characters.
 
 ```console
 > catw -l --echo -n The last 'Parameter' does not count!\nThis is not a newline!
-[57] -n The last Parameter does not count!\nThis is not a newline!
-```
-
-```console
-> catw -l -E -n The last 'Parameter' does not count!\nThis is a newline!
-[37] -n The last Parameter does not count!
-[18] This is a newline!
+[57] -n The last Parameter does not count!\nThis is not a newline, unless the config option is set!
 ```
 
 ### <a id="----stdin">-, --stdin</a>
@@ -937,7 +931,7 @@ Opens a simple Editor to write/edit the Content of any provided File one by one.
 Not-existing Files will be opened first and existing Ones will be able to be edited after that.
 The Editor will not save Changes automatically.
 Files will be saved with the Text Encoding defined by <a href="#encx-encx">enc=X, enc&#42889;X</a>.
-Note that ^c (Ctrl-c) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
+Note that ^D (Ctrl-D) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
 The Auto-Indendation Feature can be turned on in the Config Menu using the `editor_auto_indent` Element.
 The Indendation when using Auto-Indendation can be configured in the Config Menu (<a href="#--config---config">--config, --config</a>) using `editor_indentation`.
 The Input inside the Find Prompt (see Key Bindings) is unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_editor_search` is set but in Case of an unicode-error the Input will simply be used literally.
@@ -1006,7 +1000,7 @@ The currently supported Key Bindings are as follows:
 Opens a simple Hex-Editor to write/edit the Content of any provided File one by one.
 Not-existing Files will be opened first and existing Ones will be able to be edited after that.
 The Editor will not save Changes automatically.
-Note that ^c (Ctrl-c) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
+Note that ^D (Ctrl-D) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
 The displayed Columns per Row can be configured in the Config Menu (<a href="#--config---config">--config, --config</a>) using `hex_editor_columns`.
 On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module.
 The currently supported Key Bindings are as follows:
@@ -1077,7 +1071,7 @@ Each Step the Output is paused until User Interaction.
 The first Step always fills the entire Screen.
 The following Steps have the Size as defined by the Config Element `more_step_length`.
 Display the available Commands by entering `?` or `h` or `help`.
-As opposed to the <a href="#-m---more">-M, --more</a> Parameter, every other Argument will be ignored and the File will be loaded lazily, resulting in a very fast loading Time.
+As opposed to the <a href="#-m---more">-M, --more</a> Parameter, every other Argument will be ignored and the File will be loaded lazily, resulting in a very fast loading Time (but possibly incorrect Formatting).
 
 ```console
 > catw file -M
@@ -1457,6 +1451,7 @@ Defines a Replacement for queried Literals and Patterns given by <a href="#findx
 When defining multiple Replacements only the last one will be used.
 The Interpretation of the Replacement is dependent on the queried Literal or Pattern.
 This way regular Expressions can be substituted.
+Using the shortened Version r=X or r:X yields the same Result.
 
 ```console
 > catw test.txt "m:([a-z]{3})s" "replace=\\1\\1"
@@ -1475,7 +1470,8 @@ It's raining catcat \1\1 dogdog!
 
 Truncates every File by the Specifics defined.
 This Parameter uses the Default Python slicing Mechanic and uses it on the Lines of each File.
-The Argument is valid by defining trunc=\<start\>\:\<stop\> or trunc=\<start\>\:\<stop\>\:\<step\>
+The Argument is valid by defining trunc=\<start\>\:\<stop\> or trunc=\<start\>\:\<stop\>\:\<step\>.
+Using the shortened Version t=X:Y or t:X:Y yields the same Result.
 
 ```console
 > catw test.txt trunc=5:-5:2
@@ -1499,7 +1495,7 @@ This is a Backslash: /
 
 ### <a id="abc">[a&#42889;b&#42889;c]</a>
 
-Similiar to the <a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a> Parameter this Argument is used on each Line individually.
+Similiar to the <a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a> Parameter yet this Argument is used on each Line individually.
 Every Line is being cut down as specified by the Elements within the Argument [\<start\>\:\<stop\>\:\<step>].
 
 ```console
