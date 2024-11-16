@@ -9,8 +9,8 @@ import os
 from cat_win.src.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_ECHO
 from cat_win.src.const.regex import compile_re
 from cat_win.src.const.regex import RE_ENCODING, RE_Q_MATCH, RE_M_ATCH, RE_Q_FIND, RE_F_IND
-from cat_win.src.const.regex import RE_Q_REPLACE, RE_R_EPLACE
-from cat_win.src.const.regex import RE_TRUNC, RE_CUT, RE_REPLACE, RE_REPLACE_COMMA
+from cat_win.src.const.regex import RE_Q_REPLACE, RE_R_EPLACE, RE_Q_TRUNC, RE_T_RUNC
+from cat_win.src.const.regex import RE_CUT, RE_REPLACE, RE_REPLACE_COMMA
 
 IS_FILE, IS_DIR, IS_PATTERN = range(0, 3)
 
@@ -271,8 +271,9 @@ class ArgParser:
             self.file_queries_replacement = query
             return False
         # 'trunc' + ('='/':') + file_truncate[0] +':'+ file_truncate[1] [+ ':' + file_truncate[2]]
-        if RE_TRUNC.match(param):
-            for i, p_split in enumerate(param[6:].split(':')):
+        if RE_Q_TRUNC.match(param) or RE_T_RUNC.match(param):
+            p_length = 6 if RE_Q_TRUNC.match(param) else 2
+            for i, p_split in enumerate(param[p_length:].split(':')):
                 try:
                     self.file_truncate[i] = int(eval(p_split))
                 except (SyntaxError, NameError, ValueError, ArithmeticError):
