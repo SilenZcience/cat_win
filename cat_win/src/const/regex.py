@@ -25,7 +25,10 @@ RE_Q_FIND        = re.compile(r"\Afind[\=\:].*\Z",    re.IGNORECASE)
 RE_F_IND         = re.compile(r"\Af[\=\:].*\Z",       re.IGNORECASE)
 RE_Q_REPLACE     = re.compile(r"\Areplace[\=\:].*\Z", re.IGNORECASE)
 RE_R_EPLACE      = re.compile(r"\Ar[\=\:].*\Z",       re.IGNORECASE)
-RE_TRUNC         = re.compile(r"\Atrunc[\=\:][0-9\(\)\+\-\*\/]*"
+RE_Q_TRUNC       = re.compile(r"\Atrunc[\=\:][0-9\(\)\+\-\*\/]*"
+                              r"\:[0-9\(\)\+\-\*\/]*\:?"
+                              r"[0-9\(\)\+\-\*\/]*\Z",re.IGNORECASE)
+RE_T_RUNC       = re.compile(r"\At[\=\:][0-9\(\)\+\-\*\/]*"
                               r"\:[0-9\(\)\+\-\*\/]*\:?"
                               r"[0-9\(\)\+\-\*\/]*\Z",re.IGNORECASE)
 RE_CUT           = re.compile(r"\A\[[0-9\(\)\+\-\*\/]*\:"
@@ -43,7 +46,7 @@ CONFIG_VALID_COLOR = re.compile(
     r"(?:(?:\;(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])){2})?\Z",
     re.IGNORECASE
 )
-CONFIG_VALID_ANSI  = re.compile(r"\[(?:\d|;)*m") # custom ansi escape code
+CONFIG_VALID_ANSI  = re.compile(r"\A\[(?:\d|;)*m\Z") # custom ansi escape code
 
 # matches a mathematical expression consisting of
 # either hex-numbers = (0x...), octal-numbers (0o...),
