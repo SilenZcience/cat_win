@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.10.1] - TBA
+
+### Minor Changes
+
+- added shortform `t=`, `t:` for the `trunc=`, `trunc:` parameter.
+
+## Bugfixes
+
+- fixed Bug where the color config would allow certain invalid inputs.
+
+
 ## [1.10.0] - 2024-11-15
 
 ### Major Changes
