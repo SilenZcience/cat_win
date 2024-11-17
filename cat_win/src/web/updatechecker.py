@@ -107,7 +107,7 @@ def only_alpha(_s: str) -> str:
         only alpha chars and 'z'
     """
     x = 'abcdefghijklmnopqrstuvwxyz'
-    return ''.join(filter(lambda c: c in x, _s.lower())) + 'z'
+    return ''.join(filter(lambda c: c in x, _s.lower()))
 
 
 def gen_version_tuples(_v: str, _w: str) -> tuple:
@@ -170,6 +170,9 @@ def new_version_available(current_version: str, latest_version: str) -> int:
             break
         if c_alpha < l_alpha:
             status = STATUS_PRE_RELEASE_AVAILABLE
+            break
+        if c_alpha > l_alpha and all(l.isdigit() for l in latest[i-1:]):
+            status = STATUS_STABLE_RELEASE_AVAILABLE
             break
     if i < len(current):
         status *= -1
