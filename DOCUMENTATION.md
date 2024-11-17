@@ -730,6 +730,7 @@ This Behaviour is included by Default when using <a href="#--nk---nokeyword">--n
 Shows meta Information for each File provided and stops Code Execution.
 The meta Information includes file Signature, File Size, Time of Access, -Modified and -Created.
 On Windows OS Systems this Parameter will also display the classic File Attributes.
+On Unix Systems this Prameter will also display the classic Group Permissions.
 
 ```console
 > catw test.txt -a
@@ -741,6 +742,16 @@ MTime:          YYYY-MM-DD HH:MM:SS.
 CTime:          YYYY-MM-DD HH:MM:SS.
 +Archive, Indexed
 -System, Hidden, Readonly, Compressed, Encrypted
+```
+```console
+> catw test.txt -a
+<Path>/test.txt
+Signature:      -
+Size:           1.55 KB
+ATime:          YYYY-MM-DD HH:MM:SS.
+MTime:          YYYY-MM-DD HH:MM:SS.
+CTime:          YYYY-MM-DD HH:MM:SS.
+-rwxrwxrwx 1 user user
 ```
 
 ### <a id="-m---checksum">-m, --checksum</a>
