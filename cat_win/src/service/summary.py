@@ -2,6 +2,7 @@
 summary
 """
 
+from collections import Counter
 from itertools import groupby
 
 from cat_win.src.const.regex import TOKENIZER
@@ -175,15 +176,14 @@ class Summary:
         if Summary.unique:
             files = Summary._unique_list(files)
 
-        word_count = {}
+        word_count = Counter()
         used_files = []
 
         for hfile in files:
             try:
                 f_content = IoHelper.read_file(hfile.path, file_encoding=file_encoding,
                                                errors='replace')
-                for token in TOKENIZER.findall(f_content):
-                    word_count[token] = word_count.get(token, 0)+1
+                word_count.update(TOKENIZER.findall(f_content))
                 used_files.append(hfile.displayname)
             except (OSError, UnicodeError):
                 pass
@@ -199,13 +199,12 @@ class Summary:
         print('\n\t'.join(map(
             lambda f: f"{Summary.color}{f}{Summary.color_reset}", used_files
         )))
-        sorted_word_count = sorted(word_count.items(), key=lambda token: token[1], reverse=True)
-        format_delimeter = f"{Summary.color_reset}:{Summary.color} "
-        for _, group in groupby(sorted_word_count, lambda token: token[1]):
+
+        for _, group in groupby(word_count.most_common(), lambda token: token[1]):
             sorted_group = sorted(group, key=lambda token: token[0])
             formatted_word_count = map(
-                lambda x: f"{Summary.color}{x[0]}"
-                f"{format_delimeter}{x[1]}{Summary.color_reset}",
+                lambda x: f"{Summary.color}{x[0]}{Summary.color_reset}: "
+                f"{Summary.color}{x[1]}{Summary.color_reset}",
                 sorted_group
             )
             print('\n' + '\n'.join(formatted_word_count), end='')
@@ -225,15 +224,14 @@ class Summary:
         if Summary.unique:
             files = Summary._unique_list(files)
 
-        char_count = {}
+        char_count = Counter()
         used_files = []
 
         for hfile in files:
             try:
                 f_content = IoHelper.read_file(hfile.path, file_encoding=file_encoding,
                                                errors='replace')
-                for char in list(f_content):
-                    char_count[char] = char_count.get(char, 0)+1
+                char_count.update(f_content)
                 used_files.append(hfile.displayname)
             except (OSError, UnicodeError):
                 pass
@@ -249,13 +247,12 @@ class Summary:
         print('\n\t'.join(map(
             lambda f: f"{Summary.color}{f}{Summary.color_reset}", used_files
         )))
-        sorted_char_count = sorted(char_count.items(), key=lambda token: token[1], reverse=True)
-        format_delimeter = f"{Summary.color_reset}:{Summary.color} "
-        for _, group in groupby(sorted_char_count, lambda token: token[1]):
+
+        for _, group in groupby(char_count.most_common(), lambda token: token[1]):
             sorted_group = sorted(group, key=lambda token: token[0])
             formatted_char_count = map(
                 lambda x: f"{Summary.color}{repr(x[0]) if x[0].isspace() else x[0]}"
-                f"{format_delimeter}{x[1]}{Summary.color_reset}",
+                f"{Summary.color_reset}: {Summary.color}{x[1]}{Summary.color_reset}",
                 sorted_group
             )
             print('\n' + '\n'.join(formatted_char_count), end='')
