@@ -88,6 +88,17 @@ class Editor:
             return (self.spos.get_pos(), self.cpos.get_pos())
         return (self.cpos.get_pos(), self.spos.get_pos())
 
+    @property
+    def selected_text(self):
+        (sel_from_y, sel_from_x), (sel_to_y, sel_to_x) = self.selected_area
+        if not self.selecting:
+            sel_from_y, sel_from_x = self.cpos.get_pos()
+            sel_to_y, sel_to_x = sel_from_y, sel_from_x+1
+        content_window = self.window_content[sel_from_y:sel_to_y+1]
+        content_window[-1] = content_window[-1][:sel_to_x]
+        content_window[0] = content_window[0][sel_from_x:]
+        return content_window
+
     def _set_special_chars(self, special_chars: dict) -> None:
         self.special_chars = special_chars
 
@@ -526,6 +537,11 @@ class Editor:
         return wchars_
 
     def _remove_chunk(self) -> None:
+        """
+        after calling this method:
+            cpos will be the previous selected start pos,
+            spos is unreliable and should not be used
+        """
         pre_cpos = self.cpos.get_pos()
         pre_spos = self.spos.get_pos()
         pre_selecting = self.selecting
@@ -536,11 +552,31 @@ class Editor:
                             pre_selecting, self.selecting,
                             action_text)
 
-    def _add_chunk(self, wchars_: str) -> None:
+    def _add_chunk(self, wchars_) -> None:
+        """
+        after calling this method:
+            cpos will be the end of the chunk,
+            spos will be the start of the chunk
+        """
+        if isinstance(wchars_, str):
+            line_break = '\n'
+            for lb in ('\r\n', '\r', '\n'):
+                if lb in wchars_:
+                    line_break = lb
+                    break
+            wchars_ = wchars_.split(line_break)
+
         pre_cpos = self.cpos.get_pos()
         pre_spos = self.spos.get_pos()
         pre_selecting = self.selecting
-        action_text = self._key_add_chunk(wchars_)
+        action_text = self._key_add_chunk('\n'.join(wchars_))
+        # _remove_chunk needs both pos-markers, so set them after add chunk,
+        # such that undo works correctly, and cursor is at the end of the chunk
+        self.spos.set_pos(pre_cpos)
+        self.cpos.set_pos((
+            pre_cpos[0]+len(wchars_)-1,
+            pre_cpos[1]+len(wchars_[-1]) if len(wchars_) == 1 else len(wchars_[-1])
+        ))
         self.history.add(b'_key_add_chunk', '\n' in action_text,
                             pre_cpos, self.cpos.get_pos(),
                             pre_spos, self.spos.get_pos(),
@@ -597,13 +633,20 @@ class Editor:
     def _action_copy(self) -> bool:
         if not self.selecting:
             return True
-        (sel_from_y, sel_from_x), (sel_to_y, sel_to_x) = self.selected_area
-        content_window = self.window_content[sel_from_y:sel_to_y+1]
-        content_window[-1] = content_window[-1][:sel_to_x]
-        content_window[0] = content_window[0][sel_from_x:]
         self.error_bar = self.error_bar if (
-            Clipboard.put(self.line_sep.join(content_window))
+            Clipboard.put(self.line_sep.join(self.selected_text))
         ) else 'An error occured copying the selected text to the clipboard!'
+        return True
+
+    def _action_paste(self) -> bool:
+        clipboard = Clipboard.get()
+        if clipboard is None:
+            self.error_bar = 'An error occured pasting the clipboard!'
+            return True
+
+        if self.selecting:
+            self._remove_chunk()
+        self._add_chunk(clipboard)
         return True
 
     def _action_cut(self) -> bool:
@@ -731,13 +774,7 @@ class Editor:
                 if w_query == 'exit':
                     break
                 result_color = 2
-                (sel_from_y, sel_from_x), (sel_to_y, sel_to_x) = self.selected_area
-                if not self.selecting:
-                    sel_from_y, sel_from_x = self.cpos.get_pos()
-                    sel_to_y, sel_to_x = sel_from_y, sel_from_x+1
-                content_window = self.window_content[sel_from_y:sel_to_y+1]
-                content_window[-1] = content_window[-1][:sel_to_x]
-                content_window[0] = content_window[0][sel_from_x:]
+                content_window = self.selected_text
                 if w_query in bool_expressions:
                     joined_content = '\n'.join(content_window)
                     query_truthy = bool_expressions[w_query](joined_content)
@@ -749,12 +786,8 @@ class Editor:
                         query_result = 'no area has been selected!'
                         continue
                     new_content = [string_expressions[w_query](line) for line in content_window]
-                    joined_content = '\n'.join(new_content)
-                    _, end_pos = self.selected_area
                     self._remove_chunk()
-                    self.spos.set_pos((end_pos[0],
-                                       end_pos[1]+len(new_content[-1])-len(content_window[-1])))
-                    self._add_chunk(joined_content)
+                    self._add_chunk(new_content)
                     break
                 else:
                     query_result = f"'{w_query}' not found!"

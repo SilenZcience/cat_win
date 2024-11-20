@@ -162,19 +162,20 @@ UNIFY_HOTKEYS = {
     # selection
     b'^A'           : b'_select_key_all',
     # actions
+    b'^B'           : b'_action_background',
     b'^C'           : b'_action_copy',
-    b'^X'           : b'_action_cut',
-    b'ALT_S'        : b'_action_save',
-    b'^S'           : b'_action_save',
-    b'^T'           : b'_action_transform',
+    b'^D'           : b'_action_interrupt',
     b'^E'           : b'_action_jump',
     b'^F'           : b'_action_find',
-    b'^P'           : b'_action_replace',
-    b'^R'           : b'_action_reload',
     b'^N'           : b'_action_insert',
-    b'^B'           : b'_action_background',
+    b'^P'           : b'_action_replace',
     b'^Q'           : b'_action_quit',
-    b'^D'           : b'_action_interrupt',
+    b'^R'           : b'_action_reload',
+    b'^S'           : b'_action_save',
+    b'ALT_S'        : b'_action_save',
+    b'^T'           : b'_action_transform',
+    b'^V'           : b'_action_paste',
+    b'^X'           : b'_action_cut',
     b'KEY_RESIZE'   : b'_action_resize',
 } # translates key-inputs to pre-defined actions/methods
 
