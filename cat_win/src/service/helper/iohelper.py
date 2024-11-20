@@ -186,7 +186,7 @@ class IoHelper:
             file.close()
 
     @staticmethod
-    def get_newline(file: Path) -> str:
+    def get_newline(file: Path, default: str = '\n') -> str:
         """
         determines the line ending of a given file.
 
@@ -202,10 +202,10 @@ class IoHelper:
         try:
             with open(file, 'rb') as _f:
                 _l = _f.readline()
-                _l += b'\n' * bool(not _l[-1:] or _l[-1:] not in b'\r\n')
-                return '\r\n' if _l[-2:] == b'\r\n' else _l[-1:].decode()
+                _l+= default.encode() * (not _l[-1:] or _l[-1:] not in b'\r\n')
+                return _l[-1-(_l[-2:] == b'\r\n'):].decode()
         except OSError:
-            return '\n'
+            return default
 
 
     @staticmethod
