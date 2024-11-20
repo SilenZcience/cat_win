@@ -55,6 +55,9 @@ class TestStdInHelper(TestCase):
         self.assertEqual(IoHelper.get_newline(test_file_path), '\r\n')
         self.assertEqual(IoHelper.get_newline(test_file_path_empty), '\n')
         self.assertEqual(IoHelper.get_newline(test_file_path_oneline), '\n')
+        self.assertEqual(IoHelper.get_newline(test_file_path, 'x'), '\r\n')
+        self.assertEqual(IoHelper.get_newline(test_file_path_empty, 'x'), 'x')
+        self.assertEqual(IoHelper.get_newline(test_file_path_oneline, 'x'), 'x')
 
     def test_get_stdin_content_oneline(self):
         stdin_mock.set_content('hello\nworld')
