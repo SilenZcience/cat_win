@@ -15,24 +15,20 @@ class More:
     """
     implements 'more' behaviour
     """
-    on_windows_os = True
     step_length = 0
     t_width = 120
     t_height = 28
 
     @staticmethod
-    def set_flags(on_windows_os: bool, step_length: int = 0) -> None:
+    def set_flags(step_length: int = 0) -> None:
         """
         setup the configuration
 
         Parameters:
-        on_windows_os (bool):
-            indicates if the current system is Windows
         step_length (int):
             defines how many lines should be displayed before pausing.
             a value of 0 is equivalent to the size of the terminal window
         """
-        More.on_windows_os = on_windows_os
         More.step_length = step_length
         try:
             t_width, t_height = shutil.get_terminal_size()
@@ -171,9 +167,11 @@ class More:
                     break_line = False
                     info, clear_size = '', 0
                     while True:
-                        user_input = More._pause_output((line_index+1)*100//i_length,
-                                                  info,
-                                                  clear_size)
+                        user_input = More._pause_output(
+                            (line_index+1)*100//i_length,
+                            info,
+                            clear_size
+                        )
                         info, clear_size = '', 0
 
                         if user_input == 'INTERRUPT':
@@ -266,7 +264,7 @@ class More:
             return
 
         # in case the terminal size is used
-        More.set_flags(More.on_windows_os, More.step_length)
+        More.set_flags(More.step_length)
 
-        with IoHelper.dup_stdin(More.on_windows_os, dup_needed):
+        with IoHelper.dup_stdin(dup_needed):
             self._step_through()

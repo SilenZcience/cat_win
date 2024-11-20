@@ -1054,7 +1054,7 @@ class TestEditor(TestCase):
             self.assertEqual(editor._open(), None)
 
     @patch('cat_win.src.service.editor.CURSES_MODULE_ERROR', new=True)
-    @patch('cat_win.src.service.editor.Editor.on_windows_os', new=True)
+    @patch('cat_win.src.service.editor.on_windows_os', new=True)
     def test_editor_no_curses_error(self):
         with patch('sys.stderr', new=StdOutMock()) as fake_out:
             self.assertEqual(Editor.open('', '', True), False)
@@ -1074,16 +1074,14 @@ class TestEditor(TestCase):
 
     def test_editor_set_flags(self):
         backup_a = Editor.save_with_alt
-        backup_b = Editor.on_windows_os
-        backup_c = Editor.debug_mode
-        backup_d = Editor.unicode_escaped_search
-        backup_e = Editor.unicode_escaped_replace
-        backup_f = Editor.file_encoding
-        Editor.set_flags(True, True, True, False, False, 'utf-16')
+        backup_b = Editor.debug_mode
+        backup_c = Editor.unicode_escaped_search
+        backup_d = Editor.unicode_escaped_replace
+        backup_e = Editor.file_encoding
+        Editor.set_flags(True, True, False, False, 'utf-16')
         self.assertEqual(Editor.save_with_alt, True)
-        self.assertEqual(Editor.on_windows_os, True)
         self.assertEqual(Editor.debug_mode, True)
         self.assertEqual(Editor.unicode_escaped_search, False)
         self.assertEqual(Editor.unicode_escaped_replace, False)
         self.assertEqual(Editor.file_encoding, 'utf-16')
-        Editor.set_flags(backup_a, backup_b, backup_c, backup_d, backup_e, backup_f)
+        Editor.set_flags(backup_a, backup_b, backup_c, backup_d, backup_e)

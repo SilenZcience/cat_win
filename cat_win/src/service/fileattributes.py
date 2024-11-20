@@ -32,6 +32,7 @@ try:
 except ImportError:
     pass
 
+from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.winstreams import WinStreams
 
 
@@ -233,7 +234,7 @@ def get_file_mtime(file: Path) -> float:
     except OSError:
         return 0.0
 
-def get_file_meta_data(file: Path, res_path: str, on_windows_os: bool, colors = None) -> str:
+def get_file_meta_data(file: Path, res_path: str, colors = None) -> str:
     """
     calculate file metadata information.
 
@@ -242,9 +243,6 @@ def get_file_meta_data(file: Path, res_path: str, on_windows_os: bool, colors = 
         a string representation of a file (-path)
     res_path (str);
         the path to the signatures database
-    on_windows_os (bool):
-        indicates if the user is on windows OS using
-        platform.system() == 'Windows'
     colors (list):
         a list containing the ANSI-Colorcodes to display
         the attributes like [RESET_ALL, ATTRIB, +ATTRIB, -ATTRIB]
@@ -299,17 +297,15 @@ def get_file_meta_data(file: Path, res_path: str, on_windows_os: bool, colors = 
     except OSError:
         return ''
 
-def print_meta(file: Path, res_path: str, on_windows_os: bool, colors: list) -> None:
+def print_meta(file: Path, res_path: str, colors: list) -> None:
     """
     print the information retrieved by get_file_meta_data()
 
     Parameters:
     file (Path):
         a string representation of a file (-path)
-    on_windows_os (bool):
-        indicates if the current system is Windows
     colors (list):
         [reset, attributes, positive_attr, negative_attr] color codes
     """
-    meta_data = get_file_meta_data(file, res_path, on_windows_os, colors)
+    meta_data = get_file_meta_data(file, res_path, colors)
     print(meta_data)

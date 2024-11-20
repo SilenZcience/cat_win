@@ -11,7 +11,6 @@ from functools import lru_cache
 from itertools import groupby
 from time import monotonic
 import os
-import platform
 import shlex
 import sys
 
@@ -24,15 +23,16 @@ from cat_win.src.domain.arguments import Arguments
 from cat_win.src.domain.files import Files
 from cat_win.src.persistence.cconfig import CConfig
 from cat_win.src.persistence.config import Config
+from cat_win.src.service.helper.archiveviewer import display_archive
+from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
-from cat_win.src.service.helper.progressbar import PBar
 from cat_win.src.service.helper.levenshtein import calculate_suggestions
+from cat_win.src.service.helper.progressbar import PBar
 from cat_win.src.service.helper.tmpfilehelper import TmpFileHelper
 try:
     from cat_win.src.service.helper.utility import comp_eval, comp_conv
 except SyntaxError: # in case of Python 3.7
     from cat_win.src.service.helper.utilityold import comp_eval, comp_conv
-from cat_win.src.service.helper.archiveviewer import display_archive
 from cat_win.src.service.cbase64 import encode_base64, decode_base64
 from cat_win.src.service.checksum import print_checksum
 from cat_win.src.service.clipboard import Clipboard
@@ -56,7 +56,6 @@ from cat_win import __project__, __version__, __sysversion__, __author__, __url_
 coloramaInit(strip=False)
 working_dir = os.path.abspath(os.path.join(os.path.realpath(__file__), os.pardir, os.pardir))
 
-on_windows_os = platform.system() == 'Windows'
 file_uri_prefix = 'file://' + '/' * on_windows_os
 
 cconfig = CConfig(working_dir)
@@ -78,8 +77,7 @@ def setup():
     color_dic = default_color_dic.copy()
     const_dic = config.load_config()
 
-    arg_parser = ArgParser(on_windows_os,
-                           const_dic[DKW.DEFAULT_FILE_ENCODING],
+    arg_parser = ArgParser(const_dic[DKW.DEFAULT_FILE_ENCODING],
                            const_dic[DKW.UNICODE_ESCAPED_ECHO],
                            const_dic[DKW.UNICODE_ESCAPED_FIND],
                            const_dic[DKW.UNICODE_ESCAPED_REPLACE])
@@ -177,7 +175,7 @@ def _show_help(repl: bool = False) -> None:
     try:
         (More(help_message.splitlines())).step_through()
     finally:
-        print_update_information(__project__, __version__, color_dic, on_windows_os)
+        print_update_information(__project__, __version__, color_dic)
 
 
 def _show_version(repl: bool = False) -> None:
@@ -201,7 +199,7 @@ def _show_version(repl: bool = False) -> None:
         version_message += 'Install time: \t-\n'
     version_message += f"Author: \t{__author__}\n"
     print(version_message)
-    print_update_information(__project__, __version__, color_dic, on_windows_os)
+    print_update_information(__project__, __version__, color_dic)
 
 
 def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files: list,
@@ -258,7 +256,6 @@ def _print_meta_and_checksum(show_meta: bool, show_checksum: bool) -> None:
     for file in u_files:
         if show_meta:
             print_meta(file.path, os.path.join(working_dir, 'res', 'signatures.json'),
-                       on_windows_os,
                        [color_dic[CKW.RESET_ALL],
                         color_dic[CKW.ATTRIB],
                         color_dic[CKW.ATTRIB_POSITIVE],
@@ -1037,14 +1034,14 @@ def init(repl: bool = False) -> tuple:
         sys.exit(0)
 
     Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
-    Editor.set_flags(u_args[ARGS_STDIN] and on_windows_os, on_windows_os,
-                     u_args[ARGS_DEBUG], const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
+    Editor.set_flags(u_args[ARGS_STDIN] and on_windows_os, u_args[ARGS_DEBUG],
+                     const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
                      const_dic[DKW.UNICODE_ESCAPED_EDITOR_REPLACE],
                      arg_parser.file_encoding)
-    HexEditor.set_flags(u_args[ARGS_STDIN] and on_windows_os, on_windows_os,
-                        u_args[ARGS_DEBUG], const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
+    HexEditor.set_flags(u_args[ARGS_STDIN] and on_windows_os, u_args[ARGS_DEBUG],
+                        const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
                         const_dic[DKW.HEX_EDITOR_COLUMNS])
-    More.set_flags(on_windows_os, const_dic[DKW.MORE_STEP_LENGTH])
+    More.set_flags(const_dic[DKW.MORE_STEP_LENGTH])
     Visualizer.set_flags(u_args[ARGS_DEBUG])
     Summary.set_flags(const_dic[DKW.SUMMARY_UNIQUE_ELEMENTS])
     Summary.set_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
@@ -1104,16 +1101,15 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
         )]
     else:
         unknown_files = IoHelper.read_write_files_from_stdin(
-            unknown_files, arg_parser.file_encoding, on_windows_os,
-            u_args[ARGS_ONELINE]
+            unknown_files, arg_parser.file_encoding, u_args[ARGS_ONELINE]
         )
 
     if u_args[ARGS_EDITOR]:
-        with IoHelper.dup_stdin(on_windows_os, u_args[ARGS_STDIN]):
+        with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
             for file in known_files:
                 Editor.open(file, u_files.get_file_display_name(file), u_args[ARGS_PLAIN_ONLY])
     elif u_args[ARGS_HEX_EDITOR]:
-        with IoHelper.dup_stdin(on_windows_os, u_args[ARGS_STDIN]):
+        with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
             for file in known_files:
                 HexEditor.open(file, u_files.get_file_display_name(file))
 

@@ -76,5 +76,5 @@ class TestStdInHelper(TestCase):
         self.assertEqual(''.join(IoHelper.get_stdin_content(False)), 'hello\nworld')
 
     def test_dup_stdin_do_not_dup(self):
-        with IoHelper.dup_stdin(True, False) as dup:
+        with IoHelper.dup_stdin(False) as dup:
             self.assertEqual(dup, None)

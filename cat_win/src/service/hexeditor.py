@@ -15,6 +15,7 @@ import sys
 from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.service.helper.editorhelper import Position, UNIFY_HOTKEYS, \
     KEY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, SELECT_HOTKEYS, HEX_BYTE_KEYS
+from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
 from cat_win.src.service.clipboard import Clipboard
 from cat_win.src.service.rawviewer import get_display_char_gen
@@ -27,7 +28,6 @@ class HexEditor:
     loading_failed = False
 
     save_with_alt = False
-    on_windows_os = False
     debug_mode = False
 
     unicode_escaped_search = True
@@ -1065,7 +1065,7 @@ class HexEditor:
 
         if CURSES_MODULE_ERROR:
             err_print("The Editor could not be loaded. No Module 'curses' was found.")
-            if HexEditor.on_windows_os:
+            if on_windows_os:
                 err_print('If you are on Windows OS, try pip-installing ', end='')
                 err_print("'windows-curses'.")
             err_print()
@@ -1074,7 +1074,7 @@ class HexEditor:
 
         editor = cls(file, display_name)
 
-        if HexEditor.on_windows_os:
+        if on_windows_os:
             # disable background feature on windows
             editor._action_background = lambda *_: True
         else:
@@ -1086,7 +1086,7 @@ class HexEditor:
         return editor.changes_made
 
     @staticmethod
-    def set_flags(save_with_alt: bool, on_windows_os: bool, debug_mode: bool,
+    def set_flags(save_with_alt: bool, debug_mode: bool,
                   unicode_escaped_search: bool, columns: int) -> None:
         """
         set the config flags for the Editor
@@ -1094,8 +1094,6 @@ class HexEditor:
         Parameters:
         save_with_alt (bool):
             indicates whetcher the stdin pipe has been used (and therefor tampered)
-        on_windows_os (bool):
-            indicates if the user is on windows OS using platform.system() == 'Windows'
         debug_mode (bool)
             indicates if debug info should be displayed
         unicode_escaped_search (bool):
@@ -1104,7 +1102,6 @@ class HexEditor:
             defines how many columns the editor should have
         """
         HexEditor.save_with_alt = save_with_alt
-        HexEditor.on_windows_os = on_windows_os
         HexEditor.debug_mode = debug_mode
         HexEditor.unicode_escaped_search = unicode_escaped_search
         HexEditor.columns = columns

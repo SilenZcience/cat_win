@@ -19,6 +19,7 @@ from cat_win.src.const.regex import compile_re
 from cat_win.src.service.helper.editorhelper import History, Position, _SearchIter, \
     UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, \
         SELECT_HOTKEYS, HISTORY_HOTKEYS, INDENT_HOTKEYS, HEX_BYTE_KEYS
+from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
 from cat_win.src.service.clipboard import Clipboard
 from cat_win.src.service.rawviewer import SPECIAL_CHARS
@@ -33,7 +34,6 @@ class Editor:
     auto_indent = False
 
     save_with_alt = False
-    on_windows_os = False
     debug_mode = False
 
     unicode_escaped_search  = True
@@ -1527,7 +1527,7 @@ class Editor:
 
         if CURSES_MODULE_ERROR:
             err_print("The Editor could not be loaded. No Module 'curses' was found.")
-            if Editor.on_windows_os:
+            if on_windows_os:
                 err_print('If you are on Windows OS, try pip-installing ', end='')
                 err_print("'windows-curses'.")
             err_print()
@@ -1540,7 +1540,7 @@ class Editor:
         special_chars = dict(map(lambda x: (chr(x[0]), x[2]), SPECIAL_CHARS))
         editor._set_special_chars(special_chars)
 
-        if Editor.on_windows_os:
+        if on_windows_os:
             # disable background feature on windows
             editor._action_background = lambda *_: True
         else:
@@ -1567,7 +1567,7 @@ class Editor:
         Editor.auto_indent = auto_indent
 
     @staticmethod
-    def set_flags(save_with_alt: bool, on_windows_os: bool, debug_mode: bool,
+    def set_flags(save_with_alt: bool, debug_mode: bool,
                   unicode_escaped_search: bool, unicode_escaped_replace: bool,
                   file_encoding: str) -> None:
         """
@@ -1576,8 +1576,6 @@ class Editor:
         Parameters:
         save_with_alt (bool):
             indicates whetcher the stdin pipe has been used (and therefor tampered)
-        on_windows_os (bool):
-            indicates if the user is on windows OS using platform.system() == 'Windows'
         debug_mode (bool)
             indicates if debug info should be displayed
         unicode_escaped_search (bool):
@@ -1586,7 +1584,6 @@ class Editor:
             the file encoding to use when opening a file
         """
         Editor.save_with_alt = save_with_alt
-        Editor.on_windows_os = on_windows_os
         Editor.debug_mode = debug_mode
         Editor.unicode_escaped_search = unicode_escaped_search
         Editor.unicode_escaped_replace = unicode_escaped_replace

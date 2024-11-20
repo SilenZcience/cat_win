@@ -9,6 +9,7 @@ import io
 import os
 import sys
 
+from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.progressbar import PBar
 
 
@@ -334,7 +335,7 @@ class IoHelper:
 
 
     @staticmethod
-    def read_write_files_from_stdin(file_list: list, file_encoding: str, on_windows_os: bool,
+    def read_write_files_from_stdin(file_list: list, file_encoding: str,
                                     one_line: bool = False) -> list:
         """
         Write stdin input to multiple files.
@@ -344,9 +345,6 @@ class IoHelper:
             all files that should be written
         file_encoding (str):
             the encoding to use for writing the files
-        on_windows_os (bool):
-            indicates if the user is on windows OS using
-            platform.system() == 'Windows'
         one_line (bool):
             determines if only the first stdin line should be read
 
@@ -370,13 +368,11 @@ class IoHelper:
 
     @staticmethod
     @contextlib.contextmanager
-    def dup_stdin(on_windows_os: bool, dup: bool = True):
+    def dup_stdin(dup: bool = True):
         """
         dup the stdin so the user can interact while also piping into cat.
 
         Parameters:
-        on_windows_os (bool):
-            indicates if the current system is Windows
         dup (bool):
             is this is false the function will not do anything.
             only implemented to eliminate repeated code somewhere else
