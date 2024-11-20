@@ -818,7 +818,7 @@ class TestHexEditor(TestCase):
             self.assertEqual(editor._open(), None)
 
     @patch('cat_win.src.service.hexeditor.CURSES_MODULE_ERROR', new=True)
-    @patch('cat_win.src.service.hexeditor.HexEditor.on_windows_os', new=True)
+    @patch('cat_win.src.service.hexeditor.on_windows_os', new=True)
     def test_open_no_curses_error(self):
         with patch('sys.stderr', new=StdOutMock()) as fake_out:
             self.assertEqual(HexEditor.open('', ''), False)
@@ -830,14 +830,12 @@ class TestHexEditor(TestCase):
 
     def test_set_flags(self):
         backup_a = HexEditor.save_with_alt
-        backup_b = HexEditor.on_windows_os
-        backup_c = HexEditor.debug_mode
-        backup_d = HexEditor.unicode_escaped_search
-        backup_e = HexEditor.columns
-        HexEditor.set_flags(True, True, True, False, 1002)
+        backup_b = HexEditor.debug_mode
+        backup_c = HexEditor.unicode_escaped_search
+        backup_d = HexEditor.columns
+        HexEditor.set_flags(True, True, False, 1002)
         self.assertEqual(HexEditor.save_with_alt, True)
-        self.assertEqual(HexEditor.on_windows_os, True)
         self.assertEqual(HexEditor.debug_mode, True)
         self.assertEqual(HexEditor.unicode_escaped_search, False)
         self.assertEqual(HexEditor.columns, 1002)
-        HexEditor.set_flags(backup_a, backup_b, backup_c, backup_d, backup_e)
+        HexEditor.set_flags(backup_a, backup_b, backup_c, backup_d)

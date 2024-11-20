@@ -2,9 +2,7 @@
 clipboard
 """
 
-import os
-import sys
-
+from cat_win.src.service.helper.environment import get_py_executable
 from cat_win.src.service.helper.iohelper import err_print
 
 
@@ -52,7 +50,7 @@ class Clipboard:
             error_msg += "in order to use the '--clip' parameter.\n"
             error_msg += 'Should you have any problem with either module, '
             error_msg += 'try to install a different one using '
-            error_msg += f"'{os.path.basename(sys.executable)} -m pip install ...'"
+            error_msg += f"'{get_py_executable()} -m pip install ...'"
             err_print('\n', error_msg, sep='')
             return False
         try:
@@ -115,7 +113,7 @@ class Clipboard:
             error_msg += "in order to use the '--clip' parameter.\n"
             error_msg += 'Should you have any problem with either module, '
             error_msg += 'try to install a different one using '
-            error_msg += f"'{os.path.basename(sys.executable)} -m pip install ...'"
+            error_msg += f"'{get_py_executable()} -m pip install ...'"
             err_print('\n', error_msg, sep='')
             return
         try:

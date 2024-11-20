@@ -11,6 +11,7 @@ from cat_win.src.const.regex import compile_re
 from cat_win.src.const.regex import RE_ENCODING, RE_Q_MATCH, RE_M_ATCH, RE_Q_FIND, RE_F_IND
 from cat_win.src.const.regex import RE_Q_REPLACE, RE_R_EPLACE, RE_Q_TRUNC, RE_T_RUNC
 from cat_win.src.const.regex import RE_CUT, RE_REPLACE, RE_REPLACE_COMMA
+from cat_win.src.service.helper.environment import on_windows_os
 
 IS_FILE, IS_DIR, IS_PATTERN = range(0, 3)
 
@@ -19,12 +20,11 @@ class ArgParser:
     """
     defines the ArgParser
     """
-    def __init__(self, on_windows_os: bool = None,
-                 default_file_encoding: str = 'utf-8',
+    def __init__(self, default_file_encoding: str = 'utf-8',
                  unicode_echo: bool = True,
                  unicode_find: bool = True,
                  unicode_replace: bool = True) -> None:
-        self.win_prefix_lit = '\\\\?\\' * bool(on_windows_os)
+        self.win_prefix_lit = '\\\\?\\' * on_windows_os
         self.default_file_encoding: str = default_file_encoding
         self.unicode_echo: bool = unicode_echo
         self.unicode_find = unicode_find

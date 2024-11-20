@@ -3,11 +3,10 @@ updatechecker
 """
 
 import json
-import os
-import sys
 import urllib.request
 
 from cat_win.src.const.colorconstants import CKW
+from cat_win.src.service.helper.environment import get_py_executable
 from cat_win.src.service.helper.iohelper import err_print
 from cat_win import __url__
 
@@ -179,8 +178,7 @@ def new_version_available(current_version: str, latest_version: str) -> int:
     return status
 
 
-def print_update_information(package: str, current_version: str, color_dic: dict,
-                             on_windows_os: bool) -> None:
+def print_update_information(package: str, current_version: str, color_dic: dict) -> None:
     """
     prints update information if there are any.
 
@@ -191,15 +189,7 @@ def print_update_information(package: str, current_version: str, color_dic: dict
         a version representation as string of the current version
     color_dic (dict):
         a dictionary translating the color-keywords to ANSI-Colorcodes
-    on_windows_os (bool):
-        indicates whether the platfowm is Windows or not
     """
-    py_executable = sys.executable
-    if os.path.dirname(py_executable) in os.environ['PATH'].split(os.pathsep):
-        py_executable = os.path.basename(py_executable)
-    elif ' ' in py_executable:
-        py_executable = f'"{py_executable}"' if on_windows_os else py_executable.replace(' ', '\\ ')
-
     latest_stable_version = get_stable_package_version(package)
     if latest_stable_version == current_version:
         latest_version = get_latest_package_version(package)
@@ -218,7 +208,7 @@ def print_update_information(package: str, current_version: str, color_dic: dict
         message += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_IMPORTANT]}"
         message += 'To update, run:'
         message += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_IMPORTANT]}"
-        message += f"{py_executable} -m pip install --upgrade {package}"
+        message += f"{get_py_executable()} -m pip install --upgrade {package}"
     elif abs(status) == STATUS_PRE_RELEASE_AVAILABLE:
         message += f"{color_dic[CKW.MESSAGE_INFORMATION]}"
         message += f"A new pre-release of {package} is available: v{latest_stable_version}"
