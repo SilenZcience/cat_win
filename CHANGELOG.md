@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - added shortform `t=`, `t:` for the `trunc=`, `trunc:` parameter.
+- added `^V` hotkey to the editor to paste the contents of the clipboard.
 
 ## Bugfixes
 
