@@ -967,6 +967,7 @@ The currently supported Key Bindings are as follows:
 ||||||
 | <kbd>SelectAll/^A</kbd> | - | - | select the entire file | - |
 | <kbd>Copy/^C</kbd> | - | - | copy selected text | - |
+| <kbd>Paste/^V</kbd> | - | - | paste text from clipboard | - |
 | <kbd>Cut/^X</kbd> | - | - | cut selected text | - |
 | <kbd>Save/^S</kbd> | - | - | save changes | save changes |
 | <kbd>Transform/^T</kbd> | - | - | <a href="#transform-selected-text">transform</a> or <a href="#question-selected-text">question</a> the selected text | - |
