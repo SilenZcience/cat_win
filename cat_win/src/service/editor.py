@@ -530,10 +530,12 @@ class Editor:
             self.window_content[self.cpos.row][:self.cpos.col] + segments[-1]
         if len(segments) == 1:
             self.window_content[self.cpos.row] += end_segment
+            self.unsaved_progress = True
             return wchars_
         self.window_content.insert(self.cpos.row+1, segments[0] + end_segment)
         for row in segments[1:-1]:
             self.window_content.insert(self.cpos.row+1, row)
+        self.unsaved_progress = True
         return wchars_
 
     def _remove_chunk(self) -> None:
