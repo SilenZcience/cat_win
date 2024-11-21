@@ -973,7 +973,7 @@ The currently supported Key Bindings are as follows:
 | <kbd>Transform/^T</kbd> | - | - | <a href="#transform-selected-text">transform</a> or <a href="#question-selected-text">question</a> the selected text | - |
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to specific line | - |
 | <kbd>Find/^F</kbd> | - | - | prompt to search in the file \| toggle to search regular expressions | - |
-| <kbd>Find/^P</kbd> | - | - | prompt to replace a search in the file \| toggle to replace all | - |
+| <kbd>Replace/^P</kbd> | - | - | prompt to replace a search in the file \| toggle to replace all | - |
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
 | <kbd>Insert/^N</kbd> | - | - | Insert a byte sequence \| toggle action menu switch | - |
 | <kbd>Background/^B</kbd> | - | - | put the editor in the background</br>(UNIX only) | - |
@@ -1032,6 +1032,7 @@ The currently supported Key Bindings are as follows:
 ||||||
 | <kbd>SelectAll/^A</kbd> | - | - | select the entire file | - |
 | <kbd>Copy/^C</kbd> | - | - | copy selected bytes | - |
+| <kbd>Paste/^V</kbd> | - | - | overwrite bytes from clipboard or insert text from clipboard | - |
 | <kbd>Cut/^X</kbd> | - | - | cut selected bytes | - |
 | <kbd>Save/^S</kbd> | - | - | save changes | save changes |
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to a specific byte | - |
