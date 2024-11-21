@@ -384,16 +384,35 @@ class HexEditor:
         if not self.selecting:
             sel_from = sel_to = self.cpos.get_pos()
         sel_bytes = ''
-        for row in range(sel_from[0], sel_to[0]+1):
-            for col in range(HexEditor.columns):
-                if sel_from <= (row, col) <= sel_to:
-                    hex_byte = self.hex_array_edit[row][col]
-                    if hex_byte is None:
-                        hex_byte = self.hex_array[row][col]
-                    sel_bytes += hex_byte
+        for row, col in HexEditor.pos_between(sel_from, sel_to):
+            hex_byte = self.hex_array_edit[row][col]
+            if hex_byte is None:
+                hex_byte = self.hex_array[row][col]
+            sel_bytes += hex_byte
         self.error_bar = self.error_bar if (
             Clipboard.put(sel_bytes)
         ) else 'An error occured copying the selected bytes to the clipboard!'
+        return True
+
+    def _action_paste(self) -> bool:
+        clipboard = Clipboard.get()
+        if clipboard is None:
+            self.error_bar = 'An error occured pasting the clipboard!'
+            return True
+        max_y, _ = self.getxymax()
+        i_chars = clipboard.encode('utf-16', 'surrogatepass').decode('utf-16')
+        if self.hex_array_edit[self.cpos.row][self.cpos.col] in ['--', None] and \
+            self.hex_array[self.cpos.row][self.cpos.col] == '--':
+            for i_char in i_chars:
+                for byte_ in i_char.encode():
+                    self._fix_cursor_position(max_y)
+                    self.hex_array_edit[self.cpos.row][self.cpos.col] = f"{byte_:02X}"
+                    self._insert_byte('>')
+        else:
+            for i_char in i_chars.upper():
+                if i_char in HEX_BYTE_KEYS:
+                    self._key_string(i_char)
+        self.unsaved_progress = True
         return True
 
     def _action_cut(self) -> bool:
@@ -879,19 +898,21 @@ class HexEditor:
             return
         # Highlight Selected Area
         sel_from, sel_to = self.selected_area
-        for row in range(max(sel_from[0], self.wpos.row), min(sel_to[0]+1, self.wpos.row+max_y)):
-            for col in range(HexEditor.columns):
-                if sel_from <= (row, col) <= sel_to:
-                    color_id = 7 if self.hex_array_edit[row][col] is None else 8
-                    if (row, col) == self.cpos.get_pos():
-                        color_id = 4 if self.hex_array_edit[row][col] is None else 6
-                    try:
-                        self.curse_window.chgat(row-self.wpos.row+2, 13 + col*3,
-                                                2, self._get_color(color_id))
-                        self.curse_window.chgat(row-self.wpos.row+2, 15 + HexEditor.columns*3 + col,
-                                                1, self._get_color(color_id))
-                    except curses.error:
-                        pass
+        for row, col in HexEditor.pos_between(sel_from, sel_to):
+            if row < self.wpos.row:
+                continue
+            if row >= self.wpos.row+max_y:
+                break
+            color_id = 7 if self.hex_array_edit[row][col] is None else 8
+            if (row, col) == self.cpos.get_pos():
+                color_id = 4 if self.hex_array_edit[row][col] is None else 6
+            try:
+                self.curse_window.chgat(row-self.wpos.row+2, 13 + col*3,
+                                        2, self._get_color(color_id))
+                self.curse_window.chgat(row-self.wpos.row+2, 15 + HexEditor.columns*3 + col,
+                                        1, self._get_color(color_id))
+            except curses.error:
+                pass
 
     def _render_search_items(self, max_y: int) -> None:
         # Highlight Search Items
