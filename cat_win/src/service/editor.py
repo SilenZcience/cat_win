@@ -901,7 +901,7 @@ class Editor:
                         tmp_error = str(exc)
                         continue
                     self.cpos.set_pos(next(search))
-                    self.search_items.append((self.cpos.row, self.cpos.col, search.s_len))
+                    self.search_items.append((*self.cpos.get_pos(), search.s_len))
                     break
                 except StopIteration:
                     if self.selecting:
@@ -1289,6 +1289,10 @@ class Editor:
             self.curse_window.clrtoeol()
             self.curse_window.move(row+1, 0)
         for row, col, length in self.search_items:
+            if row < self.wpos.row or row >= self.wpos.row+max_y:
+                continue
+            if col+length < self.wpos.col or col >= self.wpos.col+max_x:
+                continue
             self.curse_window.chgat(row-self.wpos.row, col-self.wpos.col,
                                     length, self._get_color(6))
         self.search_items.clear()
