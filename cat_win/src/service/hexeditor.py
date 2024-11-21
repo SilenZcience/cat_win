@@ -46,6 +46,7 @@ class HexEditor:
         self.edited_byte_pos = 0
 
         self.search = ''
+        self.search_items = []
 
         self.status_bar_size = 1
         self.error_bar = ''
@@ -584,6 +585,7 @@ class HexEditor:
                     continue
                 if search_result >= 0:
                     self.cpos.col += search_result+1-self.selecting
+                    self.search_items.append((*self.cpos.get_pos(), len(self.search)))
                     break
                 # check rest of file until back at current line
                 c_row = self.cpos.row
@@ -598,6 +600,7 @@ class HexEditor:
                     if search_result >= 0:
                         self.cpos.row = c_row_wrapped
                         self.cpos.col = search_result
+                        self.search_items.append((*self.cpos.get_pos(), len(self.search)))
                         break
                 else:
                     tmp_error = 'no matches were found!'
@@ -890,6 +893,31 @@ class HexEditor:
                     except curses.error:
                         pass
 
+    def _render_search_items(self, max_y: int) -> None:
+        # Highlight Search Items
+        for row, col, length in self.search_items:
+            e_row = row + (col+length//2 - 1) // HexEditor.columns
+            e_col = (col+length//2 - 1) % HexEditor.columns
+
+            for p_row, p_col in HexEditor.pos_between((row, col), (e_row, e_col)):
+                if p_row < self.wpos.row or p_row >= self.wpos.row+max_y:
+                    break
+                self.curse_window.chgat(p_row-self.wpos.row+2, 13 + p_col*3,
+                                        2, self._get_color(9))
+                self.curse_window.chgat(p_row-self.wpos.row+2, 15 + HexEditor.columns*3 + p_col,
+                                        1, self._get_color(9))
+            if length%2:
+                e_row = row + (col+length//2) // HexEditor.columns
+                e_col = (col+length//2) % HexEditor.columns
+                if e_row < self.wpos.row or e_row >= self.wpos.row+max_y:
+                    continue
+                self.curse_window.chgat(e_row-self.wpos.row+2, 13 + e_col*3,
+                                        1, self._get_color(9))
+                self.curse_window.chgat(e_row-self.wpos.row+2, 15 + HexEditor.columns*3 + e_col,
+                                        1, self._get_color(9))
+
+        self.search_items.clear()
+
     def _render_status_bar(self, max_y: int, max_x: int) -> None:
         # Draw status/error_bar
         try:
@@ -932,6 +960,7 @@ class HexEditor:
         self._render_highlight_selection()
         self._render_highlight_edits(max_y)
         self._render_highlight_selected_area(max_y)
+        self._render_search_items(max_y)
         self._render_status_bar(max_y, max_x)
 
         self.curse_window.refresh()
@@ -996,21 +1025,23 @@ class HexEditor:
             if curses.can_change_color():
                 curses.use_default_colors()
                 # status_bar
-                curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+                curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE )
                 # error_bar
-                curses.init_pair(2, curses.COLOR_RED  , curses.COLOR_WHITE)
+                curses.init_pair(2, curses.COLOR_RED  , curses.COLOR_WHITE )
                 # prompts
-                curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_RED  )
+                curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_RED   )
                 # selected byte
-                curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_WHITE)
+                curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_WHITE )
                 # edited byte
-                curses.init_pair(5, curses.COLOR_RED  , curses.COLOR_BLACK)
+                curses.init_pair(5, curses.COLOR_RED  , curses.COLOR_BLACK )
                 # selected and edited byte
-                curses.init_pair(6, curses.COLOR_RED  , curses.COLOR_WHITE)
+                curses.init_pair(6, curses.COLOR_RED  , curses.COLOR_WHITE )
                 # selected area
                 curses.init_pair(7, curses.COLOR_BLACK, curses.COLOR_YELLOW)
                 # selected area and edited byte
-                curses.init_pair(8, curses.COLOR_RED, curses.COLOR_YELLOW)
+                curses.init_pair(8, curses.COLOR_RED  , curses.COLOR_YELLOW)
+                # find (& replace)
+                curses.init_pair(9, curses.COLOR_WHITE, curses.COLOR_BLUE  )
         curses.raw()
         self.curse_window.nodelay(False)
 
