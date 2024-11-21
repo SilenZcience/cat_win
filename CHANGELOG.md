@@ -9,10 +9,12 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - added shortform `t=`, `t:` for the `trunc=`, `trunc:` parameter.
 - added `^V` hotkey to the editor to paste the contents of the clipboard.
+- the find and replace in the hex-editor is now shortly highlighted.
 
 ## Bugfixes
 
 - fixed Bug where the color config would allow certain invalid inputs.
+- fixed Bug where the editor would crash when certain elements were all being replaced.
 
 
 ## [1.10.0] - 2024-11-15
