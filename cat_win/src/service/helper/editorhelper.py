@@ -177,15 +177,19 @@ UNIFY_HOTKEYS = {
     b'^V'           : b'_action_paste',
     b'^X'           : b'_action_cut',
     b'KEY_RESIZE'   : b'_action_resize',
+
+    b'KEY_F(1)'     : b'_function_help',
+    b'KEY_F(3)'     : b'_function_next',
 } # translates key-inputs to pre-defined actions/methods
 
-KEY_HOTKEYS     = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_key'    ))
-INDENT_HOTKEYS  = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_indent' ))
-ACTION_HOTKEYS  = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_action' ))
-SCROLL_HOTKEYS  = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_scroll' ))
-MOVE_HOTKEYS    = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_move'   ))
-HISTORY_HOTKEYS = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_history'))
-SELECT_HOTKEYS  = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_select' ))
+KEY_HOTKEYS      = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_key'     ))
+INDENT_HOTKEYS   = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_indent'  ))
+ACTION_HOTKEYS   = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_action'  ))
+SCROLL_HOTKEYS   = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_scroll'  ))
+MOVE_HOTKEYS     = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_move'    ))
+HISTORY_HOTKEYS  = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_history' ))
+SELECT_HOTKEYS   = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_select'  ))
+FUNCTION_HOTKEYS = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_function'))
 
 REVERSE_ACTION = {
     b'_key_dc'             : b'_key_string',
