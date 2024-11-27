@@ -18,7 +18,7 @@ from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.const.regex import compile_re
 from cat_win.src.service.helper.editorhelper import History, Position, _SearchIter, \
     UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, \
-        SELECT_HOTKEYS, HISTORY_HOTKEYS, INDENT_HOTKEYS, HEX_BYTE_KEYS
+        SELECT_HOTKEYS, HISTORY_HOTKEYS, INDENT_HOTKEYS, FUNCTION_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
 from cat_win.src.service.clipboard import Clipboard
@@ -833,7 +833,7 @@ class Editor:
                 break
         return True
 
-    def _action_find(self) -> bool:
+    def _action_find(self, find_next: bool = False) -> bool:
         """
         handles the find in editor action.
 
@@ -845,6 +845,7 @@ class Editor:
 
         search_regex = not isinstance(self.search, str)
         wchar, sub_s, tmp_error = '', '', ''
+        key = b'_key_enter'
         while str(wchar) != ESC_CODE:
             pre_s = ''
             if self.search and isinstance(self.search, str):
@@ -852,8 +853,9 @@ class Editor:
             elif self.search:
                 pre_s = f" re:[{repr(self.search.pattern)[1:-1]}]"
             rep_r = 'Match' if search_regex else 'Search for'
-            self._action_render_scr(f"Confirm: 'ENTER' - {rep_r}{pre_s}: {sub_s}␣", tmp_error)
-            wchar, key = next(self.get_char)
+            if not find_next:
+                self._action_render_scr(f"Confirm: 'ENTER' - {rep_r}{pre_s}: {sub_s}␣", tmp_error)
+                wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
@@ -1177,6 +1179,62 @@ class Editor:
         self.curse_window.clear()
         return True
 
+    def _function_help(self) -> None:
+        curses.curs_set(0)
+        self.curse_window.move(0, 0)
+        self.curse_window.clear()
+        coff = 20
+
+        help_text = [
+            f"{'F1':<{coff}}help",
+            '',
+            f"{'^A':<{coff}}select all",
+            f"{'^C':<{coff}}copy selection",
+            f"{'^X':<{coff}}cut selection",
+            f"{'^V':<{coff}}paste from clipboard",
+            '',
+            f"{'^Z':<{coff}}undo",
+            f"{'^Y':<{coff}}redo",
+            '',
+            f"{'^E':<{coff}}jump to line",
+            f"{'^T':<{coff}}transform",
+            f"{'^N':<{coff}}insert byte sequence",
+            f"{'^F':<{coff}}find strings or patterns",
+            f"{'F3':<{coff}}find next",
+            f"{'^P':<{coff}}replace string or pattern",
+            '',
+            f"{'(Shift-)Tab':<{coff}}(de-)indent",
+            '',
+            f"{'^S':<{coff}}save file",
+            f"{'^R':<{coff}}reload file",
+            '',
+            f"{'^B':<{coff}}put editor in background",
+            f"{'^D':<{coff}}interrupt/force close",
+            f"{'^Q':<{coff}}quit",
+        ]
+        max_y, max_x = self.getxymax()
+        coff = ' ' * ((max_x - max(len(line) for line in help_text)) // 2)
+        for row, line in enumerate(
+            help_text,
+            start = max(
+                (max_y+self.status_bar_size-len(help_text)) // 2,
+                0
+            )
+        ):
+            try:
+                self.curse_window.addstr(row, 0, coff + f"{line}")
+            except curses.error:
+                self.curse_window.addstr(row-1, 0, coff + '...')
+                self.curse_window.clrtoeol()
+                break
+        self.curse_window.refresh()
+        next(self.get_char)
+
+    def _function_next(self) -> None:
+        if not self.search:
+            return
+        self._action_find(True)
+
     def _get_new_char(self):
         """
         get next char
@@ -1413,7 +1471,7 @@ class Editor:
                         self.scrolling = True
                         getattr(self, key.decode(), lambda *_: None)()
                     # moving the cursor:
-                    elif key in MOVE_HOTKEYS | HISTORY_HOTKEYS:
+                    elif key in MOVE_HOTKEYS | HISTORY_HOTKEYS | FUNCTION_HOTKEYS:
                         getattr(self, key.decode(), lambda *_: None)()
                     # select text:
                     if key in SELECT_HOTKEYS:

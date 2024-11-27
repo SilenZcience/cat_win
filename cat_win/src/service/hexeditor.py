@@ -15,7 +15,7 @@ import sys
 from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.service.helper.editorhelper import Position, _SearchIterHex, \
     UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, SELECT_HOTKEYS, \
-        HEX_BYTE_KEYS
+        FUNCTION_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
 from cat_win.src.service.clipboard import Clipboard
@@ -510,7 +510,7 @@ class HexEditor:
                 break
         return True
 
-    def _action_find(self) -> bool:
+    def _action_find(self, find_next: bool = False) -> bool:
         """
         handles the find in editor action.
 
@@ -521,6 +521,7 @@ class HexEditor:
         search_byte_mode, bm_ind = True, '0x'
         sub_s_encoded = self.search
         wchar, sub_s, tmp_error= '', '', ''
+        key = b'_key_enter'
         while str(wchar) != ESC_CODE:
             pre_s = ''
             if self.search:
@@ -530,9 +531,10 @@ class HexEditor:
                         pre_s = f" [{bm_ind}{repr(bytes.fromhex(self.search))[2:-1]}]"
                     except ValueError:
                         pass
-            self._action_render_scr(f"Confirm: 'ENTER' - Search for{pre_s}: {bm_ind}{sub_s}␣",
-                                    tmp_error)
-            wchar, key = self._get_next_char()
+            if not find_next:
+                self._action_render_scr(f"Confirm: 'ENTER' - Search for{pre_s}: {bm_ind}{sub_s}␣",
+                                        tmp_error)
+                wchar, key = self._get_next_char()
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
@@ -751,6 +753,58 @@ class HexEditor:
             pass
         self.curse_window.clear()
         return True
+
+
+    def _function_help(self) -> None:
+        curses.curs_set(0)
+        self.curse_window.move(0, 0)
+        self.curse_window.clear()
+        coff = 20
+
+        help_text = [
+            f"{'F1':<{coff}}help",
+            '',
+            f"{'^A':<{coff}}select all",
+            f"{'^C':<{coff}}copy selection",
+            f"{'^X':<{coff}}cut selection",
+            f"{'^V':<{coff}}paste from clipboard",
+            '',
+            f"{'^E':<{coff}}jump to offset",
+            f"{'^N':<{coff}}insert text sequence",
+            f"{'^F':<{coff}}find bytes or strings",
+            f"{'F3':<{coff}}find next",
+            '',
+            f"{'Space > <':<{coff}}insert new byte",
+            '',
+            f"{'^S':<{coff}}save file",
+            f"{'^R':<{coff}}reload file",
+            '',
+            f"{'^B':<{coff}}put editor in background",
+            f"{'^D':<{coff}}interrupt/force close",
+            f"{'^Q':<{coff}}quit",
+        ]
+        max_y, max_x = self.getxymax()
+        coff = ' ' * ((max_x - max(len(line) for line in help_text)) // 2)
+        for row, line in enumerate(
+            help_text,
+            start = max(
+                (max_y+self.status_bar_size+3-len(help_text)) // 2,
+                0
+            )
+        ):
+            try:
+                self.curse_window.addstr(row, 0, coff + f"{line}")
+            except curses.error:
+                self.curse_window.addstr(row-1, 0, coff + '...')
+                self.curse_window.clrtoeol()
+                break
+        self.curse_window.refresh()
+        self._get_next_char()
+
+    def _function_next(self) -> None:
+        if not self.search:
+            return
+        self._action_find(True)
 
     def _get_next_char(self) -> tuple:
         """
@@ -1008,7 +1062,7 @@ class HexEditor:
                 getattr(self, key.decode(), lambda *_: None)(wchar)
             elif key in ACTION_HOTKEYS:
                 running &= getattr(self, key.decode(), lambda *_: True)()
-            elif key in MOVE_HOTKEYS:
+            elif key in MOVE_HOTKEYS | FUNCTION_HOTKEYS:
                 getattr(self, key.decode(), lambda *_: None)()
             # select bytes:
             if key in SELECT_HOTKEYS:
