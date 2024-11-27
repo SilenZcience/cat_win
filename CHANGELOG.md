@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.10.2] - TBA
+
+### Minor Changes
+
+- added `F1` hotkey to the (hex-)editor to display a help-message containing the keybindings.
+- added `F3` hotkey to the (hex-)editor to jump to the next found search-element (find next).
+
 ## [1.10.1] - 2024-11-23
 
 ### Minor Changes
