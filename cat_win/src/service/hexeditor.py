@@ -13,8 +13,9 @@ import signal
 import sys
 
 from cat_win.src.const.escapecodes import ESC_CODE
-from cat_win.src.service.helper.editorhelper import Position, UNIFY_HOTKEYS, \
-    KEY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, SELECT_HOTKEYS, HEX_BYTE_KEYS
+from cat_win.src.service.helper.editorhelper import Position, _SearchIterHex, \
+    UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, SELECT_HOTKEYS, \
+        HEX_BYTE_KEYS
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
 from cat_win.src.service.clipboard import Clipboard
@@ -46,7 +47,7 @@ class HexEditor:
         self.edited_byte_pos = 0
 
         self.search = ''
-        self.search_items = []
+        self.search_items: dict = {}
 
         self.status_bar_size = 1
         self.error_bar = ''
@@ -517,19 +518,6 @@ class HexEditor:
         (bool):
             indicates if the editor should keep running
         """
-        def find_bytes(row: int, col: int = 0) -> int:
-            search_in = ''.join(self._get_current_state_row(row)[col:])
-            search_wrap = ''
-            while len(self.search)-1 > len(search_wrap) and row < len(self.hex_array)-1:
-                row += 1
-                search_wrap += ''.join(self._get_current_state_row(row))
-            search_in += search_wrap[:len(self.search)-1]
-
-            for i in range(0, len(search_in), 2):
-                if search_in[i:].startswith(self.search):
-                    return i//2
-            return -1
-
         search_byte_mode, bm_ind = True, '0x'
         sub_s_encoded = self.search
         wchar, sub_s, tmp_error= '', '', ''
@@ -591,45 +579,35 @@ class HexEditor:
                 sub_s_encoded = self.search
 
                 cpos_tmp, spos_tmp = self.cpos.get_pos(), self.spos.get_pos()
-                sel_pos_a, sel_pos_b = self.selected_area
-                if self.selecting and self.cpos.get_pos() == sel_pos_b:
-                    self.cpos.set_pos(sel_pos_a)
-                    self.spos.set_pos(sel_pos_b)
-                # check current line
-                search_result = find_bytes(self.cpos.row, self.cpos.col+1-self.selecting)
-                if self.selecting and (self.cpos.row, self.cpos.col+search_result) > sel_pos_b:
-                    self.cpos.set_pos(cpos_tmp)
-                    self.spos.set_pos(spos_tmp)
-                    tmp_error = 'no matches were found within the selection!'
-                    continue
-                if search_result >= 0:
-                    self.cpos.col += search_result+1-self.selecting
-                    self.search_items.append((*self.cpos.get_pos(), len(self.search)))
+                try:
+                    sel_pos_a, sel_pos_b = self.selected_area
+                    if self.selecting and self.cpos.get_pos() == sel_pos_b:
+                        self.cpos.set_pos(sel_pos_a)
+                        self.spos.set_pos(sel_pos_b)
+                    try:
+                        search = _SearchIterHex(self, 1-self.selecting)
+                    except ValueError as exc:
+                        tmp_error = str(exc)
+                        continue
+                    max_y, _ = self.getxymax()
+                    cpos = next(search)
+                    self.search_items[cpos] = search.s_len
+                    if not self.selecting:
+                        self.cpos.set_pos((max(cpos[0]-max_y, 0), 0))
+                    search = _SearchIterHex(self, 1)
+                    for search_pos in search:
+                        if search_pos[0] < cpos[0]-max_y or search_pos[0] > cpos[0]+max_y:
+                            break
+                        self.cpos.set_pos(search_pos)
+                        self.search_items[search_pos] = search.s_len
+                    self.cpos.set_pos(cpos)
                     break
-                # check rest of file until back at current line
-                c_row = self.cpos.row
-                while c_row < self.cpos.row+len(self.hex_array):
-                    if c_row+1 >= len(self.hex_array):
-                        self._build_file_upto(c_row+31)
-                    c_row += 1
-                    c_row_wrapped = c_row%len(self.hex_array)
-                    search_result = find_bytes(c_row_wrapped)
-                    if self.selecting and (c_row, search_result) > sel_pos_b:
-                        break
-                    if search_result >= 0:
-                        self.cpos.row = c_row_wrapped
-                        self.cpos.col = search_result
-                        self.search_items.append((*self.cpos.get_pos(), len(self.search)))
-                        break
-                else:
-                    tmp_error = 'no matches were found!'
-                    continue
-                if self.selecting and (c_row, search_result) > sel_pos_b:
-                    self.cpos.set_pos(cpos_tmp)
-                    self.spos.set_pos(spos_tmp)
-                    tmp_error = 'no matches were found within the selection!'
-                    continue
-                break
+                except StopIteration:
+                    if self.selecting:
+                        self.cpos.set_pos(cpos_tmp)
+                        self.spos.set_pos(spos_tmp)
+                    tmp_error = 'no matches were found'
+                    tmp_error+= ' within the selection!' if self.selecting else '!'
         return True
 
     def _action_reload(self) -> bool:
@@ -916,26 +894,54 @@ class HexEditor:
 
     def _render_search_items(self, max_y: int) -> None:
         # Highlight Search Items
-        for row, col, length in self.search_items:
+        for (row, col), length in self.search_items.items():
             e_row = row + (col+length//2 - 1) // HexEditor.columns
             e_col = (col+length//2 - 1) % HexEditor.columns
 
             for p_row, p_col in HexEditor.pos_between((row, col), (e_row, e_col)):
-                if p_row < self.wpos.row or p_row >= self.wpos.row+max_y:
+                if p_row < self.wpos.row:
+                    continue
+                if p_row >= self.wpos.row+max_y:
                     break
                 self.curse_window.chgat(p_row-self.wpos.row+2, 13 + p_col*3,
                                         2, self._get_color(9))
                 self.curse_window.chgat(p_row-self.wpos.row+2, 15 + HexEditor.columns*3 + p_col,
                                         1, self._get_color(9))
-            if length%2:
-                e_row = row + (col+length//2) // HexEditor.columns
-                e_col = (col+length//2) % HexEditor.columns
-                if e_row < self.wpos.row or e_row >= self.wpos.row+max_y:
-                    continue
-                self.curse_window.chgat(e_row-self.wpos.row+2, 13 + e_col*3,
-                                        1, self._get_color(9))
-                self.curse_window.chgat(e_row-self.wpos.row+2, 15 + HexEditor.columns*3 + e_col,
-                                        1, self._get_color(9))
+            else:
+                if length%2:
+                    e_row = row + (col+length//2) // HexEditor.columns
+                    e_col = (col+length//2) % HexEditor.columns
+                    if e_row < self.wpos.row or e_row >= self.wpos.row+max_y:
+                        continue
+                    self.curse_window.chgat(e_row-self.wpos.row+2, 13 + e_col*3,
+                                            1, self._get_color(9))
+                    self.curse_window.chgat(e_row-self.wpos.row+2, 15 + HexEditor.columns*3 + e_col,
+                                            1, self._get_color(9))
+
+        if self.cpos.get_pos() in self.search_items:
+            row, col = self.cpos.get_pos()
+            length = self.search_items[self.cpos.get_pos()]
+            e_row = row + (col+length//2 - 1) // HexEditor.columns
+            e_col = (col+length//2 - 1) % HexEditor.columns
+
+            for p_row, p_col in HexEditor.pos_between((row, col), (e_row, e_col)):
+                if p_row >= self.wpos.row+max_y:
+                    break
+                self.curse_window.chgat(p_row-self.wpos.row+2, 13 + p_col*3,
+                                        2, self._get_color(10))
+                self.curse_window.chgat(p_row-self.wpos.row+2,
+                                        15 + HexEditor.columns*3 + p_col,
+                                        1, self._get_color(10))
+            else:
+                if length%2:
+                    e_row = row + (col+length//2) // HexEditor.columns
+                    e_col = (col+length//2) % HexEditor.columns
+                    if self.wpos.row <= e_row < self.wpos.row+max_y:
+                        self.curse_window.chgat(e_row-self.wpos.row+2, 13 + e_col*3,
+                                                1, self._get_color(10))
+                        self.curse_window.chgat(e_row-self.wpos.row+2,
+                                                15 + HexEditor.columns*3 + e_col,
+                                                1, self._get_color(10))
 
         self.search_items.clear()
 
@@ -1063,6 +1069,8 @@ class HexEditor:
                 curses.init_pair(8, curses.COLOR_RED  , curses.COLOR_YELLOW)
                 # find (& replace)
                 curses.init_pair(9, curses.COLOR_WHITE, curses.COLOR_BLUE  )
+                # find (& replace) current match
+                curses.init_pair(10, curses.COLOR_BLACK, curses.COLOR_GREEN )
         curses.raw()
         self.curse_window.nodelay(False)
 
