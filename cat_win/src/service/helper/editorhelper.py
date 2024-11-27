@@ -469,10 +469,11 @@ class _SearchIter:
     inspired by:
     # -------- https://github.com/asottile/babi -------- #
     """
-    def __init__(self, editor, offset: int) -> None:
+    def __init__(self, editor, offset: int, replacing: bool = False) -> None:
         self.editor = editor
         self.offset = offset
         self.empty_match_offset = 0
+        self.replacing = replacing
         self.wrapped = False
         self._start_y = editor.cpos.row
         self._start_x = editor.cpos.col + offset
@@ -513,12 +514,12 @@ class _SearchIter:
             (row, f_col) >= self.editor.spos.get_pos()
         ):
             raise StopIteration()
-        if self.wrapped and row == self._start_y:
+        if self.replacing and self.wrapped and row == self._start_y:
             # offset highlights and start positions
-            self.editor.search_items = [
-                (r, c+self.r_len-self.s_len, l) if r == row and c >= self._start_x else (r, c, l)
-                for r, c, l in self.editor.search_items
-            ]
+            self.editor.search_items = {
+                ((r, c+self.r_len-self.s_len) if r == row and c >= self._start_x else (r, c)): l
+                for (r, c), l in self.editor.search_items.items()
+            }
             self._start_x += self.r_len-self.s_len
         self.yielded_result = True
         return (row, f_col)
@@ -549,6 +550,79 @@ class _SearchIter:
             self.wrapped = True
             for line_y in range(0, self._start_y + 1):
                 found_pos = self._get_next_pos(self.editor.window_content[line_y])
+                if found_pos >= 0:
+                    return self._stop_if_past_original(line_y, found_pos)
+        raise StopIteration()
+
+class _SearchIterHex:
+    """
+    inspired by:
+    # -------- https://github.com/asottile/babi -------- #
+    """
+    def __init__(self, editor, offset: int) -> None:
+        self.editor = editor
+        self.offset = offset
+        self.wrapped = False
+        self._start_y = editor.cpos.row
+        self._start_x = editor.cpos.col + offset
+        self.yielded_result = False
+        self.search = self.editor.search
+        self.s_len = len(self.search)
+
+    def __iter__(self):
+        return self
+
+    def _get_next_pos(self, row: int, col: int = 0):
+        search_in = ''.join(self.editor._get_current_state_row(row)[col:])
+        search_wrap = ''
+        while len(self.search)-1 > len(search_wrap) and row < len(self.editor.hex_array)-1:
+            row += 1
+            search_wrap += ''.join(self.editor._get_current_state_row(row))
+        search_in += search_wrap[:len(self.search)-1]
+
+        for i in range(0, len(search_in), 2):
+            if search_in[i:].startswith(self.search):
+                return i//2
+        return -1
+
+    def _stop_if_past_original(self, row: int, f_col: int) -> tuple:
+        if self.wrapped and (
+            row > self._start_y or
+            row == self._start_y and f_col >= self._start_x
+        ):
+            raise StopIteration()
+        if self.editor.selecting and (
+            (row, f_col) >= self.editor.spos.get_pos()
+        ):
+            raise StopIteration()
+        self.yielded_result = True
+        return (row, f_col)
+
+    def __next__(self) -> tuple:
+        row = self.editor.cpos.row
+        col = self.editor.cpos.col + self.offset
+
+        found_pos = self._get_next_pos(row, col)
+        if found_pos >= 0:
+            return self._stop_if_past_original(row, found_pos+col)
+        if self.wrapped:
+            for line_y in range(row + 1, self._start_y + 1):
+                found_pos = self._get_next_pos(line_y)
+                if found_pos >= 0:
+                    return self._stop_if_past_original(line_y, found_pos)
+        else:
+            content_len = -1
+            while content_len != len(self.editor.hex_array):
+                content_len = len(self.editor.hex_array)
+                for line_y in range(row + 1, len(self.editor.hex_array)):
+                    found_pos = self._get_next_pos(line_y)
+                    if found_pos >= 0:
+                        return self._stop_if_past_original(line_y, found_pos)
+            if self.editor.selecting:
+                raise StopIteration()
+            self.wrapped = True
+            for line_y in range(0, self._start_y + 1):
+                found_pos = self._get_next_pos(line_y)
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
         raise StopIteration()

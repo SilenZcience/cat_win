@@ -63,7 +63,7 @@ class Editor:
         self.special_chars: dict = {}
         self.search  = '' # str | re.Pattern
         self.replace = ''
-        self.search_items = []
+        self.search_items: dict = {}
 
         self.status_bar_size = 1
         self.error_bar = ''
@@ -880,6 +880,8 @@ class Editor:
                 sub_s += wchar
             elif key == b'_key_enter':
                 self.search = sub_s if sub_s else self.search
+                if not self.search:
+                    break
                 if Editor.unicode_escaped_search and sub_s:
                     try:
                         self.search = sub_s.encode().decode('unicode_escape').encode('latin-1').decode()
@@ -902,14 +904,25 @@ class Editor:
                     except ValueError as exc:
                         tmp_error = str(exc)
                         continue
-                    self.cpos.set_pos(next(search))
-                    self.search_items.append((*self.cpos.get_pos(), search.s_len))
+                    max_y, _ = self.getxymax()
+                    cpos = next(search)
+                    self.search_items[cpos] = search.s_len
+                    if not self.selecting:
+                        self.cpos.set_pos((max(cpos[0]-max_y, 0), 0))
+                    search = _SearchIter(self, 1)
+                    for search_pos in search:
+                        if search_pos[0] < cpos[0]-max_y or search_pos[0] > cpos[0]+max_y:
+                            break
+                        self.cpos.set_pos(search_pos)
+                        self.search_items[search_pos] = search.s_len
+                    self.cpos.set_pos(cpos)
                     break
                 except StopIteration:
                     if self.selecting:
                         self.cpos.set_pos(cpos_tmp)
                         self.spos.set_pos(spos_tmp)
-                    tmp_error = 'no matches were found!'
+                    tmp_error = 'no matches were found'
+                    tmp_error+= ' within the selection!' if self.selecting else '!'
         return True
 
     def _action_replace(self) -> bool:
@@ -983,22 +996,25 @@ class Editor:
                     self.cpos.set_pos(sel_pos_a)
                     self.spos.set_pos(sel_pos_b)
                 try:
-                    search = _SearchIter(self, 0)
+                    search = _SearchIter(self, 0, True)
                 except ValueError as exc:
                     tmp_error = str(exc)
                     continue
-                for found_row, found_col in search:
-                    self.cpos.set_pos((found_row,found_col))
-                    self.search_items.append((self.cpos.row, self.cpos.col, search.r_len))
+                for search_pos in search:
+                    self.cpos.set_pos(search_pos)
+                    self.search_items[search_pos] = search.r_len
                     self._replace_search(self.search, self.replace, search)
                     if not replace_all:
                         break
+                else:
+                    self.cpos.col -= search.r_len
                 if self.selecting:
                     self.cpos.set_pos(cpos_tmp)
                     self.spos.set_pos(spos_tmp)
                 if search.yielded_result:
                     break
-                tmp_error = 'no matches were found!'
+                tmp_error = 'no matches were found'
+                tmp_error+= ' within the selection!' if self.selecting else '!'
         return True
 
     def _action_reload(self) -> bool:
@@ -1290,13 +1306,28 @@ class Editor:
                     self.curse_window.addch(row, col, '�', self._get_color(3))
             self.curse_window.clrtoeol()
             self.curse_window.move(row+1, 0)
-        for row, col, length in self.search_items:
+
+        for (row, col), length in self.search_items.items():
             if row < self.wpos.row or row >= self.wpos.row+max_y:
                 continue
             if col+length < self.wpos.col or col >= self.wpos.col+max_x:
                 continue
-            self.curse_window.chgat(row-self.wpos.row, col-self.wpos.col,
-                                    length, self._get_color(6))
+            if col < self.wpos.col:
+                length -= self.wpos.col - col
+                col = self.wpos.col
+            self.curse_window.chgat(
+                row-self.wpos.row,
+                col-self.wpos.col,
+                length,
+                self._get_color(6)
+            )
+        if self.cpos.get_pos() in self.search_items:
+            self.curse_window.chgat(
+                self.cpos.row-self.wpos.row,
+                self.cpos.col-self.wpos.col,
+                self.search_items[self.cpos.get_pos()],
+                self._get_color(4)
+            )
         self.search_items.clear()
 
         # display status/error_bar
@@ -1468,7 +1499,7 @@ class Editor:
                 curses.init_pair(2, curses.COLOR_RED  , curses.COLOR_WHITE )
                 # special char (not printable or ws) & prompts
                 curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_RED   )
-                # tab-char
+                # tab-char & current match
                 curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_GREEN )
                 # selection
                 curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_YELLOW)
