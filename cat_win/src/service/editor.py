@@ -1204,6 +1204,7 @@ class Editor:
             f"{'^F':<{coff}}find strings or patterns",
             f"{'F3':<{coff}}find next",
             f"{'^P':<{coff}}replace string or pattern",
+            f"{'F2':<{coff}}replace next",
             '',
             f"{'(Shift-)Tab':<{coff}}(de-)indent",
             '',
