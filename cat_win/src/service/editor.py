@@ -847,13 +847,13 @@ class Editor:
         wchar, sub_s, tmp_error = '', '', ''
         key = b'_key_enter'
         while str(wchar) != ESC_CODE:
-            pre_s = ''
-            if self.search and isinstance(self.search, str):
-                pre_s = f" [{repr(self.search)[1:-1]}]"
-            elif self.search:
-                pre_s = f" re:[{repr(self.search.pattern)[1:-1]}]"
-            rep_r = 'Match' if search_regex else 'Search for'
             if not find_next:
+                pre_s = ''
+                if self.search and isinstance(self.search, str):
+                    pre_s = f" [{repr(self.search)[1:-1]}]"
+                elif self.search:
+                    pre_s = f" re:[{repr(self.search.pattern)[1:-1]}]"
+                rep_r = 'Match' if search_regex else 'Search for'
                 self._action_render_scr(f"Confirm: 'ENTER' - {rep_r}{pre_s}: {sub_s}␣", tmp_error)
                 wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
@@ -927,7 +927,7 @@ class Editor:
                     tmp_error+= ' within the selection!' if self.selecting else '!'
         return True
 
-    def _action_replace(self) -> bool:
+    def _action_replace(self, replace_next: bool = False) -> bool:
         """
         handles the replace in editor action.
 
@@ -939,18 +939,20 @@ class Editor:
 
         replace_all = False
         wchar, sub_s, tmp_error = '', '', ''
+        key = b'_key_enter'
         while str(wchar) != ESC_CODE:
-            pre_s = '[]'
-            if self.search and isinstance(self.search, str):
-                pre_s = f"[{repr(self.search)[1:-1]}]"
-            elif self.search:
-                pre_s = f"re:[{repr(self.search.pattern)[1:-1]}]"
-            pre_r = f" [{repr(self.replace)[1:-1]}]" if self.replace else ''
-            rep_a = 'ALL ' if replace_all else ''
-            self._action_render_scr(
-                f"Confirm: 'ENTER' - Replace {rep_a}{pre_s} with{pre_r}: {sub_s}␣", tmp_error
-            )
-            wchar, key = next(self.get_char)
+            if not replace_next:
+                pre_s = '[]'
+                if self.search and isinstance(self.search, str):
+                    pre_s = f"[{repr(self.search)[1:-1]}]"
+                elif self.search:
+                    pre_s = f"re:[{repr(self.search.pattern)[1:-1]}]"
+                pre_r = f" [{repr(self.replace)[1:-1]}]" if self.replace else ''
+                rep_a = 'ALL ' if replace_all else ''
+                self._action_render_scr(
+                    f"Confirm: 'ENTER' - Replace {rep_a}{pre_s} with{pre_r}: {sub_s}␣", tmp_error
+                )
+                wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
@@ -1230,10 +1232,15 @@ class Editor:
         self.curse_window.refresh()
         next(self.get_char)
 
-    def _function_next(self) -> None:
+    def _function_search(self) -> None:
         if not self.search:
             return
         self._action_find(True)
+
+    def _function_replace(self) -> None:
+        if not self.search:
+            return
+        self._action_replace(True)
 
     def _get_new_char(self):
         """
