@@ -523,15 +523,15 @@ class HexEditor:
         wchar, sub_s, tmp_error= '', '', ''
         key = b'_key_enter'
         while str(wchar) != ESC_CODE:
-            pre_s = ''
-            if self.search:
-                pre_s = f" [{bm_ind}{repr(self.search)[1:-1]}]"
-                if not search_byte_mode:
-                    try:
-                        pre_s = f" [{bm_ind}{repr(bytes.fromhex(self.search))[2:-1]}]"
-                    except ValueError:
-                        pass
             if not find_next:
+                pre_s = ''
+                if self.search:
+                    pre_s = f" [{bm_ind}{repr(self.search)[1:-1]}]"
+                    if not search_byte_mode:
+                        try:
+                            pre_s = f" [{bm_ind}{repr(bytes.fromhex(self.search))[2:-1]}]"
+                        except ValueError:
+                            pass
                 self._action_render_scr(f"Confirm: 'ENTER' - Search for{pre_s}: {bm_ind}{sub_s}␣",
                                         tmp_error)
                 wchar, key = self._get_next_char()
@@ -801,7 +801,7 @@ class HexEditor:
         self.curse_window.refresh()
         self._get_next_char()
 
-    def _function_next(self) -> None:
+    def _function_search(self) -> None:
         if not self.search:
             return
         self._action_find(True)
