@@ -73,7 +73,7 @@ class Arguments:
     about the user defined arguments
     """
     def __init__(self) -> None:
-        self.args: list = []  # list of all used parameters: format [[id, param]]
+        self.args: list = []  # list of all used parameters: format [(id, param),...]
         self.args_id: dict = {}
 
     def set_args(self, args: list) -> None:
@@ -109,6 +109,31 @@ class Arguments:
         """
         self.args_id = {}
         self.set_args(diff_list(self.args, args))
+
+    def find_first(self, arg_id1: int, arg_id2: int, is_first: bool = False) -> tuple:
+        """
+        decide if an argument was passed in before another one.
+
+        Parameters:
+        arg_id1 (int):
+            the first arg to compare
+        arg_id2 (int):
+            the second arg to compare
+
+        Returns:
+        (tuple|None):
+            the argument that was passed in first or None
+            with is_first == True:
+            the first argument if it was passed in before the second one else None
+        """
+        if not self[arg_id1] and (not self[arg_id2] or is_first):
+            return None
+        for a_id, param in self.args:
+            if a_id == arg_id1:
+                return (arg_id1, param)
+            if a_id == arg_id2:
+                return None if is_first else (arg_id2, param)
+        return None
 
     def __getitem__(self, o: int) -> bool:
         return self.args_id.get(o, False)
