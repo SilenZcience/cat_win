@@ -855,21 +855,18 @@ def edit_files() -> None:
     start = len(u_files)-1 if u_args[ARGS_REVERSE] else 0
     end = -1 if u_args[ARGS_REVERSE] else len(u_files)
 
-    raw_view_mode = None
-    if u_args[ARGS_HEXVIEW] or u_args[ARGS_BINVIEW]:
-        for arg, param in u_args:
-            if arg == ARGS_HEXVIEW:
-                raw_view_mode = 'X' if param.isupper() else 'x'
-                break
-            if arg == ARGS_BINVIEW:
-                raw_view_mode = 'b'
-                break
+    raw_view_mode = u_args.find_first(ARGS_HEXVIEW, ARGS_BINVIEW)
+    if raw_view_mode is not None:
+        raw_view_mode = (
+            'b' if raw_view_mode[0] == ARGS_BINVIEW else
+            'X' if raw_view_mode[1].isupper() else 'x'
+        )
 
     for i in range(start, end, -1 if u_args[ARGS_REVERSE] else 1):
-        if raw_view_mode:
-            print_raw_view(i, raw_view_mode)
-        else:
+        if raw_view_mode is None:
             edit_file(i)
+        else:
+            print_raw_view(i, raw_view_mode)
     if u_args[ARGS_FILES] or u_args[ARGS_DIRECTORIES]:
         print()
         if u_args[ARGS_FILES]:
@@ -1091,11 +1088,11 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
         unknown_files = IoHelper.write_files(
             unknown_files, piped_input, arg_parser.file_encoding
         )
-    elif u_args[ARGS_EDITOR]:
+    elif u_args.find_first(ARGS_EDITOR, ARGS_HEX_EDITOR, True) is not None:
         unknown_files = [file for file in unknown_files if Editor.open(
             file, u_files.get_file_display_name(file), u_args[ARGS_PLAIN_ONLY]
         )]
-    elif u_args[ARGS_HEX_EDITOR]:
+    elif u_args.find_first(ARGS_HEX_EDITOR, ARGS_EDITOR, True) is not None:
         unknown_files = [file for file in unknown_files if HexEditor.open(
             file, u_files.get_file_display_name(file)
         )]
@@ -1104,11 +1101,11 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
             unknown_files, arg_parser.file_encoding, u_args[ARGS_ONELINE]
         )
 
-    if u_args[ARGS_EDITOR]:
+    if u_args.find_first(ARGS_EDITOR, ARGS_HEX_EDITOR, True) is not None:
         with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
             for file in known_files:
                 Editor.open(file, u_files.get_file_display_name(file), u_args[ARGS_PLAIN_ONLY])
-    elif u_args[ARGS_HEX_EDITOR]:
+    elif u_args.find_first(ARGS_HEX_EDITOR, ARGS_EDITOR, True) is not None:
         with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
             for file in known_files:
                 HexEditor.open(file, u_files.get_file_display_name(file))
