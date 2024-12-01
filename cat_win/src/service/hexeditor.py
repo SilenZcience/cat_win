@@ -13,7 +13,7 @@ import signal
 import sys
 
 from cat_win.src.const.escapecodes import ESC_CODE
-from cat_win.src.service.helper.editorhelper import Position, _SearchIterHex, \
+from cat_win.src.service.helper.editorhelper import Position, _SearchIterHex, frepr, \
     UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, SELECT_HOTKEYS, \
         FUNCTION_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.environment import on_windows_os
@@ -176,6 +176,13 @@ class HexEditor:
         """
         max_y, max_x = self.curse_window.getmaxyx()
         return (max_y-self.status_bar_size-3, max_x)
+
+    def _get_clipboard(self) -> bool:
+        clipboard = Clipboard.get()
+        if clipboard is None:
+            self.error_bar = 'An error occured pasting the clipboard!'
+            return None
+        return clipboard
 
     def _key_dc(self, _) -> None:
         if not self.hex_array_edit[self.cpos.row]:
@@ -396,23 +403,18 @@ class HexEditor:
         return True
 
     def _action_paste(self) -> bool:
-        clipboard = Clipboard.get()
+        clipboard = self._get_clipboard()
         if clipboard is None:
-            self.error_bar = 'An error occured pasting the clipboard!'
             return True
         max_y, _ = self.getxymax()
         i_chars = clipboard.encode('utf-16', 'surrogatepass').decode('utf-16')
-        if self.hex_array_edit[self.cpos.row][self.cpos.col] in ['--', None] and \
-            self.hex_array[self.cpos.row][self.cpos.col] == '--':
-            for i_char in i_chars:
-                for byte_ in i_char.encode():
-                    self._fix_cursor_position(max_y)
-                    self.hex_array_edit[self.cpos.row][self.cpos.col] = f"{byte_:02X}"
-                    self._insert_byte('>')
-        else:
-            for i_char in i_chars.upper():
-                if i_char in HEX_BYTE_KEYS:
-                    self._key_string(i_char)
+        insert_paste = self.hex_array_edit[self.cpos.row][self.cpos.col] in ['--', None] and \
+            self.hex_array[self.cpos.row][self.cpos.col] == '--'
+        for i_char in filter(HEX_BYTE_KEYS.__contains__, i_chars.upper()):
+            self._key_string(i_char)
+            if insert_paste and not self.edited_byte_pos%2:
+                self._insert_byte('<')
+            self._fix_cursor_position(max_y)
         self.unsaved_progress = True
         return True
 
@@ -490,6 +492,10 @@ class HexEditor:
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
+                if key == b'_action_paste':
+                    clipboard = self._get_clipboard()
+                    if clipboard is not None:
+                        l_jmp += ''.join(filter(HEX_BYTE_KEYS.__contains__, clipboard.upper()))
                 if key == b'_action_jump':
                     wchar, key = '', b'_key_enter'
                 if key == b'_action_background':
@@ -532,12 +538,21 @@ class HexEditor:
                             pre_s = f" [{bm_ind}{repr(bytes.fromhex(self.search))[2:-1]}]"
                         except ValueError:
                             pass
-                self._action_render_scr(f"Confirm: 'ENTER' - Search for{pre_s}: {bm_ind}{sub_s}␣",
-                                        tmp_error)
+                self._action_render_scr(
+                    f"Confirm: 'ENTER' - Search for{pre_s}: {bm_ind}{frepr(sub_s)}␣",
+                    tmp_error
+                )
                 wchar, key = self._get_next_char()
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
+                if key == b'_action_paste':
+                    clipboard = self._get_clipboard()
+                    if clipboard is not None:
+                        if search_byte_mode:
+                            sub_s += ''.join(filter(HEX_BYTE_KEYS.__contains__, clipboard.upper()))
+                        else:
+                            sub_s += clipboard
                 if key == b'_action_find':
                     wchar, key = '', b'_key_enter'
                 if key == b'_action_insert':
@@ -652,11 +667,15 @@ class HexEditor:
         """
         wchar, i_chars = '', ''
         while str(wchar) != ESC_CODE:
-            self._action_render_scr(f"Confirm: 'ENTER' - Insert char(s): {i_chars}␣")
+            self._action_render_scr(f"Confirm: 'ENTER' - Insert char(s): {frepr(i_chars)}␣")
             wchar, key = self._get_next_char()
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
+                if key == b'_action_paste':
+                    clipboard = self._get_clipboard()
+                    if clipboard is not None:
+                        i_chars += clipboard
                 if key == b'_action_insert':
                     wchar, key = '', b'_key_enter'
                 if key == b'_action_background':
@@ -774,7 +793,7 @@ class HexEditor:
             f"{'^F':<{coff}}find bytes or strings",
             f"{'F3':<{coff}}find next",
             '',
-            f"{'Space > <':<{coff}}insert new byte",
+            f"{'Space,>,<':<{coff}}insert new byte",
             '',
             f"{'^S':<{coff}}save file",
             f"{'^R':<{coff}}reload file",
