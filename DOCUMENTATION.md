@@ -962,23 +962,30 @@ The currently supported Key Bindings are as follows:
 | <kbd>Backspace</kbd> | delete char on the left | delete char on the left | delete word on the left | delete char on the left |
 | <kbd>Delete</kbd> | delete char on the right | delete char on the right | delete word on the right | delete char on the right |
 ||||||
-| <kbd>Undo/^Z</kbd> | - | - | undo an action | - |
-| <kbd>Redo/^Y</kbd> | - | - | redo an action | - |
+| <kbd>Help/F1</kbd> | - | - | display a help message | - |
 ||||||
 | <kbd>SelectAll/^A</kbd> | - | - | select the entire file | - |
 | <kbd>Copy/^C</kbd> | - | - | copy selected text | - |
-| <kbd>Paste/^V</kbd> | - | - | paste text from clipboard | - |
 | <kbd>Cut/^X</kbd> | - | - | cut selected text | - |
-| <kbd>Save/^S</kbd> | - | - | save changes | save changes |
-| <kbd>Transform/^T</kbd> | - | - | <a href="#transform-selected-text">transform</a> or <a href="#question-selected-text">question</a> the selected text | - |
+| <kbd>Paste/^V</kbd> | - | - | paste text from clipboard | - |
+||||||
+| <kbd>Undo/^Z</kbd> | - | - | undo an action | - |
+| <kbd>Redo/^Y</kbd> | - | - | redo an action | - |
+||||||
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to specific line | - |
-| <kbd>Find/^F</kbd> | - | - | prompt to search in the file \| toggle to search regular expressions | - |
-| <kbd>Replace/^P</kbd> | - | - | prompt to replace a search in the file \| toggle to replace all | - |
-| <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
+| <kbd>Transform/^T</kbd> | - | - | <a href="#transform-selected-text">transform</a> or <a href="#question-selected-text">question</a> the selected text | - |
 | <kbd>Insert/^N</kbd> | - | - | Insert a byte sequence \| toggle action menu switch | - |
+| <kbd>Find/^F</kbd> | - | - | prompt to search in the file \| toggle to search regular expressions | - |
+| <kbd>FindNext/F3</kbd> | - | - | jump to the next found search-element | - |
+| <kbd>Replace/^P</kbd> | - | - | prompt to replace a search in the file \| toggle to replace all | - |
+| <kbd>ReplaceNext/F2</kbd> | - | - | replace the next found search-element | - |
+||||||
+| <kbd>Save/^S</kbd> | - | - | save changes | save changes |
+| <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
+||||||
 | <kbd>Background/^B</kbd> | - | - | put the editor in the background</br>(UNIX only) | - |
-| <kbd>Quit/^Q</kbd> | - | - | close editor</br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^D</kbd> | - | - | interrupt program | - |
+| <kbd>Quit/^Q</kbd> | - | - | close editor</br>(prompt to save, if neccessary) | - |
 
 <a id="transform-selected-text">Transform</a> in the following ways:
 
@@ -1030,18 +1037,24 @@ The currently supported Key Bindings are as follows:
 | <kbd>Backspace</kbd> | reset current byte(s) | reset current byte(s) | remove current byte(s) | reset current byte(s) |
 | <kbd>Delete</kbd> | reset current byte(s) | reset current byte(s) | remove current byte(s) | reset current byte(s) |
 ||||||
+| <kbd>Help/F1</kbd> | - | - | display a help message | - |
+||||||
 | <kbd>SelectAll/^A</kbd> | - | - | select the entire file | - |
 | <kbd>Copy/^C</kbd> | - | - | copy selected bytes | - |
-| <kbd>Paste/^V</kbd> | - | - | overwrite bytes from clipboard or insert text from clipboard | - |
 | <kbd>Cut/^X</kbd> | - | - | cut selected bytes | - |
-| <kbd>Save/^S</kbd> | - | - | save changes | save changes |
+| <kbd>Paste/^V</kbd> | - | - | overwrite bytes from clipboard or insert text from clipboard | - |
+||||||
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to a specific byte | - |
-| <kbd>Find/^F</kbd> | - | - | prompt to search a byte(-sequence) in the file \| toggle to search text | - |
-| <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
 | <kbd>Insert/^N</kbd> | - | - | insert a text sequence \| toggle action menu switch | - |
+| <kbd>Find/^F</kbd> | - | - | prompt to search a byte(-sequence) in the file \| toggle to search text | - |
+| <kbd>FindNext/F3</kbd> | - | - | jump to the next found search-element | - |
+||||||
+| <kbd>Save/^S</kbd> | - | - | save changes | save changes |
+| <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
+||||||
 | <kbd>Background/^B</kbd> | - | - | put the hex-editor in the background</br>(UNIX only) | - |
-| <kbd>Quit/^Q</kbd> | - | - | close hex-editor</br>(prompt to save, if neccessary) | - |
 | <kbd>Interrupt/^D</kbd> | - | - | interrupt program | - |
+| <kbd>Quit/^Q</kbd> | - | - | close hex-editor</br>(prompt to save, if neccessary) | - |
 
 ### <a id="-m---more">-M, --more</a>
 
