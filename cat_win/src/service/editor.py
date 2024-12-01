@@ -16,7 +16,7 @@ import unicodedata
 
 from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.const.regex import compile_re
-from cat_win.src.service.helper.editorhelper import History, Position, _SearchIter, \
+from cat_win.src.service.helper.editorhelper import History, Position, _SearchIter, frepr, \
     UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, \
         SELECT_HOTKEYS, HISTORY_HOTKEYS, INDENT_HOTKEYS, FUNCTION_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.environment import on_windows_os
@@ -151,6 +151,13 @@ class Editor:
         """
         max_y, max_x = self.curse_window.getmaxyx()
         return (max_y-self.status_bar_size, max_x)
+
+    def _get_clipboard(self) -> bool:
+        clipboard = Clipboard.get()
+        if clipboard is None:
+            self.error_bar = 'An error occured pasting the clipboard!'
+            return None
+        return clipboard
 
     def _key_enter(self, _) -> str:
         new_line = self.window_content[self.cpos.row][self.cpos.col:]
@@ -641,9 +648,8 @@ class Editor:
         return True
 
     def _action_paste(self) -> bool:
-        clipboard = Clipboard.get()
+        clipboard = self._get_clipboard()
         if clipboard is None:
-            self.error_bar = 'An error occured pasting the clipboard!'
             return True
 
         if self.selecting:
@@ -748,11 +754,15 @@ class Editor:
         wchar, w_query, query_result = '', '', ''
         result_color = 2
         while str(wchar).upper() != ESC_CODE:
-            self._action_render_scr(f"Query: {w_query}␣", query_result, result_color)
+            self._action_render_scr(f"Query: {frepr(w_query)}␣", query_result, result_color)
             wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
+                if key == b'_action_paste':
+                    clipboard = self._get_clipboard()
+                    if clipboard is not None:
+                        w_query += clipboard
                 if key == b'_action_transform':
                     wchar, key = '', b'_key_enter'
                 if key == b'_action_background':
@@ -792,7 +802,7 @@ class Editor:
                     self._add_chunk(new_content)
                     break
                 else:
-                    query_result = f"'{w_query}' not found!"
+                    query_result = f"'{frepr(w_query)}' not found!"
         return True
 
     def _action_jump(self) -> bool:
@@ -812,6 +822,10 @@ class Editor:
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
+                if key == b'_action_paste':
+                    clipboard = self._get_clipboard()
+                    if clipboard is not None:
+                        l_jmp += ''.join(filter(str.isdigit, clipboard))
                 if key == b'_action_jump':
                     wchar, key = '', b'_key_enter'
                 if key == b'_action_background':
@@ -854,11 +868,18 @@ class Editor:
                 elif self.search:
                     pre_s = f" re:[{repr(self.search.pattern)[1:-1]}]"
                 rep_r = 'Match' if search_regex else 'Search for'
-                self._action_render_scr(f"Confirm: 'ENTER' - {rep_r}{pre_s}: {sub_s}␣", tmp_error)
+                self._action_render_scr(
+                    f"Confirm: 'ENTER' - {rep_r}{pre_s}: {frepr(sub_s)}␣",
+                    tmp_error
+                )
                 wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
+                if key == b'_action_paste':
+                    clipboard = self._get_clipboard()
+                    if clipboard is not None:
+                        sub_s += clipboard
                 if key == b'_action_find':
                     wchar, key = '', b'_key_enter'
                 if key == b'_action_insert':
@@ -950,12 +971,17 @@ class Editor:
                 pre_r = f" [{repr(self.replace)[1:-1]}]" if self.replace else ''
                 rep_a = 'ALL ' if replace_all else ''
                 self._action_render_scr(
-                    f"Confirm: 'ENTER' - Replace {rep_a}{pre_s} with{pre_r}: {sub_s}␣", tmp_error
+                    f"Confirm: 'ENTER' - Replace {rep_a}{pre_s} with{pre_r}: {frepr(sub_s)}␣",
+                    tmp_error
                 )
                 wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
+                if key == b'_action_paste':
+                    clipboard = self._get_clipboard()
+                    if clipboard is not None:
+                        sub_s += clipboard
                 if key == b'_action_find':
                     cpos_tmp, spos_tmp = self.cpos.get_pos(), self.spos.get_pos()
                     search_items_tmp = self.search_items.copy()
@@ -1074,6 +1100,10 @@ class Editor:
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
+                if key == b'_action_paste':
+                    clipboard = self._get_clipboard()
+                    if clipboard is not None:
+                        i_bytes += ''.join(filter(HEX_BYTE_KEYS.__contains__, clipboard))
                 if key == b'_action_insert':
                     wchar, key = '', b'_key_enter'
                 if key == b'_action_background':
