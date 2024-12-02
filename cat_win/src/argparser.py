@@ -143,7 +143,7 @@ class ArgParser:
                 path_name = norm_path
                 if not norm_exists or (lit_exists and not p_equal):
                     path_name = lit_path
-                if norm_exists or lit_exists:
+                if (norm_exists or lit_exists) and (dot_files or not path_name.name.startswith('.')):
                     self._known_files.append(path_name)
                     continue
                 norm_exists, lit_exists = False, False
@@ -160,12 +160,19 @@ class ArgParser:
                 path_name = norm_path
                 if not norm_exists or (lit_exists and not p_equal):
                     path_name = lit_path
-                if norm_exists or lit_exists:
+                if (norm_exists or lit_exists) and (dot_files or not path_name.name.startswith('.')):
                     self._known_directories.append(path_name)
 
         return self._known_files
 
     def _add_path_struct(self, param: str) -> bool:
+        provided_path = Path(param)
+        if provided_path.parts[0] == '~':
+            if (
+                not os.path.exists('~') or
+                os.path.isfile('~') and len(provided_path.parts) > 1
+            ):
+                param = os.path.expanduser(param)
         norm_path = Path(os.path.realpath(param))
         lit_path  = Path(f"{self.win_prefix_lit}{norm_path.parent}/{Path(param).name}")
         p_equal = lit_path.stem == norm_path.stem
