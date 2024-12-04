@@ -995,30 +995,30 @@ class TestEditor(TestCase):
     def test__enforce_boundaries(self):
         editor = Editor('', 'X' * 300)
         editor.cpos.set_pos((4, 205))
-        self.assertEqual(editor._enforce_boundaries(), None)
+        self.assertEqual(editor._enforce_boundaries(b''), None)
         self.assertEqual(editor.cpos.get_pos(), (4, 200))
 
         editor.cpos.set_pos((4, 0))
         editor.wpos.set_pos((6, 0))
-        self.assertEqual(editor._enforce_boundaries(), None)
+        self.assertEqual(editor._enforce_boundaries(b''), None)
         self.assertEqual(editor.cpos.get_pos(), (4, 0))
         self.assertEqual(editor.wpos.get_pos(), (4, 0))
 
         editor.cpos.set_pos((34, 0))
         editor.wpos.set_pos((0, 0))
-        self.assertEqual(editor._enforce_boundaries(), None)
+        self.assertEqual(editor._enforce_boundaries(b''), None)
         self.assertEqual(editor.cpos.get_pos(), (34, 0))
         self.assertEqual(editor.wpos.get_pos(), (5, 0))
 
         editor.cpos.set_pos((7, 4))
         editor.wpos.set_pos((5, 6))
-        self.assertEqual(editor._enforce_boundaries(), None)
+        self.assertEqual(editor._enforce_boundaries(b''), None)
         self.assertEqual(editor.cpos.get_pos(), (7, 4))
         self.assertEqual(editor.wpos.get_pos(), (5, 4))
 
         editor.cpos.set_pos((7, 180))
         editor.wpos.set_pos((5, 0))
-        self.assertEqual(editor._enforce_boundaries(), None)
+        self.assertEqual(editor._enforce_boundaries(b''), None)
         self.assertEqual(editor.cpos.get_pos(), (7, 180))
         self.assertEqual(editor.wpos.get_pos(), (5, 61))
 

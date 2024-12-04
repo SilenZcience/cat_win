@@ -181,7 +181,6 @@ class HexEditor:
         clipboard = Clipboard.get()
         if clipboard is None:
             self.error_bar = 'An error occured pasting the clipboard!'
-            return None
         return clipboard
 
     def _key_dc(self, _) -> None:
@@ -824,6 +823,9 @@ class HexEditor:
         if not self.search:
             return
         self._action_find(True)
+
+    def _function_search_r(self) -> None:
+        self.error_bar = 'not implemented yet!'
 
     def _get_next_char(self) -> tuple:
         """
