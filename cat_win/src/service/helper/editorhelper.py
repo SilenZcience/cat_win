@@ -181,6 +181,8 @@ UNIFY_HOTKEYS = {
     b'KEY_F(1)'     : b'_function_help',
     b'KEY_F(2)'     : b'_function_replace',
     b'KEY_F(3)'     : b'_function_search',
+    b'KEY_F(14)'    : b'_function_replace_r',
+    b'KEY_F(15)'    : b'_function_search_r',
 } # translates key-inputs to pre-defined actions/methods
 
 KEY_HOTKEYS      = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_key'     ))

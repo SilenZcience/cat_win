@@ -75,6 +75,7 @@ class Editor:
 
         # current cursor position
         self.cpos = Position(0, 0)
+        self.snap_pos = Position(0, 0)
         # window position (top-left)
         self.wpos = Position(0, 0)
         # second cursor for selection area
@@ -156,7 +157,6 @@ class Editor:
         clipboard = Clipboard.get()
         if clipboard is None:
             self.error_bar = 'An error occured pasting the clipboard!'
-            return None
         return clipboard
 
     def _key_enter(self, _) -> str:
@@ -1268,10 +1268,16 @@ class Editor:
             return
         self._action_find(True)
 
+    def _function_search_r(self) -> None:
+        self.error_bar = 'not implemented yet!'
+
     def _function_replace(self) -> None:
         if not self.search:
             return
         self._action_replace(True)
+
+    def _function_replace_r(self) -> None:
+        self.error_bar = 'not implemented yet!'
 
     def _get_new_char(self):
         """
@@ -1335,17 +1341,27 @@ class Editor:
             return 0
         return curses.color_pair(c_id)
 
-    def _enforce_boundaries(self) -> None:
+    def _enforce_boundaries(self, key: bytes) -> None:
         """
-        set/enforce the boundaries
+        Enforce boundary constraints for cursor and window positions.
+        Adjusts cursor snap position, window position and column boundaries
+        based on cursor movement and window size.
+
+        Parameters:
+        key (bytes):
+            The key that was pressed last
         """
         max_y, max_x = self.getxymax()
 
         # fix cursor position (makes movement hotkeys easier)
-        row = self.window_content[self.cpos.row] if (
+        rowlen = len(self.window_content[self.cpos.row]) if(
             self.cpos.row < len(self.window_content)
-        ) else None
-        rowlen = len(row) if row is not None else 0
+        ) else 0
+        if self.snap_pos.row == self.cpos.row or key not in MOVE_HOTKEYS | SELECT_HOTKEYS:
+            self.snap_pos.set_pos(self.cpos.get_pos())
+        else:
+            self.snap_pos.row = self.cpos.row
+            self.cpos.col = min(self.snap_pos.col, rowlen)
         self.cpos.col = min(self.cpos.col, rowlen)
 
         if not self.scrolling:
@@ -1520,7 +1536,7 @@ class Editor:
                     elif key not in INDENT_HOTKEYS | HISTORY_HOTKEYS:
                         self.selecting = False
 
-                    self._enforce_boundaries()
+                    self._enforce_boundaries(key)
 
                     self.history.add(key, self.deleted_line,
                                         pre_cpos, self.cpos.get_pos(),
