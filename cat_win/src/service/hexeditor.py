@@ -794,7 +794,7 @@ class HexEditor:
             '',
             f"{'Space,>,<':<{coff}}insert new byte",
             '',
-            f"{'^S':<{coff}}save file",
+            f"{'alt+S' if self.save_with_alt else '^S':<{coff}}save file",
             f"{'^R':<{coff}}reload file",
             '',
             f"{'^B':<{coff}}put editor in background",
@@ -1027,8 +1027,7 @@ class HexEditor:
                 self.curse_window.addstr(max_y + self.status_bar_size + 1, 0,
                                          self.error_bar[:max_x].ljust(max_x), self._get_color(2))
 
-            save_hotkey = ('alt+' if self.save_with_alt else '^') + 's'
-            status_bar = f"File: {self.display_name} | Exit: ^q | Save: {save_hotkey} | "
+            status_bar = f"File: {self.display_name} | Help: F1 | "
             status_bar += f"{self.cpos.row*HexEditor.columns+self.cpos.col:08X}"
             status_bar += f" | {'NOT ' * self.unsaved_progress}Saved!"
             if self.debug_mode:
@@ -1036,7 +1035,7 @@ class HexEditor:
             if len(status_bar) > max_x:
                 necc_space = max(0, max_x - (len(status_bar) - len(self.display_name) + 3))
                 status_bar = f"File: ...{self.display_name[-necc_space:] * bool(necc_space)} "
-                status_bar += f"| Exit: ^q | Save: {save_hotkey} | "
+                status_bar += '| Help: F1 | '
                 status_bar += f"{self.cpos.row*HexEditor.columns+self.cpos.col:08X}"
                 status_bar += f" | {'NOT ' * self.unsaved_progress}Saved!"
                 if self.debug_mode:
