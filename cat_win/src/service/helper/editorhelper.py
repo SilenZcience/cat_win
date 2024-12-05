@@ -639,6 +639,7 @@ class _SearchIterHex:
                     found_pos = self._get_next_pos(line_y)
                     if found_pos >= 0:
                         return self._stop_if_past_original(line_y, found_pos)
+                self.editor._build_file_upto(content_len+30)
             if self.editor.selecting:
                 raise StopIteration()
             self.wrapped = True
