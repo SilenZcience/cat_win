@@ -1357,11 +1357,13 @@ class Editor:
         rowlen = len(self.window_content[self.cpos.row]) if(
             self.cpos.row < len(self.window_content)
         ) else 0
-        if self.snap_pos.row == self.cpos.row or key not in MOVE_HOTKEYS | SELECT_HOTKEYS:
-            self.snap_pos.set_pos(self.cpos.get_pos())
-        else:
+        if key in MOVE_HOTKEYS | SELECT_HOTKEYS and (
+            b'_up' in key or b'_down' in key
+        ):
             self.snap_pos.row = self.cpos.row
             self.cpos.col = min(self.snap_pos.col, rowlen)
+        else:
+            self.snap_pos.set_pos(self.cpos.get_pos())
         self.cpos.col = min(self.cpos.col, rowlen)
 
         if not self.scrolling:
