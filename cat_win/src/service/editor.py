@@ -1037,7 +1037,8 @@ class Editor:
                     if not replace_all:
                         break
                 else:
-                    self.cpos.col -= search.r_len
+                    if search.yielded_result:
+                        self.cpos.col -= search.r_len
                 if self.selecting:
                     self.cpos.set_pos(cpos_tmp)
                     self.spos.set_pos(spos_tmp)
