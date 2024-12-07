@@ -16,7 +16,8 @@ import unicodedata
 
 from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.const.regex import compile_re
-from cat_win.src.service.helper.editorhelper import History, Position, _SearchIter, frepr, \
+from cat_win.src.service.helper.editorsearchhelper import _SearchIterBase, search_iter_factory
+from cat_win.src.service.helper.editorhelper import History, Position, frepr, \
     UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, \
         SELECT_HOTKEYS, HISTORY_HOTKEYS, INDENT_HOTKEYS, FUNCTION_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.environment import on_windows_os
@@ -427,7 +428,9 @@ class Editor:
         self.wpos.col = max(max_line+1-max_x, 0)
 
     def _move_key_home(self) -> None:
-        self.cpos.col = 0
+        n_col = len(self.window_content[self.cpos.row])
+        n_col-= len(self.window_content[self.cpos.row].lstrip())
+        self.cpos.col = n_col if n_col < self.cpos.col else 0
 
     def _move_key_ctl_home(self) -> None:
         self.cpos.row = 0
@@ -494,7 +497,7 @@ class Editor:
         self.cpos.col -= len(r_with)
         return self._key_replace_search(r_this=r_with, r_with=r_this)
 
-    def _replace_search(self, r_this, r_with: str, search_: _SearchIter) -> None:
+    def _replace_search(self, r_this, r_with: str, search_: _SearchIterBase) -> None:
         pre_cpos = self.cpos.get_pos()
         pre_spos = self.spos.get_pos()
         if not isinstance(r_this, str):
@@ -847,7 +850,7 @@ class Editor:
                 break
         return True
 
-    def _action_find(self, find_next: bool = False) -> bool:
+    def _action_find(self, find_next: int = 0) -> bool:
         """
         handles the find in editor action.
 
@@ -859,7 +862,7 @@ class Editor:
 
         search_regex = not isinstance(self.search, str)
         wchar, sub_s, tmp_error = '', '', ''
-        key = b'_key_enter'
+        key, running = b'_key_enter', False
         while str(wchar) != ESC_CODE:
             if not find_next:
                 pre_s = ''
@@ -873,6 +876,9 @@ class Editor:
                     tmp_error
                 )
                 wchar, key = next(self.get_char)
+            elif running:
+                break
+            running = True
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
@@ -919,11 +925,18 @@ class Editor:
                 cpos_tmp, spos_tmp = self.cpos.get_pos(), self.spos.get_pos()
                 try:
                     sel_pos_a, sel_pos_b = self.selected_area
-                    if self.selecting and self.cpos.get_pos() == sel_pos_b:
+                    if self.selecting and self.cpos.get_pos() == sel_pos_b and find_next >= 0:
                         self.cpos.set_pos(sel_pos_a)
                         self.spos.set_pos(sel_pos_b)
+                    elif self.selecting and self.cpos.get_pos() == sel_pos_a and find_next < 0:
+                        self.cpos.set_pos(sel_pos_b)
+                        self.spos.set_pos(sel_pos_a)
                     try:
-                        search = _SearchIter(self, 1-self.selecting)
+                        search = search_iter_factory(
+                            self,
+                            1-(self.selecting and find_next >= 0),
+                            downwards=(find_next >= 0)
+                        )
                     except ValueError as exc:
                         tmp_error = str(exc)
                         continue
@@ -931,13 +944,22 @@ class Editor:
                     cpos = next(search)
                     self.search_items[cpos] = search.s_len
                     if not self.selecting:
-                        self.cpos.set_pos((max(cpos[0]-max_y, 0), 0))
-                    search = _SearchIter(self, 1)
+                        if find_next >= 0:
+                            self.cpos.set_pos((max(cpos[0]-max_y, 0), 0))
+                        else:
+                            self.cpos.set_pos((min(cpos[0]+max_y, len(self.window_content)-1),
+                                               len(self.window_content[cpos[0]])))
+                    search = search_iter_factory(
+                        self,
+                        1,
+                        downwards=(find_next >= 0)
+                    )
                     for search_pos in search:
                         if search_pos[0] < cpos[0]-max_y or search_pos[0] > cpos[0]+max_y:
                             break
                         self.cpos.set_pos(search_pos)
-                        self.search_items[search_pos] = search.s_len
+                        if search.s_len:
+                            self.search_items[search_pos] = search.s_len
                     self.cpos.set_pos(cpos)
                     break
                 except StopIteration:
@@ -948,7 +970,7 @@ class Editor:
                     tmp_error+= ' within the selection!' if self.selecting else '!'
         return True
 
-    def _action_replace(self, replace_next: bool = False) -> bool:
+    def _action_replace(self, replace_next: int = 0) -> bool:
         """
         handles the replace in editor action.
 
@@ -960,7 +982,7 @@ class Editor:
 
         replace_all = False
         wchar, sub_s, tmp_error = '', '', ''
-        key = b'_key_enter'
+        key, running = b'_key_enter', False
         while str(wchar) != ESC_CODE:
             if not replace_next:
                 pre_s = '[]'
@@ -975,6 +997,9 @@ class Editor:
                     tmp_error
                 )
                 wchar, key = next(self.get_char)
+            elif running:
+                break
+            running = True
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
@@ -1022,18 +1047,29 @@ class Editor:
                         pass
                 cpos_tmp, spos_tmp = self.cpos.get_pos(), self.spos.get_pos()
                 sel_pos_a, sel_pos_b = self.selected_area
-                if self.selecting and self.cpos.get_pos() == sel_pos_b:
+                if self.selecting and self.cpos.get_pos() == sel_pos_b and replace_next >= 0:
                     self.cpos.set_pos(sel_pos_a)
                     self.spos.set_pos(sel_pos_b)
+                elif self.selecting and self.cpos.get_pos() == sel_pos_a and replace_next < 0:
+                    self.cpos.set_pos(sel_pos_b)
+                    self.spos.set_pos(sel_pos_a)
                 try:
-                    search = _SearchIter(self, 0, True)
+                    search = search_iter_factory(
+                        self,
+                        0,
+                        True,
+                        downwards=(replace_next >= 0)
+                    )
                 except ValueError as exc:
                     tmp_error = str(exc)
                     continue
                 for search_pos in search:
                     self.cpos.set_pos(search_pos)
-                    self.search_items[search_pos] = search.r_len
+                    if search.r_len:
+                        self.search_items[search_pos] = search.r_len
                     self._replace_search(self.search, self.replace, search)
+                    if replace_next < 0:
+                        self.cpos.set_pos(search_pos)
                     if not replace_all:
                         break
                 else:
@@ -1233,7 +1269,7 @@ class Editor:
             f"{'^T':<{coff}}transform",
             f"{'^N':<{coff}}insert byte sequence",
             f"{'^F':<{coff}}find strings or patterns",
-            f"{'F3':<{coff}}find next",
+            f"{'(Shift-)F3':<{coff}}find next/(previous)",
             f"{'^P':<{coff}}replace string or pattern",
             f"{'F2':<{coff}}replace next",
             '',
@@ -1267,18 +1303,22 @@ class Editor:
     def _function_search(self) -> None:
         if not self.search:
             return
-        self._action_find(True)
+        self._action_find(1)
 
     def _function_search_r(self) -> None:
-        self.error_bar = 'not implemented yet!'
+        if not self.search:
+            return
+        self._action_find(-1)
 
     def _function_replace(self) -> None:
         if not self.search:
             return
-        self._action_replace(True)
+        self._action_replace(1)
 
     def _function_replace_r(self) -> None:
-        self.error_bar = 'not implemented yet!'
+        if not self.search:
+            return
+        self._action_replace(-1)
 
     def _get_new_char(self):
         """

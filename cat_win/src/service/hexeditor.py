@@ -13,7 +13,8 @@ import signal
 import sys
 
 from cat_win.src.const.escapecodes import ESC_CODE
-from cat_win.src.service.helper.editorhelper import Position, _SearchIterHex, frepr, \
+from cat_win.src.service.helper.editorsearchhelper import search_iter_hex_factory
+from cat_win.src.service.helper.editorhelper import Position, frepr, \
     UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, SELECT_HOTKEYS, \
         FUNCTION_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.environment import on_windows_os
@@ -515,7 +516,7 @@ class HexEditor:
                 break
         return True
 
-    def _action_find(self, find_next: bool = False) -> bool:
+    def _action_find(self, find_next: int = 0) -> bool:
         """
         handles the find in editor action.
 
@@ -526,7 +527,7 @@ class HexEditor:
         search_byte_mode, bm_ind = True, '0x'
         sub_s_encoded = self.search
         wchar, sub_s, tmp_error= '', '', ''
-        key = b'_key_enter'
+        key, running = b'_key_enter', False
         while str(wchar) != ESC_CODE:
             if not find_next:
                 pre_s = ''
@@ -542,6 +543,9 @@ class HexEditor:
                     tmp_error
                 )
                 wchar, key = self._get_next_char()
+            elif running:
+                break
+            running = True
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
                     break
@@ -597,11 +601,18 @@ class HexEditor:
                 cpos_tmp, spos_tmp = self.cpos.get_pos(), self.spos.get_pos()
                 try:
                     sel_pos_a, sel_pos_b = self.selected_area
-                    if self.selecting and self.cpos.get_pos() == sel_pos_b:
+                    if self.selecting and self.cpos.get_pos() == sel_pos_b and find_next >= 0:
                         self.cpos.set_pos(sel_pos_a)
                         self.spos.set_pos(sel_pos_b)
+                    elif self.selecting and self.cpos.get_pos() == sel_pos_a and find_next < 0:
+                        self.cpos.set_pos(sel_pos_b)
+                        self.spos.set_pos(sel_pos_a)
                     try:
-                        search = _SearchIterHex(self, 1-self.selecting)
+                        search = search_iter_hex_factory(
+                            self,
+                            1-self.selecting,
+                            downwards=(find_next >= 0)
+                        )
                     except ValueError as exc:
                         tmp_error = str(exc)
                         continue
@@ -609,8 +620,16 @@ class HexEditor:
                     cpos = next(search)
                     self.search_items[cpos] = search.s_len
                     if not self.selecting:
-                        self.cpos.set_pos((max(cpos[0]-max_y, 0), 0))
-                    search = _SearchIterHex(self, 1)
+                        if find_next >= 0:
+                            self.cpos.set_pos((max(cpos[0]-max_y, 0), 0))
+                        else:
+                            self.cpos.set_pos((min(cpos[0]+max_y, len(self.hex_array)-1),
+                                               len(self.hex_array[cpos[0]])-1))
+                    search = search_iter_hex_factory(
+                        self,
+                        1,
+                        downwards=(find_next >= 0)
+                    )
                     for search_pos in search:
                         if search_pos[0] < cpos[0]-max_y or search_pos[0] > cpos[0]+max_y:
                             break
@@ -790,7 +809,7 @@ class HexEditor:
             f"{'^E':<{coff}}jump to offset",
             f"{'^N':<{coff}}insert text sequence",
             f"{'^F':<{coff}}find bytes or strings",
-            f"{'F3':<{coff}}find next",
+            f"{'(Shift+)F3':<{coff}}find next/(previous)",
             '',
             f"{'Space,>,<':<{coff}}insert new byte",
             '',
@@ -822,10 +841,12 @@ class HexEditor:
     def _function_search(self) -> None:
         if not self.search:
             return
-        self._action_find(True)
+        self._action_find(1)
 
     def _function_search_r(self) -> None:
-        self.error_bar = 'not implemented yet!'
+        if not self.search:
+            return
+        self._action_find(-1)
 
     def _get_next_char(self) -> tuple:
         """
