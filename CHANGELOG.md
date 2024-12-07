@@ -9,7 +9,9 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - added `F1` hotkey to the (hex-)editor to display a help-message containing the keybindings.
 - added `F2` hotkey to the editor to replace the next found search-element (replace next).
+- added `Shift+F2`/`F14` hotkey to the editor to replace the next previous found search-element (replace previous).
 - added `F3` hotkey to the (hex-)editor to jump to the next found search-element (find next).
+- added `(Shift+)F3`/`F15` hotkey to the (hex-)editor to jump to the next previous found search-element (find previous).
 - allow clipboard pasting in (hex-)editor prompts.
 - changed the behaviour of the clipbaord pasting in the hex-editor to filter hex-symbols.
 
