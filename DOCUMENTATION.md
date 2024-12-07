@@ -976,9 +976,9 @@ The currently supported Key Bindings are as follows:
 | <kbd>Transform/^T</kbd> | - | - | <a href="#transform-selected-text">transform</a> or <a href="#question-selected-text">question</a> the selected text | - |
 | <kbd>Insert/^N</kbd> | - | - | Insert a byte sequence \| toggle action menu switch | - |
 | <kbd>Find/^F</kbd> | - | - | prompt to search in the file \| toggle to search regular expressions | - |
-| <kbd>FindNext/F3</kbd> | - | - | jump to the next found search-element | - |
+| <kbd>QuickFind/F3</kbd> | - | jump to the next previous found search-element | jump to the next found search-element | - |
 | <kbd>Replace/^P</kbd> | - | - | prompt to replace a search in the file \| toggle to replace all | - |
-| <kbd>ReplaceNext/F2</kbd> | - | - | replace the next found search-element | - |
+| <kbd>QuickReplace/F2</kbd> | - | replace the next previous found search-element | replace the next found search-element | - |
 ||||||
 | <kbd>Save/^S</kbd> | - | - | save changes | save changes |
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
@@ -1047,7 +1047,7 @@ The currently supported Key Bindings are as follows:
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to a specific byte | - |
 | <kbd>Insert/^N</kbd> | - | - | insert a text sequence \| toggle action menu switch | - |
 | <kbd>Find/^F</kbd> | - | - | prompt to search a byte(-sequence) in the file \| toggle to search text | - |
-| <kbd>FindNext/F3</kbd> | - | - | jump to the next found search-element | - |
+| <kbd>QuickFind/F3</kbd> | - | jump to the next previous found search-element | jump to the next found search-element | - |
 ||||||
 | <kbd>Save/^S</kbd> | - | - | save changes | save changes |
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
