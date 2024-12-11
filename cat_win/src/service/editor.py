@@ -503,6 +503,8 @@ class Editor:
         if not isinstance(r_this, str):
             r_this = self.window_content[self.cpos.row][self.cpos.col:self.cpos.col+search_.s_len]
             r_with = search_.replace
+        if not r_this and not r_with:
+            return
         self._key_replace_search(r_this, r_with)
         self.history.add(b'_key_replace_search', False,
                             pre_cpos, self.cpos.get_pos(),
