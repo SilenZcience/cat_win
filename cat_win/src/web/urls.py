@@ -56,7 +56,7 @@ def sep_valid_urls(to_check: list) -> tuple:
         else:
             not_valid_urls.append(url)
 
-    return (valid_urls, not_valid_urls)
+    return (not_valid_urls, valid_urls)
 
 def read_url(url: str, _rec: bool = False) -> bytes:
     """

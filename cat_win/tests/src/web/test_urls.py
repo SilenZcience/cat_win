@@ -31,7 +31,7 @@ class TestUrls(TestCase):
             ]
         test_input = valid_expected+invalid_expected
         random.shuffle(test_input)
-        valid_output, invalid_output = sep_valid_urls(test_input)
+        invalid_output, valid_output = sep_valid_urls(test_input)
         self.assertCountEqual(valid_expected, valid_output)
         self.assertCountEqual(invalid_expected, invalid_output)
 

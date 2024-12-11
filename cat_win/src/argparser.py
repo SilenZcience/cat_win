@@ -12,6 +12,7 @@ from cat_win.src.const.regex import RE_ENCODING, RE_Q_MATCH, RE_M_ATCH, RE_Q_FIN
 from cat_win.src.const.regex import RE_Q_REPLACE, RE_R_EPLACE, RE_Q_TRUNC, RE_T_RUNC
 from cat_win.src.const.regex import RE_CUT, RE_REPLACE, RE_REPLACE_COMMA
 from cat_win.src.service.helper.environment import on_windows_os
+from cat_win.src.web.urls import sep_valid_urls
 
 IS_FILE, IS_DIR, IS_PATTERN = range(0, 3)
 
@@ -98,7 +99,26 @@ class ArgParser:
                 echo_args = echo_args.encode(self.file_encoding).decode('unicode_escape').encode('latin-1').decode(self.file_encoding)
             except UnicodeError:
                 pass
-        return (self._args, self._unknown_args, self._unknown_files, echo_args)
+        return (self._args, self._unknown_args, echo_args)
+
+    def filter_urls(self, do_filter: bool) -> tuple:
+        """
+        filter the unknown files for valid urls
+
+        Parameters:
+        do_filter (bool):
+            indicates if urls should be filtered
+
+        Returns:
+        (unknown_files, valid_urls) (tuple):
+            contains the unknown files and the valid urls
+        """
+        if not do_filter:
+            unknown_files = [Path(file) for file in self._unknown_files]
+            return (unknown_files, [])
+        unknown_files, valid_urls = sep_valid_urls(self._unknown_files)
+        unknown_files = [Path(file) for file in unknown_files]
+        return (unknown_files, valid_urls)
 
     def get_files(self, dot_files: bool = False) -> list:
         """
@@ -322,7 +342,7 @@ class ArgParser:
         # out of bound is not possible, in case of length 0 param, possible_path would have
         # become the working-path and therefor handled the param as a directory
         elif param[0] != '-':
-            self._unknown_files.append(Path(param))
+            self._unknown_files.append(param)
         else:
             self._unknown_args.append(param)
         return False

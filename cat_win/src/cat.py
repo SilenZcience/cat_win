@@ -49,7 +49,7 @@ from cat_win.src.service.strings import get_strings
 from cat_win.src.service.summary import Summary
 from cat_win.src.service.visualizer import Visualizer
 from cat_win.src.web.updatechecker import print_update_information
-from cat_win.src.web.urls import sep_valid_urls, read_url
+from cat_win.src.web.urls import read_url
 from cat_win import __project__, __version__, __sysversion__, __author__, __url__
 
 
@@ -981,14 +981,12 @@ def init(repl: bool = False) -> tuple:
     setup()
 
     # read parameter-args
-    args, _, unknown_files, echo_args = arg_parser.get_arguments(config.get_args(sys.argv[:]))
+    args, _, echo_args = arg_parser.get_arguments(config.get_args(sys.argv[:]))
 
     u_args.set_args(args)
 
     known_files = arg_parser.get_files(u_args[ARGS_DOTFILES])
-    valid_urls = []
-    if u_args[ARGS_URI]:
-        valid_urls, unknown_files = sep_valid_urls(unknown_files)
+    unknown_files, valid_urls = arg_parser.filter_urls(u_args[ARGS_URI])
 
     if u_args[ARGS_RECONFIGURE] or u_args[ARGS_RECONFIGURE_IN]:
         sys.stdin.reconfigure(encoding=arg_parser.file_encoding)
