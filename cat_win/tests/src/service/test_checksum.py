@@ -38,6 +38,9 @@ class TestChecksum(TestCase):
         expected_output += 'bd82ce9e8527412ce2cc8355a391a1Y\n'
         self.assertEqual(get_checksum_from_file(test_file_path, ['X', 'Y']), expected_output)
 
+    def test_checksum_invalid_file(self):
+        self.assertEqual(get_checksum_from_file('randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|'), 'OSError')
+
     def test_print_checksum(self):
         expected_output = f"XChecksum of '{test_file_path}':Y\n"
         expected_output += '\tXCRC32:   C7222F64Y\n'
