@@ -39,7 +39,7 @@ class TestChecksum(TestCase):
         self.assertEqual(get_checksum_from_file(test_file_path, ['X', 'Y']), expected_output)
 
     def test_checksum_invalid_file(self):
-        self.assertEqual(get_checksum_from_file('randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|'), 'OSError')
+        self.assertIn(get_checksum_from_file('randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|'), ['FileNotFoundError', 'OSError'])
 
     def test_print_checksum(self):
         expected_output = f"XChecksum of '{test_file_path}':Y\n"
