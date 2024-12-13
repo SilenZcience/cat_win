@@ -15,6 +15,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 - allow clipboard pasting in (hex-)editor prompts.
 - changed the behaviour of the clipbaord pasting in the hex-editor to filter hex-symbols.
 
+## Bugfixes
+
+- fixed Bug where -`U`, --`url` would not correctly recognize valid URIs.
+
 
 ## [1.10.1] - 2024-11-23
 
