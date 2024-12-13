@@ -514,6 +514,84 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.spos.get_pos(), (0, 0))
         self.assertEqual(editor.cpos.get_pos(), (1, 3))
 
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen([]))
+    def test_full_integration(self):
+        mm_backup1 = mm.error
+        mm_backup2 = mm.keyname
+        mm_backup2 = mm.initscr
+        def char_gen(user_input: list):
+            yield from user_input
+            while True:
+                yield user_input[-1]
+        _keyname_mapping = {
+            '\x11'     : b'^Q',
+            '\x7f'     : b'^?',
+            '\r'       : b'^M',
+            '\t'       : b'^I',
+            'ş'        : b'KEY_BTAB',
+            '\x1a'     : b'^Z',
+            '\x19'     : b'^Y',
+            'Ŋ'        : b'KEY_DC',
+            'ȏ'        : b'CTL_DEL',
+            'Ą'        : b'KEY_LEFT',
+            'ą'        : b'KEY_RIGHT',
+            'ă'        : b'KEY_UP',
+            'Ă'        : b'KEY_DOWN',
+            'Ƈ'        : b'KEY_SLEFT',
+            'ȣ'        : b'KEY_SUP',
+            'Ȥ'        : b'KEY_SDOWN',
+            '\x10'     : b'^P',
+            '\x06'     : b'^F',
+            '\x0e'     : b'^N',
+            '\x14'     : b'^T',
+            '\x01'     : b'^A',
+            '\x05'     : b'^E',
+            'ĉ'        : b'KEY_F(1)',
+        }
+        def _keyname(x):
+            return _keyname_mapping.get(chr(x), chr(x).encode())
+
+        g = [
+            [' ', '2', '2', ' ', ' ', ' ', 260, 260, '0', 'd', '0', 'a', '2', '2', '\x11', '\x11'],
+            ['\x0e', 'H', 'e', 'x', 'E', 'd', 'i', 't', 'o', 'r', '_', 'F', 'u', 'l', 'l', 'I', 'n', 't', 'e', 'g', 'r', 'a', 't', 'i', 'o', 'n', 'T', 'e', 's', 't', '\r', '\x05', 'd', '\r', '0', 'd', '0', 'a', '\x7f', '\x11', '\x11'],
+            ['\x0e', 'H', 'e', 'x', 'E', 'd', 'i', 't', 'o', 'r', '_', 'F', 'u', 'l', 'l', 'I', 'n', 't', 'e', 'g', 'r', 'a', 't', 'i', 'o', 'n', 'T', 'e', 's', 't', '\r', 265, 'a', 260, 547, '\x7f', '\x11', '\x11']
+        ]
+        r = [
+            [
+                ['22', '0D', '0A', '22'],
+            ],
+            [
+                ['48', '65', '78', '45', '64', '69', '74', '6F', '72', '5F', '46', '75', '6C', '0D', '0A', '--'],
+                ['74', '65', '67', '72', '61', '74', '69', '6F', '6E', '54', '65', '73', '74'],
+            ],
+            [
+                ['48', '65', '78', '45', '64', '69', '74', '6F', '72', '5F', '46', '--', '--', '--', '--', '--'],
+                ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '74'],
+            ],
+        ]
+        mm.keyname = _keyname
+        mm.error = KeyboardInterrupt
+        for get_wch_, result_ in zip(g, r):
+            char_gen_get_wch = char_gen(get_wch_)
+            def _get_wch():
+                return next(char_gen_get_wch)
+
+            editor = HexEditor('', '')
+            # editor.debug_mode = True
+
+            curse_window_mock = MagicMock()
+            curse_window_mock.get_wch = _get_wch
+
+            mm.initscr = lambda *args: curse_window_mock
+
+            editor._open()
+            for i in range(len(result_)):
+                self.assertSequenceEqual(editor._get_current_state_row(i), result_[i])
+
+        mm.error = mm_backup1
+        mm.keyname = mm_backup2
+        mm.initscr = mm_backup2
+
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 21))
     def test__action_copy(self):
         def assertCopy(_s: str):
