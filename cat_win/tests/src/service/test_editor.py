@@ -959,7 +959,7 @@ class TestEditor(TestCase):
         with self.assertRaises(KeyboardInterrupt):
             with patch('sys.stderr', new=StdOutMock()) as fake_out:
                 editor._action_interrupt()
-            self.assertEqual('Interrupting...\n', fake_out.getvalue())
+        self.assertEqual('Interrupting...\n', fake_out.getvalue())
 
     def test__action_resize(self):
         editor = Editor('', '')

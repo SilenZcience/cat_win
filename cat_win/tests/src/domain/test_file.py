@@ -32,3 +32,8 @@ class TestFile(TestCase):
 
         file.set_plaintext(False)
         self.assertEqual(file.plaintext, False)
+
+    def test_file_hashable(self):
+        file = File('testPath', 'testName')
+        file2 = File('testPath', 'testName')
+        self.assertSetEqual({file, file2}, {file2})

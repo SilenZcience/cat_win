@@ -38,6 +38,32 @@ class TestArguments(TestCase):
         self.assertListEqual(u_args.args, [])
         self.assertEqual(len(u_args.args_id), 0)
 
+    def test_find_first(self):
+        u_args = Arguments()
+        u_args.set_args([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
+        self.assertTupleEqual(u_args.find_first(ARGS_NUMBER, ARGS_LLENGTH, False), (ARGS_NUMBER, 'a'))
+        u_args = Arguments()
+        u_args.set_args([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
+        self.assertTupleEqual(u_args.find_first(ARGS_LLENGTH, ARGS_NUMBER, False), (ARGS_NUMBER, 'a'))
+        u_args = Arguments()
+        u_args.set_args([(ARGS_NUMBER, 'a'), (ARGS_ENDS, 'c')])
+        self.assertTupleEqual(u_args.find_first(ARGS_NUMBER, ARGS_LLENGTH, False), (ARGS_NUMBER, 'a'))
+        u_args = Arguments()
+        u_args.set_args([(ARGS_ENDS, 'c'), (ARGS_LLENGTH, 'b')])
+        self.assertTupleEqual(u_args.find_first(ARGS_LLENGTH, ARGS_NUMBER, False), (ARGS_LLENGTH, 'b'))
+        u_args = Arguments()
+        u_args.set_args([(ARGS_ENDS, 'c')])
+        self.assertEqual(u_args.find_first(ARGS_LLENGTH, ARGS_NUMBER, False), None)
+        u_args = Arguments()
+        u_args.set_args([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
+        self.assertTupleEqual(u_args.find_first(ARGS_NUMBER, ARGS_LLENGTH, True), (ARGS_NUMBER, 'a'))
+        u_args = Arguments()
+        u_args.set_args([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
+        self.assertEqual(u_args.find_first(ARGS_LLENGTH, ARGS_NUMBER, True), None)
+        u_args = Arguments()
+        u_args.set_args([(ARGS_ENDS, 'c')])
+        self.assertEqual(u_args.find_first(ARGS_LLENGTH, ARGS_NUMBER, True), None)
+
     def test_reduce_list(self):
         test_list = [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')]
         reduced_list = reduce_list(test_list)
