@@ -6,9 +6,9 @@ from cat_win.tests.mocks.edit import getxymax
 from cat_win.tests.mocks.error import ErrorDefGen
 from cat_win.tests.mocks.std import StdOutMock, IoHelperMock
 
-import cat_win.src.service.editor as editor_pkg
-if editor_pkg.CURSES_MODULE_ERROR:
-    setattr(editor_pkg, 'curses', None)
+from cat_win.src.service import editor
+if editor.CURSES_MODULE_ERROR:
+    setattr(editor, 'curses', None)
 from cat_win.src.service.editor import Editor
 
 mm = MagicMock()
@@ -959,7 +959,7 @@ class TestEditor(TestCase):
         with self.assertRaises(KeyboardInterrupt):
             with patch('sys.stderr', new=StdOutMock()) as fake_out:
                 editor._action_interrupt()
-                self.assertEqual('Interrupting...\n', fake_out.getvalue())
+            self.assertEqual('Interrupting...\n', fake_out.getvalue())
 
     def test__action_resize(self):
         editor = Editor('', '')
