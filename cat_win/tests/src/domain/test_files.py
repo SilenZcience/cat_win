@@ -16,6 +16,12 @@ test_file_empty       = os.path.join(test_file_dir, 'test_empty.txt')
 
 
 class TestFiles(TestCase):
+    def test__calc_max_line_length_(self):
+        u_files = Files()
+        self.assertEqual(u_files._calc_max_line_length_(test_file_path), 2)
+        self.assertEqual(u_files._calc_max_line_length_(test_file_empty), 0)
+        self.assertEqual(u_files._calc_max_line_length_('randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|'), 0)
+
     def test_calc_file_line_length_place_holder_(self):
         u_files = Files()
         u_files.set_files([test_file_path])
@@ -43,6 +49,12 @@ class TestFiles(TestCase):
     def test__calc_max_line_length__empty(self):
         u_files = Files()
         self.assertEqual(u_files._calc_max_line_length_(test_file_empty), 0)
+
+    def test__get_file_lines_sum_(self):
+        u_files = Files()
+        self.assertEqual(u_files._get_file_lines_sum_(test_file_path), 8)
+        self.assertEqual(u_files._get_file_lines_sum_(test_file_empty), 1)
+        self.assertEqual(u_files._get_file_lines_sum_('randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|'), 0)
 
     def test_all_line_number_place_holder(self):
         u_files = Files()
@@ -98,3 +110,19 @@ class TestFiles(TestCase):
             u_files.get_file_display_name('TEMPFILEURL1'), '<URL www.example.com>')
         self.assertEqual(
             u_files.get_file_display_name('TEMPFILEURL2'), '<URL abcdefghijklmnopqrst...0123456789>')
+
+    def test_is_temp_file(self):
+        u_files = Files()
+        u_files.set_temp_file_stdin('STDINFILE')
+        u_files.set_temp_file_echo('TEMPFILEECHO')
+        u_files.set_temp_files_url({'TEMPFILEURL1': 'www.example.com',
+                                    'TEMPFILEURL2': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'})
+        u_files.set_files([test_file_edge_case_3, 'STDINFILE',
+                          test_file_edge_case_4, 'TEMPFILEECHO',
+                          'TEMPFILEURL1', 'TEMPFILEURL2'])
+        self.assertEqual(u_files.is_temp_file(0), False)
+        self.assertEqual(u_files.is_temp_file(1), True)
+        self.assertEqual(u_files.is_temp_file(2), False)
+        self.assertEqual(u_files.is_temp_file(3), True)
+        self.assertEqual(u_files.is_temp_file(4), True)
+        self.assertEqual(u_files.is_temp_file(5), True)
