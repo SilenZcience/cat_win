@@ -44,7 +44,7 @@ def get_stable_package_version(package: str) -> str:
                                     timeout=2) as _response:
             response = _response.read()
         return json.loads(response)['info']['version']
-    except (ValueError, OSError):
+    except (ValueError, OSError, KeyError):
         return '0.0.0'
 
 
@@ -71,7 +71,7 @@ def get_latest_package_version(package: str) -> str:
             key=lambda x: x[1][0]['upload_time'] if x[1] else '1970-01-01T00:00:00',
             reverse=True
         )[0][0]
-    except (ValueError, OSError, IndexError):
+    except (ValueError, OSError, KeyError, IndexError):
         return '0.0.0'
 
 

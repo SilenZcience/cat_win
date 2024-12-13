@@ -6,7 +6,7 @@ from cat_win.tests.mocks.edit import getxymax
 from cat_win.tests.mocks.error import ErrorDefGen
 from cat_win.tests.mocks.std import StdOutMock, IoHelperMock
 
-import cat_win.src.service.hexeditor as hexeditor
+from cat_win.src.service import hexeditor
 if hexeditor.CURSES_MODULE_ERROR:
     setattr(hexeditor, 'curses', None)
 from cat_win.src.service.hexeditor import HexEditor
@@ -671,8 +671,6 @@ class TestHexEditor(TestCase):
     def test__action_insert(self):
         editor = HexEditor('', '')
         editor.curse_window = MagicMock()
-        def yield_tuple(a, b):
-            yield (a, b)
         def char_gen(user_input: list):
             yield from user_input
         editor.cpos.set_pos((1, 3))
