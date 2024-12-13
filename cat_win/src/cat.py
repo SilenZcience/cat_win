@@ -870,7 +870,7 @@ def edit_files() -> None:
     if u_args[ARGS_FILES] or u_args[ARGS_DIRECTORIES]:
         print()
         if u_args[ARGS_FILES]:
-            Summary.show_files(u_args[ARGS_FFILES], u_files.files)
+            Summary.show_files(u_files.files, u_args[ARGS_FFILES])
         if u_args[ARGS_DIRECTORIES]:
             Summary.show_dirs(arg_parser.get_dirs())
     if u_args[ARGS_SUM]:
@@ -1114,7 +1114,7 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
 
     if u_args[ARGS_FFILES] or u_args[ARGS_DDIRECTORIES]:
         if u_args[ARGS_FFILES]:
-            Summary.show_files(u_args[ARGS_FFILES], u_files.files)
+            Summary.show_files(u_files.files, u_args[ARGS_FFILES])
         if u_args[ARGS_DDIRECTORIES]:
             Summary.show_dirs(arg_parser.get_dirs())
         return

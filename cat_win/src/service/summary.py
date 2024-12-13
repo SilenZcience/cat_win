@@ -55,7 +55,7 @@ class Summary:
         return unique_elements
 
     @staticmethod
-    def show_files(detailed: bool, files: list) -> None:
+    def show_files(files: list, detailed: bool) -> None:
         """
         displays u_files.files including their size and calculates
         their size sum.

@@ -10,11 +10,32 @@ test_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'texts', 't
 
 
 class TestSummary(TestCase):
+    def test__unique_list(self):
+        self.assertListEqual(Summary._unique_list([1, 2, 3, 1, 2, 3]), [1, 2, 3])
+        self.assertListEqual(Summary._unique_list([1, 3, 3, 3, 2, 3]), [1, 3, 2])
+        self.assertListEqual(Summary._unique_list([]), [])
+        self.assertListEqual(Summary._unique_list([1]), [1])
+        self.assertListEqual(Summary._unique_list([5, 1]), [5, 1])
+
+    def test_show_files_empty(self):
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            Summary.show_files([], False)
+            self.assertEqual('No files have been found!\n', fake_out.getvalue())
+
     def test_show_dirs(self):
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            Summary.show_dirs(['dirA', 'dirB'])
+            Summary.show_dirs(['dirA', 'dirB', 'dirB'])
             self.assertIn('dirA', fake_out.getvalue())
             self.assertIn('dirB', fake_out.getvalue())
+            self.assertEqual(fake_out.getvalue().count('dirB'), 2)
+
+    @patch('cat_win.src.service.summary.Summary.unique', True)
+    def test_show_dirs_unique(self):
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            Summary.show_dirs(['dirA', 'dirB', 'dirB'])
+            self.assertIn('dirA', fake_out.getvalue())
+            self.assertIn('dirB', fake_out.getvalue())
+            self.assertEqual(fake_out.getvalue().count('dirB'), 1)
 
     def test_show_dirs_empty(self):
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
@@ -30,11 +51,23 @@ class TestSummary(TestCase):
     def test_show_sum_detailed(self):
         output = r"""File LineCount
 test 111
+test 111
+
+Lines (Sum): 222
+"""
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            Summary.show_sum([File('test', ''), File('test', '')], True, {'test': 111}, 0)
+            self.assertEqual(fake_out.getvalue(), output)
+
+    @patch('cat_win.src.service.summary.Summary.unique', True)
+    def test_show_sum_detailed_unique(self):
+        output = r"""File LineCount
+test 111
 
 Lines (Sum): 111
 """
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            Summary.show_sum([File('test', '')], True, {'test': 111}, 0)
+            Summary.show_sum([File('test', ''), File('test', '')], True, {'test': 111}, 0)
             self.assertEqual(fake_out.getvalue(), output)
 
     def test_show_wordcount(self):
@@ -69,6 +102,11 @@ following: 1
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             Summary.show_wordcount([File(test_file_path, '')], 'utf-8')
             self.assertIn(output, fake_out.getvalue())
+
+    def test_show_wordcount_empty(self):
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            Summary.show_wordcount([], 'utf-8')
+            self.assertEqual('The word count could not be calculated.\n', fake_out.getvalue())
 
     def test_show_charcount(self):
         output = r"""
@@ -119,3 +157,8 @@ x: 1
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             Summary.show_charcount([File(test_file_path, '')], 'utf-8')
             self.assertIn(output, fake_out.getvalue())
+
+    def test_show_charcount_empty(self):
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            Summary.show_charcount([], 'utf-8')
+            self.assertEqual('The char count could not be calculated.\n', fake_out.getvalue())
