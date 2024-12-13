@@ -186,13 +186,6 @@ class ArgParser:
         return self._known_files
 
     def _add_path_struct(self, param: str) -> bool:
-        provided_path = Path(param)
-        if provided_path.parts[0] == '~':
-            if (
-                not os.path.exists('~') or
-                os.path.isfile('~') and len(provided_path.parts) > 1
-            ):
-                param = os.path.expanduser(param)
         norm_path = Path(os.path.realpath(param))
         lit_path  = Path(f"{self.win_prefix_lit}{norm_path.parent}/{Path(param).name}")
         p_equal = lit_path.stem == norm_path.stem
@@ -236,6 +229,16 @@ class ArgParser:
             is_struct = True
 
         return is_struct
+
+    def _expand_user(self, param: str) -> str:
+        provided_path = Path(param)
+        if provided_path.parts[0] == '~':
+            if (
+                not os.path.exists('~') or
+                os.path.isfile('~') and len(provided_path.parts) > 1
+            ):
+                param = os.path.expanduser(param)
+        return param
 
     def _add_argument(self, param: str, delete: bool = False) -> bool:
         """
@@ -332,6 +335,7 @@ class ArgParser:
                 self._args.append((arg.arg_id, param))
                 return arg.arg_id == ARGS_ECHO
 
+        param = self._expand_user(param)
         if self._add_path_struct(param):
             return False
 

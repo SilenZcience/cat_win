@@ -155,6 +155,19 @@ class TestArgParser(TestCase):
         self.assertIn('testTesttest', ''.join(map(str,unknown_files)))
         self.assertIn('test-file.txt', ''.join(map(str,unknown_files)))
 
+    def test_get_arguments_unknown_file_expanduser(self):
+        arg_parser = ArgParser()
+        args, unknown_args, echo_args = arg_parser.get_arguments(
+            ['CAT', '~/randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety!:<>|'])
+        known_files = arg_parser.get_files()
+        unknown_files, _ = arg_parser.filter_urls(False)
+        self.assertCountEqual(args, [])
+        self.assertCountEqual(unknown_args, [])
+        self.assertCountEqual(known_files, [])
+        self.assertCountEqual(echo_args, [])
+        self.assertEqual(len(unknown_files), 1)
+        self.assertIn('randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety!:<>|', str(unknown_files[0]))
+
     def test_get_arguments_unknown_args(self):
         arg_parser = ArgParser()
         arg_parser.gen_arguments(['CAT', '--test-file.txt'])
