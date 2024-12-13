@@ -59,6 +59,9 @@ class TestStdInHelper(TestCase):
         self.assertEqual(IoHelper.get_newline(test_file_path_empty, 'x'), 'x')
         self.assertEqual(IoHelper.get_newline(test_file_path_oneline, 'x'), 'x')
 
+    def test_get_newline_error(self):
+        self.assertEqual(IoHelper.get_newline('randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|', 'DEFAULT'), 'DEFAULT')
+
     def test_get_stdin_content_oneline(self):
         stdin_mock.set_content('hello\nworld')
         self.assertEqual(''.join(IoHelper.get_stdin_content(True)), 'hello')
