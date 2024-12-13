@@ -715,6 +715,7 @@ class TestEditor(TestCase):
             ['ABCDEF', ''],
         ]
         mm.keyname = _keyname
+        mm.error = KeyboardInterrupt
         for get_wch_, result_ in zip(g, r):
             char_gen_get_wch = char_gen(get_wch_)
             def _get_wch():
@@ -726,7 +727,6 @@ class TestEditor(TestCase):
             curse_window_mock = MagicMock()
             curse_window_mock.get_wch = _get_wch
 
-            mm.error = KeyboardInterrupt
             mm.initscr = lambda *args: curse_window_mock
 
             editor._open()
