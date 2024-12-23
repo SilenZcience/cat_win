@@ -76,6 +76,7 @@ class Config:
         DKW.UNICODE_ESCAPED_ECHO: True,
         DKW.UNICODE_ESCAPED_EDITOR_SEARCH: True,
         DKW.UNICODE_ESCAPED_EDITOR_REPLACE: True,
+        DKW.UNICODE_ESCAPED_EDITOR_INSERT: True,
         DKW.UNICODE_ESCAPED_FIND: True,
         DKW.UNICODE_ESCAPED_REPLACE: True,
     }
@@ -99,6 +100,7 @@ class Config:
         DKW.UNICODE_ESCAPED_ECHO: validator_bool,
         DKW.UNICODE_ESCAPED_EDITOR_SEARCH: validator_bool,
         DKW.UNICODE_ESCAPED_EDITOR_REPLACE: validator_bool,
+        DKW.UNICODE_ESCAPED_EDITOR_INSERT: validator_bool,
         DKW.UNICODE_ESCAPED_FIND: validator_bool,
         DKW.UNICODE_ESCAPED_REPLACE: validator_bool,
     }
