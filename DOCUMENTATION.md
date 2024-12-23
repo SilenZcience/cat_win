@@ -1033,7 +1033,8 @@ The currently supported Key Bindings are as follows:
 ||||||
 | <kbd>0-9</kbd> <kbd>A-F</kbd> | edit the current byte | - | - | - |
 | <kbd><</kbd> | insert a new byte to the left | - | - | - |
-| <kbd>></kbd> <kbd>␣</kbd> | insert a new byte to the right | - | - | - |
+| <kbd>></kbd> | insert a new byte to the right | - | - | - |
+| <kbd>␣</kbd> | insert a new chunk of bytes to the right | - | - | - |
 | <kbd>Backspace</kbd> | reset current byte(s) | reset current byte(s) | remove current byte(s) | reset current byte(s) |
 | <kbd>Delete</kbd> | reset current byte(s) | reset current byte(s) | remove current byte(s) | reset current byte(s) |
 ||||||
@@ -1301,6 +1302,7 @@ Valid Options are:
 | unicode_escaped_echo | unicode-escape the input when using <a href="#-e---echo">-E, --echo</a> | false | true |
 | unicode_escaped_editor_search | unicode-escape the Search in the Editor (<a href="#----edit">-!, --edit</a>) | false | true |
 | unicode_escaped_editor_replace | unicode-escape the Replacement in the Editor (<a href="#----edit">-!, --edit</a>) | false | true |
+| unicode_escaped_editor_insert | unicode-escape the Insertion in the Hex-Editor (<a href="#----hexedit">-#, --hexedit</a>) | false | true |
 | unicode_escaped_find | unicode-escape the queried Substring when using <a href="#findx-findx">find=X, find&#42889;X</a> | false | true |
 | unicode_escaped_replace | unicode-escape a and b when using <a href="#ab">[a,b]</a> or <a href="#replacex-replacex">replace=X, replace&#42889;X</a> | false | true |
 |||||
