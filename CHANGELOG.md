@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.10.3] - TBA
+
+### Minor Changes
+
+- added `unicode_escaped_editor_insert` option to the config menu to unicode-escape the insert in the hex-editor.
+
+
 ## [1.10.2] - 2024-12-14
 
 ### Minor Changes
