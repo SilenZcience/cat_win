@@ -25,5 +25,6 @@ class DKW:
     UNICODE_ESCAPED_ECHO = 'unicode_escaped_echo'
     UNICODE_ESCAPED_EDITOR_SEARCH = 'unicode_escaped_editor_search'
     UNICODE_ESCAPED_EDITOR_REPLACE = 'unicode_escaped_editor_replace'
+    UNICODE_ESCAPED_EDITOR_INSERT = 'unicode_escaped_editor_insert'
     UNICODE_ESCAPED_FIND = 'unicode_escaped_find'
     UNICODE_ESCAPED_REPLACE = 'unicode_escaped_replace'

@@ -33,6 +33,7 @@ class HexEditor:
     debug_mode = False
 
     unicode_escaped_search = True
+    unicode_escaped_insert = True
     columns = 16
 
     def __init__(self, file: Path, display_name: str) -> None:
@@ -335,7 +336,18 @@ class HexEditor:
         self._move_key_home()
 
     def _insert_byte(self, wchar: str) -> None:
-        pos_offset = int(wchar!='<')
+        if wchar == ' ':
+            r_len = len(self.hex_array[self.cpos.row])
+            if r_len < HexEditor.columns:
+                self.hex_array[self.cpos.row][r_len:r_len] = ['--'] * (HexEditor.columns-r_len)
+                self.hex_array_edit[self.cpos.row][r_len:r_len] = ['--'] * (HexEditor.columns-r_len)
+                self.cpos.col = r_len
+            else:
+                self.hex_array.insert(self.cpos.row+1, ['--'] * HexEditor.columns)
+                self.hex_array_edit.insert(self.cpos.row+1, ['--'] * HexEditor.columns)
+                self.cpos.set_pos((self.cpos.row+1, 0))
+            return
+        pos_offset = int(wchar=='>')
         self.hex_array[self.cpos.row].insert(self.cpos.col+pos_offset, '--')
         self.hex_array_edit[self.cpos.row].insert(self.cpos.col+pos_offset, '--')
         for i in range(self.cpos.row+1, len(self.hex_array)):
@@ -352,7 +364,7 @@ class HexEditor:
             extracted_byte = self.hex_array_edit[-1][-1]
             self.hex_array_edit[-1] = self.hex_array_edit[-1][:-1]
             self.hex_array_edit.append([extracted_byte])
-        if wchar != '<':
+        if wchar == '>':
             self.cpos.col += 1
 
     def _key_string(self, wchar) -> None:
@@ -713,6 +725,11 @@ class HexEditor:
                 i_chars += wchar
             elif key == b'_key_enter':
                 i_chars = i_chars.encode('utf-16', 'surrogatepass').decode('utf-16')
+                if HexEditor.unicode_escaped_insert:
+                    try:
+                        i_chars = i_chars.encode().decode('unicode_escape').encode('latin-1').decode()
+                    except UnicodeError:
+                        pass
                 max_y, _ = self.getxymax()
                 for i_char in i_chars:
                     for byte_ in i_char.encode():
@@ -811,7 +828,7 @@ class HexEditor:
             f"{'^F':<{coff}}find bytes or strings",
             f"{'(Shift+)F3':<{coff}}find next/(previous)",
             '',
-            f"{'Space,>,<':<{coff}}insert new byte",
+            f"{'Space,>,<':<{coff}}insert new byte(s)",
             '',
             f"{'alt+S' if self.save_with_alt else '^S':<{coff}}save file",
             f"{'^R':<{coff}}reload file",
@@ -1242,7 +1259,8 @@ class HexEditor:
 
     @staticmethod
     def set_flags(save_with_alt: bool, debug_mode: bool,
-                  unicode_escaped_search: bool, columns: int) -> None:
+                  unicode_escaped_search: bool, unicode_escaped_insert: bool,
+                  columns: int) -> None:
         """
         set the config flags for the Editor
 
@@ -1259,4 +1277,5 @@ class HexEditor:
         HexEditor.save_with_alt = save_with_alt
         HexEditor.debug_mode = debug_mode
         HexEditor.unicode_escaped_search = unicode_escaped_search
+        HexEditor.unicode_escaped_insert = unicode_escaped_insert
         HexEditor.columns = columns

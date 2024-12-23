@@ -463,9 +463,20 @@ class TestHexEditor(TestCase):
         editor._insert_byte('>')
         self.assertSequenceEqual(editor.hex_array, [['40'] * 9 + ['--'] + ['40'] * 6] + [['40']])
         self.assertEqual(editor.cpos.get_pos(), (0, 9))
-        editor._insert_byte(' ')
+        editor._insert_byte('>')
         self.assertSequenceEqual(editor.hex_array, [['40'] * 9 + ['--'] * 2 + ['40'] * 5] + [['40'] * 2])
         self.assertEqual(editor.cpos.get_pos(), (0, 10))
+
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 20))
+    def test__insert_byte_chunk(self):
+        editor = HexEditor('', '')
+        editor.cpos.set_pos((1, 2))
+        editor._insert_byte(' ')
+        self.assertSequenceEqual(editor.hex_array, [['40'] * 16, ['40'] * 4 + ['--'] * 12])
+        self.assertEqual(editor.cpos.get_pos(), (1, 4))
+        editor._insert_byte(' ')
+        self.assertSequenceEqual(editor.hex_array, [['40'] * 16, ['40'] * 4 + ['--'] * 12, ['--'] * 16])
+        self.assertEqual(editor.cpos.get_pos(), (2, 0))
 
     def test__key_string_invalid(self):
         editor = HexEditor(__file__, '')
@@ -552,7 +563,7 @@ class TestHexEditor(TestCase):
             return _keyname_mapping.get(chr(x), chr(x).encode())
 
         g = [
-            [' ', '2', '2', ' ', ' ', ' ', 260, 260, '0', 'd', '0', 'a', '2', '2', '\x11', '\x11'],
+            ['>', '2', '2', '>', '>', '>', 260, 260, '0', 'd', '0', 'a', '2', '2', '\x11', '\x11'],
             ['\x0e', 'H', 'e', 'x', 'E', 'd', 'i', 't', 'o', 'r', '_', 'F', 'u', 'l', 'l', 'I', 'n', 't', 'e', 'g', 'r', 'a', 't', 'i', 'o', 'n', 'T', 'e', 's', 't', '\r', '\x05', 'd', '\r', '0', 'd', '0', 'a', '\x7f', '\x11', '\x11'],
             ['\x0e', 'H', 'e', 'x', 'E', 'd', 'i', 't', 'o', 'r', '_', 'F', 'u', 'l', 'l', 'I', 'n', 't', 'e', 'g', 'r', 'a', 't', 'i', 'o', 'n', 'T', 'e', 's', 't', '\r', 265, 'a', 260, 547, '\x7f', '\x11', '\x11']
         ]
@@ -663,7 +674,7 @@ class TestHexEditor(TestCase):
         editor._key_string('2')
         editor._key_string('1')
         for _ in range(100):
-            editor._key_string(' ')
+            editor._key_string('>')
         editor._build_file_upto(editor.cpos.row+32)
         editor._fix_cursor_position(30)
         for _ in range(4):
@@ -908,10 +919,12 @@ class TestHexEditor(TestCase):
         backup_a = HexEditor.save_with_alt
         backup_b = HexEditor.debug_mode
         backup_c = HexEditor.unicode_escaped_search
-        backup_d = HexEditor.columns
-        HexEditor.set_flags(True, True, False, 1002)
+        backup_d = HexEditor.unicode_escaped_insert
+        backup_e = HexEditor.columns
+        HexEditor.set_flags(True, True, False, False, 1002)
         self.assertEqual(HexEditor.save_with_alt, True)
         self.assertEqual(HexEditor.debug_mode, True)
         self.assertEqual(HexEditor.unicode_escaped_search, False)
+        self.assertEqual(HexEditor.unicode_escaped_insert, False)
         self.assertEqual(HexEditor.columns, 1002)
-        HexEditor.set_flags(backup_a, backup_b, backup_c, backup_d)
+        HexEditor.set_flags(backup_a, backup_b, backup_c, backup_d, backup_e)
