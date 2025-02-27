@@ -9,6 +9,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - added `unicode_escaped_editor_insert` option to the config menu to unicode-escape the insert in the hex-editor.
 
+## Bugfixes
+
+- fixed Bug where certain file paths would not be correctly recognized and potentially result in a crash.
+
 
 ## [1.10.2] - 2024-12-14
 
