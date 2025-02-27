@@ -35,6 +35,8 @@ jobs:
             python-version: '3.13' # temporary
           - os: ubuntu-latest
             python-version: '3.6'
+          - os: ubuntu-latest
+            python-version: '3.7'
         include:
           - os: macos-13
             python-version: '3.6'
@@ -48,6 +50,8 @@ jobs:
             python-version: 'pypy-3.6'
           - os: ubuntu-20.04
             python-version: '3.6'
+          - os: ubuntu-20.04
+            python-version: '3.7'
     steps:
       - name: Set Windows Line Ending
         run: |
