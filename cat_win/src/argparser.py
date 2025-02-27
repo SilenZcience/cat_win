@@ -147,7 +147,10 @@ class ArgParser:
                                                                             recursive=True)
             for _filename in path_gen:
                 norm_path = Path(os.path.realpath(_filename))
-                lit_path  = Path(f"{self.win_prefix_lit}{norm_path.parent}/{Path(_filename).name}")
+                p_name = Path(_filename).name
+                if not p_name:
+                    p_name = norm_path.stem
+                lit_path  = Path(f"{self.win_prefix_lit}{norm_path.parent}/{p_name}")
                 p_equal = lit_path.stem == norm_path.stem
                 norm_exists, lit_exists = False, False
                 try:
@@ -187,7 +190,10 @@ class ArgParser:
 
     def _add_path_struct(self, param: str) -> bool:
         norm_path = Path(os.path.realpath(param))
-        lit_path  = Path(f"{self.win_prefix_lit}{norm_path.parent}/{Path(param).name}")
+        p_name = Path(param).name
+        if not p_name:
+            p_name = norm_path.stem
+        lit_path  = Path(f"{self.win_prefix_lit}{norm_path.parent}/{p_name}")
         p_equal = lit_path.stem == norm_path.stem
         norm_exists, lit_exists = False, False
         try:
@@ -232,7 +238,7 @@ class ArgParser:
 
     def _expand_user(self, param: str) -> str:
         provided_path = Path(param)
-        if provided_path.parts[0] == '~':
+        if provided_path.parts and provided_path.parts[0] == '~':
             if (
                 not os.path.exists('~') or
                 os.path.isfile('~') and len(provided_path.parts) > 1
