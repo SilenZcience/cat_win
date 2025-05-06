@@ -76,5 +76,5 @@ Issues = "https://github.com/SilenZcience/cat_win/issues"
 [tool.pytest.ini_options]
 filterwarnings = [
     "ignore::DeprecationWarning",
-    "ignore::PendingDeprecationWarning ",
+    "ignore::PendingDeprecationWarning",
 ]
