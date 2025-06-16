@@ -831,7 +831,8 @@ def print_raw_view(file_index: int = 0, mode: str = 'X') -> None:
     print(u_files[file_index].displayname, ':', sep='')
     raw_gen = get_raw_view_lines_gen(u_files[file_index].path, mode,
                                      [color_dic[CKW.RAWVIEWER], color_dic[CKW.RESET_ALL]],
-                                     arg_parser.file_encoding)
+                                     arg_parser.file_encoding,
+                                     slice(*arg_parser.file_truncate))
     print(next(raw_gen)) # the header will always be available
     for line in raw_gen:
         skipped += 1
