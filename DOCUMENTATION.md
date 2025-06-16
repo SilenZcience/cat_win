@@ -1497,6 +1497,7 @@ It's raining catcat \1\1 dogdog!
 ### <a id="truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>
 
 Truncates every File by the Specifics defined.
+When using <a href="#--binview---binview">--binview, --binview</a> or <a href="#--hexview---hexview">--hexview, --HEXVIEW</a> this Paremeter will slice the Bytestream instead.
 This Parameter uses the Default Python slicing Mechanic and uses it on the Lines of each File.
 The Argument is valid by defining trunc=\<start\>\:\<stop\> or trunc=\<start\>\:\<stop\>\:\<step\>.
 Using the shortened Version t=X:Y or t:X:Y yields the same Result.
