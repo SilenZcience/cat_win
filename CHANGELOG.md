@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.10.4] - TBA
+
+### Minor Changes
+
+- using --`hexview` and --`binview` is now compatible with using the `trunc=`, `trunc:` parameter to slice the bytestream.
+
+
 ## [1.10.3] - 2025-02-27
 
 ### Minor Changes
