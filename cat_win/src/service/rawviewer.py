@@ -90,7 +90,8 @@ def get_display_char_gen(file_encoding: str = 'utf-8', base: int = 16):
 
 
 def get_raw_view_lines_gen(file: Path, mode: str = 'X', colors: list = None,
-                           file_encoding: str = 'utf-8'):
+                           file_encoding: str = 'utf-8',
+                           file_truncate_slice: slice = None):
     """
     return the raw byte representation of a file in hexadecimal or binary
     line by line
@@ -106,6 +107,8 @@ def get_raw_view_lines_gen(file: Path, mode: str = 'X', colors: list = None,
         Index 1 holds the color CKW.RESET_ALL
     file_encoding (str):
         the encoding used (possibly for stdout)
+    file_truncate_slice (slice):
+        a slice to truncate the raw file content
 
     Yields:
     current_line (str):
@@ -113,19 +116,22 @@ def get_raw_view_lines_gen(file: Path, mode: str = 'X', colors: list = None,
         output containing the header and line information aswell
         as the bytes themselves
     """
-    if colors is None or len(colors) < 2:
-        colors = ['', '']
     if not (mode and mode in 'xXb'):
         mode = 'X'
+    if colors is None or len(colors) < 2:
+        colors = ['', '']
+    if file_truncate_slice is None:
+        file_truncate_slice = slice(None)
 
     get_display_char = get_display_char_gen(file_encoding)
 
     try:
         raw_file_content = IoHelper.read_file(file, True)
+        raw_file_content = raw_file_content[file_truncate_slice]
         raw_file_content_length = len(raw_file_content)
     except OSError as exc:
         yield type(exc).__name__
-        return ''
+        return
 
     repr_length = 2 * (mode in 'xX') + 8 * (mode == 'b')
 
@@ -153,3 +159,6 @@ def get_raw_view_lines_gen(file: Path, mode: str = 'X', colors: list = None,
                         f" {colors[0]}#{colors[1]} " + \
                         ' '.join(map(get_display_char, line))
         yield current_line
+    if file_truncate_slice != slice(None):
+        yield f"The raw file content was truncated to {file_truncate_slice}. " \
+              f"The adress information could be wrong."
