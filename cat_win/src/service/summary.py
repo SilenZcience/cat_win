@@ -84,12 +84,12 @@ class Summary:
                 file.set_file_size(get_file_size(file.path))
             file_sizes.append(file.file_size)
             print(f"     {Summary.color}" + \
-                f"{str(_convert_size(file.file_size)).rjust(9)}", end='')
+                f"{str(_convert_size(file.file_size)).rjust(10)}", end='')
             prefix = ' ' if file.plaintext        else '-'
             prefix+= '*' if file.contains_queried else ' '
             print(f"{prefix}{file.displayname}{Summary.color_reset}")
         print(Summary.color, end='')
-        print(f"Sum: {str(_convert_size(sum(file_sizes))).rjust(9)}", end='')
+        print(f"Sum: {str(_convert_size(sum(file_sizes))).rjust(10)}", end='')
         print(Summary.color_reset)
         print(Summary.color, end='')
         print(f"Amount:\t{len(files)}", end='')
@@ -118,10 +118,10 @@ class Summary:
         for directory in known_directories:
             dir_sizes.append(get_dir_size(directory))
             print(f"     {Summary.color}" + \
-                f"{str(_convert_size(dir_sizes[-1]).rjust(9))}", end='')
+                f"{str(_convert_size(dir_sizes[-1]).rjust(10))}", end='')
             print(f"  {directory}{Summary.color_reset}")
         print(Summary.color, end='')
-        print(f"Sum: {str(_convert_size(sum(dir_sizes))).rjust(9)}", end='')
+        print(f"Sum: {str(_convert_size(sum(dir_sizes))).rjust(10)}", end='')
         print(Summary.color_reset)
         print(Summary.color, end='')
         print(f"Amount:\t{len(known_directories)}", end='')

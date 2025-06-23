@@ -374,7 +374,7 @@ class IoHelper:
 
         Parameters:
         dup (bool):
-            is this is false the function will not do anything.
+            if this is false the function will not do anything.
             only implemented to eliminate repeated code somewhere else
         """
         if not dup:
