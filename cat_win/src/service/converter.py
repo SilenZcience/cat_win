@@ -72,18 +72,19 @@ class Converter:
             if integrated:
                 new_l_tokens.append(_l[:res.start()])
             try:
-                new_l_tokens.append(f"{self.colors[0]}{eval(res.group(), {"__builtins__": {}})}{self.colors[2]}")
+                eval_call = eval(res.group(), {"__builtins__": {}})
+                new_l_tokens.append(f"{self.colors[0]}{eval_call}{self.colors[2]}")
             except SyntaxError as exc:
                 p_diff = res.group().count('(') - res.group().count(')')
                 try:
                     if p_diff > 0 and res.group()[:p_diff] == '(' * p_diff:
-                        new_l_tokens.append(f"{self.colors[0]}" + \
-                            f"{eval(res.group()[p_diff:], {"__builtins__": {}})}{self.colors[2]}")
+                        eval_call = eval(res.group()[p_diff:], {"__builtins__": {}})
+                        new_l_tokens.append(f"{self.colors[0]}{eval_call}{self.colors[2]}")
                         if integrated:
                             new_l_tokens.insert(len(new_l_tokens)-1, '(' * p_diff)
                     elif p_diff < 0 and res.group()[p_diff:] == ')' * (-1 * p_diff):
-                        new_l_tokens.append(f"{self.colors[0]}" + \
-                            f"{eval(res.group()[:p_diff], {"__builtins__": {}})}{self.colors[2]}")
+                        eval_call = eval(res.group()[:p_diff], {"__builtins__": {}})
+                        new_l_tokens.append(f"{self.colors[0]}{eval_call}{self.colors[2]}")
                         _l = ')' * (-1 * p_diff) + _l
                     else:
                         raise SyntaxError from exc
