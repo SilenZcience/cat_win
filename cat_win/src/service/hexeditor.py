@@ -517,7 +517,9 @@ class HexEditor:
                     self._render_scr()
             if not isinstance(wchar, str):
                 continue
-            if key == b'_key_string' and wchar.upper() in HEX_BYTE_KEYS:
+            if key == b'_key_backspace':
+                l_jmp = l_jmp[:-1]
+            elif key == b'_key_string' and wchar.upper() in HEX_BYTE_KEYS:
                 l_jmp += wchar
             elif (key == b'_key_string' and wchar.upper() in ['Y', 'J']) or \
                 key == b'_key_enter':

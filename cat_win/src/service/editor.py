@@ -841,7 +841,9 @@ class Editor:
                     curses.curs_set(0)
             if not isinstance(wchar, str):
                 continue
-            if key == b'_key_string' and wchar.isdigit():
+            if key == b'_key_backspace':
+                l_jmp = l_jmp[:-1]
+            elif key == b'_key_string' and wchar.isdigit():
                 l_jmp += wchar
             elif (key == b'_key_string' and wchar.upper() in ['Y', 'J']) or \
                 key == b'_key_enter':
