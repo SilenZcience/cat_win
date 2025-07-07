@@ -311,7 +311,7 @@ class ArgParser:
             p_length = 6 if RE_Q_TRUNC.match(param) else 2
             for i, p_split in enumerate(param[p_length:].split(':')):
                 try:
-                    self.file_truncate[i] = int(eval(p_split))
+                    self.file_truncate[i] = int(eval(p_split, {"__builtins__": {}}))
                 except (SyntaxError, NameError, ValueError, ArithmeticError):
                     self.file_truncate[i] = None
             return False
