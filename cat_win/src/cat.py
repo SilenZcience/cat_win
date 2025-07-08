@@ -37,6 +37,7 @@ from cat_win.src.service.cbase64 import encode_base64, decode_base64
 from cat_win.src.service.checksum import print_checksum
 from cat_win.src.service.clipboard import Clipboard
 from cat_win.src.service.converter import Converter
+from cat_win.src.service.diffviewer import DiffViewer
 from cat_win.src.service.editor import Editor
 from cat_win.src.service.fileattributes import get_file_size, get_file_mtime, print_meta
 from cat_win.src.service.fileattributes import _convert_size
@@ -1029,6 +1030,7 @@ def init(repl: bool = False) -> tuple:
         cconfig.save_config()
         sys.exit(0)
 
+    DiffViewer.set_flags(u_args[ARGS_DEBUG], arg_parser.file_encoding)
     Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
     Editor.set_flags(u_args[ARGS_STDIN] and on_windows_os, u_args[ARGS_DEBUG],
                      const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
@@ -1109,6 +1111,11 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
         with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
             for file in known_files:
                 HexEditor.open(file, u_files.get_file_display_name(file))
+    elif u_args[ARGS_DIFF]:
+        for i in range(1, len(known_files), 2):
+            diff_files = known_files[i-1:i+1]
+            DiffViewer.open(diff_files, [u_files.get_file_display_name(f) for f in diff_files])
+
 
     # fill holder object with neccessary values
     u_files.set_files([*known_files, *unknown_files])
