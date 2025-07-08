@@ -35,7 +35,7 @@ ARGS_CHARCOUNT, ARGS_CCHARCOUNT, ARGS_STRINGS, ARGS_MORE, ARGS_RAW = range(55, 6
 ARGS_CONFIG_FLUSH, ARGS_CCONFIG_FLUSH, ARGS_CONFIG_REMOVE = range(60, 63)
 ARGS_HEX_EDITOR, ARGS_SSORT, ARGS_VISUALIZE_B, ARGS_VISUALIZE_Z = range(63, 67)
 ARGS_VISUALIZE_H, ARGS_VISUALIZE_E, ARGS_VISUALIZE_D = range(67, 70)
-ARGS_LESS, = range(70, 71)
+ARGS_LESS, ARGS_DIFF = range(70, 72)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -155,6 +155,8 @@ ALL_ARGS = [
 				ARGS_EDITOR, show_arg_on_repl=False, section=10),
     ArgConstant('-#', '--hexedit', 'open each file in a simple hex-editor',
 				ARGS_HEX_EDITOR, show_arg_on_repl=False, section=10),
+    ArgConstant('-?', '--diff', 'open two files in a simple diff side-by-side viewer',
+				ARGS_DIFF, show_arg_on_repl=False, section=10),
     ArgConstant('-M', '--more', 'page through the file step by step',
                 ARGS_MORE, show_arg_on_repl=False, section=10),
     ArgConstant('-L', '--less', 'page through the file step by step (lazy)',
