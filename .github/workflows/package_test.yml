@@ -20,9 +20,6 @@ jobs:
         os: [macos-latest, windows-latest, ubuntu-latest]
         # python-version: ['3.6', '3.7', '3.8', '3.9', '3.10', '3.11', '3.12', 'pypy-3.7', 'pypy-3.8', 'pypy-3.9', 'pypy-3.10']
         python-version: ['3.8', '3.10', '3.13', 'pypy-3.10']
-        exclude:
-          - os: windows-latest
-            python-version: '3.13' # temporary
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
@@ -46,7 +43,7 @@ jobs:
       - name: Install Local Package
         # this should also install the code dependency in requirements.txt
         run: |
-          python -m workflowHelper.dist 
+          python -m workflowHelper.dist
       - name: Test Code Execution
         run: |
           python -m cat_win
