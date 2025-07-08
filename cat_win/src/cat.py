@@ -679,7 +679,7 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
             slice_evals = [None, None, None]
             for i, p_split in enumerate(param[1:-1].split(':')):
                 try:
-                    slice_evals[i] = int(eval(p_split))
+                    slice_evals[i] = int(eval(p_split, {"__builtins__": {}}))
                 except (SyntaxError, NameError, ValueError, ArithmeticError):
                     pass
             content = [(prefix, line[slice_evals[0]:slice_evals[1]:slice_evals[2]])
