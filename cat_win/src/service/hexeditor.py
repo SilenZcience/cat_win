@@ -813,7 +813,6 @@ class HexEditor:
 
     def _function_help(self) -> None:
         curses.curs_set(0)
-        self.curse_window.move(0, 0)
         self.curse_window.clear()
         coff = 20
 
