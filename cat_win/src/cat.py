@@ -39,7 +39,7 @@ from cat_win.src.service.clipboard import Clipboard
 from cat_win.src.service.converter import Converter
 from cat_win.src.service.diffviewer import DiffViewer
 from cat_win.src.service.editor import Editor
-from cat_win.src.service.fileattributes import get_file_size, get_file_mtime, print_meta
+from cat_win.src.service.fileattributes import get_file_size, get_file_mtime, get_file_ctime, print_meta
 from cat_win.src.service.fileattributes import _convert_size
 from cat_win.src.service.formatter import Formatter
 from cat_win.src.service.hexeditor import HexEditor
@@ -194,7 +194,7 @@ def _show_version(repl: bool = False) -> None:
     version_message += '\n'
     version_message += f"Built with: \tPython {__sysversion__}\n"  # sys.version
     try:
-        time_stamp = datetime.fromtimestamp(os.path.getctime(os.path.realpath(__file__)))
+        time_stamp = datetime.fromtimestamp(get_file_ctime(os.path.realpath(__file__)))
         version_message += f"Install time: \t{time_stamp}\n"
     except OSError: # fails on pyinstaller executable
         version_message += 'Install time: \t-\n'
