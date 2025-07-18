@@ -234,6 +234,25 @@ def get_file_mtime(file: Path) -> float:
     except OSError:
         return 0.0
 
+def get_file_ctime(file: Path) -> float:
+    """
+    get the created time of a file
+
+    Parameters:
+    file (Path):
+        a string representation of a file (-path)
+
+    Returns:
+    (float):
+        the created time of a file
+    """
+    try:
+        return os.stat(file).st_birthtime
+    except AttributeError:
+        return os.stat(file).st_ctime
+    except OSError:
+        return 0.0
+
 def get_file_meta_data(file: Path, res_path: str, colors = None) -> str:
     """
     calculate file metadata information.
@@ -268,20 +287,26 @@ def get_file_meta_data(file: Path, res_path: str, colors = None) -> str:
         meta_data += f"{colors[1]}{'MTime:': <16}"
         meta_data += f"{datetime.fromtimestamp(stats.st_mtime)}{colors[0]}\n"
         meta_data += f"{colors[1]}{'CTime:': <16}"
-        meta_data += f"{datetime.fromtimestamp(stats.st_ctime)}{colors[0]}\n"
+        try:
+            meta_data += f"{datetime.fromtimestamp(stats.st_birthtime)}{colors[0]}\n"
+        except AttributeError:
+            meta_data += f"{datetime.fromtimestamp(stats.st_ctime)}{colors[0]}\n"
 
+        perms = [
+            (S_IRUSR, 'r'), (S_IWUSR, 'w'), (S_IXUSR, 'x'),  # User
+            (S_IRGRP, 'r'), (S_IWGRP, 'w'), (S_IXGRP, 'x'),  # Group
+            (S_IROTH, 'r'), (S_IWOTH, 'w'), (S_IXOTH, 'x'),  # Others
+        ]
+        meta_data += f"{colors[1]}{'d' if S_ISDIR(stats.st_mode) else '-'}"
+        meta_data += f"{''.join([per if stats.st_mode & bit else '-' for bit, per in perms])} "
+        meta_data += f"({oct(stats.st_mode)[-3:]})"
         if not on_windows_os:
-            perms = [
-                (S_IRUSR, 'r'), (S_IWUSR, 'w'), (S_IXUSR, 'x'),  # User
-                (S_IRGRP, 'r'), (S_IWGRP, 'w'), (S_IXGRP, 'x'),  # Group
-                (S_IROTH, 'r'), (S_IWOTH, 'w'), (S_IXOTH, 'x'),  # Others
-            ]
-            meta_data += f"{colors[1]}{'d' if S_ISDIR(stats.st_mode) else '-'}"
-            meta_data += f"{''.join([per if stats.st_mode & bit else '-' for bit, per in perms])} "
-            meta_data += f"{stats.st_nlink} {getpwuid(stats.st_uid).pw_name} "
-            meta_data += f"{getgrgid(stats.st_gid).gr_name}{colors[0]}\n"
+            meta_data += f" {stats.st_nlink} {getpwuid(stats.st_uid).pw_name}"
+            meta_data += f" {getgrgid(stats.st_gid).gr_name}{colors[0]}\n"
 
             return meta_data
+
+        meta_data += f"{colors[0]}\n"
 
         file_handle = WinStreams(file)
         if file_handle.streams:

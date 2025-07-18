@@ -75,6 +75,7 @@ class TestFileAttributes(TestCase):
                 self.assertIn('Indexed', meta_data)
                 self.assertIn('Compressed', meta_data)
                 self.assertIn('Encrypted', meta_data)
+                self.assertIn('-rw-rw-rw- (666)', meta_data)
                 self.assertNotIn('rwx', meta_data)
             else:
                 self.assertNotIn('Archive', meta_data)
