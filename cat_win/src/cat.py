@@ -1206,6 +1206,7 @@ def cleanup(tmp_file_helper: TmpFileHelper) -> None:
     tmp_file_helper (TmpFileHelper):
         the temporary file helper to clean up the files
     """
+    sys.stdout.flush()
     if u_args[ARGS_DEBUG]:
         err_print(color_dic[CKW.MESSAGE_INFORMATION], end='')
         err_print('================================================ '
