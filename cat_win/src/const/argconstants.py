@@ -18,28 +18,51 @@ class ArgConstant:
         self.section = section
 
 
-ARGS_HELP, ARGS_NUMBER, ARGS_ENDS, ARGS_EDITOR, ARGS_SQUEEZE = range(0, 5)
-ARGS_REVERSE, ARGS_SUM, ARGS_BLANK, ARGS_FILES, ARGS_STDIN = range(5, 10)
-ARGS_CLIP, ARGS_CHECKSUM, ARGS_DEC, ARGS_HEX, ARGS_BIN = range(10, 15)
-ARGS_VERSION, ARGS_DEBUG, ARGS_CUT, ARGS_REPLACE, ARGS_DATA = range(15, 20)
-ARGS_CCONFIG, ARGS_LLENGTH, ARGS_ONELINE, ARGS_PEEK, ARGS_NOCOL = range(20, 25)
-ARGS_CHR, ARGS_B64E, ARGS_B64D, ARGS_FFILES, ARGS_GREP = range(25, 30)
-ARGS_NOBREAK, ARGS_ECHO, ARGS_SSUM, ARGS_HEXVIEW, ARGS_BINVIEW = range(30, 35)
-ARGS_NOKEYWORD, ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN = range(35, 38)
-ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(38, 40)
-ARGS_EVAL, ARGS_SORT, ARGS_GREP_ONLY, ARGS_PLAIN_ONLY, ARGS_FILE_PREFIX = range(40, 45)
-ARGS_FFILE_PREFIX, ARGS_DOTFILES, ARGS_OCT, ARGS_URI, ARGS_WORDCOUNT = range(45, 50)
-ARGS_WWORDCOUNT, ARGS_DIRECTORIES, ARGS_DDIRECTORIES = range(50, 53)
-ARGS_SPECIFIC_FORMATS, ARGS_CONFIG = range(53, 55)
-ARGS_CHARCOUNT, ARGS_CCHARCOUNT, ARGS_STRINGS, ARGS_MORE, ARGS_RAW = range(55, 60)
-ARGS_CONFIG_FLUSH, ARGS_CCONFIG_FLUSH, ARGS_CONFIG_REMOVE = range(60, 63)
-ARGS_HEX_EDITOR, ARGS_SSORT, ARGS_VISUALIZE_B, ARGS_VISUALIZE_Z = range(63, 67)
-ARGS_VISUALIZE_H, ARGS_VISUALIZE_E, ARGS_VISUALIZE_D = range(67, 70)
-ARGS_LESS, ARGS_DIFF = range(70, 72)
+# informational
+ARGS_HELP, ARGS_VERSION, ARGS_DEBUG = range(0, 3)
+# prefix
+ARGS_LLENGTH, ARGS_NUMBER, ARGS_FILE_PREFIX, ARGS_FFILE_PREFIX = range(100, 104)
+# simple replacements
+ARGS_ENDS, ARGS_CHR = range(200, 202)
+# line manipulation
+ARGS_BLANK, ARGS_PEEK, ARGS_REVERSE, ARGS_SQUEEZE = range(300, 304)
+ARGS_SORT, ARGS_SSORT, ARGS_SPECIFIC_FORMATS      = range(304, 307)
+# different content types
+ARGS_ECHO, ARGS_STDIN, ARGS_ONELINE, ARGS_URI = range(400, 404)
+# summary
+ARGS_FILES, ARGS_FFILES, ARGS_DIRECTORIES, ARGS_DDIRECTORIES = range(500, 504)
+ARGS_SUM, ARGS_SSUM, ARGS_WORDCOUNT, ARGS_WWORDCOUNT         = range(504, 508)
+ARGS_CHARCOUNT, ARGS_CCHARCOUNT                              = range(508, 510)
+# search and match
+ARGS_GREP, ARGS_GREP_ONLY, ARGS_NOKEYWORD, ARGS_NOBREAK = range(600, 604)
+# meta information
+ARGS_DATA, ARGS_CHECKSUM, ARGS_STRINGS = range(700, 703)
+# numbers
+ARGS_B64D, ARGS_B64E, ARGS_EVAL, ARGS_HEX = range(800, 804)
+ARGS_DEC, ARGS_OCT, ARGS_BIN              = range(804, 807)
+# raw-view
+ARGS_BINVIEW, ARGS_HEXVIEW = range(900, 902)
+# display & edit
+ARGS_EDITOR, ARGS_HEX_EDITOR, ARGS_DIFF = range(1000, 1003)
+ARGS_MORE, ARGS_LESS, ARGS_RAW          = range(1003, 1006)
+# visualize
+ARGS_VISUALIZE_B, ARGS_VISUALIZE_Z, ARGS_VISUALIZE_H = range(1100, 1103)
+ARGS_VISUALIZE_E, ARGS_VISUALIZE_D                   = range(1103, 1105)
+# behavioural
+ARGS_CLIP, ARGS_DOTFILES, ARGS_PLAIN_ONLY, ARGS_NOCOL = range(1200, 1204)
+# configuration
+ARGS_CONFIG, ARGS_CCONFIG, ARGS_CONFIG_FLUSH = range(1300, 1303)
+ARGS_CCONFIG_FLUSH, ARGS_CONFIG_REMOVE       = range(1303, 1305)
+# streams
+ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN      = range(1400, 1402)
+ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(1402, 1404)
+
+ARGS_CUT, ARGS_REPLACE = range(1500, 1502)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
 ALL_ARGS = [
+    # informational
     ArgConstant('-h', '--help', 'show this help message and exit',
 				ARGS_HELP, section=0),
     ArgConstant('-v', '--version', 'output version information and exit',
@@ -151,6 +174,7 @@ ALL_ARGS = [
     ArgConstant('--hexview', '--HEXVIEW', 'display the raw byte representation in hexadecimal',
 				ARGS_HEXVIEW, show_arg_on_repl=False, section=9),
 
+    # display & edit
     ArgConstant('-!', '--edit', 'open each file in a simple editor',
 				ARGS_EDITOR, show_arg_on_repl=False, section=10),
     ArgConstant('-#', '--hexedit', 'open each file in a simple hex-editor',
@@ -200,12 +224,12 @@ ALL_ARGS = [
 
     # streams
     ArgConstant('-R', '--R', 'reconfigure the stdin and stdout with the parsed encoding',
-				ARGS_RECONFIGURE, show_arg=False),
+				ARGS_RECONFIGURE, show_arg=False, section=14),
     ArgConstant('--Rin', '--Rin', 'reconfigure the stdin with the parsed encoding',
-				ARGS_RECONFIGURE_IN, show_arg=False),
+				ARGS_RECONFIGURE_IN, show_arg=False, section=14),
     ArgConstant('--Rout', '--Rout', 'reconfigure the stdout with the parsed encoding',
-                ARGS_RECONFIGURE_OUT, show_arg=False),
+                ARGS_RECONFIGURE_OUT, show_arg=False, section=14),
     ArgConstant('--Rerr', '--Rerr', 'reconfigure the stderr with the parsed encoding',
-                ARGS_RECONFIGURE_ERR, show_arg=False),
+                ARGS_RECONFIGURE_ERR, show_arg=False, section=14),
 ]
 ALL_ARGS.sort(key=lambda x:x.section)
