@@ -119,7 +119,7 @@ class Signatures:
                     signature_option = f"{signature['mime']}({ext})"
                     if ext == file_ext:
                         file_signature_primary = signature_option
-                    elif sig not in encountered_sig:
+                    elif sig not in encountered_sig or not file_signature_secondary:
                         file_signature_secondary.append((signature_option, len(sig)))
                     encountered_sig.add(sig)
                     break

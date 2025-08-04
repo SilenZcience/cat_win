@@ -695,24 +695,51 @@
     "txt": {
         "signs": [
             "0,EFBBBF",
-            "0,FFFE",
             "0,FEFF",
-            "0,FFFE0000",
+            "0,FFFE",
             "0,0000FEFF",
-            "0,0EFEFF"
+            "0,FFFE0000",
+            "0,2B2F7638",
+            "0,2B2F7639",
+            "0,2B2F762B",
+            "0,2B2F762F",
+            "0,F7644C",
+            "0,DD736673",
+            "0,0EFEFF",
+            "0,FBEE28",
+            "0,84319533"
         ],
         "mime": "text/plain"
     },
-    "others": {
+    "UTF-8 byte order mark for text": {
         "signs": [
-            "0,EFBBBF",
-            "0,FFFE",
-            "0,FEFF",
-            "0,FFFE0000",
-            "0,0000FEFF",
-            "0,0EFEFF"
+            "0,EFBBBF"
         ],
-        "mime": "text"
+        "mime": "text/plain"
+    },
+    "UTF-16 (BE) byte order mark for text": {
+        "signs": [
+            "0,FEFF"
+        ],
+        "mime": "text/plain"
+    },
+    "UTF-16 (LE) byte order mark for text": {
+        "signs": [
+            "0,FFFE"
+        ],
+        "mime": "text/plain"
+    },
+    "UTF-32 (BE) byte order mark for text": {
+        "signs": [
+            "0,0000FEFF"
+        ],
+        "mime": "text/plain"
+    },
+    "UTF-32 (LE) byte order mark for text": {
+        "signs": [
+            "0,FFFE0000"
+        ],
+        "mime": "text/plain"
     },
     "UTF-7 byte order mark for text": {
         "signs": [
@@ -721,31 +748,37 @@
             "0,2B2F762B",
             "0,2B2F762F"
         ],
-        "mime": "UTF-7"
+        "mime": "text/plain"
     },
     "UTF-1 byte order mark for text": {
         "signs": [
             "0,F7644C"
         ],
-        "mime": "UTF-1"
-    },
-    "BOCU-1 byte order mark for text": {
-        "signs": [
-            "0,FBEE28"
-        ],
-        "mime": "BOCU-1"
-    },
-    "GB18030 byte order mark for text": {
-        "signs": [
-            "0,84319533"
-        ],
-        "mime": "GB18030"
+        "mime": "text/plain"
     },
     "UTF-EBCDIC byte order mark for text": {
         "signs": [
             "0,DD736673"
         ],
-        "mime": "UTF-EBCDIC"
+        "mime": "text/plain"
+    },
+    "SCSU byte order mark for text": {
+        "signs": [
+            "0,0EFEFF"
+        ],
+        "mime": "text/plain"
+    },
+    "BOCU-1 byte order mark for text": {
+        "signs": [
+            "0,FBEE28"
+        ],
+        "mime": "text/plain"
+    },
+    "GB 18030 byte order mark for text": {
+        "signs": [
+            "0,84319533"
+        ],
+        "mime": "text/plain"
     },
     "JKS Javakey Store": {
         "signs": [
