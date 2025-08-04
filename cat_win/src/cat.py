@@ -40,7 +40,7 @@ from cat_win.src.service.converter import Converter
 from cat_win.src.service.diffviewer import DiffViewer
 from cat_win.src.service.editor import Editor
 from cat_win.src.service.fileattributes import get_file_size, get_file_mtime, get_file_ctime, print_meta
-from cat_win.src.service.fileattributes import _convert_size
+from cat_win.src.service.fileattributes import _convert_size, Signatures
 from cat_win.src.service.formatter import Formatter
 from cat_win.src.service.hexeditor import HexEditor
 from cat_win.src.service.more import More
@@ -256,7 +256,7 @@ def _print_meta_and_checksum(show_meta: bool, show_checksum: bool) -> None:
     """
     for file in u_files:
         if show_meta:
-            print_meta(file.path, os.path.join(working_dir, 'res', 'signatures.json'),
+            print_meta(file.path,
                        [color_dic[CKW.RESET_ALL],
                         color_dic[CKW.ATTRIB],
                         color_dic[CKW.ATTRIB_POSITIVE],
@@ -1041,6 +1041,7 @@ def init(repl: bool = False) -> tuple:
                         const_dic[DKW.UNICODE_ESCAPED_EDITOR_INSERT],
                         const_dic[DKW.HEX_EDITOR_COLUMNS])
     More.set_flags(const_dic[DKW.MORE_STEP_LENGTH])
+    Signatures.set_res_path(os.path.join(working_dir, 'res', 'signatures.json'))
     Visualizer.set_flags(u_args[ARGS_DEBUG])
     Summary.set_flags(const_dic[DKW.SUMMARY_UNIQUE_ELEMENTS])
     Summary.set_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
