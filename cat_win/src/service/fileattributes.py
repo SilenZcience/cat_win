@@ -43,6 +43,21 @@ class Signatures:
     signatures = None
 
     @staticmethod
+    def set_res_path(res_path: str) -> None:
+        """
+        set the path to the signatures database
+
+        Parameters:
+        res_path (str):
+            the path to the signatures database
+        """
+        try:
+            with open(res_path, 'r', encoding='utf-8') as sig:
+                Signatures.signatures = json.load(sig)
+        except (OSError, json.JSONDecodeError):
+            Signatures.signatures = None
+
+    @staticmethod
     def match(file_prefix_: str, signature_: str) -> bool:
         """
         check if a signature (magic number) matches
@@ -67,13 +82,11 @@ class Signatures:
         return True
 
     @staticmethod
-    def read_signature(res_path: str, file: Path) -> str:
+    def read_signature(file: Path) -> str:
         """
         read a file and compare its signature to known signatures.
 
         Parameters:
-        res_path (str):
-            the path to the signatures database
         file (Path):
             a string representation of a file (-path)
 
@@ -90,16 +103,13 @@ class Signatures:
         try:
             file_ = open(file, 'rb')
             file_prefix = file_.read(348).hex().upper()
-
             if Signatures.signatures is None:
-                with open(res_path, 'r', encoding='utf-8') as sig:
-                    Signatures.signatures = json.load(sig)
-            signatures_json = Signatures.signatures
-        except OSError:
+                raise OSError("Signatures not loaded")
+        except OSError as e:
             if file_ is not None:
                 file_.close()
-            return 'lookup failed!'
-        for ext, signature in signatures_json.items():
+            return f"lookup failed: {e}"
+        for ext, signature in Signatures.signatures.items():
             for sign in signature['signs']:
                 offset, sig = sign.split(',')
                 sig_distance = len(sig) - len(file_prefix) + int(offset)*2
@@ -253,15 +263,13 @@ def get_file_ctime(file: Path) -> float:
     except OSError:
         return 0.0
 
-def get_file_meta_data(file: Path, res_path: str, colors = None) -> str:
+def get_file_meta_data(file: Path, colors = None) -> str:
     """
     calculate file metadata information.
 
     Parameters:
     file (Path):
         a string representation of a file (-path)
-    res_path (str);
-        the path to the signatures database
     colors (list):
         a list containing the ANSI-Colorcodes to display
         the attributes like [RESET_ALL, ATTRIB, +ATTRIB, -ATTRIB]
@@ -279,7 +287,7 @@ def get_file_meta_data(file: Path, res_path: str, colors = None) -> str:
         meta_data = f"{colors[1]}{file}{colors[0]}\n"
 
         meta_data += f"{colors[1]}{'Signature:' : <16}"
-        meta_data += f"{Signatures.read_signature(res_path, file)}{colors[0]}\n"
+        meta_data += f"{Signatures.read_signature(file)}{colors[0]}\n"
         meta_data += f"{colors[1]}{'Size:' : <16}"
         meta_data += f"{_convert_size(stats.st_size)} ({stats.st_size}){colors[0]}\n"
         meta_data += f"{colors[1]}{'ATime:': <16}"
@@ -322,7 +330,7 @@ def get_file_meta_data(file: Path, res_path: str, colors = None) -> str:
     except OSError:
         return ''
 
-def print_meta(file: Path, res_path: str, colors: list) -> None:
+def print_meta(file: Path, colors: list) -> None:
     """
     print the information retrieved by get_file_meta_data()
 
@@ -332,5 +340,5 @@ def print_meta(file: Path, res_path: str, colors: list) -> None:
     colors (list):
         [reset, attributes, positive_attr, negative_attr] color codes
     """
-    meta_data = get_file_meta_data(file, res_path, colors)
+    meta_data = get_file_meta_data(file, colors)
     print(meta_data)

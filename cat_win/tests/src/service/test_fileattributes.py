@@ -16,15 +16,19 @@ test_tar_file_path  = os.path.abspath(os.path.join(test_zip_file_dir, 'test.tar.
 
 class TestSignatures(TestCase):
     def test_read_signature_failed(self):
-        self.assertEqual(Signatures.read_signature('', __file__), 'lookup failed!')
-        self.assertEqual(Signatures.read_signature(signatures_path, ''), 'lookup failed!')
+        Signatures.set_res_path('')
+        self.assertEqual(Signatures.read_signature(__file__), 'lookup failed: Signatures not loaded')
+        Signatures.set_res_path(signatures_path)
+        self.assertEqual(Signatures.read_signature(''), "lookup failed: [Errno 2] No such file or directory: ''")
 
     def test_read_signatures_empty(self):
-        self.assertEqual(Signatures.read_signature(signatures_path, __file__), '-')
+        Signatures.set_res_path(signatures_path)
+        self.assertEqual(Signatures.read_signature(__file__), '-')
 
     def test_read_signatures(self):
-        self.assertEqual(Signatures.read_signature(signatures_path, test_zip_file_path), 'application/x-zip-compressed(zip)')
-        self.assertEqual(Signatures.read_signature(signatures_path, test_tar_file_path), 'application/x-gzip(gz) [application/gzip(tgz)]')
+        Signatures.set_res_path(signatures_path)
+        self.assertEqual(Signatures.read_signature(test_zip_file_path), 'application/x-zip-compressed(zip)')
+        self.assertEqual(Signatures.read_signature(test_tar_file_path), 'application/x-gzip(gz) [application/gzip(tgz)]')
 
 
 class TestFileAttributes(TestCase):
@@ -98,7 +102,8 @@ class TestFileAttributes(TestCase):
 
     def test_print_meta(self):
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            print_meta(__file__, '', ['A', 'B', 'C', 'D'])
+            Signatures.set_res_path('')
+            print_meta(__file__, ['A', 'B', 'C', 'D'])
             self.assertIn('Signature:', fake_out.getvalue())
             self.assertIn('Size:', fake_out.getvalue())
             self.assertIn('ATime:', fake_out.getvalue())
