@@ -27,8 +27,8 @@ class TestSignatures(TestCase):
 
     def test_read_signatures(self):
         Signatures.set_res_path(signatures_path)
-        self.assertEqual(Signatures.read_signature(test_zip_file_path), 'application/x-zip-compressed(zip)')
-        self.assertEqual(Signatures.read_signature(test_tar_file_path), 'application/x-gzip(gz) [application/gzip(tgz)]')
+        self.assertEqual(Signatures.read_signature(test_zip_file_path), 'application/x-zip-compressed(zip) [aar(aar)]')
+        self.assertEqual(Signatures.read_signature(test_tar_file_path), 'application/x-gzip(gz) [application/gzip(tgz);tar.gz(tar.gz)]')
 
 
 class TestFileAttributes(TestCase):
