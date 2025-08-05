@@ -229,7 +229,7 @@ class ArgParser:
             self._known_file_structures.append((IS_DIR, lit_path))
         is_struct |= norm_exists or lit_exists
 
-        if any(c in param for c in '*?['):
+        if param[0] != '-' and any(c in param for c in '*?['):
             # matches file-patterns, not directories (e.g. *.txt)
             self._known_file_structures.append((IS_PATTERN, param))
             is_struct = True
