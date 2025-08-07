@@ -86,6 +86,7 @@
             <li><a href="#--hexview---hexview">--hexview, --HEXVIEW</a></li>
             <li><a href="#----edit">-!, --edit</a></li>
             <li><a href="#----hexedit">-#, --hexedit</a></li>
+            <li><a href="#-?---diff">-?, --diff</a></li>
             <li><a href="#-m---more">-M, --more</a></li>
             <li><a href="#-l---less">-L, --less</a></li>
             <li><a href="#-b---raw">-B, --raw</a></li>
@@ -182,6 +183,7 @@
 ||||
 | *<a href="#----edit">-!, --edit</a>* | open each file in a simple editor |❌|
 | *<a href="#----hexedit">-#, --hexedit</a>* | open each file in a simple hex-editor |❌|
+| *<a href="#-?---diff">-?, --diff</a>* | open two files in a simple side-by-side diff-viewer |❌|
 | *<a href="#-m---more">-M, --more</a>* | page through the file step by step |❌|
 | *<a href="#-l---less">-L, --less</a>* | page through the file step by step (lazy)|❌|
 | *<a href="#-b---raw">-B, --raw</a>* | open the file as raw bytes |❌|
@@ -962,7 +964,7 @@ The currently supported Key Bindings are as follows:
 | <kbd>Backspace</kbd> | delete char on the left | delete char on the left | delete word on the left | delete char on the left |
 | <kbd>Delete</kbd> | delete char on the right | delete char on the right | delete word on the right | delete char on the right |
 ||||||
-| <kbd>Help/F1</kbd> | - | - | display a help message | - |
+| <kbd>Help/F1</kbd> | display a help message | - | - | - |
 ||||||
 | <kbd>SelectAll/^A</kbd> | - | - | select the entire file | - |
 | <kbd>Copy/^C</kbd> | - | - | copy selected text | - |
@@ -976,9 +978,9 @@ The currently supported Key Bindings are as follows:
 | <kbd>Transform/^T</kbd> | - | - | <a href="#transform-selected-text">transform</a> or <a href="#question-selected-text">question</a> the selected text | - |
 | <kbd>Insert/^N</kbd> | - | - | Insert a byte sequence \| toggle action menu switch | - |
 | <kbd>Find/^F</kbd> | - | - | prompt to search in the file \| toggle to search regular expressions | - |
-| <kbd>QuickFind/F3</kbd> | - | jump to the next previous found search-element | jump to the next found search-element | - |
+| <kbd>QuickFind/F3</kbd> | jump to the next found search-element | jump to the next previous found search-element | - | - |
 | <kbd>Replace/^P</kbd> | - | - | prompt to replace a search in the file \| toggle to replace all | - |
-| <kbd>QuickReplace/F2</kbd> | - | replace the next previous found search-element | replace the next found search-element | - |
+| <kbd>QuickReplace/F2</kbd> | replace the next found search-element | replace the next previous found search-element | - | - |
 ||||||
 | <kbd>Save/^S</kbd> | - | - | save changes | save changes |
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
@@ -1038,7 +1040,7 @@ The currently supported Key Bindings are as follows:
 | <kbd>Backspace</kbd> | reset current byte(s) | reset current byte(s) | remove current byte(s) | reset current byte(s) |
 | <kbd>Delete</kbd> | reset current byte(s) | reset current byte(s) | remove current byte(s) | reset current byte(s) |
 ||||||
-| <kbd>Help/F1</kbd> | - | - | display a help message | - |
+| <kbd>Help/F1</kbd> | display a help message | - | - | - |
 ||||||
 | <kbd>SelectAll/^A</kbd> | - | - | select the entire file | - |
 | <kbd>Copy/^C</kbd> | - | - | copy selected bytes | - |
@@ -1048,7 +1050,7 @@ The currently supported Key Bindings are as follows:
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to a specific byte | - |
 | <kbd>Insert/^N</kbd> | - | - | insert a text sequence \| toggle action menu switch | - |
 | <kbd>Find/^F</kbd> | - | - | prompt to search a byte(-sequence) in the file \| toggle to search text | - |
-| <kbd>QuickFind/F3</kbd> | - | jump to the next previous found search-element | jump to the next found search-element | - |
+| <kbd>QuickFind/F3</kbd> | jump to the next found search-element | jump to the next previous found search-element | - | - |
 ||||||
 | <kbd>Save/^S</kbd> | - | - | save changes | save changes |
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
@@ -1056,6 +1058,30 @@ The currently supported Key Bindings are as follows:
 | <kbd>Background/^B</kbd> | - | - | put the hex-editor in the background</br>(UNIX only) | - |
 | <kbd>Interrupt/^D</kbd> | - | - | interrupt program | - |
 | <kbd>Quit/^Q</kbd> | - | - | close hex-editor</br>(prompt to save, if neccessary) | - |
+
+### <a id="-?---diff">-?, --diff</a>
+
+Opens a simple Diff-Viewer to see the specific Differences between two Files.
+When multiple File are provided the Diff-Viewer will display the Files in Pairs of Two in the Order they were provided.
+On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module.
+The currently supported Key Bindings are as follows:
+
+| Key(s) | default behaviour | shift click | control click | alt click |
+|--------|:-----------------:|:-----------:|:-------------:|:---------:|
+| <kbd>Arrows</kbd> | move view-window by one character | - | move view-window by ten characters | - |
+| <kbd>Page Up/Down</kbd> | move view-window by page | - | move view-window by page | - |
+| <kbd>Home/Pos</kbd> | move view-window to start of line | - | move view-window to start of file | - |
+| <kbd>End</kbd> | move view-window to end of line | - | move view-window to end of file | - |
+||||||
+| <kbd>Help/F1</kbd> | display a help message | display info overview | - | - |
+||||||
+| <kbd>Jump/^E</kbd> | - | - | prompt to jump to a specific line | - |
+||||||
+| <kbd>Reload/^R</kbd> | - | - | prompt to reload the diff | - |
+||||||
+| <kbd>Background/^B</kbd> | - | - | put the diff-viewer in the background</br>(UNIX only) | - |
+| <kbd>Interrupt/^D</kbd> | - | - | interrupt program | - |
+| <kbd>Quit/^Q</kbd> | - | - | close diff-viewer | - |
 
 ### <a id="-m---more">-M, --more</a>
 
