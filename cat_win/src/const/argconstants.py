@@ -179,7 +179,7 @@ ALL_ARGS = [
 				ARGS_EDITOR, show_arg_on_repl=False, section=10),
     ArgConstant('-#', '--hexedit', 'open each file in a simple hex-editor',
 				ARGS_HEX_EDITOR, show_arg_on_repl=False, section=10),
-    ArgConstant('-?', '--diff', 'open two files in a simple diff side-by-side viewer',
+    ArgConstant('-?', '--diff', 'open two files in a simple side-by-side diff-viewer',
 				ARGS_DIFF, show_arg_on_repl=False, section=10),
     ArgConstant('-M', '--more', 'page through the file step by step',
                 ARGS_MORE, show_arg_on_repl=False, section=10),
