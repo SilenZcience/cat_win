@@ -2,6 +2,7 @@
 DiffViewer
 """
 
+from datetime import datetime
 try:
     import curses
     CURSES_MODULE_ERROR = False
@@ -12,6 +13,8 @@ import signal
 import sys
 
 from cat_win.src.const.escapecodes import ESC_CODE
+from cat_win.src.service.fileattributes import get_file_size, _convert_size, \
+    get_file_mtime, get_file_ctime
 from cat_win.src.service.helper.editorhelper import Position, \
     UNIFY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, FUNCTION_HOTKEYS
 from cat_win.src.service.helper.environment import on_windows_os
@@ -34,8 +37,8 @@ class DiffViewer:
 
         self.files = files
         self.display_names = display_names
-        self.difflibparser = None
-        self.diff_items = None
+        self.difflibparser = self.difflibparser_bak = None
+        self.diff_items = self.diff_items_bak = None
 
         self.half_width = 0
         self.l_offset = 0
@@ -43,7 +46,9 @@ class DiffViewer:
         self.error_bar = ''
 
         # window position (top-left)
-        self.wpos = Position(0, 0)
+        self.wpos = self.wpos_bak = Position(0, 0)
+
+        self.displaying_overview = False
 
         self._setup_file()
 
@@ -52,24 +57,33 @@ class DiffViewer:
         """
         setup the diffviewer content screen by reading the given file.
         """
+        self.displaying_overview = False
         try:
-            self.difflibparser = DifflibParser(
-                IoHelper.read_file(self.files[0], False, DiffViewer.file_encoding).splitlines(),
-                IoHelper.read_file(self.files[1], False, DiffViewer.file_encoding).splitlines(),
-                0.5, 0.6
+            text1: list = IoHelper.read_file(
+                self.files[0], False, DiffViewer.file_encoding, errors='replace'
+            ).splitlines()
+            text2: list = IoHelper.read_file(
+                self.files[1], False, DiffViewer.file_encoding, errors='replace'
+            ).splitlines()
+            self.difflibparser = self.difflibparser_bak = DifflibParser(
+                text1,
+                text2,
+                0.5, 0.6 # TODO: make these configurable
             )
-            self.diff_items = self.difflibparser.get_diff()
-            if self.diff_items:
-                self.l_offset = len(self.diff_items[0].lineno)+1
-            else:
-                self.l_offset = 0
+            self.diff_items = self.diff_items_bak = self.difflibparser.get_diff()
+            self.l_offset = len(self.diff_items[0].lineno)+1 if self.diff_items else 0
             self.error_bar = ''
             self.status_bar_size = 1
-        except OSError as exc:
+        except (OSError, UnicodeError) as exc:
             self.error_bar = str(exc)
             self.status_bar_size = 2
             if self.debug_mode:
                 err_print(self.error_bar)
+            self.difflibparser = self.difflibparser_bak = DifflibParser(
+                [],
+                [],
+            )
+            self.diff_items = self.diff_items_bak = self.difflibparser.get_diff()
 
     def getxymax(self) -> tuple:
         """
@@ -233,6 +247,16 @@ class DiffViewer:
         (bool):
             indicates if the diffviewer should keep running
         """
+        if self.displaying_overview:
+            self.displaying_overview = False
+            self.curse_window.clear()
+
+            self.difflibparser = self.difflibparser_bak
+            self.diff_items = self.diff_items_bak
+            self.l_offset = len(self.diff_items[0].lineno)+1 if self.diff_items else 0
+            self.wpos = self.wpos_bak
+            return True
+
         return False
 
     def _action_interrupt(self) -> bool:
@@ -262,6 +286,114 @@ class DiffViewer:
         self.half_width = (self.getxymax()[1]-4-self.l_offset) // 2
         self.curse_window.clear()
         return True
+
+    def _function_help(self) -> None:
+        self.curse_window.clear()
+        coff = 20
+
+        help_text = [
+            f"{'F1':<{coff}}help",
+            f"{'Shift+F1 / F13':<{coff}}info overview",
+            '',
+            f"{'^E':<{coff}}jump to line",
+            '',
+            f"{'^R':<{coff}}reload file",
+            '',
+            f"{'^B':<{coff}}put editor in background",
+            f"{'^D':<{coff}}interrupt/force close",
+            f"{'^Q':<{coff}}quit",
+        ]
+        max_y, max_x = self.getxymax()
+        coff = ' ' * ((max_x - max(len(line) for line in help_text)) // 2)
+        for row, line in enumerate(
+            help_text,
+            start = max(
+                (max_y+self.status_bar_size-len(help_text)) // 2,
+                0
+            )
+        ):
+            try:
+                self.curse_window.addstr(row, 0, coff + f"{line}")
+            except curses.error:
+                self.curse_window.addstr(row-1, 0, coff + '...')
+                self.curse_window.clrtoeol()
+                break
+        self.curse_window.refresh()
+        self._get_next_char()
+
+    def _function_overview(self) -> None:
+        """
+        shows an overview of the diffviewer.
+        """
+        if self.displaying_overview:
+            self._action_quit()
+            return
+        self.curse_window.clear()
+
+        text1_similarity = self.difflibparser_bak.count_equal + sum(
+            (len(item.line1)-len(item.changes1))/len(item.line1)
+            for item in self.diff_items if item.code == DifflibID.CHANGED
+        )
+        text1_similarity /= max(
+            1,
+            self.difflibparser_bak.count_equal + self.difflibparser_bak.count_delete + self.difflibparser_bak.count_changed
+        )
+        text2_similarity = self.difflibparser_bak.count_equal + sum(
+            (len(item.line2)-len(item.changes2))/len(item.line2)
+            for item in self.diff_items if item.code == DifflibID.CHANGED
+        )
+        text2_similarity /= max(
+            1,
+            self.difflibparser_bak.count_equal + self.difflibparser_bak.count_insert + self.difflibparser_bak.count_changed
+        )
+
+        self.difflibparser = DifflibParser(
+            [
+                'Filepath:',
+                str(self.files[0]),
+                '',
+                'Size:',
+                f"{get_file_size(self.files[0])} Bytes - {_convert_size(get_file_size(self.files[0]))}",
+                '',
+                'Line count:',
+                f"{self.difflibparser_bak.count_equal + self.difflibparser_bak.count_delete + self.difflibparser_bak.count_changed}",
+                '',
+                'Time modified:',
+                f"{datetime.fromtimestamp(get_file_mtime(self.files[0]))}",
+                '',
+                'Time created:',
+                f"{datetime.fromtimestamp(get_file_ctime(self.files[0]))}",
+                '',
+                'Similiarity (%):',
+                f"{(text1_similarity * 100):.2f}",
+            ],
+            [
+                'Filepath:',
+                str(self.files[1]),
+                '',
+                'Size:',
+                f"{get_file_size(self.files[1])} Bytes - {_convert_size(get_file_size(self.files[1]))}",
+                '',
+                'Line count:',
+                f"{self.difflibparser_bak.count_equal + self.difflibparser_bak.count_insert + self.difflibparser_bak.count_changed}",
+                '',
+                'Time modified:',
+                f"{datetime.fromtimestamp(get_file_mtime(self.files[1]))}",
+                '',
+                'Time created:',
+                f"{datetime.fromtimestamp(get_file_ctime(self.files[1]))}",
+                '',
+                'Similiarity (%):',
+                f"{(text2_similarity * 100):.2f}",
+            ],
+            0.0, 0.0
+        )
+        self.diff_items = self.difflibparser.get_diff()
+        self.l_offset = len(self.diff_items[0].lineno)+1 if self.diff_items else 0
+        self.wpos = Position(0, 0)
+
+
+        self.displaying_overview = True
 
     def _get_next_char(self) -> tuple:
         """
@@ -312,6 +444,26 @@ class DiffViewer:
 
         self.wpos.col = min(self.wpos.col, self.lllen() - self.half_width)
         self.wpos.col = max(self.wpos.col, 0)
+
+    def _render_status_bar(self, max_y: int, max_x: int) -> None:
+        # display status/error_bar
+        try:
+            if self.error_bar:
+                self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
+                                         self.error_bar[:max_x].ljust(max_x), self._get_color(2))
+
+            status_bar = f"Equal: {self.difflibparser.count_equal} | "
+            status_bar+= f"Insertions: {self.difflibparser.count_insert} | "
+            status_bar+= f"Deletions: {self.difflibparser.count_delete} | "
+            status_bar+= f"Modifications: {self.difflibparser.count_changed}"
+            if self.debug_mode:
+                status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x}"
+            # this throws an error (should be max_x-1), but looks better:
+            status_bar = status_bar[:max_x].ljust(max_x)
+            self.curse_window.addstr(max_y + self.status_bar_size - 1, 0,
+                                     status_bar, self._get_color(1))
+        except curses.error:
+            pass
 
     def _render_scr(self) -> None:
         """
@@ -368,7 +520,7 @@ class DiffViewer:
                 self.curse_window.addstr(
                     row, self.l_offset,
                     self.diff_items[brow].line1[self.wpos.col:self.wpos.col+self.half_width],
-                    self._get_color(5) | curses.A_BLINK
+                    self._get_color(5) | curses.A_UNDERLINE
                 )
             elif self.diff_items[brow].code == DifflibID.INSERT:
                 self.curse_window.addstr(
@@ -426,25 +578,7 @@ class DiffViewer:
 
             self.curse_window.move(row+1, 0)
 
-        # display status/error_bar
-        try:
-            if self.error_bar:
-                self.curse_window.addstr(max_y + self.status_bar_size - 2, 0,
-                                         self.error_bar[:max_x].ljust(max_x), self._get_color(2))
-
-            status_bar = f"Equal: {self.difflibparser.count_equal} | "
-            status_bar+= f"Insertions: {self.difflibparser.count_insert} | "
-            status_bar+= f"Deletions: {self.difflibparser.count_delete} | "
-            status_bar+= f"Modifications: {self.difflibparser.count_changed}"
-            if self.debug_mode:
-                status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x}"
-            # this throws an error (should be max_x-1), but looks better:
-            status_bar = status_bar[:max_x].ljust(max_x)
-            self.curse_window.addstr(max_y + self.status_bar_size - 1, 0,
-                                     status_bar, self._get_color(1))
-        except curses.error:
-            pass
-
+        self._render_status_bar(max_y, max_x)
         self.curse_window.refresh()
 
     def _run(self) -> None:
