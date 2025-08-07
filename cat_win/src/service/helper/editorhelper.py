@@ -178,6 +178,7 @@ UNIFY_HOTKEYS = {
     b'KEY_RESIZE'   : b'_action_resize',
 
     b'KEY_F(1)'     : b'_function_help',
+    b'KEY_F(13)'    : b'_function_overview',
     b'KEY_F(2)'     : b'_function_replace',
     b'KEY_F(3)'     : b'_function_search',
     b'KEY_F(14)'    : b'_function_replace_r',
