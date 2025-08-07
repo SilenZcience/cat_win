@@ -386,7 +386,7 @@ class DiffViewer:
                 'Similiarity (%):',
                 f"{(text2_similarity * 100):.2f}",
             ],
-            0.0, 0.0
+            -0.01, 0.0
         )
         self.diff_items = self.difflibparser.get_diff()
         self.l_offset = len(self.diff_items[0].lineno)+1 if self.diff_items else 0
