@@ -843,6 +843,8 @@ class Editor:
                 continue
             if key == b'_key_backspace':
                 l_jmp = l_jmp[:-1]
+            elif key == b'_key_ctl_backspace':
+                l_jmp = ''
             elif key == b'_key_string' and wchar.isdigit():
                 l_jmp += wchar
             elif (key == b'_key_string' and wchar.upper() in ['Y', 'J']) or \
