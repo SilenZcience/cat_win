@@ -968,8 +968,8 @@ The currently supported Key Bindings are as follows:
 ||||||
 | <kbd>SelectAll/^A</kbd> | - | - | select the entire file | - |
 | <kbd>Copy/^C</kbd> | - | - | copy selected text | - |
-| <kbd>Cut/^X</kbd> | - | - | cut selected text | - |
 | <kbd>Paste/^V</kbd> | - | - | paste text from clipboard | - |
+| <kbd>Cut/^X</kbd> | - | - | cut selected text | - |
 ||||||
 | <kbd>Undo/^Z</kbd> | - | - | undo an action | - |
 | <kbd>Redo/^Y</kbd> | - | - | redo an action | - |
@@ -1044,8 +1044,8 @@ The currently supported Key Bindings are as follows:
 ||||||
 | <kbd>SelectAll/^A</kbd> | - | - | select the entire file | - |
 | <kbd>Copy/^C</kbd> | - | - | copy selected bytes | - |
-| <kbd>Cut/^X</kbd> | - | - | cut selected bytes | - |
 | <kbd>Paste/^V</kbd> | - | - | overwrite bytes from clipboard or insert text from clipboard | - |
+| <kbd>Cut/^X</kbd> | - | - | cut selected bytes | - |
 ||||||
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to a specific byte | - |
 | <kbd>Insert/^N</kbd> | - | - | insert a text sequence \| toggle action menu switch | - |
@@ -1076,6 +1076,8 @@ The currently supported Key Bindings are as follows:
 | <kbd>Help/F1</kbd> | display a help message | display info overview | - | - |
 ||||||
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to a specific line | - |
+| <kbd>DiffCutoff/^N</kbd> | - | - | prompt to change diff cutoff ratio and reload diff</br>(display two lines side-by-side if their similarity is above this ratio) | - |
+| <kbd>SkipEqual/F2</kbd> | jump to the next change | jump to the next previous change | - | - |
 ||||||
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the diff | - |
 ||||||
