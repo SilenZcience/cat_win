@@ -49,9 +49,9 @@ class DiffViewer:
         self.wpos = self.wpos_bak = Position(0, 0)
 
         self.displaying_overview = False
+        self.difflibparser_cutoff = 0.75
 
         self._setup_file()
-
 
     def _setup_file(self) -> None:
         """
@@ -68,7 +68,7 @@ class DiffViewer:
             self.difflibparser = self.difflibparser_bak = DifflibParser(
                 text1,
                 text2,
-                0.5, 0.6 # TODO: make these configurable
+                self.difflibparser_cutoff-0.01, self.difflibparser_cutoff
             )
             self.diff_items = self.diff_items_bak = self.difflibparser.get_diff()
             self.l_offset = len(self.diff_items[0].lineno)+1 if self.diff_items else 0
@@ -207,6 +207,8 @@ class DiffViewer:
                 continue
             if key == b'_key_backspace':
                 l_jmp = l_jmp[:-1]
+            elif key == b'_key_ctl_backspace':
+                l_jmp = ''
             elif key == b'_key_string' and wchar.isdigit():
                 l_jmp += wchar
             elif (key == b'_key_string' and wchar.upper() in ['Y', 'J']) or \
@@ -218,6 +220,53 @@ class DiffViewer:
                             self.wpos.row = i
                             self.wpos.col = 0
                             break
+                break
+        return True
+
+    def _action_insert(self) -> bool:
+        """
+        *naming convention only for hotkeys*
+        handles the prompt to change the cutoff ratio for the difflibparser.
+
+        Returns:
+        (bool):
+            indicates if the editor should keep running
+        """
+        wchar, cutoff = '', ''
+        while str(wchar) != ESC_CODE:
+            self._action_render_scr(
+                f"Confirm: 'ENTER' - Cutoff Ratio [{self.difflibparser_cutoff}]: {cutoff}␣"
+            )
+            wchar, key = self._get_next_char()
+            if key in ACTION_HOTKEYS:
+                if key in [b'_action_quit', b'_action_interrupt']:
+                    break
+                if key == b'_action_insert':
+                    wchar, key = '', b'_key_enter'
+                if key == b'_action_background':
+                    getattr(self, key.decode(), lambda *_: False)()
+                if key == b'_action_resize':
+                    getattr(self, key.decode(), lambda *_: False)()
+                    self._render_scr()
+            if not isinstance(wchar, str):
+                continue
+            if key == b'_key_backspace':
+                cutoff = cutoff[:-1]
+            elif key == b'_key_ctl_backspace':
+                cutoff = ''
+            elif key == b'_key_string':
+                if cutoff == '1':
+                    continue
+                if not cutoff and wchar in '10.':
+                    cutoff += wchar
+                elif wchar == '.' and '.' not in cutoff:
+                    cutoff += wchar
+                elif '.' in cutoff[:2] and wchar.isdigit():
+                    cutoff += wchar
+            elif key == b'_key_enter':
+                if cutoff:
+                    self.difflibparser_cutoff = float(cutoff)
+                    self._setup_file()
                 break
         return True
 
@@ -394,6 +443,37 @@ class DiffViewer:
 
 
         self.displaying_overview = True
+
+    def _function_replace(self) -> None:
+        """
+        *naming convention only for hotkeys*
+        jumps the view-window to the next change
+        """
+        max_y, _ = self.getxymax()
+        skip_final_page = False
+        if self.wpos.row == max(0, len(self.diff_items) - max_y):
+            skip_final_page = True
+
+        for i in range(1, len(self.diff_items)):
+            row = (self.wpos.row + i) % len(self.diff_items)
+            if skip_final_page and row > self.wpos.row:
+                continue
+            if self.diff_items[row].code != DifflibID.EQUAL:
+                self.wpos.row = row
+                break
+
+    def _function_replace_r(self) -> None:
+        """
+        *naming convention only for hotkeys*
+        jumps the view-window to the previous change
+        """
+        for i in range(1, len(self.diff_items)):
+            row = self.wpos.row - i
+            if row < 0:
+                row += len(self.diff_items)
+            if self.diff_items[row].code != DifflibID.EQUAL:
+                self.wpos.row = row
+                break
 
     def _get_next_char(self) -> tuple:
         """
