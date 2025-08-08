@@ -10,10 +10,10 @@ Start of documentation: 2023-02-16 / v1.1.0
 - the python versions `3.6.x` and `pypy-3.6.x` are no longer officially supported and will no longer be tested. they should however for the most part keep working.
 - added `-?`, `--diff` parameter to open two files in a simple side-by-side diff-viewer.
 
-
 ### Minor Changes
 
 - using --`hexview` and --`binview` is now compatible with using the `trunc=`, `trunc:` parameter to slice the bytestream.
+- the jump prompt in the (hex-)editor now allows ctrl-backspace to clear the input.
 
 
 ## [1.10.3] - 2025-02-27
