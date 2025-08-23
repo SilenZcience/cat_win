@@ -22,10 +22,16 @@ class TestArgConstants(TestCase):
         self.assertEqual(len(all_colors_vals), len(set(all_colors_vals))+2)
 
     def test_remove_colors(self):
+        # Save original color values
+        original_attrs = {}
         for attr in dir(CVis):
             if not callable(getattr(CVis, attr)) and not attr.startswith("__"):
+                original_attrs[attr] = getattr(CVis, attr)
                 self.assertNotEqual(getattr(CVis, attr), '')
         CVis.remove_colors()
         for attr in dir(CVis):
             if not callable(getattr(CVis, attr)) and not attr.startswith("__"):
                 self.assertEqual(getattr(CVis, attr), '')
+        # Restore original color values
+        for attr, value in original_attrs.items():
+            setattr(CVis, attr, value)
