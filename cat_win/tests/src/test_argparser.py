@@ -79,6 +79,8 @@ class TestArgParser(TestCase):
         self.assertCountEqual([p.pattern for p, _ in arg_parser.file_queries], ['\\Atest\\Z'])
         arg_parser.get_arguments(['CAT', 'match=\\Atest\\Z'])
         self.assertCountEqual([p.pattern for p, _ in arg_parser.file_queries], ['\\Atest\\Z'] * 2)
+        arg_parser.get_arguments(['CAT', 'm=\\Atest\\Z'])
+        self.assertCountEqual([p.pattern for p, _ in arg_parser.file_queries], ['\\Atest\\Z'] * 3)
 
     def test_get_arguments_find(self):
         arg_parser = ArgParser()
@@ -86,6 +88,17 @@ class TestArgParser(TestCase):
         self.assertCountEqual(arg_parser.file_queries, [('Test123', False)])
         arg_parser.get_arguments(['CAT', 'FIND:Test123'])
         self.assertCountEqual(arg_parser.file_queries, [('Test123', False), ('Test123', True)])
+        arg_parser.get_arguments(['CAT', 'f:Test123'])
+        self.assertCountEqual(arg_parser.file_queries, [('Test123', False), ('Test123', True), ('Test123', False)])
+
+    def test_get_arguments_replace_query(self):
+        arg_parser = ArgParser()
+        arg_parser.get_arguments(['CAT', 'replace=Test123'])
+        self.assertEqual(arg_parser.file_queries_replacement, 'Test123')
+        arg_parser.get_arguments(['CAT', 'REPLACE:Test123'])
+        self.assertEqual(arg_parser.file_queries_replacement, 'Test123')
+        arg_parser.get_arguments(['CAT', 'r:Test123'])
+        self.assertEqual(arg_parser.file_queries_replacement, 'Test123')
 
     def test_get_arguments_trunc(self):
         arg_parser = ArgParser()
@@ -102,6 +115,8 @@ class TestArgParser(TestCase):
         arg_parser.get_arguments(['CAT', 'trunc:4:6:-5'])
         self.assertListEqual(arg_parser.file_truncate, [4, 6, -5])
         arg_parser.get_arguments(['CAT', 'trunc=:2*4-3:'])
+        self.assertListEqual(arg_parser.file_truncate, [None, 5, None])
+        arg_parser.get_arguments(['CAT', 't=:2*4-3:'])
         self.assertListEqual(arg_parser.file_truncate, [None, 5, None])
 
     def test_get_arguments_cut(self):
