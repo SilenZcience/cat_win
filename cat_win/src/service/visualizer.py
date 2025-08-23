@@ -22,7 +22,7 @@ class Visualizer:
 
     def __init__(self, files: list, v_type: str = 'ByteView', truncate: list = None) -> None:
         self.files = files
-        self.v_type =v_type
+        self.v_type = v_type
         self.truncate = truncate if truncate is not None else [None, None, None]
 
     @staticmethod
@@ -87,15 +87,16 @@ class Visualizer:
         """
         d_char = GRAY_SCALE_VECTOR[0] * 2
 
-        vis_row, last_byte = '', -1
+        vis_row, last_color_def = '', None
         for row in data_generator:
             for byte in row:
                 if byte < 0:
-                    vis_row += '  '
+                    vis_row += '  ' + '  ' * Visualizer.debug
                     continue
-                if byte != last_byte:
-                    vis_row += f"{CVis.COLOR_RESET}{color_def(byte)}"
-                    last_byte = byte
+                c_color_def = color_def(byte)
+                if c_color_def != last_color_def:
+                    vis_row += f"{CVis.COLOR_RESET}{c_color_def}"
+                    last_color_def = c_color_def
                 vis_row += str(byte).rjust(4) if Visualizer.debug else d_char
             if vis_row:
                 print(vis_row)
@@ -112,7 +113,7 @@ class Visualizer:
             a string representation of a file (-path)
         """
         width = shutil.get_terminal_size()[0] // 2
-        bin_content = IoHelper.read_file(file_p, True).__getitem__(slice(*self.truncate))
+        bin_content = IoHelper.read_file(file_p, True)[slice(*self.truncate)]
         Visualizer.display_data(SpaceFilling.get_scan_curve(bin_content, width),
                                 Visualizer.get_color_byte_view)
 
@@ -126,7 +127,7 @@ class Visualizer:
             a string representation of a file (-path)
         """
         width = shutil.get_terminal_size()[0] // 2
-        bin_content = IoHelper.read_file(file_p, True).__getitem__(slice(*self.truncate))
+        bin_content = IoHelper.read_file(file_p, True)[slice(*self.truncate)]
         Visualizer.display_data(SpaceFilling.get_zorder_curve(bin_content, width),
                                 Visualizer.get_color_byte_view)
 
@@ -140,7 +141,7 @@ class Visualizer:
             a string representation of a file (-path)
         """
         width = shutil.get_terminal_size()[0] // 2
-        bin_content = IoHelper.read_file(file_p, True).__getitem__(slice(*self.truncate))
+        bin_content = IoHelper.read_file(file_p, True)[slice(*self.truncate)]
         Visualizer.display_data(SpaceFilling.get_hilbert_curve(bin_content, width),
                                 Visualizer.get_color_byte_view)
 
@@ -154,7 +155,7 @@ class Visualizer:
             a string representation of a file (-path)
         """
         width = shutil.get_terminal_size()[0] // 2
-        bin_content = IoHelper.read_file(file_p, True).__getitem__(slice(*self.truncate))
+        bin_content = IoHelper.read_file(file_p, True)[slice(*self.truncate)]
         bin_content = Entropy.normalized_shannon_entropy(bin_content)
         Visualizer.display_data(SpaceFilling.get_hilbert_curve(bin_content, width),
                                 Visualizer.get_color_entropy)
@@ -168,7 +169,7 @@ class Visualizer:
         file_p (Path):
             a string representation of a file (-path)
         """
-        bin_content = IoHelper.read_file(file_p, True).__getitem__(slice(*self.truncate))
+        bin_content = IoHelper.read_file(file_p, True)[slice(*self.truncate)]
         digraph = [0] * 65536
 
         bin_content_it = iter(bin_content)
