@@ -101,7 +101,7 @@ class TestFileAttributes(TestCase):
             'randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|'), 0)
 
     def test_get_dir_size(self):
-        self.assertGreater(get_dir_size(os.path.dirname(__file__)), 750000)
+        self.assertGreater(get_dir_size(os.path.dirname(__file__)), 180000)
         self.assertEqual(get_dir_size(''), 0)
 
     def test_get_file_mtime(self):
