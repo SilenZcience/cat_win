@@ -101,6 +101,31 @@ class TestMore(TestCase):
             self.assertGreater(fake_out.getvalue().rfind(bottom_line), fake_out.getvalue().find(bottom_line))
             self.assertIn(bottom_line, fake_out.getvalue())
 
+    def test_line(self):
+        def input_mock_helper():
+            yield (1, 'LINE')
+            yield (2, '')
+            yield (3, 'LINE')
+            yield (4, 'n')
+
+        helper = input_mock_helper()
+        def input_mock(inp: str):
+            c, y = next(helper)
+            if c == 1:
+                self.assertEqual(inp, '-- More (46%) -- ')
+            elif c == 2:
+                self.assertEqual(inp, "-- More (46%)[Line: 28] -- ")
+            elif c == 3:
+                self.assertEqual(inp, '-- More (93%) -- ')
+            elif c == 4:
+                self.assertEqual(inp, "-- More (93%)[Line: 56] -- ")
+            return y
+
+        more = More(['a'] * 60)
+        with patch('builtins.input', input_mock), patch('sys.stdout', new=StdOutMock()) as fake_out:
+            more.step_through()
+            self.assertIn('a\n' * 28 + '\n', fake_out.getvalue())
+
     def test_skip_one(self):
         def input_mock(_):
             return 's1'
@@ -162,7 +187,9 @@ class TestMore(TestCase):
         def input_mock_helper():
             yield (1, 'X')
             yield (2, 'DY')
-            yield (3, 'n')
+            yield (3, 'SKIP?')
+            yield (4, 'J!')
+            yield (5, 'n')
 
         helper = input_mock_helper()
         def input_mock(inp: str):
@@ -173,6 +200,10 @@ class TestMore(TestCase):
                 self.assertEqual(inp, "-- More (93%)[invalid command: X - Type 'help'] -- ")
             elif c == 3:
                 self.assertEqual(inp, "-- More (93%)[invalid input: Y] -- ")
+            elif c == 4:
+                self.assertEqual(inp, "-- More (93%)[invalid input: ?] -- ")
+            elif c == 5:
+                self.assertEqual(inp, "-- More (93%)[invalid input: !] -- ")
             return y
 
         more = More(['a'] * 30)
@@ -181,6 +212,7 @@ class TestMore(TestCase):
             self.assertIn('a\n' * 28 + '\n', fake_out.getvalue())
 
 
+@patch('shutil.get_terminal_size', lambda: (120, 30))
 @patch('os.isatty', OSAttyDefGen.get_def({0: True, 1: False}))
 class TestMorePiped(TestCase):
     maxDiff = None
