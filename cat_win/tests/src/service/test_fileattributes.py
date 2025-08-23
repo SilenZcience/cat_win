@@ -102,15 +102,18 @@ class TestFileAttributes(TestCase):
 
     def test_get_dir_size(self):
         self.assertGreater(get_dir_size(os.path.dirname(__file__)), 180000)
-        self.assertEqual(get_dir_size(''), 0)
+        self.assertEqual(get_dir_size(
+            'randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|'), 0)
 
     def test_get_file_mtime(self):
         self.assertGreater(get_file_mtime(__file__), 1500000000)
-        self.assertEqual(get_file_mtime(''), 0)
+        self.assertEqual(get_file_mtime(
+            'randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|'), 0)
 
     def test_get_file_ctime(self):
         self.assertGreater(get_file_ctime(__file__), 1500000000)
-        self.assertEqual(get_file_ctime(''), 0)
+        self.assertEqual(get_file_ctime(
+            'randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|'), 0)
 
     def test_print_meta(self):
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
