@@ -4,9 +4,9 @@ import os
 
 from cat_win.src import cat
 from cat_win.src.const.defaultconstants import DKW
-from cat_win.tests.mocks.std import StdOutMock, OSAttyDefGen
 from cat_win.src.persistence.cconfig import CConfig
 from cat_win.src.persistence.config import Config
+from cat_win.tests.mocks.std import StdOutMock, OSAttyDefGen
 # import sys
 # sys.path.append('../cat_win')
 
