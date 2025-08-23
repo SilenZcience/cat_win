@@ -133,7 +133,6 @@ class Arguments:
                 return (arg_id1, param)
             if a_id == arg_id2:
                 return None if is_first else (arg_id2, param)
-        return None
 
     def __getitem__(self, o: int) -> bool:
         return self.args_id.get(o, False)
