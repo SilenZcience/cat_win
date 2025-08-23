@@ -4,7 +4,7 @@ import os
 
 from cat_win.tests.mocks.std import StdOutMock
 from cat_win.src.service.helper.environment import on_windows_os
-from cat_win.src.service.fileattributes import _convert_size, get_file_meta_data, get_file_size, print_meta, Signatures
+from cat_win.src.service.fileattributes import _convert_size, get_file_meta_data, get_file_size, get_dir_size, get_file_mtime, get_file_ctime, print_meta, Signatures
 # import sys
 # sys.path.append('../cat_win')
 res_dir = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'res')
@@ -99,6 +99,18 @@ class TestFileAttributes(TestCase):
         self.assertGreater(get_file_size(__file__), 0)
         self.assertEqual(get_file_size(
             'randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|'), 0)
+
+    def test_get_dir_size(self):
+        self.assertGreater(get_dir_size(os.path.dirname(__file__)), 750000)
+        self.assertEqual(get_dir_size(''), 0)
+
+    def test_get_file_mtime(self):
+        self.assertGreater(get_file_mtime(__file__), 1500000000)
+        self.assertEqual(get_file_mtime(''), 0)
+
+    def test_get_file_ctime(self):
+        self.assertGreater(get_file_ctime(__file__), 1500000000)
+        self.assertEqual(get_file_ctime(''), 0)
 
     def test_print_meta(self):
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
