@@ -11,6 +11,7 @@ from cat_win.src.service.clipboard import Clipboard
 test_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'texts', 'test.txt')
 
 
+@patch('cat_win.src.service.clipboard.get_py_executable', lambda *_: 'python')
 class TestClipboard(TestCase):
     maxDiff = None
 
