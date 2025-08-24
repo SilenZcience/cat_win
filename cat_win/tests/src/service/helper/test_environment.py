@@ -38,22 +38,16 @@ class TestEnvironment(TestCase):
     def test_get_py_executable_windows_path_b(self):
         self.assertEqual(get_py_executable(), 'python')
 
-    @patch('sys.executable', '/Users/user/AppData/Local/Programs/Python/Python39/python.exe')
-    @patch('os.environ', {'PATH': '/Users/user/AppData/Local/Programs/Python/Python39\\'})
+    @patch('sys.executable', '/Users/user/AppData/Local/Programs/Python/Python39/python3.exe')
+    @patch('os.environ', {'PATH': '/Users/user/AppData/Local/Programs/Python/Python39/'})
     @patch('cat_win.src.service.helper.environment.on_windows_os', True)
     def test_get_py_executable_windows_path_c(self):
-        self.assertEqual(get_py_executable(), 'python')
-
-    @patch('sys.executable', '/Users/user/AppData/Local/Programs/Python/Python39/python3.exe')
-    @patch('os.environ', {'PATH': '/Users/user/AppData/Local/Programs/Python/Python39\\'})
-    @patch('cat_win.src.service.helper.environment.on_windows_os', True)
-    def test_get_py_executable_windows_path_d(self):
         self.assertEqual(get_py_executable(), 'python3')
 
     @patch('sys.executable', '/Users/user/AppData/Local/Programs/Python/Python39/py')
-    @patch('os.environ', {'PATH': '/Users/user/AppData/Local/Programs/Python/Python39\\'})
+    @patch('os.environ', {'PATH': '/Users/user/AppData/Local/Programs/Python/Python39/'})
     @patch('cat_win.src.service.helper.environment.on_windows_os', True)
-    def test_get_py_executable_windows_path_e(self):
+    def test_get_py_executable_windows_path_d(self):
         self.assertEqual(get_py_executable(), 'py')
 
 
