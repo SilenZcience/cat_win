@@ -381,7 +381,7 @@ class DiffViewer:
 
         text1_similarity = self.difflibparser_bak.count_equal + sum(
             (len(item.line1)-len(item.changes1))/len(item.line1)
-            for item in self.diff_items if item.code == DifflibID.CHANGED
+            for item in self.diff_items if item.code == DifflibID.CHANGED and item.line1
         )
         text1_similarity /= max(
             1,
@@ -389,7 +389,7 @@ class DiffViewer:
         )
         text2_similarity = self.difflibparser_bak.count_equal + sum(
             (len(item.line2)-len(item.changes2))/len(item.line2)
-            for item in self.diff_items if item.code == DifflibID.CHANGED
+            for item in self.diff_items if item.code == DifflibID.CHANGED and item.line2
         )
         text2_similarity /= max(
             1,
