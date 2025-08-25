@@ -4,6 +4,7 @@ progressbar
 
 import contextlib
 import os
+import shutil
 import sys
 from cat_win.src.const.colorconstants import ColorOptions
 from cat_win.src.const.escapecodes import CURSOR_VISIBLE, CURSOR_INVISIBLE
@@ -35,13 +36,22 @@ class PBar:
         PBar.COLOR_RESET = color_reset
 
     def __init__(self, total: int, prefix: str = '', suffix: str = '',
-                    decimals: int = 1, length: int = 100,
+                    decimals: int = 1, length: int = -1,
                     fill_l: str = '█', fill_r: str = '-', erase: bool = False) -> None:
         # x━x x╺x x╸x x-x
         self.total = total
         self.prefix = prefix
+        if suffix and suffix[0] != ' ':
+            suffix = ' ' + suffix
         self.suffix = suffix
         self.decimals = decimals
+        if length < 0:
+            length = shutil.get_terminal_size()[0]
+            length -= len(self.prefix)
+            length -= len(self.suffix)
+            length -= 4 # 2 spaces and 1 '%' and 1 buffer at the end
+            length -= (4+decimals) # '100.' -> 4 + decimals
+            length = max(0, length)
         self.length = length
         self.fill_l = fill_l
         self.fill_r = fill_r
@@ -79,12 +89,12 @@ class PBar:
         percent = f"{percentage:5.{self.decimals}f}"
         length_l = int(self.length * iteration // self.total)
         bars = f"{PBar.COLOR_DONE}{self.fill_l * length_l}{PBar.COLOR_MISSING}{self.fill_r * (self.length - length_l)}"
-        progress = f"\r{self.prefix} {bars} {percent_color}{percent}%{PBar.COLOR_RESET} {self.suffix}"
+        progress = f"\r{self.prefix} {bars} {percent_color}{percent}%{PBar.COLOR_RESET}{self.suffix}"
         print(progress, end='', flush=True)
 
     def erase_progress_bar(self) -> None:
         """
         erase the progress bar from screen
         """
-        length = len(self.prefix) + len(self.suffix) + self.length + 9
+        length = self.length + len(self.prefix) + len(self.suffix) + 4 + (4+self.decimals)
         print('\b \b' * length, end='')
