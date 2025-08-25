@@ -206,7 +206,7 @@ class Entropy:
         counter = dict(zip(range(256), [0]*256))
 
         with PBar(data_length, prefix='Calculating Entropy:',
-                  length=50, fill_l='━', fill_r='╺').init() as p_bar:
+                  fill_l='━', fill_r='╺').init() as p_bar:
 
             # first frame:
             for i in range(frame_window):
