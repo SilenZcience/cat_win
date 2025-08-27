@@ -117,8 +117,8 @@ class IoHelper:
         if file_length >= 0 and not binary:
             src_content, src_length = '', 0
             with PBar(
-                file_length, 'Reading file',
-                fill_l='━', fill_r='╺', erase=True
+                file_length, prefix='Reading file',
+                length=128, fill_l='━', fill_r='╺', erase=True, decimals=5
             ).init() as p_bar, open(src_file, 'rb') as file:
                 buf_reader = io.BufferedReader(file, buffer_size=262144000) # 250MB
                 while True:
