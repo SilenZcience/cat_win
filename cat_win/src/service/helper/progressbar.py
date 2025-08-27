@@ -46,13 +46,13 @@ class PBar:
         self.suffix = suffix
         self.decimals = decimals
 
-        length = min(shutil.get_terminal_size()[0], length)
-        length -= len(self.prefix)
-        length -= len(self.suffix)
-        length -= 4 # 2 spaces and 1 '%' and 1 buffer at the end
-        length -= (4+decimals) # '100.' -> 4 + decimals
-        length = max(0, length)
-        self.length = length
+        length_  = shutil.get_terminal_size()[0]
+        length_ -= len(self.prefix)
+        length_ -= len(self.suffix)
+        length_ -= 4 # 2 spaces and 1 '%' and 1 buffer at the end
+        length_ -= (4+decimals) # '100.' -> 4 + decimals
+        length_  = max(0, min(length_, length))
+        self.length = length_
         self.fill_l = fill_l
         self.fill_r = fill_r
         self.erase = erase
