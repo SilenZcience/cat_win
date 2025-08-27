@@ -45,13 +45,13 @@ class PBar:
             suffix = ' ' + suffix
         self.suffix = suffix
         self.decimals = decimals
-        if length < 0:
-            length = shutil.get_terminal_size()[0]
-            length -= len(self.prefix)
-            length -= len(self.suffix)
-            length -= 4 # 2 spaces and 1 '%' and 1 buffer at the end
-            length -= (4+decimals) # '100.' -> 4 + decimals
-            length = max(0, length)
+
+        length = min(shutil.get_terminal_size()[0], length)
+        length -= len(self.prefix)
+        length -= len(self.suffix)
+        length -= 4 # 2 spaces and 1 '%' and 1 buffer at the end
+        length -= (4+decimals) # '100.' -> 4 + decimals
+        length = max(0, length)
         self.length = length
         self.fill_l = fill_l
         self.fill_r = fill_r
@@ -86,7 +86,7 @@ class PBar:
             iteration = self.total
         percentage = min(100 * (iteration / float(self.total)), 100.0)
         percent_color = PBar.COLOR_DONE if percentage == 100.0 else PBar.COLOR_MISSING
-        percent = f"{percentage:5.{self.decimals}f}"
+        percent = f"{percentage:{4+self.decimals}.{self.decimals}f}"
         length_l = int(self.length * iteration // self.total)
         bars = f"{PBar.COLOR_DONE}{self.fill_l * length_l}{PBar.COLOR_MISSING}{self.fill_r * (self.length - length_l)}"
         progress = f"\r{self.prefix} {bars} {percent_color}{percent}%{PBar.COLOR_RESET}{self.suffix}"
