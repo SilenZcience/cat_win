@@ -5,7 +5,27 @@ diffviewerhelper
 import difflib
 import unicodedata
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Sequence
+
+
+@lru_cache(maxsize=256)
+def is_special_character(char: str) -> bool:
+    """
+    Check if character is problematic (wide, emoji, control, combining)
+    https://www.unicode.org/reports/tr44/#General_Category_Values
+    """
+    category = unicodedata.category(char)
+    # Replace if it's:
+    # - Wide character (W or F) - these don't display correctly in curses
+    # # - Emoji or symbol that's not basic punctuation
+    # - Control character (except allowed whitespace)
+    # - Combining mark
+    return (
+        unicodedata.east_asian_width(char) in 'WF' or  # Wide characters
+        # category in ['So', 'Sk'] or  # Other symbols, modifier symbols (emojis)
+        category[0] in 'CM' # Control characters (C) or Combining marks (M)
+    )
 
 
 class CustomDiffer(difflib.Differ):
@@ -163,37 +183,6 @@ class DifflibParser:
 
         self.parse()
 
-    @staticmethod
-    def _replace_special_chars(text: str) -> str:
-        n_text = ''
-        for char in text:
-            # Keep tab characters
-            if char == '\t':
-                n_text += char
-                continue
-            # Check if character is problematic (wide, emoji, control, combining)
-            category = unicodedata.category(char)
-            width = unicodedata.east_asian_width(char)
-
-            # Replace if it's:
-            # - Wide character (W or F) - these don't display correctly in curses
-            # - Emoji or symbol that's not basic punctuation
-            # - Control character (except allowed whitespace)
-            # - Combining mark
-            # - Zero-width characters
-            if (
-                width in 'WF' or  # Wide characters
-                category in ['So', 'Sk'] or  # Other symbols, modifier symbols (emojis)
-                category.startswith('C') or  # Control characters
-                category.startswith('M') or  # Combining marks
-                ord(char) in [0x200B, 0x200C, 0x200D, 0xFEFF]  # Zero-width chars
-            ):
-                n_text += '�'
-            else:
-                n_text += char
-
-        return n_text
-
     def get_diff(self):
         return self._diff
 
@@ -213,7 +202,7 @@ class DifflibParser:
     def advance(self):
         c_line = self._ndiff[self._c_lineno]
 
-        c_line_no_tab = DifflibParser._replace_special_chars(c_line[2:].replace('\t', ' '))
+        c_line_no_tab = ''.join('�' if is_special_character(c) else c for c in c_line[2:].replace('\t', ' '))
         cmp_line = Difflib_Item(
             c_line_no_tab,
             c_line_no_tab
@@ -242,19 +231,19 @@ class DifflibParser:
 
         # case ('-', '?', '+', '?')
         if line_window_prefixes == ['- ', '? ', '+ ', '? ']:
-            cmp_line.line2    = DifflibParser._replace_special_chars(line_window[2][2:].replace('\t', ' '))
+            cmp_line.line2    = ''.join('�' if is_special_character(c) else c for c in line_window[2][2:].replace('\t', ' '))
             cmp_line.changes1 = [i for (i,c) in enumerate(line_window[1][2:]) if c in '-^']
             cmp_line.changes2 = [i for (i,c) in enumerate(line_window[3][2:]) if c in '+^']
             return 3
         # case ('-', '+', '?')
         if line_window_prefixes[:3] == ['- ', '+ ', '? ']:
-            cmp_line.line2    = DifflibParser._replace_special_chars(line_window[1][2:].replace('\t', ' '))
+            cmp_line.line2    = ''.join('�' if is_special_character(c) else c for c in line_window[1][2:].replace('\t', ' '))
             cmp_line.changes1 = []
             cmp_line.changes2 = [i for (i,c) in enumerate(line_window[2][2:]) if c in '+^']
             return 2
         # case ('-', '?', '+')
         if line_window_prefixes[:3] == ['- ', '? ', '+ ']:
-            cmp_line.line2    = DifflibParser._replace_special_chars(line_window[2][2:].replace('\t', ' '))
+            cmp_line.line2    = ''.join('�' if is_special_character(c) else c for c in line_window[2][2:].replace('\t', ' '))
             cmp_line.changes1 = [i for (i,c) in enumerate(line_window[1][2:]) if c in '-^']
             cmp_line.changes2 = []
             return 2

@@ -237,6 +237,53 @@ class HexEditor:
         self.unsaved_progress = True
         self.cpos.col -= 1
 
+    def _move_key_mouse_get_cell_by_mouse_pos(self, x: int, y: int) -> tuple:
+        y += self.wpos.row - 2
+        if y > len(self.hex_array):
+            return None
+        x -= 13
+        if x < 0:
+            return None
+        if x < HexEditor.columns * 3:
+            return (y, x//3)
+        x -= HexEditor.columns * 3
+        x -= 2
+        if x < 0:
+            return None
+        if x < HexEditor.columns:
+            return (y, x)
+
+    def _move_key_mouse(self) -> None:
+        """
+        handles mouse events.
+        """
+        self.selecting = False
+        _, x, y, _, bstate = curses.getmouse()
+        if bstate & curses.BUTTON1_CLICKED:
+            cell = self._move_key_mouse_get_cell_by_mouse_pos(x, y)
+            if cell is not None:
+                self.cpos.set_pos(cell)
+        elif bstate & curses.BUTTON1_PRESSED:
+            cpos_tmp = self.cpos.get_pos()
+            cell = self._move_key_mouse_get_cell_by_mouse_pos(x, y)
+            if cell is not None:
+                self.cpos.set_pos(cell)
+                self._fix_cursor_position(self.getxymax()[0])
+                self.spos.set_pos(self.cpos.get_pos())
+                self.cpos.set_pos(cpos_tmp)
+        elif bstate & curses.BUTTON1_RELEASED:
+            self.selecting = True
+            cell = self._move_key_mouse_get_cell_by_mouse_pos(x, y)
+            if cell is not None:
+                self.cpos.set_pos(cell)
+
+        elif bstate & curses.BUTTON4_PRESSED:
+            for _ in range(3):
+                self._move_key_up()
+        elif bstate & curses.BUTTON5_PRESSED:
+            for _ in range(3):
+                self._move_key_down()
+
     def _move_key_left(self) -> None:
         if self.selecting:
             self.cpos.set_pos(self.selected_area[0])
@@ -1131,7 +1178,7 @@ class HexEditor:
                     self.spos.set_pos(self.cpos.get_pos())
                 getattr(self, key.decode(), lambda *_: None)()
                 self.selecting = True
-            else:
+            elif key != b'_move_key_mouse':
                 self.selecting = False
 
     def _init_screen(self) -> None:
@@ -1145,6 +1192,9 @@ class HexEditor:
         # where no buffering is performed on keyboard input
         curses.noecho()
         curses.cbreak()
+
+        curses.mousemask(-1)
+        curses.mouseinterval(100)
 
         # --------https://github.com/asottile/babi/blob/main/babi/main.py-------- #
         # set the escape delay so curses does not pause waiting for sequences

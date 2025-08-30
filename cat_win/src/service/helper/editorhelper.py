@@ -55,6 +55,9 @@ UNIFY_HOTKEYS = {
     # ctrl-backspace
     b'^?'           : b'_key_ctl_backspace', # windows
 
+    # any mouse action
+    b'KEY_MOUSE'    : b'_move_key_mouse',
+
     # arrows
     b'KEY_LEFT'     : b'_move_key_left', # windows & xterm
     b'KEY_RIGHT'    : b'_move_key_right',
