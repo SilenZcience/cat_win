@@ -24,6 +24,7 @@ from cat_win.src.domain.files import Files
 from cat_win.src.persistence.cconfig import CConfig
 from cat_win.src.persistence.config import Config
 from cat_win.src.service.helper.archiveviewer import display_archive
+from cat_win.src.service.helper.diffviewerhelper import is_special_character
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
 from cat_win.src.service.helper.levenshtein import calculate_suggestions
@@ -1219,6 +1220,7 @@ def cleanup(tmp_file_helper: TmpFileHelper) -> None:
             u_files._calc_max_line_length_,
             Visualizer.get_color_byte_view,
             Visualizer.get_color_entropy,
+            is_special_character
         ]
         caches_info = [(cache.__name__,
                         str(cache.cache_info().hits),
