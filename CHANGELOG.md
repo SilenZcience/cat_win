@@ -14,6 +14,12 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - using --`hexview` and --`binview` is now compatible with using the `trunc=`, `trunc:` parameter to slice the bytestream.
 - the jump prompt in the (hex-)editor now allows ctrl-backspace to clear the input.
+- added functionality to the (hex-)editor to use the mouse wheel to scroll up or down.
+- added functionality to the (hex-)editor to use the mouse to select areas or place the cursor.
+
+## Bugfixes
+
+- fixed Bug where certain control characters would break the curses window in the (hex-)editor.
 
 
 ## [1.10.3] - 2025-02-27
