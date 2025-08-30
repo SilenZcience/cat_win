@@ -12,7 +12,6 @@ import os
 import re
 import signal
 import sys
-import unicodedata
 
 from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.const.regex import compile_re
@@ -20,6 +19,7 @@ from cat_win.src.service.helper.editorsearchhelper import _SearchIterBase, searc
 from cat_win.src.service.helper.editorhelper import History, Position, frepr, \
     UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, \
         SELECT_HOTKEYS, HISTORY_HOTKEYS, INDENT_HOTKEYS, FUNCTION_HOTKEYS, HEX_BYTE_KEYS
+from cat_win.src.service.helper.diffviewerhelper import is_special_character
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
 from cat_win.src.service.clipboard import Clipboard
@@ -262,6 +262,34 @@ class Editor:
             self.deleted_line = True
             return ''
         return None
+
+    def _move_key_mouse(self) -> None:
+        """
+        handles mouse events.
+        """
+        self.selecting = False
+        _, x, y, _, bstate = curses.getmouse()
+        if bstate & curses.BUTTON1_CLICKED:
+            self.cpos.row = min(self.wpos.row+y, len(self.window_content)-1)
+            self.cpos.col = min(self.wpos.col+x, len(self.window_content[self.cpos.row]))
+            # err_print(f" {x} {y} {bstate} CLICKED")
+        elif bstate & curses.BUTTON1_PRESSED:
+            self.spos.row = min(self.wpos.row+y, len(self.window_content)-1)
+            self.spos.col = min(self.wpos.col+x, len(self.window_content[self.spos.row]))
+            # err_print(f" {x} {y} {bstate} PRESSED")
+        elif bstate & curses.BUTTON1_RELEASED:
+            self.selecting = True
+            self.cpos.row = min(self.wpos.row+y, len(self.window_content)-1)
+            self.cpos.col = min(self.wpos.col+x, len(self.window_content[self.cpos.row]))
+            # err_print(f" {x} {y} {bstate} RELEASED")
+            # err_print(f"Selected area: {self.spos.get_pos()} {self.cpos.get_pos()}")
+
+        elif bstate & curses.BUTTON4_PRESSED:
+            for _ in range(3):
+                self._move_key_up()
+        elif bstate & curses.BUTTON5_PRESSED:
+            for _ in range(3):
+                self._move_key_down()
 
     def _move_key_left(self) -> None:
         if self.selecting:
@@ -1455,15 +1483,13 @@ class Editor:
                 sel_from, sel_to = self.selected_area
                 if self.selecting and sel_from <= (brow, bcol) < sel_to:
                     color = self._get_color(5)
-                try:
-                    if unicodedata.east_asian_width(cur_char) in 'WF':
-                        raise TypeError
-                    # CJK unicode (problems in windows-terminal) fix:
-                    # if 12799 < ord(cur_char) < 65103:
-                    #     raise TypeError
-                    self.curse_window.addch(row, col, cur_char, color)
-                except TypeError:
-                    self.curse_window.addch(row, col, '�', self._get_color(3))
+
+                if is_special_character(cur_char):
+                    cur_char = '�'
+                    color = self._get_color(3)
+
+                self.curse_window.addch(row, col, cur_char, color)
+
             self.curse_window.clrtoeol()
             self.curse_window.move(row+1, 0)
 
@@ -1580,7 +1606,7 @@ class Editor:
                             self.spos.set_pos(self.cpos.get_pos())
                         getattr(self, key.decode(), lambda *_: None)()
                         self.selecting = True
-                    elif key not in INDENT_HOTKEYS | HISTORY_HOTKEYS:
+                    elif key not in (INDENT_HOTKEYS | HISTORY_HOTKEYS) and key != b'_move_key_mouse':
                         self.selecting = False
 
                     self._enforce_boundaries(key)
@@ -1630,6 +1656,9 @@ class Editor:
         # where no buffering is performed on keyboard input
         curses.noecho()
         curses.cbreak()
+
+        curses.mousemask(-1)
+        curses.mouseinterval(100)
 
         # inspired by:
         # -------- https://github.com/asottile/babi -------- #

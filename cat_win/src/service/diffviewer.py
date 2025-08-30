@@ -117,6 +117,18 @@ class DiffViewer:
             ]
         )
 
+    def _move_key_mouse(self) -> None:
+        """
+        handles mouse events.
+        """
+        m_state = curses.getmouse()[4]
+        if m_state & curses.BUTTON4_PRESSED:
+            for _ in range(3):
+                self._move_key_up()
+        elif m_state & curses.BUTTON5_PRESSED:
+            for _ in range(3):
+                self._move_key_down()
+
     def _move_key_left(self) -> None:
         self.wpos.col -= 1
 
@@ -688,6 +700,9 @@ class DiffViewer:
         # where no buffering is performed on keyboard input
         curses.noecho()
         curses.cbreak()
+
+        curses.mousemask(-1)
+        curses.mouseinterval(0)
 
         # --------https://github.com/asottile/babi/blob/main/babi/main.py-------- #
         # set the escape delay so curses does not pause waiting for sequences
