@@ -193,7 +193,6 @@ class _SearchIterHexBase:
         self.wrapped = False
         self._start_y = editor.cpos.row
         self._start_x = editor.cpos.col + offset
-        self.yielded_result = False
         self.search = self.editor.search
         self.s_len = len(self.search)
 
@@ -205,7 +204,6 @@ class _SearchIterHexBase:
 
     def __next__(self) -> tuple:
         raise NotImplementedError
-
 
 class _SearchIterHexUp(_SearchIterHexBase):
     def _get_next_pos(self, row: int, col: int = None):
@@ -232,7 +230,6 @@ class _SearchIterHexUp(_SearchIterHexBase):
             (row, f_col) < self.editor.selected_area[0]
         ):
             raise StopIteration()
-        self.yielded_result = True
         return (row, f_col)
 
     def __next__(self) -> tuple:
@@ -286,7 +283,6 @@ class _SearchIterHexDown(_SearchIterHexBase):
             (row, f_col) > self.editor.selected_area[1]
         ):
             raise StopIteration()
-        self.yielded_result = True
         return (row, f_col)
 
     def __next__(self) -> tuple:
@@ -319,7 +315,95 @@ class _SearchIterHexDown(_SearchIterHexBase):
                     return self._stop_if_past_original(line_y, found_pos)
         raise StopIteration()
 
+
 def search_iter_hex_factory(*args, downwards: bool = True) -> _SearchIterHexBase:
     if downwards:
         return _SearchIterHexDown(*args)
     return _SearchIterHexUp(*args)
+
+
+class _SearchIterDiffBase:
+    def __init__(self, diffviewer, offset: int) -> None:
+        self.diffviewer = diffviewer
+        self.offset = offset
+        self.wrapped = False
+        self._start_y = diffviewer.cpos.row
+        self._start_x = diffviewer.cpos.col
+        self.search = self.diffviewer.search
+        self.s_len = len(self.search)
+        self.line2_matched = False
+        self.match_buffer = None
+
+    def __iter__(self):
+        return self
+
+    def _stop_if_past_original(self, row: int, f_col: int) -> tuple:
+        raise NotImplementedError
+
+    def __next__(self) -> tuple:
+        raise NotImplementedError
+
+class _SearchIterDiffDown(_SearchIterDiffBase):
+    def _get_next_pos(self, row: int, col: int = None):
+        if col is not None and col > max(
+            len(self.diffviewer.diff_items[row].line1),
+            len(self.diffviewer.diff_items[row].line2)
+        ):
+            return -1
+        line1_find = self.diffviewer.diff_items[row].line1[col:].find(self.search)
+        line2_find = self.diffviewer.diff_items[row].line2[col:].find(self.search)
+        if line1_find < 0 and line2_find < 0:
+            return -1
+        if line1_find < 0 or 0 <= line2_find < line1_find:
+            self.line2_matched = True
+            return line2_find
+        if line2_find < 0 or 0 <= line1_find < line2_find:
+            self.line2_matched = False
+            return line1_find
+        if line1_find == line2_find:
+            self.match_buffer = (row, line1_find+(col or 0))
+            self.line2_matched = False
+            return line1_find
+
+    def _stop_if_past_original(self, row: int, f_col: int) -> tuple:
+        if self.wrapped and (
+            row > self._start_y or
+            row == self._start_y and f_col > self._start_x - (not self.offset)
+        ):
+            raise StopIteration()
+        return (row, f_col)
+
+    def __next__(self) -> tuple:
+        if self.match_buffer is not None:
+            buf = self.match_buffer
+            self.match_buffer = None
+            self.line2_matched = True
+            return self._stop_if_past_original(*buf)
+        row = self.diffviewer.cpos.row
+        col = self.diffviewer.cpos.col + self.offset
+
+        found_pos = self._get_next_pos(row, col)
+        if found_pos >= 0:
+            return self._stop_if_past_original(row, found_pos+col)
+        if self.wrapped:
+            for line_y in range(row + 1, self._start_y + 1):
+                found_pos = self._get_next_pos(line_y)
+                if found_pos >= 0:
+                    return self._stop_if_past_original(line_y, found_pos)
+        else:
+            for line_y in range(row + 1, len(self.diffviewer.diff_items)):
+                found_pos = self._get_next_pos(line_y)
+                if found_pos >= 0:
+                    return self._stop_if_past_original(line_y, found_pos)
+            self.wrapped = True
+            for line_y in range(0, self._start_y + 1):
+                found_pos = self._get_next_pos(line_y)
+                if found_pos >= 0:
+                    return self._stop_if_past_original(line_y, found_pos)
+        raise StopIteration()
+
+
+def search_iter_diff_factory(*args, downwards: bool = True) -> _SearchIterDiffBase:
+    if downwards:
+        return _SearchIterDiffDown(*args)
+    raise NotImplementedError
