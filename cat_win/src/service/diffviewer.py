@@ -15,7 +15,8 @@ import sys
 from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.service.fileattributes import get_file_size, _convert_size, \
     get_file_mtime, get_file_ctime
-from cat_win.src.service.helper.editorhelper import Position, \
+from cat_win.src.service.helper.editorsearchhelper import search_iter_diff_factory
+from cat_win.src.service.helper.editorhelper import Position, frepr, \
     UNIFY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, FUNCTION_HOTKEYS
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.diffviewerhelper import DifflibParser, DifflibID
@@ -45,8 +46,12 @@ class DiffViewer:
         self.status_bar_size = 1
         self.error_bar = ''
 
+        self.search = ''
+        self.search_items: dict = {}
+
         # window position (top-left)
         self.wpos = self.wpos_bak = Position(0, 0)
+        self.cpos = Position(0, 0)
 
         self.displaying_overview = False
         self.difflibparser_cutoff = 0.75
@@ -233,6 +238,98 @@ class DiffViewer:
                             self.wpos.col = 0
                             break
                 break
+        return True
+
+    def _action_find(self, find_next: int = 0) -> bool:
+        """
+        handles the find in diffviewer action.
+
+        Returns:
+        (bool):
+            indicates if the diffviewer should keep running
+        """
+        wchar, sub_s, tmp_error = '', '', ''
+        key, running = b'_key_enter', False
+        while str(wchar) != ESC_CODE:
+            if not find_next:
+                pre_s = ''
+                if self.search:
+                    pre_s = f" [{repr(self.search)[1:-1]}]"
+                self._action_render_scr(
+                    f"Confirm: 'ENTER' - Search for{pre_s}: {frepr(sub_s)}␣",
+                    tmp_error
+                )
+                wchar, key = self._get_next_char()
+            elif running:
+                break
+            running = True
+            if key in ACTION_HOTKEYS:
+                if key in [b'_action_quit', b'_action_interrupt']:
+                    break
+                # if key == b'_action_paste':
+                #     clipboard = self._get_clipboard()
+                #     if clipboard is not None:
+                #         sub_s += clipboard
+                if key == b'_action_find':
+                    wchar, key = '', b'_key_enter'
+                if key == b'_action_background':
+                    getattr(self, key.decode(), lambda *_: False)()
+                if key == b'_action_resize':
+                    getattr(self, key.decode(), lambda *_: False)()
+                    self._render_scr()
+            if not isinstance(wchar, str):
+                continue
+            if key == b'_key_backspace':
+                sub_s = sub_s[:-1]
+            elif key == b'_key_ctl_backspace':
+                t_p = sub_s[-1:].isalnum()
+                while sub_s and sub_s[-1:].isalnum() == t_p:
+                    sub_s = sub_s[:-1]
+            elif key == b'_key_string':
+                sub_s += wchar
+            elif key == b'_key_enter':
+                self.search = sub_s if sub_s else self.search
+                if not self.search:
+                    break
+                # if Editor.unicode_escaped_search and sub_s:
+                #     try:
+                #         self.search = sub_s.encode().decode('unicode_escape').encode('latin-1').decode()
+                #     except UnicodeError:
+                #         pass
+                self.cpos.set_pos(self.wpos.get_pos())
+                try:
+                    try:
+                        search = search_iter_diff_factory(
+                            self,
+                            1,
+                            downwards=(find_next >= 0)
+                        )
+                    except ValueError as exc:
+                        tmp_error = str(exc)
+                        continue
+                    max_y, _ = self.getxymax()
+                    cpos = next(search)
+                    self.search_items[(*cpos, search.line2_matched)] = search.s_len
+                    if find_next >= 0:
+                        self.cpos.set_pos((max(cpos[0]-max_y, 0), 0))
+                    else:
+                        self.cpos.set_pos((min(cpos[0]+max_y, len(self.diff_items)-1),
+                                            max(len(self.diff_items[cpos[0]].line1),
+                                                len(self.diff_items[cpos[0]].line2))))
+                    search = search_iter_diff_factory(
+                        self,
+                        1,
+                        downwards=(find_next >= 0)
+                    )
+                    for search_pos in search:
+                        if search_pos[0] < cpos[0]-max_y or search_pos[0] > cpos[0]+max_y:
+                            break
+                        self.cpos.set_pos(search_pos)
+                        self.search_items[(*search_pos, search.line2_matched)] = search.s_len
+                    self.cpos.set_pos(cpos)
+                    break
+                except StopIteration:
+                    tmp_error = 'no matches were found!'
         return True
 
     def _action_insert(self) -> bool:
@@ -456,6 +553,24 @@ class DiffViewer:
 
         self.displaying_overview = True
 
+    def _function_search(self) -> None:
+        if not self.search:
+            return
+        if self.wpos.row == len(self.diff_items)-self.getxymax()[0]:
+            self._move_key_ctl_home()
+        else:
+            self._move_key_ctl_down()
+        self._action_find(1)
+
+    def _function_search_r(self) -> None:
+        if not self.search:
+            return
+        if self.wpos.row == 0:
+            self._move_key_ctl_end()
+        else:
+            self._move_key_ctl_up()
+        self._action_find(1)
+
     def _function_replace(self) -> None:
         """
         *naming convention only for hotkeys*
@@ -670,6 +785,23 @@ class DiffViewer:
 
             self.curse_window.move(row+1, 0)
 
+        for (row, col, s_idx), s_len in self.search_items.items():
+            if row < self.wpos.row or row >= self.wpos.row + max_y:
+                continue
+            if col + s_len < self.wpos.col or col >= self.wpos.col + self.half_width:
+                continue
+            if col < self.wpos.col:
+                s_len -= self.wpos.col - col
+                col = self.wpos.col
+            self.curse_window.chgat(
+                row - self.wpos.row,
+                self.l_offset + (self.half_width + 3 if s_idx else 0) +
+                col - self.wpos.col,
+                s_len,
+                self._get_color(11)
+            )
+        self.search_items.clear()
+
         self._render_status_bar(max_y, max_x)
         self.curse_window.refresh()
 
@@ -762,6 +894,8 @@ class DiffViewer:
                     curses.init_pair(9, curses.COLOR_BLACK, curses.COLOR_BLACK)
                 # prompts
                 curses.init_pair(10, curses.COLOR_WHITE, curses.COLOR_RED)
+                # find
+                curses.init_pair(11, curses.COLOR_WHITE, curses.COLOR_BLUE)
 
         curses.raw()
         self.curse_window.nodelay(False)

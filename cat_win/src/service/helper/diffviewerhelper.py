@@ -211,11 +211,13 @@ class DifflibParser:
         code = c_line[:2]
         if code == '+ ':
             cmp_line.code = DifflibID.INSERT
+            cmp_line.line1 = ''
             self.count_insert += 1
         if code == '- ':
             skip_lines = self._tryGetChangedLine(cmp_line)
             if not skip_lines:
                 cmp_line.code = DifflibID.DELETE
+                cmp_line.line2 = ''
                 self.count_delete += 1
             else:
                 cmp_line.code = DifflibID.CHANGED
