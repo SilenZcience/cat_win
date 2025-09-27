@@ -1,7 +1,7 @@
 """Simple Text-Processing and -Analytics Command Line Tool made in Python."""
 
 __project__ = 'cat_win'
-__version__ = '1.10.3'
-__sysversion__ = '3.12.8 (tags/v3.12.8:2dc476b, Dec  3 2024, 19:30:04) [MSC v.1942 64 bit (AMD64)]'
+__version__ = '1.10.4'
+__sysversion__ = '3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]'
 __author__ = 'Silas A. Kraume'
 __url__ = 'https://github.com/SilenZcience/cat_win'
