@@ -296,7 +296,26 @@ class DiffViewer:
                 #         self.search = sub_s.encode().decode('unicode_escape').encode('latin-1').decode()
                 #     except UnicodeError:
                 #         pass
-                self.cpos.set_pos(self.wpos.get_pos())
+                max_y, _ = self.getxymax()
+                if (
+                    self.cpos.get_pos()[0] < self.wpos.get_pos()[0] or
+                    self.cpos.get_pos()[0] >= self.wpos.get_pos()[0]+max_y or
+                    self.cpos.get_pos()[1] < self.wpos.get_pos()[1] or
+                    self.cpos.get_pos()[1] >= self.wpos.get_pos()[1]+self.half_width
+                ):
+                    if find_next >= 0:
+                        self.cpos.set_pos(self.wpos.get_pos())
+                    else:
+                        self.cpos.set_pos(
+                            (
+                                self.wpos.get_pos()[0]+max_y-1,
+                                max(
+                                    len(self.diff_items[self.wpos.get_pos()[0]+max_y-1].line1),
+                                    len(self.diff_items[self.wpos.get_pos()[0]+max_y-1].line2)
+                                )
+                            )
+                        )
+
                 try:
                     try:
                         search = search_iter_diff_factory(
@@ -307,7 +326,6 @@ class DiffViewer:
                     except ValueError as exc:
                         tmp_error = str(exc)
                         continue
-                    max_y, _ = self.getxymax()
                     cpos = next(search)
                     self.search_items[(*cpos, search.line2_matched)] = search.s_len
                     if find_next >= 0:
@@ -327,6 +345,20 @@ class DiffViewer:
                         self.cpos.set_pos(search_pos)
                         self.search_items[(*search_pos, search.line2_matched)] = search.s_len
                     self.cpos.set_pos(cpos)
+                    if (
+                        self.cpos.get_pos()[0] < self.wpos.get_pos()[0] or
+                        self.cpos.get_pos()[0] >= self.wpos.get_pos()[0]+max_y or
+                        self.cpos.get_pos()[1] < self.wpos.get_pos()[1] or
+                        self.cpos.get_pos()[1] >= self.wpos.get_pos()[1]+self.half_width
+                    ):
+                        if find_next >= 0:
+                            self.wpos.row = cpos[0]
+                        else:
+                            self.wpos.row = max(0, cpos[0]-max_y+1)
+                        if cpos[1]+len(self.search) < self.half_width:
+                            self.wpos.col = 0
+                        else:
+                            self.wpos.col = cpos[1]+len(self.search) - self.half_width
                     break
                 except StopIteration:
                     tmp_error = 'no matches were found!'
@@ -556,20 +588,12 @@ class DiffViewer:
     def _function_search(self) -> None:
         if not self.search:
             return
-        if self.wpos.row == len(self.diff_items)-self.getxymax()[0]:
-            self._move_key_ctl_home()
-        else:
-            self._move_key_ctl_down()
         self._action_find(1)
 
     def _function_search_r(self) -> None:
         if not self.search:
             return
-        if self.wpos.row == 0:
-            self._move_key_ctl_end()
-        else:
-            self._move_key_ctl_up()
-        self._action_find(1)
+        self._action_find(-1)
 
     def _function_replace(self) -> None:
         """
@@ -664,7 +688,7 @@ class DiffViewer:
             status_bar+= f"Deletions: {self.difflibparser.count_delete} | "
             status_bar+= f"Modifications: {self.difflibparser.count_changed}"
             if self.debug_mode:
-                status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x}"
+                status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x} | {self.cpos.get_pos()}"
             # this throws an error (should be max_x-1), but looks better:
             status_bar = status_bar[:max_x].ljust(max_x)
             self.curse_window.addstr(max_y + self.status_bar_size - 1, 0,
@@ -800,6 +824,21 @@ class DiffViewer:
                 s_len,
                 self._get_color(11)
             )
+        if (*self.cpos.get_pos(), False) in self.search_items:
+            self.curse_window.chgat(
+                self.cpos.row-self.wpos.row,
+                self.l_offset + self.cpos.col-self.wpos.col,
+                self.search_items[(*self.cpos.get_pos(), False)],
+                self._get_color(12)
+            )
+        if (*self.cpos.get_pos(), True) in self.search_items:
+            self.curse_window.chgat(
+                self.cpos.row-self.wpos.row,
+                self.l_offset + self.half_width + 3 +
+                self.cpos.col-self.wpos.col,
+                self.search_items[(*self.cpos.get_pos(), True)],
+                self._get_color(12)
+            )
         self.search_items.clear()
 
         self._render_status_bar(max_y, max_x)
@@ -896,6 +935,8 @@ class DiffViewer:
                 curses.init_pair(10, curses.COLOR_WHITE, curses.COLOR_RED)
                 # find
                 curses.init_pair(11, curses.COLOR_WHITE, curses.COLOR_BLUE)
+                # current match
+                curses.init_pair(12, curses.COLOR_WHITE, curses.COLOR_CYAN)
 
         curses.raw()
         self.curse_window.nodelay(False)
