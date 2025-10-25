@@ -89,7 +89,7 @@ class _SearchIterUp(_SearchIterBase):
         if found_pos >= 0:
             return self._stop_if_past_original(row, found_pos)
         if self.wrapped:
-            for line_y in range(row - 1, self._start_y - 1, -1):
+            for line_y in range(row-1, self._start_y-1, -1):
                 found_pos = self._get_next_pos(self.editor.window_content[line_y])
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
@@ -157,7 +157,7 @@ class _SearchIterDown(_SearchIterBase):
         if found_pos >= 0:
             return self._stop_if_past_original(row, found_pos+col)
         if self.wrapped:
-            for line_y in range(row + 1, self._start_y + 1):
+            for line_y in range(row+1, self._start_y+1):
                 found_pos = self._get_next_pos(self.editor.window_content[line_y])
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
@@ -165,7 +165,7 @@ class _SearchIterDown(_SearchIterBase):
             content_len = -1
             while content_len != len(self.editor.window_content):
                 content_len = len(self.editor.window_content)
-                for line_y in range(row + 1, len(self.editor.window_content)):
+                for line_y in range(row+1, len(self.editor.window_content)):
                     found_pos = self._get_next_pos(self.editor.window_content[line_y])
                     if found_pos >= 0:
                         return self._stop_if_past_original(line_y, found_pos)
@@ -173,7 +173,7 @@ class _SearchIterDown(_SearchIterBase):
             if self.editor.selecting:
                 raise StopIteration()
             self.wrapped = True
-            for line_y in range(0, self._start_y + 1):
+            for line_y in range(0, self._start_y+1):
                 found_pos = self._get_next_pos(self.editor.window_content[line_y])
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
@@ -240,7 +240,7 @@ class _SearchIterHexUp(_SearchIterHexBase):
         if found_pos >= 0:
             return self._stop_if_past_original(row, found_pos)
         if self.wrapped:
-            for line_y in range(row - 1, self._start_y - 1, -1):
+            for line_y in range(row-1, self._start_y-1, -1):
                 found_pos = self._get_next_pos(line_y)
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
@@ -293,7 +293,7 @@ class _SearchIterHexDown(_SearchIterHexBase):
         if found_pos >= 0:
             return self._stop_if_past_original(row, found_pos+col)
         if self.wrapped:
-            for line_y in range(row + 1, self._start_y + 1):
+            for line_y in range(row+1, self._start_y+1):
                 found_pos = self._get_next_pos(line_y)
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
@@ -301,7 +301,7 @@ class _SearchIterHexDown(_SearchIterHexBase):
             content_len = -1
             while content_len != len(self.editor.hex_array):
                 content_len = len(self.editor.hex_array)
-                for line_y in range(row + 1, len(self.editor.hex_array)):
+                for line_y in range(row+1, len(self.editor.hex_array)):
                     found_pos = self._get_next_pos(line_y)
                     if found_pos >= 0:
                         return self._stop_if_past_original(line_y, found_pos)
@@ -309,7 +309,7 @@ class _SearchIterHexDown(_SearchIterHexBase):
             if self.editor.selecting:
                 raise StopIteration()
             self.wrapped = True
-            for line_y in range(0, self._start_y + 1):
+            for line_y in range(0, self._start_y+1):
                 found_pos = self._get_next_pos(line_y)
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
@@ -342,6 +342,64 @@ class _SearchIterDiffBase:
 
     def __next__(self) -> tuple:
         raise NotImplementedError
+
+class _SearchIterDiffUp(_SearchIterDiffBase):
+    def _get_next_pos(self, row: int, col: int = None):
+        if col is not None and col < 0:
+            return -1
+        if col is not None:
+            col += self.s_len
+        line1_find = self.diffviewer.diff_items[row].line1.rfind(self.search, 0, col)
+        line2_find = self.diffviewer.diff_items[row].line2.rfind(self.search, 0, col)
+        if line1_find < 0 and line2_find < 0:
+            return -1
+        if line1_find < 0 or 0 <= line2_find < line1_find:
+            self.line2_matched = True
+            return line2_find
+        if line2_find < 0 or 0 <= line1_find < line2_find:
+            self.line2_matched = False
+            return line1_find
+        if line1_find == line2_find:
+            self.match_buffer = (row, line1_find)
+            self.line2_matched = False
+            return line1_find
+
+    def _stop_if_past_original(self, row: int, f_col: int) -> tuple:
+        if self.wrapped and (
+            row < self._start_y or
+            row == self._start_y and f_col < self._start_x
+        ):
+            raise StopIteration()
+        return (row, f_col)
+
+    def __next__(self) -> tuple:
+        if self.match_buffer is not None:
+            buf = self.match_buffer
+            self.match_buffer = None
+            self.line2_matched = True
+            return self._stop_if_past_original(*buf)
+        row = self.diffviewer.cpos.row
+        col = self.diffviewer.cpos.col - self.offset
+
+        found_pos = self._get_next_pos(row, col)
+        if found_pos >= 0:
+            return self._stop_if_past_original(row, found_pos)
+        if self.wrapped:
+            for line_y in range(row-1, self._start_y-1, -1):
+                found_pos = self._get_next_pos(line_y)
+                if found_pos >= 0:
+                    return self._stop_if_past_original(line_y, found_pos)
+        else:
+            for line_y in range(row-1, -1, -1):
+                found_pos = self._get_next_pos(line_y)
+                if found_pos >= 0:
+                    return self._stop_if_past_original(line_y, found_pos)
+            self.wrapped = True
+            for line_y in range(len(self.diffviewer.diff_items)-1, self._start_y-1, -1):
+                found_pos = self._get_next_pos(line_y)
+                if found_pos >= 0:
+                    return self._stop_if_past_original(line_y, found_pos)
+        raise StopIteration()
 
 class _SearchIterDiffDown(_SearchIterDiffBase):
     def _get_next_pos(self, row: int, col: int = None):
@@ -386,17 +444,17 @@ class _SearchIterDiffDown(_SearchIterDiffBase):
         if found_pos >= 0:
             return self._stop_if_past_original(row, found_pos+col)
         if self.wrapped:
-            for line_y in range(row + 1, self._start_y + 1):
+            for line_y in range(row+1, self._start_y+1):
                 found_pos = self._get_next_pos(line_y)
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
         else:
-            for line_y in range(row + 1, len(self.diffviewer.diff_items)):
+            for line_y in range(row+1, len(self.diffviewer.diff_items)):
                 found_pos = self._get_next_pos(line_y)
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
             self.wrapped = True
-            for line_y in range(0, self._start_y + 1):
+            for line_y in range(0, self._start_y+1):
                 found_pos = self._get_next_pos(line_y)
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
@@ -406,4 +464,4 @@ class _SearchIterDiffDown(_SearchIterDiffBase):
 def search_iter_diff_factory(*args, downwards: bool = True) -> _SearchIterDiffBase:
     if downwards:
         return _SearchIterDiffDown(*args)
-    raise NotImplementedError
+    return _SearchIterDiffUp(*args)
