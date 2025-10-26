@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.10.5] - TBA
+
+### Minor Changes
+
+- improved the search functionality inside the diff-viewer.
+
+
 ## [1.10.4] - 2025-09-27
 
 ### Major Changes
