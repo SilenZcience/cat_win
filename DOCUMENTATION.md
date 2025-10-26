@@ -1079,7 +1079,7 @@ The currently supported Key Bindings are as follows:
 | <kbd>DiffCutoff/^N</kbd> | - | - | prompt to change diff cutoff ratio and reload diff</br>(display two lines side-by-side if their similarity is above this ratio) | - |
 | <kbd>Find/^F</kbd> | - | - | prompt to search in the files | - |
 | <kbd>QuickFind/F3</kbd> | jump downwards keeping the search active | jump upwards keeping the search active | - | - |
-| <kbd>SkipEqual/F2</kbd> | jump to the next change | jump to the next previous change | - | - |
+| <kbd>SkipEqual/F2</kbd> | jump to the next found search-element | jump to the next previous found search-element | - | - |
 ||||||
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the diff | - |
 ||||||
