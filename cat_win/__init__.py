@@ -1,4 +1,4 @@
-"""Simple Text-Processing and -Analytics Command Line Tool made in Python."""
+"""Advanced Text-Processing and -Analytics Command Line Tool made in Python."""
 
 __project__ = 'cat_win'
 __version__ = '1.10.4'
