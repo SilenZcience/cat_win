@@ -48,6 +48,7 @@
             <li><a href="#-h---help">-h, --help</a></li>
             <li><a href="#-v---version">-v, --version</a></li>
             <li><a href="#--debug---debug">--debug, --debug</a></li>
+            <li><a href="#--debuglog---debug-log">--debuglog, --debug-log</a></li>
             <li><a href="#-l---linelength">-l, --linelength</a></li>
             <li><a href="#-n---number">-n, --number</a></li>
             <li><a href="#--fp---file-prefix">--fp, --file-prefix</a></li>
@@ -135,6 +136,7 @@
 | *<a href="#-h---help">-h, --help</a>* | show help message and exit |✔|
 | *<a href="#-v---version">-v, --version</a>* | output version information and exit |✔|
 | *<a href="#--debug---debug">--debug, --debug</a>* | show debug information |✔|
+| *<a href="#--debuglog---debug-log">--debuglog, --debug-log</a>* | log debug information to file |✔|
 ||||
 | *<a href="#-l---linelength">-l, --linelength</a>* | display the length of each line |✔|
 | *<a href="#-n---number">-n, --number</a>* | number all output lines |✔|
@@ -279,6 +281,11 @@ Author:         Silas A. Kraume
 
 Displays debug Information before and after the Code Execution.
 This Argument is not shown in the Default Help Message and is provided for Developers/Development.
+
+### <a id="--debuglog---debug-log">--debuglog, --debug-log</a>
+
+Writes the debug Information into a File called `catw_debug.log` instead of using the Stderr Stream.
+This Parameter only works in Combination with the <a href="#--debug---debug">--debug, --debug</a> Parameter
 
 - - - -
 <a id="prefix"></a>
