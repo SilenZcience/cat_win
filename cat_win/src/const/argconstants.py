@@ -19,7 +19,7 @@ class ArgConstant:
 
 
 # informational
-ARGS_HELP, ARGS_VERSION, ARGS_DEBUG = range(0, 3)
+ARGS_HELP, ARGS_VERSION, ARGS_DEBUG, ARGS_DEBUG_LOG = range(0, 4)
 # prefix
 ARGS_LLENGTH, ARGS_NUMBER, ARGS_FILE_PREFIX, ARGS_FFILE_PREFIX = range(100, 104)
 # simple replacements
@@ -69,6 +69,8 @@ ALL_ARGS = [
 				ARGS_VERSION, section=0),
     ArgConstant('--debug', '--debug', 'show debug information',
 				ARGS_DEBUG, show_arg=False, section=0),
+    ArgConstant('--debuglog', '--debug-log', 'log debug information to file',
+                ARGS_DEBUG_LOG, show_arg=False, section=0),
 
     # prefix
     ArgConstant('-l', '--linelength', 'display the length of each line',

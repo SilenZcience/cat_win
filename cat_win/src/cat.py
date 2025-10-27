@@ -988,6 +988,8 @@ def init(repl: bool = False) -> tuple:
 
     u_args.set_args(args)
 
+    err_print.set_log_to_file(u_args[ARGS_DEBUG_LOG])
+
     known_files = arg_parser.get_files(u_args[ARGS_DOTFILES])
     unknown_files, valid_urls = arg_parser.filter_urls(u_args[ARGS_URI])
 
@@ -1250,7 +1252,7 @@ def cleanup(tmp_file_helper: TmpFileHelper) -> None:
         err_print('==================================================='
             '====================================================', end='')
         err_print(color_dic[CKW.RESET_ALL])
-
+    err_print.close()
 
 def main():
     """
