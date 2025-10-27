@@ -13,13 +13,51 @@ from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.progressbar import PBar
 
 
-def err_print(*args, **kwargs) -> None:
+class ErrorPrinter:
     """
-    print to stderr.
+    ErrorPrinter
     """
-    kwargs['file']  = sys.stderr
-    kwargs['flush'] = True
-    print(*args, **kwargs)
+    def __init__(self):
+        self.log_to_file = False
+        self.file_handle = None
+
+    def set_log_to_file(self, log_to_file: bool = True) -> None:
+        """
+        Set the logging mode to use a file or stderr.
+
+        Parameters:
+        log_to_file (bool):
+            if True, log to file; if False, log to stderr
+        """
+        self.log_to_file = log_to_file
+        if log_to_file:
+            log_file = Path(os.path.join(os.getcwd(), 'catw_debug.log'))
+            self.file_handle = open(log_file, 'a', encoding='utf-8', errors='replace')
+
+    def __call__(self, *args, **kwargs) -> None:
+        """
+        print to stderr.
+        """
+        kwargs['file']  = self.file_handle if self.log_to_file else sys.stderr
+        kwargs['flush'] = True
+        print(*args, **kwargs)
+
+    def close(self) -> None:
+        """
+        Close the file handle if logging to a file.
+        """
+        if not hasattr(self, 'file_handle'):
+            return
+        if self.file_handle is None:
+            return
+        if self.file_handle.closed:
+            return
+        self.file_handle.close()
+
+    def __del__(self) -> None:
+        self.close()
+
+err_print = ErrorPrinter()
 
 
 def path_parts(path: str) -> list:
