@@ -24,7 +24,7 @@ def reduce_list(args: list) -> list:
 
     for arg in args:
         arg_id, _ = arg
-        # it can make sense to have the exact same parameter twice, even if it does
+        # it can make sense to have the exact same parameter twice, even if it has
         # the same information, therefor we do not test for the param here.
         if arg_id in DIFFERENTIABLE_ARGS:
             new_args.append(arg)
