@@ -1117,6 +1117,8 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
         for i in range(1, len(known_files), 2):
             diff_files = known_files[i-1:i+1]
             DiffViewer.open(diff_files, [u_files.get_file_display_name(f) for f in diff_files])
+        if len(known_files) % 2 == 1:
+            DiffViewer.open([None, known_files[-1]], [None, u_files.get_file_display_name(known_files[-1])])
 
 
     # fill holder object with neccessary values

@@ -1,8 +1,8 @@
 """
 DiffViewer
 """
-
 from datetime import datetime
+from pathlib import Path
 try:
     import curses
     CURSES_MODULE_ERROR = False
@@ -10,6 +10,7 @@ except ImportError:
     CURSES_MODULE_ERROR = True
 import os
 import signal
+import subprocess
 import sys
 
 from cat_win.src.const.escapecodes import ESC_CODE
@@ -21,6 +22,60 @@ from cat_win.src.service.helper.editorhelper import Position, frepr, \
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.diffviewerhelper import DifflibParser, DifflibID
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
+
+
+def get_git_file_content(git_file: Path) -> list:
+    """
+    get the content of a file previously commited using git.
+    may raise exceptions, e.g. when git is not installed.
+
+    Parameters:
+    git_file (Path):
+        the path to the git file.
+
+    Returns:
+    (list):
+        the already committed content of the file.
+    """
+    # Get the repo root and relative path
+    repo_root = subprocess.run(
+        ['git', 'rev-parse', '--show-toplevel'],
+        cwd=os.path.dirname(git_file) or None,
+        capture_output=True, check=False
+    ).stdout.decode().strip()
+    if not repo_root:
+        raise OSError('not a git repository (or any of the parent directories)')
+    rel_path = os.path.relpath(git_file, repo_root)
+    # Find last commit and path where file existed (follow renames)
+    log_output = subprocess.run(
+        ['git', 'log', '--follow', '--name-status', '--pretty=format:%H', '--', rel_path],
+        cwd=repo_root,
+        capture_output=True, check=True
+    ).stdout.decode().splitlines()
+    last_commit, last_path = None, None
+    for i, line in enumerate(log_output):
+        if line and len(line) == 40:  # commit hash
+            commit = line
+            # Look ahead for the next line that is a file status
+            if i + 1 < len(log_output):
+                status_line = log_output[i + 1]
+                parts = status_line.split('\t')
+                if len(parts) == 2 and parts[1].replace('/', os.sep) == rel_path.replace('/', os.sep):
+                    last_commit = commit
+                    last_path = parts[1]
+                    break
+                if len(parts) == 3 and parts[2].replace('/', os.sep) == rel_path.replace('/', os.sep):
+                    # Renamed file: parts[2] is the new name
+                    last_commit = commit
+                    last_path = parts[1]  # old name
+                    break
+    if last_commit and last_path:
+        return subprocess.run(
+            ['git', 'show', f'{last_commit}:{last_path}'],
+            cwd=repo_root,
+            capture_output=True, check=True
+        ).stdout.decode().splitlines()
+    return []
 
 
 class DiffViewer:
@@ -64,17 +119,28 @@ class DiffViewer:
         """
         self.displaying_overview = False
         try:
-            text1: list = IoHelper.read_file(
-                self.files[0], False, DiffViewer.file_encoding, errors='replace'
-            ).splitlines()
-            text2: list = IoHelper.read_file(
+
+            if self.files[0] is None:
+                try:
+                    text1 = get_git_file_content(self.files[1])
+                    self.display_names[0] = f"GIT: {str(self.files[1])}"
+                except OSError as exc:
+                    text1 = []
+                    self.display_names[0] = f'<GIT_ERROR> {str(exc)}'
+            else:
+                text1 = IoHelper.read_file(
+                    self.files[0], False, DiffViewer.file_encoding, errors='replace'
+                ).splitlines()
+            text2 = IoHelper.read_file(
                 self.files[1], False, DiffViewer.file_encoding, errors='replace'
             ).splitlines()
+
             self.difflibparser = self.difflibparser_bak = DifflibParser(
                 text1,
                 text2,
                 self.difflibparser_cutoff-0.01, self.difflibparser_cutoff
             )
+
             self.diff_items = self.diff_items_bak = self.difflibparser.get_diff()
             self.l_offset = len(self.diff_items[0].lineno)+1 if self.diff_items else 0
             self.error_bar = ''
@@ -539,25 +605,43 @@ class DiffViewer:
 
         self.difflibparser = DifflibParser(
             [
+                'Filename:',
+                self.display_names[0],
+                '',
                 'Filepath:',
-                str(self.files[0]),
+                (
+                    str(self.files[0])
+                    if self.files[0] is not None else f"GIT: {str(self.files[1])}"
+                ),
                 '',
                 'Size:',
-                f"{get_file_size(self.files[0])} Bytes - {_convert_size(get_file_size(self.files[0]))}",
+                (
+                    f"{get_file_size(self.files[0])} Bytes - {_convert_size(get_file_size(self.files[0]))}"
+                    if self.files[0] is not None else 'N/A'
+                ),
                 '',
                 'Line count:',
                 f"{self.difflibparser_bak.count_equal + self.difflibparser_bak.count_delete + self.difflibparser_bak.count_changed}",
                 '',
                 'Time modified:',
-                f"{datetime.fromtimestamp(get_file_mtime(self.files[0]))}",
+                (
+                    f"{datetime.fromtimestamp(get_file_mtime(self.files[0]))}"
+                    if self.files[0] is not None else 'N/A'
+                ),
                 '',
                 'Time created:',
-                f"{datetime.fromtimestamp(get_file_ctime(self.files[0]))}",
+                (
+                    f"{datetime.fromtimestamp(get_file_ctime(self.files[0]))}"
+                    if self.files[0] is not None else 'N/A'
+                ),
                 '',
                 'Similiarity (%):',
                 f"{(text1_similarity * 100):.2f}",
             ],
             [
+                'Filename:',
+                self.display_names[1],
+                '',
                 'Filepath:',
                 str(self.files[1]),
                 '',
