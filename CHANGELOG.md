@@ -10,6 +10,11 @@ Start of documentation: 2023-02-16 / v1.1.0
 - improved the search functionality inside the diff-viewer.
 - added basic git support inside the diff-viewer to compare a file against its own git history.
 - added libmagic-file output to the file information displayed when using the parameter -`a`, --`attributes` (if file or git is available on the current system).
+- added --`debuglog`, --`debug-log` parameter to log debug and error information to a log-file instead of the stderr-stream.
+
+## Bugfixes
+
+- fixed Bug where the diff-viewer would break when using -, --`stdin`.
 
 
 ## [1.10.4] - 2025-09-27
