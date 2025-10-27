@@ -26,7 +26,7 @@
       <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/cat_win.logo.png" width="25%"/>
    </p>
    <p align="center">
-      Simple Text-Processing and -Analytics Command Line Tool made in Python
+      Advanced Text-Processing and -Analytics Command Line Tool made in Python
       <br/>
       <a href="https://github.com/SilenZcience/cat_win/blob/main/cat_win/src/cat.py">
          <strong>Explore the code »</strong>
