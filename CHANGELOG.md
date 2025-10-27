@@ -8,6 +8,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - improved the search functionality inside the diff-viewer.
+- added basic git support inside the diff-viewer to compare a file against its own git history.
+- added libmagic-file output to the file information displayed when using the parameter -`a`, --`attributes` (if file or git is available on the current system).
 
 
 ## [1.10.4] - 2025-09-27
