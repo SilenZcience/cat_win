@@ -730,9 +730,10 @@ This Behaviour is included by Default when using <a href="#--nk---nokeyword">--n
 ### <a id="-a---attributes">-a, --attributes</a>
 
 Shows meta Information for each File provided and stops Code Execution.
-The meta Information includes file Signature, File Size, Time of Access, -Modified and -Created.
+The meta Information includes File Signature, File Size, Time of Access, -Modified and -Created.
 On Windows OS Systems this Parameter will also display the classic File Attributes.
-On Unix Systems this Prameter will also display the classic Group Permissions.
+On Unix Systems this Prameter will also display the classic Group Permissions/Ids.
+If the libmagic file Command is available (inside the PATH or Git install Directory) it will be used to expand the Information displayed.
 
 ```console
 > catw test.txt -a
@@ -742,6 +743,8 @@ Size:           1.55 KB
 ATime:          YYYY-MM-DD HH:MM:SS.
 MTime:          YYYY-MM-DD HH:MM:SS.
 CTime:          YYYY-MM-DD HH:MM:SS.
+-rw-rw-rw- (666)
+<Path>/test.txt: ASCII text, with CRLF line terminators
 +Archive, Indexed
 -System, Hidden, Readonly, Compressed, Encrypted
 ```
@@ -754,6 +757,7 @@ ATime:          YYYY-MM-DD HH:MM:SS.
 MTime:          YYYY-MM-DD HH:MM:SS.
 CTime:          YYYY-MM-DD HH:MM:SS.
 -rwxrwxrwx 1 user user
+<Path>/test.txt: ASCII text, with CRLF line terminators
 ```
 
 ### <a id="-m---checksum">-m, --checksum</a>
@@ -1063,6 +1067,7 @@ The currently supported Key Bindings are as follows:
 
 Opens a simple Diff-Viewer to see the specific Differences between two Files.
 When multiple File are provided the Diff-Viewer will display the Files in Pairs of Two in the Order they were provided.
+If a File has no Pair to compare itself with, it will try to compare against the Git History.
 On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module.
 The currently supported Key Bindings are as follows:
 
