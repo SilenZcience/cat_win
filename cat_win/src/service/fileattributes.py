@@ -137,6 +137,65 @@ class Signatures:
             return '[' + ';'.join(file_signature_secondary) + ']'
         return '-'
 
+def get_libmagic_file(file: Path) -> str:
+    """
+    get the libmagic file information of a file
+
+    Parameters:
+    file (Path):
+        a string representation of a file (-path)
+
+    Returns:
+    (str):
+        the libmagic file information of a file
+    """
+    # try to find a native file.exe first
+    file_cmd = which('file.exe') or which('file') # should work on windows/unix
+    if file_cmd:
+        try:
+            sub = subprocess.run([str(file_cmd), str(file)], capture_output=True, check=False)
+            if sub.returncode != 0:
+                return ''
+            libmagic_out = sub.stdout.decode().strip()
+            return libmagic_out.rpartition(':')[-1].lstrip()
+        except OSError:
+            pass
+
+    # fallback: try to find git.exe and locate file.exe inside the Git installation
+    git_cmd = which('git.exe') or which('git')
+
+    if not git_cmd:
+        return ''
+
+    try:
+        git_path = Path(git_cmd).resolve()
+    except OSError:
+        return ''
+
+    search_root = git_path.parent.parent if len(git_path.parents) >= 2 else git_path.parent
+
+    found_file = None
+    try:
+        for file_exe in search_root.rglob('file.exe'):
+            found_file = file_exe
+            break
+        else:
+            for file_exe in search_root.rglob('file'):
+                found_file = file_exe
+                break
+    except OSError:
+        found_file = None
+
+    if not found_file:
+        return ''
+
+    try:
+        sub = subprocess.run([str(found_file), str(file)], capture_output=True, check=True)
+    except OSError:
+        return ""
+    libmagic_out = sub.stdout.decode().strip()
+    return libmagic_out.rpartition(':')[-1].lstrip()
+
 def _convert_size(size_bytes: int) -> str:
     """
     convert a size value to a more compact representation
@@ -265,61 +324,6 @@ def get_file_ctime(file: Path) -> float:
     except OSError:
         return 0.0
 
-def get_libmagic_file(file: Path) -> str:
-    """
-    get the libmagic file information of a file
-
-    Parameters:
-    file (Path):
-        a string representation of a file (-path)
-
-    Returns:
-    (str):
-        the libmagic file information of a file
-    """
-    # try to find a native file.exe first
-    file_cmd = which('file.exe') or which('file') # should work on windows/unix
-    if file_cmd:
-        try:
-            sub = subprocess.run([str(file_cmd), str(file)], capture_output=True, check=False)
-            if sub.returncode != 0:
-                return ''
-            return sub.stdout.decode().strip()
-        except OSError:
-            pass
-
-    # fallback: try to find git.exe and locate file.exe inside the Git installation
-    git_cmd = which('git.exe') or which('git')
-
-    if not git_cmd:
-        return ''
-
-    try:
-        git_path = Path(git_cmd).resolve()
-    except OSError:
-        return ''
-
-    search_root = git_path.parent.parent if len(git_path.parents) >= 2 else git_path.parent
-
-    found_file = None
-    try:
-        for file_exe in search_root.rglob('file.exe'):
-            found_file = file_exe
-            break
-    except OSError:
-        found_file = None
-
-    if not found_file:
-        return ''
-
-    try:
-        sub = subprocess.run([str(found_file), str(file)], capture_output=True, check=True)
-    except OSError:
-        return ""
-    if sub.returncode != 0:
-        return ''
-    return sub.stdout.decode().strip()
-
 def get_file_meta_data(file: Path, colors = None) -> str:
     """
     calculate file metadata information.
@@ -345,6 +349,8 @@ def get_file_meta_data(file: Path, colors = None) -> str:
 
         meta_data += f"{colors[1]}{'Signature:' : <16}"
         meta_data += f"{Signatures.read_signature(file)}{colors[0]}\n"
+        meta_data += f"{colors[1]}{'LibMagic:' : <16}"
+        meta_data += f"{get_libmagic_file(file)}{colors[0]}\n"
         meta_data += f"{colors[1]}{'Size:' : <16}"
         meta_data += f"{_convert_size(stats.st_size)} ({stats.st_size}){colors[0]}\n"
         meta_data += f"{colors[1]}{'ATime:': <16}"
@@ -368,15 +374,9 @@ def get_file_meta_data(file: Path, colors = None) -> str:
         if not on_windows_os:
             meta_data += f" {stats.st_nlink} {getpwuid(stats.st_uid).pw_name}"
             meta_data += f" {getgrgid(stats.st_gid).gr_name}{colors[0]}\n"
-            libmagic_file = get_libmagic_file(file)
-            if libmagic_file:
-                meta_data += f"{colors[1]}{libmagic_file}{colors[0]}\n"
             return meta_data
 
         meta_data += f"{colors[0]}\n"
-        libmagic_file = get_libmagic_file(file)
-        if libmagic_file:
-            meta_data += f"{colors[1]}{libmagic_file}{colors[0]}\n"
 
         file_handle = WinStreams(file)
         if file_handle.streams:
