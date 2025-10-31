@@ -51,7 +51,7 @@ class Clipboard:
             error_msg += 'Should you have any problem with either module, '
             error_msg += 'try to install a different one using '
             error_msg += f"'{get_py_executable()} -m pip install ...'"
-            err_print('\n', error_msg, sep='')
+            err_print('\n', error_msg, sep='', priority=err_print.WARNING)
             return False
         try:
             if __dependency == 3:
@@ -114,7 +114,7 @@ class Clipboard:
             error_msg += 'Should you have any problem with either module, '
             error_msg += 'try to install a different one using '
             error_msg += f"'{get_py_executable()} -m pip install ...'"
-            err_print('\n', error_msg, sep='')
+            err_print('\n', error_msg, sep='', priority=err_print.WARNING)
             return
         try:
             if __dependency == 3:

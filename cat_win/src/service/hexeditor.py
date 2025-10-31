@@ -145,7 +145,7 @@ class HexEditor:
             self.error_bar = str(exc)
             self.status_bar_size = 2
             if self.debug_mode:
-                err_print(self.error_bar)
+                err_print(self.error_bar, priority=err_print.WARNING)
 
     def _get_current_state_row(self, row: int) -> list:
         """
@@ -533,7 +533,7 @@ class HexEditor:
             self.error_bar = str(exc)
             self.status_bar_size = 2
             if self.debug_mode:
-                err_print(self.error_bar)
+                err_print(self.error_bar, priority=err_print.WARNING)
         return True
 
     def _action_jump(self) -> bool:
@@ -841,7 +841,7 @@ class HexEditor:
             indicates if the editor should keep running
         """
         if self.debug_mode:
-            err_print('Interrupting...')
+            err_print('Interrupting...', priority=err_print.INFORMATION)
         raise KeyboardInterrupt
 
     def _action_resize(self) -> bool:
@@ -928,7 +928,7 @@ class HexEditor:
                 _debug_info = repr(chr(wchar_)) if isinstance(wchar_, int) else \
                     ord(wchar_) if len(wchar_) == 1 else '-'
                 err_print(f"__DEBUG__: Received  {str(key_):<22}{_debug_info}" + \
-                    f"\t{str(key__):<15} \t{repr(wchar_)}")
+                    f"\t{str(key__):<15} \t{repr(wchar_)}", priority=err_print.INFORMATION)
         wchar = self.curse_window.get_wch()
         _key = curses.keyname(wchar if isinstance(wchar, int) else ord(wchar))
         key = UNIFY_HOTKEYS.get(_key, b'_key_string')
@@ -1251,7 +1251,7 @@ class HexEditor:
             if not self.unsaved_progress:
                 raise e
             if not isinstance(e, KeyboardInterrupt):
-                err_print('Oops..! Something went wrong.')
+                err_print('Oops..! Something went wrong.', priority=err_print.IMPORTANT)
             user_input = ''
             while user_input not in ['Y', 'J', 'N']:
                 user_input = input('Do you want to save the changes? [Y/N]').upper()
@@ -1259,9 +1259,9 @@ class HexEditor:
                 raise e
             self._action_save()
             if self.unsaved_progress:
-                err_print('Oops..! Something went wrong. The file could not be saved.')
+                err_print('Oops..! Something went wrong. The file could not be saved.', priority=err_print.IMPORTANT)
             else:
-                err_print('The file has been successfully saved.')
+                err_print('The file has been successfully saved.', priority=err_print.INFORMATION)
             raise e
         finally:
             try: # cleanup - close file
@@ -1289,11 +1289,11 @@ class HexEditor:
             return False
 
         if CURSES_MODULE_ERROR:
-            err_print("The Editor could not be loaded. No Module 'curses' was found.")
+            err_print("The Editor could not be loaded. No Module 'curses' was found.", priority=err_print.INFORMATION)
             if on_windows_os:
-                err_print('If you are on Windows OS, try pip-installing ', end='')
-                err_print("'windows-curses'.")
-            err_print()
+                err_print('If you are on Windows OS, try pip-installing ', end='', priority=err_print.INFORMATION)
+                err_print("'windows-curses'.", priority=err_print.INFORMATION)
+            err_print(priority=err_print.INFORMATION)
             HexEditor.loading_failed = True
             return False
 

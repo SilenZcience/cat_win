@@ -138,7 +138,7 @@ class Editor:
             self.error_bar = str(exc)
             self.status_bar_size = 2
             if self.debug_mode:
-                err_print(self.error_bar)
+                err_print(self.error_bar, priority=err_print.WARNING)
         if not self.window_content:
             self.window_content.append('')
 
@@ -644,8 +644,8 @@ class Editor:
         # we can fix these with the utf-16 surrogatepass error-handler
         wchars = wchars_.encode('utf-16', 'surrogatepass').decode('utf-16')
         if self.debug_mode and wchars != wchars_:
-            err_print(f"__DEBUG__: Changed {wchars_} to {wchars}", end=' ')
-            err_print(f"Length: {len(wchars)} Ord: {ord(wchars[0])}")
+            err_print(f"__DEBUG__: Changed {wchars_} to {wchars}", end=' ', priority=err_print.INFORMATION)
+            err_print(f"Length: {len(wchars)} Ord: {ord(wchars[0])}", priority=err_print.INFORMATION)
         # in case the line has no text yet and tab is pressed, we indent with
         # the custom indentation
         if self.special_indentation != '\t' == wchars and \
@@ -701,7 +701,7 @@ class Editor:
         msg = msg.replace('\0', '')
         error_bar_backup = self.error_bar
         if self.debug_mode and tmp_error:
-            err_print(tmp_error)
+            err_print(tmp_error, priority=err_print.IMPORTANT)
         self.error_bar = tmp_error if tmp_error else self.error_bar
         try:
             if self.error_bar:
@@ -738,7 +738,7 @@ class Editor:
             self.error_bar = str(exc)
             self.status_bar_size = 2
             if self.debug_mode:
-                err_print(self.error_bar)
+                err_print(self.error_bar, priority=err_print.WARNING)
         return True
 
     def _action_transform(self) -> bool:
@@ -1264,7 +1264,7 @@ class Editor:
             indicates if the editor should keep running
         """
         if self.debug_mode:
-            err_print('Interrupting...')
+            err_print('Interrupting...', priority=err_print.INFORMATION)
         raise KeyboardInterrupt
 
     def _action_resize(self) -> bool:
@@ -1366,7 +1366,7 @@ class Editor:
                 _debug_info = repr(chr(wchar_)) if isinstance(wchar_, int) else \
                     ord(wchar_) if len(wchar_) == 1 else '-'
                 err_print(f"__DEBUG__: Received  {str(key_):<22}{_debug_info}" + \
-                    f"\t{str(key__):<15} \t{repr(wchar_)}")
+                    f"\t{str(key__):<15} \t{repr(wchar_)}", priority=err_print.INFORMATION)
         buffer: tuple = None
         while True:
             if buffer is not None:
@@ -1711,7 +1711,7 @@ class Editor:
             if not self.unsaved_progress:
                 raise e
             if not isinstance(e, KeyboardInterrupt):
-                err_print('Oops..! Something went wrong.')
+                err_print('Oops..! Something went wrong.', priority=err_print.IMPORTANT)
             user_input = ''
             while user_input not in ['Y', 'J', 'N']:
                 user_input = input('Do you want to save the changes? [Y/N]').upper()
@@ -1719,9 +1719,9 @@ class Editor:
                 raise e
             self._action_save()
             if self.unsaved_progress:
-                err_print('Oops..! Something went wrong. The file could not be saved.')
+                err_print('Oops..! Something went wrong. The file could not be saved.', priority=err_print.IMPORTANT)
             else:
-                err_print('The file has been successfully saved.')
+                err_print('The file has been successfully saved.', priority=err_print.INFORMATION)
             raise e
         finally:
             try: # cleanup - close file
@@ -1751,11 +1751,11 @@ class Editor:
             return False
 
         if CURSES_MODULE_ERROR:
-            err_print("The Editor could not be loaded. No Module 'curses' was found.")
+            err_print("The Editor could not be loaded. No Module 'curses' was found.", priority=err_print.INFORMATION)
             if on_windows_os:
-                err_print('If you are on Windows OS, try pip-installing ', end='')
-                err_print("'windows-curses'.")
-            err_print()
+                err_print('If you are on Windows OS, try pip-installing ', end='', priority=err_print.INFORMATION)
+                err_print("'windows-curses'.", priority=err_print.INFORMATION)
+            err_print(priority=err_print.INFORMATION)
             Editor.loading_failed = True
             return False
 
