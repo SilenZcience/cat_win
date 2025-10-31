@@ -20,31 +20,31 @@ BOOL_NEG_RESPONSE = ['FALSE','NO','N','0']
 
 def validator_string(_, d_h: bool=False) -> bool:
     if d_h:
-        err_print('Any UTF-8 String (unicode-escaped) without Nullbytes')
+        err_print('Any UTF-8 String (unicode-escaped) without Nullbytes', priority=err_print.INFORMATION)
         return False
     return True
 
 def validator_int(value: str, d_h: bool=False) -> bool:
     if d_h:
-        err_print('Integers greater than Zero or Zero')
+        err_print('Integers greater than Zero or Zero', priority=err_print.INFORMATION)
         return False
     return value.isdigit() and int(value) >= 0
 
 def validator_int_pos(value: str, d_h: bool=False) -> bool:
     if d_h:
-        err_print('Integers greater than Zero')
+        err_print('Integers greater than Zero', priority=err_print.INFORMATION)
         return False
     return value.isdigit() and int(value) > 0
 
 def validator_bool(value: str, d_h: bool=False) -> bool:
     if d_h:
-        err_print(BOOL_POS_RESPONSE, '&', BOOL_NEG_RESPONSE, '(not case sensitive)')
+        err_print(BOOL_POS_RESPONSE, '&', BOOL_NEG_RESPONSE, '(not case sensitive)', priority=err_print.INFORMATION)
         return False
     return value.upper() in BOOL_POS_RESPONSE + BOOL_NEG_RESPONSE
 
 def validator_encoding(value: str, d_h: bool=False) -> bool:
     if d_h:
-        err_print('Valid Encoding Formats defined by the current Python Interpreter')
+        err_print('Valid Encoding Formats defined by the current Python Interpreter', priority=err_print.INFORMATION)
         return False
     try:
         return codecs.lookup(value) is not None
@@ -139,8 +139,8 @@ class Config:
             c_value_rep = repr(self.default_dic[element])
             if c_value_rep[0] not in ['"', "'"]:
                 c_value_rep = f"'{c_value_rep}'"
-            err_print(f"invalid config value '{value}' for '{element}'")
-            err_print(f"resetting to {c_value_rep} ...")
+            err_print(f"invalid config value '{value}' for '{element}'", priority=err_print.IMPORTANT)
+            err_print(f"resetting to {c_value_rep} ...", priority=err_print.IMPORTANT)
             self._save_config(element, self.default_dic[element])
             sys.exit(1)
 
@@ -307,7 +307,7 @@ class Config:
                 self.config_parser.write(conf)
             print(f"Successfully updated config file:\n\t{self.config_file}")
         except OSError:
-            err_print(f"Could not write to config file:\n\t{self.config_file}")
+            err_print(f"Could not write to config file:\n\t{self.config_file}", priority=err_print.WARNING)
 
     def _save_config_element(self, keyword: str) -> None:
         print(f"Successfully selected element '{keyword}'")
@@ -323,13 +323,13 @@ class Config:
         value = None
         while not self.is_valid_value(value, keyword):
             if value is not None:
-                err_print(f"Something went wrong. Invalid option: '{value}'.")
-                err_print('Valid Options are: ', end='')
+                err_print(f"Something went wrong. Invalid option: '{value}'.", priority=err_print.IMPORTANT)
+                err_print('Valid Options are: ', end='', priority=err_print.IMPORTANT)
                 self.v_validation[keyword](None, True)
             try:
                 value = input('Input new value: ')
             except EOFError:
-                err_print('\nAborting due to End-of-File character...')
+                err_print('\nAborting due to End-of-File character...', priority=err_print.WARNING)
                 return
 
         self._save_config(keyword, value)
@@ -346,7 +346,7 @@ class Config:
         try:
             value = input('Input new value: ')
         except EOFError:
-            err_print('\nAborting due to End-of-File character...')
+            err_print('\nAborting due to End-of-File character...', priority=err_print.WARNING)
             return
 
         if not value:
@@ -359,8 +359,8 @@ class Config:
     def _save_config_add_custom_command(self) -> None:
         def validator_custom_command(value: str, d_h: bool=False) -> bool:
             if d_h:
-                err_print("The command needs to start with a '-' ", end='')
-                err_print('and cannot be a duplicate of an existing command')
+                err_print("The command needs to start with a '-' ", end='', priority=err_print.INFORMATION)
+                err_print('and cannot be a duplicate of an existing command', priority=err_print.INFORMATION)
                 return False
             if not value:
                 return False
@@ -375,12 +375,12 @@ class Config:
         value = None
         while not validator_custom_command(value):
             if value is not None:
-                err_print(f"Something went wrong. Invalid option: '{value}'.")
+                err_print(f"Something went wrong. Invalid option: '{value}'.", priority=err_print.IMPORTANT)
                 validator_custom_command(None, True)
             try:
                 value = input('Input new custom command: ')
             except EOFError:
-                err_print('\nAborting due to End-of-File character...')
+                err_print('\nAborting due to End-of-File character...', priority=err_print.WARNING)
                 return
 
         print(f"Successfully added new custom command '{value}'")
@@ -402,11 +402,11 @@ class Config:
             if keyword == '<NEW CUSTOM COMMAND>':
                 return self._save_config_add_custom_command()
             if keyword != '':
-                err_print(f"Something went wrong. Unknown keyword '{keyword}'")
+                err_print(f"Something went wrong. Unknown keyword '{keyword}'", priority=err_print.IMPORTANT)
             try:
                 keyword = input('Input name or id of keyword to change: ')
             except EOFError:
-                err_print('\nAborting due to End-of-File character...')
+                err_print('\nAborting due to End-of-File character...', priority=err_print.WARNING)
                 return
             if keyword.isdigit():
                 if (
@@ -441,8 +441,8 @@ class Config:
             os.remove(self.config_file)
             print(f"Successfully removed config file:\n\t{self.config_file}")
         except FileNotFoundError:
-            err_print('No active config file has been found.')
+            err_print('No active config file has been found.', priority=err_print.WARNING)
         except PermissionError:
-            err_print(f"Permission denied! Error deleting config file:\n\t{self.config_file}")
+            err_print(f"Permission denied! Error deleting config file:\n\t{self.config_file}", priority=err_print.WARNING)
         except OSError:
-            err_print('An unexpected error occured.')
+            err_print('An unexpected error occured.', priority=err_print.WARNING)

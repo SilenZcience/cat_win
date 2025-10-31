@@ -91,8 +91,8 @@ class CConfig:
         if value.count('.') == 1:
             color_type, color = value.split('.')
             return ColorOptions.Fore[color] if color_type == 'Fore' else ColorOptions.Back[color]
-        err_print(f"invalid config value {repr(value)} for '{element}'")
-        err_print(f"resetting to {repr(self.default_dic[element][1:])} ...")
+        err_print(f"invalid config value {repr(value)} for '{element}'", priority=err_print.IMPORTANT)
+        err_print(f"resetting to {repr(self.default_dic[element][1:])} ...", priority=err_print.IMPORTANT)
         self._save_config(element, self.default_dic[element][1:])
         sys.exit(1)
 
@@ -243,7 +243,7 @@ class CConfig:
                 self.config_parser.write(conf)
             print(f"Successfully updated config file:\n\t{self.config_file}")
         except OSError:
-            err_print(f"Could not write to config file:\n\t{self.config_file}")
+            err_print(f"Could not write to config file:\n\t{self.config_file}", priority=err_print.WARNING)
 
     def save_config(self) -> None:
         """
@@ -259,7 +259,7 @@ class CConfig:
             try:
                 keyword = input('Input name or id of the element to change: ')
             except EOFError:
-                err_print('\nAborting due to End-of-File character...')
+                err_print('\nAborting due to End-of-File character...', priority=err_print.WARNING)
                 return
             if keyword.isdigit():
                 keyword = self.elements[int(keyword)-1] if (
@@ -281,7 +281,7 @@ class CConfig:
             try:
                 color = input('Input new color: ')
             except EOFError:
-                err_print('\nAborting due to End-of-File character...')
+                err_print('\nAborting due to End-of-File character...', priority=err_print.WARNING)
                 return
             if color.isdigit():
                 color = color_options[int(color)-1] if (
@@ -300,13 +300,13 @@ class CConfig:
             color.startswith('Back') or
             (higher_bit_color and color.startswith('b'))
         ):
-            err_print(f"An Error occured: '{keyword}' can only be of style 'Fore'")
+            err_print(f"An Error occured: '{keyword}' can only be of style 'Fore'", priority=err_print.IMPORTANT)
             return
         if keyword in self.exclusive_definitions['Back'] and (
             color.startswith('Fore') or
             (higher_bit_color and color.startswith('f'))
         ):
-            err_print(f"An Error occured: '{keyword}' can only be of style 'Back'")
+            err_print(f"An Error occured: '{keyword}' can only be of style 'Back'", priority=err_print.IMPORTANT)
             return
 
         if higher_bit_color:

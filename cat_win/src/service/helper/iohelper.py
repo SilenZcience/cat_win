@@ -17,6 +17,42 @@ class ErrorPrinter:
     """
     ErrorPrinter
     """
+    INFORMATION, IMPORTANT, WARNING = range(1, 4)
+
+    COLOR_INFORMATION: str = ''
+    COLOR_IMPORTANT: str = ''
+    COLOR_WARNING: str = ''
+    COLOR_RESET: str = ''
+
+    @staticmethod
+    def set_colors(info: str, important: str, warning: str, reset: str) -> None:
+        """
+        Set the colors for the error printer.
+
+        Parameters
+        info (str):
+            color for information messages
+        important (str):
+            color for important messages
+        warning (str):
+            color for warning messages
+        reset (str):
+            color to reset to default
+        """
+        ErrorPrinter.COLOR_INFORMATION = info
+        ErrorPrinter.COLOR_IMPORTANT = important
+        ErrorPrinter.COLOR_WARNING = warning
+        ErrorPrinter.COLOR_RESET = reset
+
+    def clear_colors(self) -> None:
+        """
+        Clear all colors (set to empty strings).
+        """
+        ErrorPrinter.COLOR_INFORMATION = ''
+        ErrorPrinter.COLOR_IMPORTANT = ''
+        ErrorPrinter.COLOR_WARNING = ''
+        ErrorPrinter.COLOR_RESET = ''
+
     def __init__(self):
         self.log_to_file = False
         self.file_handle = None
@@ -34,13 +70,24 @@ class ErrorPrinter:
             log_file = Path(os.path.join(os.getcwd(), 'catw_debug.log'))
             self.file_handle = open(log_file, 'a', encoding='utf-8', errors='replace')
 
-    def __call__(self, *args, **kwargs) -> None:
+    def __call__(self, *args, priority: int = 0, **kwargs) -> None:
         """
         print to stderr.
         """
         kwargs['file']  = self.file_handle if self.log_to_file else sys.stderr
         kwargs['flush'] = True
+        backup_end = kwargs.get('end', '\n')
+        if priority:
+            kwargs['end'] = ''
+        if priority == ErrorPrinter.INFORMATION:
+            print(self.COLOR_INFORMATION, end='',   file=kwargs['file'])
+        elif priority == ErrorPrinter.IMPORTANT:
+            print(self.COLOR_IMPORTANT,   end='',   file=kwargs['file'])
+        elif priority == ErrorPrinter.WARNING:
+            print(self.COLOR_WARNING,     end='',   file=kwargs['file'])
         print(*args, **kwargs)
+        if priority:
+            print(self.COLOR_RESET, end=backup_end, file=kwargs['file'])
 
     def close(self) -> None:
         """

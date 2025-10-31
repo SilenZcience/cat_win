@@ -103,10 +103,10 @@ def exception_handler(exception_type: type, exception, traceback,
         err_print(color_dic[CKW.RESET_ALL])
         if u_args[ARGS_DEBUG]:
             return debug_hook(exception_type, exception, traceback)
-        err_print(f"\n{exception_type.__name__}{':' * bool(str(exception))} {exception}")
+        err_print(f"\n{exception_type.__name__}{':' * bool(str(exception))} {exception}", priority=err_print.WARNING)
         if exception_type != KeyboardInterrupt:
-            err_print('If this Exception is unexpected, please raise an official Issue at:')
-            err_print(f"{__url__}/issues")
+            err_print('If this Exception is unexpected, please raise an official Issue at:', priority=err_print.IMPORTANT)
+            err_print(f"{__url__}/issues", priority=err_print.IMPORTANT)
         sys.exit(0)
     except BrokenPipeError: # we only used stderr in the try-block, so it has to be the broken pipe
         devnull = os.open(os.devnull, os.O_WRONLY)
@@ -209,40 +209,38 @@ def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files
     """
     Print all neccassary debug information
     """
-    err_print(color_dic[CKW.MESSAGE_INFORMATION], end='')
     err_print('================================================ '
-        'DEBUG ================================================')
-    err_print('sys_args:', sys.argv)
-    err_print('args: ', end='')
-    err_print([(arg[0], arg[1], u_args[arg[0]]) for arg in args])
-    err_print('unknown_args: ', end='')
-    err_print(unknown_args)
-    err_print('known_files: ', end='')
-    err_print(list(map(str, known_files)))
-    err_print('unknown_files: ', end='')
-    err_print(list(map(str, unknown_files)))
-    err_print('echo_args: ', end='')
-    err_print(repr(echo_args))
-    err_print('known_directories: ', end='')
-    err_print(list(map(str, known_dirs)))
-    err_print('valid_urls: ', end='')
-    err_print(valid_urls)
-    err_print('file encoding: ', end='')
-    err_print(arg_parser.file_encoding)
-    err_print('search queries: ', end='')
+        'DEBUG ================================================', priority=err_print.INFORMATION)
+    err_print('sys_args:', sys.argv, priority=err_print.INFORMATION)
+    err_print('args: ', end='', priority=err_print.INFORMATION)
+    err_print([(arg[0], arg[1], u_args[arg[0]]) for arg in args], priority=err_print.INFORMATION)
+    err_print('unknown_args: ', end='', priority=err_print.INFORMATION)
+    err_print(unknown_args, priority=err_print.INFORMATION)
+    err_print('known_files: ', end='', priority=err_print.INFORMATION)
+    err_print(list(map(str, known_files)), priority=err_print.INFORMATION)
+    err_print('unknown_files: ', end='', priority=err_print.INFORMATION)
+    err_print(list(map(str, unknown_files)), priority=err_print.INFORMATION)
+    err_print('echo_args: ', end='', priority=err_print.INFORMATION)
+    err_print(repr(echo_args), priority=err_print.INFORMATION)
+    err_print('known_directories: ', end='', priority=err_print.INFORMATION)
+    err_print(list(map(str, known_dirs)), priority=err_print.INFORMATION)
+    err_print('valid_urls: ', end='', priority=err_print.INFORMATION)
+    err_print(valid_urls, priority=err_print.INFORMATION)
+    err_print('file encoding: ', end='', priority=err_print.INFORMATION)
+    err_print(arg_parser.file_encoding, priority=err_print.INFORMATION)
+    err_print('search queries: ', end='', priority=err_print.INFORMATION)
     err_print(','.join(
         ('str(' + ('CI' if c else 'CS') + '):' if isinstance(v, str) else 're:') + str(v)
         for v, c in arg_parser.file_queries
-    ))
-    err_print('replace queries: ', end='')
-    err_print(repr(arg_parser.file_queries_replacement))
-    err_print('truncate file: ', end='')
-    err_print(arg_parser.file_truncate)
-    err_print('replace mapping: ', end='')
-    err_print(arg_parser.file_replace_mapping)
+    ), priority=err_print.INFORMATION)
+    err_print('replace queries: ', end='', priority=err_print.INFORMATION)
+    err_print(repr(arg_parser.file_queries_replacement), priority=err_print.INFORMATION)
+    err_print('truncate file: ', end='', priority=err_print.INFORMATION)
+    err_print(arg_parser.file_truncate, priority=err_print.INFORMATION)
+    err_print('replace mapping: ', end='', priority=err_print.INFORMATION)
+    err_print(arg_parser.file_replace_mapping, priority=err_print.INFORMATION)
     err_print('==================================================='
-              '====================================================', end='')
-    err_print(color_dic[CKW.RESET_ALL])
+              '====================================================', priority=err_print.INFORMATION)
 
 
 def _print_meta_and_checksum(show_meta: bool, show_checksum: bool) -> None:
@@ -649,10 +647,8 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
         file_mtime = get_file_mtime(u_files[file_index].path)
         date_nowtime = datetime.timestamp(datetime.now())
         if abs(date_nowtime - file_mtime) < 0.5:
-            err_print(f"{color_dic[CKW.MESSAGE_WARNING]}Warning: It looks like you are " + \
-                f"trying to pipe a file into itself.{color_dic[CKW.RESET_ALL]}")
-            err_print(f"{color_dic[CKW.MESSAGE_WARNING]}In this case you might have lost " + \
-                f"all data.{color_dic[CKW.RESET_ALL]}")
+            err_print('Warning: It looks like you are trying to pipe a file into itself.', priority=err_print.WARNING)
+            err_print('In this case you might have lost all data.', priority=err_print.WARNING)
         # in any case we have nothing to do and can return
         return
 
@@ -787,11 +783,11 @@ def edit_file(file_index: int = 0) -> None:
             file_content = remove_ansi_codes_from_line(file_content)
         content = [('', line) for line in file_content.splitlines()]
     except PermissionError:
-        err_print(f"Permission denied! Skipping {u_files[file_index].displayname} ...")
+        err_print(f"Permission denied! Skipping {u_files[file_index].displayname} ...", priority=err_print.WARNING)
         return
     except (BlockingIOError, FileNotFoundError):
         err_print('Resource blocked/unavailable! Skipping ' + \
-            f"{u_files[file_index].displayname} ...")
+            f"{u_files[file_index].displayname} ...", priority=err_print.WARNING)
         return
     except (OSError, UnicodeError):
         u_files[file_index].set_plaintext(plain=False)
@@ -810,7 +806,7 @@ def edit_file(file_index: int = 0) -> None:
                 file_content = remove_ansi_codes_from_line(file_content)
             content = [('', line) for line in file_content.splitlines()]
         except OSError:
-            err_print('Operation failed! Try using the enc=X parameter.')
+            err_print('Operation failed! Try using the enc=X parameter.', priority=err_print.WARNING)
             return
 
     edit_content(content, file_index)
@@ -912,7 +908,7 @@ def decode_files_base64(tmp_file_helper: TmpFileHelper) -> None:
                                     arg_parser.file_encoding)
             u_files[i].path = tmp_file_path
         except (OSError, UnicodeError):
-            err_print(f"Base64 decoding failed for file: {file.displayname}")
+            err_print(f"Base64 decoding failed for file: {file.displayname}", priority=err_print.WARNING)
 
 
 def show_unknown_args_suggestions(repl: bool = False) -> list:
@@ -937,12 +933,10 @@ def show_unknown_args_suggestions(repl: bool = False) -> list:
                        for arg in ALL_ARGS]
     arg_suggestions = calculate_suggestions(arg_parser._unknown_args, arg_options)
     for u_arg, arg_replacement in arg_suggestions:
-        err_print(f"{color_dic[CKW.MESSAGE_IMPORTANT]}Unknown argument: " + \
-            f"'{u_arg}'{color_dic[CKW.RESET_ALL]}")
+        err_print(f"Unknown argument: '{u_arg}'", priority=err_print.IMPORTANT)
         if arg_replacement:
             arg_replacement = [arg_r[0] for arg_r in arg_replacement]
-            err_print(f"\t{color_dic[CKW.MESSAGE_IMPORTANT]}Did you mean " + \
-                f"{' or '.join(arg_replacement)}{color_dic[CKW.RESET_ALL]}")
+            err_print(f"\tDid you mean {' or '.join(arg_replacement)}", priority=err_print.IMPORTANT)
     return arg_suggestions
 
 
@@ -960,6 +954,9 @@ def init_colors() -> None:
         CVis.remove_colors()
     else:
         color_dic = default_color_dic.copy()
+    if u_args[ARGS_NOCOL] or u_args[ARGS_DEBUG_LOG] or sys.stderr.closed or \
+        (not os.isatty(sys.stderr.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]):
+        err_print.clear_colors()
 
     converter.set_params(u_args[ARGS_DEBUG],
                          [color_dic[CKW.EVALUATION],
@@ -989,6 +986,10 @@ def init(repl: bool = False) -> tuple:
     u_args.set_args(args)
 
     err_print.set_log_to_file(u_args[ARGS_DEBUG_LOG])
+    err_print.set_colors(color_dic[CKW.MESSAGE_INFORMATION],
+                         color_dic[CKW.MESSAGE_IMPORTANT],
+                         color_dic[CKW.MESSAGE_WARNING],
+                         color_dic[CKW.RESET_ALL])
 
     known_files = arg_parser.get_files(u_args[ARGS_DOTFILES])
     unknown_files, valid_urls = arg_parser.filter_urls(u_args[ARGS_URI])
@@ -1179,10 +1180,8 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
         file.set_file_size(get_file_size(file.path))
         file_size_sum += file.file_size
     if file_size_sum >= const_dic[DKW.LARGE_FILE_SIZE]:
-        err_print(color_dic[CKW.MESSAGE_IMPORTANT], end='')
-        err_print('An exceedingly large amount of data is being loaded. ', end='')
-        err_print('This may require a lot of time and resources.', end='')
-        err_print(color_dic[CKW.RESET_ALL])
+        err_print('An exceedingly large amount of data is being loaded. ', end='', priority=err_print.IMPORTANT)
+        err_print('This may require a lot of time and resources.', priority=err_print.IMPORTANT)
 
     if u_args[ARGS_B64D]:
         decode_files_base64(tmp_file_helper)
@@ -1214,9 +1213,8 @@ def cleanup(tmp_file_helper: TmpFileHelper) -> None:
         the temporary file helper to clean up the files
     """
     if u_args[ARGS_DEBUG]:
-        err_print(color_dic[CKW.MESSAGE_INFORMATION], end='')
         err_print('================================================ '
-            'DEBUG ================================================')
+            'DEBUG ================================================', priority=err_print.INFORMATION)
         caches = [
             remove_ansi_codes_from_line,
             _calculate_line_prefix_spacing,
@@ -1240,19 +1238,18 @@ def cleanup(tmp_file_helper: TmpFileHelper) -> None:
             cache_info+= f"maxsize:{maxsize.ljust(max_val[3])}"
             cache_info+= f"currsize:{currsize.ljust(max_val[4])}"
             cache_info+= f"full:{100*int(currsize)/int(maxsize):6.2f}%"
-            err_print(cache_info)
+            err_print(cache_info, priority=err_print.INFORMATION)
     for tmp_file in tmp_file_helper.get_generated_temp_files():
         if u_args[ARGS_DEBUG]:
-            err_print('Cleaning', tmp_file)
+            err_print('Cleaning', tmp_file, priority=err_print.INFORMATION)
         try:
             os.remove(tmp_file)
         except OSError as exc:
             if u_args[ARGS_DEBUG]:
-                err_print(type(exc).__name__, tmp_file)
+                err_print(type(exc).__name__, tmp_file, priority=err_print.INFORMATION)
     if u_args[ARGS_DEBUG]:
         err_print('==================================================='
-            '====================================================', end='')
-        err_print(color_dic[CKW.RESET_ALL])
+            '====================================================', priority=err_print.INFORMATION)
     err_print.close()
 
 def main():

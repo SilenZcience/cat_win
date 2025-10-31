@@ -214,16 +214,13 @@ def print_update_information(package: str, current_version: str, color_dic: dict
         message += f"A new pre-release of {package} is available: v{latest_stable_version}"
     message += f"{color_dic[CKW.RESET_ALL]}"
     if status < STATUS_UP_TO_DATE:
-        warning += f"{color_dic[CKW.MESSAGE_WARNING]}"
         warning += 'Warning: Due to the drastic version increase, '
-        warning += 'backwards compatibility is no longer guaranteed!'
-        warning += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_WARNING]}"
+        warning += 'backwards compatibility is no longer guaranteed!\n'
         warning += 'You may experience fundamental differences.'
-        warning += f"{color_dic[CKW.RESET_ALL]}"
     info += f"{color_dic[CKW.MESSAGE_INFORMATION]}Take a look at the changelog here:"
     info += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_INFORMATION]}"
     info += f"{__url__}/blob/main/CHANGELOG.md{color_dic[CKW.RESET_ALL]}"
 
     print(message)
-    err_print(warning)
+    err_print(warning, priority=err_print.WARNING)
     print(info)
