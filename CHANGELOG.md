@@ -15,6 +15,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 ## Bugfixes
 
 - fixed Bug where the diff-viewer would break when using -, --`stdin`.
+- fixed Bug where curses would use the wrong colors when stdout is not a tty.
+- fixed Bug where stderr stream would loose its coloring if stdout is not a tty.
 
 
 ## [1.10.4] - 2025-09-27
