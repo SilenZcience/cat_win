@@ -21,17 +21,17 @@ jobs:
         python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12', '3.13', 'pypy-3.7', 'pypy-3.8', 'pypy-3.9', 'pypy-3.10']
         # python-version: ['3.8', '3.9', '3.11', 'pypy-3.8', 'pypy-3.10']
         exclude:
-          - os: macos-latest
-            python-version: '3.7'
-          - os: macos-latest
-            python-version: 'pypy-3.7'
+          # - os: macos-latest
+          #   python-version: '3.7'
+          # - os: macos-latest
+          #   python-version: 'pypy-3.7'
           - os: ubuntu-latest
             python-version: '3.7'
         include:
-          - os: macos-13
-            python-version: '3.7'
-          - os: macos-13
-            python-version: 'pypy-3.7'
+          # - os: macos-13
+          #   python-version: '3.7'
+          # - os: macos-13
+          #   python-version: 'pypy-3.7'
           - os: ubuntu-22.04
             python-version: '3.7'
     steps:
