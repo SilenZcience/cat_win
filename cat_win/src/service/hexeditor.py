@@ -997,6 +997,7 @@ class HexEditor:
             start=2
         ):
             self.curse_window.addstr(row_id, 0, f"│ {row} │"[:max_x])
+            self.curse_window.clrtoeol()
 
         self.curse_window.move(len(hex_section)+2, 0)
         if len(self.hex_array) <= self.wpos.row + max_y:
