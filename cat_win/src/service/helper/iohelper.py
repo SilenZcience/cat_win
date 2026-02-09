@@ -316,12 +316,14 @@ class IoHelper:
         """
         if isinstance(content, str):
             with open(src_file, 'w', encoding=file_encoding, errors=errors, newline='') as file:
-                file.write(content)
+                if file.write(content) != len(content):
+                    raise OSError('Not all characters could be written to the file.')
             return src_file
         # in case the content is of types bytes:
         # important for the editor, so the encoding errors do not get replaced!
         with open(src_file, 'wb') as raw_f:
-            raw_f.write(content)
+            if raw_f.write(content) != len(content):
+                raise OSError('Not all bytes could be written to the file.')
         return src_file
 
 
