@@ -10,6 +10,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - improved the search functionality inside the diff-viewer.
 - added basic git support inside the diff-viewer to compare a file against its own git history.
 - added libmagic-file output to the file information displayed when using the parameter -`a`, --`attributes` (if file or git is available on the current system).
+- added color `more_less_prompt` to change the color of the prompt when using -`M`, --`more` or -`L`, --`less`.
 - added --`debuglog`, --`debug-log` parameter to log debug and error information to a log-file instead of the stderr-stream.
 
 ## Bugfixes
@@ -17,6 +18,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fixed Bug where the diff-viewer would break when using -, --`stdin`.
 - fixed Bug where curses would use the wrong colors when stdout is not a tty.
 - fixed Bug where stderr stream would loose its coloring if stdout is not a tty.
+- fixed Bug where `find=` and `match=` would not halt the output when used in combination with -, --`stdin`.
 
 
 ## [1.10.4] - 2025-09-27
