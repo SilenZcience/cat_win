@@ -544,12 +544,13 @@ def print_file(content: list, stepper: More) -> bool:
             found_sth = True
 
         if found_sth and not u_args[ARGS_MORE]:
-            try:
-                # fails when using --stdin mode, because the stdin will send en EOF char
-                # to input without prompting the user
-                input()
-            except (EOFError, UnicodeDecodeError):
-                pass
+            with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
+                try:
+                    # fails when using --stdin mode, because the stdin will send en EOF char
+                    # to input without prompting the user -> dup stdin
+                    input()
+                except (EOFError, UnicodeDecodeError):
+                    pass
 
     return contains_queried
 
