@@ -139,6 +139,8 @@ class CKW:
 
     REPL_PREFIX         = 'repl_prefix'
 
+    MORE_LESS_PROMPT    = 'more_less_prompt'
+
     MESSAGE_INFORMATION = 'message_information'
     MESSAGE_IMPORTANT   = 'message_important'
     MESSAGE_WARNING     = 'message_warning'

@@ -15,6 +15,9 @@ class More:
     """
     implements 'more' behaviour
     """
+    color: str = ''
+    color_reset: str = ''
+
     step_length = 0
     t_width = 120
     t_height = 28
@@ -35,6 +38,20 @@ class More:
             More.t_width, More.t_height = max(t_width, 1), max(t_height-2, 1)
         except OSError: # PyPy-Error: "Inappropriate ioctl for device"
             pass
+
+    @staticmethod
+    def set_colors(color: str, color_reset: str) -> None:
+        """
+        setup the colors to use in the more/less prompt.
+
+        Parameters:
+        color (str):
+            the color to use (ansi escape)
+        color_reset (str)
+            the ansi esacpe to reset the color
+        """
+        More.color = color
+        More.color_reset = color_reset
 
     def __init__(self, lines: list = None) -> None:
         self.lines = lines if lines else []
@@ -97,14 +114,15 @@ class More:
         print() # move to bottom line
         # print bottom line:
         if More.t_width < 7:
-            print('-' * More.t_width)
+            bottom_line = '-' * More.t_width
         else:
             padding = '-' * ((More.t_width-7)//2)
-            print(padding + 'cat_win' + '-' * (More.t_width-7-len(padding)), end='')
+            bottom_line = padding + 'cat_win' + '-' * (More.t_width-7-len(padding))
+        print(f"{More.color}{bottom_line[:len(bottom_line)*percentage//100]}{More.color_reset}{bottom_line[len(bottom_line)*percentage//100:]}", end='')
         print(CURSOR_START_ABOVE_1, end='', flush=True) # move up to input() line
         try:
             user_input = input(
-                f"-- More ({percentage: >2}%){('['+info+']') if info else ''} -- "
+                f"{More.color}-- More ({percentage: >2}%){('['+info+']') if info else ''} -- {More.color_reset}"
             ).strip().upper()
         except EOFError:
             user_input = ''
@@ -177,13 +195,13 @@ class More:
                         if user_input == 'INTERRUPT':
                             raise KeyboardInterrupt
                         if user_input in ['?', 'H', 'HELP']:
-                            print('H HELP       display this help message')
-                            print('Q QUIT       quit')
-                            print('N NEXT       skip to next file')
-                            print('L LINE       display current line number')
-                            print('D DOWN <x>   step x lines down')
-                            print('S SKIP <x>   skip x lines')
-                            print('J JUMP <x>   jump to line x')
+                            print(f"{More.color}H HELP       display this help message{More.color_reset}")
+                            print(f"{More.color}Q QUIT       quit{More.color_reset}")
+                            print(f"{More.color}N NEXT       skip to next file{More.color_reset}")
+                            print(f"{More.color}L LINE       display current line number{More.color_reset}")
+                            print(f"{More.color}D DOWN <x>   step x lines down{More.color_reset}")
+                            print(f"{More.color}S SKIP <x>   skip x lines{More.color_reset}")
+                            print(f"{More.color}J JUMP <x>   jump to line x{More.color_reset}")
                             clear_size = 7
                             continue
                         if user_input in ['\x11', 'Q', 'QUIT']: # '\x11' = ^Q
