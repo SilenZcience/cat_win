@@ -1391,6 +1391,7 @@ Valid Options are:
 | progressbar_done | the progress that is already done (displayed when using <a href="#--vise---visualizee">--vise, --visualizee</a> or reading large files) |
 | progressbar_missing | the progress that is still missing (displayed when using <a href="#--vise---visualizee">--vise, --visualizee</a> or reading large files) |
 | repl_prefix | the prefix displayed when using the cat_win REPL (cats) |
+| more_less_prompt | the prompt displayed when using <a href="#-m---more">-M, --more</a> or <a href="#-l---less">-L, --less</a> |
 | message_information | any informational message like update information |
 | message_important | any important message like large file sizes |
 | message_warning | any warning message like overwriting a file with itself |
