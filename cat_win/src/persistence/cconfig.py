@@ -43,6 +43,7 @@ class CConfig:
         CKW.PROGRESSBAR_DONE    : ColorOptions.Fore['LIGHTGREEN'],
         CKW.PROGRESSBAR_MISSING : ColorOptions.Fore['LIGHTMAGENTA'],
         CKW.REPL_PREFIX         : ColorOptions.Fore['MAGENTA'],
+        CKW.MORE_LESS_PROMPT    : ColorOptions.Fore['GREEN'],
         CKW.MESSAGE_INFORMATION : ColorOptions.Fore['LIGHTBLACK'],
         CKW.MESSAGE_IMPORTANT   : ColorOptions.Fore['YELLOW'],
         CKW.MESSAGE_WARNING     : ColorOptions.Fore['RED'],
