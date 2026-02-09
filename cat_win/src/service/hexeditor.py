@@ -512,14 +512,14 @@ class HexEditor:
         bytes_loaded = len(self.hex_array)*HexEditor.columns
         bytes_loaded-= HexEditor.columns
         bytes_loaded+= len(self.hex_array[-1])
-        content = b''
+        content = bytearray()
         for i in range(len(self.hex_array)):
             for hex_byte in self._get_current_state_row(i):
                 try:
-                    content += bytes.fromhex(hex_byte)
+                    content.extend(bytes.fromhex(hex_byte))
                 except ValueError:
                     pass
-        content += bytes(self._f_content_gen)
+        content.extend(bytes(self._f_content_gen))
         try:
             IoHelper.write_file(self.file, content)
             self.changes_made = True
