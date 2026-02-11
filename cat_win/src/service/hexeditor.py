@@ -991,6 +991,7 @@ class HexEditor:
             '',
             f"{'alt+S' if self.save_with_alt else '^S':<{coff}}save file",
             f"{'^R':<{coff}}reload file",
+            f"{'Ctrl+F1':<{coff}}open file manager",
             '',
             f"{'^B':<{coff}}put editor in background",
             f"{'^D':<{coff}}interrupt/force close",
