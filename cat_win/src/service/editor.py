@@ -1783,23 +1783,23 @@ class Editor:
                 if os.isatty(sys.stdout.fileno()):
                     curses.use_default_colors()
                 # status_bar
-                curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE  )
+                curses.init_pair(1, curses.COLOR_BLACK  , curses.COLOR_WHITE )
                 # error_bar
-                curses.init_pair(2, curses.COLOR_RED  , curses.COLOR_WHITE  )
+                curses.init_pair(2, curses.COLOR_RED    , curses.COLOR_WHITE )
                 # special char (not printable or ws) & prompts
-                curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_RED    )
+                curses.init_pair(3, curses.COLOR_WHITE  , curses.COLOR_RED   )
                 # tab-char & current match
-                curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_GREEN  )
+                curses.init_pair(4, curses.COLOR_BLACK  , curses.COLOR_GREEN )
                 # selection
-                curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_YELLOW )
+                curses.init_pair(5, curses.COLOR_BLACK  , curses.COLOR_YELLOW)
                 # find & replace
-                curses.init_pair(6, curses.COLOR_WHITE, curses.COLOR_BLUE   )
+                curses.init_pair(6, curses.COLOR_WHITE  , curses.COLOR_BLUE  )
                 # correct transform query
-                curses.init_pair(7, curses.COLOR_GREEN, curses.COLOR_WHITE  )
+                curses.init_pair(7, curses.COLOR_GREEN  , curses.COLOR_WHITE )
                 # file-selector, active file
-                curses.init_pair(8, curses.COLOR_MAGENTA, curses.COLOR_WHITE)
+                curses.init_pair(8, curses.COLOR_MAGENTA, curses.COLOR_WHITE )
                 # file-selector, active file selected
-                curses.init_pair(9, curses.COLOR_MAGENTA, -1                )
+                curses.init_pair(9, curses.COLOR_MAGENTA, -1                 )
         curses.raw()
         self.curse_window.nodelay(False)
 
@@ -1862,6 +1862,8 @@ class Editor:
             Editor.loading_failed = True
             return False
 
+        changes_made = False
+
         editor = cls(files)
         if skip_binary and editor.error_bar:
             return False
@@ -1876,6 +1878,7 @@ class Editor:
             signal.signal(signal.SIGTSTP, signal.SIG_IGN)
 
         editor._open()
+        changes_made |= editor.changes_made
         while editor.open_next_idx is not None:
             editor = cls(files, file_idx = editor.open_next_idx)
             editor._set_special_chars(special_chars)
@@ -1883,8 +1886,9 @@ class Editor:
                 # disable background feature on windows
                 editor._action_background = lambda *_: True
             editor._open()
+            changes_made |= editor.changes_made
 
-        return editor.changes_made
+        return changes_made
 
     @staticmethod
     def set_indentation(indentation: str = '\t', auto_indent: bool = True) -> None:
