@@ -1219,23 +1219,23 @@ class HexEditor:
                 if os.isatty(sys.stdout.fileno()):
                     curses.use_default_colors()
                 # status_bar
-                curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE )
+                curses.init_pair(1,  curses.COLOR_BLACK, curses.COLOR_WHITE )
                 # error_bar
-                curses.init_pair(2, curses.COLOR_RED  , curses.COLOR_WHITE )
+                curses.init_pair(2,  curses.COLOR_RED  , curses.COLOR_WHITE )
                 # prompts
-                curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_RED   )
+                curses.init_pair(3,  curses.COLOR_WHITE, curses.COLOR_RED   )
                 # selected byte
-                curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_WHITE )
+                curses.init_pair(4,  curses.COLOR_BLACK, curses.COLOR_WHITE )
                 # edited byte
-                curses.init_pair(5, curses.COLOR_RED  , curses.COLOR_BLACK )
+                curses.init_pair(5,  curses.COLOR_RED  , -1                 )
                 # selected and edited byte
-                curses.init_pair(6, curses.COLOR_RED  , curses.COLOR_WHITE )
+                curses.init_pair(6,  curses.COLOR_RED  , curses.COLOR_WHITE )
                 # selected area
-                curses.init_pair(7, curses.COLOR_BLACK, curses.COLOR_YELLOW)
+                curses.init_pair(7,  curses.COLOR_BLACK, curses.COLOR_YELLOW)
                 # selected area and edited byte
-                curses.init_pair(8, curses.COLOR_RED  , curses.COLOR_YELLOW)
+                curses.init_pair(8,  curses.COLOR_RED  , curses.COLOR_YELLOW)
                 # find (& replace)
-                curses.init_pair(9, curses.COLOR_WHITE, curses.COLOR_BLUE  )
+                curses.init_pair(9,  curses.COLOR_WHITE, curses.COLOR_BLUE  )
                 # find (& replace) current match
                 curses.init_pair(10, curses.COLOR_BLACK, curses.COLOR_GREEN )
         curses.raw()

@@ -1799,7 +1799,7 @@ class Editor:
                 # file-selector, active file
                 curses.init_pair(8, curses.COLOR_MAGENTA, curses.COLOR_WHITE)
                 # file-selector, active file selected
-                curses.init_pair(9, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+                curses.init_pair(9, curses.COLOR_MAGENTA, -1                )
         curses.raw()
         self.curse_window.nodelay(False)
 
