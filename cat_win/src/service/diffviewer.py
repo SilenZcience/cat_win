@@ -985,11 +985,11 @@ class DiffViewer:
                 if os.isatty(sys.stdout.fileno()):
                     curses.use_default_colors()
                 # status_bar
-                curses.init_pair(1, curses.COLOR_BLACK  , curses.COLOR_WHITE)
+                curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
                 # error_bar
-                curses.init_pair(2, curses.COLOR_RED    , curses.COLOR_WHITE)
+                curses.init_pair(2, curses.COLOR_RED  , curses.COLOR_WHITE)
                 # green background
-                curses.init_pair(3, curses.COLOR_BLACK  , curses.COLOR_GREEN)
+                curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_GREEN)
                 # light green background
                 if curses.COLORS >= 16:
                     try:
@@ -999,7 +999,7 @@ class DiffViewer:
                 else:
                     curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_GREEN)
                 # red background
-                curses.init_pair(5, curses.COLOR_BLACK  , curses.COLOR_RED  )
+                curses.init_pair(5, curses.COLOR_BLACK  , curses.COLOR_RED)
                 # light red background
                 if curses.COLORS >= 16:
                     try:
@@ -1009,9 +1009,9 @@ class DiffViewer:
                 else:
                     curses.init_pair(6, curses.COLOR_BLACK, curses.COLOR_RED)
                 # default color
-                curses.init_pair(7, curses.COLOR_WHITE  , curses.COLOR_BLACK)
+                curses.init_pair(7, curses.COLOR_WHITE  , -1)
                 # lineno color
-                curses.init_pair(8, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+                curses.init_pair(8, curses.COLOR_MAGENTA, -1)
                 # gray background
                 if curses.COLORS >= 16:
                     try:
@@ -1021,7 +1021,7 @@ class DiffViewer:
                 else:
                     curses.init_pair(9, curses.COLOR_BLACK, curses.COLOR_BLACK)
                 # prompts
-                curses.init_pair(10, curses.COLOR_WHITE, curses.COLOR_RED)
+                curses.init_pair(10, curses.COLOR_WHITE, curses.COLOR_RED )
                 # find
                 curses.init_pair(11, curses.COLOR_WHITE, curses.COLOR_BLUE)
                 # current match
