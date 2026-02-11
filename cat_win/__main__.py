@@ -2,8 +2,12 @@
 __main__
 """
 
+import os
+import platform
 import sys
 
+if (3,14) <= sys.version_info <= (3,15) and platform.system() == 'Windows':
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '_vendor')))
 
 try:
     from cat_win.src import cat
