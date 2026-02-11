@@ -336,7 +336,7 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 [Github-Watchers]: https://img.shields.io/github/watchers/SilenZcience/cat_win?style=flat&color=purple
 
 [MadeWith-Python]: https://img.shields.io/badge/Made%20with-Python-brightgreen
-[Python-Version]: https://img.shields.io/badge/Python-3.6%20--%203.13%20%7C%20pypy--3.6%20--%20pypy--3.10-blue
+[Python-Version]: https://img.shields.io/badge/Python-3.6%20--%203.14%20%7C%20pypy--3.6%20--%20pypy--3.10-blue
 <!-- https://img.shields.io/badge/Python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%20pypy--3.7%20%7C%20pypy--3.8%20%7C%20pypy--3.9%20%7C%20pypy--3.10-blue -->
 
 [CurrentVersion]: https://img.shields.io/pypi/v/cat_win?label=PyPI
