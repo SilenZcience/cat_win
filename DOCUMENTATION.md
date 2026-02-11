@@ -975,7 +975,7 @@ The currently supported Key Bindings are as follows:
 | <kbd>Backspace</kbd> | delete char on the left | delete char on the left | delete word on the left | delete char on the left |
 | <kbd>Delete</kbd> | delete char on the right | delete char on the right | delete word on the right | delete char on the right |
 ||||||
-| <kbd>Help/F1</kbd> | display a help message | - | - | - |
+| <kbd>Help/F1</kbd> | display a help message | - | open file manager | - |
 ||||||
 | <kbd>SelectAll/^A</kbd> | - | - | select the entire file | - |
 | <kbd>Copy/^C</kbd> | - | - | copy selected text | - |
@@ -1051,7 +1051,7 @@ The currently supported Key Bindings are as follows:
 | <kbd>Backspace</kbd> | reset current byte(s) | reset current byte(s) | remove current byte(s) | reset current byte(s) |
 | <kbd>Delete</kbd> | reset current byte(s) | reset current byte(s) | remove current byte(s) | reset current byte(s) |
 ||||||
-| <kbd>Help/F1</kbd> | display a help message | - | - | - |
+| <kbd>Help/F1</kbd> | display a help message | - | open file manager | - |
 ||||||
 | <kbd>SelectAll/^A</kbd> | - | - | select the entire file | - |
 | <kbd>Copy/^C</kbd> | - | - | copy selected bytes | - |
@@ -1085,7 +1085,7 @@ The currently supported Key Bindings are as follows:
 | <kbd>Home/Pos</kbd> | move view-window to start of line | - | move view-window to start of file | - |
 | <kbd>End</kbd> | move view-window to end of line | - | move view-window to end of file | - |
 ||||||
-| <kbd>Help/F1</kbd> | display a help message | display info overview | - | - |
+| <kbd>Help/F1</kbd> | display a help message | display info overview | open file manager | - |
 ||||||
 | <kbd>Jump/^E</kbd> | - | - | prompt to jump to a specific line | - |
 | <kbd>DiffCutoff/^N</kbd> | - | - | prompt to change diff cutoff ratio and reload diff</br>(display two lines side-by-side if their similarity is above this ratio) | - |
