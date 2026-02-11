@@ -36,12 +36,23 @@ class HexEditor:
     unicode_escaped_insert = True
     columns = 16
 
-    def __init__(self, file: Path, display_name: str) -> None:
+    def __init__(self, files: list, file_idx: int = 0) -> None:
+        """
+        defines an HexEditor object.
+
+        Parameters:
+        files (list):
+            list of tuples (file, display_name)
+        file_idx (int):
+            index of the file to open in the editor
+        """
         self.curse_window = None
         self.decode_char = get_display_char_gen()
 
-        self.file = file
-        self.display_name = display_name
+        self.files = files
+        self.file = files[file_idx][0]
+        self.display_name = files[file_idx][1]
+        self.open_next_idx = None
         self._f_content_gen = None
         self.hex_array = [[]]
         self.hex_array_edit = [[]]
@@ -859,6 +870,103 @@ class HexEditor:
         self.curse_window.clear()
         return True
 
+    def _action_file_selection(self) -> None:
+        """
+        handles the file selection action.
+
+        Returns:
+        (bool):
+            indicates if the editor should keep running
+        """
+
+        curses.curs_set(0)
+        self.curse_window.clear()
+
+        selected_idx = self.files.index((self.file, self.display_name))
+
+        max_y, max_x = self.getxymax()
+        max_y += self.status_bar_size + 1
+        nav_x, nav_y = 0, max(0, min(selected_idx - max_y // 2, len(self.files) - max_y))
+
+        wchar, key = '', b''
+        while str(wchar) != ESC_CODE:
+            maxlen_displayname = max(
+                len(display_name)
+                for _, display_name in self.files[nav_y:nav_y+max_y]
+            )
+            self.curse_window.move(max_y, 0)
+            self.curse_window.clrtoeol()
+            for (_, display_name), row in zip(self.files[nav_y:], range(max_y)):
+                color = 0
+                if selected_idx == row + nav_y and self.files[row + nav_y][0] == self.file:
+                    color = self._get_color(11)
+                elif selected_idx == row + nav_y:
+                    color = self._get_color(1)
+                elif self.files[row + nav_y][0] == self.file:
+                    color = self._get_color(12)
+
+                try:
+                    self.curse_window.addstr(row, 0, f"{display_name}"[nav_x:nav_x+max_x], color)
+                    self.curse_window.clrtoeol()
+                except curses.error:
+                    break
+                if row == max_y - 1 and len(self.files) > max_y + nav_y:
+                    self.curse_window.addstr(row+1, 0, '...')
+                    self.curse_window.clrtoeol()
+                    break
+            try:
+                self.curse_window.addstr(
+                    max_y+1, 0,
+                    'Select file to open. Confirm with <Enter> or <Space>.'[:max_x].ljust(max_x),
+                    self._get_color(1)
+                )
+            except curses.error:
+                pass
+
+            self.curse_window.refresh()
+
+            wchar, key = self._get_next_char()
+            if key in ACTION_HOTKEYS:
+                if key in [b'_action_quit', b'_action_interrupt']:
+                    break
+                if key == b'_action_file_selection':
+                    wchar, key = ' ', b'_key_string'
+                if key == b'_action_background':
+                    getattr(self, key.decode(), lambda *_: False)()
+                if key == b'_action_resize':
+                    getattr(self, key.decode(), lambda *_: False)()
+                    max_y, max_x = self.getxymax()
+                    max_y += self.status_bar_size + 1
+            if key in MOVE_HOTKEYS:
+                if key == b'_move_key_up':
+                    selected_idx = max(0, selected_idx - 1)
+                    nav_y = min(nav_y, selected_idx)
+                elif key == b'_move_key_ctl_up':
+                    selected_idx = max(0, selected_idx - 10)
+                    nav_y = min(nav_y, selected_idx)
+                elif key == b'_move_key_down':
+                    selected_idx = min(len(self.files) - 1, selected_idx + 1)
+                    if selected_idx >= nav_y + max_y - 1:
+                        nav_y = selected_idx - max_y + 1
+                elif key == b'_move_key_ctl_down':
+                    selected_idx = min(len(self.files) - 1, selected_idx + 10)
+                    if selected_idx >= nav_y + max_y - 1:
+                        nav_y = selected_idx - max_y + 1
+                elif key == b'_move_key_left':
+                    nav_x = max(0, nav_x - 1)
+                elif key == b'_move_key_ctl_left':
+                    nav_x = max(0, nav_x - 10)
+                elif key == b'_move_key_right':
+                    nav_x = max(0, min(maxlen_displayname - max_x, nav_x + 1))
+                elif key == b'_move_key_ctl_right':
+                    nav_x = max(0, min(maxlen_displayname - max_x, nav_x + 10))
+
+            if key == b'_key_enter' or (key == b'_key_string' and wchar == ' '):
+                if self.files[selected_idx][0] != self.file:
+                    self.open_next_idx = selected_idx
+                break
+
+        return True if self.open_next_idx is None else self._action_quit()
 
     def _function_help(self) -> None:
         curses.curs_set(0)
@@ -1219,25 +1327,29 @@ class HexEditor:
                 if os.isatty(sys.stdout.fileno()):
                     curses.use_default_colors()
                 # status_bar
-                curses.init_pair(1,  curses.COLOR_BLACK, curses.COLOR_WHITE )
+                curses.init_pair(1 , curses.COLOR_BLACK  , curses.COLOR_WHITE )
                 # error_bar
-                curses.init_pair(2,  curses.COLOR_RED  , curses.COLOR_WHITE )
+                curses.init_pair(2 , curses.COLOR_RED    , curses.COLOR_WHITE )
                 # prompts
-                curses.init_pair(3,  curses.COLOR_WHITE, curses.COLOR_RED   )
+                curses.init_pair(3 , curses.COLOR_WHITE  , curses.COLOR_RED   )
                 # selected byte
-                curses.init_pair(4,  curses.COLOR_BLACK, curses.COLOR_WHITE )
+                curses.init_pair(4 , curses.COLOR_BLACK  , curses.COLOR_WHITE )
                 # edited byte
-                curses.init_pair(5,  curses.COLOR_RED  , -1                 )
+                curses.init_pair(5 , curses.COLOR_RED    , -1                 )
                 # selected and edited byte
-                curses.init_pair(6,  curses.COLOR_RED  , curses.COLOR_WHITE )
+                curses.init_pair(6 , curses.COLOR_RED    , curses.COLOR_WHITE )
                 # selected area
-                curses.init_pair(7,  curses.COLOR_BLACK, curses.COLOR_YELLOW)
+                curses.init_pair(7 , curses.COLOR_BLACK  , curses.COLOR_YELLOW)
                 # selected area and edited byte
-                curses.init_pair(8,  curses.COLOR_RED  , curses.COLOR_YELLOW)
+                curses.init_pair(8 , curses.COLOR_RED    , curses.COLOR_YELLOW)
                 # find (& replace)
-                curses.init_pair(9,  curses.COLOR_WHITE, curses.COLOR_BLUE  )
+                curses.init_pair(9 , curses.COLOR_WHITE  , curses.COLOR_BLUE  )
                 # find (& replace) current match
-                curses.init_pair(10, curses.COLOR_BLACK, curses.COLOR_GREEN )
+                curses.init_pair(10, curses.COLOR_BLACK  , curses.COLOR_GREEN )
+                # file-selector, active file
+                curses.init_pair(11, curses.COLOR_MAGENTA, curses.COLOR_WHITE )
+                # file-selector, active file selected
+                curses.init_pair(12, curses.COLOR_MAGENTA, -1                 )
         curses.raw()
         self.curse_window.nodelay(False)
 
@@ -1273,15 +1385,13 @@ class HexEditor:
             curses.endwin()
 
     @classmethod
-    def open(cls, file: Path, display_name: str) -> bool:
+    def open(cls, files: list) -> bool:
         """
         simple editor to change the contents of any provided file.
 
         Parameters:
-        file (Path):
-            a string representing a file(-path)
-        display_name (str):
-            the display name for the current file
+        files (list):
+            list of tuples (file, display_name)
 
         Returns:
         (bool):
@@ -1299,7 +1409,9 @@ class HexEditor:
             HexEditor.loading_failed = True
             return False
 
-        editor = cls(file, display_name)
+        changes_made = False
+
+        editor = cls(files)
 
         if on_windows_os:
             # disable background feature on windows
@@ -1309,8 +1421,16 @@ class HexEditor:
             signal.signal(signal.SIGTSTP, signal.SIG_IGN)
 
         editor._open()
+        changes_made |= editor.changes_made
+        while editor.open_next_idx is not None:
+            editor = cls(files, file_idx = editor.open_next_idx)
+            if on_windows_os:
+                # disable background feature on windows
+                editor._action_background = lambda *_: True
+            editor._open()
+            changes_made |= editor.changes_made
 
-        return editor.changes_made
+        return changes_made
 
     @staticmethod
     def set_flags(save_with_alt: bool, debug_mode: bool,
