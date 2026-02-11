@@ -839,6 +839,7 @@ class HexEditor:
                 if wchar.upper() in ['Y', 'J']:
                     self._action_save()
                 elif wchar == ESC_CODE: # ESC
+                    self.open_next_idx = None
                     return True
 
         return False
@@ -870,7 +871,7 @@ class HexEditor:
         self.curse_window.clear()
         return True
 
-    def _action_file_selection(self) -> None:
+    def _action_file_selection(self) -> bool:
         """
         handles the file selection action.
 

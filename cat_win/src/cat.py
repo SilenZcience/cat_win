@@ -1117,12 +1117,9 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
             with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
                 HexEditor.open([(file, u_files.get_file_display_name(file)) for file in known_files])
     if u_args[ARGS_DIFF]:
-        with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
-            for i in range(1, len(known_files), 2):
-                diff_files = known_files[i-1:i+1]
-                DiffViewer.open(diff_files, [u_files.get_file_display_name(f) for f in diff_files])
-            if len(known_files) % 2 == 1:
-                DiffViewer.open([None, known_files[-1]], [None, u_files.get_file_display_name(known_files[-1])])
+        if known_files:
+            with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
+                DiffViewer.open([(file, u_files.get_file_display_name(file)) for file in known_files])
 
 
     # fill holder object with neccessary values

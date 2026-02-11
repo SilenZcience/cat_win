@@ -24,58 +24,127 @@ from cat_win.src.service.helper.diffviewerhelper import DifflibParser, DifflibID
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
 
 
-def get_git_file_content(git_file: Path) -> list:
+def get_git_file_history(file_path: Path) -> list:
     """
-    get the content of a file previously commited using git.
-    may raise exceptions, e.g. when git is not installed.
+    Get a list of all commits that changed a specific file.
 
     Parameters:
-    git_file (Path):
-        the path to the git file.
+    file_path (Path):
+        the path to the file.
 
     Returns:
     (list):
-        the already committed content of the file.
+        A list of dictionaries, each containing:
+        - 'hash': commit hash (str)
+        - 'date': commit date (str)
+        - 'author': commit author (str)
+        - 'message': commit message (str)
+        - 'file_path': path of the file at this commit (str, accounts for renames)
+
+    Raises:
+    OSError: if not in a git repository
+    subprocess.CalledProcessError: if git command fails
     """
-    # Get the repo root and relative path
     repo_root = subprocess.run(
         ['git', 'rev-parse', '--show-toplevel'],
-        cwd=os.path.dirname(git_file) or None,
+        cwd=os.path.dirname(file_path) or None,
         capture_output=True, check=False
     ).stdout.decode().strip()
     if not repo_root:
         raise OSError('not a git repository (or any of the parent directories)')
-    rel_path = os.path.relpath(git_file, repo_root)
-    # Find last commit and path where file existed (follow renames)
+
+    rel_path = os.path.relpath(file_path, repo_root)
+
     log_output = subprocess.run(
-        ['git', 'log', '--follow', '--name-status', '--pretty=format:%H', '--', rel_path],
+        ['git', 'log', '--follow', '--name-status',
+         '--pretty=format:%H|%ai|%an|%s', '--', rel_path],
         cwd=repo_root,
         capture_output=True, check=True
     ).stdout.decode().splitlines()
-    last_commit, last_path = None, None
-    for i, line in enumerate(log_output):
-        if line and len(line) == 40:  # commit hash
-            commit = line
-            # Look ahead for the next line that is a file status
-            if i + 1 < len(log_output):
-                status_line = log_output[i + 1]
-                parts = status_line.split('\t')
-                if len(parts) == 2 and parts[1].replace('/', os.sep) == rel_path.replace('/', os.sep):
-                    last_commit = commit
-                    last_path = parts[1]
-                    break
-                if len(parts) == 3 and parts[2].replace('/', os.sep) == rel_path.replace('/', os.sep):
-                    # Renamed file: parts[2] is the new name
-                    last_commit = commit
-                    last_path = parts[1]  # old name
-                    break
-    if last_commit and last_path:
-        return subprocess.run(
-            ['git', 'show', f'{last_commit}:{last_path}'],
+
+    commits = []
+    i = 0
+    while i < len(log_output):
+        line = log_output[i].strip()
+
+        if not line or '|' not in line:
+            i += 1
+            continue # Skip empty lines or lines without commit info
+
+        parts = line.split('|', 3)
+        if len(parts) != 4 or len(parts[0]) != 40:
+            i += 1
+            continue  # Not a valid commit line, skip
+
+        commit_hash, commit_date, commit_author, commit_message = parts
+        file_path_at_commit = rel_path
+        if i + 1 < len(log_output):
+            status_line = log_output[i + 1].strip()
+            if status_line:
+                status_parts = status_line.split('\t')
+                if len(status_parts) >= 2:
+                    # For renamed files (R), parts[1] is old name (needed for --follow)
+                    # For other statuses (M, A, D), parts[1] is the file name
+                    file_path_at_commit = status_parts[1]
+
+        commits.append({
+            'hash': commit_hash,
+            'date': commit_date,
+            'author': commit_author,
+            'message': commit_message,
+            'file_path': file_path_at_commit
+        })
+
+        i += 1
+
+    return commits
+
+
+def get_git_file_content_at_commit(file_path: Path, commit_hash: str) -> list:
+    """
+    Get the content of a file at a specific commit.
+
+    Parameters:
+    file_path (Path):
+        the path to the file.
+    commit_hash (str or dict):
+        either a commit hash string, or a commit dictionary from get_git_file_history()
+
+    Returns:
+    (list):
+        the content of the file at the specified commit as a list of lines.
+        Returns empty list if the file doesn't exist at that commit.
+
+    Raises:
+    OSError: if not in a git repository
+    subprocess.CalledProcessError: if git command fails
+    """
+    repo_root = subprocess.run(
+        ['git', 'rev-parse', '--show-toplevel'],
+        cwd=os.path.dirname(file_path) or None,
+        capture_output=True, check=False
+    ).stdout.decode().strip()
+    if not repo_root:
+        raise OSError('not a git repository (or any of the parent directories)')
+
+    if isinstance(commit_hash, dict):
+        actual_hash = commit_hash['hash']
+        file_path_at_commit = commit_hash.get('file_path')
+        if not file_path_at_commit:
+            file_path_at_commit = os.path.relpath(file_path, repo_root)
+    else:
+        actual_hash = commit_hash
+        file_path_at_commit = os.path.relpath(file_path, repo_root)
+
+    try:
+        result = subprocess.run(
+            ['git', 'show', f'{actual_hash}:{file_path_at_commit}'],
             cwd=repo_root,
             capture_output=True, check=True
-        ).stdout.decode().splitlines()
-    return []
+        )
+        return result.stdout.decode(errors='replace').splitlines()
+    except subprocess.CalledProcessError:
+        return []
 
 
 class DiffViewer:
@@ -88,11 +157,24 @@ class DiffViewer:
 
     file_encoding = 'utf-8'
 
-    def __init__(self, files: list, display_names: list) -> None:
+    def __init__(self, files: list, file_idxs: tuple = (0, 0), file_commit_hashes: tuple = (None, None)) -> None:
+        """
+        defines a DiffViewer object.
+
+        Parameters:
+        files (list):
+            list of tuples (file, display_name)
+        file_idxs (tuple):
+            indexes of the files to open in the diffviewer
+        """
         self.curse_window = None
 
         self.files = files
-        self.display_names = display_names
+        self.file_commit_hashes = file_commit_hashes
+        self.diff_files = [files[file_idxs[0]][0], files[file_idxs[1]][0]]
+        self.display_names = [files[file_idxs[0]][1], files[file_idxs[1]][1]]
+        self.open_next_idxs = None
+        self.open_next_hashes = (None, None)
         self.difflibparser = self.difflibparser_bak = None
         self.diff_items = self.diff_items_bak = None
 
@@ -119,21 +201,32 @@ class DiffViewer:
         """
         self.displaying_overview = False
         try:
-
-            if self.files[0] is None:
+            if self.file_commit_hashes[0] is None:
+                text1 = IoHelper.read_file(
+                    self.diff_files[0], False, DiffViewer.file_encoding, errors='replace'
+                ).splitlines()
+            else:
                 try:
-                    text1 = get_git_file_content(self.files[1])
-                    self.display_names[0] = f"GIT: {str(self.files[1])}"
-                except OSError as exc:
+                    text1 = get_git_file_content_at_commit(
+                        self.diff_files[0], self.file_commit_hashes[0]
+                    )
+                    self.display_names[0] = f"GIT: {self.display_names[0]}"
+                except (OSError, subprocess.CalledProcessError) as exc:
                     text1 = []
                     self.display_names[0] = f'<GIT_ERROR> {str(exc)}'
-            else:
-                text1 = IoHelper.read_file(
-                    self.files[0], False, DiffViewer.file_encoding, errors='replace'
+            if self.file_commit_hashes[1] is None:
+                text2 = IoHelper.read_file(
+                    self.diff_files[1], False, DiffViewer.file_encoding, errors='replace'
                 ).splitlines()
-            text2 = IoHelper.read_file(
-                self.files[1], False, DiffViewer.file_encoding, errors='replace'
-            ).splitlines()
+            else:
+                try:
+                    text2 = get_git_file_content_at_commit(
+                        self.diff_files[1], self.file_commit_hashes[1]
+                    )
+                    self.display_names[1] = f"GIT: {self.display_names[1]}"
+                except (OSError, subprocess.CalledProcessError) as exc:
+                    text1 = []
+                    self.display_names[0] = f'<GIT_ERROR> {str(exc)}'
 
             self.difflibparser = self.difflibparser_bak = DifflibParser(
                 text1,
@@ -503,7 +596,7 @@ class DiffViewer:
         (bool):
             indicates if the diffviewer should keep running
         """
-        if self.displaying_overview:
+        if self.displaying_overview and self.open_next_idxs is None:
             self.displaying_overview = False
             self.curse_window.clear()
 
@@ -542,6 +635,225 @@ class DiffViewer:
         self.half_width = (self.getxymax()[1]-4-self.l_offset) // 2
         self.curse_window.clear()
         return True
+
+    def _action_file_selection(self) -> bool:
+        """
+        handles the file selection action.
+
+        Returns:
+        (bool):
+            indicates if the editor should keep running
+        """
+
+        curses.curs_set(0)
+        self.curse_window.clear()
+
+
+        def _find_current_idx(target_file: Path, target_display: str) -> int:
+            try:
+                return self.files.index((target_file, target_display))
+            except ValueError:
+                for idx, (file_path, _) in enumerate(self.files):
+                    if file_path == target_file:
+                        return idx
+            return 0
+
+        selected_idx = [
+            _find_current_idx(self.diff_files[0], self.display_names[0]),
+            _find_current_idx(self.diff_files[1], self.display_names[1])
+        ]
+
+        max_y, max_x = self.getxymax()
+        max_y += self.status_bar_size - 2
+        nav_x = [0, 0]
+        nav_y = [
+            max(0, min(selected_idx[0] - max_y // 2, len(self.files) - max_y)),
+            max(0, min(selected_idx[1] - max_y // 2, len(self.files) - max_y))
+        ]
+        active_list = 0
+
+        # Selection mode: 'files' or 'commits'
+        mode = 'files'
+        file_commits = [None, None]
+        file_selected_idxs = None
+
+        wchar, key = '', b''
+        while str(wchar) != ESC_CODE:
+            list_width = max(1, (max_x - 3) // 2)
+            right_x = list_width + 3
+
+            if mode == 'files':
+                data_lists = [self.files, self.files]
+                maxlen_displayname = [
+                    max((len(display_name) for _, display_name in self.files[nav_y[0]:nav_y[0]+max_y]), default=0),
+                    max((len(display_name) for _, display_name in self.files[nav_y[1]:nav_y[1]+max_y]), default=0)
+                ]
+            else:
+                data_lists = [file_commits[0] or [], file_commits[1] or []]
+                maxlen_displayname = [0, 0]
+                for side in (0, 1):
+                    if data_lists[side]:
+                        maxlen_displayname[side] = max(
+                            (len(f"{c['hash'][:7]} | {c['date'][:10]} | {c['author']} | {c['message']}")
+                             for c in data_lists[side][nav_y[side]:nav_y[side]+max_y]),
+                            default=0
+                        )
+
+            self.curse_window.move(max_y, 0)
+            self.curse_window.clrtoeol()
+            for row in range(max_y):
+                for side in (0, 1):
+                    entry_idx = row + nav_y[side]
+                    if entry_idx >= len(data_lists[side]):
+                        continue
+
+                    if mode == 'files':
+                        _, display_name = data_lists[side][entry_idx]
+                        is_selected = selected_idx[side] == entry_idx
+                        is_current = self.files[entry_idx][0] == self.diff_files[side]
+                    else:
+                        commit = data_lists[side][entry_idx]
+                        display_name = f"{commit['hash'][:7]} | {commit['date'][:10]} | {commit['author']} | {commit['message']}"
+                        is_selected = selected_idx[side] == entry_idx
+                        is_current = False
+
+                    color = 0
+                    if is_selected and is_current:
+                        color = self._get_color(13) if side == active_list else self._get_color(14)
+                    elif is_selected:
+                        color = self._get_color(1) if side == active_list else self._get_color(15)
+                    elif is_current:
+                        color = self._get_color(8)
+
+                    start_x = 0 if side == 0 else right_x
+                    offset_x = nav_x[side]
+                    text = f"{display_name}"[offset_x:offset_x+list_width]
+                    try:
+                        self.curse_window.addstr(row, start_x, text.ljust(list_width), color)
+                    except curses.error:
+                        break
+
+                if row == max_y - 1:
+                    if len(data_lists[0]) > max_y + nav_y[0]:
+                        self.curse_window.addstr(row + 1, 0, '...')
+                    if len(data_lists[1]) > max_y + nav_y[1]:
+                        self.curse_window.addstr(row + 1, right_x, '...')
+                    self.curse_window.clrtoeol()
+                    break
+
+            if mode == 'files':
+                status_msg = 'Select two files. Tab/Shift+Tab switch list. Confirm with <Enter> or <Space>.'
+            else:
+                status_msg = 'Select commits (or go back with <Escape>). Tab/Shift+Tab switch list. Confirm with <Enter> or <Space>.'
+
+            try:
+                self.curse_window.addstr(
+                    max_y+1, 0,
+                    status_msg[:max_x].ljust(max_x),
+                    self._get_color(1)
+                )
+            except curses.error:
+                pass
+
+            self.curse_window.refresh()
+
+            wchar, key = self._get_next_char()
+            if key in ACTION_HOTKEYS:
+                if key in [b'_action_quit', b'_action_interrupt']:
+                    break
+                if key == b'_action_file_selection':
+                    wchar, key = ' ', b'_key_string'
+                if key == b'_action_background':
+                    getattr(self, key.decode(), lambda *_: False)()
+                if key == b'_action_resize':
+                    getattr(self, key.decode(), lambda *_: False)()
+                    max_y, max_x = self.getxymax()
+                    max_y += self.status_bar_size - 2
+            if key in [b'_indent_tab', b'_indent_btab']:
+                active_list = 1 - active_list
+            if key in MOVE_HOTKEYS:
+                list_len = len(data_lists[active_list])
+                if list_len == 0:
+                    continue
+
+                if key == b'_move_key_up':
+                    selected_idx[active_list] = max(0, selected_idx[active_list] - 1)
+                    nav_y[active_list] = min(nav_y[active_list], selected_idx[active_list])
+                elif key == b'_move_key_ctl_up':
+                    selected_idx[active_list] = max(0, selected_idx[active_list] - 10)
+                    nav_y[active_list] = min(nav_y[active_list], selected_idx[active_list])
+                elif key == b'_move_key_down':
+                    selected_idx[active_list] = min(list_len - 1, selected_idx[active_list] + 1)
+                    if selected_idx[active_list] >= nav_y[active_list] + max_y - 1:
+                        nav_y[active_list] = selected_idx[active_list] - max_y + 1
+                elif key == b'_move_key_ctl_down':
+                    selected_idx[active_list] = min(list_len - 1, selected_idx[active_list] + 10)
+                    if selected_idx[active_list] >= nav_y[active_list] + max_y - 1:
+                        nav_y[active_list] = selected_idx[active_list] - max_y + 1
+                elif key == b'_move_key_left':
+                    nav_x[active_list] = max(0, nav_x[active_list] - 1)
+                elif key == b'_move_key_ctl_left':
+                    nav_x[active_list] = max(0, nav_x[active_list] - 10)
+                elif key == b'_move_key_right':
+                    nav_x[active_list] = max(0, min(maxlen_displayname[active_list] - list_width, nav_x[active_list] + 1))
+                elif key == b'_move_key_ctl_right':
+                    nav_x[active_list] = max(0, min(maxlen_displayname[active_list] - list_width, nav_x[active_list] + 10))
+
+            if key == b'_key_enter' or (key == b'_key_string' and wchar == ' '):
+                if mode == 'files':
+                    file_selected_idxs = [selected_idx[0], selected_idx[1]]
+
+                    for side in (0, 1):
+                        file_path = self.files[file_selected_idxs[side]][0]
+                        try:
+                            commits = get_git_file_history(file_path)
+                            file_commits[side] = [{'hash': '_LOCAL_', 'date': 'Current', 'author': 'Local', 'message': 'Use local file (not git)'}] + commits
+                        except (OSError, subprocess.CalledProcessError):
+                            file_commits[side] = None
+
+                    if file_commits[0] or file_commits[1]:
+                        mode = 'commits'
+                        selected_idx = [0, 0]
+                        nav_x = [0, 0]
+                        nav_y = [0, 0]
+                        active_list = 0
+                        self.curse_window.clear()
+                    else:
+                        current_idxs = (
+                            _find_current_idx(self.diff_files[0], self.display_names[0]),
+                            _find_current_idx(self.diff_files[1], self.display_names[1])
+                        )
+                        if file_selected_idxs != current_idxs:
+                            self.open_next_idxs = file_selected_idxs
+                        break
+                else:
+                    current_idxs = (
+                        _find_current_idx(self.diff_files[0], self.display_names[0]),
+                        _find_current_idx(self.diff_files[1], self.display_names[1])
+                    )
+                    if file_selected_idxs != current_idxs:
+                        self.open_next_idxs = file_selected_idxs
+
+                    self.open_next_hashes = (
+                        None if (
+                            file_commits[0] and file_commits[0][selected_idx[0]]['hash'] == '_LOCAL_'
+                        ) else (
+                            file_commits[0][selected_idx[0]] if file_commits[0] else None
+                        ),
+                        None if (
+                            file_commits[1] and file_commits[1][selected_idx[1]]['hash'] == '_LOCAL_'
+                        ) else (
+                            file_commits[1][selected_idx[1]] if file_commits[1] else None
+                        )
+                    )
+                    break
+
+            if mode == 'commits' and str(wchar) == ESC_CODE:
+                mode = 'files'
+                wchar = ''
+                selected_idx = file_selected_idxs if file_selected_idxs else selected_idx
+
+        return self.open_next_idxs is None
 
     def _function_help(self) -> None:
         self.curse_window.clear()
@@ -607,65 +919,86 @@ class DiffViewer:
             self.difflibparser_bak.count_equal + self.difflibparser_bak.count_insert + self.difflibparser_bak.count_changed
         )
 
-        self.difflibparser = DifflibParser(
-            [
-                'Filename:',
-                self.display_names[0],
-                '',
-                'Filepath:',
-                (
-                    str(self.files[0])
-                    if self.files[0] is not None else f"GIT: {str(self.files[1])}"
-                ),
-                '',
-                'Size:',
-                (
-                    f"{get_file_size(self.files[0])} Bytes - {_convert_size(get_file_size(self.files[0]))}"
-                    if self.files[0] is not None else 'N/A'
-                ),
-                '',
-                'Line count:',
-                f"{self.difflibparser_bak.count_equal + self.difflibparser_bak.count_delete + self.difflibparser_bak.count_changed}",
-                '',
-                'Time modified:',
-                (
-                    f"{datetime.fromtimestamp(get_file_mtime(self.files[0]))}"
-                    if self.files[0] is not None else 'N/A'
-                ),
-                '',
-                'Time created:',
-                (
-                    f"{datetime.fromtimestamp(get_file_ctime(self.files[0]))}"
-                    if self.files[0] is not None else 'N/A'
-                ),
-                '',
-                'Similiarity (%):',
-                f"{(text1_similarity * 100):.2f}",
-            ],
-            [
-                'Filename:',
-                self.display_names[1],
-                '',
-                'Filepath:',
-                str(self.files[1]),
-                '',
-                'Size:',
-                f"{get_file_size(self.files[1])} Bytes - {_convert_size(get_file_size(self.files[1]))}",
-                '',
-                'Line count:',
-                f"{self.difflibparser_bak.count_equal + self.difflibparser_bak.count_insert + self.difflibparser_bak.count_changed}",
-                '',
-                'Time modified:',
-                f"{datetime.fromtimestamp(get_file_mtime(self.files[1]))}",
-                '',
-                'Time created:',
-                f"{datetime.fromtimestamp(get_file_ctime(self.files[1]))}",
-                '',
-                'Similiarity (%):',
-                f"{(text2_similarity * 100):.2f}",
-            ],
-            -0.01, 0.0
-        )
+        data_list1 = [
+            'Filename:',
+            self.display_names[0],
+            '',
+            'Filepath:',
+            'GIT: ' * (self.file_commit_hashes[0] is not None) + str(self.diff_files[0]),
+            '',
+            'Size:',
+            (
+                f"{get_file_size(self.diff_files[0])} Bytes - {_convert_size(get_file_size(self.diff_files[0]))}"
+                if self.file_commit_hashes[0] is None else 'N/A'
+            ),
+            '',
+            'Line count:',
+            f"{self.difflibparser_bak.count_equal + self.difflibparser_bak.count_delete + self.difflibparser_bak.count_changed}",
+            '',
+            'Time modified:',
+            (
+                f"{datetime.fromtimestamp(get_file_mtime(self.diff_files[0]))}"
+                if self.file_commit_hashes[0] is None else 'N/A'
+            ),
+            '',
+            'Time created:',
+            (
+                f"{datetime.fromtimestamp(get_file_ctime(self.diff_files[0]))}"
+                if self.file_commit_hashes[0] is None else 'N/A'
+            ),
+            '',
+            'Similiarity (%):',
+            f"{(text1_similarity * 100):.2f}",
+        ]
+        if self.file_commit_hashes[0] is not None:
+            commit = self.file_commit_hashes[0]
+            data_list1.insert(6, '')
+            if isinstance(commit, dict):
+                data_list1.insert(6, f"{commit['hash'][:7]} | {commit['date'][:19]} | {commit['author']} | {commit['message']}")
+            else:
+                data_list1.insert(6, commit[:7])
+            data_list1.insert(6, 'Git commit:')
+        data_list2 = [
+            'Filename:',
+            self.display_names[1],
+            '',
+            'Filepath:',
+            'GIT: ' * (self.file_commit_hashes[1] is not None) + str(self.diff_files[1]),
+            '',
+            'Size:',
+            (
+                f"{get_file_size(self.diff_files[1])} Bytes - {_convert_size(get_file_size(self.diff_files[1]))}"
+                if self.file_commit_hashes[1] is None else 'N/A'
+            ),
+            '',
+            'Line count:',
+            f"{self.difflibparser_bak.count_equal + self.difflibparser_bak.count_insert + self.difflibparser_bak.count_changed}",
+            '',
+            'Time modified:',
+            (
+                f"{datetime.fromtimestamp(get_file_mtime(self.diff_files[1]))}"
+                if self.file_commit_hashes[1] is None else 'N/A'
+            ),
+            '',
+            'Time created:',
+            (
+                f"{datetime.fromtimestamp(get_file_ctime(self.diff_files[1]))}"
+                if self.file_commit_hashes[1] is None else 'N/A'
+            ),
+            '',
+            'Similiarity (%):',
+            f"{(text2_similarity * 100):.2f}",
+        ]
+        if self.file_commit_hashes[1] is not None:
+            commit = self.file_commit_hashes[1]
+            data_list2.insert(6, '')
+            if isinstance(commit, dict):
+                data_list2.insert(6, f"{commit['hash'][:7]} | {commit['date'][:19]} | {commit['author']} | {commit['message']}")
+            else:
+                data_list2.insert(6, commit[:7])
+            data_list2.insert(6, 'Git commit:')
+
+        self.difflibparser = DifflibParser( data_list1, data_list2, -0.01, 0.0)
         self.diff_items = self.difflibparser.get_diff()
         self.l_offset = len(self.diff_items[0].lineno)+1 if self.diff_items else 0
         self.wpos = Position(0, 0)
@@ -1010,7 +1343,7 @@ class DiffViewer:
                     curses.init_pair(6, curses.COLOR_BLACK, curses.COLOR_RED)
                 # default color
                 curses.init_pair(7, curses.COLOR_WHITE  , -1)
-                # lineno color
+                # lineno color & file-selector, active file selected
                 curses.init_pair(8, curses.COLOR_MAGENTA, -1)
                 # gray background
                 if curses.COLORS >= 16:
@@ -1021,11 +1354,29 @@ class DiffViewer:
                 else:
                     curses.init_pair(9, curses.COLOR_BLACK, curses.COLOR_BLACK)
                 # prompts
-                curses.init_pair(10, curses.COLOR_WHITE, curses.COLOR_RED )
+                curses.init_pair(10, curses.COLOR_WHITE  , curses.COLOR_RED  )
                 # find
-                curses.init_pair(11, curses.COLOR_WHITE, curses.COLOR_BLUE)
+                curses.init_pair(11, curses.COLOR_WHITE  , curses.COLOR_BLUE )
                 # current match
-                curses.init_pair(12, curses.COLOR_WHITE, curses.COLOR_CYAN)
+                curses.init_pair(12, curses.COLOR_WHITE  , curses.COLOR_CYAN )
+                # file-selector, active file
+                curses.init_pair(13, curses.COLOR_MAGENTA, curses.COLOR_WHITE)
+                # file-selector, active file (selected) inactive page
+                if curses.COLORS >= 16:
+                    try:
+                        curses.init_pair(14, curses.COLOR_MAGENTA, curses.COLOR_BLACK+8)
+                    except curses.error:
+                        curses.init_pair(14, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+                else:
+                    curses.init_pair(14, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+                # file-selector, selected inactive page
+                if curses.COLORS >= 16:
+                    try:
+                        curses.init_pair(15, curses.COLOR_WHITE, curses.COLOR_BLACK+8)
+                    except curses.error:
+                        curses.init_pair(15, curses.COLOR_WHITE, curses.COLOR_BLACK)
+                else:
+                    curses.init_pair(15, curses.COLOR_WHITE, curses.COLOR_BLACK)
 
         curses.raw()
         self.curse_window.nodelay(False)
@@ -1046,15 +1397,13 @@ class DiffViewer:
             curses.endwin()
 
     @classmethod
-    def open(cls, files: list, display_names: list) -> None:
+    def open(cls, files: list) -> None:
         """
         simple diffviewer to view the contents/differences of two provided files.
 
         Parameters:
-        file (Path):
-            a list containing exactly two files(-path)
-        display_name (str):
-            the display names for the two files
+        files (list):
+            list of tuples (file, display_name)
         """
         if DiffViewer.loading_failed:
             return
@@ -1068,7 +1417,7 @@ class DiffViewer:
             DiffViewer.loading_failed = True
             return
 
-        diffviewer = cls(files, display_names)
+        diffviewer = cls(files)
 
         if on_windows_os:
             # disable background feature on windows
@@ -1078,6 +1427,12 @@ class DiffViewer:
             signal.signal(signal.SIGTSTP, signal.SIG_IGN)
 
         diffviewer._open()
+        while diffviewer.open_next_idxs is not None:
+            diffviewer = cls(files, file_idxs = diffviewer.open_next_idxs, file_commit_hashes = diffviewer.open_next_hashes)
+            if on_windows_os:
+                # disable background feature on windows
+                diffviewer._action_background = lambda *_: True
+            diffviewer._open()
 
     @staticmethod
     def set_flags(debug_mode: bool, file_encoding: str) -> None:
