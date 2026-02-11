@@ -870,6 +870,7 @@ class DiffViewer:
             f"{'(Shift-)F2':<{coff}}jump to next/(previous) change",
             '',
             f"{'^R':<{coff}}reload file",
+            f"{'Ctrl+F1':<{coff}}open file manager",
             '',
             f"{'^B':<{coff}}put editor in background",
             f"{'^D':<{coff}}interrupt/force close",
@@ -1107,7 +1108,8 @@ class DiffViewer:
             status_bar = f"Equal: {self.difflibparser.count_equal} | "
             status_bar+= f"Insertions: {self.difflibparser.count_insert} | "
             status_bar+= f"Deletions: {self.difflibparser.count_delete} | "
-            status_bar+= f"Modifications: {self.difflibparser.count_changed}"
+            status_bar+= f"Modifications: {self.difflibparser.count_changed} | "
+            status_bar+= 'Help: F1'
             if self.debug_mode:
                 status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x} | {self.cpos.get_pos()}"
             # this throws an error (should be max_x-1), but looks better:
