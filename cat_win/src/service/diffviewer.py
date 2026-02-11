@@ -48,7 +48,9 @@ def get_git_file_history(file_path: Path) -> list:
     repo_root = subprocess.run(
         ['git', 'rev-parse', '--show-toplevel'],
         cwd=os.path.dirname(file_path) or None,
-        capture_output=True, check=False
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False
     ).stdout.decode().strip()
     if not repo_root:
         raise OSError('not a git repository (or any of the parent directories)')
@@ -59,7 +61,9 @@ def get_git_file_history(file_path: Path) -> list:
         ['git', 'log', '--follow', '--name-status',
          '--pretty=format:%H|%ai|%an|%s', '--', rel_path],
         cwd=repo_root,
-        capture_output=True, check=True
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=True
     ).stdout.decode().splitlines()
 
     commits = []
@@ -122,7 +126,9 @@ def get_git_file_content_at_commit(file_path: Path, commit_hash: str) -> list:
     repo_root = subprocess.run(
         ['git', 'rev-parse', '--show-toplevel'],
         cwd=os.path.dirname(file_path) or None,
-        capture_output=True, check=False
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False
     ).stdout.decode().strip()
     if not repo_root:
         raise OSError('not a git repository (or any of the parent directories)')
@@ -140,7 +146,9 @@ def get_git_file_content_at_commit(file_path: Path, commit_hash: str) -> list:
         result = subprocess.run(
             ['git', 'show', f'{actual_hash}:{file_path_at_commit}'],
             cwd=repo_root,
-            capture_output=True, check=True
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=True
         )
         return result.stdout.decode(errors='replace').splitlines()
     except subprocess.CalledProcessError:

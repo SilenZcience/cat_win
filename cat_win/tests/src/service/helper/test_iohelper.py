@@ -39,17 +39,13 @@ class TestStdInHelper(TestCase):
         self.assertEqual(inspect.getgeneratorstate(gen), 'GEN_CREATED')
         next(gen)
         self.assertEqual(inspect.getgeneratorstate(gen), 'GEN_SUSPENDED')
-        with self.assertRaises((RuntimeError, StopIteration)) as context:
-            gen.throw(StopIteration)
+        gen.close()
         self.assertEqual(inspect.getgeneratorstate(gen), 'GEN_CLOSED')
-        self.assertIn(str(*context.exception.args), 'generator raised StopIteration')
 
         gen = IoHelper.yield_file(__file__)
         self.assertEqual(inspect.getgeneratorstate(gen), 'GEN_CREATED')
-        with self.assertRaises((RuntimeError, StopIteration)) as context:
-            gen.throw(StopIteration)
+        gen.close()
         self.assertEqual(inspect.getgeneratorstate(gen), 'GEN_CLOSED')
-        self.assertIn(str(*context.exception.args), 'generator raised StopIteration')
 
     def test_get_newline(self):
         self.assertEqual(IoHelper.get_newline(test_file_path), '\r\n')

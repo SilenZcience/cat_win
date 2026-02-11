@@ -4,7 +4,6 @@ diffviewerhelper
 
 import difflib
 import unicodedata
-from dataclasses import dataclass
 from functools import lru_cache
 from typing import Sequence
 
@@ -145,14 +144,18 @@ class DifflibID:
     DELETE    = 2 # starts with '- '
     CHANGED   = 3 # either three or four lines with the prefixes ('-', '+', '?'), ('-', '?', '+') or ('-', '?', '+', '?') respectively
 
-@dataclass
 class Difflib_Item:
-    line1: str
-    line2: str
-    code: int = DifflibID.EQUAL
-    lineno: str = ''
-    changes1: list = None
-    changes2: list = None
+    def __init__(self, line1: str, line2: str,
+                 code: int = DifflibID.EQUAL,
+                 lineno: str = '',
+                 changes1: list = None,
+                 changes2: list = None):
+        self.line1 = line1
+        self.line2 = line2
+        self.code = code
+        self.lineno = lineno
+        self.changes1 = changes1
+        self.changes2 = changes2
 
 class DifflibParser:
     """
