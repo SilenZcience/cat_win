@@ -153,7 +153,12 @@ def get_libmagic_file(file: Path) -> str:
     file_cmd = which('file.exe') or which('file') # should work on windows/unix
     if file_cmd:
         try:
-            sub = subprocess.run([str(file_cmd), str(file)], capture_output=True, check=False)
+            sub = subprocess.run(
+                [str(file_cmd), str(file)],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False
+            )
             if sub.returncode != 0:
                 return ''
             libmagic_out = sub.stdout.decode().strip()
@@ -190,7 +195,12 @@ def get_libmagic_file(file: Path) -> str:
         return ''
 
     try:
-        sub = subprocess.run([str(found_file), str(file)], capture_output=True, check=True)
+        sub = subprocess.run(
+            [str(found_file), str(file)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=True
+        )
     except OSError:
         return ""
     libmagic_out = sub.stdout.decode().strip()
