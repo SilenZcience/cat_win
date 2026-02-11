@@ -19,12 +19,12 @@ class TestHexEditor(TestCase):
     maxDiff = None
 
     def test_hexeditor_unknown_file(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         self.assertEqual(editor.error_bar, "[Errno 2] No such file or directory: ''")
         self.assertCountEqual(editor.hex_array, [[]])
 
     def test_selected_area(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         self.assertEqual(editor.selected_area, ((0, 0), (0, 0)))
         editor.cpos.set_pos((5, 4))
         editor.spos.set_pos((5, 3))
@@ -44,7 +44,7 @@ class TestHexEditor(TestCase):
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 723))
     def test__build_file(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         self.assertSequenceEqual(editor.hex_array, [['40'] * 16] * 30)
         self.assertSequenceEqual(editor.hex_array_edit, [[None] * 16] * 30)
         editor.hex_array_edit[15][1] = '00'
@@ -55,7 +55,7 @@ class TestHexEditor(TestCase):
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 723))
     def test__build_file_upto_16(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         self.assertSequenceEqual(editor.hex_array, [['40'] * 16] * 30)
         self.assertSequenceEqual(editor.hex_array_edit, [[None] * 16] * 30)
         editor._build_file_upto(40)
@@ -70,7 +70,7 @@ class TestHexEditor(TestCase):
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'!' * 454))
     @patch('cat_win.src.service.hexeditor.HexEditor.columns', 10)
     def test__build_file_upto_10(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         self.assertSequenceEqual(editor.hex_array, [['21'] * 10] * 30)
         self.assertSequenceEqual(editor.hex_array_edit, [[None] * 10] * 30)
         editor._build_file_upto(40)
@@ -83,14 +83,14 @@ class TestHexEditor(TestCase):
                                  [[None] * 10] * 15 + [[None, '00', None, None, None, None, None, None, None, None]] + [[None] * 10] * 29 + [[None] * 4])
 
     def test__key_dc_empty(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor._build_file_upto(0)
         editor._key_dc(None)
         self.assertEqual(editor.cpos.get_pos(), (0, 0))
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 20))
     def test__get_current_state_row(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         self.assertListEqual(editor._get_current_state_row(0), ['40'] * 16)
         self.assertListEqual(editor._get_current_state_row(1), ['40'] * 4)
         editor.hex_array_edit[1][3] = '--'
@@ -101,7 +101,7 @@ class TestHexEditor(TestCase):
         self.assertListEqual(editor._get_current_state_row(1), ['40'] * 3 + ['--'])
 
     def test__key_dc(self):
-        editor = HexEditor(__file__, '')
+        editor = HexEditor([(__file__, '')])
         hex_array = deepcopy(editor.hex_array)
         hex_array_edit = deepcopy(editor.hex_array_edit)
         editor.cpos.set_pos((5, 12))
@@ -112,7 +112,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (5, 13))
 
     def test__key_dc_selection(self):
-        editor = HexEditor(__file__, '')
+        editor = HexEditor([(__file__, '')])
         hex_array = deepcopy(editor.hex_array)
         hex_array_edit = deepcopy(editor.hex_array_edit)
         editor.cpos.set_pos((1,5))
@@ -129,13 +129,13 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (4, 11))
 
     def test__key_dl_empty(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor._build_file_upto(0)
         editor._key_dl(None)
         self.assertEqual(editor.cpos.get_pos(), (0, 0))
 
     def test__key_dl(self):
-        editor = HexEditor(__file__, '')
+        editor = HexEditor([(__file__, '')])
         hex_array = deepcopy(editor.hex_array)
         hex_array_edit = deepcopy(editor.hex_array_edit)
         editor.cpos.set_pos((5, 12))
@@ -146,7 +146,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (5, 13))
 
     def test__key_dl_selection(self):
-        editor = HexEditor(__file__, '')
+        editor = HexEditor([(__file__, '')])
         hex_array = deepcopy(editor.hex_array)
         hex_array_edit = deepcopy(editor.hex_array_edit)
         editor.cpos.set_pos((3, 15))
@@ -161,14 +161,14 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (5, 1))
 
     def test__key_backspace_empty(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor._build_file_upto(0)
         editor._key_backspace(None)
         editor.cpos.set_pos((5, 5))
         self.assertEqual(editor.cpos.get_pos(), (5, 5))
 
     def test__key_backspace(self):
-        editor = HexEditor(__file__, '')
+        editor = HexEditor([(__file__, '')])
         hex_array = deepcopy(editor.hex_array)
         hex_array_edit = deepcopy(editor.hex_array_edit)
         editor.cpos.set_pos((5, 5))
@@ -179,7 +179,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (5, 4))
 
     def test__key_backspace_selection(self):
-        editor = HexEditor(__file__, '')
+        editor = HexEditor([(__file__, '')])
         hex_array = deepcopy(editor.hex_array)
         hex_array_edit = deepcopy(editor.hex_array_edit)
         editor.cpos.set_pos((4,10))
@@ -196,14 +196,14 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (1, 4))
 
     def test__key_ctl_backspace_empty(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor._build_file_upto(0)
         editor._key_ctl_backspace(None)
         editor.cpos.set_pos((5, 5))
         self.assertEqual(editor.cpos.get_pos(), (5, 5))
 
     def test__key_ctl_backspace(self):
-        editor = HexEditor(__file__, '')
+        editor = HexEditor([(__file__, '')])
         hex_array = deepcopy(editor.hex_array)
         hex_array_edit = deepcopy(editor.hex_array_edit)
         editor.cpos.set_pos((5, 5))
@@ -214,7 +214,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (5, 4))
 
     def test__key_ctl_backspace_selection(self):
-        editor = HexEditor(__file__, '')
+        editor = HexEditor([(__file__, '')])
         hex_array = deepcopy(editor.hex_array)
         hex_array_edit = deepcopy(editor.hex_array_edit)
         editor.cpos.set_pos((5, 0))
@@ -229,7 +229,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (3, 14))
 
     def test__move_key_left(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((5, 2))
         editor._move_key_left()
         self.assertEqual(editor.cpos.get_pos(), (5, 1))
@@ -238,7 +238,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (5, -1))
 
     def test__move_key_right(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((5, 2))
         editor._move_key_right()
         self.assertEqual(editor.cpos.get_pos(), (5, 3))
@@ -247,7 +247,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (5, 5))
 
     def test__move_key_up(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((2, 2))
         editor._move_key_up()
         self.assertEqual(editor.cpos.get_pos(), (1, 2))
@@ -256,7 +256,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (-1, 2))
 
     def test__move_key_down(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((5, 2))
         editor._move_key_down()
         self.assertEqual(editor.cpos.get_pos(), (6, 2))
@@ -265,7 +265,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (8, 2))
 
     def test__move_key_ctl_left(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((10, 10))
         editor._move_key_ctl_left()
         self.assertEqual(editor.cpos.get_pos(), (10, 2))
@@ -278,7 +278,7 @@ class TestHexEditor(TestCase):
             self.assertEqual(editor.cpos.get_pos(), (10, -18))
 
     def test__move_key_ctl_right(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((10, 10))
         editor._move_key_ctl_right()
         self.assertEqual(editor.cpos.get_pos(), (10, 18))
@@ -291,7 +291,7 @@ class TestHexEditor(TestCase):
             self.assertEqual(editor.cpos.get_pos(), (10, 38))
 
     def test__move_key_ctl_up(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((11, 11))
         editor._move_key_ctl_up()
         self.assertEqual(editor.cpos.get_pos(), (1, 11))
@@ -300,7 +300,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (-19, 11))
 
     def test__move_key_ctl_down(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((11, 11))
         editor._move_key_ctl_down()
         self.assertEqual(editor.cpos.get_pos(), (21, 11))
@@ -309,7 +309,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (41, 11))
 
     def test__select_key_left(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((5, 2))
         editor._select_key_left()
         self.assertEqual(editor.cpos.get_pos(), (5, 1))
@@ -318,7 +318,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (5, -1))
 
     def test__select_key_right(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((5, 2))
         editor._select_key_right()
         self.assertEqual(editor.cpos.get_pos(), (5, 3))
@@ -327,7 +327,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (5, 5))
 
     def test__select_key_up(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((2, 2))
         editor._select_key_up()
         self.assertEqual(editor.cpos.get_pos(), (1, 2))
@@ -336,7 +336,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (-1, 2))
 
     def test__select_key_down(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((5, 2))
         editor._select_key_down()
         self.assertEqual(editor.cpos.get_pos(), (6, 2))
@@ -345,7 +345,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (8, 2))
 
     def test__move_key_page_up(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.wpos.set_pos((83, 0))
         editor.cpos.set_pos((93, 11))
         editor._move_key_page_up()
@@ -362,7 +362,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.wpos.get_pos(), (0, 0))
 
     def test__move_key_page_down(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.wpos.set_pos((0, 0))
         editor.cpos.set_pos((3, 11))
         editor._move_key_page_down()
@@ -373,7 +373,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.wpos.get_pos(), (0, 0))
 
     def test__select_key_page_up(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.wpos.set_pos((83, 0))
         editor.cpos.set_pos((93, 11))
         editor._select_key_page_up()
@@ -390,7 +390,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.wpos.get_pos(), (0, 0))
 
     def test__select_key_page_down(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.wpos.set_pos((0, 0))
         editor.cpos.set_pos((3, 11))
         editor._select_key_page_down()
@@ -402,7 +402,7 @@ class TestHexEditor(TestCase):
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 20))
     def test__move_key_end(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((0, 2))
         editor._move_key_end()
         self.assertEqual(editor.cpos.get_pos(), (0, 15))
@@ -412,14 +412,14 @@ class TestHexEditor(TestCase):
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 70))
     def test__move_key_ctl_end(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((1, 1))
         editor._move_key_ctl_end()
         self.assertEqual(editor.cpos.get_pos(), (4, 5))
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 20))
     def test__select_key_end(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((0, 2))
         editor._select_key_end()
         self.assertEqual(editor.cpos.get_pos(), (0, 15))
@@ -428,26 +428,26 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (1, 3))
 
     def test__move_key_home(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((123, 123))
         editor._move_key_home()
         self.assertEqual(editor.cpos.get_pos(), (123, 0))
 
     def test__move_key_ctl_home(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((123, 123))
         editor._move_key_ctl_home()
         self.assertEqual(editor.cpos.get_pos(), (0, 0))
 
     def test__select_key_home(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((123, 123))
         editor._select_key_home()
         self.assertEqual(editor.cpos.get_pos(), (123, 0))
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 16))
     def test__insert_byte_left(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((0, 8))
         editor._insert_byte('<')
         self.assertSequenceEqual(editor.hex_array, [['40'] * 8 + ['--'] + ['40'] * 7] + [['40']])
@@ -458,7 +458,7 @@ class TestHexEditor(TestCase):
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 16))
     def test__insert_byte_right(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((0, 8))
         editor._insert_byte('>')
         self.assertSequenceEqual(editor.hex_array, [['40'] * 9 + ['--'] + ['40'] * 6] + [['40']])
@@ -469,7 +469,7 @@ class TestHexEditor(TestCase):
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 20))
     def test__insert_byte_chunk(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((1, 2))
         editor._insert_byte(' ')
         self.assertSequenceEqual(editor.hex_array, [['40'] * 16, ['40'] * 4 + ['--'] * 12])
@@ -479,7 +479,7 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (2, 0))
 
     def test__key_string_invalid(self):
-        editor = HexEditor(__file__, '')
+        editor = HexEditor([(__file__, '')])
         hex_array = deepcopy(editor.hex_array)
         hex_array_edit = deepcopy(editor.hex_array_edit)
         editor._key_string('')
@@ -495,7 +495,7 @@ class TestHexEditor(TestCase):
         self.assertSequenceEqual(editor.hex_array_edit, hex_array_edit)
         self.assertEqual(editor.cpos.get_pos(), (0, 0))
 
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         hex_array = deepcopy(editor.hex_array)
         hex_array_edit = deepcopy(editor.hex_array_edit)
         editor._key_string('0')
@@ -505,7 +505,7 @@ class TestHexEditor(TestCase):
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 16))
     def test__key_string(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((0, 1))
         editor._key_string('f')
         self.assertSequenceEqual(editor.hex_array_edit, [[None] + ['F0'] + [None] * 14])
@@ -519,7 +519,7 @@ class TestHexEditor(TestCase):
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 20))
     def test__select_key_all(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.spos.set_pos((1,1))
         editor._select_key_all()
         self.assertEqual(editor.spos.get_pos(), (0, 0))
@@ -587,7 +587,7 @@ class TestHexEditor(TestCase):
             def _get_wch():
                 return next(char_gen_get_wch)
 
-            editor = HexEditor('', '')
+            editor = HexEditor([('', '')])
             # editor.debug_mode = True
 
             curse_window_mock = MagicMock()
@@ -607,7 +607,7 @@ class TestHexEditor(TestCase):
     def test__action_copy(self):
         def assertCopy(_s: str):
             self.assertEqual(_s, '40' * 10 + '21' + '40' * 10)
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.selecting = True
         editor.hex_array_edit[0][10] = '21'
         editor._select_key_all()
@@ -618,7 +618,7 @@ class TestHexEditor(TestCase):
     def test__action_copy_single(self):
         def assertCopy(_s: str):
             self.assertEqual(_s, '21')
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.hex_array_edit[0][10] = '21'
         editor.cpos.set_pos((0, 10))
         with patch('cat_win.src.service.clipboard.Clipboard.put', assertCopy):
@@ -628,7 +628,7 @@ class TestHexEditor(TestCase):
     def test__action_cut(self):
         def assertCopy(_s: str):
             self.assertEqual(_s, '40' * 10 + '21' + '40' * 10)
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.selecting = True
         editor.hex_array_edit[0][10] = '21'
         editor._select_key_all()
@@ -640,7 +640,7 @@ class TestHexEditor(TestCase):
     def test__action_cut_single(self):
         def assertCopy(_s: str):
             self.assertEqual(_s, '21')
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.hex_array_edit[0][10] = '21'
         editor.cpos.set_pos((0, 10))
         with patch('cat_win.src.service.clipboard.Clipboard.put', assertCopy):
@@ -648,7 +648,7 @@ class TestHexEditor(TestCase):
         self.assertListEqual(editor.hex_array_edit, [[None] * 10 + ['--'] + [None] * 5, [None] * 5])
 
     def test__action_render_scr(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.curse_window = MagicMock()
         self.assertNotEqual(editor.error_bar, '')
         self.assertEqual(editor._action_render_scr(''), None)
@@ -657,7 +657,7 @@ class TestHexEditor(TestCase):
     def test__action_save(self):
         def assertWriteFile(_, _s: str):
             self.assertEqual(_s, b'!'*16+b'@'*479)
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.hex_array_edit[0] = ['21'] * 16
         editor.cpos.set_pos((5, 2))
         editor._key_dl(None)
@@ -669,7 +669,7 @@ class TestHexEditor(TestCase):
     def test__action_save_correctness(self):
         def assertWriteFile(_, _s: str):
             self.assertEqual(_s, b'@'*6+b'!@!'+b'@'*492)
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((1,1))
         editor._key_string('2')
         editor._key_string('1')
@@ -687,14 +687,14 @@ class TestHexEditor(TestCase):
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 496))
     @patch('cat_win.src.service.helper.iohelper.IoHelper.write_file', ErrorDefGen.get_def(PermissionError("validn't")))
     def test__action_save_error(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.hex_array_edit[0] = ['21'] * 16
         editor._action_save()
         self.assertEqual(editor.error_bar, "validn't")
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 496))
     def test__action_jump(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.curse_window = MagicMock()
         def char_gen(user_input: list):
             yield from zip(user_input, [b'_key_string'] * len(user_input))
@@ -716,7 +716,7 @@ class TestHexEditor(TestCase):
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 254 + b'!' * 2 + b'@' * 255))
     def test__action_find(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.curse_window = MagicMock()
         def char_gen(user_input: list):
             yield from zip(user_input + ['', ''], [b'_key_string'] * len(user_input) + [b'_key_backspace', b'_key_enter'])
@@ -740,7 +740,7 @@ class TestHexEditor(TestCase):
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 66))
     def test__action_reload(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.curse_window = MagicMock()
         def char_gen(user_input: list):
             yield from zip(user_input, [b'_key_string'] * len(user_input))
@@ -758,7 +758,7 @@ class TestHexEditor(TestCase):
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 32))
     def test__action_insert(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.curse_window = MagicMock()
         def char_gen(user_input: list):
             yield from user_input
@@ -789,7 +789,7 @@ class TestHexEditor(TestCase):
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 32))
     def test__action_quit(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.curse_window = MagicMock()
         self.assertEqual(editor._action_quit(), False)
         editor.unsaved_progress = True
@@ -812,17 +812,17 @@ class TestHexEditor(TestCase):
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 32))
     def test__action_interrupt(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.curse_window = MagicMock()
         self.assertRaises(KeyboardInterrupt, editor._action_interrupt)
 
     def test__action_resize(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.curse_window = MagicMock()
         self.assertEqual(editor._action_resize(), True)
 
     def test__get_next_char(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.curse_window = MagicMock()
         editor.curse_window.get_wch.return_value = '!'
         self.assertEqual(editor._get_next_char(), ('!', b'_key_string'))
@@ -838,7 +838,7 @@ class TestHexEditor(TestCase):
             self.assertIn("' '", fake_out.getvalue())
 
     def test__get_color(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         mm.has_colors.return_value = False
         self.assertEqual(editor._get_color(0), 0)
         mm.has_colors.return_value = True
@@ -847,7 +847,7 @@ class TestHexEditor(TestCase):
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 66))
     def test__fix_cursor_position(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.cpos.set_pos((-2, 1))
         editor._fix_cursor_position(30)
         self.assertEqual(editor.cpos.get_pos(), (0, 1))
@@ -882,7 +882,7 @@ class TestHexEditor(TestCase):
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 66))
     def test__render_scr(self):
-        editor = HexEditor('', 'X' * 300)
+        editor = HexEditor([('', 'X' * 300)])
         editor.curse_window = MagicMock()
         editor.error_bar = ':)'
         editor.debug_mode = True
@@ -892,14 +892,14 @@ class TestHexEditor(TestCase):
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 16))
     def test__run(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.curse_window = MagicMock()
         with patch('cat_win.src.service.hexeditor.HexEditor._get_next_char', lambda *args: ('\x11', b'_action_quit')):
             self.assertEqual(editor._run(), None)
 
     @patch('os.environ.setdefault', lambda *args: None)
     def test__open(self):
-        editor = HexEditor('', '')
+        editor = HexEditor([('', '')])
         editor.curse_window = MagicMock()
         with patch('cat_win.src.service.hexeditor.HexEditor._run', lambda *args: None):
             self.assertEqual(editor._open(), None)
@@ -908,11 +908,11 @@ class TestHexEditor(TestCase):
     @patch('cat_win.src.service.hexeditor.on_windows_os', new=True)
     def test_open_no_curses_error(self):
         with patch('sys.stderr', new=StdOutMock()) as fake_out:
-            self.assertEqual(HexEditor.open('', ''), False)
+            self.assertEqual(HexEditor.open([('', '')]), False)
             self.assertIn('could not be loaded', fake_out.getvalue())
             self.assertIn('windows-curses', fake_out.getvalue())
         with patch('sys.stderr', new=StdOutMock()) as fake_out:
-            self.assertEqual(HexEditor.open('', ''), False)
+            self.assertEqual(HexEditor.open([('', '')]), False)
             self.assertEqual('', fake_out.getvalue())
 
     def test_set_flags(self):

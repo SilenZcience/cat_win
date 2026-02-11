@@ -1101,9 +1101,8 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
         if unknown_files:
             Editor.open([(file, u_files.get_file_display_name(file)) for file in unknown_files], u_args[ARGS_PLAIN_ONLY])
     elif u_args.find_first(ARGS_HEX_EDITOR, ARGS_EDITOR, True) is not None:
-        unknown_files = [file for file in unknown_files if HexEditor.open(
-            file, u_files.get_file_display_name(file)
-        )]
+        if unknown_files:
+            HexEditor.open([(file, u_files.get_file_display_name(file)) for file in unknown_files])
     else:
         unknown_files = IoHelper.read_write_files_from_stdin(
             unknown_files, arg_parser.file_encoding, u_args[ARGS_ONELINE]
@@ -1114,9 +1113,9 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
             with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
                 Editor.open([(file, u_files.get_file_display_name(file)) for file in known_files], u_args[ARGS_PLAIN_ONLY])
     elif u_args.find_first(ARGS_HEX_EDITOR, ARGS_EDITOR, True) is not None:
-        with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
-            for file in known_files:
-                HexEditor.open(file, u_files.get_file_display_name(file))
+        if known_files:
+            with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
+                HexEditor.open([(file, u_files.get_file_display_name(file)) for file in known_files])
     if u_args[ARGS_DIFF]:
         with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
             for i in range(1, len(known_files), 2):
