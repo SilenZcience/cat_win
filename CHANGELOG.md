@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.10.6] - TBA
+
+## Bugfixes
+
+- fixed Python3.6 compatibility issues.
+- fixed Bug where upwards search inside the diffviewer was wrong.
+- fixed Bug where diffviewer would crash on certain cutoff-ratio inputs.
+
+
 ## [1.10.5] - 2026-02-11
 
 ### Minor Changes
