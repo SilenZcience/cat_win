@@ -165,7 +165,7 @@ class DiffViewer:
 
     file_encoding = 'utf-8'
 
-    def __init__(self, files: list, file_idxs: tuple = (0, 0), file_commit_hashes: tuple = (None, None)) -> None:
+    def __init__(self, files: list, file_idxs: tuple = None, file_commit_hashes: tuple = (None, None)) -> None:
         """
         defines a DiffViewer object.
 
@@ -175,6 +175,9 @@ class DiffViewer:
         file_idxs (tuple):
             indexes of the files to open in the diffviewer
         """
+        if file_idxs is None:
+            file_idxs = (0, 1) if len(files) >= 2 else (0, 0)
+
         self.curse_window = None
 
         self.files = files
@@ -196,6 +199,7 @@ class DiffViewer:
 
         # window position (top-left)
         self.wpos = self.wpos_bak = Position(0, 0)
+        self.rpos = self.rpos_bak = Position(0, 0)
         self.cpos = Position(0, 0)
 
         self.displaying_overview = False
@@ -246,6 +250,8 @@ class DiffViewer:
             self.l_offset = len(self.diff_items[0].lineno)+1 if self.diff_items else 0
             self.error_bar = ''
             self.status_bar_size = 1
+            if self.diff_items:
+                self.rpos.row = min(max(self.rpos.row, 0), len(self.diff_items)-1)
         except (OSError, UnicodeError) as exc:
             self.error_bar = str(exc)
             self.status_bar_size = 2
@@ -256,6 +262,7 @@ class DiffViewer:
                 [],
             )
             self.diff_items = self.diff_items_bak = self.difflibparser.get_diff()
+            self.rpos.row = 0
 
     def getxymax(self) -> tuple:
         """
@@ -308,10 +315,12 @@ class DiffViewer:
         self.wpos.col += 1
 
     def _move_key_up(self) -> None:
-        self.wpos.row -= 1
+        self.rpos.row = max(self.rpos.row-1, 0)
+        self._ensure_rpos_visible()
 
     def _move_key_down(self) -> None:
-        self.wpos.row += 1
+        self.rpos.row = min(self.rpos.row+1, len(self.diff_items)-1)
+        self._ensure_rpos_visible()
 
     def _move_key_ctl_left(self) -> None:
         self.wpos.col -= 10
@@ -320,33 +329,46 @@ class DiffViewer:
         self.wpos.col += 10
 
     def _move_key_ctl_up(self) -> None:
-        self.wpos.row -= 10
+        self.rpos.row = max(self.rpos.row-10, 0)
+        self._ensure_rpos_visible()
 
     def _move_key_ctl_down(self) -> None:
-        self.wpos.row += 10
+        self.rpos.row = min(self.rpos.row+10, len(self.diff_items)-1)
+        self._ensure_rpos_visible()
 
     def _move_key_page_up(self) -> None:
         max_y, _ = self.getxymax()
-        self.wpos.row -= max_y
+        self.rpos.row = max(self.rpos.row-max_y, 0)
+        self._ensure_rpos_visible()
 
     def _move_key_page_down(self) -> None:
         max_y, _ = self.getxymax()
-        self.wpos.row += max_y
+        self.rpos.row = min(self.rpos.row+max_y, len(self.diff_items)-1)
+        self._ensure_rpos_visible()
 
     def _move_key_end(self) -> None:
         self.wpos.col = self.lllen() - self.half_width
 
     def _move_key_ctl_end(self) -> None:
-        max_y, _ = self.getxymax()
-        self.wpos.row = len(self.diff_items) - max_y
+        self.rpos.row = max(len(self.diff_items)-1, 0)
+        self._ensure_rpos_visible()
         self.wpos.col = self.lllen() - self.half_width
 
     def _move_key_home(self) -> None:
         self.wpos.col = 0
 
     def _move_key_ctl_home(self) -> None:
+        self.rpos.row = 0
+        self._ensure_rpos_visible()
         self.wpos.row = 0
         self.wpos.col = 0
+
+    def _ensure_rpos_visible(self) -> None:
+        max_y, _ = self.getxymax()
+        if self.rpos.row < self.wpos.row:
+            self.wpos.row = self.rpos.row
+        elif self.rpos.row >= self.wpos.row + max_y:
+            self.wpos.row = self.rpos.row - max_y + 1
 
     def _action_render_scr(self, msg: str, tmp_error: str = '') -> None:
         max_y, max_x = self.getxymax()
@@ -401,7 +423,8 @@ class DiffViewer:
                     l_jmp = max(min(int(l_jmp), self.difflibparser.last_lineno), 1)
                     for i in range(l_jmp-1, len(self.diff_items)):
                         if not self.diff_items[i].lineno.isspace() and int(self.diff_items[i].lineno) == l_jmp:
-                            self.wpos.row = i
+                            self.rpos.row = i
+                            self._ensure_rpos_visible()
                             self.wpos.col = 0
                             break
                 break
@@ -573,7 +596,7 @@ class DiffViewer:
                     cutoff += wchar
             elif key == b'_key_enter':
                 if cutoff:
-                    self.difflibparser_cutoff = float(cutoff)
+                    self.difflibparser_cutoff = float(0 if cutoff=='.' else cutoff)
                     self._setup_file()
                 break
         return True
@@ -612,6 +635,7 @@ class DiffViewer:
             self.diff_items = self.diff_items_bak
             self.l_offset = len(self.diff_items[0].lineno)+1 if self.diff_items else 0
             self.wpos = self.wpos_bak
+            self.rpos = self.rpos_bak
             return True
 
         return False
@@ -777,7 +801,7 @@ class DiffViewer:
                     getattr(self, key.decode(), lambda *_: False)()
                     max_y, max_x = self.getxymax()
                     max_y += self.status_bar_size - 2
-            if key in [b'_indent_tab', b'_indent_btab']:
+            if key in [b'_indent_tab', b'_indent_btab', b'_select_key_left', b'_select_key_right']:
                 active_list = 1 - active_list
             if key in MOVE_HOTKEYS:
                 list_len = len(data_lists[active_list])
@@ -1011,6 +1035,7 @@ class DiffViewer:
         self.diff_items = self.difflibparser.get_diff()
         self.l_offset = len(self.diff_items[0].lineno)+1 if self.diff_items else 0
         self.wpos = Position(0, 0)
+        self.rpos = Position(0, 0)
 
 
         self.displaying_overview = True
@@ -1036,11 +1061,12 @@ class DiffViewer:
             skip_final_page = True
 
         for i in range(1, len(self.diff_items)):
-            row = (self.wpos.row + i) % len(self.diff_items)
-            if skip_final_page and row > self.wpos.row:
+            row = (self.rpos.row + i) % len(self.diff_items)
+            if skip_final_page and row > self.rpos.row:
                 continue
             if self.diff_items[row].code != DifflibID.EQUAL:
-                self.wpos.row = row
+                self.rpos.row = row
+                self._ensure_rpos_visible()
                 break
 
     def _function_replace_r(self) -> None:
@@ -1049,11 +1075,12 @@ class DiffViewer:
         jumps the view-window to the previous change
         """
         for i in range(1, len(self.diff_items)):
-            row = self.wpos.row - i
+            row = self.rpos.row - i
             if row < 0:
                 row += len(self.diff_items)
             if self.diff_items[row].code != DifflibID.EQUAL:
-                self.wpos.row = row
+                self.rpos.row = row
+                self._ensure_rpos_visible()
                 break
 
     def _get_next_char(self) -> tuple:
@@ -1106,6 +1133,17 @@ class DiffViewer:
         self.wpos.col = min(self.wpos.col, self.lllen() - self.half_width)
         self.wpos.col = max(self.wpos.col, 0)
 
+    def _get_diff_ratio(self, row: int) -> float:
+        item = self.diff_items[row]
+
+        if item.code in (DifflibID.INSERT, DifflibID.DELETE):
+            return 0.0
+        if item.code == DifflibID.CHANGED:
+            ratio1 = len(item.changes1) / len(item.line1) * 100 if item.line1 else 0
+            ratio2 = len(item.changes2) / len(item.line2) * 100 if item.line2 else 0
+            return 100.0 - (ratio1 + ratio2) / 2
+        return 100.0
+
     def _render_status_bar(self, max_y: int, max_x: int) -> None:
         # display status/error_bar
         try:
@@ -1117,6 +1155,8 @@ class DiffViewer:
             status_bar+= f"Insertions: {self.difflibparser.count_insert} | "
             status_bar+= f"Deletions: {self.difflibparser.count_delete} | "
             status_bar+= f"Modifications: {self.difflibparser.count_changed} | "
+            similarity = self._get_diff_ratio(self.rpos.row)
+            status_bar+= f"Similarity: {similarity:6.2f}% | "
             status_bar+= 'Help: F1'
             if self.debug_mode:
                 status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x} | {self.cpos.get_pos()}"
@@ -1142,10 +1182,12 @@ class DiffViewer:
                 break
             self.curse_window.clrtoeol()
 
+            sel_color = self._get_color(13) if brow == self.rpos.row else self._get_color(8)
+
             self.curse_window.addstr(
                 row, 0,
                 f"{self.diff_items[brow].lineno} ",
-                self._get_color(8)
+                sel_color
             )
             if self.diff_items[brow].code == DifflibID.EQUAL:
                 self.curse_window.addstr(
@@ -1156,7 +1198,7 @@ class DiffViewer:
                 self.curse_window.addstr(
                     row, self.l_offset + self.half_width,
                     ' | ',
-                    self._get_color(8)
+                    sel_color
                 )
                 self.curse_window.addstr(
                     row, self.l_offset,
@@ -1172,7 +1214,7 @@ class DiffViewer:
                 self.curse_window.addstr(
                     row, self.l_offset + self.half_width,
                     ' | ',
-                    self._get_color(8)
+                    sel_color
                 )
                 self.curse_window.addstr(
                     row, self.l_offset,
@@ -1198,7 +1240,7 @@ class DiffViewer:
                 self.curse_window.addstr(
                     row, self.l_offset + self.half_width,
                     ' | ',
-                    self._get_color(8)
+                    sel_color
                 )
                 self.curse_window.addstr(
                     row, self.l_offset,
@@ -1222,7 +1264,7 @@ class DiffViewer:
                 self.curse_window.addstr(
                     row, self.l_offset + self.half_width,
                     ' | ',
-                    self._get_color(8)
+                    sel_color
                 )
                 self.curse_window.addstr(
                     row, self.l_offset,
