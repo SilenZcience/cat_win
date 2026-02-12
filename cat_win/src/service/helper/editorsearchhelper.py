@@ -353,10 +353,10 @@ class _SearchIterDiffUp(_SearchIterDiffBase):
         line2_find = self.diffviewer.diff_items[row].line2.rfind(self.search, 0, col)
         if line1_find < 0 and line2_find < 0:
             return -1
-        if line1_find < 0 or 0 <= line2_find < line1_find:
+        if line1_find < 0 or line2_find > line1_find >= 0:
             self.line2_matched = True
             return line2_find
-        if line2_find < 0 or 0 <= line1_find < line2_find:
+        if line2_find < 0 or line1_find > line2_find >= 0:
             self.line2_matched = False
             return line1_find
         if line1_find == line2_find:
