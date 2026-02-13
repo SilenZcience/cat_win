@@ -664,7 +664,7 @@ class DiffViewer:
             curses.resize_term(*self.curse_window.getmaxyx())
         except curses.error:
             pass
-        self.half_width = (self.getxymax()[1]-4-self.l_offset) // 2
+        self.half_width = (self.getxymax()[1]-3-self.l_offset) // 2
         self.curse_window.clear()
         return True
 
@@ -1159,7 +1159,7 @@ class DiffViewer:
             status_bar+= f"Similarity: {similarity:6.2f}% | "
             status_bar+= 'Help: F1'
             if self.debug_mode:
-                status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x} | {self.cpos.get_pos()}"
+                status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x}"
             # this throws an error (should be max_x-1), but looks better:
             status_bar = status_bar[:max_x].ljust(max_x)
             self.curse_window.addstr(max_y + self.status_bar_size - 1, 0,
@@ -1182,44 +1182,55 @@ class DiffViewer:
                 break
             self.curse_window.clrtoeol()
 
-            sel_color = self._get_color(13) if brow == self.rpos.row else self._get_color(8)
+            sep_color    = self._get_color(8)
+            equal_color  = self._get_color(7)
+            empty_color  = self._get_color(9)
+            delete_color = self._get_color(6)
+            insert_color = self._get_color(4)
+            if brow == self.rpos.row:
+                self.curse_window.chgat(row, 0, max_x, self._get_color(1))
+                sep_color    = self._get_color(1)
+                equal_color  = self._get_color(1)
+                empty_color  = self._get_color(1)
+                delete_color = self._get_color(1)
+                insert_color = self._get_color(1)
 
             self.curse_window.addstr(
                 row, 0,
                 f"{self.diff_items[brow].lineno} ",
-                sel_color
+                sep_color
             )
             if self.diff_items[brow].code == DifflibID.EQUAL:
                 self.curse_window.addstr(
                     row, self.l_offset + self.half_width + 3,
                     self.diff_items[brow].line2[self.wpos.col:self.wpos.col+self.half_width].ljust(self.half_width),
-                    self._get_color(7)
+                    equal_color
                 )
                 self.curse_window.addstr(
                     row, self.l_offset + self.half_width,
                     ' | ',
-                    sel_color
+                    sep_color
                 )
                 self.curse_window.addstr(
                     row, self.l_offset,
                     self.diff_items[brow].line1[self.wpos.col:self.wpos.col+self.half_width].ljust(self.half_width),
-                    self._get_color(7)
+                    equal_color
                 )
             elif self.diff_items[brow].code == DifflibID.DELETE:
                 self.curse_window.addstr(
                     row, self.l_offset + self.half_width + 3,
                     ' ' * self.half_width,
-                    self._get_color(9)
+                    empty_color
                 )
                 self.curse_window.addstr(
                     row, self.l_offset + self.half_width,
                     ' | ',
-                    sel_color
+                    sep_color
                 )
                 self.curse_window.addstr(
                     row, self.l_offset,
                     ' ' * self.half_width,
-                    self._get_color(6)
+                    delete_color
                 )
                 self.curse_window.addstr(
                     row, self.l_offset,
@@ -1230,7 +1241,7 @@ class DiffViewer:
                 self.curse_window.addstr(
                     row, self.l_offset + self.half_width + 3,
                     ' ' * self.half_width,
-                    self._get_color(4)
+                    insert_color
                 )
                 self.curse_window.addstr(
                     row, self.l_offset + self.half_width + 3,
@@ -1240,18 +1251,18 @@ class DiffViewer:
                 self.curse_window.addstr(
                     row, self.l_offset + self.half_width,
                     ' | ',
-                    sel_color
+                    sep_color
                 )
                 self.curse_window.addstr(
                     row, self.l_offset,
                     ' ' * self.half_width,
-                    self._get_color(9)
+                    empty_color
                 )
             elif self.diff_items[brow].code == DifflibID.CHANGED:
                 self.curse_window.addstr(
                     row, self.l_offset + self.half_width + 3,
                     self.diff_items[brow].line2[self.wpos.col:self.wpos.col+self.half_width].ljust(self.half_width),
-                    self._get_color(4)
+                    insert_color
                 )
                 for idx_ in self.diff_items[brow].changes2:
                     idx = idx_ - self.wpos.col
@@ -1264,12 +1275,12 @@ class DiffViewer:
                 self.curse_window.addstr(
                     row, self.l_offset + self.half_width,
                     ' | ',
-                    sel_color
+                    sep_color
                 )
                 self.curse_window.addstr(
                     row, self.l_offset,
                     self.diff_items[brow].line1[self.wpos.col:self.wpos.col+self.half_width].ljust(self.half_width),
-                    self._get_color(6)
+                    delete_color
                 )
                 for idx_ in self.diff_items[brow].changes1:
                     idx = idx_ - self.wpos.col
@@ -1321,7 +1332,7 @@ class DiffViewer:
         """
         main loop for the diffviewer.
         """
-        self.half_width = (self.getxymax()[1]-4-self.l_offset) // 2
+        self.half_width = (self.getxymax()[1]-3-self.l_offset) // 2
         running = True
 
         while running:
