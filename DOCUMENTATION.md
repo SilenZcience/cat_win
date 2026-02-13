@@ -728,8 +728,7 @@ The Combination of --nokeyword and <a href="#-g---grep">-g, --grep</a> means tha
 
 ### <a id="--nb---nobreak">--nb, --nobreak</a>
 
-Using this Argument will open non-plaintext Files automatically without prompting the User.
-In Addition the Output will not stop on queried Substrings or Patterns.
+Using this Argument the Output will not halt when a queried Substring or Pattern is found.
 This Behaviour is included by Default when using <a href="#--nk---nokeyword">--nk, --nokeyword</a> or <a href="#-g---grep">-g, --grep</a>.
 
 - - - -
