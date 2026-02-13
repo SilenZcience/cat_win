@@ -768,7 +768,7 @@ def edit_file(file_index: int = 0) -> None:
         return
     content = []
     file_size = -1 if (
-        u_files[file_index].file_size < const_dic[DKW.LARGE_FILE_SIZE]//len(u_files)
+        u_files[file_index].file_size < const_dic[DKW.LARGE_FILE_SIZE]
     ) else u_files[file_index].file_size
     try:
         file_content = IoHelper.read_file(
