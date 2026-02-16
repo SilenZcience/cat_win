@@ -10,6 +10,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fixed Python3.6 compatibility issues.
 - fixed Bug where upwards search inside the diffviewer was wrong.
 - fixed Bug where diffviewer would crash on certain cutoff-ratio inputs.
+- fixed visual Bug inside diffviewer.
 
 
 ## [1.10.5] - 2026-02-11
