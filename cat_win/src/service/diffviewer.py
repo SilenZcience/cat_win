@@ -772,6 +772,7 @@ class DiffViewer:
                         self.curse_window.addstr(row + 1, right_x, '...')
                     self.curse_window.clrtoeol()
                     break
+            self.curse_window.clrtobot()
 
             if mode == 'files':
                 status_msg = 'Select two files. Tab/Shift+Tab switch list. Confirm with <Enter> or <Space>.'
@@ -839,7 +840,7 @@ class DiffViewer:
                         file_path = self.files[file_selected_idxs[side]][0]
                         try:
                             commits = get_git_file_history(file_path)
-                            file_commits[side] = [{'hash': '_LOCAL_', 'date': 'Current', 'author': 'Local', 'message': 'Use local file (not git)'}] + commits
+                            file_commits[side] = [{'hash': '_LOCAL_', 'date': ' _Latest_ ', 'author': '_Local_', 'message': 'Use local file (not git)'}] + commits
                         except (OSError, subprocess.CalledProcessError):
                             file_commits[side] = None
 
