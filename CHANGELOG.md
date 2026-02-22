@@ -3,9 +3,22 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [1.10.7] - TBA
+
+### Minor Changes
+
+- added basic git support to the (hex-)editor to load the git history of a file.
+- further improvements to the file selection menu inside the diffviewer.
+
+### Bugfixes
+
+- fixed Bug where the diffviewer would crash on empty files.
+- fixed bug where the the diffviewer would not correctly open the next selected file/hash.
+
+
 ## [1.10.6] - 2026-02-16
 
-## Bugfixes
+### Bugfixes
 
 - fixed Python3.6 compatibility issues.
 - fixed Bug where upwards search inside the diffviewer was wrong.
@@ -24,7 +37,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added color `more_less_prompt` to change the color of the prompt when using -`M`, --`more` or -`L`, --`less`.
 - added --`debuglog`, --`debug-log` parameter to log debug and error information to a log-file instead of the stderr-stream.
 
-## Bugfixes
+### Bugfixes
 
 - compatibility for Python v3.14.
 - fixed Bug where the diff-viewer would break when using -, --`stdin`.
@@ -47,7 +60,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added functionality to the (hex-)editor to use the mouse wheel to scroll up or down.
 - added functionality to the (hex-)editor to use the mouse to select areas or place the cursor.
 
-## Bugfixes
+### Bugfixes
 
 - fixed Bug where certain control characters would break the curses window in the (hex-)editor.
 
@@ -58,7 +71,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - added `unicode_escaped_editor_insert` option to the config menu to unicode-escape the insert in the hex-editor.
 
-## Bugfixes
+### Bugfixes
 
 - fixed Bug where certain file paths would not be correctly recognized and potentially result in a crash.
 
@@ -75,7 +88,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - allow clipboard pasting in (hex-)editor prompts.
 - changed the behaviour of the clipbaord pasting in the hex-editor to filter hex-symbols.
 
-## Bugfixes
+### Bugfixes
 
 - fixed Bug where -`U`, --`url` would not correctly recognize valid URIs.
 
@@ -88,7 +101,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added `^V` hotkey to the (hex-)editor to paste the contents of the clipboard.
 - the find (and replace) in the hex-editor is now shortly highlighted.
 
-## Bugfixes
+### Bugfixes
 
 - fixed Bug where the color config would allow certain invalid inputs.
 - fixed Bug where the editor would crash when certain elements were all being replaced at once.
@@ -108,7 +121,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - when using -`B`, --`raw` in combination with --`b64e`, --`b64e` it is now possible to copy the base64 encoded file to the clipboard using -`c`, --`clip`.
 - added `^T` hotkey to the editor to transform or question the selected text in various ways.
 
-## Bugfixes
+### Bugfixes
 
 - fixed Bug where a false warning might be displayed when using the stdin in combination to using -`U`, --`url`.
 - compatibility for Python v3.13.
@@ -129,7 +142,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added `replace=`, `replace:` parameter to replace queried Literals and substitute queried Patterns.
 - the `trunc=`, `trunc:` parameter is no longer case sensitive.
 
-## Bugfixes
+### Bugfixes
 
 - fixed Bug where certain arguments could not be removed when using the repl.
 - fixed Bug where the editor would crash when trying to find literals or patterns.
@@ -144,7 +157,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added feature to define custom commands in the config menu.
 - added `summary_unique_elements` option to the config menu to only display unique elements in summary overviews.
 
-## Bugfixes
+### Bugfixes
 
 - fixed Bug where a false warning would be displayed when using the stdin.
 
@@ -163,7 +176,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - when matching regular expressions in the editor the replace can be used for pattern substitutions.
 - the find and replace in the editor is now shortly highlighted.
 
-## Bugfixes
+### Bugfixes
 
 - added missing error message in (hex-)editor for clipboard errors.
 - added compatibility with python version pypy-3.6
