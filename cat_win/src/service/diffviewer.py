@@ -10,7 +10,6 @@ except ImportError:
     CURSES_MODULE_ERROR = True
 import os
 import signal
-import subprocess
 import sys
 
 from cat_win.src.const.escapecodes import ESC_CODE
@@ -20,139 +19,9 @@ from cat_win.src.service.helper.editorsearchhelper import search_iter_diff_facto
 from cat_win.src.service.helper.editorhelper import Position, frepr, \
     UNIFY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, FUNCTION_HOTKEYS
 from cat_win.src.service.helper.environment import on_windows_os
+from cat_win.src.service.helper.githelper import GitHelper
 from cat_win.src.service.helper.diffviewerhelper import DifflibParser, DifflibID
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
-
-
-def get_git_file_history(file_path: Path) -> list:
-    """
-    Get a list of all commits that changed a specific file.
-
-    Parameters:
-    file_path (Path):
-        the path to the file.
-
-    Returns:
-    (list):
-        A list of dictionaries, each containing:
-        - 'hash': commit hash (str)
-        - 'date': commit date (str)
-        - 'author': commit author (str)
-        - 'message': commit message (str)
-        - 'file_path': path of the file at this commit (str, accounts for renames)
-
-    Raises:
-    OSError: if not in a git repository
-    subprocess.CalledProcessError: if git command fails
-    """
-    repo_root = subprocess.run(
-        ['git', 'rev-parse', '--show-toplevel'],
-        cwd=os.path.dirname(file_path) or None,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        check=False
-    ).stdout.decode().strip()
-    if not repo_root:
-        raise OSError('not a git repository (or any of the parent directories)')
-
-    rel_path = os.path.relpath(file_path, repo_root)
-
-    log_output = subprocess.run(
-        ['git', 'log', '--follow', '--name-status',
-         '--pretty=format:%H|%ai|%an|%s', '--', rel_path],
-        cwd=repo_root,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        check=True
-    ).stdout.decode().splitlines()
-
-    commits = []
-    i = 0
-    while i < len(log_output):
-        line = log_output[i].strip()
-
-        if not line or '|' not in line:
-            i += 1
-            continue # Skip empty lines or lines without commit info
-
-        parts = line.split('|', 3)
-        if len(parts) != 4 or len(parts[0]) != 40:
-            i += 1
-            continue  # Not a valid commit line, skip
-
-        commit_hash, commit_date, commit_author, commit_message = parts
-        file_path_at_commit = rel_path
-        if i + 1 < len(log_output):
-            status_line = log_output[i + 1].strip()
-            if status_line:
-                status_parts = status_line.split('\t')
-                if len(status_parts) >= 2:
-                    # For renamed files (R), parts[1] is old name (needed for --follow)
-                    # For other statuses (M, A, D), parts[1] is the file name
-                    file_path_at_commit = status_parts[1]
-
-        commits.append({
-            'hash': commit_hash,
-            'date': commit_date,
-            'author': commit_author,
-            'message': commit_message,
-            'file_path': file_path_at_commit
-        })
-
-        i += 1
-
-    return commits
-
-
-def get_git_file_content_at_commit(file_path: Path, commit_hash: str) -> list:
-    """
-    Get the content of a file at a specific commit.
-
-    Parameters:
-    file_path (Path):
-        the path to the file.
-    commit_hash (str or dict):
-        either a commit hash string, or a commit dictionary from get_git_file_history()
-
-    Returns:
-    (list):
-        the content of the file at the specified commit as a list of lines.
-        Returns empty list if the file doesn't exist at that commit.
-
-    Raises:
-    OSError: if not in a git repository
-    subprocess.CalledProcessError: if git command fails
-    """
-    repo_root = subprocess.run(
-        ['git', 'rev-parse', '--show-toplevel'],
-        cwd=os.path.dirname(file_path) or None,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        check=False
-    ).stdout.decode().strip()
-    if not repo_root:
-        raise OSError('not a git repository (or any of the parent directories)')
-
-    if isinstance(commit_hash, dict):
-        actual_hash = commit_hash['hash']
-        file_path_at_commit = commit_hash.get('file_path')
-        if not file_path_at_commit:
-            file_path_at_commit = os.path.relpath(file_path, repo_root)
-    else:
-        actual_hash = commit_hash
-        file_path_at_commit = os.path.relpath(file_path, repo_root)
-
-    try:
-        result = subprocess.run(
-            ['git', 'show', f'{actual_hash}:{file_path_at_commit}'],
-            cwd=repo_root,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            check=True
-        )
-        return result.stdout.decode(errors='replace').splitlines()
-    except subprocess.CalledProcessError:
-        return []
 
 
 class DiffViewer:
@@ -174,6 +43,8 @@ class DiffViewer:
             list of tuples (file, display_name)
         file_idxs (tuple):
             indexes of the files to open in the diffviewer
+        file_commit_hashes (tuple):
+            commit hashes for the files to open in the diffviewer (if any)
         """
         if file_idxs is None:
             file_idxs = (0, 1) if len(files) >= 2 else (0, 0)
@@ -219,11 +90,11 @@ class DiffViewer:
                 ).splitlines()
             else:
                 try:
-                    text1 = get_git_file_content_at_commit(
+                    text1 = GitHelper.get_git_file_content_at_commit(
                         self.diff_files[0], self.file_commit_hashes[0]
                     )
                     self.display_names[0] = f"GIT: {self.display_names[0]}"
-                except (OSError, subprocess.CalledProcessError) as exc:
+                except OSError as exc:
                     text1 = []
                     self.display_names[0] = f'<GIT_ERROR> {str(exc)}'
             if self.file_commit_hashes[1] is None:
@@ -232,13 +103,13 @@ class DiffViewer:
                 ).splitlines()
             else:
                 try:
-                    text2 = get_git_file_content_at_commit(
+                    text2 = GitHelper.get_git_file_content_at_commit(
                         self.diff_files[1], self.file_commit_hashes[1]
                     )
                     self.display_names[1] = f"GIT: {self.display_names[1]}"
-                except (OSError, subprocess.CalledProcessError) as exc:
-                    text1 = []
-                    self.display_names[0] = f'<GIT_ERROR> {str(exc)}'
+                except OSError as exc:
+                    text2 = []
+                    self.display_names[1] = f'<GIT_ERROR> {str(exc)}'
 
             self.difflibparser = self.difflibparser_bak = DifflibParser(
                 text1,
@@ -707,7 +578,7 @@ class DiffViewer:
         # Selection mode: 'files' or 'commits'
         mode = 'files'
         file_commits = [None, None]
-        file_selected_idxs = None
+        file_selected_idxs: list = None
 
         wchar, key = '', b''
         while str(wchar) != ESC_CODE:
@@ -747,7 +618,16 @@ class DiffViewer:
                         commit = data_lists[side][entry_idx]
                         display_name = f"{commit['hash'][:7]} | {commit['date'][:10]} | {commit['author']} | {commit['message']}"
                         is_selected = selected_idx[side] == entry_idx
-                        is_current = False
+
+                        current_hash = self.file_commit_hashes[side]
+                        if isinstance(current_hash, dict):
+                            current_hash = current_hash.get('hash')
+                        is_current = (
+                            self.files[file_selected_idxs[side]][0] == self.diff_files[side] and (
+                                (commit['hash'] == '_LOCAL_' and current_hash is None) or
+                                (commit['hash'] == current_hash)
+                            )
+                        )
 
                     color = 0
                     if is_selected and is_current:
@@ -802,8 +682,14 @@ class DiffViewer:
                     getattr(self, key.decode(), lambda *_: False)()
                     max_y, max_x = self.getxymax()
                     max_y += self.status_bar_size - 2
-            if key in [b'_indent_tab', b'_indent_btab', b'_select_key_left', b'_select_key_right']:
+            if key in [b'_indent_tab', b'_indent_btab']:
                 active_list = 1 - active_list
+            if key in [b'_select_key_left', b'_select_key_right']:
+                active_list = 1 - active_list
+                selected_idx[active_list] = min(selected_idx[1 - active_list], len(data_lists[active_list]) - 1)
+                nav_y[active_list] = min(nav_y[active_list], selected_idx[active_list])
+                if selected_idx[active_list] >= nav_y[active_list] + max_y - 1:
+                    nav_y[active_list] = selected_idx[active_list] - max_y + 1
             if key in MOVE_HOTKEYS:
                 list_len = len(data_lists[active_list])
                 if list_len == 0:
@@ -839,9 +725,9 @@ class DiffViewer:
                     for side in (0, 1):
                         file_path = self.files[file_selected_idxs[side]][0]
                         try:
-                            commits = get_git_file_history(file_path)
+                            commits = GitHelper.get_git_file_history(file_path)
                             file_commits[side] = [{'hash': '_LOCAL_', 'date': ' _Latest_ ', 'author': '_Local_', 'message': 'Use local file (not git)'}] + commits
-                        except (OSError, subprocess.CalledProcessError):
+                        except OSError:
                             file_commits[side] = None
 
                     if file_commits[0] or file_commits[1]:
@@ -864,10 +750,8 @@ class DiffViewer:
                         _find_current_idx(self.diff_files[0], self.display_names[0]),
                         _find_current_idx(self.diff_files[1], self.display_names[1])
                     )
-                    if file_selected_idxs != current_idxs:
-                        self.open_next_idxs = file_selected_idxs
 
-                    self.open_next_hashes = (
+                    current_hashes = (
                         None if (
                             file_commits[0] and file_commits[0][selected_idx[0]]['hash'] == '_LOCAL_'
                         ) else (
@@ -879,12 +763,21 @@ class DiffViewer:
                             file_commits[1][selected_idx[1]] if file_commits[1] else None
                         )
                     )
+
+                    if tuple(file_selected_idxs) != current_idxs or tuple(self.file_commit_hashes) != current_hashes:
+                        self.open_next_idxs = file_selected_idxs
+                        self.open_next_hashes = current_hashes
                     break
 
             if mode == 'commits' and str(wchar) == ESC_CODE:
                 mode = 'files'
                 wchar = ''
                 selected_idx = file_selected_idxs if file_selected_idxs else selected_idx
+                nav_x = [0, 0]
+                nav_y = [
+                    max(0, min(selected_idx[0] - max_y // 2, len(self.files) - max_y)),
+                    max(0, min(selected_idx[1] - max_y // 2, len(self.files) - max_y))
+                ]
 
         return self.open_next_idxs is None
 
@@ -1135,6 +1028,8 @@ class DiffViewer:
         self.wpos.col = max(self.wpos.col, 0)
 
     def _get_diff_ratio(self, row: int) -> float:
+        if not self.diff_items:
+            return 100.0
         item = self.diff_items[row]
 
         if item.code in (DifflibID.INSERT, DifflibID.DELETE):
