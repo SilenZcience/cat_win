@@ -14,6 +14,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - fixed Bug where the diffviewer would crash on empty files.
 - fixed bug where the the diffviewer would not correctly open the next selected file/hash.
+- fixed bug where the diffviewer would not correctly jump to the next diff when pressin `F2`.
 
 
 ## [1.10.6] - 2026-02-16
