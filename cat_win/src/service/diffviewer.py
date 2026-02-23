@@ -957,15 +957,8 @@ class DiffViewer:
         *naming convention only for hotkeys*
         jumps the view-window to the next change
         """
-        max_y, _ = self.getxymax()
-        skip_final_page = False
-        if self.wpos.row == max(0, len(self.diff_items) - max_y):
-            skip_final_page = True
-
         for i in range(1, len(self.diff_items)):
             row = (self.rpos.row + i) % len(self.diff_items)
-            if skip_final_page and row > self.rpos.row:
-                continue
             if self.diff_items[row].code != DifflibID.EQUAL:
                 self.rpos.row = row
                 self._ensure_rpos_visible()
