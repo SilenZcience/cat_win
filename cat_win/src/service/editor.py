@@ -1460,6 +1460,13 @@ class Editor:
                     if file_commits:
                         mode = 'commits'
                         selected_idx = 0
+                        if self.file_commit_hash is not None:
+                            try:
+                                selected_idx = file_commits.index(self.file_commit_hash) if (
+                                    isinstance(self.file_commit_hash, dict)
+                                ) else [item['hash'] for item in file_commits].index(self.file_commit_hash)
+                            except ValueError:
+                                pass
                         nav_x = 0
                         nav_y = 0
                         self.curse_window.clear()

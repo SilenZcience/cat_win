@@ -733,6 +733,14 @@ class DiffViewer:
                     if file_commits[0] or file_commits[1]:
                         mode = 'commits'
                         selected_idx = [0, 0]
+                        for side in (0, 1):
+                            if self.file_commit_hashes[side] is not None:
+                                try:
+                                    selected_idx[side] = file_commits[side].index(self.file_commit_hashes[side]) if (
+                                        isinstance(self.file_commit_hashes[side], dict)
+                                    ) else [item['hash'] for item in file_commits[side]].index(self.file_commit_hashes[side])
+                                except ValueError:
+                                    pass
                         nav_x = [0, 0]
                         nav_y = [0, 0]
                         active_list = 0
