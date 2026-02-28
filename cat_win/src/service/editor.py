@@ -23,6 +23,7 @@ from cat_win.src.service.helper.diffviewerhelper import is_special_character
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.githelper import GitHelper
 from cat_win.src.service.helper.iohelper import IoHelper, err_print
+from cat_win.src.service.helper.syntaxhighlight import SyntaxHighlighter
 from cat_win.src.service.clipboard import Clipboard
 from cat_win.src.service.rawviewer import SPECIAL_CHARS
 
@@ -41,6 +42,14 @@ class Editor:
     unicode_escaped_search  = True
     unicode_escaped_replace = True
     file_encoding = 'utf-8'
+
+    _SYNTAX_COLOR_IDS = {
+        'keyword': 10,
+        'string':  11,
+        'number':  12,
+        'comment': 13,
+        'builtin': 14,
+    }
 
     def __init__(self, files: list, file_idx: int = 0, file_commit_hash = None) -> None:
         """
@@ -67,6 +76,8 @@ class Editor:
         self._f_content_gen = None
         self.line_sep = '\n'
         self.window_content = []
+        self._syntax_cache: dict = {}
+        self._syntax_highlighter = SyntaxHighlighter.get_plugin(Path(self.file).suffix.casefold())
 
         self.special_chars: dict = {}
         self.search  = '' # str | re.Pattern
@@ -133,6 +144,7 @@ class Editor:
         setup the editor content screen by reading the given file.
         """
         self.window_content = []
+        self._syntax_cache.clear()
         try:
             self.line_sep = IoHelper.get_newline(self.file)
             if self.file_commit_hash is None:
@@ -154,6 +166,35 @@ class Editor:
                 err_print(self.error_bar, priority=err_print.WARNING)
         if not self.window_content:
             self.window_content.append('')
+
+    def _get_syntax_tokens(self, top_row: int, bottom_row: int) -> None:
+        if self._syntax_highlighter is None:
+            return
+
+        start_row = 0
+        start_state = None
+        for prev_row in range(top_row - 1, -1, -1):
+            cached = self._syntax_cache.get(prev_row)
+            if cached is None:
+                continue
+            if cached[0] != self.window_content[prev_row]:
+                continue
+            start_row = prev_row + 1
+            start_state = cached[2]
+            break
+
+        current_state = start_state
+        for current_row in range(start_row, bottom_row):
+            line = self.window_content[current_row]
+            cached = self._syntax_cache.get(current_row)
+
+            if cached is not None and cached[0] == line and cached[1] == current_state:
+                current_state = cached[2]
+                continue
+
+            tokens, end_state = self._syntax_highlighter.tokenize_line(line, current_state)
+            self._syntax_cache[current_row] = (line, current_state, end_state, tokens)
+            current_state = end_state
 
     def getxymax(self) -> tuple:
         """
@@ -1379,7 +1420,7 @@ class Editor:
                     color = self._get_color(9)
 
                 try:
-                    self.curse_window.addstr(row, 0, f"{display_name}"[nav_x:nav_x+max_x], color)
+                    self.curse_window.addstr(row, 0, f"{display_name}".ljust(max_x)[nav_x:nav_x+max_x], color)
                     self.curse_window.clrtoeol()
                 except curses.error:
                     break
@@ -1452,12 +1493,12 @@ class Editor:
                     file_selected_idx = selected_idx
 
                     try:
-                        commits = GitHelper.get_git_file_history(self.files[file_selected_idx][0])
-                        file_commits = [{'hash': '_LOCAL_', 'date': ' _Latest_ ', 'author': '_Local_', 'message': 'Use local file (not git)'}] + commits
-                    except (OSError):
+                        file_commits = GitHelper.get_git_file_history(self.files[file_selected_idx][0])
+                    except OSError:
                         file_commits = None
 
                     if file_commits:
+                        file_commits = [{'hash': '_LOCAL_', 'date': ' _Latest_ ', 'author': '_Local_', 'message': 'Use local file (not git)'}] + file_commits
                         mode = 'commits'
                         selected_idx = 0
                         if self.file_commit_hash is not None:
@@ -1527,6 +1568,7 @@ class Editor:
             f"{'alt+S' if self.save_with_alt else '^S':<{coff}}save file",
             f"{'^R':<{coff}}reload file",
             f"{'Ctrl+F1':<{coff}}open file manager",
+            f"{'F4':<{coff}}open syntax highlighter selection",
             '',
             f"{'^B':<{coff}}put editor in background",
             f"{'^D':<{coff}}interrupt/force close",
@@ -1569,6 +1611,124 @@ class Editor:
         if not self.search:
             return
         self._action_replace(-1)
+
+    def _function_sel_highlight(self) -> None:
+        curses.curs_set(0)
+        self.curse_window.clear()
+
+        available_plugins = SyntaxHighlighter.get_available_plugins()
+        current_plugin_name = next(
+            (k for k, v in available_plugins.items() if v == self._syntax_highlighter),
+            None
+        )
+        selected_idx = 0
+        if self._syntax_highlighter is not None:
+            selected_idx = list(available_plugins.values()).index(self._syntax_highlighter)
+        available_plugins = list(available_plugins.keys())
+
+        max_y, max_x = self.getxymax()
+        max_y += self.status_bar_size - 2
+        nav_x = 0
+        nav_y = max(0, min(selected_idx - max_y // 2, len(available_plugins) - max_y))
+
+        wchar, key = '', b''
+        while str(wchar) != ESC_CODE:
+            maxlen_displayname = max(
+                (len(plugin) for plugin in available_plugins),
+                default=0
+            )
+
+            self.curse_window.move(max_y, 0)
+            self.curse_window.clrtoeol()
+            for row in range(max_y):
+                entry_idx = row + nav_y
+                if entry_idx >= len(available_plugins):
+                    break
+
+                is_selected = selected_idx == entry_idx
+                is_current = available_plugins[entry_idx] == current_plugin_name
+
+                color = 0
+                if is_selected and is_current:
+                    color = self._get_color(8)
+                elif is_selected:
+                    color = self._get_color(1)
+                elif is_current:
+                    color = self._get_color(9)
+
+                try:
+                    self.curse_window.addstr(row, 0, f"Language mode: {available_plugins[entry_idx]}".ljust(max_x)[nav_x:nav_x+max_x], color)
+                    self.curse_window.clrtoeol()
+                except curses.error:
+                    break
+
+                if row == max_y - 1:
+                    if len(available_plugins) > max_y + nav_y:
+                        self.curse_window.addstr(row+1, 0, '...')
+                        self.curse_window.clrtoeol()
+                    break
+            self.curse_window.clrtobot()
+
+            status_msg = 'Select syntax highlighter. Confirm with <Enter> or <Space>.'
+            try:
+                self.curse_window.addstr(
+                    max_y+1, 0,
+                    status_msg[:max_x].ljust(max_x),
+                    self._get_color(1)
+                )
+            except curses.error:
+                pass
+
+            self.curse_window.refresh()
+
+            wchar, key = next(self.get_char)
+            if key in ACTION_HOTKEYS:
+                if key in [b'_action_quit', b'_action_interrupt']:
+                    break
+                if key == b'_action_background':
+                    getattr(self, key.decode(), lambda *_: False)()
+                if key == b'_action_resize':
+                    getattr(self, key.decode(), lambda *_: False)()
+                    max_y, max_x = self.getxymax()
+                    max_y += self.status_bar_size - 2
+            elif key in FUNCTION_HOTKEYS:
+                if key == b'_function_sel_highlight':
+                    wchar, key = ' ', b'_key_string'
+            elif key in MOVE_HOTKEYS:
+                list_len = len(available_plugins)
+                if list_len == 0:
+                    continue
+
+                if key == b'_move_key_up':
+                    selected_idx = max(0, selected_idx - 1)
+                    nav_y = min(nav_y, selected_idx)
+                elif key == b'_move_key_ctl_up':
+                    selected_idx = max(0, selected_idx - 10)
+                    nav_y = min(nav_y, selected_idx)
+                elif key == b'_move_key_down':
+                    selected_idx = min(list_len - 1, selected_idx + 1)
+                    if selected_idx >= nav_y + max_y - 1:
+                        nav_y = selected_idx - max_y + 1
+                elif key == b'_move_key_ctl_down':
+                    selected_idx = min(list_len - 1, selected_idx + 10)
+                    if selected_idx >= nav_y + max_y - 1:
+                        nav_y = selected_idx - max_y + 1
+                elif key == b'_move_key_left':
+                    nav_x = max(0, nav_x - 1)
+                elif key == b'_move_key_ctl_left':
+                    nav_x = max(0, nav_x - 10)
+                elif key == b'_move_key_right':
+                    nav_x = max(0, min(maxlen_displayname - max_x, nav_x + 1))
+                elif key == b'_move_key_ctl_right':
+                    nav_x = max(0, min(maxlen_displayname - max_x, nav_x + 10))
+
+            if key == b'_key_enter' or (key == b'_key_string' and wchar == ' '):
+                _syntax_highlighter = SyntaxHighlighter.get_plugin(available_plugins[selected_idx])
+                if _syntax_highlighter != self._syntax_highlighter:
+                    self._syntax_highlighter = _syntax_highlighter
+                    self._syntax_cache.clear()
+                    self._init_highlighter_colors()
+                break
 
     def _get_new_char(self):
         """
@@ -1673,6 +1833,7 @@ class Editor:
         """
         max_y, max_x = self.getxymax()
         # self._enforce_boundaries()
+        self._get_syntax_tokens(self.wpos.row, min(self.wpos.row+max_y, len(self.window_content)))
 
         # display screen
         self.curse_window.move(0, 0)
@@ -1681,6 +1842,8 @@ class Editor:
             if brow >= len(self.window_content):
                 self.curse_window.clrtobot()
                 break
+
+            syntax_token_idx = 0
             for col in range(max_x):
                 bcol = col + self.wpos.col
                 if bcol >= len(self.window_content[brow]):
@@ -1696,6 +1859,16 @@ class Editor:
                     color = self._get_color(3)
                 elif self.window_content[brow][bcol:].isspace():
                     color = self._get_color(3)
+                elif self._syntax_highlighter is not None:
+                    syntax_tokens = self._syntax_cache.get(brow, [None, None, None, []])[3]
+                    while syntax_token_idx < len(syntax_tokens) and bcol >= syntax_tokens[syntax_token_idx][1]:
+                        syntax_token_idx += 1
+                    if syntax_token_idx < len(syntax_tokens):
+                        token_start, token_end, token_type = syntax_tokens[syntax_token_idx]
+                        if token_start <= bcol < token_end:
+                            syntax_color = self._SYNTAX_COLOR_IDS.get(token_type)
+                            if syntax_color is not None:
+                                color = self._get_color(syntax_color)
 
                 sel_from, sel_to = self.selected_area
                 if self.selecting and sel_from <= (brow, bcol) < sel_to:
@@ -1863,6 +2036,33 @@ class Editor:
                     self.get_char = self._get_new_char()
                     break
 
+    def _init_highlighter_colors(self) -> None:
+        if curses.can_change_color():
+            # syntax-highlight keyword
+            curses.init_pair(10, curses.COLOR_CYAN   , -1)
+            # syntax-highlight string
+            curses.init_pair(11, curses.COLOR_GREEN  , -1)
+            # syntax-highlight number
+            curses.init_pair(12, curses.COLOR_RED+8  , -1)
+            # syntax-highlight comment
+            curses.init_pair(13, curses.COLOR_BLACK+8, -1)
+            # syntax-highlight builtin
+            curses.init_pair(14, curses.COLOR_BLUE   , -1)
+            if self._syntax_highlighter and self._syntax_highlighter.token_color_map:
+                new_color_id = max(self._SYNTAX_COLOR_IDS.values(), default=14) + 1
+                for token_type, color in self._syntax_highlighter.token_color_map.items():
+                    if token_type not in self._SYNTAX_COLOR_IDS:
+                        self._SYNTAX_COLOR_IDS[token_type] = new_color_id
+                        new_color_id += 1
+                    color = color.casefold()
+                    color_offset = 0
+                    if color.startswith('light'):
+                        color = color[5:]
+                        color_offset = 8
+                    curses_color = getattr(curses, f'COLOR_{color.upper()}', None)
+                    if curses_color is not None:
+                        curses.init_pair(self._SYNTAX_COLOR_IDS[token_type], curses_color + color_offset, -1)
+
     def _init_screen(self) -> None:
         """
         init and define curses
@@ -1926,6 +2126,7 @@ class Editor:
         """
         try:
             self._init_screen()
+            self._init_highlighter_colors()
             self._build_file_upto()
             self._run()
         except (Exception, KeyboardInterrupt) as e:

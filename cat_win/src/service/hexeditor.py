@@ -972,7 +972,7 @@ class HexEditor:
                     color = self._get_color(12)
 
                 try:
-                    self.curse_window.addstr(row, 0, f"{display_name}"[nav_x:nav_x+max_x], color)
+                    self.curse_window.addstr(row, 0, f"{display_name}".ljust(max_x)[nav_x:nav_x+max_x], color)
                     self.curse_window.clrtoeol()
                 except curses.error:
                     break
@@ -1043,12 +1043,12 @@ class HexEditor:
                     file_selected_idx = selected_idx
 
                     try:
-                        commits = GitHelper.get_git_file_history(self.files[file_selected_idx][0])
-                        file_commits = [{'hash': '_LOCAL_', 'date': ' _Latest_ ', 'author': '_Local_', 'message': 'Use local file (not git)'}] + commits
-                    except (OSError):
+                        file_commits = GitHelper.get_git_file_history(self.files[file_selected_idx][0])
+                    except OSError:
                         file_commits = None
 
                     if file_commits:
+                        file_commits = [{'hash': '_LOCAL_', 'date': ' _Latest_ ', 'author': '_Local_', 'message': 'Use local file (not git)'}] + file_commits
                         mode = 'commits'
                         selected_idx = 0
                         if self.file_commit_hash is not None:
