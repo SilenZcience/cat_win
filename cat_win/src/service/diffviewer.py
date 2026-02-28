@@ -639,9 +639,9 @@ class DiffViewer:
 
                     start_x = 0 if side == 0 else right_x
                     offset_x = nav_x[side]
-                    text = f"{display_name}"[offset_x:offset_x+list_width]
+                    text = f"{display_name}".ljust(list_width)[offset_x:offset_x+list_width]
                     try:
-                        self.curse_window.addstr(row, start_x, text.ljust(list_width), color)
+                        self.curse_window.addstr(row, start_x, text, color)
                     except curses.error:
                         break
 
@@ -725,12 +725,15 @@ class DiffViewer:
                     for side in (0, 1):
                         file_path = self.files[file_selected_idxs[side]][0]
                         try:
-                            commits = GitHelper.get_git_file_history(file_path)
-                            file_commits[side] = [{'hash': '_LOCAL_', 'date': ' _Latest_ ', 'author': '_Local_', 'message': 'Use local file (not git)'}] + commits
+                            file_commits[side] = GitHelper.get_git_file_history(file_path)
                         except OSError:
                             file_commits[side] = None
 
                     if file_commits[0] or file_commits[1]:
+                        if file_commits[0]:
+                            file_commits[0] = [{'hash': '_LOCAL_', 'date': ' _Latest_ ', 'author': '_Local_', 'message': 'Use local file (not git)'}] + file_commits[0]
+                        if file_commits[1]:
+                            file_commits[1] = [{'hash': '_LOCAL_', 'date': ' _Latest_ ', 'author': '_Local_', 'message': 'Use local file (not git)'}] + file_commits[1]
                         mode = 'commits'
                         selected_idx = [0, 0]
                         for side in (0, 1):
