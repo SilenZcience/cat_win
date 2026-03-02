@@ -83,6 +83,7 @@ class Editor:
         self.search  = '' # str | re.Pattern
         self.replace = ''
         self.search_items: dict = {}
+        self.search_items_focused_span: list = []
 
         self.status_bar_size = 1
         self.error_bar = ''
@@ -1031,6 +1032,9 @@ class Editor:
                     max_y, _ = self.getxymax()
                     cpos = next(search)
                     self.search_items[cpos] = search.s_len
+                    self.search_items_focused_span = list(search.s_rows)
+                    for pos, l in search.s_rows:
+                        self.search_items[pos] = l
                     if not self.selecting:
                         if find_next >= 0:
                             self.cpos.set_pos((max(cpos[0]-max_y, 0), 0))
@@ -1048,6 +1052,8 @@ class Editor:
                         self.cpos.set_pos(search_pos)
                         if search.s_len:
                             self.search_items[search_pos] = search.s_len
+                            for pos, l in search.s_rows:
+                                self.search_items[pos] = l
                     self.cpos.set_pos(cpos)
                     break
                 except StopIteration:
@@ -1537,6 +1543,7 @@ class Editor:
                 nav_x = 0
                 nav_y = max(0, min(selected_idx - max_y // 2, len(self.files) - max_y))
 
+        self.curse_window.clear()
         return True if self.open_next_idx is None else self._action_quit()
 
     def _function_help(self) -> None:
@@ -1904,7 +1911,22 @@ class Editor:
                 self.search_items[self.cpos.get_pos()],
                 self._get_color(4)
             )
+            for (row, col), length in self.search_items_focused_span:
+                if row < self.wpos.row or row >= self.wpos.row+max_y:
+                    continue
+                if col+length < self.wpos.col or col >= self.wpos.col+max_x:
+                    continue
+                if col < self.wpos.col:
+                    length -= self.wpos.col - col
+                    col = self.wpos.col
+                self.curse_window.chgat(
+                    row-self.wpos.row,
+                    col-self.wpos.col,
+                    length,
+                    self._get_color(4)
+                )
         self.search_items.clear()
+        self.search_items_focused_span.clear()
 
         # display status/error_bar
         try:

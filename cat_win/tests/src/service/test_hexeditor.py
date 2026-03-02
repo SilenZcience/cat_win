@@ -82,6 +82,14 @@ class TestHexEditor(TestCase):
         self.assertSequenceEqual(editor.hex_array_edit,
                                  [[None] * 10] * 15 + [[None, '00', None, None, None, None, None, None, None, None]] + [[None] * 10] * 29 + [[None] * 4])
 
+    @patch('cat_win.src.service.hexeditor.GitHelper.get_git_file_bytes_at_commit', MagicMock(return_value=b'ABC'))
+    def test__setup_file_git_content_str(self):
+        editor = HexEditor([(__file__, 'test')], file_commit_hash='deadbeef')
+        self.assertSequenceEqual(editor.hex_array, [['41', '42', '43']])
+        self.assertSequenceEqual(editor.hex_array_edit, [[None, None, None]])
+        self.assertEqual(editor.display_name, 'GIT: test')
+        self.assertTrue(editor.unsaved_progress)
+
     def test__key_dc_empty(self):
         editor = HexEditor([('', '')])
         editor._build_file_upto(0)
@@ -89,16 +97,16 @@ class TestHexEditor(TestCase):
         self.assertEqual(editor.cpos.get_pos(), (0, 0))
 
     @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', IoHelperMock.yield_file_gen(b'@' * 20))
-    def test__get_current_state_row(self):
+    def test__get_current_state_bytes_row(self):
         editor = HexEditor([('', '')])
-        self.assertListEqual(editor._get_current_state_row(0), ['40'] * 16)
-        self.assertListEqual(editor._get_current_state_row(1), ['40'] * 4)
+        self.assertEqual(editor._get_current_state_bytes_row(0), b'@' * 16)
+        self.assertEqual(editor._get_current_state_bytes_row(1), b'@' * 4)
         editor.hex_array_edit[1][3] = '--'
-        self.assertListEqual(editor._get_current_state_row(0), ['40'] * 16)
-        self.assertListEqual(editor._get_current_state_row(1), ['40'] * 3 + ['--'])
+        self.assertEqual(editor._get_current_state_bytes_row(0), b'@' * 16)
+        self.assertEqual(editor._get_current_state_bytes_row(1), b'@' * 3)
         editor.hex_array_edit[0][0] = '21'
-        self.assertListEqual(editor._get_current_state_row(0), ['21'] + ['40'] * 15)
-        self.assertListEqual(editor._get_current_state_row(1), ['40'] * 3 + ['--'])
+        self.assertEqual(editor._get_current_state_bytes_row(0), b'!' + b'@' * 15)
+        self.assertEqual(editor._get_current_state_bytes_row(1), b'@' * 3)
 
     def test__key_dc(self):
         editor = HexEditor([(__file__, '')])
@@ -569,15 +577,15 @@ class TestHexEditor(TestCase):
         ]
         r = [
             [
-                ['22', '0D', '0A', '22'],
+                b'"\r\n"',
             ],
             [
-                ['48', '65', '78', '45', '64', '69', '74', '6F', '72', '5F', '46', '75', '6C', '0D', '0A', '--'],
-                ['74', '65', '67', '72', '61', '74', '69', '6F', '6E', '54', '65', '73', '74'],
+                b'HexEditor_Ful\r\n',
+                b'tegrationTest',
             ],
             [
-                ['48', '65', '78', '45', '64', '69', '74', '6F', '72', '5F', '46', '--', '--', '--', '--', '--'],
-                ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '74'],
+                b'HexEditor_F',
+                b't',
             ],
         ]
         mm.keyname = _keyname
@@ -597,7 +605,7 @@ class TestHexEditor(TestCase):
 
             editor._open()
             for i in range(len(result_)):
-                self.assertSequenceEqual(editor._get_current_state_row(i), result_[i])
+                self.assertSequenceEqual(editor._get_current_state_bytes_row(i), result_[i])
 
         mm.error = mm_backup1
         mm.keyname = mm_backup2

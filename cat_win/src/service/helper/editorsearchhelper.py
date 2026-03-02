@@ -1,6 +1,7 @@
 """
 editorsearchhelper
 """
+import bisect
 import re
 
 
@@ -15,7 +16,9 @@ class _SearchIterBase:
         self._start_x = editor.cpos.col
         self.yielded_result = False
         self.search = self.editor.search
+        self.search_parts = self.search.splitlines() if isinstance(self.search, str) else []
         self.s_len = len(self.search) if isinstance(self.search, str) else 0
+        self.s_rows = []
         self.replace = self.editor.replace
         self.r_len = len(self.replace)
 
@@ -29,10 +32,31 @@ class _SearchIterBase:
         raise NotImplementedError
 
 class _SearchIterUp(_SearchIterBase):
-    def _get_next_pos(self, line: str, col: int = None):
+    def _get_next_pos(self, line: str, col: int = None, row: int = None):
+        self.s_rows = []
         if col is not None and col < 0:
             return -1
         if isinstance(self.search, str):
+            if len(self.search_parts) > 1:
+                if row is None:
+                    return -1
+                content = self.editor.window_content
+                if row + len(self.search_parts) - 1 >= len(content):
+                    return -1
+                c = len(line) - len(self.search_parts[0])
+                if c < 0 or (col is not None and c > col):
+                    return -1
+                if line[c:] != self.search_parts[0]:
+                    return -1
+                for i, part in enumerate(self.search_parts[1:-1], 1):
+                    if content[row + i] != part:
+                        return -1
+                if not content[row + len(self.search_parts) - 1].startswith(self.search_parts[-1]):
+                    return -1
+                self.s_len = len(self.search_parts[0])
+                self.s_rows = [((row + i, 0), len(p))
+                               for i, p in enumerate(self.search_parts[1:], 1)]
+                return c
             if col is not None:
                 col += self.s_len
             found_pos = line.rfind(self.search, 0, col)
@@ -85,17 +109,17 @@ class _SearchIterUp(_SearchIterBase):
         row = self.editor.cpos.row
         col = self.editor.cpos.col - self.offset - self.empty_match_offset
 
-        found_pos = self._get_next_pos(self.editor.window_content[row], col)
+        found_pos = self._get_next_pos(self.editor.window_content[row], col, row)
         if found_pos >= 0:
             return self._stop_if_past_original(row, found_pos)
         if self.wrapped:
             for line_y in range(row-1, self._start_y-1, -1):
-                found_pos = self._get_next_pos(self.editor.window_content[line_y])
+                found_pos = self._get_next_pos(self.editor.window_content[line_y], row=line_y)
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
         else:
             for line_y in range(row-1, -1, -1):
-                found_pos = self._get_next_pos(self.editor.window_content[line_y])
+                found_pos = self._get_next_pos(self.editor.window_content[line_y], row=line_y)
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
             self.editor._build_file()
@@ -103,17 +127,35 @@ class _SearchIterUp(_SearchIterBase):
                 raise StopIteration()
             self.wrapped = True
             for line_y in range(len(self.editor.window_content)-1, self._start_y-1, -1):
-                found_pos = self._get_next_pos(self.editor.window_content[line_y])
+                found_pos = self._get_next_pos(self.editor.window_content[line_y], row=line_y)
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
         raise StopIteration()
 
 class _SearchIterDown(_SearchIterBase):
-    def _get_next_pos(self, line: str, col: int = None):
+    def _get_next_pos(self, line: str, col: int = None, row: int = None):
+        self.s_rows = []
         if col is not None and col > len(line):
             return -1
         line = line[col:]
         if isinstance(self.search, str):
+            if len(self.search_parts) > 1:
+                if row is None:
+                    return -1
+                content = self.editor.window_content
+                if row + len(self.search_parts) - 1 >= len(content):
+                    return -1
+                c = len(line) - len(self.search_parts[0])
+                if c < 0 or line[c:] != self.search_parts[0]:
+                    return -1
+                for i, part in enumerate(self.search_parts[1:-1], 1):
+                    if content[row + i] != part:
+                        return -1
+                if not content[row + len(self.search_parts) - 1].startswith(self.search_parts[-1]):
+                    return -1
+                self.s_len = len(self.search_parts[0])
+                self.s_rows = [((row + i, 0), len(p)) for i, p in enumerate(self.search_parts[1:], 1)]
+                return c
             return line.find(self.search)
         match_ = self.search.search(line)
         if match_ is None:
@@ -153,12 +195,12 @@ class _SearchIterDown(_SearchIterBase):
         row = self.editor.cpos.row
         col = self.editor.cpos.col + self.offset + self.empty_match_offset
 
-        found_pos = self._get_next_pos(self.editor.window_content[row], col)
+        found_pos = self._get_next_pos(self.editor.window_content[row], col, row)
         if found_pos >= 0:
             return self._stop_if_past_original(row, found_pos+col)
         if self.wrapped:
             for line_y in range(row+1, self._start_y+1):
-                found_pos = self._get_next_pos(self.editor.window_content[line_y])
+                found_pos = self._get_next_pos(self.editor.window_content[line_y], row=line_y)
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
         else:
@@ -166,7 +208,7 @@ class _SearchIterDown(_SearchIterBase):
             while content_len != len(self.editor.window_content):
                 content_len = len(self.editor.window_content)
                 for line_y in range(row+1, len(self.editor.window_content)):
-                    found_pos = self._get_next_pos(self.editor.window_content[line_y])
+                    found_pos = self._get_next_pos(self.editor.window_content[line_y], row=line_y)
                     if found_pos >= 0:
                         return self._stop_if_past_original(line_y, found_pos)
                 self.editor._build_file_upto(content_len+30)
@@ -174,7 +216,7 @@ class _SearchIterDown(_SearchIterBase):
                 raise StopIteration()
             self.wrapped = True
             for line_y in range(0, self._start_y+1):
-                found_pos = self._get_next_pos(self.editor.window_content[line_y])
+                found_pos = self._get_next_pos(self.editor.window_content[line_y], row=line_y)
                 if found_pos >= 0:
                     return self._stop_if_past_original(line_y, found_pos)
         raise StopIteration()
@@ -193,11 +235,28 @@ class _SearchIterHexBase:
         self.wrapped = False
         self._start_y = editor.cpos.row
         self._start_x = editor.cpos.col + offset
-        self.search = self.editor.search
-        self.s_len = len(self.search)
+        self.search = bytes.fromhex(editor.search)
+        self.s_len = len(editor.search)
+
+        editor._build_file()
+        row_bytes_list = [editor._get_current_state_bytes_row(i)
+                          for i in range(len(editor.hex_array))]
+        self._row_offsets = [0]
+        for rb in row_bytes_list:
+            self._row_offsets.append(self._row_offsets[-1] + len(rb))
+        self._file_bytes = b''.join(row_bytes_list)
+        self._start_pos_flat = self._pos_to_flat(self._start_y, self._start_x)
 
     def __iter__(self):
         return self
+
+    def _flat_to_pos(self, flat_idx: int) -> tuple:
+        row = bisect.bisect_right(self._row_offsets, flat_idx) - 1
+        col = flat_idx - self._row_offsets[row]
+        return (row, col)
+
+    def _pos_to_flat(self, row: int, col: int) -> int:
+        return self._row_offsets[row] + col
 
     def _stop_if_past_original(self, row: int, f_col: int) -> tuple:
         raise NotImplementedError
@@ -206,20 +265,6 @@ class _SearchIterHexBase:
         raise NotImplementedError
 
 class _SearchIterHexUp(_SearchIterHexBase):
-    def _get_next_pos(self, row: int, col: int = None):
-        search_in = ''.join(self.editor._get_current_state_row(row))
-        if col is None:
-            col = len(search_in)//2
-        search_wrap = ''
-        while self.s_len-1 > len(search_wrap) and row < len(self.editor.hex_array)-1:
-            row += 1
-            search_wrap += ''.join(self.editor._get_current_state_row(row))
-        search_in += search_wrap[:self.s_len-1]
-        for i in range(col*2, -1, -2):
-            if search_in[i:].startswith(self.search):
-                return i//2
-        return -1
-
     def _stop_if_past_original(self, row: int, f_col: int) -> tuple:
         if self.wrapped and (
             row < self._start_y or
@@ -236,43 +281,26 @@ class _SearchIterHexUp(_SearchIterHexBase):
         row = self.editor.cpos.row
         col = self.editor.cpos.col - self.offset
 
-        found_pos = self._get_next_pos(row, col)
-        if found_pos >= 0:
-            return self._stop_if_past_original(row, found_pos)
+        end_flat = self._pos_to_flat(row, col) + len(self.search)
+
         if self.wrapped:
-            for line_y in range(row-1, self._start_y-1, -1):
-                found_pos = self._get_next_pos(line_y)
-                if found_pos >= 0:
-                    return self._stop_if_past_original(line_y, found_pos)
+            found = self._file_bytes.rfind(self.search, self._start_pos_flat, end_flat)
+        elif self.editor.selecting:
+            sel_start_flat = self._pos_to_flat(*self.editor.selected_area[0])
+            found = self._file_bytes.rfind(self.search, sel_start_flat, end_flat)
         else:
-            for line_y in range(row-1, -1, -1):
-                found_pos = self._get_next_pos(line_y)
-                if found_pos >= 0:
-                    return self._stop_if_past_original(line_y, found_pos)
-            self.editor._build_file()
-            if self.editor.selecting:
-                raise StopIteration()
-            self.wrapped = True
-            for line_y in range(len(self.editor.hex_array)-1, self._start_y-1, -1):
-                found_pos = self._get_next_pos(line_y)
-                if found_pos >= 0:
-                    return self._stop_if_past_original(line_y, found_pos)
+            found = self._file_bytes.rfind(self.search, 0, end_flat)
+            if found < 0:
+                if self.editor.selecting:
+                    raise StopIteration()
+                self.wrapped = True
+                found = self._file_bytes.rfind(self.search, self._start_pos_flat)
+
+        if found >= 0:
+            return self._stop_if_past_original(*self._flat_to_pos(found))
         raise StopIteration()
 
 class _SearchIterHexDown(_SearchIterHexBase):
-    def _get_next_pos(self, row: int, col: int = 0):
-        search_in = ''.join(self.editor._get_current_state_row(row)[col:])
-        search_wrap = ''
-        while self.s_len-1 > len(search_wrap) and row < len(self.editor.hex_array)-1:
-            row += 1
-            search_wrap += ''.join(self.editor._get_current_state_row(row))
-        search_in += search_wrap[:self.s_len-1]
-
-        for i in range(0, len(search_in)-len(self.search)+1, 2):
-            if search_in[i:].startswith(self.search):
-                return i//2
-        return -1
-
     def _stop_if_past_original(self, row: int, f_col: int) -> tuple:
         if self.wrapped and (
             row > self._start_y or
@@ -288,31 +316,23 @@ class _SearchIterHexDown(_SearchIterHexBase):
     def __next__(self) -> tuple:
         row = self.editor.cpos.row
         col = self.editor.cpos.col + self.offset
+        start_flat = self._pos_to_flat(row, col)
 
-        found_pos = self._get_next_pos(row, col)
-        if found_pos >= 0:
-            return self._stop_if_past_original(row, found_pos+col)
         if self.wrapped:
-            for line_y in range(row+1, self._start_y+1):
-                found_pos = self._get_next_pos(line_y)
-                if found_pos >= 0:
-                    return self._stop_if_past_original(line_y, found_pos)
+            found = self._file_bytes.find(self.search, start_flat, self._start_pos_flat + len(self.search))
+        elif self.editor.selecting:
+            sel_end_flat = self._pos_to_flat(*self.editor.selected_area[1])
+            found = self._file_bytes.find(self.search, start_flat, sel_end_flat)
         else:
-            content_len = -1
-            while content_len != len(self.editor.hex_array):
-                content_len = len(self.editor.hex_array)
-                for line_y in range(row+1, len(self.editor.hex_array)):
-                    found_pos = self._get_next_pos(line_y)
-                    if found_pos >= 0:
-                        return self._stop_if_past_original(line_y, found_pos)
-                self.editor._build_file_upto(content_len+30)
-            if self.editor.selecting:
-                raise StopIteration()
-            self.wrapped = True
-            for line_y in range(0, self._start_y+1):
-                found_pos = self._get_next_pos(line_y)
-                if found_pos >= 0:
-                    return self._stop_if_past_original(line_y, found_pos)
+            found = self._file_bytes.find(self.search, start_flat)
+            if found < 0:
+                if self.editor.selecting:
+                    raise StopIteration()
+                self.wrapped = True
+                found = self._file_bytes.find(self.search, 0, self._start_pos_flat + len(self.search))
+
+        if found >= 0:
+            return self._stop_if_past_original(*self._flat_to_pos(found))
         raise StopIteration()
 
 
