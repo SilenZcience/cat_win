@@ -790,6 +790,7 @@ class DiffViewer:
                     max(0, min(selected_idx[1] - max_y // 2, len(self.files) - max_y))
                 ]
 
+        self.curse_window.clear()
         return self.open_next_idxs is None
 
     def _function_help(self) -> None:

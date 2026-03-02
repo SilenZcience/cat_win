@@ -8,6 +8,7 @@ try:
     CURSES_MODULE_ERROR = False
 except ImportError:
     CURSES_MODULE_ERROR = True
+import itertools
 import os
 import signal
 import sys
@@ -118,31 +119,42 @@ class HexEditor:
             from_y += (from_x // HexEditor.columns)
             from_x = from_x % HexEditor.columns
 
-    def _build_file(self):
-        for _byte in self._f_content_gen:
-            if len(self.hex_array[-1]) >= HexEditor.columns:
-                self.hex_array.append([])
-                self.hex_array_edit.append([])
-            self.hex_array[-1].append(f"{_byte:02X}")
-            self.hex_array_edit[-1].append(None)
+    def _append_raw_bytes(self, raw: bytes) -> None:
+        columns = HexEditor.columns
+        hex_str = raw.hex().upper()
+        pairs = [hex_str[i:i+2] for i in range(0, len(hex_str), 2)]
 
-    def _yield_next_bytes(self, n: int):
-        for _ in range(n):
-            try:
-                yield f"{next(self._f_content_gen):02X}"
-            except StopIteration:
+        space = columns - len(self.hex_array[-1])
+        if space > 0:
+            take = pairs[:space]
+            self.hex_array[-1].extend(take)
+            self.hex_array_edit[-1].extend([None] * len(take))
+            pairs = pairs[space:]
+
+        full_rows = len(pairs) // columns
+        for i in range(full_rows):
+            self.hex_array.append(pairs[i*columns:(i+1)*columns])
+            self.hex_array_edit.append([None] * columns)
+
+        tail = pairs[full_rows*columns:]
+        if tail:
+            self.hex_array.append(tail)
+            self.hex_array_edit.append([None] * len(tail))
+
+    def _build_file(self):
+        while True:
+            raw = bytes(itertools.islice(self._f_content_gen, HexEditor.columns * 256))
+            if not raw:
                 break
+            self._append_raw_bytes(raw)
 
     def _build_file_upto(self, to_row: int) -> None:
         if len(self.hex_array) >= to_row:
             return
-        next_bytes = self._yield_next_bytes((to_row-len(self.hex_array))*HexEditor.columns)
-        for _byte in next_bytes:
-            if len(self.hex_array[-1]) >= HexEditor.columns:
-                self.hex_array.append([])
-                self.hex_array_edit.append([])
-            self.hex_array[-1].append(_byte)
-            self.hex_array_edit[-1].append(None)
+        needed = (to_row - len(self.hex_array)) * HexEditor.columns
+        raw = bytes(itertools.islice(self._f_content_gen, needed))
+        if raw:
+            self._append_raw_bytes(raw)
 
     def _setup_file(self, first_setup: bool = True) -> None:
         """
@@ -177,25 +189,34 @@ class HexEditor:
             if self.debug_mode:
                 err_print(self.error_bar, priority=err_print.WARNING)
 
-    def _get_current_state_row(self, row: int) -> list:
+    def _get_current_state_bytes_row(self, row: int) -> bytes:
         """
-        get the current state of the hex row
+        get the current state of the hex row as bytes
 
         Parameters:
         row (int):
             the row to get
 
         Returns:
-        hex_row (list):
-            the row in the current edited state
+        hex_row (bytes):
+            the row in the current edited state as a bytes object
         """
-        hex_row = []
-        for j, byte in enumerate(self.hex_array[row]):
-            hex_byte = self.hex_array_edit[row][j]
+        edit_row = self.hex_array_edit[row]
+        base_row = self.hex_array[row]
+
+        if edit_row.count(None) == len(base_row):
+            try:
+                return bytes.fromhex(''.join(base_row))
+            except ValueError:
+                pass
+        parts = []
+        for j, byte in enumerate(base_row):
+            hex_byte = edit_row[j]
             if hex_byte is None:
                 hex_byte = byte
-            hex_row.append(hex_byte)
-        return hex_row
+            if '-' not in hex_byte:
+                parts.append(hex_byte)
+        return bytes.fromhex(''.join(parts))
 
     def getxymax(self) -> tuple:
         """
@@ -544,11 +565,7 @@ class HexEditor:
         bytes_loaded+= len(self.hex_array[-1])
         content = bytearray()
         for i in range(len(self.hex_array)):
-            for hex_byte in self._get_current_state_row(i):
-                try:
-                    content.extend(bytes.fromhex(hex_byte))
-                except ValueError:
-                    pass
+            content.extend(self._get_current_state_bytes_row(i))
         content.extend(bytes(self._f_content_gen))
         try:
             IoHelper.write_file(self.file, content)
@@ -1087,6 +1104,7 @@ class HexEditor:
                 nav_x = 0
                 nav_y = max(0, min(selected_idx - max_y // 2, len(self.files) - max_y))
 
+        self.curse_window.clear()
         return True if self.open_next_idx is None else self._action_quit()
 
     def _function_help(self) -> None:
