@@ -1623,7 +1623,7 @@ class Editor:
         curses.curs_set(0)
         self.curse_window.clear()
 
-        available_plugins = SyntaxHighlighter.get_available_plugins()
+        available_plugins, extensions_by_name = SyntaxHighlighter.get_available_plugins()
         current_plugin_name = next(
             (k for k, v in available_plugins.items() if v == self._syntax_highlighter),
             None
@@ -1664,7 +1664,11 @@ class Editor:
                     color = self._get_color(9)
 
                 try:
-                    self.curse_window.addstr(row, 0, f"Language mode: {available_plugins[entry_idx]}".ljust(max_x)[nav_x:nav_x+max_x], color)
+                    self.curse_window.addstr(
+                        row, 0,
+                        f"Language mode: {available_plugins[entry_idx]} {extensions_by_name.get(available_plugins[entry_idx], '')}".ljust(max_x)[nav_x:nav_x+max_x],
+                        color
+                    )
                     self.curse_window.clrtoeol()
                 except curses.error:
                     break

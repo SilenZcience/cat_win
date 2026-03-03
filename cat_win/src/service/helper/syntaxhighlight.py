@@ -31,6 +31,7 @@ class SyntaxHighlighter:
     """
     _plugins_by_name = {}
     _plugins_by_extension = {}
+    _extensions_by_name = {}
 
     def __init__(
         self,
@@ -104,6 +105,7 @@ class SyntaxHighlighter:
         )
 
         SyntaxHighlighter._plugins_by_name[name.casefold()] = tokenizer
+        SyntaxHighlighter._extensions_by_name[name.casefold()] = extensions
         for extension in extensions:
             SyntaxHighlighter._plugins_by_extension[str(extension).casefold()] = tokenizer
 
@@ -116,8 +118,8 @@ class SyntaxHighlighter:
             SyntaxHighlighter._plugins_by_name.get(lookup_key)
 
     @staticmethod
-    def get_available_plugins() -> dict:
-        return SyntaxHighlighter._plugins_by_name
+    def get_available_plugins() -> tuple:
+        return SyntaxHighlighter._plugins_by_name, SyntaxHighlighter._extensions_by_name
 
     @staticmethod
     def _build_plain_regex_and_tokens(
@@ -307,20 +309,21 @@ SyntaxHighlighter.register(
         'instanceof', 'native', 'new',
         'return',
         'strictfp', 'super', 'switch', 'synchronized', 'this', 'throw', 'throws',
-        'transient', 'try', 'volatile', 'while', 'true', 'false', 'null',
+        'transient', 'try', 'volatile',
+        'while', 'true', 'false', 'null',
         'var', 'record', 'sealed', 'permits', 'non-sealed',
     ),
     lex_builtins=(
-        "toString", "equals", "hashCode", "getClass", "clone", "wait", "notify", "notifyAll",
-        "currentTimeMillis", "nanoTime", "exit", "gc", "getProperty", "getenv", "arraycopy",
-        "lineSeparator",
-        "abs", "max", "min", "sqrt", "pow", "round", "ceil", "floor", "random", "sin", "cos",
-        "tan", "log", "log10", "exp",
-        "length", "isEmpty", "charAt", "substring", "indexOf", "lastIndexOf", "contains",
-        "equalsIgnoreCase", "toUpperCase", "toLowerCase", "trim", "replace", "replaceAll",
-        "split", "startsWith", "endsWith", "valueOf", "format",
-        "parseInt", "parseDouble", "parseLong", "compareTo",
-        "print", "println", "printf",
+        'toString', 'equals', 'hashCode', 'getClass', 'clone', 'wait', 'notify', 'notifyAll',
+        'currentTimeMillis', 'nanoTime', 'exit', 'gc', 'getProperty', 'getenv', 'arraycopy',
+        'lineSeparator',
+        'abs', 'max', 'min', 'sqrt', 'pow', 'round', 'ceil', 'floor', 'random', 'sin', 'cos',
+        'tan', 'log', 'log10', 'exp',
+        'length', 'isEmpty', 'charAt', 'substring', 'indexOf', 'lastIndexOf', 'contains',
+        'equalsIgnoreCase', 'toUpperCase', 'toLowerCase', 'trim', 'replace', 'replaceAll',
+        'split', 'startsWith', 'endsWith', 'valueOf', 'format',
+        'parseInt', 'parseDouble', 'parseLong', 'compareTo',
+        'print', 'println', 'printf',
     ),
     extra_plain_patterns=(
         r"(?P<import_keyword>\b(?:import|package)\b)",
