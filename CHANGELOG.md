@@ -9,12 +9,16 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - added basic git support to the (hex-)editor to load the git history of a file.
 - further improvements to the file selection menu inside the diffviewer.
+- added colored syntax highlighting to the editor. custom selections can be made when pressing `F4` to open the syntax highlighter manager.
+- expanded the editor-search to support multiple lines when searching for literal strings.
 
 ### Bugfixes
 
 - fixed Bug where the diffviewer would crash on empty files.
 - fixed bug where the the diffviewer would not correctly open the next selected file/hash.
-- fixed bug where the diffviewer would not correctly jump to the next diff when pressin `F2`.
+- fixed bug where the diffviewer would not correctly jump to the next diff when pressing `F2`.
+- fixed visual Bugs in the curses applications.
+
 
 
 ## [1.10.6] - 2026-02-16

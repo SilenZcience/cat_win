@@ -16,7 +16,7 @@ class _SearchIterBase:
         self._start_x = editor.cpos.col
         self.yielded_result = False
         self.search = self.editor.search
-        self.search_parts = self.search.splitlines() if isinstance(self.search, str) else []
+        self.search_parts = self.search.split(self.editor.line_sep) if isinstance(self.search, str) else []
         self.s_len = len(self.search) if isinstance(self.search, str) else 0
         self.s_rows = []
         self.replace = self.editor.replace
