@@ -10,7 +10,7 @@ from collections import deque
 from datetime import datetime
 from functools import lru_cache
 from itertools import groupby
-from time import monotonic
+from time import monotonic, sleep
 import os
 import shlex
 import sys
@@ -880,6 +880,21 @@ def edit_files() -> None:
             edit_file(i)
         else:
             print_raw_view(i, raw_view_mode)
+    if u_args[ARGS_WATCH]:
+        mtimes = {f.path: get_file_mtime(f.path) for f in u_files}
+        try:
+            while True:
+                sleep(2)
+                for i in range(start, end, -1 if u_args[ARGS_REVERSE] else 1):
+                    if get_file_mtime(u_files[i].path) != mtimes[u_files[i].path]:
+                        mtimes[u_files[i].path] = get_file_mtime(u_files[i].path)
+                        err_print(f"File '{u_files[i].displayname}' has been modified. Reloading ...", priority=err_print.INFORMATION)
+                        if raw_view_mode is None:
+                            edit_file(i)
+                        else:
+                            print_raw_view(i, raw_view_mode)
+        except KeyboardInterrupt:
+            pass
     if u_args[ARGS_FILES] or u_args[ARGS_DIRECTORIES]:
         print()
         if u_args[ARGS_FILES]:

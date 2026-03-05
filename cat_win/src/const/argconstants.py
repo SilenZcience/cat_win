@@ -50,6 +50,7 @@ ARGS_VISUALIZE_B, ARGS_VISUALIZE_Z, ARGS_VISUALIZE_H = range(1100, 1103)
 ARGS_VISUALIZE_E, ARGS_VISUALIZE_D                   = range(1103, 1105)
 # behavioural
 ARGS_CLIP, ARGS_DOTFILES, ARGS_PLAIN_ONLY, ARGS_NOCOL = range(1200, 1204)
+ARGS_WATCH, = range(1204, 1205)
 # configuration
 ARGS_CONFIG, ARGS_CCONFIG, ARGS_CONFIG_FLUSH = range(1300, 1303)
 ARGS_CCONFIG_FLUSH, ARGS_CONFIG_REMOVE       = range(1303, 1305)
@@ -211,6 +212,8 @@ ALL_ARGS = [
 				ARGS_PLAIN_ONLY, show_arg_on_repl=False, section=12),
     ArgConstant('--nc', '--nocolor', 'disable colored output',
 				ARGS_NOCOL, section=12),
+    ArgConstant('--watch', '--track', 'watch files for changes and update the output',
+                ARGS_WATCH, section=12),
 
     # configuration
     ArgConstant('--config', '--config', 'change default parameters',
