@@ -18,6 +18,7 @@ class DKW:
     SUMMARY_UNIQUE_ELEMENTS = 'summary_unique_elements'
     STRINGS_MIN_SEQUENCE_LENGTH = 'strings_minimum_sequence_length'
     STRINGS_DELIMETER = 'strings_delimeter'
+    GREP_CONTEXT_LINES = 'grep_context_lines'
     EDITOR_INDENTATION = 'editor_indentation'
     EDITOR_AUTO_INDENT = 'editor_auto_indent'
     HEX_EDITOR_COLUMNS = 'hex_editor_columns'
