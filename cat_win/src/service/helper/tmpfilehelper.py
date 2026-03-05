@@ -32,7 +32,8 @@ class TmpFileHelper:
         (Path):
             the path to the new file
         """
-        tmp_file = Path(tempfile.NamedTemporaryFile(delete=False).name)
+        with tempfile.NamedTemporaryFile(delete=False) as f:
+            tmp_file = Path(f.name)
         self.tmp_files.append(tmp_file)
         self.tmp_count += 1
         return tmp_file
