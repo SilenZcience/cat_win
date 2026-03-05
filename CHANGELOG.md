@@ -11,6 +11,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - further improvements to the file selection menu inside the diffviewer.
 - added colored syntax highlighting to the editor. custom selections can be made when pressing `F4` to open the syntax highlighter manager.
 - expanded the editor-search to support multiple lines when searching for literal strings.
+- added `grep_context_lines` element to the config menu to define the amount of context line displayed before and after every grep-line.
 
 ### Bugfixes
 
@@ -18,7 +19,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fixed bug where the the diffviewer would not correctly open the next selected file/hash.
 - fixed bug where the diffviewer would not correctly jump to the next diff when pressing `F2`.
 - fixed visual Bugs in the curses applications.
-
+- fixed Bug in the cat-repl (cats) that would crash the application when using `!del` on an unknown search query.
 
 
 ## [1.10.6] - 2026-02-16
