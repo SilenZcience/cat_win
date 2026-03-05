@@ -513,7 +513,11 @@ SyntaxHighlighter.register(
         'co_await', 'co_return', 'co_yield', 'try', 'throw', 'this',
         'static_cast', 'reinterpret_cast', 'nullptr', 'new', 'noexcept',
         'dynamic_cast', 'catch',  'const_cast', 'delete',
-        'operator', 'reinterpret_cast', 'static_assert', 'typeid', 'typename', 'alignas', 'alignof', 'decltype',
+        'operator', 'static_assert', 'typeid', 'typename', 'alignas', 'alignof', 'decltype',
+        'and', 'and_eq', 'atomic_cancel', 'atomic_commit', 'atomic_noexcept', 'bitand',
+        'bitor', 'compl', 'contract_assert', 'not', 'not_eq', 'or', 'or_eq', 'reflexpr',
+        'synchronized', 'typename', 'xor', 'xor_eq',
+
     ),
     lex_builtins=(
         'printf', 'scanf', 'fprintf', 'fscanf', 'sprintf', 'sscanf', 'snprintf',
@@ -534,10 +538,11 @@ SyntaxHighlighter.register(
         'qsort', 'bsearch', 'NULL',
     ),
     extra_plain_patterns=(
-        r"(?P<type_keyword>\b(?:unsigned|double|signed|float|short|void|char|long|int|bool|friend|mutable|explicit|volatile|namespace|public|protected|privateunion|const|enum|virtual|template|extern|static|register|restrict|class|final|override|thread_local|consteval|constexpr|wchar_t)\b)",
-        r"(?P<red_keyword>\b(?:concept|requires|constinit|using|export)\b)",
-        r"(?P<preprocessor>#(?:include|define|undef|ifdef|ifndef|elif|endif|pragma|error|warning|line|if|else)\b)",
+        r"(?P<type_keyword>\b(?:unsigned|double|signed|float|short|void|char|long|int|bool|friend|mutable|explicit|volatile|namespace|public|protected|private|union|const|enum|virtual|template|extern|static|register|restrict|class|final|override|thread_local|consteval|constexpr|wchar_t)\b)",
+        r"(?P<red_keyword>\b(?:concept|requires|constinit|using|export|import|module)\b)",
+        r"(?P<preprocessor>#(?:include|define|defined|undef|ifdef|ifndef|elifdef|elifndef|elif|endif|pragma|error|warning|line|embed|if|else)\b)",
         r"(?P<typedef>\b(?:typedef|struct)\b)",
+        r"(?P<charclass>\b(?:char8_t|char16_t|char32_t)\b)",
         r"(?P<symbols>[\[\]\{\}\(\)\+\-\*\/\=\%\<\>\&\|\^\~\.\!\?\:\,\;])",
     ),
     extra_group_to_token={
@@ -546,6 +551,7 @@ SyntaxHighlighter.register(
         'preprocessor': 'preprocessor',
         'symbols': 'symbols',
         'typedef': 'typedef',
+        'charclass': 'charclass',
     },
     number_pattern=r"""
 (?<![0-9A-Za-z_.$+\-])
@@ -570,5 +576,6 @@ SyntaxHighlighter.register(
         'preprocessor': 'cyan',
         'symbols': 'yellow',
         'typedef': 'red',
+        'charclass': 'yellow',
     }
 )
