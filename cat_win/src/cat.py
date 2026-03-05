@@ -6,6 +6,7 @@ try:
     from colorama import init as coloramaInit
 except ImportError:
     nop = lambda *_, **__: None; coloramaInit = nop
+from collections import deque
 from datetime import datetime
 from functools import lru_cache
 from itertools import groupby
@@ -462,7 +463,9 @@ def print_file(content: list, stepper: More) -> bool:
                 print(line_prefix + cleaned_line)
         return contains_queried
 
-    for line_prefix, line in content:
+    last_grep_line = -const_dic[DKW.GREP_CONTEXT_LINES]-1
+    grep_context_dq = deque(maxlen=const_dic[DKW.GREP_CONTEXT_LINES])
+    for c_idx, (line_prefix, line) in enumerate(content):
         cleaned_line = remove_ansi_codes_from_line(line)
         intervals, f_keywords, m_keywords = string_finder.find_keywords(cleaned_line)
 
@@ -497,12 +500,22 @@ def print_file(content: list, stepper: More) -> bool:
         #     1     |  1   |     0     ->   1
         #     1     |  1   |     1     ->   0
         if not intervals:
-            if not u_args[ARGS_GREP]:
+            if not u_args[ARGS_GREP] or c_idx - last_grep_line <= const_dic[DKW.GREP_CONTEXT_LINES]:
                 if u_args[ARGS_MORE]:
                     stepper.add_line(line_prefix + line)
                     continue
                 print(line_prefix + line)
+            elif u_args[ARGS_GREP]:
+                grep_context_dq.append(line_prefix + line)
             continue
+
+        for grep_line in grep_context_dq:
+            if u_args[ARGS_MORE]:
+                stepper.add_line(grep_line)
+            else:
+                print(grep_line)
+        grep_context_dq.clear()
+        last_grep_line = c_idx
 
         if u_args[ARGS_NOKEYWORD]:
             continue
