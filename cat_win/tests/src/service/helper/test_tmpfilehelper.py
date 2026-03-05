@@ -8,6 +8,7 @@ from cat_win.src.service.helper.tmpfilehelper import TmpFileHelper
 mm = MagicMock()
 mock_file = MagicMock()
 mock_file.name = "magic"
+mock_file.__enter__ = MagicMock(return_value=mock_file)
 mm.return_value = mock_file
 
 @patch('tempfile.NamedTemporaryFile', mm)
