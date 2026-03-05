@@ -212,7 +212,7 @@ ALL_ARGS = [
 				ARGS_PLAIN_ONLY, show_arg_on_repl=False, section=12),
     ArgConstant('--nc', '--nocolor', 'disable colored output',
 				ARGS_NOCOL, section=12),
-    ArgConstant('--watch', '--track', 'watch files for changes and update the output',
+    ArgConstant('--watch', '--track', 'watch files for changes and continuously update the output',
                 ARGS_WATCH, section=12),
 
     # configuration
