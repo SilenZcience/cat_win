@@ -288,7 +288,8 @@ class ArgParser:
                 pass
             query_element = (query, param[:p_length].isupper())
             if delete:
-                self.file_queries.remove(query_element)
+                if query_element in self.file_queries:
+                    self.file_queries.remove(query_element)
                 return False
             self.file_queries.append(query_element)
             return False
