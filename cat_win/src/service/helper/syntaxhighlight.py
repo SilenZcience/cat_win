@@ -41,6 +41,7 @@ class SyntaxHighlighter:
         line_comment_prefixes: tuple,
         multiline_delimiters: tuple,
         multiline_end_map: dict,
+        multiline_case_insensitive: bool,
         delimiter_escape_char: str,
         state_token_map: dict,
         token_color_map: dict,
@@ -51,6 +52,7 @@ class SyntaxHighlighter:
         self.line_comment_prefixes = line_comment_prefixes
         self.multiline_delimiters = multiline_delimiters
         self.multiline_end_map = multiline_end_map
+        self.multiline_case_insensitive = multiline_case_insensitive
         self.delimiter_escape_char = delimiter_escape_char
         self.state_token_map = state_token_map
         self.token_color_map = token_color_map
@@ -60,7 +62,9 @@ class SyntaxHighlighter:
             name: str,
             extensions: tuple,
             lex_keywords: tuple = (),
+            lex_keywords_case_insensitive: bool = False,
             lex_builtins: tuple = (),
+            lex_builtins_case_insensitive: bool = False,
             number_pattern: str = None,
             extra_plain_patterns: tuple = (),
             extra_group_to_token: dict = None,
@@ -68,6 +72,7 @@ class SyntaxHighlighter:
             line_comment_prefixes: tuple = (),
             multiline_delimiters: tuple = (),
             multiline_end_delimiters: dict = None,
+            multiline_delimiters_case_insensitive: bool = False,
             state_token_map: dict = None,
             delimiter_escape_char: str = '\\',
             token_color_map: dict = None,
@@ -79,7 +84,9 @@ class SyntaxHighlighter:
 
         plain_pattern, group_to_token = SyntaxHighlighter._build_plain_regex_and_tokens(
             lex_keywords=lex_keywords,
+            lex_keywords_case_insensitive=lex_keywords_case_insensitive,
             lex_builtins=lex_builtins,
+            lex_builtins_case_insensitive=lex_builtins_case_insensitive,
             number_pattern=number_pattern,
             extra_plain_patterns=extra_plain_patterns,
             extra_group_to_token=extra_group_to_token or {}
@@ -97,6 +104,7 @@ class SyntaxHighlighter:
                 delimiter: multiline_end_delimiters.get(delimiter, delimiter)
                 for delimiter in multiline_delimiters
             },
+            multiline_case_insensitive=multiline_delimiters_case_insensitive,
             line_comment_prefixes=line_comment_prefixes,
             simple_string_pattern=re.compile(simple_string_pattern) if simple_string_pattern else None,
             state_token_map=state_token_map or {},
@@ -119,12 +127,14 @@ class SyntaxHighlighter:
 
     @staticmethod
     def get_available_plugins() -> tuple:
-        return SyntaxHighlighter._plugins_by_name, SyntaxHighlighter._extensions_by_name
+        return dict(sorted(SyntaxHighlighter._plugins_by_name.items())), SyntaxHighlighter._extensions_by_name
 
     @staticmethod
     def _build_plain_regex_and_tokens(
             lex_keywords: tuple = (),
+            lex_keywords_case_insensitive: bool = False,
             lex_builtins: tuple = (),
+            lex_builtins_case_insensitive: bool = False,
             number_pattern: str = None,
             extra_plain_patterns: tuple = (),
             extra_group_to_token: dict = None
@@ -138,11 +148,13 @@ class SyntaxHighlighter:
 
         if lex_keywords:
             word_pattern = '|'.join(sorted(lex_keywords, key=len, reverse=True))
-            parts.append(r"(?P<keyword>\b(?:" + word_pattern + r")\b)")
+            i = 'i' * lex_keywords_case_insensitive
+            parts.append(fr"(?P<keyword>\b(?{i}:" + word_pattern + r")\b)")
 
         if lex_builtins:
             word_pattern = '|'.join(sorted(lex_builtins, key=len, reverse=True))
-            parts.append(r"(?P<builtin>\b(?:" + word_pattern + r")\b(?=\s*\())")
+            i = 'i' * lex_builtins_case_insensitive
+            parts.append(fr"(?P<builtin>\b(?{i}:" + word_pattern + r")\b(?=\s*\())")
 
         if number_pattern:
             parts.append(r"(?P<number>(?x:" + number_pattern + r"))")
@@ -165,6 +177,7 @@ class SyntaxHighlighter:
 
         multiline_delimiters = self.multiline_delimiters
         multiline_end_map = self.multiline_end_map
+        multiline_case_insensitive = self.multiline_case_insensitive
         state_token_map = self.state_token_map
         line_comment_prefixes = self.line_comment_prefixes
         plain_pattern = self.plain_pattern
@@ -175,10 +188,16 @@ class SyntaxHighlighter:
         if not line and active_state in multiline_delimiters:
             return tokens, active_state
 
+        if multiline_case_insensitive:
+            _line_ci = line.lower()
+            _mfind = lambda needle, start: _line_ci.find(needle.lower(), start)
+        else:
+            _mfind = line.find
+
         while idx < len(line):
             if active_state in multiline_delimiters:
                 end_delimiter = multiline_end_map.get(active_state, active_state)
-                end_idx = line.find(end_delimiter, idx)
+                end_idx = _mfind(end_delimiter, idx)
                 state_token = state_token_map.get(active_state, TOKEN_STRING)
                 if end_idx < 0:
                     tokens.append((idx, len(line), state_token))
@@ -193,7 +212,7 @@ class SyntaxHighlighter:
             next_value = None
 
             for delimiter in multiline_delimiters:
-                delimiter_idx = line.find(delimiter, idx)
+                delimiter_idx = _mfind(delimiter, idx)
                 if delimiter_idx >= 0 and delimiter_idx < next_special:
                     if delimiter_escape_char and delimiter_idx > 0 and line[delimiter_idx - 1] == delimiter_escape_char:
                         continue
@@ -241,7 +260,7 @@ class SyntaxHighlighter:
 
             if next_type == TYPE_DELIMITER:
                 end_delimiter = multiline_end_map.get(next_value, next_value)
-                end_idx = line.find(end_delimiter, idx + len(next_value))
+                end_idx = _mfind(end_delimiter, idx + len(next_value))
                 state_token = state_token_map.get(next_value, TOKEN_STRING)
                 if end_idx < 0:
                     tokens.append((idx, len(line), state_token))
@@ -274,17 +293,21 @@ SyntaxHighlighter.register(
     },
     lex_builtins=tuple((f for f in dir(builtins) if not f.startswith('_'))),
     number_pattern=r"""
-\b(?:
+(?<![0-9A-Za-z_.$+\-])
+(?:
     0[bB][01](?:_?[01])* |
+    0[oO][0-7](?:_?[0-7])* |
     0[xX][0-9a-fA-F](?:_?[0-9a-fA-F])* |
-    \d(?:_?\d)*(?:\.\d(?:_?\d)*)?(?:[eE][+-]?\d(?:_?\d)*)? |
+    [1-9](?:_?\d)*(?:\.\d(?:_?\d)*)?(?:[eE][+-]?\d(?:_?\d)*)? |
+    \.\d(?:_?\d)*(?:[eE][+-]?\d(?:_?\d)*)? |
     (?:
-        (?:\d(?:_?\d)*(?:\.\d(?:_?\d)*)?(?:[eE][+-]?\d(?:_?\d)*)?)?
+        (?:[1-9](?:_?\d)*(?:\.\d(?:_?\d)*)?(?:[eE][+-]?\d(?:_?\d)*)?)?
         [+-]?
         \d(?:_?\d)*(?:\.\d(?:_?\d)*)?(?:[eE][+-]?\d(?:_?\d)*)?
         [jJ]
     )
-)\b
+)
+(?![0-9A-Za-z_.$+\-])
 """,
     simple_string_pattern=r"(['\"])(?:\\.|(?!\1)[^\\\n])*\1",
     line_comment_prefixes=('#',),
@@ -336,12 +359,14 @@ SyntaxHighlighter.register(
         'symbols': 'symbols',
     },
     number_pattern=r"""
-\b(?:
+(?<![0-9A-Za-z_$+\-.])
+(?:
     0[bB][01](?:_?[01])*[lL]? |
     0[xX][0-9a-fA-F](?:_?[0-9a-fA-F])*[lL]? |
     \d(?:_?\d)*(?:\.\d(?:_?\d)*)?(?:[eE][+-]?\d(?:_?\d)*)?[fFdDlL]? |
     \.\d(?:_?\d)*(?:[eE][+-]?\d(?:_?\d)*)?[fFdD]?
-)\b
+)
+(?![0-9A-Za-z_$+\-.])
 """,
     simple_string_pattern=r"(['\"])(?:\\.|(?!\1)[^\\\n])*\1",
     line_comment_prefixes=('//',),
@@ -357,5 +382,193 @@ SyntaxHighlighter.register(
         'import_keyword': 'red',
         'object_keyword': 'magenta',
         'symbols': 'yellow',
+    }
+)
+
+SyntaxHighlighter.register(
+    name='autoit',
+    extensions=('.au3',),
+    lex_keywords=(
+        'False', 'True', 'ContinueCase', 'ContinueLoop', 'Default', 'Dim', 'Global',
+        'Local', 'Const', 'Do', 'Until', 'Enum', 'Exit', 'ExitLoop', 'For', 'To',
+        'Step', 'Next', 'In', 'Func', 'Return', 'EndFunc', 'If', 'Then', 'ElseIf', 'Else',
+        'EndIf', 'Null', 'ReDim', 'Select', 'Case', 'EndSelect', 'Static', 'Switch', 'EndSwitch',
+        'Volatile', 'While', 'WEnd', 'With', 'EndWith', 'ByRef', 'And', 'Or', 'Not',
+    ),
+    lex_keywords_case_insensitive=True,
+    lex_builtins=(
+        'Function', 'Abs', 'ACos', 'AdlibRegister', 'AdlibUnRegister', 'Asc', 'AscW', 'ASin', 'Assign',
+        'ATan', 'AutoItSetOption', 'AutoItWinGetTitle', 'AutoItWinSetTitle', 'Beep', 'Binary', 'BinaryLen',
+        'BinaryMid', 'BinaryToString', 'BitAND', 'BitNOT', 'BitOR', 'BitRotate', 'BitShift', 'BitXOR', 'BlockInput',
+        'Break', 'Call', 'CDTray', 'Ceiling', 'Chr', 'ChrW', 'ClipGet', 'ClipPut', 'ConsoleRead', 'ConsoleWrite',
+        'ConsoleWriteError', 'ControlClick', 'ControlCommand', 'ControlDisable', 'ControlEnable', 'ControlFocus',
+        'ControlGetFocus', 'ControlGetHandle', 'ControlGetPos', 'ControlGetText', 'ControlHide', 'ControlListView',
+        'ControlMove', 'ControlSend', 'ControlSetText', 'ControlShow', 'ControlTreeView', 'Cos', 'Dec', 'DirCopy',
+        'DirCreate', 'DirGetSize', 'DirMove', 'DirRemove', 'DllCall', 'DllCallAddress', 'DllCallbackFree', 'DllCallbackGetPtr',
+        'DllCallbackRegister', 'DllClose', 'DllOpen', 'DllStructCreate', 'DllStructGetData', 'DllStructGetPtr', 'DllStructGetSize',
+        'DllStructSetData', 'DriveGetDrive', 'DriveGetFileSystem', 'DriveGetLabel', 'DriveGetSerial', 'DriveGetType',
+        'DriveMapAdd', 'DriveMapDel', 'DriveMapGet', 'DriveSetLabel', 'DriveSpaceFree', 'DriveSpaceTotal', 'DriveStatus',
+        'EnvGet', 'EnvSet', 'EnvUpdate', 'Eval', 'Execute', 'Exp', 'FileChangeDir', 'FileClose', 'FileCopy', 'FileCreateNTFSLink',
+        'FileCreateShortcut', 'FileDelete', 'FileExists', 'FileFindFirstFile', 'FileFindNextFile', 'FileFlush', 'FileGetAttrib',
+        'FileGetEncoding', 'FileGetLongName', 'FileGetPos', 'FileGetShortcut', 'FileGetShortName', 'FileGetSize', 'FileGetTime',
+        'FileGetVersion', 'FileInstall', 'FileMove', 'FileOpen', 'FileOpenDialog', 'FileRead', 'FileReadLine', 'FileReadToArray',
+        'FileRecycle', 'FileRecycleEmpty', 'FileSaveDialog', 'FileSelectFolder', 'FileSetAttrib', 'FileSetEnd', 'FileSetPos',
+        'FileSetTime', 'FileWrite', 'FileWriteLine', 'Floor', 'FtpSetProxy', 'FuncName', 'GUICreate', 'GUICtrlCreateAvi',
+        'GUICtrlCreateButton', 'GUICtrlCreateCheckbox', 'GUICtrlCreateCombo', 'GUICtrlCreateContextMenu', 'GUICtrlCreateDate',
+        'GUICtrlCreateDummy', 'GUICtrlCreateEdit', 'GUICtrlCreateGraphic', 'GUICtrlCreateGroup', 'GUICtrlCreateIcon', 'GUICtrlCreateInput',
+        'GUICtrlCreateLabel', 'GUICtrlCreateList', 'GUICtrlCreateListView', 'GUICtrlCreateListViewItem', 'GUICtrlCreateMenu',
+        'GUICtrlCreateMenuItem', 'GUICtrlCreateMonthCal', 'GUICtrlCreateObj', 'GUICtrlCreatePic', 'GUICtrlCreateProgress',
+        'GUICtrlCreateRadio', 'GUICtrlCreateSlider', 'GUICtrlCreateTab', 'GUICtrlCreateTabItem', 'GUICtrlCreateTreeView',
+        'GUICtrlCreateTreeViewItem', 'GUICtrlCreateUpdown', 'GUICtrlDelete', 'GUICtrlGetHandle', 'GUICtrlGetState', 'GUICtrlRead',
+        'GUICtrlRecvMsg', 'GUICtrlRegisterListViewSort', 'GUICtrlSendMsg', 'GUICtrlSendToDummy', 'GUICtrlSetBkColor', 'GUICtrlSetColor',
+        'GUICtrlSetCursor', 'GUICtrlSetData', 'GUICtrlSetDefBkColor', 'GUICtrlSetDefColor', 'GUICtrlSetFont', 'GUICtrlSetGraphic',
+        'GUICtrlSetImage', 'GUICtrlSetLimit', 'GUICtrlSetOnEvent', 'GUICtrlSetPos', 'GUICtrlSetResizing', 'GUICtrlSetState',
+        'GUICtrlSetStyle', 'GUICtrlSetTip', 'GUIDelete', 'GUIGetCursorInfo', 'GUIGetMsg', 'GUIGetStyle', 'GUIRegisterMsg',
+        'GUISetAccelerators', 'GUISetBkColor', 'GUISetCoord', 'GUISetCursor', 'GUISetFont', 'GUISetHelp', 'GUISetIcon', 'GUISetOnEvent',
+        'GUISetState', 'GUISetStyle', 'GUIStartGroup', 'GUISwitch', 'Hex', 'HotKeySet', 'HttpSetProxy', 'HttpSetUserAgent', 'HWnd',
+        'InetClose', 'InetGet', 'InetGetInfo', 'InetGetSize', 'InetRead', 'IniDelete', 'IniRead', 'IniReadSection',
+        'IniReadSectionNames', 'IniRenameSection', 'IniWrite', 'IniWriteSection', 'InputBox', 'Int', 'IsAdmin', 'IsArray', 'IsBinary',
+        'IsBool', 'IsDeclared', 'IsDllStruct', 'IsFloat', 'IsFunc', 'IsHWnd', 'IsInt', 'IsKeyword', 'IsMap', 'IsNumber', 'IsObj',
+        'IsPtr', 'IsString', 'Log', 'MapAppend', 'MapExists', 'MapKeys', 'MapRemove', 'MemGetStats', 'Mod', 'MouseClick', 'MouseClickDrag',
+        'MouseDown', 'MouseGetCursor', 'MouseGetPos', 'MouseMove', 'MouseUp', 'MouseWheel', 'MsgBox', 'Number', 'ObjCreate',
+        'ObjCreateInterface', 'ObjEvent', 'ObjGet', 'ObjName', 'OnAutoItExitRegister', 'OnAutoItExitUnRegister', 'Ping', 'PixelChecksum',
+        'PixelGetColor', 'PixelSearch', 'ProcessClose', 'ProcessExists', 'ProcessGetStats', 'ProcessList', 'ProcessSetPriority', 'ProcessWait',
+        'ProcessWaitClose', 'ProgressOff', 'ProgressOn', 'ProgressSet', 'Ptr', 'Random', 'RegDelete', 'RegEnumKey', 'RegEnumVal', 'RegRead',
+        'RegWrite', 'Round', 'Run', 'RunAs', 'RunAsWait', 'RunWait', 'Send', 'SendKeepActive', 'SetError', 'SetExtended', 'ShellExecute',
+        'ShellExecuteWait', 'Shutdown', 'Sin', 'Sleep', 'SoundPlay', 'SoundSetWaveVolume', 'SplashImageOn', 'SplashOff', 'SplashTextOn', 'Sqrt',
+        'SRandom', 'StatusbarGetText', 'StderrRead', 'StdinWrite', 'StdioClose', 'StdoutRead', 'String', 'StringAddCR', 'StringCompare', 'StringFormat',
+        'StringFromASCIIArray', 'StringInStr', 'StringIsAlNum', 'StringIsAlpha', 'StringIsASCII', 'StringIsDigit', 'StringIsFloat', 'StringIsInt',
+        'StringIsLower', 'StringIsSpace', 'StringIsUpper', 'StringIsXDigit', 'StringLeft', 'StringLen', 'StringLower', 'StringMid', 'StringRegExp',
+        'StringRegExpReplace', 'StringReplace', 'StringReverse', 'StringRight', 'StringSplit', 'StringStripCR', 'StringStripWS', 'StringToASCIIArray',
+        'StringToBinary', 'StringTrimLeft', 'StringTrimRight', 'StringUpper', 'Tan', 'TCPAccept', 'TCPCloseSocket', 'TCPConnect', 'TCPListen',
+        'TCPNameToIP', 'TCPRecv', 'TCPSend', 'TCPShutdown', 'TCPStartup', 'TimerDiff', 'TimerInit', 'ToolTip', 'TrayCreateItem', 'TrayCreateMenu',
+        'TrayGetMsg', 'TrayItemDelete', 'TrayItemGetHandle', 'TrayItemGetState', 'TrayItemGetText', 'TrayItemSetOnEvent', 'TrayItemSetState',
+        'TrayItemSetText', 'TraySetClick', 'TraySetIcon', 'TraySetOnEvent', 'TraySetPauseIcon', 'TraySetState', 'TraySetToolTip', 'TrayTip',
+        'UBound', 'UDPBind', 'UDPCloseSocket', 'UDPOpen', 'UDPRecv', 'UDPSend', 'VarGetType', 'WinActivate', 'WinActive', 'WinClose', 'WinExists',
+        'WinFlash', 'WinGetCaretPos', 'WinGetClassList', 'WinGetClientSize', 'WinGetHandle', 'WinGetPos', 'WinGetProcess', 'WinGetState',
+        'WinGetText', 'WinGetTitle', 'WinKill', 'WinList', 'WinMenuSelectItem', 'WinMinimizeAll', 'WinMinimizeAllUndo', 'WinMove',
+        'WinSetOnTop', 'WinSetState', 'WinSetTitle', 'WinSetTrans', 'WinWait', 'WinWaitActive', 'WinWaitClose', 'WinWaitNotActive',
+    ),
+    lex_builtins_case_insensitive=True,
+    extra_plain_patterns=(
+        r"(?P<hashtag_keywords>(?i:#(?:include-once|include|NoTrayIcon|OnAutoItStartRegister|pragma|RequireAdmin))\b)",
+        r"(?P<preproccesing>(?i:#(?:Region|EndRegion|AutoIt3Wrapper.*))\b)",
+        r"(?P<at_keywords>(?i:@(?:AppDataCommonDir|AppDataDir|AutoItExe|AutoItPID|AutoItVersion|AutoItX64|COM_EventObj|CommonFilesDir|Compiled|ComputerName|ComSpec|primary|CPUArch|CR|CRLF|DesktopCommonDir|DesktopDepth|DesktopDir|DesktopHeight|DesktopRefresh|DesktopWidth|DocumentsCommonDir|error|exitCode|exitMethod|extended|FavoritesCommonDir|FavoritesDir|GUI_CtrlHandle|GUI_CtrlId|GUI_DragFile|GUI_DragId|GUI_DropId|GUI_WinHandle|HomeDrive|HomePath|HomeShare|HotKeyPressed|HOUR|IPAddress1|IPAddress2|IPAddress3|IPAddress4|KBLayout|LF|LocalAppDataDir|LogonDNSDomain|LogonDomain|LogonServer|MDAY|MIN|MON|MSEC|MUILang|MyDocumentsDir|NumParams|OSArch|OSBuild|OSLang|OSServicePack|OSType|OSVersion|ProgramFilesDir|ProgramsCommonDir|ProgramsDir|ScriptDir|ScriptFullPath|ScriptLineNumber|ScriptName|SEC|StartMenuCommonDir|StartMenuDir|StartupCommonDir|StartupDir|SW_DISABLE|SW_ENABLE|SW_HIDE|SW_LOCK|SW_MAXIMIZE|SW_MINIMIZE|SW_RESTORE|SW_SHOW|SW_SHOWDEFAULT|SW_SHOWMAXIMIZED|SW_SHOWMINIMIZED|SW_SHOWMINNOACTIVE|SW_SHOWNA|SW_SHOWNOACTIVATE|SW_SHOWNORMAL|SW_UNLOCK|SystemDir|TAB|TempDir|TRAY_ID|TrayIconFlashing|TrayIconVisible|UserName|UserProfileDir|WDAY|WindowsDir|WorkingDir|YDAY|YEAR))\b)",
+        r"(?P<variable>(?i:\$\w+)\b)",
+        r"(?P<symbols>[\[\]\{\}\(\)\+\-\*\/\=\<\>\&\|\^\?\:])",
+    ),
+    extra_group_to_token={
+        'hashtag_keywords': 'hashtag_keywords',
+        'preproccesing': 'preproccesing',
+        'at_keywords': 'at_keywords',
+        'variable': 'variable',
+        'symbols': 'symbols',
+    },
+    number_pattern=r"""
+(?<![0-9A-Za-z_+\-.])
+(?:
+    0[xX][0-9a-fA-F]* |
+    \d+(?:\.\d*)?(?:[eE][+-]?\d*)? |
+    \.\d+(?:[eE][+-]?\d*)?
+)
+(?![0-9A-Za-z_+\-.])
+""",
+    simple_string_pattern=r"(['\"])(?:\\.|(?!\1)[^\\\n])*\1",
+    line_comment_prefixes=(';',),
+    multiline_delimiters=('#comments-start', '#cs'),
+    multiline_end_delimiters={
+        '#comments-start': '#comments-end',
+        '#cs': '#ce',
+    },
+    multiline_delimiters_case_insensitive=True,
+    state_token_map={
+        '#comments-start' : TOKEN_COMMENT,
+        '#cs': TOKEN_COMMENT,
+    },
+    token_color_map={
+        TOKEN_KEYWORD: 'lightblue',
+        TOKEN_BUILTIN: 'blue',
+        TOKEN_NUMBER: 'lightblue',
+        TOKEN_COMMENT: 'green',
+        TOKEN_STRING: 'red',
+        'hashtag_keywords': 'yellow',
+        'preproccesing': 'red',
+        'at_keywords': 'yellow',
+        'variable': 'lightblack',
+        'symbols': 'yellow',
+    }
+)
+
+SyntaxHighlighter.register(
+    name='c/c++',
+    extensions=(
+        '.c', '.h',
+        '.cpp', '.cxx', '.cc', '.hpp', '.hxx', '.hh', '.h++', '.c++'
+    ),
+    lex_keywords=(
+        'auto', 'break', 'case', 'continue', 'default', 'do',
+        'else', 'for', 'goto', 'if',
+        'return', 'sizeof', 'switch',
+        'while', 'asm', 'typeof', 'inline', 'false', 'true',
+        'co_await', 'co_return', 'co_yield', 'try', 'throw', 'this',
+        'static_cast', 'reinterpret_cast', 'nullptr', 'new', 'noexcept',
+        'dynamic_cast', 'catch',  'const_cast', 'delete',
+        'operator', 'reinterpret_cast', 'static_assert', 'typeid', 'typename', 'alignas', 'alignof', 'decltype',
+    ),
+    lex_builtins=(
+        'printf', 'scanf', 'fprintf', 'fscanf', 'sprintf', 'sscanf', 'snprintf',
+        'fopen', 'fclose', 'fread', 'fwrite', 'fseek', 'ftell', 'rewind',
+        'fgets', 'fputs', 'fputc', 'fgetc', 'getchar', 'putchar', 'puts', 'gets',
+        'malloc', 'calloc', 'realloc', 'free',
+        'exit', 'abort', 'atexit',
+        'strlen', 'strcpy', 'strncpy', 'strcat', 'strncat', 'strcmp', 'strncmp',
+        'strchr', 'strrchr', 'strstr', 'strtok',
+        'memset', 'memcpy', 'memmove', 'memcmp', 'memchr',
+        'atoi', 'atof', 'atol', 'strtol', 'strtod', 'strtoul',
+        'rand', 'srand', 'abs', 'labs', 'div', 'ldiv',
+        'ceil', 'floor', 'sqrt', 'pow', 'fabs', 'sin', 'cos', 'tan',
+        'asin', 'acos', 'atan', 'atan2', 'exp', 'log', 'log10',
+        'assert', 'perror',
+        'isalpha', 'isdigit', 'isalnum', 'isspace', 'isupper', 'islower',
+        'toupper', 'tolower',
+        'qsort', 'bsearch', 'NULL',
+    ),
+    extra_plain_patterns=(
+        r"(?P<type_keyword>\b(?:unsigned|double|signed|float|short|void|char|long|int|bool|friend|mutable|explicit|volatile|namespace|public|protected|privateunion|const|enum|virtual|template|extern|static|register|restrict|class|final|override|thread_local|consteval|constexpr|wchar_t)\b)",
+        r"(?P<red_keyword>\b(?:concept|requires|constinit|using|export)\b)",
+        r"(?P<preprocessor>#(?:include|define|undef|ifdef|ifndef|elif|endif|pragma|error|warning|line|if|else)\b)",
+        r"(?P<typedef>\b(?:typedef|struct)\b)",
+        r"(?P<symbols>[\[\]\{\}\(\)\+\-\*\/\=\%\<\>\&\|\^\~\.\!\?\:\,\;])",
+    ),
+    extra_group_to_token={
+        'type_keyword': 'type_keyword',
+        'red_keyword': 'red_keyword',
+        'preprocessor': 'preprocessor',
+        'symbols': 'symbols',
+        'typedef': 'typedef',
+    },
+    number_pattern=r"""
+(?<![0-9A-Za-z_.$+\-])
+(?:
+    0[bB][01](?:_?[01])*(?:[uU](?:ll?|LL?)?|(?:ll?|LL?)[uU]?)? |
+    0[xX][0-9a-fA-F](?:_?[0-9a-fA-F])*(?:[uU](?:ll?|LL?)?|(?:ll?|LL?)[uU]?)? |
+    0[0-7]+(?:[uU](?:ll?|LL?)?|(?:ll?|LL?)[uU]?)? |
+    \d(?:_?\d)*(?:\.\d(?:_?\d)*)?(?:[eE][+-]?\d(?:_?\d)*)?(?:[uU](?:ll?|LL?)?|(?:ll?|LL?)[uU]?|[fFlL])? |
+    \.\d(?:_?\d)*(?:[eE][+-]?\d(?:_?\d)*)?[fFlL]?
+)
+(?![0-9A-Za-z_.$+\-])
+""",
+    simple_string_pattern=r"(['\"])(?:\\.|(?!\1)[^\\\n])*\1",
+    line_comment_prefixes=('//',),
+    multiline_delimiters=('/*',),
+    multiline_end_delimiters={'/*': '*/'},
+    state_token_map={'/*': TOKEN_COMMENT},
+    token_color_map={
+        TOKEN_KEYWORD: 'lightblue',
+        'type_keyword': 'magenta',
+        'red_keyword': 'lightred',
+        'preprocessor': 'cyan',
+        'symbols': 'yellow',
+        'typedef': 'red',
     }
 )
