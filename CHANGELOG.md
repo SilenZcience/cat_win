@@ -12,6 +12,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added colored syntax highlighting to the editor. custom selections can be made when pressing `F4` to open the syntax highlighter manager.
 - expanded the editor-search to support multiple lines when searching for literal strings.
 - added `grep_context_lines` element to the config menu to define the amount of context line displayed before and after every grep-line.
+- added --`watch`, --`track` argument to watch files for changes and continuously update the output.
 
 ### Bugfixes
 
