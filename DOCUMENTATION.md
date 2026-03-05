@@ -100,6 +100,7 @@
             <li><a href="#--dot---dotfiles">--dot, --dotfiles</a></li>
             <li><a href="#--plain---plain-only">--plain, --plain-only</a></li>
             <li><a href="#--nc---nocolor">--nc, --nocolor</a></li>
+            <li><a href="#--watch---track">--watch, --track</a></li>
             <li><a href="#--config---config">--config, --config</a></li>
             <li><a href="#--cconfig---cconfig">--cconfig, --cconfig</a></li>
             <li><a href="#--config-clear---config-reset">--config-clear, --config-reset</a></li>
@@ -200,6 +201,7 @@
 | *<a href="#--dot---dotfiles">--dot, --dotfiles</a>* | additionally query and edit dotfiles |❌|
 | *<a href="#--plain---plain-only">--plain, --plain-only</a>* | ignore non-plaintext files automatically |❌|
 | *<a href="#--nc---nocolor">--nc, --nocolor</a>* | disable colored output |✔|
+| *<a href="#--watch---track">--watch, --track</a>* | watch files for changes and continuously update the output |❌|
 ||||
 | *<a href="#--config---config">--config, --config</a>* | change default parameters |✔|
 | *<a href="#--cconfig---cconfig">--cconfig, --cconfig</a>* | change color configuration |✔|
@@ -1313,6 +1315,20 @@ Often the Problem is being fixed by providing another Codepage using the <a href
 
 By Default different Colors will be used to better highlight specific Parts of the Output or make original and changed Parts of a Line more distinguishable.
 Using --nocolor will disable all Colors and only display the Output in plain monochrome Text.
+
+### <a id="--watch---track">--watch, --track</a>
+
+Continuously keep tracking if the given Files have been changed/modified in which Case the Output will be freshly generated again.
+This endless cycle can be terminated via KeyboardInterrupt after which the execution will continue as usual.
+
+```console
+> catw status.log --watch F=error -g
+File 'status.log' has been modified. Reloading ...
+1) Error: Service cannot be started. [0x8007045b]
+File 'status.log' has been modified. Reloading ...
+1) Error: Service cannot be started. [0x8007045b]
+2) Error: Access is denied.
+```
 
 - - - -
 <a id="configuration"></a>
