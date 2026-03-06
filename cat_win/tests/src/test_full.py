@@ -172,7 +172,7 @@ class TestCatFull(TestCase):
             self.assertIn(test_empty_path.casefold(), lower_out)
             self.assertIn(test_peek.casefold(), lower_out)
 
-    @patch('sys.argv', ['<CAT>', test_file_path, '-W'])
+    @patch('sys.argv', ['<CAT>', test_file_path, '--WC'])
     def test_cat_output_full_show_wordcount(self):
         contains = """:: 5
 is: 4

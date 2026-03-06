@@ -128,9 +128,9 @@ ALL_ARGS = [
 				ARGS_SUM, show_arg_on_repl=False, section=5),
     ArgConstant('-S', '--SUM', 'ONLY show sum of lines',
 				ARGS_SSUM, show_arg=False, section=5),
-    ArgConstant('-w', '--wordcount', 'display the wordcount',
+    ArgConstant('--wc', '--wordcount', 'display the wordcount',
                 ARGS_WORDCOUNT, show_arg_on_repl=False, section=5),
-    ArgConstant('-W', '--WORDCOUNT', 'ONLY display the wordcount',
+    ArgConstant('--WC', '--WORDCOUNT', 'ONLY display the wordcount',
                 ARGS_WWORDCOUNT, show_arg=False, section=5),
     ArgConstant('--cc', '--charcount', 'display the charcount',
                 ARGS_CHARCOUNT, show_arg_on_repl=False, section=5),
@@ -212,7 +212,7 @@ ALL_ARGS = [
 				ARGS_PLAIN_ONLY, show_arg_on_repl=False, section=12),
     ArgConstant('--nc', '--nocolor', 'disable colored output',
 				ARGS_NOCOL, section=12),
-    ArgConstant('--watch', '--track', 'watch files for changes and continuously update the output',
+    ArgConstant('-w', '--watch', 'watch files for changes and continuously update the output',
                 ARGS_WATCH, section=12),
 
     # configuration
