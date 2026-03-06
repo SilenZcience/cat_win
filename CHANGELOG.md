@@ -3,7 +3,11 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
-## [1.10.7] - TBA
+## [1.11.0] - TBA
+
+### Major Changes
+
+changed the -`w`, --`wordcount` parameter to --`wc`, --`wordcount`
 
 ### Minor Changes
 
@@ -12,7 +16,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added colored syntax highlighting to the editor. custom selections can be made when pressing `F4` to open the syntax highlighter manager.
 - expanded the editor-search to support multiple lines when searching for literal strings.
 - added `grep_context_lines` element to the config menu to define the amount of context line displayed before and after every grep-line.
-- added --`watch`, --`track` argument to watch files for changes and continuously update the output.
+- added -`w`, --`watch` argument to watch files for changes and continuously update the output.
 
 ### Bugfixes
 
