@@ -171,11 +171,14 @@ class DiffViewer:
         """
         handles mouse events.
         """
-        m_state = curses.getmouse()[4]
-        if m_state & curses.BUTTON4_PRESSED:
+        _, _, y, _, b_state = curses.getmouse()
+        if b_state & curses.BUTTON1_PRESSED:
+            self.rpos.row = min(self.wpos.row + y, len(self.diff_items)-1)
+            self._ensure_rpos_visible()
+        elif b_state & curses.BUTTON4_PRESSED:
             for _ in range(3):
                 self._move_key_up()
-        elif m_state & curses.BUTTON5_PRESSED:
+        elif b_state & curses.BUTTON5_PRESSED:
             for _ in range(3):
                 self._move_key_down()
 
