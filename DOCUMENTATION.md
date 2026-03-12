@@ -1536,7 +1536,7 @@ It's raining cats and dogs!
 ### <a id="replacex-replacex">replace=X, replace&#42889;X</a>
 
 Defines a Replacement for queried Literals and Patterns given by <a href="#findx-findx">find=X, find&#42889;X</a> and <a href="#matchx-matchx">match=X, match&#42889;X</a>.
-When defining multiple Replacements only the last one will be used.
+The Replacement will be used for all Queries previously defined up to the last Definition of this Argument.
 The Interpretation of the Replacement is dependent on the queried Literal or Pattern.
 This way regular Expressions can be substituted.
 Using the shortened Version r=X or r:X yields the same Result.

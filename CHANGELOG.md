@@ -17,6 +17,7 @@ changed the -`w`, --`wordcount` parameter to --`wc`, --`wordcount`
 - expanded the editor-search to support multiple lines when searching for literal strings.
 - added `grep_context_lines` element to the config menu to define the amount of context line displayed before and after every grep-line.
 - added -`w`, --`watch` argument to watch files for changes and continuously update the output.
+- fixed a lot of coloring issues when multiple arguments apply color the same line.
 
 ### Bugfixes
 
@@ -25,6 +26,7 @@ changed the -`w`, --`wordcount` parameter to --`wc`, --`wordcount`
 - fixed bug where the diffviewer would not correctly jump to the next diff when pressing `F2`.
 - fixed visual Bugs in the curses applications.
 - fixed Bug in the cat-repl (cats) that would crash the application when using `!del` on an unknown search query.
+- fixed Bug where -`G`, --`GREP` would display the wrong output on previously colored lines.
 
 
 ## [1.10.6] - 2026-02-16
