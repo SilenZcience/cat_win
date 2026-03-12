@@ -35,13 +35,12 @@ class SyntaxHighlighter:
 
     def __init__(
         self,
-        plain_pattern: re.Pattern,
+        plain_pattern,
         plain_group_to_token: dict,
-        simple_string_pattern: re.Pattern,
+        simple_string_pattern,
         line_comment_prefixes: tuple,
         multiline_delimiters: tuple,
         multiline_end_map: dict,
-        multiline_case_insensitive: bool,
         delimiter_escape_char: str,
         state_token_map: dict,
         token_color_map: dict,
@@ -52,7 +51,6 @@ class SyntaxHighlighter:
         self.line_comment_prefixes = line_comment_prefixes
         self.multiline_delimiters = multiline_delimiters
         self.multiline_end_map = multiline_end_map
-        self.multiline_case_insensitive = multiline_case_insensitive
         self.delimiter_escape_char = delimiter_escape_char
         self.state_token_map = state_token_map
         self.token_color_map = token_color_map
@@ -96,18 +94,33 @@ class SyntaxHighlighter:
         if not multiline_delimiters and multiline_end_delimiters:
             multiline_delimiters = tuple(multiline_end_delimiters.keys())
 
+        _state_token_map_str = state_token_map or {}
+        compiled_delimiters = []
+        compiled_end_map = {}
+        compiled_state_token_map = {}
+        for delimiter_str in multiline_delimiters:
+            if multiline_delimiters_case_insensitive:
+                start_compiled = re.compile(f'(?i:{delimiter_str})')
+            else:
+                start_compiled = re.compile(delimiter_str)
+            end_val = multiline_end_delimiters.get(delimiter_str, delimiter_str)
+            if callable(end_val):
+                compiled_end_map[start_compiled] = end_val
+            elif multiline_delimiters_case_insensitive:
+                compiled_end_map[start_compiled] = re.compile(f'(?i:{end_val})')
+            else:
+                compiled_end_map[start_compiled] = re.compile(end_val)
+            compiled_state_token_map[start_compiled] = _state_token_map_str.get(delimiter_str, TOKEN_STRING)
+            compiled_delimiters.append(start_compiled)
+
         tokenizer = SyntaxHighlighter(
             plain_pattern=plain_pattern,
             plain_group_to_token=group_to_token,
-            multiline_delimiters=multiline_delimiters,
-            multiline_end_map={
-                delimiter: multiline_end_delimiters.get(delimiter, delimiter)
-                for delimiter in multiline_delimiters
-            },
-            multiline_case_insensitive=multiline_delimiters_case_insensitive,
+            multiline_delimiters=tuple(compiled_delimiters),
+            multiline_end_map=compiled_end_map,
             line_comment_prefixes=line_comment_prefixes,
             simple_string_pattern=re.compile(simple_string_pattern) if simple_string_pattern else None,
-            state_token_map=state_token_map or {},
+            state_token_map=compiled_state_token_map,
             delimiter_escape_char=delimiter_escape_char,
             token_color_map=token_color_map or {},
         )
@@ -170,14 +183,13 @@ class SyntaxHighlighter:
             return None, group_to_token
         return re.compile('|'.join(parts)), group_to_token
 
-    def tokenize_line(self, line: str, state: str = None) -> tuple:
+    def tokenize_line(self, line: str, state=None) -> tuple:
         tokens = []
         idx = 0
         active_state = state
 
         multiline_delimiters = self.multiline_delimiters
         multiline_end_map = self.multiline_end_map
-        multiline_case_insensitive = self.multiline_case_insensitive
         state_token_map = self.state_token_map
         line_comment_prefixes = self.line_comment_prefixes
         plain_pattern = self.plain_pattern
@@ -185,25 +197,19 @@ class SyntaxHighlighter:
         simple_string_pattern = self.simple_string_pattern
         delimiter_escape_char = self.delimiter_escape_char
 
-        if not line and active_state in multiline_delimiters:
+        if not line and active_state is not None:
             return tokens, active_state
 
-        if multiline_case_insensitive:
-            _line_ci = line.lower()
-            _mfind = lambda needle, start: _line_ci.find(needle.lower(), start)
-        else:
-            _mfind = line.find
-
         while idx < len(line):
-            if active_state in multiline_delimiters:
-                end_delimiter = multiline_end_map.get(active_state, active_state)
-                end_idx = _mfind(end_delimiter, idx)
-                state_token = state_token_map.get(active_state, TOKEN_STRING)
-                if end_idx < 0:
+            if active_state is not None:
+                start_pattern, end_pattern = active_state
+                end_m = end_pattern.search(line, idx)
+                state_token = state_token_map.get(start_pattern, TOKEN_STRING)
+                if end_m is None:
                     tokens.append((idx, len(line), state_token))
                     return tokens, active_state
-                tokens.append((idx, end_idx + len(end_delimiter), state_token))
-                idx = end_idx + len(end_delimiter)
+                tokens.append((idx, end_m.end(), state_token))
+                idx = end_m.end()
                 active_state = None
                 continue
 
@@ -211,14 +217,14 @@ class SyntaxHighlighter:
             next_type = None
             next_value = None
 
-            for delimiter in multiline_delimiters:
-                delimiter_idx = _mfind(delimiter, idx)
-                if delimiter_idx >= 0 and delimiter_idx < next_special:
-                    if delimiter_escape_char and delimiter_idx > 0 and line[delimiter_idx - 1] == delimiter_escape_char:
+            for start_pattern in multiline_delimiters:
+                m = start_pattern.search(line, idx)
+                if m is not None and m.start() < next_special:
+                    if delimiter_escape_char and m.start() > 0 and line[m.start() - 1] == delimiter_escape_char:
                         continue
-                    next_special = delimiter_idx
+                    next_special = m.start()
                     next_type = TYPE_DELIMITER
-                    next_value = delimiter
+                    next_value = (start_pattern, m)
 
             for comment_prefix in line_comment_prefixes:
                 comment_idx = line.find(comment_prefix, idx)
@@ -259,14 +265,19 @@ class SyntaxHighlighter:
                 return tokens, None
 
             if next_type == TYPE_DELIMITER:
-                end_delimiter = multiline_end_map.get(next_value, next_value)
-                end_idx = _mfind(end_delimiter, idx + len(next_value))
-                state_token = state_token_map.get(next_value, TOKEN_STRING)
-                if end_idx < 0:
-                    tokens.append((idx, len(line), state_token))
-                    return tokens, next_value
-                tokens.append((idx, end_idx + len(end_delimiter), state_token))
-                idx = end_idx + len(end_delimiter)
+                start_pattern, start_match = next_value
+                end_val = multiline_end_map.get(start_pattern, start_pattern)
+                if callable(end_val):
+                    end_pattern = re.compile(end_val(start_match))
+                else:
+                    end_pattern = end_val
+                state_token = state_token_map.get(start_pattern, TOKEN_STRING)
+                end_m = end_pattern.search(line, start_match.end())
+                if end_m is None:
+                    tokens.append((start_match.start(), len(line), state_token))
+                    return tokens, (start_pattern, end_pattern)
+                tokens.append((start_match.start(), end_m.end(), state_token))
+                idx = end_m.end()
                 continue
 
             if next_type == TYPE_SIMPLE_STRING and next_value is not None:
@@ -311,10 +322,10 @@ SyntaxHighlighter.register(
 """,
     simple_string_pattern=r"(['\"])(?:\\.|(?!\1)[^\\\n])*\1",
     line_comment_prefixes=('#',),
-    multiline_delimiters=('"""', "'''"),
+    multiline_delimiters=(r'"""', r"'''"),
     state_token_map={
-        '"""': TOKEN_STRING,
-        "'''": TOKEN_STRING,
+        r'"""': TOKEN_STRING,
+        r"'''": TOKEN_STRING,
     },
     token_color_map={
         'decl_keyword': 'magenta',
@@ -370,13 +381,13 @@ SyntaxHighlighter.register(
 """,
     simple_string_pattern=r"(['\"])(?:\\.|(?!\1)[^\\\n])*\1",
     line_comment_prefixes=('//',),
-    multiline_delimiters=('/*', '"""'),
+    multiline_delimiters=(r'/\*', r'"""'),
     multiline_end_delimiters={
-        '/*': '*/',
+        r'/\*': r'\*/',
     },
     state_token_map={
-        '/*' : TOKEN_COMMENT,
-        '"""': TOKEN_STRING,
+        r'/\*': TOKEN_COMMENT,
+        r'"""': TOKEN_STRING,
     },
     token_color_map={
         'import_keyword': 'red',
@@ -475,15 +486,15 @@ SyntaxHighlighter.register(
 """,
     simple_string_pattern=r"(['\"])(?:\\.|(?!\1)[^\\\n])*\1",
     line_comment_prefixes=(';',),
-    multiline_delimiters=('#comments-start', '#cs'),
+    multiline_delimiters=(r'#comments-start', r'#cs'),
     multiline_end_delimiters={
-        '#comments-start': '#comments-end',
-        '#cs': '#ce',
+        r'#comments-start': r'#comments-end',
+        r'#cs': r'#ce',
     },
     multiline_delimiters_case_insensitive=True,
     state_token_map={
-        '#comments-start' : TOKEN_COMMENT,
-        '#cs': TOKEN_COMMENT,
+        r'#comments-start' : TOKEN_COMMENT,
+        r'#cs': TOKEN_COMMENT,
     },
     token_color_map={
         TOKEN_KEYWORD: 'lightblue',
@@ -566,9 +577,9 @@ SyntaxHighlighter.register(
 """,
     simple_string_pattern=r"(['\"])(?:\\.|(?!\1)[^\\\n])*\1",
     line_comment_prefixes=('//',),
-    multiline_delimiters=('/*',),
-    multiline_end_delimiters={'/*': '*/'},
-    state_token_map={'/*': TOKEN_COMMENT},
+    multiline_delimiters=(r'/\*',),
+    multiline_end_delimiters={r'/\*': r'\*/'},
+    state_token_map={r'/\*': TOKEN_COMMENT},
     token_color_map={
         TOKEN_KEYWORD: 'lightblue',
         'type_keyword': 'magenta',
@@ -577,5 +588,122 @@ SyntaxHighlighter.register(
         'symbols': 'yellow',
         'typedef': 'red',
         'charclass': 'yellow',
+    }
+)
+
+SyntaxHighlighter.register(
+    name='lua',
+    extensions=(
+        '.lua',
+    ),
+    lex_keywords=(
+        'and', 'break', 'do', 'else', 'elseif',
+        'end', 'false', 'for', 'function', 'global',
+        'goto', 'if',
+        'in', 'local', 'nil', 'not', 'or',
+        'repeat', 'return', 'then', 'true', 'until', 'while',
+    ),
+    lex_builtins=(
+        'dofile', 'dostring', 'next', 'nextvar', 'tostring',
+        'print', 'tonumber', 'type', 'assert', 'error', 'setglobal',
+        'getglobal', 'setfallback',
+    ),
+    extra_plain_patterns=(
+        r"(?P<const>\<const\>)",
+        r"(?P<symbols>[\[\]\{\}\(\)\+\-\*\/\=\%\<\>\^\.\:\,\;\#\~\&\|])",
+    ),
+    extra_group_to_token={
+        'symbols': 'symbols',
+        'const': 'const',
+    },
+    number_pattern=r"""
+(?<![0-9A-Za-z_.])
+(?:
+    0[xX][0-9a-fA-F]+ |
+    \d+(?:\.\d*)?(?:[eE][+-]?\d+)? |
+    \.\d+(?:[eE][+-]?\d+)?
+)
+(?![0-9A-Za-z_.])
+""",
+    simple_string_pattern=r"(['\"])(?:\\.|(?!\1)[^\\\n])*\1",
+    line_comment_prefixes=('--',),
+    multiline_delimiters=(r'--\[(=*)\[',),
+    multiline_end_delimiters={r'--\[(=*)\[': lambda m: r'\]' + re.escape(m.group(1)) + r'\]'},
+    state_token_map={r'--\[(=*)\[': TOKEN_COMMENT},
+    token_color_map={
+        TOKEN_KEYWORD: 'lightblue',
+        'symbols': 'yellow',
+        'const': 'lightmagenta',
+    }
+)
+
+SyntaxHighlighter.register(
+    name='rust',
+    extensions=('.rs',),
+    lex_keywords=(
+        'as', 'await', 'break', 'continue',
+        'else', 'extern', 'false', 'for', 'if', 'in',
+        'loop', 'match', 'mod', 'move',
+        'return', 'self', 'Self', 'static', 'super',
+        'true', 'type', 'union', 'while',
+        'abstract', 'do', 'macro',
+        'try', 'yield', 'raw',
+        'macro_rules',
+    ),
+    lex_builtins=(
+        'drop', 'Some', 'None', 'Ok', 'Err',
+        'Box', 'Vec', 'String', 'Option', 'Result',
+        'panic', 'assert', 'assert_eq', 'assert_ne',
+        'println', 'print', 'eprintln', 'eprint',
+        'format', 'write', 'writeln',
+        'todo', 'unimplemented', 'unreachable',
+        'clone', 'copy', 'default',
+        'len', 'push', 'pop', 'contains', 'iter', 'map', 'filter',
+        'unwrap', 'expect', 'into', 'from', 'into_iter',
+        'min', 'max', 'abs', 'pow', 'sqrt',
+    ),
+    extra_plain_patterns=(
+        r"(?P<decl_keyword>\b(?:let|mut|struct|trait|enum|const)\b)",
+        r"(?P<fn_keyword>\b(?:async|crate|safe|unsafe|use|pub|priv|impl|dyn|where|fn|ref|become|box|final|gen|override|typeof|unsized|virtual)\b)",
+        r"(?P<type_keyword>\b(?:bool|char|str|i8|i16|i32|i64|i128|isize|u8|u16|u32|u64|u128|usize|f32|f64)\b)",
+        r"(?P<char>'.')",
+        r"(?P<lifetime>'[A-Za-z_][A-Za-z0-9_]*\b)",
+        r"(?P<macro_call>\b[A-Za-z_][A-Za-z0-9_]*!)",
+        r"(?P<symbols>[\[\]\{\}\(\)\+\-\*\/\=\%\<\>\&\|\^\~\.\!\?\:\,\;\@\#])",
+    ),
+    extra_group_to_token={
+        'decl_keyword': 'decl_keyword',
+        'fn_keyword': 'fn_keyword',
+        'type_keyword': 'type_keyword',
+        'char': 'char',
+        'lifetime': 'lifetime',
+        'macro_call': 'macro_call',
+        'symbols': 'symbols',
+    },
+    number_pattern=r"""
+(?<![0-9A-Za-z_])
+(?:
+    0[bB][01][01_]*(?:_?(?:i8|i16|i32|i64|i128|isize|u8|u16|u32|u64|u128|usize))? |
+    0[oO][0-7][0-7_]*(?:_?(?:i8|i16|i32|i64|i128|isize|u8|u16|u32|u64|u128|usize))? |
+    0[xX][0-9a-fA-F][0-9a-fA-F_]*(?:_?(?:i8|i16|i32|i64|i128|isize|u8|u16|u32|u64|u128|usize))? |
+    \d[\d_]*(?:\.[\d_]+)?(?:[eE][+-]?[\d_]+)?(?:_?(?:f32|f64|i8|i16|i32|i64|i128|isize|u8|u16|u32|u64|u128|usize))?
+)
+(?![0-9A-Za-z_])
+""",
+    simple_string_pattern=r'"(?:\\.|[^"\\\n])*"',
+    line_comment_prefixes=('//',),
+    multiline_delimiters=(r'/\*',),
+    multiline_end_delimiters={r'/\*': r'\*/'},
+    state_token_map={r'/\*': TOKEN_COMMENT},
+    delimiter_escape_char='',
+    token_color_map={
+        TOKEN_KEYWORD: 'lightblue',
+        'decl_keyword': 'magenta',
+        'fn_keyword': 'red',
+        'type_keyword': 'yellow',
+        'char': 'lightgreen',
+        'lifetime': 'yellow',
+        'macro_call': 'blue',
+        'symbols': 'lightcyan',
     }
 )
