@@ -11,6 +11,7 @@ except ImportError:
 import os
 import signal
 import sys
+import time
 
 from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.service.fileattributes import get_file_size, _convert_size, \
@@ -31,6 +32,8 @@ class DiffViewer:
     loading_failed = False
 
     debug_mode = False
+
+    watch_mode = False
 
     file_encoding = 'utf-8'
 
@@ -75,6 +78,8 @@ class DiffViewer:
 
         self.displaying_overview = False
         self.difflibparser_cutoff = 0.75
+        self._watch_text2 = []
+        self._mtime_cache = [None, None]
 
         self._setup_file()
 
@@ -88,6 +93,7 @@ class DiffViewer:
                 text1 = IoHelper.read_file(
                     self.diff_files[0], False, DiffViewer.file_encoding, errors='replace'
                 ).splitlines()
+                self._mtime_cache[0] = get_file_mtime(self.diff_files[0])
             else:
                 try:
                     text1 = GitHelper.get_git_file_content_at_commit(
@@ -101,6 +107,7 @@ class DiffViewer:
                 text2 = IoHelper.read_file(
                     self.diff_files[1], False, DiffViewer.file_encoding, errors='replace'
                 ).splitlines()
+                self._mtime_cache[1] = get_file_mtime(self.diff_files[1])
             else:
                 try:
                     text2 = GitHelper.get_git_file_content_at_commit(
@@ -111,6 +118,7 @@ class DiffViewer:
                     text2 = []
                     self.display_names[1] = f'<GIT_ERROR> {str(exc)}'
 
+            self._watch_text2 = text2
             self.difflibparser = self.difflibparser_bak = DifflibParser(
                 text1,
                 text2,
@@ -485,6 +493,50 @@ class DiffViewer:
         """
         self._setup_file()
         return True
+
+    def _watch_update(self) -> None:
+        """
+        auto-reload for watch mode: advance text1 <- old text2, text2 <- fresh file read.
+        Only runs when file_commit_hashes[1] is None (local file).
+        """
+        if self.displaying_overview or self._mtime_cache[1] == get_file_mtime(self.diff_files[1]):
+            return
+        try:
+            new_text2 = IoHelper.read_file(
+                self.diff_files[1], False, DiffViewer.file_encoding, errors='replace'
+            ).splitlines()
+        except (OSError, UnicodeError):
+            return
+        old_text2 = self._watch_text2
+        self._watch_text2 = new_text2
+        self._mtime_cache[0] = self._mtime_cache[1]
+        self._mtime_cache[1] = get_file_mtime(self.diff_files[1])
+        try:
+            self.difflibparser = self.difflibparser_bak = DifflibParser(
+                old_text2,
+                new_text2,
+                self.difflibparser_cutoff-0.01, self.difflibparser_cutoff
+            )
+            self.diff_items = self.diff_items_bak = self.difflibparser.get_diff()
+            self.l_offset = len(self.diff_items[0].lineno)+1 if self.diff_items else 0
+            self.error_bar = ''
+            self.status_bar_size = 1
+            if self.diff_items:
+                self.rpos.row = min(max(self.rpos.row, 0), len(self.diff_items) - 1)
+                self.wpos.row = min(self.wpos.row, max(0, len(self.diff_items) - 1))
+            self.half_width = (self.getxymax()[1]-3-self.l_offset) // 2
+        except (OSError, UnicodeError) as exc:
+            self.error_bar = str(exc)
+            self.status_bar_size = 2
+            if self.debug_mode:
+                err_print(self.error_bar, priority=err_print.WARNING)
+            self.difflibparser = self.difflibparser_bak = DifflibParser(
+                [],
+                [],
+            )
+            self.diff_items = self.diff_items_bak = self.difflibparser.get_diff()
+            self.rpos.row = 0
+        self.curse_window.clear()
 
     def _action_background(self) -> bool:
         # only callable on UNIX
@@ -879,8 +931,8 @@ class DiffViewer:
             '',
             'Time modified:',
             (
-                f"{datetime.fromtimestamp(get_file_mtime(self.diff_files[0]))}"
-                if self.file_commit_hashes[0] is None else 'N/A'
+                f"{datetime.fromtimestamp(self._mtime_cache[0])}"
+                if self._mtime_cache[0] is None else 'N/A'
             ),
             '',
             'Time created:',
@@ -918,8 +970,8 @@ class DiffViewer:
             '',
             'Time modified:',
             (
-                f"{datetime.fromtimestamp(get_file_mtime(self.diff_files[1]))}"
-                if self.file_commit_hashes[1] is None else 'N/A'
+                f"{datetime.fromtimestamp(self._mtime_cache[1])}"
+                if self._mtime_cache[1] is None else 'N/A'
             ),
             '',
             'Time created:',
@@ -999,7 +1051,12 @@ class DiffViewer:
                     ord(wchar_) if len(wchar_) == 1 else '-'
                 err_print(f"__DEBUG__: Received  {str(key_):<22}{_debug_info}" + \
                     f"\t{str(key__):<15} \t{repr(wchar_)}", priority=err_print.INFORMATION)
-        wchar = self.curse_window.get_wch()
+        try:
+            wchar = self.curse_window.get_wch()
+        except curses.error:
+            return (-1, b'_key_timeout')
+        if wchar == -1:
+            return (-1, b'_key_timeout')
         _key = curses.keyname(wchar if isinstance(wchar, int) else ord(wchar))
         key = UNIFY_HOTKEYS.get(_key, b'_key_string')
         debug_out(wchar, _key, key)
@@ -1239,14 +1296,32 @@ class DiffViewer:
         self.half_width = (self.getxymax()[1]-3-self.l_offset) // 2
         running = True
 
+        watch_active = DiffViewer.watch_mode and self.file_commit_hashes[1] is None
+        if watch_active:
+            self.curse_window.timeout(500)
+            _last_watch_time = time.time()
+
         while running:
             self._render_scr()
-            _, key = self._get_next_char()
+
+            wchar, key = self._get_next_char()
+            while wchar == -1:
+                if watch_active:
+                    _now = time.time()
+                    if _now - _last_watch_time >= 5:
+                        _last_watch_time = _now
+                        self._watch_update()
+                        self._render_scr()
+
+                wchar, key = self._get_next_char()
 
             if key in ACTION_HOTKEYS:
                 running &= getattr(self, key.decode(), lambda *_: True)()
             elif key in MOVE_HOTKEYS | FUNCTION_HOTKEYS:
                 getattr(self, key.decode(), lambda *_: None)()
+
+        if watch_active:
+            self.curse_window.timeout(-1)
 
     def _init_screen(self) -> None:
         """
@@ -1402,15 +1477,18 @@ class DiffViewer:
             diffviewer._open()
 
     @staticmethod
-    def set_flags(debug_mode: bool, file_encoding: str) -> None:
+    def set_flags(debug_mode: bool, watch_mode: bool, file_encoding: str) -> None:
         """
         set the config flags for the Diffviewer
 
         Parameters:
         debug_mode (bool)
             indicates if debug info should be displayed
+        watch_mode (bool)
+            indicates if the diffviewer should watch for changes
         file_encoding (str):
             the file encoding to use when opening a file
         """
         DiffViewer.debug_mode = debug_mode
+        DiffViewer.watch_mode = watch_mode
         DiffViewer.file_encoding = file_encoding

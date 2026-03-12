@@ -94,11 +94,13 @@ class TestArgParser(TestCase):
     def test_get_arguments_replace_query(self):
         arg_parser = ArgParser()
         arg_parser.get_arguments(['CAT', 'replace=Test123'])
-        self.assertEqual(arg_parser.file_queries_replacement, 'Test123')
-        arg_parser.get_arguments(['CAT', 'REPLACE:Test123'])
-        self.assertEqual(arg_parser.file_queries_replacement, 'Test123')
+        self.assertListEqual(arg_parser.file_queries_replacement, [])
+        arg_parser.get_arguments(['CAT', 'f:1', 'REPLACE:Test123'])
+        self.assertListEqual(arg_parser.file_queries_replacement, ['Test123'])
         arg_parser.get_arguments(['CAT', 'r:Test123'])
-        self.assertEqual(arg_parser.file_queries_replacement, 'Test123')
+        self.assertListEqual(arg_parser.file_queries_replacement, ['Test123'])
+        arg_parser.get_arguments(['CAT', 'f:2', 'f:3', 'r:Test123'])
+        self.assertListEqual(arg_parser.file_queries_replacement, ['Test123'] * 3)
 
     def test_get_arguments_trunc(self):
         arg_parser = ArgParser()
