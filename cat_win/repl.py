@@ -10,7 +10,7 @@ try:
 except KeyboardInterrupt:
     sys.exit(1)
 except Exception as exc:
-    print('an error occured while loading the module:', file=sys.stderr)
+    print('an error occurred while loading the module:', file=sys.stderr)
     print(exc, file=sys.stderr)
     sys.exit(1)
 
