@@ -52,7 +52,7 @@ class ArgParser:
         """
         self.file_encoding = self.default_file_encoding
         self.file_queries = []
-        self.file_queries_replacement = None
+        self.file_queries_replacement = []
         self.file_replace_mapping = {}
         self.file_truncate = [None, None, None]
 
@@ -273,7 +273,12 @@ class ArgParser:
                              param[:p_length].isupper())
             if delete:
                 if query_element in self.file_queries:
-                    self.file_queries.remove(query_element)
+                    self.file_queries.reverse()
+                    idx = len(self.file_queries) - 1 - self.file_queries.index(query_element)
+                    self.file_queries.reverse()
+                    self.file_queries.pop(idx)
+                    if len(self.file_queries_replacement) > idx:
+                        self.file_queries_replacement.pop(idx)
                 return False
             self.file_queries.append(query_element)
             return False
@@ -289,7 +294,12 @@ class ArgParser:
             query_element = (query, param[:p_length].isupper())
             if delete:
                 if query_element in self.file_queries:
-                    self.file_queries.remove(query_element)
+                    self.file_queries.reverse()
+                    idx = len(self.file_queries) - 1 - self.file_queries.index(query_element)
+                    self.file_queries.reverse()
+                    self.file_queries.pop(idx)
+                    if len(self.file_queries_replacement) > idx:
+                        self.file_queries_replacement.pop(idx)
                 return False
             self.file_queries.append(query_element)
             return False
@@ -303,9 +313,18 @@ class ArgParser:
             except UnicodeError:
                 pass
             if delete:
-                self.file_queries_replacement = None
+                if query in self.file_queries_replacement:
+                    idx_s = self.file_queries_replacement.index(query)
+                    self.file_queries_replacement.reverse()
+                    idx_e = self.file_queries_replacement.index(query)
+                    self.file_queries_replacement.reverse()
+                    if idx_e == 0:
+                        self.file_queries_replacement = self.file_queries_replacement[:idx_s]
+                    else:
+                        idx_e = len(self.file_queries_replacement) - idx_e
+                        self.file_queries_replacement = self.file_queries_replacement[:idx_s] + [self.file_queries_replacement[idx_e]] * (idx_e - idx_s) + self.file_queries_replacement[idx_e:]
                 return False
-            self.file_queries_replacement = query
+            self.file_queries_replacement.extend([query] * (len(self.file_queries) - len(self.file_queries_replacement)))
             return False
         # 'trunc' + ('='/':') + file_truncate[0] +':'+ file_truncate[1] [+ ':' + file_truncate[2]]
         if RE_Q_TRUNC.match(param) or RE_T_RUNC.match(param):

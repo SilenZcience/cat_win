@@ -288,6 +288,64 @@ def remove_ansi_codes_from_line(line: str) -> str:
     return ANSI_CSI_RE.sub('', line)
 
 
+def _map_display_pos(display_str: str, plain_pos: int) -> int:
+    """
+    Map a character position in the ANSI-stripped version of display_str
+    to the corresponding position in display_str itself.
+    ANSI escape sequences are skipped first, then the plain character count
+    is incremented.
+    """
+    plain_count = 0
+    i = 0
+    while i < len(display_str):
+        ansi_m = ANSI_CSI_RE.match(display_str, i)
+        if ansi_m:
+            i = ansi_m.end()
+            continue
+        if plain_count == plain_pos:
+            return i
+        plain_count += 1
+        i += 1
+    return i
+
+
+def _build_ansi_restore(display_str: str) -> tuple:
+    """
+    Scan display_str and return:
+      - a dict mapping each plain-text character index to the string of ANSI
+        codes that are active just before that character (used to re-emit lost
+        colours after a close keyword marker).
+      - a set of plain-text positions preceded by at least one ANSI code
+        (used to re-inject open keyword colour after any ANSI override inside
+        a keyword span, so the keyword colour always wins).
+    """
+    restore = {}
+    active = []
+    ansi_set = set()
+    had_ansi = False
+    pc = 0
+    i = 0
+    while i < len(display_str):
+        ansi_m = ANSI_CSI_RE.match(display_str, i)
+        if ansi_m:
+            code = ansi_m.group(0)
+            if code == color_dic[CKW.RESET_ALL]:
+                active = []
+            else:
+                active.append(code)
+            had_ansi = True
+            i = ansi_m.end()
+        else:
+            if had_ansi:
+                ansi_set.add(pc)
+                had_ansi = False
+            restore[pc] = ''.join(active)
+            pc += 1
+            i += 1
+    restore[pc] = ''.join(active)  # state at end of string
+    return restore, ansi_set
+
+
 @lru_cache()
 def _calculate_line_prefix_spacing(line_char_length: int, file_name_prefix: bool = False,
                                    include_file_prefix: bool = False,
@@ -409,7 +467,7 @@ def _get_file_prefix(prefix: str, file_index: int, hyper: bool = False) -> str:
     return f"{color_dic[CKW.FILE_PREFIX]}{file}{color_dic[CKW.RESET_ALL]}:{prefix}"
 
 
-def print_file(content: list, stepper: More) -> bool:
+def print_file(content: list, stepper: More, excluded_by_peek: int) -> bool:
     """
     print a file and possibly include the substrings and patterns to search for.
 
@@ -418,6 +476,8 @@ def print_file(content: list, stepper: More) -> bool:
         the content of a file like [(prefix, line), ...]
     stepper (More):
         the stepper to step through the file
+    excluded_by_peek (int):
+        the amount of lines that have been originally excluded by the peek method
 
     Returns:
     (bool):
@@ -426,48 +486,58 @@ def print_file(content: list, stepper: More) -> bool:
     """
     if not content:
         return False
+    content_len = len(content)//2
     if not any([arg_parser.file_queries, u_args[ARGS_GREP], u_args[ARGS_GREP_ONLY]]):
         if u_args[ARGS_MORE]:
-            stepper.add_lines([prefix + line for prefix, line in content])
+            if content_len:
+                stepper.add_lines([prefix + line for prefix, line in content[:content_len]])
+            print_excluded_by_peek(content, excluded_by_peek)
+            stepper.add_lines([prefix + line for prefix, line in content[content_len:]])
             return False
-        print(*[prefix + line for prefix, line in content], sep='\n')
+        if content_len:
+            print(*[prefix + line for prefix, line in content[:content_len]], sep='\n')
+        print_excluded_by_peek(content, excluded_by_peek)
+        print(*[prefix + line for prefix, line in content[content_len:]], sep='\n')
         return False
 
-    string_finder = StringFinder(arg_parser.file_queries)
+    string_finder = StringFinder(arg_parser.file_queries[len(arg_parser.file_queries_replacement):])
 
     contains_queried = False
-    if arg_parser.file_queries and arg_parser.file_queries_replacement:
-        for line_prefix, line in content:
-            cleaned_line = remove_ansi_codes_from_line(line)
-            for query, ignore_case in arg_parser.file_queries:
-                contains_queried = True
-                if isinstance(query, str):
-                    for f_s, f_e in string_finder.find_literals(query, cleaned_line, ignore_case):
-                        cleaned_line = (
-                            cleaned_line[:f_s] + \
-                                color_dic[CKW.REPLACE] + \
-                                    arg_parser.file_queries_replacement + \
-                                        color_dic[CKW.RESET_ALL] + \
-                                            cleaned_line[f_e:]
-                        )
-                else:
-                    cleaned_line = query.sub(
-                        color_dic[CKW.REPLACE] + \
-                            arg_parser.file_queries_replacement + \
-                                color_dic[CKW.RESET_ALL],
-                                cleaned_line
-                    )
-            if u_args[ARGS_MORE]:
-                stepper.add_line(line_prefix + cleaned_line)
-            else:
-                print(line_prefix + cleaned_line)
-        return contains_queried
-
     last_grep_line = -const_dic[DKW.GREP_CONTEXT_LINES]-1
     grep_context_dq = deque(maxlen=const_dic[DKW.GREP_CONTEXT_LINES])
     for c_idx, (line_prefix, line) in enumerate(content):
-        cleaned_line = remove_ansi_codes_from_line(line)
-        intervals, f_keywords, m_keywords = string_finder.find_keywords(cleaned_line)
+        if c_idx == content_len:
+            print_excluded_by_peek(content, excluded_by_peek)
+
+        plain_line = remove_ansi_codes_from_line(line)
+        display_line = line
+
+        for q_idx, replacement in enumerate(arg_parser.file_queries_replacement):
+            query, ignore_case = arg_parser.file_queries[q_idx]
+            ansi_restore, _ = _build_ansi_restore(display_line)
+            if isinstance(query, str):
+                matches = list(string_finder.find_literals(query, plain_line, ignore_case))
+                disp_pos = [(_map_display_pos(display_line, f_s),
+                             _map_display_pos(display_line, f_e)) for f_s, f_e in matches]
+                for (f_s, f_e), (d_s, d_e) in reversed(list(zip(matches, disp_pos))):
+                    plain_line = plain_line[:f_s] + replacement + plain_line[f_e:]
+                    display_line = (display_line[:d_s]
+                                    + color_dic[CKW.REPLACE] + replacement + color_dic[CKW.RESET_ALL]
+                                    + ansi_restore.get(f_e, '')
+                                    + display_line[d_e:])
+            else:
+                matches = list(query.finditer(plain_line))
+                disp_pos = [(_map_display_pos(display_line, m.start()),
+                             _map_display_pos(display_line, m.end())) for m in matches]
+                for m, (d_s, d_e) in reversed(list(zip(matches, disp_pos))):
+                    repl = m.expand(replacement)
+                    plain_line = plain_line[:m.start()] + repl + plain_line[m.end():]
+                    display_line = (display_line[:d_s]
+                                    + color_dic[CKW.REPLACE] + repl + color_dic[CKW.RESET_ALL]
+                                    + ansi_restore.get(m.end(), '')
+                                    + display_line[d_e:])
+
+        intervals, f_keywords, m_keywords = string_finder.find_keywords(plain_line)
 
         # used for marking the file when displaying applied files
         contains_queried |= bool(intervals)
@@ -476,10 +546,10 @@ def print_file(content: list, stepper: More) -> bool:
         if u_args[ARGS_GREP_ONLY]:
             if intervals:
                 fm_substrings = [(pos[0], f"{color_dic[CKW.FOUND]}" + \
-                    f"{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_FOUND]}")
+                    f"{plain_line[pos[0]:pos[1]]}{color_dic[CKW.RESET_FOUND]}")
                                  for _, pos in f_keywords]
                 fm_substrings+= [(pos[0], f"{color_dic[CKW.MATCHED]}" + \
-                    f"{line[pos[0]:pos[1]]}{color_dic[CKW.RESET_MATCHED]}")
+                    f"{plain_line[pos[0]:pos[1]]}{color_dic[CKW.RESET_MATCHED]}")
                                  for _, pos in m_keywords]
                 fm_substrings.sort(key=lambda x:x[0])
                 grepped_line = f"{line_prefix}{','.join(sub for _, sub in fm_substrings)}"
@@ -502,11 +572,11 @@ def print_file(content: list, stepper: More) -> bool:
         if not intervals:
             if not u_args[ARGS_GREP] or c_idx - last_grep_line <= const_dic[DKW.GREP_CONTEXT_LINES]:
                 if u_args[ARGS_MORE]:
-                    stepper.add_line(line_prefix + line)
+                    stepper.add_line(line_prefix + display_line)
                     continue
-                print(line_prefix + line)
+                print(line_prefix + display_line)
             elif u_args[ARGS_GREP]:
-                grep_context_dq.append(line_prefix + line)
+                grep_context_dq.append(line_prefix + display_line)
             continue
 
         for grep_line in grep_context_dq:
@@ -521,13 +591,38 @@ def print_file(content: list, stepper: More) -> bool:
             continue
 
         if not u_args[ARGS_NOCOL]:
+            # Pre-scan display_line to know:
+            #  - active ANSI state at each plain position (restore after CLOSE)
+            #  - positions where RESET_ALL occurred (re-open colour inside span)
+            ansi_restore, ansi_set = _build_ansi_restore(display_line)
+            # Pair each open marker with its matching close (same colour type,
+            # both lists are in the same reverse-sorted order).
+            found_closes = (pos for pos, code in intervals if code == CKW.RESET_FOUND)
+            matched_closes = (pos for pos, code in intervals if code == CKW.RESET_MATCHED)
+            span_end = {}
+            for pos, code in intervals:
+                if code == CKW.FOUND:
+                    span_end[(pos, code)] = next(found_closes)
+                elif code == CKW.MATCHED:
+                    span_end[(pos, code)] = next(matched_closes)
             for kw_pos, kw_code in intervals:
-                cleaned_line = cleaned_line[:kw_pos] + color_dic[kw_code] + cleaned_line[kw_pos:]
+                mapped = _map_display_pos(display_line, kw_pos)
+                if kw_code in (CKW.FOUND, CKW.MATCHED):
+                    # Re-inject open colour before any char inside the span that
+                    # was preceded by an ANSI code, so the keyword colour wins.
+                    close_pos = span_end[(kw_pos, kw_code)]
+                    for r in sorted([r for r in ansi_set if kw_pos < r < close_pos], reverse=True):
+                        r_mapped = _map_display_pos(display_line, r)
+                        display_line = display_line[:r_mapped] + color_dic[kw_code] + display_line[r_mapped:]
+                    display_line = display_line[:mapped] + color_dic[kw_code] + display_line[mapped:]
+                else:
+                    restore = ansi_restore.get(kw_pos, '')
+                    display_line = display_line[:mapped] + color_dic[kw_code] + restore + display_line[mapped:]
 
         if u_args[ARGS_MORE]:
-            stepper.add_line(line_prefix + cleaned_line)
+            stepper.add_line(line_prefix + display_line)
         else:
-            print(line_prefix + cleaned_line)
+            print(line_prefix + display_line)
 
         if u_args[ARGS_GREP] or u_args[ARGS_NOBREAK]:
             continue
@@ -752,11 +847,7 @@ def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> No
         content = [('', content)]
 
     stepper = More()
-    found_queried = print_file(content[:len(content)//2], stepper)
-    if file_index >= 0:
-        u_files[file_index].set_contains_queried(found_queried)
-    print_excluded_by_peek(content, excluded_by_peek)
-    found_queried = print_file(content[len(content)//2:], stepper)
+    found_queried = print_file(content, stepper, excluded_by_peek)
     if file_index >= 0:
         u_files[file_index].set_contains_queried(found_queried)
 
@@ -880,7 +971,7 @@ def edit_files() -> None:
             edit_file(i)
         else:
             print_raw_view(i, raw_view_mode)
-    if u_args[ARGS_WATCH]:
+    if u_args[ARGS_WATCH] and not u_args[ARGS_DIFF]:
         mtimes = {f.path: get_file_mtime(f.path) for f in u_files}
         try:
             while True:
@@ -1063,7 +1154,7 @@ def init(repl: bool = False) -> tuple:
         cconfig.save_config()
         sys.exit(0)
 
-    DiffViewer.set_flags(u_args[ARGS_DEBUG], arg_parser.file_encoding)
+    DiffViewer.set_flags(u_args[ARGS_DEBUG], u_args[ARGS_WATCH], arg_parser.file_encoding)
     Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
     Editor.set_flags(u_args[ARGS_STDIN] and on_windows_os, u_args[ARGS_DEBUG],
                      const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
@@ -1104,11 +1195,14 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
     if u_args[ARGS_URI]:
         # the dictionary should contain an entry for each valid_url, since
         # generated temp-files are unique
-        temp_files = dict([
-            (IoHelper.write_file(tmp_file_helper.generate_temp_file_name(), read_url(valid_url),
-                                 arg_parser.file_encoding), valid_url)
+        temp_files = {
+            IoHelper.write_file(
+                tmp_file_helper.generate_temp_file_name(),
+                read_url(valid_url),
+                arg_parser.file_encoding
+            ): valid_url
             for valid_url in valid_urls
-        ])
+        }
         known_files.extend(list(temp_files.keys()))
         u_files.set_temp_files_url(temp_files)
     if u_args[ARGS_STDIN]:
