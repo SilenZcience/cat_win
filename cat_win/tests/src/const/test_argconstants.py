@@ -10,7 +10,7 @@ class TestArgConstants(TestCase):
         parameters_short_form = [x.short_form for x in ALL_ARGS]
         parameters_long_form = [x.long_form for x in ALL_ARGS]
         parameters_help = [x.arg_help for x in ALL_ARGS]
-        parameters_id= [x.arg_id for x in ALL_ARGS]
+        parameters_id= [x.arg_id for x in ALL_ARGS if x.arg_id != -1]
         self.assertEqual(len(set(parameters_short_form)), len(parameters_short_form))
         self.assertEqual(len(set(parameters_long_form)), len(parameters_long_form))
         self.assertEqual(len(set(parameters_help)), len(parameters_help))

@@ -3,17 +3,16 @@ A collection of methods for list comprehension in regard to the converter.py mod
 for Python >= 3.8 (using the Walrus operator).
 """
 
+from cat_win.src.domain.contentbuffer import ContentBuffer
 from cat_win.src.service.converter import Converter
 
 
-def comp_eval(converter: Converter, content: list, param: str, cleaner: object) -> list:
+def comp_eval(content: ContentBuffer, param: str, cleaner: object) -> ContentBuffer:
     """
     comprehend the content list for the eval parameter
 
     Parameters:
-    converter (Converter):
-        the converter object instance to use
-    content (list):
+    content (ContentBuffer):
         the file content to comprehend
     param (str):
         the parameter used
@@ -21,20 +20,21 @@ def comp_eval(converter: Converter, content: list, param: str, cleaner: object) 
         the method to call on each line in order to strip ansi color codes
 
     Returns:
-    (list):
+    (ContentBuffer):
         the new comprehended content list with all equations evaluated
     """
-    return [(prefix, evaluated) for prefix, line in content if
-            (evaluated := converter.evaluate(cleaner(line), (param.islower()))) is not None]
+    return ContentBuffer.from_rows(
+        (evaluated, prefix, suffix)
+        for line, prefix, suffix in content
+        if (evaluated := Converter.evaluate(cleaner(line), param.islower())) is not None
+    )
 
-def comp_conv(converter: Converter, content: list, param: str, cleaner: object):
+def comp_conv(content: ContentBuffer, param: str, cleaner: object) -> ContentBuffer:
     """
     comprehend the content list for the dec/hex/bin parameters
 
     Parameters:
-    converter (Converter):
-        the converter object instance to use
-    content (list):
+    content (ContentBuffer):
         the file content to comprehend
     param (str):
         the parameter used
@@ -44,13 +44,15 @@ def comp_conv(converter: Converter, content: list, param: str, cleaner: object):
         the method to call on each line in order to strip ansi color codes
 
     Returns:
-    (list):
+    (ContentBuffer):
         the new comprehended content list with all numbers converted
     """
     base = param.lstrip('-').lower()
-    method_is_convertable = getattr(converter, 'is_' + base, lambda _: False)
-    method_convert = getattr(converter, 'c_from_' + base, lambda x: x)
+    method_is_convertable = getattr(Converter, 'is_' + base, lambda _: False)
+    method_convert = getattr(Converter, 'c_from_' + base, lambda x: x)
 
-    return [(prefix, f"{line} {method_convert(cleaned, param.islower())}")
-            for prefix, line in content if (cleaned := cleaner(line)) \
-                and method_is_convertable(cleaned)]
+    return ContentBuffer.from_rows(
+        (line, prefix, f"{suffix} {method_convert(cleaned, param.islower())}")
+        for line, prefix, suffix in content
+        if (cleaned := cleaner(line)) and method_is_convertable(cleaned)
+    )

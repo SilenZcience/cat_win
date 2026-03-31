@@ -126,3 +126,56 @@ class TestFiles(TestCase):
         self.assertEqual(u_files.is_temp_file(3), True)
         self.assertEqual(u_files.is_temp_file(4), True)
         self.assertEqual(u_files.is_temp_file(5), True)
+
+    def test_files_len(self):
+        u_files = Files()
+        u_files.set_files([test_file_edge_case_3, test_file_edge_case_4])
+        self.assertEqual(len(u_files.files), 2)
+        self.assertEqual(len(u_files), 2)
+
+    def test_files_getitem(self):
+        u_files = Files()
+        u_files.set_files([test_file_edge_case_3, test_file_edge_case_4])
+        self.assertEqual(u_files[0].path, test_file_edge_case_3)
+        self.assertEqual(u_files[1].path, test_file_edge_case_4)
+
+    def test_files_iter(self):
+        u_files = Files()
+        u_files.set_files([test_file_edge_case_3, test_file_edge_case_4])
+        for file, expected_path in zip(u_files, [test_file_edge_case_3, test_file_edge_case_4]):
+            self.assertEqual(file.path, expected_path)
+
+    def test_files_generate_values(self):
+        u_files = Files()
+        u_files.set_files([test_file_edge_case_3, test_file_edge_case_4])
+        self.assertEqual(u_files.file_number_place_holder, 0)
+        self.assertEqual(u_files.all_line_number_place_holder, 0)
+        self.assertEqual(u_files.file_line_length_place_holder, 0)
+
+        u_files = Files()
+        u_files.set_files([test_file_edge_case_3, test_file_edge_case_4])
+        u_files.generate_values(False, False)
+        self.assertEqual(u_files.file_number_place_holder, 1)
+        self.assertEqual(u_files.all_line_number_place_holder, 0)
+        self.assertEqual(u_files.file_line_length_place_holder, 0)
+
+        u_files = Files()
+        u_files.set_files([test_file_edge_case_3, test_file_edge_case_4])
+        u_files.generate_values(True, False)
+        self.assertEqual(u_files.file_number_place_holder, 1)
+        self.assertEqual(u_files.all_line_number_place_holder, 2)
+        self.assertEqual(u_files.file_line_length_place_holder, 0)
+
+        u_files = Files()
+        u_files.set_files([test_file_edge_case_3, test_file_edge_case_4])
+        u_files.generate_values(False, True)
+        self.assertEqual(u_files.file_number_place_holder, 1)
+        self.assertEqual(u_files.all_line_number_place_holder, 0)
+        self.assertEqual(u_files.file_line_length_place_holder, 1)
+
+        u_files = Files()
+        u_files.set_files([test_file_edge_case_3, test_file_edge_case_4])
+        u_files.generate_values(True, True)
+        self.assertEqual(u_files.file_number_place_holder, 1)
+        self.assertEqual(u_files.all_line_number_place_holder, 2)
+        self.assertEqual(u_files.file_line_length_place_holder, 1)

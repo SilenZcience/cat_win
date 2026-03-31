@@ -16,13 +16,13 @@ import time
 from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.service.fileattributes import get_file_size, _convert_size, \
     get_file_mtime, get_file_ctime
-from cat_win.src.service.helper.editorsearchhelper import search_iter_diff_factory
-from cat_win.src.service.helper.editorhelper import Position, frepr, \
+from cat_win.src.curses.helper.editorsearchhelper import search_iter_diff_factory
+from cat_win.src.curses.helper.editorhelper import Position, frepr, \
     UNIFY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, FUNCTION_HOTKEYS
 from cat_win.src.service.helper.environment import on_windows_os
-from cat_win.src.service.helper.githelper import GitHelper
-from cat_win.src.service.helper.diffviewerhelper import DifflibParser, DifflibID
-from cat_win.src.service.helper.iohelper import IoHelper, err_print
+from cat_win.src.curses.helper.githelper import GitHelper
+from cat_win.src.curses.helper.diffviewerhelper import DifflibParser, DifflibID
+from cat_win.src.service.helper.iohelper import IoHelper, logger
 
 
 class DiffViewer:
@@ -37,7 +37,10 @@ class DiffViewer:
 
     file_encoding = 'utf-8'
 
-    def __init__(self, files: list, file_idxs: tuple = None, file_commit_hashes: tuple = (None, None)) -> None:
+    def __init__(
+            self, files: list,
+            file_idxs: tuple = None, file_commit_hashes: tuple = (None, None)
+    ) -> None:
         """
         defines a DiffViewer object.
 
@@ -134,8 +137,7 @@ class DiffViewer:
         except (OSError, UnicodeError) as exc:
             self.error_bar = str(exc)
             self.status_bar_size = 2
-            if self.debug_mode:
-                err_print(self.error_bar, priority=err_print.WARNING)
+            logger(self.error_bar, priority=logger.WARNING)
             self.difflibparser = self.difflibparser_bak = DifflibParser(
                 [],
                 [],
@@ -494,19 +496,19 @@ class DiffViewer:
         self._setup_file()
         return True
 
-    def _watch_update(self) -> None:
+    def _watch_update(self) -> bool:
         """
         auto-reload for watch mode: advance text1 <- old text2, text2 <- fresh file read.
         Only runs when file_commit_hashes[1] is None (local file).
         """
         if self.displaying_overview or self._mtime_cache[1] == get_file_mtime(self.diff_files[1]):
-            return
+            return False
         try:
             new_text2 = IoHelper.read_file(
                 self.diff_files[1], False, DiffViewer.file_encoding, errors='replace'
             ).splitlines()
         except (OSError, UnicodeError):
-            return
+            return False
         old_text2 = self._watch_text2
         self._watch_text2 = new_text2
         self._mtime_cache[0] = self._mtime_cache[1]
@@ -528,8 +530,7 @@ class DiffViewer:
         except (OSError, UnicodeError) as exc:
             self.error_bar = str(exc)
             self.status_bar_size = 2
-            if self.debug_mode:
-                err_print(self.error_bar, priority=err_print.WARNING)
+            logger(self.error_bar, priority=logger.WARNING)
             self.difflibparser = self.difflibparser_bak = DifflibParser(
                 [],
                 [],
@@ -537,8 +538,13 @@ class DiffViewer:
             self.diff_items = self.diff_items_bak = self.difflibparser.get_diff()
             self.rpos.row = 0
         self.curse_window.clear()
+        return True
 
     def _action_background(self) -> bool:
+        if on_windows_os: # TODO: this is weird
+            from cat_win.src.persistence.viewstate import save_view_state
+            save_view_state('viewstate.bin', self)
+            return False
         # only callable on UNIX
         curses.endwin()
         os.kill(os.getpid(), signal.SIGSTOP)
@@ -574,8 +580,7 @@ class DiffViewer:
         (bool):
             indicates if the diffviewer should keep running
         """
-        if self.debug_mode:
-            err_print('Interrupting...', priority=err_print.INFORMATION)
+        logger('Interrupting...', priority=logger.DEBUG)
         raise KeyboardInterrupt
 
     def _action_resize(self) -> bool:
@@ -643,8 +648,14 @@ class DiffViewer:
             if mode == 'files':
                 data_lists = [self.files, self.files]
                 maxlen_displayname = [
-                    max((len(display_name) for _, display_name in self.files[nav_y[0]:nav_y[0]+max_y]), default=0),
-                    max((len(display_name) for _, display_name in self.files[nav_y[1]:nav_y[1]+max_y]), default=0)
+                    max(
+                        (len(display_name)
+                         for _, display_name in self.files[nav_y[0]:nav_y[0]+max_y]
+                        ), default=0),
+                    max(
+                        (len(display_name)
+                         for _, display_name in self.files[nav_y[1]:nav_y[1]+max_y]
+                        ), default=0)
                 ]
             else:
                 data_lists = [file_commits[0] or [], file_commits[1] or []]
@@ -694,7 +705,7 @@ class DiffViewer:
 
                     start_x = 0 if side == 0 else right_x
                     offset_x = nav_x[side]
-                    text = f"{display_name}".ljust(list_width)[offset_x:offset_x+list_width]
+                    text = f"{display_name}"[offset_x:offset_x+list_width].ljust(list_width)
                     try:
                         self.curse_window.addstr(row, start_x, text, color)
                     except curses.error:
@@ -741,7 +752,10 @@ class DiffViewer:
                 active_list = 1 - active_list
             if key in [b'_select_key_left', b'_select_key_right']:
                 active_list = 1 - active_list
-                selected_idx[active_list] = min(selected_idx[1 - active_list], len(data_lists[active_list]) - 1)
+                selected_idx[active_list] = min(
+                    selected_idx[1 - active_list],
+                    len(data_lists[active_list]) - 1
+                )
                 nav_y[active_list] = min(nav_y[active_list], selected_idx[active_list])
                 if selected_idx[active_list] >= nav_y[active_list] + max_y - 1:
                     nav_y[active_list] = selected_idx[active_list] - max_y + 1
@@ -769,9 +783,15 @@ class DiffViewer:
                 elif key == b'_move_key_ctl_left':
                     nav_x[active_list] = max(0, nav_x[active_list] - 10)
                 elif key == b'_move_key_right':
-                    nav_x[active_list] = max(0, min(maxlen_displayname[active_list] - list_width, nav_x[active_list] + 1))
+                    nav_x[active_list] = max(
+                        0,
+                        min(maxlen_displayname[active_list] - list_width, nav_x[active_list] + 1)
+                    )
                 elif key == b'_move_key_ctl_right':
-                    nav_x[active_list] = max(0, min(maxlen_displayname[active_list] - list_width, nav_x[active_list] + 10))
+                    nav_x[active_list] = max(
+                        0,
+                        min(maxlen_displayname[active_list] - list_width, nav_x[active_list] + 10)
+                    )
 
             if key == b'_key_enter' or (key == b'_key_string' and wchar == ' '):
                 if mode == 'files':
@@ -786,9 +806,19 @@ class DiffViewer:
 
                     if file_commits[0] or file_commits[1]:
                         if file_commits[0]:
-                            file_commits[0] = [{'hash': '_LOCAL_', 'date': ' _Latest_ ', 'author': '_Local_', 'message': 'Use local file (not git)'}] + file_commits[0]
+                            file_commits[0] = [
+                                {
+                                    'hash': '_LOCAL_', 'date': ' _Latest_ ',
+                                    'author': '_Local_', 'message': 'Use local file (not git)'
+                                }
+                            ] + file_commits[0]
                         if file_commits[1]:
-                            file_commits[1] = [{'hash': '_LOCAL_', 'date': ' _Latest_ ', 'author': '_Local_', 'message': 'Use local file (not git)'}] + file_commits[1]
+                            file_commits[1] = [
+                                {
+                                    'hash': '_LOCAL_', 'date': ' _Latest_ ',
+                                    'author': '_Local_', 'message': 'Use local file (not git)'
+                                }
+                            ] + file_commits[1]
                         mode = 'commits'
                         selected_idx = [0, 0]
                         for side in (0, 1):
@@ -796,7 +826,9 @@ class DiffViewer:
                                 try:
                                     selected_idx[side] = file_commits[side].index(self.file_commit_hashes[side]) if (
                                         isinstance(self.file_commit_hashes[side], dict)
-                                    ) else [item['hash'] for item in file_commits[side]].index(self.file_commit_hashes[side])
+                                    ) else [
+                                        item['hash'] for item in file_commits[side]
+                                    ].index(self.file_commit_hashes[side])
                                 except ValueError:
                                     pass
                         nav_x = [0, 0]
@@ -885,7 +917,8 @@ class DiffViewer:
                 self.curse_window.clrtoeol()
                 break
         self.curse_window.refresh()
-        self._get_next_char()
+        while self._get_next_char() == (-1, b'_key_timeout'):
+            pass
 
     def _function_overview(self) -> None:
         """
@@ -948,7 +981,10 @@ class DiffViewer:
             commit = self.file_commit_hashes[0]
             data_list1.insert(6, '')
             if isinstance(commit, dict):
-                data_list1.insert(6, f"{commit['hash'][:7]} | {commit['date'][:19]} | {commit['author']} | {commit['message']}")
+                data_list1.insert(
+                    6,
+                    f"{commit['hash'][:7]} | {commit['date'][:19]} | {commit['author']} | {commit['message']}"
+                )
             else:
                 data_list1.insert(6, commit[:7])
             data_list1.insert(6, 'Git commit:')
@@ -987,7 +1023,10 @@ class DiffViewer:
             commit = self.file_commit_hashes[1]
             data_list2.insert(6, '')
             if isinstance(commit, dict):
-                data_list2.insert(6, f"{commit['hash'][:7]} | {commit['date'][:19]} | {commit['author']} | {commit['message']}")
+                data_list2.insert(
+                    6,
+                    f"{commit['hash'][:7]} | {commit['date'][:19]} | {commit['author']} | {commit['message']}"
+                )
             else:
                 data_list2.insert(6, commit[:7])
             data_list2.insert(6, 'Git commit:')
@@ -1046,11 +1085,10 @@ class DiffViewer:
             the char received and the possible action it means.
         """
         def debug_out(wchar_, key__, key_) -> None:
-            if self.debug_mode:
-                _debug_info = repr(chr(wchar_)) if isinstance(wchar_, int) else \
-                    ord(wchar_) if len(wchar_) == 1 else '-'
-                err_print(f"__DEBUG__: Received  {str(key_):<22}{_debug_info}" + \
-                    f"\t{str(key__):<15} \t{repr(wchar_)}", priority=err_print.INFORMATION)
+            _debug_info = repr(chr(wchar_)) if isinstance(wchar_, int) else \
+                ord(wchar_) if len(wchar_) == 1 else '-'
+            logger(f"__DEBUG__: Received  {str(key_):<22}{_debug_info}" + \
+                f"\t{str(key__):<15} \t{repr(wchar_)}", priority=logger.DEBUG)
         try:
             wchar = self.curse_window.get_wch()
         except curses.error:
@@ -1117,10 +1155,16 @@ class DiffViewer:
             status_bar+= f"Deletions: {self.difflibparser.count_delete} | "
             status_bar+= f"Modifications: {self.difflibparser.count_changed} | "
             similarity = self._get_diff_ratio(self.rpos.row)
-            status_bar+= f"Similarity: {similarity:6.2f}% | "
+            status_bar+= f"LineDiff: {similarity:6.2f}% | "
+            if DiffViewer.watch_mode and self.file_commit_hashes[1] is None:
+                elapsed = int(time.time() - self._mtime_cache[1])
+                ds, rem = divmod(elapsed, 86400)
+                hs, rem = divmod(rem, 3600)
+                ms, ss = divmod(rem, 60)
+                status_bar+=f"Changed: {(str(ds)+'d ')*bool(ds)}{hs:02d}:{ms:02d}:{ss:02d} | "
             status_bar+= 'Help: F1'
             if self.debug_mode:
-                status_bar += f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x}"
+                status_bar+=f" - Win: {self.wpos.col+1} {self.wpos.row+1} | {max_y}x{max_x}"
             # this throws an error (should be max_x-1), but looks better:
             status_bar = status_bar[:max_x].ljust(max_x)
             self.curse_window.addstr(max_y + self.status_bar_size - 1, 0,
@@ -1310,8 +1354,10 @@ class DiffViewer:
                     _now = time.time()
                     if _now - _last_watch_time >= 5:
                         _last_watch_time = _now
-                        self._watch_update()
-                        self._render_scr()
+                        if self._watch_update():
+                            self._render_scr()
+
+                    self._render_status_bar(*self.getxymax())
 
                 wchar, key = self._get_next_char()
 
@@ -1423,7 +1469,7 @@ class DiffViewer:
         curses.raw()
         self.curse_window.nodelay(False)
 
-    def _open(self) -> None:
+    def _open(self, fg: bool = False) -> None:
         """
         init, run, deinit
         """
@@ -1433,47 +1479,56 @@ class DiffViewer:
         except (Exception, KeyboardInterrupt) as e:
             curses.endwin()
             if not isinstance(e, KeyboardInterrupt):
-                err_print('Oops..! Something went wrong.', priority=err_print.IMPORTANT)
+                logger('Oops..! Something went wrong.', priority=logger.WARNING)
             raise e
         finally:
             curses.endwin()
 
     @classmethod
-    def open(cls, files: list) -> None:
+    def open(cls, files: list, fg_state = None) -> None:
         """
         simple diffviewer to view the contents/differences of two provided files.
 
         Parameters:
         files (list):
             list of tuples (file, display_name)
+        fg_state:
+            the state of the previously opened diffviewer that got put into background
         """
         if DiffViewer.loading_failed:
             return
 
         if CURSES_MODULE_ERROR:
-            err_print("The Diffviewer could not be loaded. No Module 'curses' was found.", priority=err_print.INFORMATION)
+            logger(
+                "The Diffviewer could not be loaded. No Module 'curses' was found.",
+                priority=logger.INFO
+            )
             if on_windows_os:
-                err_print('If you are on Windows OS, try pip-installing ', end='', priority=err_print.INFORMATION)
-                err_print("'windows-curses'.", priority=err_print.INFORMATION)
-            err_print(priority=err_print.INFORMATION)
+                logger(
+                    'If you are on Windows OS, try pip-installing ', end='',
+                    priority=logger.INFO
+                )
+                logger("'windows-curses'.", priority=logger.INFO)
+            logger(priority=logger.INFO)
             DiffViewer.loading_failed = True
             return
 
-        diffviewer = cls(files)
-
-        if on_windows_os:
-            # disable background feature on windows
-            diffviewer._action_background = lambda *_: True
+        if fg_state is None:
+            diffviewer = cls(files)
         else:
+            diffviewer = fg_state
+
+        if not on_windows_os:
             # ignore background signals on UNIX, since a custom background implementation exists
             signal.signal(signal.SIGTSTP, signal.SIG_IGN)
 
-        diffviewer._open()
+        diffviewer._open(fg=fg_state is not None)
         while diffviewer.open_next_idxs is not None:
-            diffviewer = cls(files, file_idxs = diffviewer.open_next_idxs, file_commit_hashes = diffviewer.open_next_hashes)
-            if on_windows_os:
-                # disable background feature on windows
-                diffviewer._action_background = lambda *_: True
+            diffviewer = cls(
+                files,
+                file_idxs = diffviewer.open_next_idxs,
+                file_commit_hashes = diffviewer.open_next_hashes
+            )
             diffviewer._open()
 
     @staticmethod

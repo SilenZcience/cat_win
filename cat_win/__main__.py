@@ -6,7 +6,7 @@ import os
 import platform
 import sys
 
-if (3,14) <= sys.version_info <= (3,15) and platform.system() == 'Windows':
+if (3,14) <= sys.version_info < (3,15) and platform.system() == 'Windows':
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '_vendor')))
 
 try:
@@ -18,13 +18,13 @@ except Exception as exc:
     print(exc, file=sys.stderr)
     sys.exit(1)
 
-def repl_entry_point():
+def repl_entry_point() -> None:
     """
     run the repl.
     """
     cat.repl_main()
 
-def entry_point():
+def entry_point() -> None:
     """
     run the main program.
     """

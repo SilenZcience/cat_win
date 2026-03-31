@@ -7,10 +7,21 @@ import glob
 import os
 
 from cat_win.src.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_ECHO
-from cat_win.src.const.regex import compile_re
-from cat_win.src.const.regex import RE_ENCODING, RE_Q_MATCH, RE_M_ATCH, RE_Q_FIND, RE_F_IND
-from cat_win.src.const.regex import RE_Q_REPLACE, RE_R_EPLACE, RE_Q_TRUNC, RE_T_RUNC
-from cat_win.src.const.regex import RE_CUT, RE_REPLACE, RE_REPLACE_COMMA
+from cat_win.src.const.regex import (
+    compile_re,
+    RE_ENCODING,
+    RE_Q_MATCH,
+    RE_M_ATCH,
+    RE_Q_FIND,
+    RE_F_IND,
+    RE_Q_REPLACE,
+    RE_R_EPLACE,
+    RE_Q_TRUNC,
+    RE_T_RUNC,
+    RE_CUT,
+    RE_REPLACE,
+    RE_REPLACE_COMMA
+)
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.web.urls import sep_valid_urls
 
@@ -21,15 +32,19 @@ class ArgParser:
     """
     defines the ArgParser
     """
-    def __init__(self, default_file_encoding: str = 'utf-8',
-                 unicode_echo: bool = True,
-                 unicode_find: bool = True,
-                 unicode_replace: bool = True) -> None:
+    def __init__(
+            self, default_file_encoding: str = 'utf-8',
+            unicode_echo: bool = True,
+            unicode_find: bool = True,
+            unicode_replace: bool = True,
+            custom_commands: dict = None
+    ) -> None:
         self.win_prefix_lit = '\\\\?\\' * on_windows_os
         self.default_file_encoding: str = default_file_encoding
         self.unicode_echo: bool = unicode_echo
         self.unicode_find = unicode_find
         self.unicode_replace = unicode_replace
+        self.custom_commands = custom_commands or {}
         self._clear_values()
         self.reset_values()
 
@@ -53,7 +68,6 @@ class ArgParser:
         self.file_encoding = self.default_file_encoding
         self.file_queries = []
         self.file_queries_replacement = []
-        self.file_replace_mapping = {}
         self.file_truncate = [None, None, None]
 
     def get_args(self) -> list:
@@ -143,8 +157,12 @@ class ArgParser:
                 continue
             if struct_type == IS_DIR:
                 self._known_directories.append(structure)
-            path_gen = structure.glob('*') if struct_type == IS_DIR else glob.iglob(structure,
-                                                                            recursive=True)
+            path_gen = structure.glob(
+                '*'
+            ) if struct_type == IS_DIR else glob.iglob(
+                structure,
+                recursive=True
+            )
             for _filename in path_gen:
                 norm_path = Path(os.path.realpath(_filename))
                 p_name = Path(_filename).name
@@ -324,7 +342,9 @@ class ArgParser:
                         idx_e = len(self.file_queries_replacement) - idx_e
                         self.file_queries_replacement = self.file_queries_replacement[:idx_s] + [self.file_queries_replacement[idx_e]] * (idx_e - idx_s) + self.file_queries_replacement[idx_e:]
                 return False
-            self.file_queries_replacement.extend([query] * (len(self.file_queries) - len(self.file_queries_replacement)))
+            self.file_queries_replacement.extend(
+                [query] * (len(self.file_queries) - len(self.file_queries_replacement))
+            )
             return False
         # 'trunc' + ('='/':') + file_truncate[0] +':'+ file_truncate[1] [+ ':' + file_truncate[2]]
         if RE_Q_TRUNC.match(param) or RE_T_RUNC.match(param):
@@ -337,7 +357,13 @@ class ArgParser:
             return False
         # '[' + ARGS_CUT + ']'
         if RE_CUT.match(param):
-            self._args.append((ARGS_CUT, param))
+            slice_evals = [None] * 3
+            for i, p_split in enumerate(param[1:-1].split(':')):
+                try:
+                    slice_evals[i] = int(eval(p_split, {"__builtins__": {}}))
+                except (SyntaxError, NameError, ValueError, ArithmeticError):
+                    pass
+            self._args.append((ARGS_CUT, tuple(slice_evals)))
             return False
         # '[' + ARGS_REPLACE_THIS + ',' + ARGS_REPLACE_WITH + ']' (escape chars with '\')
         if RE_REPLACE.match(param):
@@ -350,13 +376,23 @@ class ArgParser:
                     re_with = re_with.encode().decode('unicode_escape').encode('latin-1').decode()
             except UnicodeError:
                 pass
-            finally:
-                self.file_replace_mapping[param] = (re_this, re_with)
-            self._args.append((ARGS_REPLACE, param))
+            self._args.append((ARGS_REPLACE, (re_this, re_with)))
             return False
 
+        # custom parameters
+        for arg in self.custom_commands.keys():
+            if param == arg:
+                custom_args = self.custom_commands[arg]
+                for i, c_arg in enumerate(custom_args):
+                    if self._add_argument(c_arg, delete):
+                        if i < len(custom_args) - 1:
+                            self._echo_args.extend(custom_args[i+1:])
+                        return True
+                return False
         # default parameters
         for arg in ALL_ARGS:
+            if arg.arg_id < 0:
+                continue
             if param in (arg.short_form, arg.long_form):
                 self._args.append((arg.arg_id, param))
                 return arg.arg_id == ARGS_ECHO
@@ -368,6 +404,8 @@ class ArgParser:
         if len(param) > 2 and param[0] == '-' != param[1]:
             for i in range(1, len(param)):
                 if self._add_argument('-' + param[i], delete):
+                    if i < len(param) - 1:
+                        self._echo_args.append(param[i+1:])
                     return True
         # out of bound is not possible, in case of length 0 param, possible_path would have
         # become the working-path and therefor handled the param as a directory

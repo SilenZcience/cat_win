@@ -1,7 +1,10 @@
 from unittest import TestCase
 from unittest.mock import patch
+from types import SimpleNamespace
 import os
 
+from cat_win.src.const.colorconstants import CKW
+from cat_win.src.domain.file import File
 from cat_win.tests.mocks.error import ErrorDefGen
 from cat_win.src.service.rawviewer import get_display_char_gen, get_raw_view_lines_gen
 
@@ -11,6 +14,22 @@ test_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'texts', 't
 
 class TestRawViewer(TestCase):
     maxDiff = None
+
+    @staticmethod
+    def _ctx(path: str, colors: dict = None, encoding: str = 'utf-8', truncate: list = None):
+        if truncate is None:
+            truncate = [None, None, None]
+        color_dic = {
+            CKW.RAWVIEWER: '',
+            CKW.RESET_ALL: '',
+        }
+        if colors:
+            color_dic.update(colors)
+        return SimpleNamespace(
+            color_dic=color_dic,
+            arg_parser=SimpleNamespace(file_truncate=truncate, file_encoding=encoding),
+            u_files=[File(path, path)],
+        )
 
     def test_get_display_char_gen(self):
         gen_no_encoding_error = get_display_char_gen()
@@ -45,7 +64,10 @@ Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text
 000000A0 65 21 0D 0A 54 68 69 73 20 4C 69 6E 65 20 69 73 # e ! ␍ ␤ T h i s   L i n e   i s
 000000B0 20 61 20 44 75 70 6C 69 63 61 74 65 21          #   a   D u p l i c a t e !"""
 
-        self.assertEqual('\n'.join(get_raw_view_lines_gen(test_file_path, 'ERROR')), expected_result)
+        self.assertEqual(
+            '\n'.join(get_raw_view_lines_gen(self._ctx(test_file_path), 0, 'ERROR')),
+            expected_result
+        )
 
     def test_mode_x(self):
         expected_result = """\
@@ -63,7 +85,10 @@ Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text
 000000A0 65 21 0d 0a 54 68 69 73 20 4c 69 6e 65 20 69 73 # e ! ␍ ␤ T h i s   L i n e   i s
 000000B0 20 61 20 44 75 70 6c 69 63 61 74 65 21          #   a   D u p l i c a t e !"""
 
-        self.assertEqual('\n'.join(get_raw_view_lines_gen(test_file_path, 'x')), expected_result)
+        self.assertEqual(
+            '\n'.join(get_raw_view_lines_gen(self._ctx(test_file_path), 0, 'x')),
+            expected_result
+        )
 
     def test_mode_b(self):
         expected_result = """\
@@ -81,7 +106,10 @@ Address  00       01       02       03       04       05       06       07      
 000000A0 01100101 00100001 00001101 00001010 01010100 01101000 01101001 01110011 00100000 01001100 01101001 01101110 01100101 00100000 01101001 01110011 # e ! ␍ ␤ T h i s   L i n e   i s
 000000B0 00100000 01100001 00100000 01000100 01110101 01110000 01101100 01101001 01100011 01100001 01110100 01100101 00100001                            #   a   D u p l i c a t e !"""
 
-        self.assertEqual('\n'.join(get_raw_view_lines_gen(test_file_path, 'b')), expected_result)
+        self.assertEqual(
+            '\n'.join(get_raw_view_lines_gen(self._ctx(test_file_path), 0, 'b')),
+            expected_result
+        )
 
     def test_mode_x_upper_colored(self):
         expected_result = """\
@@ -99,20 +127,52 @@ Address  00       01       02       03       04       05       06       07      
 *000000A0! 65 21 0D 0A 54 68 69 73 20 4C 69 6E 65 20 69 73 *#! e ! ␍ ␤ T h i s   L i n e   i s
 *000000B0! 20 61 20 44 75 70 6C 69 63 61 74 65 21          *#!   a   D u p l i c a t e !"""
 
-        self.assertEqual('\n'.join(get_raw_view_lines_gen(test_file_path, 'X', ['*', '!'])),
-                         expected_result)
+        self.assertEqual(
+            '\n'.join(get_raw_view_lines_gen(
+                self._ctx(test_file_path, {
+                    CKW.RAWVIEWER: '*',
+                    CKW.RESET_ALL: '!',
+                }),
+                0,
+                'X'
+            )),
+            expected_result
+        )
 
     def test_get_raw_view_lines_gen_oserror(self):
         with patch('cat_win.src.service.helper.iohelper.IoHelper.read_file',
                    ErrorDefGen.get_def(FileNotFoundError('Test123'))):
-            self.assertEqual('\n'.join(get_raw_view_lines_gen(__file__)), 'FileNotFoundError')
+            self.assertEqual(
+                '\n'.join(get_raw_view_lines_gen(self._ctx(__file__), 0)),
+                'FileNotFoundError'
+            )
         with patch('cat_win.src.service.helper.iohelper.IoHelper.read_file',
                    ErrorDefGen.get_def(PermissionError('Test123'))):
-            self.assertEqual('\n'.join(get_raw_view_lines_gen(__file__)), 'PermissionError')
+            self.assertEqual(
+                '\n'.join(get_raw_view_lines_gen(self._ctx(__file__), 0)),
+                'PermissionError'
+            )
 
     def test_encoding_error(self):
-        result = '\n'.join(get_raw_view_lines_gen(test_file_path, 'X', None, 'utf-16'))
+        result = '\n'.join(get_raw_view_lines_gen(
+            self._ctx(test_file_path, encoding='utf-16'),
+            0,
+            'X'
+        ))
 
         self.assertNotIn('␍', result)
         self.assertNotIn('␤', result)
         self.assertNotIn('·', result)
+
+    def test_truncate_slicing(self):
+        expected_result = """\
+Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text                   
+00000000 33 34 35 36 37 38                               # 3 4 5 6 7 8
+The raw file content was truncated to slice(2, 8, None). The address information could be wrong."""
+        with patch('cat_win.src.service.helper.iohelper.IoHelper.read_file', lambda *_: b'1234567890'):
+            result = '\n'.join(get_raw_view_lines_gen(
+                self._ctx(test_file_path, truncate=[2, 8]),
+                0,
+                'X'
+            ))
+            self.assertEqual(result, expected_result)

@@ -3,9 +3,12 @@ from unittest.mock import patch
 import io
 
 from cat_win.tests.mocks.error import ErrorDefGen
+from cat_win.tests.mocks.logger import LoggerStub
 from cat_win.src.web import updatechecker
+from cat_win import __version__
 # import sys
 # sys.path.append('../cat_win')
+logger = LoggerStub()
 
 
 class TestUpdateChecker(TestCase):
@@ -40,6 +43,12 @@ class TestUpdateChecker(TestCase):
         self.assertEqual(updatechecker.only_numeric('1nh'), 1)
         self.assertEqual(updatechecker.only_numeric('123'), 123)
         self.assertEqual(updatechecker.only_numeric('abc'), 0)
+
+    def test_only_alpha(self):
+        self.assertEqual(updatechecker.only_alpha('1nh589h15io125b085218'), 'nhhiob')
+        self.assertEqual(updatechecker.only_alpha('1nh'), 'nh')
+        self.assertEqual(updatechecker.only_alpha('123'), '')
+        self.assertEqual(updatechecker.only_alpha('abc'), 'abc')
 
     def test_gen_version_tuples(self):
         self.assertEqual(updatechecker.gen_version_tuples('1.0.33.0', '1.1.0a'),
@@ -95,3 +104,52 @@ class TestUpdateChecker(TestCase):
 
     def test_version_availability_current_is_newest(self):
         self.assertEqual(updatechecker.new_version_available('v1.1.9', '1.0.9a'), 0)
+
+    @patch('cat_win.src.web.updatechecker.logger', logger)
+    def test_print_update_information(self):
+        logger.clear()
+        with patch('cat_win.src.web.updatechecker.get_stable_package_version', lambda *args, **kwargs: '1.2.3'):
+            with patch('cat_win.src.web.updatechecker.get_latest_package_version', lambda *args, **kwargs: '2.3.4'):
+                with patch('cat_win.src.web.updatechecker.new_version_available', lambda *args, **kwargs: updatechecker.STATUS_UP_TO_DATE):
+                    updatechecker.print_update_information('cat_win', '1.2.3')
+                    self.assertEqual(logger.output(), '')
+
+        logger.clear()
+        with patch('cat_win.src.web.updatechecker.get_stable_package_version', lambda *args, **kwargs: __version__):
+            with patch('cat_win.src.web.updatechecker.get_latest_package_version', lambda *args, **kwargs: __version__):
+                with patch('cat_win.src.web.updatechecker.new_version_available', lambda *args, **kwargs: updatechecker.STATUS_STABLE_RELEASE_AVAILABLE):
+                    updatechecker.print_update_information('cat_win', __version__)
+                    self.assertIn('new stable release', logger.output())
+                    self.assertIn('changelog', logger.output())
+                    self.assertNotIn('Warning:', logger.output())
+                    self.assertNotIn('pre-release', logger.output())
+
+        logger.clear()
+        with patch('cat_win.src.web.updatechecker.get_stable_package_version', lambda *args, **kwargs: __version__):
+            with patch('cat_win.src.web.updatechecker.get_latest_package_version', lambda *args, **kwargs: __version__):
+                with patch('cat_win.src.web.updatechecker.new_version_available', lambda *args, **kwargs: updatechecker.STATUS_UNSAFE_STABLE_RELEASE_AVAILABLE):
+                    updatechecker.print_update_information('cat_win', __version__)
+                    self.assertIn('new stable release', logger.output())
+                    self.assertIn('changelog', logger.output())
+                    self.assertIn('Warning:', logger.output())
+                    self.assertNotIn('pre-release', logger.output())
+
+        logger.clear()
+        with patch('cat_win.src.web.updatechecker.get_stable_package_version', lambda *args, **kwargs: __version__):
+            with patch('cat_win.src.web.updatechecker.get_latest_package_version', lambda *args, **kwargs: __version__):
+                with patch('cat_win.src.web.updatechecker.new_version_available', lambda *args, **kwargs: updatechecker.STATUS_PRE_RELEASE_AVAILABLE):
+                    updatechecker.print_update_information('cat_win', __version__)
+                    self.assertNotIn('new stable release', logger.output())
+                    self.assertIn('changelog', logger.output())
+                    self.assertNotIn('Warning:', logger.output())
+                    self.assertIn('pre-release', logger.output())
+
+        logger.clear()
+        with patch('cat_win.src.web.updatechecker.get_stable_package_version', lambda *args, **kwargs: __version__):
+            with patch('cat_win.src.web.updatechecker.get_latest_package_version', lambda *args, **kwargs: __version__):
+                with patch('cat_win.src.web.updatechecker.new_version_available', lambda *args, **kwargs: updatechecker.STATUS_UNSAFE_PRE_RELEASE_AVAILABLE):
+                    updatechecker.print_update_information('cat_win', __version__)
+                    self.assertNotIn('new stable release', logger.output())
+                    self.assertIn('changelog', logger.output())
+                    self.assertIn('Warning:', logger.output())
+                    self.assertIn('pre-release', logger.output())

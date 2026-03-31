@@ -172,8 +172,9 @@ class Files:
         return len(str(len(heap[0])))
 
     def _calc_file_line_length_place_holder_(self) -> None:
-        self.file_line_length_place_holder = max(self._calc_max_line_length_(file.path)
-                                             for file in self.files)
+        self.file_line_length_place_holder = max(
+            self._calc_max_line_length_(file.path) for file in self.files
+        )
 
     def generate_values(self, calc_l_: bool, calc_ll_: bool) -> None:
         """

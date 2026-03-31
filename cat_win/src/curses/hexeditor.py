@@ -14,13 +14,13 @@ import signal
 import sys
 
 from cat_win.src.const.escapecodes import ESC_CODE
-from cat_win.src.service.helper.editorsearchhelper import search_iter_hex_factory
-from cat_win.src.service.helper.editorhelper import Position, frepr, \
+from cat_win.src.curses.helper.editorsearchhelper import search_iter_hex_factory
+from cat_win.src.curses.helper.editorhelper import Position, frepr, \
     UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, SELECT_HOTKEYS, \
         FUNCTION_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.environment import on_windows_os
-from cat_win.src.service.helper.githelper import GitHelper
-from cat_win.src.service.helper.iohelper import IoHelper, err_print
+from cat_win.src.curses.helper.githelper import GitHelper
+from cat_win.src.service.helper.iohelper import IoHelper, logger
 from cat_win.src.service.clipboard import Clipboard
 from cat_win.src.service.rawviewer import get_display_char_gen
 
@@ -186,8 +186,7 @@ class HexEditor:
             self.unsaved_progress = True
             self.error_bar = str(exc)
             self.status_bar_size = 2
-            if self.debug_mode:
-                err_print(self.error_bar, priority=err_print.WARNING)
+            logger(self.error_bar, priority=logger.DEBUG)
 
     def _get_current_state_bytes_row(self, row: int) -> bytes:
         """
@@ -579,8 +578,7 @@ class HexEditor:
             self.unsaved_progress = True
             self.error_bar = str(exc)
             self.status_bar_size = 2
-            if self.debug_mode:
-                err_print(self.error_bar, priority=err_print.WARNING)
+            logger(self.error_bar, priority=logger.ERROR)
         return True
 
     def _action_jump(self) -> bool:
@@ -724,11 +722,13 @@ class HexEditor:
                             downwards=(find_next >= 0)
                         )
                     except ValueError as exc:
+
                         tmp_error = str(exc)
+                        tmp_error += self.search
                         continue
                     max_y, _ = self.getxymax()
                     cpos = next(search)
-                    self.search_items[cpos] = search.s_len
+                    self.search_items[cpos] = (search.s_len, search.match_start_half)
                     if not self.selecting:
                         if find_next >= 0:
                             self.cpos.set_pos((max(cpos[0]-max_y, 0), 0))
@@ -744,7 +744,7 @@ class HexEditor:
                         if search_pos[0] < cpos[0]-max_y or search_pos[0] > cpos[0]+max_y:
                             break
                         self.cpos.set_pos(search_pos)
-                        self.search_items[search_pos] = search.s_len
+                        self.search_items[search_pos] = (search.s_len, search.match_start_half)
                     self.cpos.set_pos(cpos)
                     break
                 except StopIteration:
@@ -839,6 +839,10 @@ class HexEditor:
         return True
 
     def _action_background(self) -> bool:
+        if on_windows_os: # TODO: this is weird
+            from cat_win.src.persistence.viewstate import save_view_state
+            save_view_state('viewstate.bin', self)
+            return False
         # only callable on UNIX
         curses.endwin()
         os.kill(os.getpid(), signal.SIGSTOP)
@@ -889,8 +893,7 @@ class HexEditor:
         (bool):
             indicates if the editor should keep running
         """
-        if self.debug_mode:
-            err_print('Interrupting...', priority=err_print.INFORMATION)
+        logger('Interrupting...', priority=logger.DEBUG)
         raise KeyboardInterrupt
 
     def _action_resize(self) -> bool:
@@ -989,7 +992,10 @@ class HexEditor:
                     color = self._get_color(12)
 
                 try:
-                    self.curse_window.addstr(row, 0, f"{display_name}".ljust(max_x)[nav_x:nav_x+max_x], color)
+                    self.curse_window.addstr(
+                        row, 0, f"{display_name}"[nav_x:nav_x+max_x].ljust(max_x),
+                        color
+                    )
                     self.curse_window.clrtoeol()
                 except curses.error:
                     break
@@ -1060,19 +1066,28 @@ class HexEditor:
                     file_selected_idx = selected_idx
 
                     try:
-                        file_commits = GitHelper.get_git_file_history(self.files[file_selected_idx][0])
+                        file_commits = GitHelper.get_git_file_history(
+                            self.files[file_selected_idx][0]
+                        )
                     except OSError:
                         file_commits = None
 
                     if file_commits:
-                        file_commits = [{'hash': '_LOCAL_', 'date': ' _Latest_ ', 'author': '_Local_', 'message': 'Use local file (not git)'}] + file_commits
+                        file_commits = [
+                            {
+                                'hash': '_LOCAL_', 'date': ' _Latest_ ',
+                                'author': '_Local_', 'message': 'Use local file (not git)'
+                            }
+                        ] + file_commits
                         mode = 'commits'
                         selected_idx = 0
                         if self.file_commit_hash is not None:
                             try:
                                 selected_idx = file_commits.index(self.file_commit_hash) if (
                                     isinstance(self.file_commit_hash, dict)
-                                ) else [item['hash'] for item in file_commits].index(self.file_commit_hash)
+                                ) else [
+                                    item['hash'] for item in file_commits
+                                ].index(self.file_commit_hash)
                             except ValueError:
                                 pass
                         nav_x = 0
@@ -1172,11 +1187,10 @@ class HexEditor:
             the char received and the possible action it means.
         """
         def debug_out(wchar_, key__, key_) -> None:
-            if self.debug_mode:
-                _debug_info = repr(chr(wchar_)) if isinstance(wchar_, int) else \
-                    ord(wchar_) if len(wchar_) == 1 else '-'
-                err_print(f"__DEBUG__: Received  {str(key_):<22}{_debug_info}" + \
-                    f"\t{str(key__):<15} \t{repr(wchar_)}", priority=err_print.INFORMATION)
+            _debug_info = repr(chr(wchar_)) if isinstance(wchar_, int) else \
+                ord(wchar_) if len(wchar_) == 1 else '-'
+            logger(f"__DEBUG__: Received  {str(key_):<22}{_debug_info}" + \
+                f"\t{str(key__):<15} \t{repr(wchar_)}", priority=logger.DEBUG)
         wchar = self.curse_window.get_wch()
         _key = curses.keyname(wchar if isinstance(wchar, int) else ord(wchar))
         key = UNIFY_HOTKEYS.get(_key, b'_key_string')
@@ -1305,55 +1319,50 @@ class HexEditor:
                 pass
 
     def _render_search_items(self, max_y: int) -> None:
-        # Highlight Search Items
-        for (row, col), length in self.search_items.items():
-            e_row = row + (col+length//2 - 1) // HexEditor.columns
-            e_col = (col+length//2 - 1) % HexEditor.columns
+        def render_item(row: int, col: int, length: int, start_half: int, color_id: int) -> None:
+            if length <= 0:
+                return
+            end_offset_bytes = (start_half + length - 1) // 2
+            e_row = row + (col + end_offset_bytes) // HexEditor.columns
+            e_col = (col + end_offset_bytes) % HexEditor.columns
+            first_byte_nibble = start_half
+            last_nibble_idx = start_half + length - 1
 
             for p_row, p_col in HexEditor.pos_between((row, col), (e_row, e_col)):
                 if p_row < self.wpos.row:
                     continue
                 if p_row >= self.wpos.row+max_y:
                     break
-                self.curse_window.chgat(p_row-self.wpos.row+2, 13 + p_col*3,
-                                        2, self._get_color(9))
-                self.curse_window.chgat(p_row-self.wpos.row+2, 15 + HexEditor.columns*3 + p_col,
-                                        1, self._get_color(9))
-            else:
-                if length%2:
-                    e_row = row + (col+length//2) // HexEditor.columns
-                    e_col = (col+length//2) % HexEditor.columns
-                    if e_row < self.wpos.row or e_row >= self.wpos.row+max_y:
-                        continue
-                    self.curse_window.chgat(e_row-self.wpos.row+2, 13 + e_col*3,
-                                            1, self._get_color(9))
-                    self.curse_window.chgat(e_row-self.wpos.row+2, 15 + HexEditor.columns*3 + e_col,
-                                            1, self._get_color(9))
+
+                byte_idx = (p_row - row) * HexEditor.columns + (p_col - col)
+                high_nibble = byte_idx * 2
+                low_nibble = high_nibble + 1
+                high_match = first_byte_nibble <= high_nibble <= last_nibble_idx
+                low_match = first_byte_nibble <= low_nibble <= last_nibble_idx
+
+                if high_match and low_match:
+                    self.curse_window.chgat(p_row-self.wpos.row+2, 13 + p_col*3,
+                                            2, self._get_color(color_id))
+                elif high_match:
+                    self.curse_window.chgat(p_row-self.wpos.row+2, 13 + p_col*3,
+                                            1, self._get_color(color_id))
+                elif low_match:
+                    self.curse_window.chgat(p_row-self.wpos.row+2, 14 + p_col*3,
+                                            1, self._get_color(color_id))
+
+                if high_match or low_match:
+                    self.curse_window.chgat(p_row-self.wpos.row+2,
+                                            15 + HexEditor.columns*3 + p_col,
+                                            1, self._get_color(color_id))
+
+        # Highlight Search Items
+        for (row, col), (length, start_half) in self.search_items.items():
+            render_item(row, col, length, start_half, 9)
 
         if self.cpos.get_pos() in self.search_items:
             row, col = self.cpos.get_pos()
-            length = self.search_items[self.cpos.get_pos()]
-            e_row = row + (col+length//2 - 1) // HexEditor.columns
-            e_col = (col+length//2 - 1) % HexEditor.columns
-
-            for p_row, p_col in HexEditor.pos_between((row, col), (e_row, e_col)):
-                if p_row >= self.wpos.row+max_y:
-                    break
-                self.curse_window.chgat(p_row-self.wpos.row+2, 13 + p_col*3,
-                                        2, self._get_color(10))
-                self.curse_window.chgat(p_row-self.wpos.row+2,
-                                        15 + HexEditor.columns*3 + p_col,
-                                        1, self._get_color(10))
-            else:
-                if length%2:
-                    e_row = row + (col+length//2) // HexEditor.columns
-                    e_col = (col+length//2) % HexEditor.columns
-                    if self.wpos.row <= e_row < self.wpos.row+max_y:
-                        self.curse_window.chgat(e_row-self.wpos.row+2, 13 + e_col*3,
-                                                1, self._get_color(10))
-                        self.curse_window.chgat(e_row-self.wpos.row+2,
-                                                15 + HexEditor.columns*3 + e_col,
-                                                1, self._get_color(10))
+            length, start_half = self.search_items[self.cpos.get_pos()]
+            render_item(row, col, length, start_half, 10)
 
         self.search_items.clear()
 
@@ -1493,19 +1502,26 @@ class HexEditor:
         curses.raw()
         self.curse_window.nodelay(False)
 
-    def _open(self) -> None:
+    def _open(self, fg: bool = False) -> None:
         """
         init, run, deinit
         """
         try:
             self._init_screen()
+            if fg:
+                self.decode_char = get_display_char_gen()
+                if self.file_commit_hash is None:
+                    self._f_content_gen = IoHelper.yield_file(self.file, True)
+                    self._build_file()
+                else:
+                    self._f_content_gen = (line for line in [])
             self._run()
         except (Exception, KeyboardInterrupt) as e:
             curses.endwin()
             if not self.unsaved_progress:
                 raise e
             if not isinstance(e, KeyboardInterrupt):
-                err_print('Oops..! Something went wrong.', priority=err_print.IMPORTANT)
+                logger('Oops..! Something went wrong.', priority=logger.ERROR)
             user_input = ''
             while user_input not in ['Y', 'J', 'N']:
                 user_input = input('Do you want to save the changes? [Y/N]').upper()
@@ -1513,9 +1529,12 @@ class HexEditor:
                 raise e
             self._action_save()
             if self.unsaved_progress:
-                err_print('Oops..! Something went wrong. The file could not be saved.', priority=err_print.IMPORTANT)
+                logger(
+                    'Oops..! Something went wrong. The file could not be saved.',
+                    priority=logger.ERROR
+                )
             else:
-                err_print('The file has been successfully saved.', priority=err_print.INFORMATION)
+                logger('The file has been successfully saved.', priority=logger.INFO)
             raise e
         finally:
             try: # cleanup - close file
@@ -1525,13 +1544,15 @@ class HexEditor:
             curses.endwin()
 
     @classmethod
-    def open(cls, files: list) -> bool:
+    def open(cls, files: list, fg_state = None) -> bool:
         """
         simple editor to change the contents of any provided file.
 
         Parameters:
         files (list):
             list of tuples (file, display_name)
+        fg_state:
+            the state of the previously opened hexeditor that got put into background
 
         Returns:
         (bool):
@@ -1541,32 +1562,38 @@ class HexEditor:
             return False
 
         if CURSES_MODULE_ERROR:
-            err_print("The Editor could not be loaded. No Module 'curses' was found.", priority=err_print.INFORMATION)
+            logger(
+                "The Editor could not be loaded. No Module 'curses' was found.",
+                priority=logger.INFO
+            )
             if on_windows_os:
-                err_print('If you are on Windows OS, try pip-installing ', end='', priority=err_print.INFORMATION)
-                err_print("'windows-curses'.", priority=err_print.INFORMATION)
-            err_print(priority=err_print.INFORMATION)
+                logger(
+                    'If you are on Windows OS, try pip-installing ', end='',
+                    priority=logger.INFO
+                )
+                logger("'windows-curses'.", priority=logger.INFO)
+            logger(priority=logger.INFO)
             HexEditor.loading_failed = True
             return False
 
         changes_made = False
 
-        editor = cls(files)
-
-        if on_windows_os:
-            # disable background feature on windows
-            editor._action_background = lambda *_: True
+        if fg_state is None:
+            editor = cls(files)
         else:
+            editor = fg_state
+
+        if not on_windows_os:
             # ignore background signals on UNIX, since a custom background implementation exists
             signal.signal(signal.SIGTSTP, signal.SIG_IGN)
 
-        editor._open()
+        editor._open(fg=fg_state is not None)
         changes_made |= editor.changes_made
         while editor.open_next_idx is not None:
-            editor = cls(files, file_idx = editor.open_next_idx, file_commit_hash = editor.open_next_hash)
-            if on_windows_os:
-                # disable background feature on windows
-                editor._action_background = lambda *_: True
+            editor = cls(
+                files,
+                file_idx = editor.open_next_idx, file_commit_hash = editor.open_next_hash
+            )
             editor._open()
             changes_made |= editor.changes_made
 
@@ -1582,7 +1609,7 @@ class HexEditor:
         Parameters:
         save_with_alt (bool):
             indicates whetcher the stdin pipe has been used (and therefor tampered)
-        debug_mode (bool)
+        debug_mode (bool):
             indicates if debug info should be displayed
         unicode_escaped_search (bool):
             indicates if the search should be unicode escaped

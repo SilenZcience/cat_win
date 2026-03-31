@@ -1,6 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 
+from cat_win.src.const.colorconstants import CKW
 from cat_win.tests.mocks.std import StdInMock, StdOutMock, OSAttyDefGen
 from cat_win.src.service.more import More
 
@@ -12,6 +13,95 @@ bottom_line = '-' * 56 + 'cat_win' + '-' * 57
 @patch('sys.stdin', new=StdInMock())
 class TestMore(TestCase):
     maxDiff = None
+
+    def setUp(self):
+        self._more_state = {
+            'COLOR': More.COLOR,
+            'COLOR_RESET': More.COLOR_RESET,
+            'step_length': More.step_length,
+            't_width': More.t_width,
+            't_height': More.t_height,
+        }
+
+    def tearDown(self):
+        More.COLOR = self._more_state['COLOR']
+        More.COLOR_RESET = self._more_state['COLOR_RESET']
+        More.step_length = self._more_state['step_length']
+        More.t_width = self._more_state['t_width']
+        More.t_height = self._more_state['t_height']
+
+    def test_set_flags_oserror(self):
+        prev_width, prev_height = More.t_width, More.t_height
+        with patch('shutil.get_terminal_size', side_effect=OSError('ioctl')):
+            More.set_flags(5)
+        self.assertEqual(More.step_length, 5)
+        self.assertEqual(More.t_width, prev_width)
+        self.assertEqual(More.t_height, prev_height)
+
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.yield_file', lambda *_args, **_kwargs: iter(['a', 'b', 'c']))
+    @patch('cat_win.src.service.more.More.t_height', 2)
+    def test_lazy_load_file(self):
+        more = More()
+        more.lazy_load_file('dummy.txt')
+        self.assertTrue(more.lazy_load)
+        self.assertEqual(more.lines, ['a', 'b'])
+
+    def test_build_file_upto_negative_to_row(self):
+        more = More(['line0'])
+        more.lazy_load = True
+        more._f_content_gen = iter(['line1', 'line2'])
+
+        size = more._build_file_upto(-1)
+
+        self.assertEqual(size, 3)
+        self.assertEqual(more.lines, ['line0', 'line1', 'line2'])
+
+    def test_build_file_upto_already_loaded(self):
+        more = More(['line0', 'line1'])
+        more.lazy_load = True
+        more._f_content_gen = iter(['line2'])
+
+        size = more._build_file_upto(1)
+
+        self.assertEqual(size, 2)
+        # Ensure generator content was not consumed on the early-return branch.
+        self.assertEqual(next(more._f_content_gen), 'line2')
+
+    @patch('cat_win.src.service.more.More.t_width', 5)
+    @patch('builtins.input', side_effect=EOFError())
+    def test_pause_output_eoferror_small_width(self, _):
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            self.assertEqual(More._pause_output(50, 'x', 1), '')
+            self.assertIn('-----', fake_out.getvalue())
+
+    @patch('cat_win.src.service.more.More.t_width', 10)
+    @patch('os.isatty', OSAttyDefGen.get_def({0: False, 1: True}))
+    @patch('builtins.input', side_effect=KeyboardInterrupt())
+    def test_pause_output_keyboardinterrupt(self, _):
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            self.assertEqual(More._pause_output(25, '', 0), 'INTERRUPT')
+            # extra newline is printed for piped input or interrupt
+            self.assertIn('\n', fake_out.getvalue())
+
+    def test_yield_parts_empty_line(self):
+        self.assertEqual(list(More._yield_parts('')), [''])
+
+    @patch('cat_win.src.service.more.More.t_width', 2)
+    def test_yield_parts_wrap(self):
+        self.assertEqual(list(More._yield_parts('ABCD')), ['AB', 'CD'])
+
+    @patch('cat_win.src.service.more.More.t_width', 3)
+    def test_yield_parts_escape_sequence(self):
+        line = f"A{chr(27)}[31mBC"
+        self.assertEqual(list(More._yield_parts(line)), [line])
+
+    @patch('cat_win.src.service.more.More.t_height', 1)
+    def test_step_through_interrupt(self):
+        more = More(['line1'])
+        with patch('sys.stdout', new=StdOutMock()):
+            with patch.object(More, '_pause_output', return_value='INTERRUPT'):
+                with self.assertRaises(KeyboardInterrupt):
+                    more._step_through()
 
     def test_output_short(self):
         more = More(['line1'])
@@ -211,11 +301,42 @@ class TestMore(TestCase):
             more.step_through()
             self.assertIn('a\n' * 28 + '\n', fake_out.getvalue())
 
+    def test_set_colors(self):
+        backup_color = More.COLOR
+        backup_color_reset = More.COLOR_RESET
+        color_dic = {
+            CKW.MORE_LESS_PROMPT: 'red',
+            CKW.RESET_ALL: 'reset'
+        }
+        More.set_colors(color_dic)
+        self.assertEqual(More.COLOR, 'red')
+        self.assertEqual(More.COLOR_RESET, 'reset')
+        color_dic = {
+            CKW.MORE_LESS_PROMPT: backup_color,
+            CKW.RESET_ALL: backup_color_reset
+        }
+        More.set_colors(color_dic)
 
 @patch('shutil.get_terminal_size', lambda: (120, 30))
 @patch('os.isatty', OSAttyDefGen.get_def({0: True, 1: False}))
 class TestMorePiped(TestCase):
     maxDiff = None
+
+    def setUp(self):
+        self._more_state = {
+            'COLOR': More.COLOR,
+            'COLOR_RESET': More.COLOR_RESET,
+            'step_length': More.step_length,
+            't_width': More.t_width,
+            't_height': More.t_height,
+        }
+
+    def tearDown(self):
+        More.COLOR = self._more_state['COLOR']
+        More.COLOR_RESET = self._more_state['COLOR_RESET']
+        More.step_length = self._more_state['step_length']
+        More.t_width = self._more_state['t_width']
+        More.t_height = self._more_state['t_height']
 
     def test_piped_output(self):
         with patch('sys.stdout', new=StdOutMock()) as fake_out:

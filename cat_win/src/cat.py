@@ -6,87 +6,59 @@ try:
     from colorama import init as coloramaInit
 except ImportError:
     nop = lambda *_, **__: None; coloramaInit = nop
-from collections import deque
-from datetime import datetime
-from functools import lru_cache
-from itertools import groupby
-from time import monotonic, sleep
+from contextlib import contextmanager
 import os
-import shlex
 import sys
 
-from cat_win.src.argparser import ArgParser
-from cat_win.src.const.argconstants import *
+from cat_win.src.const.argconstants import (
+    ALL_ARGS,
+    ARGS_DEBUG,
+    ARGS_DEBUG_LOG,
+    ARGS_NOCOL,
+    ARGS_WATCH,
+    ARGS_STDIN,
+    ARGS_B64D,
+    ARGS_SUM,
+    ARGS_SSUM,
+    ARGS_NUMBER,
+    ARGS_LLENGTH
+)
 from cat_win.src.const.colorconstants import CKW, CVis
 from cat_win.src.const.defaultconstants import DKW
-from cat_win.src.const.regex import ANSI_CSI_RE
-from cat_win.src.domain.arguments import Arguments
-from cat_win.src.domain.files import Files
-from cat_win.src.persistence.cconfig import CConfig
-from cat_win.src.persistence.config import Config
-from cat_win.src.service.helper.archiveviewer import display_archive
-from cat_win.src.service.helper.diffviewerhelper import is_special_character
+from cat_win.src.curses.diffviewer import DiffViewer
+from cat_win.src.curses.editor import Editor
+from cat_win.src.curses.hexeditor import HexEditor
+from cat_win.src.domain.appcontext import AppContext
+from cat_win.src.processor.contentprecessor import (
+    preprocess_context,
+    materialize_context_sources,
+    run_pre_content_actions,
+)
+from cat_win.src.processor.contentpostessor import finalize_context, run_post_content_actions
+from cat_win.src.processor.executionprecessor import run_startup_actions
+from cat_win.src.processor.fileprocessor import (
+    decode_files_base64 as _fp_decode_files_base64,
+    edit_files as _fp_edit_files,
+)
+from cat_win.src.service.converter import Converter
+from cat_win.src.service.fileattributes import get_file_size, Signatures
+from cat_win.src.service.more import More
+from cat_win.src.service.summary import Summary
+from cat_win.src.service.visualizer import Visualizer
 from cat_win.src.service.helper.environment import on_windows_os
-from cat_win.src.service.helper.iohelper import IoHelper, err_print
+from cat_win.src.service.helper.iohelper import logger
 from cat_win.src.service.helper.levenshtein import calculate_suggestions
 from cat_win.src.service.helper.progressbar import PBar
 from cat_win.src.service.helper.tmpfilehelper import TmpFileHelper
-try:
-    from cat_win.src.service.helper.utility import comp_eval, comp_conv
-except SyntaxError: # in case of Python 3.7
-    from cat_win.src.service.helper.utilityold import comp_eval, comp_conv
-from cat_win.src.service.cbase64 import encode_base64, decode_base64
-from cat_win.src.service.checksum import print_checksum
-from cat_win.src.service.clipboard import Clipboard
-from cat_win.src.service.converter import Converter
-from cat_win.src.service.diffviewer import DiffViewer
-from cat_win.src.service.editor import Editor
-from cat_win.src.service.fileattributes import get_file_size, get_file_mtime, get_file_ctime, print_meta
-from cat_win.src.service.fileattributes import _convert_size, Signatures
-from cat_win.src.service.formatter import Formatter
-from cat_win.src.service.hexeditor import HexEditor
-from cat_win.src.service.more import More
-from cat_win.src.service.rawviewer import SPECIAL_CHARS, get_raw_view_lines_gen
-from cat_win.src.service.stringfinder import StringFinder
-from cat_win.src.service.strings import get_strings
-from cat_win.src.service.summary import Summary
-from cat_win.src.service.visualizer import Visualizer
-from cat_win.src.web.updatechecker import print_update_information
-from cat_win.src.web.urls import read_url
-from cat_win import __project__, __version__, __sysversion__, __author__, __url__
+from cat_win.src import cats as repl_module
+from cat_win import __url__
 
 
 coloramaInit(strip=False)
 working_dir = os.path.abspath(os.path.join(os.path.realpath(__file__), os.pardir, os.pardir))
 
-file_uri_prefix = 'file://' + '/' * on_windows_os
+_ctx = AppContext(working_dir)
 
-cconfig = CConfig(working_dir)
-config = Config(working_dir)
-
-default_color_dic, color_dic, const_dic = None, None, None
-
-arg_parser, u_args, u_files, converter, = None, None, None, None
-
-
-def setup():
-    """
-    setup the global variables.
-    """
-    global default_color_dic, color_dic, const_dic
-    global arg_parser, converter, u_files, u_args
-
-    default_color_dic = cconfig.load_config()
-    color_dic = default_color_dic.copy()
-    const_dic = config.load_config()
-
-    arg_parser = ArgParser(const_dic[DKW.DEFAULT_FILE_ENCODING],
-                           const_dic[DKW.UNICODE_ESCAPED_ECHO],
-                           const_dic[DKW.UNICODE_ESCAPED_FIND],
-                           const_dic[DKW.UNICODE_ESCAPED_REPLACE])
-    u_args = Arguments()
-    u_files = Files()
-    converter = Converter()
 
 
 def exception_handler(exception_type: type, exception, traceback,
@@ -101,13 +73,20 @@ def exception_handler(exception_type: type, exception, traceback,
         os.dup2(devnull, sys.stdout.fileno())
         sys.exit(1)  # Python exits with error code 1 on EPIPE
     try:
-        err_print(color_dic[CKW.RESET_ALL])
-        if u_args[ARGS_DEBUG]:
-            return debug_hook(exception_type, exception, traceback)
-        err_print(f"\n{exception_type.__name__}{':' * bool(str(exception))} {exception}", priority=err_print.WARNING)
+        logger(_ctx.color_dic.get(CKW.RESET_ALL, ''))
+        if _ctx.u_args and _ctx.u_args[ARGS_DEBUG]:
+            debug_hook(exception_type, exception, traceback)
+            return
+        logger(
+            f"\n{exception_type.__name__}{':' * bool(str(exception))} {exception}",
+            priority=logger.ERROR
+        )
         if exception_type != KeyboardInterrupt:
-            err_print('If this Exception is unexpected, please raise an official Issue at:', priority=err_print.IMPORTANT)
-            err_print(f"{__url__}/issues", priority=err_print.IMPORTANT)
+            logger(
+                'If this Exception is unexpected, please raise an official Issue at:',
+                priority=logger.WARNING
+            )
+            logger(f"{__url__}/issues", priority=logger.WARNING)
         sys.exit(0)
     except BrokenPipeError: # we only used stderr in the try-block, so it has to be the broken pipe
         devnull = os.open(os.devnull, os.O_WRONLY)
@@ -115,1404 +94,185 @@ def exception_handler(exception_type: type, exception, traceback,
         sys.exit(1)  # Python exits with error code 1 on EPIPE
     except (Exception, KeyboardInterrupt):
         debug_hook(exception_type, exception, traceback)
-
-
 sys.excepthook = exception_handler
 
 
-def _show_help(repl: bool = False) -> None:
-    """
-    Show the Help message and exit.
-    """
-    if repl:
-        help_message = 'Usage: cats [OPTION]...\n'
-        help_message += 'Interactively manipulate standard input.\n\n'
-    else:
-        help_message = 'Usage: catw [FILE]... [OPTION]...\n'
-        help_message += 'Concatenate FILE(s) to standard output.\n\n'
-    for section_id, group in groupby(ALL_ARGS, lambda x: x.section):
-        if section_id < 0:
-            continue
-        relevant_section = False
-        for arg in group:
-            if arg.show_arg and (not repl or arg.show_arg_on_repl):
-                arg_descriptor = f'{arg.short_form}, {arg.long_form}'
-                if len(arg_descriptor) > 35:
-                    arg_descriptor = arg_descriptor[:31] + '...'
-                help_message += f"\t{arg_descriptor: <35}{arg.arg_help}\n"
-                relevant_section = True
-        help_message += '\n' * relevant_section
-    help_message += f"\t{'-R, --R<stream>': <35}"
-    help_message += 'reconfigure the std-stream(s) with the parsed encoding\n'
-    help_message += "\t<stream> == 'in'/'out'/'err' (default is stdin & stdout)\n"
-    help_message += '\n'
-    help_message += f"\t{'enc=X, enc:X'    : <35}set file encoding to X (default is utf-8)\n"
-    help_message += f"\t{'find=X, find:X'  : <35}find/query a substring X in the given files\n"
-    help_message += f"\t{'match=X, match:X': <35}find/query a pattern X in the given files\n"
-    help_message += f"\t{'replace=X, replace:X': <35}replace queried substring(s)/pattern(s) in the given files\n"
-    if not repl:
-        help_message += f"\t{'trunc=X:Y, trunc:X:Y': <35}"
-        help_message += 'truncate file to lines X and Y (python-like)\n'
-    help_message += '\n'
-    help_message += f"\t{'[a,b]': <35}replace a with b in every line\n"
-    help_message += f"\t{'[a:b:c]': <35}python-like string indexing syntax (line by line)\n"
-    help_message += '\n'
-    help_message += 'Examples:\n'
-    if repl:
-        help_message += '\tcats --ln --dec\n'
-        help_message += '\t> >>> 12345\n'
-        help_message += '\t1) [53] 12345 {Hexadecimal: 0x3039; Binary: 0b11000000111001}\n'
-        help_message += '\t> >>> !help\n'
-        help_message += '\t> ...\n'
-    else:
-        help_message += f"\t{'catw f g -r' : <35}"
-        help_message += "Output g's contents in reverse order, then f's content in reverse order\n"
-        help_message += f"\t{'catw f g -ne': <35}"
-        help_message += "Output f's, then g's content, "
-        help_message += 'while numerating and showing the end of lines\n'
-        help_message += f"\t{'catw f trunc=a:b:c': <35}"
-        help_message += "Output f's content starting at line a, ending at line b, stepping c\n"
-    help_message += '\n'
-    help_message += 'Documentation:\n'
-    help_message += f"\t{__url__}/blob/main/DOCUMENTATION.md"
-    try:
-        (More(help_message.splitlines())).step_through()
-    finally:
-        print_update_information(__project__, __version__, color_dic)
-
-
-def _show_version(repl: bool = False) -> None:
-    """
-    Show the Version message and exit.
-    """
-    cat_version = f"{__project__} "
-    if repl:
-        cat_version += 'REPL '
-    cat_version += f"{__version__} - from {working_dir}\n"
-    version_message = '\n'
-    version_message += '-' * len(cat_version) + '\n'
-    version_message += cat_version
-    version_message += '-' * len(cat_version) + '\n'
-    version_message += '\n'
-    version_message += f"Built with: \tPython {__sysversion__}\n"  # sys.version
-    try:
-        time_stamp = datetime.fromtimestamp(get_file_ctime(os.path.realpath(__file__)))
-        version_message += f"Install time: \t{time_stamp}\n"
-    except OSError: # fails on pyinstaller executable
-        version_message += 'Install time: \t-\n'
-    version_message += f"Author: \t{__author__}\n"
-    print(version_message)
-    print_update_information(__project__, __version__, color_dic)
-
-
-def _show_debug(args: list, unknown_args: list, known_files: list, unknown_files: list,
-                echo_args: str, known_dirs: list, valid_urls: list) -> None:
-    """
-    Print all neccassary debug information
-    """
-    err_print('================================================ '
-        'DEBUG ================================================', priority=err_print.INFORMATION)
-    err_print('sys_args:', sys.argv, priority=err_print.INFORMATION)
-    err_print('args: ', end='', priority=err_print.INFORMATION)
-    err_print([(arg[0], arg[1], u_args[arg[0]]) for arg in args], priority=err_print.INFORMATION)
-    err_print('unknown_args: ', end='', priority=err_print.INFORMATION)
-    err_print(unknown_args, priority=err_print.INFORMATION)
-    err_print('known_files: ', end='', priority=err_print.INFORMATION)
-    err_print(list(map(str, known_files)), priority=err_print.INFORMATION)
-    err_print('unknown_files: ', end='', priority=err_print.INFORMATION)
-    err_print(list(map(str, unknown_files)), priority=err_print.INFORMATION)
-    err_print('echo_args: ', end='', priority=err_print.INFORMATION)
-    err_print(repr(echo_args), priority=err_print.INFORMATION)
-    err_print('known_directories: ', end='', priority=err_print.INFORMATION)
-    err_print(list(map(str, known_dirs)), priority=err_print.INFORMATION)
-    err_print('valid_urls: ', end='', priority=err_print.INFORMATION)
-    err_print(valid_urls, priority=err_print.INFORMATION)
-    err_print('file encoding: ', end='', priority=err_print.INFORMATION)
-    err_print(arg_parser.file_encoding, priority=err_print.INFORMATION)
-    err_print('search queries: ', end='', priority=err_print.INFORMATION)
-    err_print(','.join(
-        ('str(' + ('CI' if c else 'CS') + '):' if isinstance(v, str) else 're:') + str(v)
-        for v, c in arg_parser.file_queries
-    ), priority=err_print.INFORMATION)
-    err_print('replace queries: ', end='', priority=err_print.INFORMATION)
-    err_print(repr(arg_parser.file_queries_replacement), priority=err_print.INFORMATION)
-    err_print('truncate file: ', end='', priority=err_print.INFORMATION)
-    err_print(arg_parser.file_truncate, priority=err_print.INFORMATION)
-    err_print('replace mapping: ', end='', priority=err_print.INFORMATION)
-    err_print(arg_parser.file_replace_mapping, priority=err_print.INFORMATION)
-    err_print('==================================================='
-              '====================================================', priority=err_print.INFORMATION)
-
-
-def _print_meta_and_checksum(show_meta: bool, show_checksum: bool) -> None:
-    """
-    calls _print_meta() and _print_checksum() on every file.
-
-    Parameters:
-    show_meta (bool):
-        decides if the metadata of the files should be displayed
-    show_checksum (bool):
-        decides if the checksum of the files should be displayed
-    """
-    for file in u_files:
-        if show_meta:
-            print_meta(file.path,
-                       [color_dic[CKW.RESET_ALL],
-                        color_dic[CKW.ATTRIB],
-                        color_dic[CKW.ATTRIB_POSITIVE],
-                        color_dic[CKW.ATTRIB_NEGATIVE]])
-        if show_checksum:
-            print_checksum(file.path, color_dic[CKW.CHECKSUM], color_dic[CKW.RESET_ALL])
-
-@lru_cache(maxsize=250)
-def remove_ansi_codes_from_line(line: str) -> str:
-    """
-    Parameters:
-    line (str):
-        the string to clean ANSI-Colorcodes from
-
-    Returns:
-    (str):
-        the cleaned string
-    """
-    # version 1: efficiency is about the same, and does not have any dependency
-    # however it is not as safe in case of unusual/broken escape sequences.
-    # while (codePosStart := line.find(ESC_CODE)) != -1:
-    #     codePosEnd = line[codePosStart:].find('m')
-    #     # here should be checks like 'codePosEnd' != -1 and
-    #     # 'codePosEnd' <= 5 to make sure we found a valid EscapeSequence
-    #     # for a better performance let's assume all EscapeSequences are valid...
-    #     line = line[:codePosStart] + line[codePosStart+codePosEnd+1:]
-    # return line
-    # version 2:
-    return ANSI_CSI_RE.sub('', line)
-
-
-def _map_display_pos(display_str: str, plain_pos: int) -> int:
-    """
-    Map a character position in the ANSI-stripped version of display_str
-    to the corresponding position in display_str itself.
-    ANSI escape sequences are skipped first, then the plain character count
-    is incremented.
-    """
-    plain_count = 0
-    i = 0
-    while i < len(display_str):
-        ansi_m = ANSI_CSI_RE.match(display_str, i)
-        if ansi_m:
-            i = ansi_m.end()
-            continue
-        if plain_count == plain_pos:
-            return i
-        plain_count += 1
-        i += 1
-    return i
-
-
-def _build_ansi_restore(display_str: str) -> tuple:
-    """
-    Scan display_str and return:
-      - a dict mapping each plain-text character index to the string of ANSI
-        codes that are active just before that character (used to re-emit lost
-        colours after a close keyword marker).
-      - a set of plain-text positions preceded by at least one ANSI code
-        (used to re-inject open keyword colour after any ANSI override inside
-        a keyword span, so the keyword colour always wins).
-    """
-    restore = {}
-    active = []
-    ansi_set = set()
-    had_ansi = False
-    pc = 0
-    i = 0
-    while i < len(display_str):
-        ansi_m = ANSI_CSI_RE.match(display_str, i)
-        if ansi_m:
-            code = ansi_m.group(0)
-            if code == color_dic[CKW.RESET_ALL]:
-                active = []
-            else:
-                active.append(code)
-            had_ansi = True
-            i = ansi_m.end()
-        else:
-            if had_ansi:
-                ansi_set.add(pc)
-                had_ansi = False
-            restore[pc] = ''.join(active)
-            pc += 1
-            i += 1
-    restore[pc] = ''.join(active)  # state at end of string
-    return restore, ansi_set
-
-
-@lru_cache()
-def _calculate_line_prefix_spacing(line_char_length: int, file_name_prefix: bool = False,
-                                   include_file_prefix: bool = False,
-                                   file_char_length: int = 0) -> str:
-    """
-    calculate a string template for the line prefix.
-
-    Parameters:
-    line_char_length (int):
-        the length of the line number
-    file_name_prefix (bool):
-        will the full file path be included in the prefix
-    include_file_prefix (bool):
-        should the file be included in the prefix
-    file_char_length (int):
-        the length of the file number
-
-    Returns:
-    (str):
-        a non-finished but correctly formatted string template to insert line number
-        and file index into
-    """
-    line_prefix = ' ' * (u_files.all_line_number_place_holder - line_char_length)
-
-    if file_name_prefix:
-        line_prefix = '%i' + line_prefix
-    else:
-        line_prefix += '%i)'
-
-    if include_file_prefix and not file_name_prefix:
-        file_prefix = (' ' * (u_files.file_number_place_holder - file_char_length)) + '%i.'
-        return color_dic[CKW.NUMBER] + file_prefix + line_prefix + color_dic[CKW.RESET_ALL] + ' '
-
-    return color_dic[CKW.NUMBER] + line_prefix + color_dic[CKW.RESET_ALL] + ' '
-
-
-def _get_line_prefix(line_num: int, index: int) -> str:
-    """
-    calculates the line prefix in regard to the line number and file count.
-
-    Parameters:
-    line_num (int):
-        the current number identifying the line
-    index (int):
-        the current number identifying the file
-
-    Returns:
-    (str):
-        the new line prefix including the line number.
-    """
-    if u_args[ARGS_FILE_PREFIX]:
-        return _calculate_line_prefix_spacing(len(str(line_num)), True) % (line_num)
-    if len(u_files) > 1:
-        return _calculate_line_prefix_spacing(len(str(line_num)), False, True,
-                                              len(str(index))) % (index, line_num)
-    return _calculate_line_prefix_spacing(len(str(line_num))) % (line_num)
-
-
-@lru_cache()
-def _calculate_line_length_prefix_spacing(line_char_length: int) -> str:
-    """
-    calculate a string template for the line prefix.
-
-    Parameters:
-    line_char_length (int):
-        the length of the line
-
-    Returns:
-    (str):
-        a non-finished but correctly formatted string template to insert line length into
-    """
-    length_prefix = '[' + ' ' * (u_files.file_line_length_place_holder - line_char_length) + '%i]'
-    return '%s' + color_dic[CKW.LINE_LENGTH] + length_prefix + color_dic[CKW.RESET_ALL] + ' '
-
-
-def _get_line_length_prefix(prefix: str, line) -> str:
-    """
-    calculates the line prefix in regard to the line length.
-
-    Parameters:
-    prefix (str):
-        the current prefix to append to
-    line (str|byte):
-        a representation of the current line
-
-    Returns:
-    (str):
-        the new line prefix including the line length.
-    """
-    if not u_args[ARGS_NOCOL] and isinstance(line, str):
-        line = remove_ansi_codes_from_line(line)
-    return _calculate_line_length_prefix_spacing(len(str(len(line)))) % (prefix, len(line))
-
-
-def _get_file_prefix(prefix: str, file_index: int, hyper: bool = False) -> str:
-    """
-    append the file to the line prefix.
-
-    Parameters:
-    prefix (str):
-        the current prefix to append to
-    file_index (int):
-        the index of the current file
-    hyper (bool):
-        if True the filename will include the file-protocol prefix.
-        (this will make the file a link, which are clickable in some terminals)
-
-    Returns:
-    (str):
-        the new line prefix including the file.
-    """
-    if file_index < 0:
-        return prefix
-    file = f"{file_uri_prefix * hyper}{u_files[file_index].displayname}"
-    if hyper:
-        file = file.replace('\\', '/')
-    if not u_args[ARGS_NUMBER] or hyper:
-        return f"{prefix}{color_dic[CKW.FILE_PREFIX]}{file}{color_dic[CKW.RESET_ALL]} "
-    return f"{color_dic[CKW.FILE_PREFIX]}{file}{color_dic[CKW.RESET_ALL]}:{prefix}"
-
-
-def print_file(content: list, stepper: More, excluded_by_peek: int) -> bool:
-    """
-    print a file and possibly include the substrings and patterns to search for.
-
-    Parameters:
-    content (list):
-        the content of a file like [(prefix, line), ...]
-    stepper (More):
-        the stepper to step through the file
-    excluded_by_peek (int):
-        the amount of lines that have been originally excluded by the peek method
-
-    Returns:
-    (bool):
-        identifies if the given content parameter contained any
-        queried keyword/pattern.
-    """
-    if not content:
-        return False
-    content_len = len(content)//2
-    if not any([arg_parser.file_queries, u_args[ARGS_GREP], u_args[ARGS_GREP_ONLY]]):
-        if u_args[ARGS_MORE]:
-            if content_len:
-                stepper.add_lines([prefix + line for prefix, line in content[:content_len]])
-            print_excluded_by_peek(content, excluded_by_peek)
-            stepper.add_lines([prefix + line for prefix, line in content[content_len:]])
-            return False
-        if content_len:
-            print(*[prefix + line for prefix, line in content[:content_len]], sep='\n')
-        print_excluded_by_peek(content, excluded_by_peek)
-        print(*[prefix + line for prefix, line in content[content_len:]], sep='\n')
-        return False
-
-    string_finder = StringFinder(arg_parser.file_queries[len(arg_parser.file_queries_replacement):])
-
-    contains_queried = False
-    last_grep_line = -const_dic[DKW.GREP_CONTEXT_LINES]-1
-    grep_context_dq = deque(maxlen=const_dic[DKW.GREP_CONTEXT_LINES])
-    for c_idx, (line_prefix, line) in enumerate(content):
-        if c_idx == content_len:
-            print_excluded_by_peek(content, excluded_by_peek)
-
-        plain_line = remove_ansi_codes_from_line(line)
-        display_line = line
-
-        for q_idx, replacement in enumerate(arg_parser.file_queries_replacement):
-            query, ignore_case = arg_parser.file_queries[q_idx]
-            ansi_restore, _ = _build_ansi_restore(display_line)
-            if isinstance(query, str):
-                matches = list(string_finder.find_literals(query, plain_line, ignore_case))
-                disp_pos = [(_map_display_pos(display_line, f_s),
-                             _map_display_pos(display_line, f_e)) for f_s, f_e in matches]
-                for (f_s, f_e), (d_s, d_e) in reversed(list(zip(matches, disp_pos))):
-                    plain_line = plain_line[:f_s] + replacement + plain_line[f_e:]
-                    display_line = (display_line[:d_s]
-                                    + color_dic[CKW.REPLACE] + replacement + color_dic[CKW.RESET_ALL]
-                                    + ansi_restore.get(f_e, '')
-                                    + display_line[d_e:])
-            else:
-                matches = list(query.finditer(plain_line))
-                disp_pos = [(_map_display_pos(display_line, m.start()),
-                             _map_display_pos(display_line, m.end())) for m in matches]
-                for m, (d_s, d_e) in reversed(list(zip(matches, disp_pos))):
-                    repl = m.expand(replacement)
-                    plain_line = plain_line[:m.start()] + repl + plain_line[m.end():]
-                    display_line = (display_line[:d_s]
-                                    + color_dic[CKW.REPLACE] + repl + color_dic[CKW.RESET_ALL]
-                                    + ansi_restore.get(m.end(), '')
-                                    + display_line[d_e:])
-
-        intervals, f_keywords, m_keywords = string_finder.find_keywords(plain_line)
-
-        # used for marking the file when displaying applied files
-        contains_queried |= bool(intervals)
-
-        # this has priority over the other arguments
-        if u_args[ARGS_GREP_ONLY]:
-            if intervals:
-                fm_substrings = [(pos[0], f"{color_dic[CKW.FOUND]}" + \
-                    f"{plain_line[pos[0]:pos[1]]}{color_dic[CKW.RESET_FOUND]}")
-                                 for _, pos in f_keywords]
-                fm_substrings+= [(pos[0], f"{color_dic[CKW.MATCHED]}" + \
-                    f"{plain_line[pos[0]:pos[1]]}{color_dic[CKW.RESET_MATCHED]}")
-                                 for _, pos in m_keywords]
-                fm_substrings.sort(key=lambda x:x[0])
-                grepped_line = f"{line_prefix}{','.join(sub for _, sub in fm_substrings)}"
-                if u_args[ARGS_MORE]:
-                    stepper.add_line(grepped_line)
-                    continue
-                print(grepped_line)
-            continue
-
-        # when bool(intervals) == True -> found keyword or matched pattern!
-        # intervals | grep | nokeyword -> print?
-        #     0     |  0   |     0     ->   1
-        #     0     |  0   |     1     ->   1
-        #     0     |  1   |     0     ->   0
-        #     0     |  1   |     1     ->   0
-        #     1     |  0   |     0     ->   1
-        #     1     |  0   |     1     ->   0
-        #     1     |  1   |     0     ->   1
-        #     1     |  1   |     1     ->   0
-        if not intervals:
-            if not u_args[ARGS_GREP] or c_idx - last_grep_line <= const_dic[DKW.GREP_CONTEXT_LINES]:
-                if u_args[ARGS_MORE]:
-                    stepper.add_line(line_prefix + display_line)
-                    continue
-                print(line_prefix + display_line)
-            elif u_args[ARGS_GREP]:
-                grep_context_dq.append(line_prefix + display_line)
-            continue
-
-        for grep_line in grep_context_dq:
-            if u_args[ARGS_MORE]:
-                stepper.add_line(grep_line)
-            else:
-                print(grep_line)
-        grep_context_dq.clear()
-        last_grep_line = c_idx
-
-        if u_args[ARGS_NOKEYWORD]:
-            continue
-
-        if not u_args[ARGS_NOCOL]:
-            # Pre-scan display_line to know:
-            #  - active ANSI state at each plain position (restore after CLOSE)
-            #  - positions where RESET_ALL occurred (re-open colour inside span)
-            ansi_restore, ansi_set = _build_ansi_restore(display_line)
-            # Pair each open marker with its matching close (same colour type,
-            # both lists are in the same reverse-sorted order).
-            found_closes = (pos for pos, code in intervals if code == CKW.RESET_FOUND)
-            matched_closes = (pos for pos, code in intervals if code == CKW.RESET_MATCHED)
-            span_end = {}
-            for pos, code in intervals:
-                if code == CKW.FOUND:
-                    span_end[(pos, code)] = next(found_closes)
-                elif code == CKW.MATCHED:
-                    span_end[(pos, code)] = next(matched_closes)
-            for kw_pos, kw_code in intervals:
-                mapped = _map_display_pos(display_line, kw_pos)
-                if kw_code in (CKW.FOUND, CKW.MATCHED):
-                    # Re-inject open colour before any char inside the span that
-                    # was preceded by an ANSI code, so the keyword colour wins.
-                    close_pos = span_end[(kw_pos, kw_code)]
-                    for r in sorted([r for r in ansi_set if kw_pos < r < close_pos], reverse=True):
-                        r_mapped = _map_display_pos(display_line, r)
-                        display_line = display_line[:r_mapped] + color_dic[kw_code] + display_line[r_mapped:]
-                    display_line = display_line[:mapped] + color_dic[kw_code] + display_line[mapped:]
-                else:
-                    restore = ansi_restore.get(kw_pos, '')
-                    display_line = display_line[:mapped] + color_dic[kw_code] + restore + display_line[mapped:]
-
-        if u_args[ARGS_MORE]:
-            stepper.add_line(line_prefix + display_line)
-        else:
-            print(line_prefix + display_line)
-
-        if u_args[ARGS_GREP] or u_args[ARGS_NOBREAK]:
-            continue
-
-        found_sth = False
-        if f_keywords:
-            found_message = f"{color_dic[CKW.FOUND_MESSAGE]}---------- Found:   ("
-            found_message+= ') ('.join(
-                [f"'{kw}' {pos_s}-{pos_e}" for kw, (pos_s, pos_e) in f_keywords]
-            )
-            found_message+= f") ----------{color_dic[CKW.RESET_ALL]}"
-            if u_args[ARGS_MORE]:
-                stepper.add_line(found_message)
-            else:
-                print(found_message)
-            found_sth = True
-        if m_keywords:
-            matched_message = f"{color_dic[CKW.MATCHED_MESSAGE]}---------- Matched: ("
-            matched_message+= ') ('.join(
-                [f"'{kw}' {pos_s}-{pos_e}" for kw, (pos_s, pos_e) in m_keywords]
-            )
-            matched_message+= f") ----------{color_dic[CKW.RESET_ALL]}"
-            if u_args[ARGS_MORE]:
-                stepper.add_line(matched_message)
-            else:
-                print(matched_message)
-            found_sth = True
-
-        if found_sth and not u_args[ARGS_MORE]:
-            with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
-                try:
-                    # fails when using --stdin mode, because the stdin will send en EOF char
-                    # to input without prompting the user -> dup stdin
-                    input()
-                except (EOFError, UnicodeDecodeError):
-                    pass
-
-    return contains_queried
-
-
-def _print_excluded_by_peek(prefix_len: int, excluded_by_peek: int) -> None:
-    """
-    print a paragraph about how many lines have been excluded.
-
-    Parameters:
-    prefix_len (int):
-        the approximate length of the prefix
-    excluded_by_peek (int):
-        the amount of lines that have been excluded
-    """
-    excluded_by_peek_length = (len(str(excluded_by_peek))-1)//2
-    excluded_by_peek_indent = ' ' * (prefix_len - excluded_by_peek_length + 10)
-    excluded_by_peek_indent_add = ' ' * excluded_by_peek_length
-    excluded_by_peek_parting = f"{excluded_by_peek_indent}{excluded_by_peek_indent_add} "
-    excluded_by_peek_parting+= f"{color_dic[CKW.NUMBER]}:{color_dic[CKW.RESET_ALL]}"
-    print(excluded_by_peek_parting)
-    print(f"{excluded_by_peek_indent}{color_dic[CKW.NUMBER]}", end='')
-    print(f"({excluded_by_peek}){color_dic[CKW.RESET_ALL]}")
-    print(excluded_by_peek_parting)
-
-def print_excluded_by_peek(content: list, excluded_by_peek: int) -> None:
-    """
-    print a paragraph about how many lines have been excluded,
-    using the method _print_excluded_by_peek().
-
-    Parameters:
-    content (list):
-        the content of a file like [(prefix, line), ...]
-    excluded_by_peek (int):
-        the amount of lines that have been originally excluded
-    """
-    if not excluded_by_peek or len(content) <= const_dic[DKW.PEEK_SIZE]:
-        return
-    if any([u_args[ARGS_GREP],
-            u_args[ARGS_GREP_ONLY],
-            u_args[ARGS_NOKEYWORD],
-            u_args[ARGS_MORE]]):
-        return
-    _print_excluded_by_peek(len(remove_ansi_codes_from_line(content[0][0])),
-                            excluded_by_peek + 2*const_dic[DKW.PEEK_SIZE] - len(content))
-
-
-def edit_raw_content(content: bytes, file_index: int = 0) -> None:
-    """
-    write raw binary
-
-    Parameters:
-    content (bytes):
-        the raw content of a binary file
-    file_index (int):
-        the index of the u_files.files list, pointing to the file that
-        is currently being processed. a negative value can be used for
-        the repl mode
-    """
-    if u_args[ARGS_STRINGS]:
-        return edit_content([('', content)], file_index)
-    if u_args[ARGS_B64E]:
-        content = encode_base64(content, True)
-        if u_args[ARGS_CLIP]:
-            Clipboard.clipboard += content
-        return print(content)
-    sys.stdout.buffer.write(content)
-
-def edit_content(content: list, file_index: int = 0, line_offset: int = 0) -> None:
-    """
-    apply all parameters to a string (file Content).
-
-    Parameters:
-    content (list):
-        the content of a file like [(prefix, line), ...]
-    file_index (int):
-        the index of the u_files.files list, pointing to the file that
-        is currently being processed. a negative value can be used for
-        the repl mode
-    line_offset (int):
-        the offset for counting the line numbers (used in the repl)
-    """
-    if not (
-        content or
-        os.isatty(sys.stdout.fileno()) or
-        file_index < 0 or
-        u_files.is_temp_file(file_index)
-    ):
-        # if the content of the file is empty, we check if maybe the file is its own pipe-target.
-        # in this case the stdout cannot be atty.
-        # also the repl would not produce this problem.
-        # also the temp-files (stdin, echo, url, ...) are (most likely) safe.
-        # an indicator would be if the file has just been modified to be empty (by the shell).
-        # checking if the file is an _unknown_file is not valid, because by using '--stdin'
-        # the stdin will be used to write the file
-        file_mtime = get_file_mtime(u_files[file_index].path)
-        date_nowtime = datetime.timestamp(datetime.now())
-        if abs(date_nowtime - file_mtime) < 0.5:
-            err_print('Warning: It looks like you are trying to pipe a file into itself.', priority=err_print.WARNING)
-            err_print('In this case you might have lost all data.', priority=err_print.WARNING)
-        # in any case we have nothing to do and can return
-        return
-
-    if u_args[ARGS_STRINGS]:
-        content = get_strings(content,
-                              const_dic[DKW.STRINGS_MIN_SEQUENCE_LENGTH],
-                              const_dic[DKW.STRINGS_DELIMETER])
-
-    if u_args[ARGS_SPECIFIC_FORMATS]:
-        content = Formatter.format(content)
-
-    excluded_by_peek = 0
-
-    if u_args[ARGS_NUMBER]:
-        content = [(_get_line_prefix(j+line_offset, file_index+1), c[1])
-                   for j, c in enumerate(content, start=1)]
-
-    content = content[slice(*arg_parser.file_truncate)]
-
-    if u_args[ARGS_PEEK] and len(content) > 2*const_dic[DKW.PEEK_SIZE]:
-        excluded_by_peek = len(content) - 2*const_dic[DKW.PEEK_SIZE]
-        content = content[:const_dic[DKW.PEEK_SIZE]] + content[-const_dic[DKW.PEEK_SIZE]:]
-
-    for arg, param in u_args:
-        if arg == ARGS_CUT:
-            slice_evals = [None, None, None]
-            for i, p_split in enumerate(param[1:-1].split(':')):
-                try:
-                    slice_evals[i] = int(eval(p_split, {"__builtins__": {}}))
-                except (SyntaxError, NameError, ValueError, ArithmeticError):
-                    pass
-            content = [(prefix, line[slice_evals[0]:slice_evals[1]:slice_evals[2]])
-                        for prefix, line in content]
-
-    for arg, param in u_args:
-        if arg == ARGS_ENDS:
-            emarker = color_dic[CKW.ENDS]+const_dic[DKW.END_MARKER_SYMBOL]+color_dic[CKW.RESET_ALL]
-            content = [(prefix, line + emarker) for prefix, line in content]
-        elif arg == ARGS_SQUEEZE:
-            content = [list(group)[0] for _, group in groupby(content, lambda x: x[1])]
-        elif arg == ARGS_REVERSE:
-            content.reverse()
-        elif arg == ARGS_SORT:
-            content.sort(key = lambda l: l[1].casefold())
-        elif arg == ARGS_SSORT:
-            content.sort(key = lambda l: len(l[1]))
-        elif arg == ARGS_BLANK:
-            content = [c for c in content if c[1].strip(
-                None if const_dic[DKW.BLANK_REMOVE_WS_LINES] else ''
-            )]
-        elif arg == ARGS_EVAL:
-            content = comp_eval(converter, content, param, remove_ansi_codes_from_line)
-        elif arg == ARGS_HEX:
-            content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
-        elif arg == ARGS_DEC:
-            content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
-        elif arg == ARGS_OCT:
-            content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
-        elif arg == ARGS_BIN:
-            content = comp_conv(converter, content, param, remove_ansi_codes_from_line)
-        elif arg == ARGS_REPLACE:
-            replace_this, replace_with = arg_parser.file_replace_mapping[param]
-            content = [(prefix, line.replace(replace_this, f"{color_dic[CKW.REPLACE]}" + \
-                f"{replace_with}{color_dic[CKW.RESET_ALL]}"))
-                        for prefix, line in content]
-        elif arg == ARGS_CHR:
-            for c_id, char, _, possible in SPECIAL_CHARS:
-                if not possible:
-                    continue
-                content = [
-                    (prefix, line.replace(
-                        chr(c_id), f"{color_dic[CKW.CHARS]}^{char}{color_dic[CKW.RESET_ALL]}"
-                    ))
-                    for prefix, line in content
-                ]
-
-    if u_args[ARGS_LLENGTH]:
-        content = [(_get_line_length_prefix(prefix, line), line) for prefix, line in content]
-    if u_args[ARGS_FILE_PREFIX]:
-        content = [(_get_file_prefix(prefix, file_index), line) for prefix, line in content]
-    elif u_args[ARGS_FFILE_PREFIX]:
-        content = [(_get_file_prefix(prefix, file_index, hyper=True), line)
-                   for prefix, line in content]
-    if u_args[ARGS_B64E]:
-        content = encode_base64('\n'.join(''.join(x) for x in content), True,
-                                arg_parser.file_encoding)
-        content = [('', content)]
-
-    stepper = More()
-    found_queried = print_file(content, stepper, excluded_by_peek)
-    if file_index >= 0:
-        u_files[file_index].set_contains_queried(found_queried)
-
-    if u_args[ARGS_MORE]:
-        stepper.step_through(u_args[ARGS_STDIN])
-
-    if u_args[ARGS_CLIP]:
-        Clipboard.clipboard += '\n'.join(prefix + line for prefix, line in content)
-
-
-def edit_file(file_index: int = 0) -> None:
-    """
-    apply all parameters to a file.
-
-    Parameters:
-    file_index (int):
-        the index regarding which file is currently being edited
-    """
-    if u_args[ARGS_RAW]:
-        raw_content = IoHelper.read_file(u_files[file_index].path, True)
-        edit_raw_content(raw_content, file_index)
-        return
-    content = []
-    file_size = -1 if (
-        u_files[file_index].file_size < const_dic[DKW.LARGE_FILE_SIZE]
-    ) else u_files[file_index].file_size
-    try:
-        file_content = IoHelper.read_file(
-            u_files[file_index].path,
-            file_encoding=arg_parser.file_encoding,
-            file_length=file_size
-        )
-        # splitlines() gives a slight inaccuracy, because
-        # it also splits on other bytes than \r and \n ...
-        # the alternative would be worse: split('\n') would increase the linecount each
-        # time catw touches a file.
-        if not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]:
-            file_content = remove_ansi_codes_from_line(file_content)
-        content = [('', line) for line in file_content.splitlines()]
-    except PermissionError:
-        err_print(f"Permission denied! Skipping {u_files[file_index].displayname} ...", priority=err_print.WARNING)
-        return
-    except (BlockingIOError, FileNotFoundError):
-        err_print('Resource blocked/unavailable! Skipping ' + \
-            f"{u_files[file_index].displayname} ...", priority=err_print.WARNING)
-        return
-    except (OSError, UnicodeError):
-        u_files[file_index].set_plaintext(plain=False)
-        if u_args[ARGS_PLAIN_ONLY]:
-            return
-        if display_archive(u_files[file_index].path, _convert_size):
-            return
-        try:
-            file_content = IoHelper.read_file(
-                u_files[file_index].path,
-                file_encoding=arg_parser.file_encoding,
-                errors='ignore' if const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace',
-                file_length=file_size
-            )
-            if not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]:
-                file_content = remove_ansi_codes_from_line(file_content)
-            content = [('', line) for line in file_content.splitlines()]
-        except OSError:
-            err_print('Operation failed! Try using the enc=X parameter.', priority=err_print.WARNING)
-            return
-
-    edit_content(content, file_index)
-
-
-def print_raw_view(file_index: int = 0, mode: str = 'X') -> None:
-    """
-    print the raw byte representation of a file in hexadecimal or binary
-
-    Parameters:
-    file_index (int):
-        the index regarding which file is currently being edited
-    mode (str):
-        either 'x', 'X' for hexadecimal (lower- or upper case letters),
-        or 'b' for binary
-    """
-    queue = []
-    skipped = 0
-
-    print(u_files[file_index].displayname, ':', sep='')
-    raw_gen = get_raw_view_lines_gen(u_files[file_index].path, mode,
-                                     [color_dic[CKW.RAWVIEWER], color_dic[CKW.RESET_ALL]],
-                                     arg_parser.file_encoding,
-                                     slice(*arg_parser.file_truncate))
-    print(next(raw_gen)) # the header will always be available
-    for line in raw_gen:
-        skipped += 1
-        if u_args[ARGS_PEEK] and skipped > const_dic[DKW.PEEK_SIZE]:
-            queue.append(line)
-            if len(queue) > const_dic[DKW.PEEK_SIZE]:
-                queue = queue[1:]
-            continue
-        print(line)
-    if queue:
-        if skipped > (2*const_dic[DKW.PEEK_SIZE]):
-            _print_excluded_by_peek(21, skipped-2*const_dic[DKW.PEEK_SIZE])
-        print('\n'.join(queue))
-    print()
-
-
-def edit_files() -> None:
-    """
-    manage the calls to edit_file() for each file.
-    """
-    start = len(u_files)-1 if u_args[ARGS_REVERSE] else 0
-    end = -1 if u_args[ARGS_REVERSE] else len(u_files)
-
-    raw_view_mode = u_args.find_first(ARGS_HEXVIEW, ARGS_BINVIEW)
-    if raw_view_mode is not None:
-        raw_view_mode = (
-            'b' if raw_view_mode[0] == ARGS_BINVIEW else
-            'X' if raw_view_mode[1].isupper() else 'x'
-        )
-
-    for i in range(start, end, -1 if u_args[ARGS_REVERSE] else 1):
-        if raw_view_mode is None:
-            edit_file(i)
-        else:
-            print_raw_view(i, raw_view_mode)
-    if u_args[ARGS_WATCH] and not u_args[ARGS_DIFF]:
-        mtimes = {f.path: get_file_mtime(f.path) for f in u_files}
-        try:
-            while True:
-                sleep(2)
-                for i in range(start, end, -1 if u_args[ARGS_REVERSE] else 1):
-                    if get_file_mtime(u_files[i].path) != mtimes[u_files[i].path]:
-                        mtimes[u_files[i].path] = get_file_mtime(u_files[i].path)
-                        err_print(f"File '{u_files[i].displayname}' has been modified. Reloading ...", priority=err_print.INFORMATION)
-                        if raw_view_mode is None:
-                            edit_file(i)
-                        else:
-                            print_raw_view(i, raw_view_mode)
-        except KeyboardInterrupt:
-            pass
-    if u_args[ARGS_FILES] or u_args[ARGS_DIRECTORIES]:
-        print()
-        if u_args[ARGS_FILES]:
-            Summary.show_files(u_files.files, u_args[ARGS_FFILES])
-        if u_args[ARGS_DIRECTORIES]:
-            Summary.show_dirs(arg_parser.get_dirs())
-    if u_args[ARGS_SUM]:
-        print()
-        Summary.show_sum(u_files.files, u_args[ARGS_SSUM], u_files.all_files_lines,
-                         u_files.all_line_number_place_holder)
-    if u_args[ARGS_WORDCOUNT]:
-        print()
-        Summary.show_wordcount(u_files.files, arg_parser.file_encoding)
-    if u_args[ARGS_CHARCOUNT]:
-        print()
-        Summary.show_charcount(u_files.files, arg_parser.file_encoding)
-    if u_args[ARGS_CLIP]:
-        Clipboard.put(remove_ansi_codes_from_line(Clipboard.clipboard))
-
-
-def decode_files_base64(tmp_file_helper: TmpFileHelper) -> None:
-    """
-    decode all files from base64 and save to temporary file.
-
-    Parameters:
-    tmp_file_helper (TmpFileHelper):
-        the TmpFileHelper to keep track of the used tmp files
-    """
-    for i, file in enumerate(u_files):
-        try:
-            tmp_file_path = tmp_file_helper.generate_temp_file_name()
-            f_read_content = IoHelper.read_file(file.path, file_encoding=arg_parser.file_encoding,
-                                                errors='replace')
-            if u_args[ARGS_RAW]:
-                IoHelper.write_file(tmp_file_path,
-                                    decode_base64(f_read_content))
-            else:
-                IoHelper.write_file(tmp_file_path,
-                                    decode_base64(f_read_content, True, arg_parser.file_encoding),
-                                    arg_parser.file_encoding)
-            u_files[i].path = tmp_file_path
-        except (OSError, UnicodeError):
-            err_print(f"Base64 decoding failed for file: {file.displayname}", priority=err_print.WARNING)
 
 
 def show_unknown_args_suggestions(repl: bool = False) -> list:
-    """
-    display the unknown arguments passed in aswell as their suggestions
-    if possible
-
-    Parameters:
-    repl (bool):
-        indicates whether or not the repl has been used
-
-    Returns:
-    arg_suggestions (list):
-        the list generated by calculate_suggestion()
-    """
-
+    """Display unknown arguments and return Levenshtein-based suggestions."""
     if repl:
-        arg_options = [(arg.short_form, arg.long_form)
-                       for arg in ALL_ARGS if arg.show_arg_on_repl]
+        arg_options = [
+            (arg.short_form, arg.long_form)
+            for arg in ALL_ARGS if arg.show_arg_on_repl and arg.arg_id >= 0
+        ]
     else:
-        arg_options = [(arg.short_form, arg.long_form)
-                       for arg in ALL_ARGS]
-    arg_suggestions = calculate_suggestions(arg_parser._unknown_args, arg_options)
+        arg_options = [(arg.short_form, arg.long_form) for arg in ALL_ARGS if arg.arg_id >= 0]
+    arg_suggestions = calculate_suggestions(_ctx.arg_parser._unknown_args, arg_options)
     for u_arg, arg_replacement in arg_suggestions:
-        err_print(f"Unknown argument: '{u_arg}'", priority=err_print.IMPORTANT)
+        logger(f"Unknown argument: '{u_arg}'", priority=logger.WARNING)
         if arg_replacement:
             arg_replacement = [arg_r[0] for arg_r in arg_replacement]
-            err_print(f"\tDid you mean {' or '.join(arg_replacement)}", priority=err_print.IMPORTANT)
+            logger(f"\tDid you mean {' or '.join(arg_replacement)}", priority=logger.WARNING)
     return arg_suggestions
 
 
 def init_colors() -> None:
-    """
-    set the color dictionary to be used. either empty for no colors
-    or the default color dictionary.
-    """
-    # do not use colors if requested, or output will be piped anyways
-    global color_dic
-
-    if u_args[ARGS_NOCOL] or sys.stdout.closed or \
-        (not os.isatty(sys.stdout.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]):
-        color_dic = dict.fromkeys(color_dic, '')
+    """Set the active colour dictionary based on output-mode flags."""
+    if _ctx.u_args[ARGS_NOCOL] or sys.stdout.closed or \
+        (not os.isatty(sys.stdout.fileno()) and _ctx.const_dic[DKW.STRIP_COLOR_ON_PIPE]):
+        _ctx.color_dic = dict.fromkeys(_ctx.color_dic, '')
         CVis.remove_colors()
     else:
-        color_dic = default_color_dic.copy()
-    if u_args[ARGS_NOCOL] or u_args[ARGS_DEBUG_LOG] or sys.stderr.closed or \
-        (not os.isatty(sys.stderr.fileno()) and const_dic[DKW.STRIP_COLOR_ON_PIPE]):
-        err_print.clear_colors()
-
-    converter.set_params(u_args[ARGS_DEBUG],
-                         [color_dic[CKW.EVALUATION],
-                          color_dic[CKW.CONVERSION],
-                          color_dic[CKW.RESET_ALL]])
+        _ctx.color_dic = _ctx.default_color_dic.copy()
+    if _ctx.u_args[ARGS_NOCOL] or _ctx.u_args[ARGS_DEBUG_LOG] or sys.stderr.closed or \
+        (not os.isatty(sys.stderr.fileno()) and _ctx.const_dic[DKW.STRIP_COLOR_ON_PIPE]):
+        logger.clear_colors()
+    else:
+        logger.set_colors(_ctx.default_color_dic)
 
 
-def init(repl: bool = False) -> tuple:
+def init(repl: bool = False) -> None:
     """
-    initiate the code by calling the argparser and handling the default
-    parameters: -h, -v, -d, --config.
+    Parse arguments, configure subsystems, and handle early-exit flags.
 
     Parameters:
     repl (bool):
-        indicates if the repl entry point was used, and the stdin will therefor
-        be used by default
-
-    Returns:
-    (tuple):
-        contains (known_files, unknown_files, echo_args, valid_urls) from the argparser
+        True when invoked from the REPL entry point.
     """
-    setup()
+    _ctx.init()
 
-    # read parameter-args
-    args, _, echo_args = arg_parser.get_arguments(config.get_args(sys.argv[:]))
+    preprocess_context(_ctx)
 
-    u_args.set_args(args)
-
-    err_print.set_log_to_file(u_args[ARGS_DEBUG_LOG])
-    err_print.set_colors(color_dic[CKW.MESSAGE_INFORMATION],
-                         color_dic[CKW.MESSAGE_IMPORTANT],
-                         color_dic[CKW.MESSAGE_WARNING],
-                         color_dic[CKW.RESET_ALL])
-
-    known_files = arg_parser.get_files(u_args[ARGS_DOTFILES])
-    unknown_files, valid_urls = arg_parser.filter_urls(u_args[ARGS_URI])
-
-    if u_args[ARGS_RECONFIGURE] or u_args[ARGS_RECONFIGURE_IN]:
-        sys.stdin.reconfigure(encoding=arg_parser.file_encoding)
-    if u_args[ARGS_RECONFIGURE] or u_args[ARGS_RECONFIGURE_OUT]:
-        sys.stdout.reconfigure(encoding=arg_parser.file_encoding)
-    if u_args[ARGS_RECONFIGURE_ERR]:
-        sys.stderr.reconfigure(encoding=arg_parser.file_encoding)
+    logger.set_log_to_file(_ctx.u_args[ARGS_DEBUG_LOG])
+    logger.set_level(logger.DEBUG if _ctx.u_args[ARGS_DEBUG] else logger.INFO)
 
     init_colors()
 
     arg_suggestions = show_unknown_args_suggestions(repl)
 
-    # check for special cases
-    if u_args[ARGS_DEBUG]:
-        _show_debug(
-            u_args.args, arg_suggestions, known_files,
-            unknown_files, echo_args, arg_parser.get_dirs(), valid_urls
-        )
-    if (len(known_files) + len(unknown_files) + len(u_args) == 0 and not repl) or \
-        u_args[ARGS_HELP]:
-        _show_help(repl)
-        sys.exit(0)
-    if u_args[ARGS_VERSION]:
-        _show_version(repl)
-        sys.exit(0)
-    if u_args[ARGS_CONFIG_REMOVE]:
-        config.remove_config()
-        sys.exit(0)
-    if u_args[ARGS_CONFIG_FLUSH]:
-        config.reset_config()
-        sys.exit(0)
-    if u_args[ARGS_CCONFIG_FLUSH]:
-        cconfig.reset_config()
-        sys.exit(0)
-    if u_args[ARGS_CONFIG]:
-        config.save_config()
-        sys.exit(0)
-    if u_args[ARGS_CCONFIG]:
-        cconfig.save_config()
-        sys.exit(0)
+    run_startup_actions(
+        _ctx,
+        repl,
+        arg_suggestions,
+    )
 
-    DiffViewer.set_flags(u_args[ARGS_DEBUG], u_args[ARGS_WATCH], arg_parser.file_encoding)
-    Editor.set_indentation(const_dic[DKW.EDITOR_INDENTATION], const_dic[DKW.EDITOR_AUTO_INDENT])
-    Editor.set_flags(u_args[ARGS_STDIN] and on_windows_os, u_args[ARGS_DEBUG],
-                     const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
-                     const_dic[DKW.UNICODE_ESCAPED_EDITOR_REPLACE],
-                     arg_parser.file_encoding)
-    HexEditor.set_flags(u_args[ARGS_STDIN] and on_windows_os, u_args[ARGS_DEBUG],
-                        const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
-                        const_dic[DKW.UNICODE_ESCAPED_EDITOR_INSERT],
-                        const_dic[DKW.HEX_EDITOR_COLUMNS])
-    More.set_flags(const_dic[DKW.MORE_STEP_LENGTH])
-    More.set_colors(color_dic[CKW.MORE_LESS_PROMPT], color_dic[CKW.RESET_ALL])
-    Signatures.set_res_path(os.path.join(working_dir, 'res', 'signatures.json'))
-    Visualizer.set_flags(u_args[ARGS_DEBUG])
-    Summary.set_flags(const_dic[DKW.SUMMARY_UNIQUE_ELEMENTS])
-    Summary.set_colors(color_dic[CKW.SUMMARY], color_dic[CKW.RESET_ALL])
-    PBar.set_colors(color_dic[CKW.PROGRESSBAR_DONE], color_dic[CKW.PROGRESSBAR_MISSING],
-                    color_dic[CKW.RESET_ALL])
-
-    return (known_files, unknown_files, echo_args, valid_urls)
+    DiffViewer.set_flags(
+        _ctx.u_args[ARGS_DEBUG],
+        _ctx.u_args[ARGS_WATCH],
+        _ctx.arg_parser.file_encoding,
+    )
+    Editor.set_indentation(
+        _ctx.const_dic[DKW.EDITOR_INDENTATION],
+        _ctx.const_dic[DKW.EDITOR_AUTO_INDENT],
+    )
+    Editor.set_flags(
+        _ctx.u_args[ARGS_STDIN] and on_windows_os,
+        _ctx.u_args[ARGS_DEBUG],
+        _ctx.const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
+        _ctx.const_dic[DKW.UNICODE_ESCAPED_EDITOR_REPLACE],
+        _ctx.arg_parser.file_encoding,
+    )
+    HexEditor.set_flags(
+        _ctx.u_args[ARGS_STDIN] and on_windows_os,
+        _ctx.u_args[ARGS_DEBUG],
+        _ctx.const_dic[DKW.UNICODE_ESCAPED_EDITOR_SEARCH],
+        _ctx.const_dic[DKW.UNICODE_ESCAPED_EDITOR_INSERT],
+        _ctx.const_dic[DKW.HEX_EDITOR_COLUMNS],
+    )
+    More.set_flags(
+        _ctx.const_dic[DKW.MORE_STEP_LENGTH],
+    )
+    More.set_colors(_ctx.color_dic)
+    Signatures.set_res_path(
+        os.path.join(working_dir, 'res', 'signatures.json'),
+    )
+    Visualizer.set_flags(
+        _ctx.u_args[ARGS_DEBUG],
+    )
+    Summary.set_flags(
+        _ctx.const_dic[DKW.SUMMARY_UNIQUE_ELEMENTS],
+    )
+    Summary.set_colors(_ctx.color_dic)
+    PBar.set_colors(_ctx.color_dic)
+    Converter.set_flags(
+        _ctx.u_args[ARGS_DEBUG],
+    )
+    Converter.set_colors(_ctx.color_dic)
 
 
 def handle_args(tmp_file_helper: TmpFileHelper) -> None:
     """
-    init, handle args, print
+    Parse args, build the file list, and trigger output.
 
     Parameters:
     tmp_file_helper (TmpFileHelper):
-        the temporary file helper to stdin, echo etc. ...
+        manages temporary files created for stdin, echo, and URLs
     """
-    piped_input = temp_file = ''
-    known_files, unknown_files, echo_args, valid_urls = init(repl=False)
+    init(repl=False)
 
-    if u_args[ARGS_ECHO]:
-        temp_file = IoHelper.write_file(tmp_file_helper.generate_temp_file_name(), echo_args,
-                                        arg_parser.file_encoding)
-        known_files.append(temp_file)
-        u_files.set_temp_file_echo(temp_file)
-    if u_args[ARGS_URI]:
-        # the dictionary should contain an entry for each valid_url, since
-        # generated temp-files are unique
-        temp_files = {
-            IoHelper.write_file(
-                tmp_file_helper.generate_temp_file_name(),
-                read_url(valid_url),
-                arg_parser.file_encoding
-            ): valid_url
-            for valid_url in valid_urls
-        }
-        known_files.extend(list(temp_files.keys()))
-        u_files.set_temp_files_url(temp_files)
-    if u_args[ARGS_STDIN]:
-        piped_input = (b'' if u_args[ARGS_RAW] else '').join(
-            IoHelper.get_stdin_content(
-                u_args[ARGS_ONELINE],
-                u_args[ARGS_RAW]
-            )
-        )
-        temp_file = IoHelper.write_file(tmp_file_helper.generate_temp_file_name(), piped_input,
-                                        arg_parser.file_encoding)
-        known_files.append(temp_file)
-        u_files.set_temp_file_stdin(temp_file)
-        unknown_files = IoHelper.write_files(
-            unknown_files, piped_input, arg_parser.file_encoding
-        )
-    elif u_args.find_first(ARGS_EDITOR, ARGS_HEX_EDITOR, True) is not None:
-        if unknown_files:
-            Editor.open([(file, u_files.get_file_display_name(file)) for file in unknown_files], u_args[ARGS_PLAIN_ONLY])
-    elif u_args.find_first(ARGS_HEX_EDITOR, ARGS_EDITOR, True) is not None:
-        if unknown_files:
-            HexEditor.open([(file, u_files.get_file_display_name(file)) for file in unknown_files])
-    else:
-        unknown_files = IoHelper.read_write_files_from_stdin(
-            unknown_files, arg_parser.file_encoding, u_args[ARGS_ONELINE]
-        )
-
-    if u_args.find_first(ARGS_EDITOR, ARGS_HEX_EDITOR, True) is not None:
-        if known_files:
-            with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
-                Editor.open([(file, u_files.get_file_display_name(file)) for file in known_files], u_args[ARGS_PLAIN_ONLY])
-    elif u_args.find_first(ARGS_HEX_EDITOR, ARGS_EDITOR, True) is not None:
-        if known_files:
-            with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
-                HexEditor.open([(file, u_files.get_file_display_name(file)) for file in known_files])
-    if u_args[ARGS_DIFF]:
-        if known_files:
-            with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
-                DiffViewer.open([(file, u_files.get_file_display_name(file)) for file in known_files])
-
-
-    # fill holder object with neccessary values
-    u_files.set_files([*known_files, *unknown_files])
-    # -------------- do not use known_files and unknown_files anymore --------------
-
-    if u_args[ARGS_FFILES] or u_args[ARGS_DDIRECTORIES]:
-        if u_args[ARGS_FFILES]:
-            Summary.show_files(u_files.files, u_args[ARGS_FFILES])
-        if u_args[ARGS_DDIRECTORIES]:
-            Summary.show_dirs(arg_parser.get_dirs())
+    if len(sys.argv) == 2 and sys.argv[1] == 'fg': # TODO: this is weird, but proof-of-concept
+        from cat_win.src.persistence.viewstate import load_view_state
+        view_obj = load_view_state('viewstate.bin') # TODO: use an actual config folder (& for cat.config)
+        type(view_obj).open(view_obj.files, fg_state = view_obj)
         return
 
-    if len(u_files) == 0:
-        return
+    materialize_context_sources(_ctx, tmp_file_helper)
 
-    if u_args[ARGS_DATA] or u_args[ARGS_CHECKSUM]:
-        _print_meta_and_checksum(u_args[ARGS_DATA], u_args[ARGS_CHECKSUM])
-        return
-
-    if u_args[ARGS_VISUALIZE_B]:
-        vis = Visualizer([f.path for f in u_files], 'ByteView', arg_parser.file_truncate)
-        vis.visualize_files()
-        return
-    if u_args[ARGS_VISUALIZE_Z]:
-        vis = Visualizer([f.path for f in u_files], 'ZOrderCurveView', arg_parser.file_truncate)
-        vis.visualize_files()
-        return
-    if u_args[ARGS_VISUALIZE_H]:
-        vis = Visualizer([f.path for f in u_files], 'HilbertCurveView', arg_parser.file_truncate)
-        vis.visualize_files()
-        return
-    if u_args[ARGS_VISUALIZE_E]:
-        vis = Visualizer([f.path for f in u_files], 'ShannonEntropy', arg_parser.file_truncate)
-        vis.visualize_files()
-        return
-    if u_args[ARGS_VISUALIZE_D]:
-        vis = Visualizer([f.path for f in u_files], 'DigraphDotPlotView', arg_parser.file_truncate)
-        vis.visualize_files()
-        return
-
-    if u_args[ARGS_LESS]:
-        for file in u_files:
-            stepper = More()
-            stepper.lazy_load_file(file.path, arg_parser.file_encoding,
-                                   'ignore' if const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace')
-            try:
-                stepper.step_through(u_args[ARGS_STDIN])
-            except SystemExit:
-                break
-        return
+    _ctx.u_files.set_files([*_ctx.known_files, *_ctx.unknown_files])
 
     file_size_sum = 0
-    for file in u_files:
+    for file in _ctx.u_files:
         file.set_file_size(get_file_size(file.path))
         file_size_sum += file.file_size
-    if file_size_sum >= const_dic[DKW.LARGE_FILE_SIZE]:
-        err_print('An exceedingly large amount of data is being loaded. ', end='', priority=err_print.IMPORTANT)
-        err_print('This may require a lot of time and resources.', priority=err_print.IMPORTANT)
+    if file_size_sum >= _ctx.const_dic[DKW.LARGE_FILE_SIZE]:
+        logger(
+            'An exceedingly large amount of data is being loaded. ', end='',
+            priority=logger.WARNING
+        )
+        logger('This may require a lot of time and resources.', priority=logger.WARNING)
 
-    if u_args[ARGS_B64D]:
-        decode_files_base64(tmp_file_helper)
-    u_files.generate_values(
-        u_args[ARGS_SUM] or u_args[ARGS_SSUM] or u_args[ARGS_NUMBER],
-        u_args[ARGS_LLENGTH]
-    )
+    if _ctx.u_args[ARGS_B64D]:
+        _fp_decode_files_base64(tmp_file_helper, _ctx)
 
-    if u_args[ARGS_SSUM]:
-        Summary.show_sum(u_files.files, u_args[ARGS_SSUM], u_files.all_files_lines,
-                         u_files.all_line_number_place_holder)
-        return
-    if u_args[ARGS_WWORDCOUNT]:
-        Summary.show_wordcount(u_files.files, arg_parser.file_encoding)
-        return
-    if u_args[ARGS_CCHARCOUNT]:
-        Summary.show_charcount(u_files.files, arg_parser.file_encoding)
+    if len(_ctx.u_files):
+        _ctx.u_files.generate_values(
+            _ctx.u_args[ARGS_SUM] or _ctx.u_args[ARGS_SSUM] or _ctx.u_args[ARGS_NUMBER],
+            _ctx.u_args[ARGS_LLENGTH],
+        )
+
+    if run_pre_content_actions(_ctx) or len(_ctx.u_files) == 0:
         return
 
-    edit_files()  # print the cat-output
+    _fp_edit_files(_ctx)
+    run_post_content_actions(_ctx)
 
 
-def cleanup(tmp_file_helper: TmpFileHelper) -> None:
-    """
-    clean up everything
-
-    Parameters:
-    tmp_file_helper (TmpFileHelper):
-        the temporary file helper to clean up the files
-    """
-    if u_args[ARGS_DEBUG]:
-        err_print('================================================ '
-            'DEBUG ================================================', priority=err_print.INFORMATION)
-        caches = [
-            remove_ansi_codes_from_line,
-            _calculate_line_prefix_spacing,
-            _calculate_line_length_prefix_spacing,
-            u_files._get_file_lines_sum_,
-            u_files._calc_max_line_length_,
-            Visualizer.get_color_byte_view,
-            Visualizer.get_color_entropy,
-            is_special_character
-        ]
-        caches_info = [(cache.__name__,
-                        str(cache.cache_info().hits),
-                        str(cache.cache_info().misses),
-                        str(cache.cache_info().maxsize),
-                        str(cache.cache_info().currsize)) for cache in caches]
-        max_val = [max(len(_c) for _c in c_info)+1 for c_info in zip(*caches_info)]
-        for name, hits, misses, maxsize, currsize in caches_info:
-            cache_info = f"def:{name.ljust(max_val[0])}"
-            cache_info+= f"hits:{hits.ljust(max_val[1])}"
-            cache_info+= f"misses:{misses.ljust(max_val[2])}"
-            cache_info+= f"maxsize:{maxsize.ljust(max_val[3])}"
-            cache_info+= f"currsize:{currsize.ljust(max_val[4])}"
-            cache_info+= f"full:{100*int(currsize)/int(maxsize):6.2f}%"
-            err_print(cache_info, priority=err_print.INFORMATION)
-    for tmp_file in tmp_file_helper.get_generated_temp_files():
-        if u_args[ARGS_DEBUG]:
-            err_print('Cleaning', tmp_file, priority=err_print.INFORMATION)
-        try:
-            os.remove(tmp_file)
-        except OSError as exc:
-            if u_args[ARGS_DEBUG]:
-                err_print(type(exc).__name__, tmp_file, priority=err_print.INFORMATION)
-    if u_args[ARGS_DEBUG]:
-        err_print('==================================================='
-            '====================================================', priority=err_print.INFORMATION)
-    err_print.close()
-
-def main():
-    """
-    main function
-    """
+@contextmanager
+def managed_tmp_file_helper():
+    """Create and clean up temporary files for one command execution."""
     tmp_file_helper = TmpFileHelper()
-    handle_args(tmp_file_helper)
-    cleanup(tmp_file_helper)
+    try:
+        yield tmp_file_helper
+    finally:
+        finalize_context(_ctx, tmp_file_helper)
 
 
-def repl_main():
-    """
-    run the repl.
-    """
-    init(True)
-
-    command_prefix = '!'
-    repl_prefix = f"{color_dic[CKW.REPL_PREFIX]}>>> {color_dic[CKW.RESET_ALL]}"
-    eof_control_char = 'Z' if on_windows_os else 'D'
-    oneline = u_args[ARGS_ONELINE]
-    repl_session_time_start = monotonic()
-
-    class CmdExec:
-        """
-        handle repl commands.
-        """
-        def __init__(self) -> None:
-            self.exit_repl = False
-            self.last_cmd = ''
-
-        def exec_colors(self) -> None:
-            """
-            reset the colors cache and init colors.
-            """
-            init_colors()
-            _calculate_line_prefix_spacing.cache_clear()
-            _calculate_line_length_prefix_spacing.cache_clear()
-
-        def exec(self, cmd: str) -> bool:
-            """
-            check if a repl line is an executable command,
-            executes it if it is.
-
-            Parameters:
-            cmd (str):
-                the line entered in the cat repl
-
-            Returns:
-            (bool):
-                indicates if a valid command has been found
-                and executed
-            """
-            if not cmd.startswith(command_prefix):
-                return False
-            line_split = shlex.split(cmd[1:])
-            self.last_cmd = line_split[0]
-            method = getattr(self, '_command_' + self.last_cmd, self._command_unknown)
-            method(line_split[1:])
-            return True
-
-        def _command_unknown(self, _) -> None:
-            print("Command '!", self.last_cmd, "' is unknown.", sep='')
-            print("If you want to escape the command input, type: '\\!",
-                  self.last_cmd, "'.", sep='')
-
-        def _command_cat(self, _) -> None:
-            repl_session_time = monotonic()-repl_session_time_start
-            hrs, mins, secs = (int(repl_session_time/3600),
-                               int(repl_session_time%3600/60),
-                               int(repl_session_time%60))
-            cat = " ,_     _\n |\\\\_,-~/\n / _  _ |    ,--.\n(  @  @ )   / ,-'\n \\  _T_/"
-            cat += "-._( (\n /         `. \\\n|         _  \\ |\n \\ \\ ,  /      |\n  || "
-            cat += f"|-_\\__   /\n ((_/`(____,-' Session time: {hrs:02d}:{mins:02d}:{secs:02d}s\a\n"
-            print('\n'.join('\t\t\t' + c for c in cat.split('\n')))
-
-        def _command_help(self, _) -> None:
-            print(f"Type ^{eof_control_char} (Ctrl + {eof_control_char}) or '!exit' to exit.")
-            print("Type '!add <OPTION>', '!del <OPTION>' to add/remove a specific parameter.")
-            print("Type '!see', '!clear' to see/remove all active parameters.")
-            print("Put a '\\' before a leading '!' to escape the command-input.")
-
-        def _command_add(self, cmd: list) -> None:
-            arg_parser.gen_arguments([''] + cmd)
-            u_args.add_args(arg_parser.get_args())
-            show_unknown_args_suggestions(repl=True)
-            self.exec_colors()
-            _added= [arg for _, arg in arg_parser.get_args()] \
-                if arg_parser.get_args() else 'parameter(s)'
-            print(f"successfully added {_added}.")
-
-        def _command_del(self, cmd: list) -> None:
-            arg_parser.gen_arguments([''] + cmd, True)
-            u_args.delete_args(arg_parser.get_args())
-            self.exec_colors()
-            _removed = [arg for _, arg in arg_parser.get_args()] \
-                if arg_parser.get_args() else 'parameter(s)'
-            print(f"successfully removed {_removed}.")
-
-        def _command_clear(self, _) -> None:
-            arg_parser.reset_values()
-            self._command_del([arg for _, arg in u_args])
-
-        def _command_see(self, _) -> None:
-            print(f"{'Active Args:': <12} {[arg for _, arg in u_args]}")
-            if arg_parser.file_queries:
-                print(f"{'Queries:':<12}", ','.join(
-                    ('str(' + ('CI' if c else 'CS') + '):' if isinstance(v, str) else '') + str(v)
-                    for v, c in arg_parser.file_queries
-                ))
-            if arg_parser.file_queries_replacement:
-                print(f"{'Replacement:':<12} {repr(arg_parser.file_queries_replacement)}")
-
-        def _command_exit(self, _) -> None:
-            self.exit_repl = True
+def main() -> None:
+    """Entry point for the catw command."""
+    with managed_tmp_file_helper() as tmp_file_helper:
+        handle_args(tmp_file_helper)
 
 
-    cmd = CmdExec()
-    command_count = 0
-
-    print(__project__, 'v' + __version__, 'REPL', '(' + __url__ + ')', end=' - ')
-    print("Use 'catw' to handle files.")
-    print("Type '!help' for more information.")
-
-    print(repl_prefix, end='', flush=True)
-    for i, line in enumerate(IoHelper.get_stdin_content(oneline)):
-        stripped_line = line.rstrip('\r\n')
-        if not os.isatty(sys.stdin.fileno()):
-            print(stripped_line)
-        if cmd.exec(stripped_line):
-            command_count += 1
-            if cmd.exit_repl:
-                break
-        else:
-            if u_args[ARGS_B64D]:
-                stripped_line = decode_base64(stripped_line, True, arg_parser.file_encoding)
-            stripped_line = stripped_line[:1].replace('\\', '') + stripped_line[1:]
-            if stripped_line:
-                edit_content([('', stripped_line)], -1, i-command_count)
-                if u_args[ARGS_CLIP]:
-                    Clipboard.put(remove_ansi_codes_from_line(Clipboard.clipboard))
-                    Clipboard.clear()
-        if not oneline:
-            print(repl_prefix, end='', flush=True)
+def repl_main() -> None:
+    """Launch the dedicated REPL module with the current app context."""
+    with managed_tmp_file_helper():
+        init(repl=True)
+        repl_module.repl_main(
+            _ctx,
+            init_colors,
+            show_unknown_args_suggestions,
+        )
 
 
 if __name__ == '__main__':

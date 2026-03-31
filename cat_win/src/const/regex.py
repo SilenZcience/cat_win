@@ -5,7 +5,7 @@ regex
 import re
 
 
-ANSI_CSI_RE = re.compile(r"\001?\033\[(?:\d|;)*[a-zA-Z]\002?") # Control Sequence Introducer
+RE_ANSI_CSI = re.compile(r"\001?\033\[(?:\d|;)*[a-zA-Z]\002?") # Control Sequence Introducer
 # ANSI_OSC_RE = re.compile(r"\001?\033\]([^\a]*)(\a)\002?")    # Operating System Command
 
 DJANGO_VALID_URL_PATTERN = re.compile(
@@ -38,7 +38,7 @@ RE_REPLACE       = re.compile(r"\A\[(.*?(?<!\\)(?:\\\\)*),(.*)\]\Z")
 RE_REPLACE_COMMA = re.compile(r"(?<!\\)((?:\\\\)*)\\,")
 # using simple if-statements (e.g. startwith()) would be faster, but arguably less readable
 
-TOKENIZER = re.compile(r"\w+|[^\s\w]")
+RE_TOKENIZER = re.compile(r"\w+|[^\s\w]")
 
 CONFIG_VALID_COLOR = re.compile(
     r"\A(?:f|b)"
@@ -76,6 +76,7 @@ RE_EVAL = re.compile(
     r"|(?:\-?(?:(?:0|[1-9][0-9]*)\.[0-9]*|\.[0-9]+|0|[1-9][0-9]*)))"
     r"(?:\s*\))*"
 )
+
 
 def compile_re(pattern: str, ignore_case: bool):
     """

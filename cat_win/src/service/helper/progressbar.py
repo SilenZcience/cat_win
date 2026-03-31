@@ -6,7 +6,8 @@ import contextlib
 import os
 import shutil
 import sys
-from cat_win.src.const.colorconstants import ColorOptions
+
+from cat_win.src.const.colorconstants import CKW
 from cat_win.src.const.escapecodes import CURSOR_VISIBLE, CURSOR_INVISIBLE
 
 
@@ -14,26 +15,22 @@ class PBar:
     """
     ProgressBar
     """
-    COLOR_DONE: str    = ColorOptions.Fore['LIGHTGREEN']
-    COLOR_MISSING: str = ColorOptions.Fore['LIGHTMAGENTA']
-    COLOR_RESET: str   = ColorOptions.Style['RESET']
+    COLOR_DONE: str    = ''
+    COLOR_MISSING: str = ''
+    COLOR_RESET: str   = ''
 
     @staticmethod
-    def set_colors(color_done: str, color_missing: str, color_reset: str) -> None:
+    def set_colors(color_dic: dict) -> None:
         """
         setup the colors to use in the progress bar.
 
         Parameters:
-        color_done (str):
-            the color to use for the done progress (ansi escape)
-        color_missing (str):
-            the color to use for the missing progress (ansi escape)
-        color_reset (str)
-            the ansi esacpe to reset the color
+        color_dic (dict):
+            color dictionary containing all configured ANSI color values
         """
-        PBar.COLOR_DONE = color_done
-        PBar.COLOR_MISSING = color_missing
-        PBar.COLOR_RESET = color_reset
+        PBar.COLOR_DONE    = color_dic[CKW.PROGRESSBAR_DONE]
+        PBar.COLOR_MISSING = color_dic[CKW.PROGRESSBAR_MISSING]
+        PBar.COLOR_RESET   = color_dic[CKW.RESET_ALL]
 
     def __init__(self, total: int, prefix: str = '', suffix: str = '',
                     decimals: int = 1, length: int = -1,

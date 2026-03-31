@@ -73,11 +73,11 @@
 <div id="about-the-project"></div>
 
 <h2>
-	<a href="#">&#x200B;</a>
-	<a href="#about-the-project" title="Noto Emoji, licensed under CC BY 4.0">
-		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" width="30" />
-	</a>
-	<b>About The Project</b>
+    <a href="#">&#x200B;</a>
+    <a href="#about-the-project" title="Noto Emoji, licensed under CC BY 4.0">
+        <img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" width="30" />
+    </a>
+    <b>About The Project</b>
 </h2>
 
 [![GitHub-Last-Commit]](https://github.com/SilenZcience/cat_win/commits/main/)
@@ -112,11 +112,11 @@ This project does not aim to exactly replicate existing tools or their specific 
 <div id="getting-started"></div>
 
 <h2>
-	<a href="#">&#x200B;</a>
-	<a href="#getting-started" title="Noto Emoji, licensed under CC BY 4.0">
-		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f680/512.gif" width="30" />
-	</a>
-	<b>Getting Started</b>
+    <a href="#">&#x200B;</a>
+    <a href="#getting-started" title="Noto Emoji, licensed under CC BY 4.0">
+        <img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f680/512.gif" width="30" />
+    </a>
+    <b>Getting Started</b>
 </h2>
 
 <div id="prerequisites"></div>
@@ -176,11 +176,11 @@ It is recommended to add the file path(s) to your system-environment `PATH`-vari
 <div id="usage"></div>
 
 <h2>
-	<a href="#">&#x200B;</a>
-	<a href="#usage" title="Noto Emoji, licensed under CC BY 4.0">
-		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/2699_fe0f/512.gif" width="30" />
-	</a>
-	<b>Usage</b>
+    <a href="#">&#x200B;</a>
+    <a href="#usage" title="Noto Emoji, licensed under CC BY 4.0">
+        <img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/2699_fe0f/512.gif" width="30" />
+    </a>
+    <b>Usage</b>
 </h2>
 
 ```console
@@ -200,11 +200,11 @@ Interactively manipulate standard input.
 <div id="documentation"></div>
 
 <h3>
-	<a href="#">&#x200B;</a>
-	<a href="#documentation" title="Noto Emoji, licensed under CC BY 4.0">
-		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4a1/512.gif" width="25" />
-	</a>
-	<b>Documentation</b>
+    <a href="#">&#x200B;</a>
+    <a href="#documentation" title="Noto Emoji, licensed under CC BY 4.0">
+        <img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4a1/512.gif" width="25" />
+    </a>
+    <b>Documentation</b>
 </h3>
 
 > [!TIP]
@@ -275,11 +275,11 @@ Interactively manipulate standard input.
 <div id="changelog"></div>
 
 <h2>
-	<a href="#">&#x200B;</a>
-	<a href="#changelog" title="Noto Emoji, licensed under CC BY 4.0">
-		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/270f_fe0f/512.gif" width="30" />
-	</a>
-	<b>Changelog</b>
+    <a href="#">&#x200B;</a>
+    <a href="#changelog" title="Noto Emoji, licensed under CC BY 4.0">
+        <img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/270f_fe0f/512.gif" width="30" />
+    </a>
+    <b>Changelog</b>
 </h2>
 
 > [!NOTE]
@@ -288,11 +288,11 @@ Interactively manipulate standard input.
 <div id="license"></div>
 
 <h2>
-	<a href="#">&#x200B;</a>
-	<a href="#license" title="Noto Emoji, licensed under CC BY 4.0">
-		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/2757/512.gif" width="30" />
-	</a>
-	<b>License</b>
+    <a href="#">&#x200B;</a>
+    <a href="#license" title="Noto Emoji, licensed under CC BY 4.0">
+        <img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/2757/512.gif" width="30" />
+    </a>
+    <b>License</b>
 </h2>
 <a href="https://github.com/SilenZcience/cat_win/blob/main/LICENSE" alt="License">
    <img src="https://img.shields.io/pypi/l/cat_win" align="right">
@@ -306,11 +306,11 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 <div id="contact"></div>
 
 <h2>
-	<a href="#">&#x200B;</a>
-	<a href="#contact" title="Noto Emoji, licensed under CC BY 4.0">
-		<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ab/512.gif" width="30" />
-	</a>
-	<b>Contact</b>
+    <a href="#">&#x200B;</a>
+    <a href="#contact" title="Noto Emoji, licensed under CC BY 4.0">
+        <img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ab/512.gif" width="30" />
+    </a>
+    <b>Contact</b>
 </h2>
 
 > **SilenZcience** <br/>

@@ -6,8 +6,10 @@ from pathlib import Path
 import hashlib
 import zlib
 
+from cat_win.src.const.colorconstants import CKW
 
-def get_checksum_from_file(file: Path, colors = None) -> str:
+
+def get_checksum_from_file(file: Path, color_dic: dict) -> str:
     """
     Calculates and returns the CRC32, MD5, SHA1, SHA256, SHA512
     hashes of a file.
@@ -15,16 +17,13 @@ def get_checksum_from_file(file: Path, colors = None) -> str:
     Parameters:
     file (Path):
         a string representation of a file (-path)
-    colors (list):
-        a list with 2 elements like [COLOR_CHECKSUM, COLOR_RESET]
-        containing the ANSI-Colorcodes used in the returned string.
+    color_dic (dict):
+        color dictionary containing all configured ANSI color values
 
     Returns:
     checksum (str):
         a formatted string representation of all checksums calculated
     """
-    if colors is None or len(colors) < 2:
-        colors = ['', '']
     buf_size = 65536  # 64kb
     md5 = hashlib.md5()
     sha1 = hashlib.sha1()
@@ -45,27 +44,25 @@ def get_checksum_from_file(file: Path, colors = None) -> str:
                 crc32 = zlib.crc32(data, crc32)
     except OSError as exc:
         return type(exc).__name__
-
     crc32 = f"{(crc32 & 0xFFFFFFFF):08X}"
 
-    checksum =  f"\t{colors[0]}{'CRC32:' : <9}{str(crc32)}{colors[1]}\n"
-    checksum += f"\t{colors[0]}{'MD5:'   : <9}{str(md5.hexdigest())}{colors[1]}\n"
-    checksum += f"\t{colors[0]}{'SHA1:'  : <9}{str(sha1.hexdigest())}{colors[1]}\n"
-    checksum += f"\t{colors[0]}{'SHA256:': <9}{str(sha256.hexdigest())}{colors[1]}\n"
-    checksum += f"\t{colors[0]}{'SHA512:': <9}{str(sha512.hexdigest())}{colors[1]}\n"
+    template = f"\t{color_dic[CKW.CHECKSUM]}%s{color_dic[CKW.RESET_ALL]}\n"
+    checksum =  template % f"{'CRC32:' : <9}{str(crc32)}"
+    checksum += template % f"{'MD5:'   : <9}{str(md5.hexdigest())}"
+    checksum += template % f"{'SHA1:'  : <9}{str(sha1.hexdigest())}"
+    checksum += template % f"{'SHA256:': <9}{str(sha256.hexdigest())}"
+    checksum += template % f"{'SHA512:': <9}{str(sha512.hexdigest())}"
     return checksum
 
-def print_checksum(file: Path, color: str, color_reset: str) -> None:
+def print_checksum(file: Path, color_dic: dict) -> None:
     """
     print the information retrieved by get_checksum_from_file()
 
     Parameters:
     file (Path):
         a string representation of a file (-path)
-    color (str):
-        the color to use
-    color_reset (str):
-        the reset color code
+    color_dic (dict):
+        color dictionary containing all configured ANSI color values
     """
-    print(f"{color}Checksum of '{file}':{color_reset}")
-    print(get_checksum_from_file(file, [color, color_reset]))
+    print(f"{color_dic[CKW.CHECKSUM]}Checksum of '{file}':{color_dic[CKW.RESET_ALL]}")
+    print(get_checksum_from_file(file, color_dic))

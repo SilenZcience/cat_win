@@ -18,7 +18,7 @@ class Visualizer:
     """
     visualize given files in different ways.
     """
-    debug: bool = False
+    debug_mode: bool = False
 
     def __init__(self, files: list, v_type: str = 'ByteView', truncate: list = None) -> None:
         self.files = files
@@ -91,13 +91,13 @@ class Visualizer:
         for row in data_generator:
             for byte in row:
                 if byte < 0:
-                    vis_row += '  ' + '  ' * Visualizer.debug
+                    vis_row += '  ' + '  ' * Visualizer.debug_mode
                     continue
                 c_color_def = color_def(byte)
                 if c_color_def != last_color_def:
                     vis_row += f"{CVis.COLOR_RESET}{c_color_def}"
                     last_color_def = c_color_def
-                vis_row += str(byte).rjust(4) if Visualizer.debug else d_char
+                vis_row += str(byte).rjust(4) if Visualizer.debug_mode else d_char
             if vis_row:
                 print(vis_row)
                 vis_row = ''
@@ -253,5 +253,5 @@ class Visualizer:
             visualizer(file)
 
     @staticmethod
-    def set_flags(debug: bool):
-        Visualizer.debug = debug
+    def set_flags(debug: bool) -> None:
+        Visualizer.debug_mode = debug

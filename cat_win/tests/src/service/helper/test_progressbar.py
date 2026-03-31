@@ -1,6 +1,7 @@
 from unittest.mock import patch
 from unittest import TestCase
 
+from cat_win.src.const.colorconstants import CKW
 from cat_win.src.service.helper.progressbar import PBar
 from cat_win.tests.mocks.std import StdOutMock, OSAttyDefGen
 # import sys
@@ -72,3 +73,21 @@ class TestPBar(TestCase):
             self.assertIn('__', fake_out.getvalue())
             self.assertIn('XX', fake_out.getvalue())
             self.assertIn('\b \b', fake_out.getvalue())
+
+    def test_pbar_set_colors(self):
+        color_dic = {
+            CKW.PROGRESSBAR_DONE: '\033[92m',
+            CKW.PROGRESSBAR_MISSING: '\033[91m',
+            CKW.RESET_ALL: '\033[0m',
+        }
+        old_done, old_missing, old_reset = PBar.COLOR_DONE, PBar.COLOR_MISSING, PBar.COLOR_RESET
+
+        with patch.multiple(PBar, COLOR_DONE='OLD_DONE', COLOR_MISSING='OLD_MISSING', COLOR_RESET='OLD_RESET'):
+            PBar.set_colors(color_dic)
+            self.assertEqual(PBar.COLOR_DONE, '\033[92m')
+            self.assertEqual(PBar.COLOR_MISSING, '\033[91m')
+            self.assertEqual(PBar.COLOR_RESET, '\033[0m')
+
+        self.assertEqual(PBar.COLOR_DONE, old_done)
+        self.assertEqual(PBar.COLOR_MISSING, old_missing)
+        self.assertEqual(PBar.COLOR_RESET, old_reset)

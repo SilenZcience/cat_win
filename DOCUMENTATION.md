@@ -4,7 +4,7 @@
       <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/cat_win.logo.png" width="25%"/>
    </p>
    <p align="center">
-      Simple Text-Processing and -Analytics Command Line Tool made in Python
+      Advanced Text-Processing and -Analytics Command Line Tool made in Python
       <br/>
       <a href="https://github.com/SilenZcience/cat_win/blob/main/cat_win/src/cat.py">
          <strong>Explore the code »</strong>
@@ -54,6 +54,7 @@
             <li><a href="#--fp---file-prefix">--fp, --file-prefix</a></li>
             <li><a href="#-e---ends">-e, --ends</a></li>
             <li><a href="#--chr---char">--chr, --char</a></li>
+            <li><a href="#--eol---end-of-line">--eol, --end-of-line</a></li>
             <li><a href="#-b---blank">-b, --blank</a></li>
             <li><a href="#-p---peek">-p, --peek</a></li>
             <li><a href="#-r---reverse">-r, --reverse</a></li>
@@ -68,7 +69,7 @@
             <li><a href="#-f---files">-f, --files</a></li>
             <li><a href="#-d---dirs">-d, --dirs</a></li>
             <li><a href="#-s---sum">-s, --sum</a></li>
-            <li><a href="#-w---wordcount">-w, --wordcount</a></li>
+            <li><a href="#--wc---wordcount">--wc, --wordcount</a></li>
             <li><a href="#--cc---charcount">--cc, --charcount</a></li>
             <li><a href="#-g---grep">-g, --grep</a></li>
             <li><a href="#--nk---nokeyword">--nk, --nokeyword</a></li>
@@ -97,10 +98,10 @@
             <li><a href="#--vise---visualizee">--vise, --visualizee</a></li>
             <li><a href="#--visd---visualized">--visd, --visualized</a></li>
             <li><a href="#-c---clip">-c, --clip</a></li>
+            <li><a href="#-w---watch">-w, --watch</a></li>
             <li><a href="#--dot---dotfiles">--dot, --dotfiles</a></li>
             <li><a href="#--plain---plain-only">--plain, --plain-only</a></li>
             <li><a href="#--nc---nocolor">--nc, --nocolor</a></li>
-            <li><a href="#-w---watch">-w, --watch</a></li>
             <li><a href="#--config---config">--config, --config</a></li>
             <li><a href="#--cconfig---cconfig">--cconfig, --cconfig</a></li>
             <li><a href="#--config-clear---config-reset">--config-clear, --config-reset</a></li>
@@ -145,6 +146,7 @@
 ||||
 | *<a href="#-e---ends">-e, --ends</a>* | mark the end of each line |✔|
 | *<a href="#--chr---char">--chr, --char</a>* | display special characters |✔|
+| *<a href="#--eol---end-of-line">--eol, --end-of-line</a>* | display end-of-line characters |❌|
 ||||
 | *<a href="#-b---blank">-b, --blank</a>* | hide empty lines |✔|
 | *<a href="#-p---peek">-p, --peek</a>* | only print the first and last lines |❌|
@@ -162,7 +164,7 @@
 | *<a href="#-f---files">-f, --files</a>* | list applied files and file sizes |❌|
 | *<a href="#-d---dirs">-d, --dirs</a>* | list found directories |❌|
 | *<a href="#-s---sum">-s, --sum</a>* | show sum of lines |❌|
-| *<a href="#-w---wordcount">-w, --wordcount</a>* | display the wordcount |❌|
+| *<a href="#--wc---wordcount">--wc, --wordcount</a>* | display the wordcount |❌|
 | *<a href="#--cc---charcount">--cc, --charcount</a>* | display the charcount |❌|
 ||||
 | *<a href="#-g---grep">-g, --grep</a>* | only show lines containing queried keywords or patterns |✔|
@@ -198,10 +200,10 @@
 | *<a href="#--visd---visualized">--visd, --visualized</a>* | visualize the data using digraph dot plot view |❌|
 ||||
 | *<a href="#-c---clip">-c, --clip</a>* | copy output to clipboard |✔|
+| *<a href="#-w---watch">-w, --watch</a>* | watch files for changes and continuously update the output |❌|
 | *<a href="#--dot---dotfiles">--dot, --dotfiles</a>* | additionally query and edit dotfiles |❌|
 | *<a href="#--plain---plain-only">--plain, --plain-only</a>* | ignore non-plaintext files automatically |❌|
 | *<a href="#--nc---nocolor">--nc, --nocolor</a>* | disable colored output |✔|
-| *<a href="#-w---watch">-w, --watch</a>* | watch files for changes and continuously update the output |❌|
 ||||
 | *<a href="#--config---config">--config, --config</a>* | change default parameters |✔|
 | *<a href="#--cconfig---cconfig">--cconfig, --cconfig</a>* | change color configuration |✔|
@@ -374,6 +376,20 @@ Note that the special Char ␛ will not be displayed as ^ESC because it is neede
 > catw test.txt --chr
 ^SUB^SUB^NUL^SUB^SUB^TAB^BEL
 ```
+
+### <a id="#--eol---end-of-line">--eol, --end-of-line</a>
+
+Displayes the end-of-line character used after each line.
+Uses the same color as <a href="--chr---char">--chr, --char</a>.
+
+```console
+> catw test.txt --eol
+a<CRLF>
+b<LF>
+c<CR>
+d<EOF-noeol>
+```
+
 
 - - - -
 <a id="linemanipulation"></a>
@@ -626,7 +642,7 @@ File             LineCount
 Lines (Sum): 4
 ```
 
-### <a id="-w---wordcount">-w, --wordcount</a>
+### <a id="--wc---wordcount">--wc, --wordcount</a>
 
 Displays a Summary of all Tokens/Words found in the given Files and how frequent they occured.
 The Output will be sorted by the Frequency of Occurrence starting with the most common Word.
@@ -1029,6 +1045,11 @@ The currently supported Key Bindings are as follows:
 - `istitle`
 - `isupper`
 
+<a href="#transform-selected-text">Transform</a> and <a href="#question-selected-text">Question</a> also allow the usage of lambda-functions:
+
+- `lambda x: ''.join(str(i)+c for i, c in enumerate(x))`
+- `lambda x: any(c.isupper() for c in x)`
+
 ### <a id="----hexedit">-#, --hexedit</a>
 
 Opens a simple Hex-Editor to write/edit the Content of any provided File one by one.
@@ -1280,6 +1301,20 @@ The Data of the Files used can be limited using the <a href="#truncxy-truncxy">t
 
 Copies the entire Output to the Clipboard additionally to printing it to the StdOut Stream.
 
+### <a id="-w---watch">-w, --watch</a>
+
+Continuously keep tracking if the given Files have been changed/modified in which Case the Output will be freshly generated again.
+This endless cycle can be terminated via KeyboardInterrupt after which the execution will continue as usual.
+
+```console
+> catw status.log -w F=error -g
+File 'status.log' has been modified. Reloading ...
+1) Error: Service cannot be started. [0x8007045b]
+File 'status.log' has been modified. Reloading ...
+1) Error: Service cannot be started. [0x8007045b]
+2) Error: Access is denied.
+```
+
 ### <a id="--dot---dotfiles">--dot, --dotfiles</a>
 
 When providing File Patterns or entire Directories cat_win will find every File including those set to hidden (e.g. on Windows OS).
@@ -1316,20 +1351,6 @@ Often the Problem is being fixed by providing another Codepage using the <a href
 By Default different Colors will be used to better highlight specific Parts of the Output or make original and changed Parts of a Line more distinguishable.
 Using --nocolor will disable all Colors and only display the Output in plain monochrome Text.
 
-### <a id="-w---watch">-w, --watch</a>
-
-Continuously keep tracking if the given Files have been changed/modified in which Case the Output will be freshly generated again.
-This endless cycle can be terminated via KeyboardInterrupt after which the execution will continue as usual.
-
-```console
-> catw status.log -w F=error -g
-File 'status.log' has been modified. Reloading ...
-1) Error: Service cannot be started. [0x8007045b]
-File 'status.log' has been modified. Reloading ...
-1) Error: Service cannot be started. [0x8007045b]
-2) Error: Access is denied.
-```
-
 - - - -
 <a id="configuration"></a>
 ### <a id="--config---config">--config, --config</a>
@@ -1348,12 +1369,14 @@ Valid Options are:
 | strip_color_on_pipe | indicate if the Output should be stripped of any Color | false | true |
 | ignore_unknown_bytes | ignore unknown Bytes instead of replacing them with � | true | false |
 | end_marker_symbol | define the Marker that will be displayed at EOL when using <a href="#-e---ends">-e, --ends</a> | ^EOL | $ |
+| squeeze_collapse_suffixes | indicate if the squeeze counter should be displayed when using <a href="#-u---unique">-u, --unique</a> | false | true |
 | blank_remove_ws_lines | additionally remove whitespace Lines when using <a href="#-b---blank">-b, --blank</a> | true | false |
 | peek_size | define the amount of Lines shown by <a href="#-p---peek">-p, --peek</a> | 10 | 5 |
 | summary_unique_elements | display only unique elements in summary overviews | true | false |
 | strings_minimum_sequence_length | set the minimum Length of a String </br> (for the <a href="#--strings---strings">--strings, --strings</a> Parameter) | 2 | 4 |
 | strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the <a href="#--strings---strings">--strings, --strings</a> Parameter) | \| | \\n |
 | grep_context_lines | set the amount of context lines visible before and after every </br> grep-line when using <a href="#-g---grep">-g, --grep</a> | 5 | 0 |
+| grep_query_separator | define the separator string between all found queries when using <a href="#-g---grep">-G, --GREP</a> | \n | , |
 | editor_indentation | set the Indentation used in the Editor (<a href="#----edit">-!, --edit</a>)</br> when pressing ↹ on an empty Line | <b>␣ ␣ ␣ ␣</b> | ↹ |
 | editor_auto_indent | set whether the Editor (<a href="#----edit">-!, --edit</a>) should auto indent or not | true | false |
 | hex_editor_columns | set the amount of columns per row in the HexEditor (<a href="#----hexedit">-#, --hexedit</a>) | 8 | 16 |
@@ -1391,8 +1414,9 @@ Valid Options are:
 | line_numbers | the numbering of each line using <a href="#-n---number">-n, --number</a> |
 | file_prefix | the file prefix using <a href="#--fp---file-prefix">--fp, --file-prefix</a> |
 | line_ends | the end of line marker using <a href="#-e---ends">-e, --ends</a> |
+| squeeze_counter | the collapse counter suffixes using <a href="#-u---unique">-u, --unique</a> |
 | special_chars | special chars using <a href="#--chr---char">--chr, --char</a> |
-| summary_message | the message displayed using <a href="#-f---files">-f, --files</a>/<a href="#-d---dirs">-d, --dirs</a>/<a href="#-s---sum">-s, --sum</a>/<a href="#-w---wordcount">-w, --wordcount</a>/<a href="#--cc---charcount">--cc, --charcount</a> |
+| summary_message | the message displayed using <a href="#-f---files">-f, --files</a>/<a href="#-d---dirs">-d, --dirs</a>/<a href="#-s---sum">-s, --sum</a>/<a href="#--wc---wordcount">--wc, --wordcount</a>/<a href="#--cc---charcount">--cc, --charcount</a> |
 | file_attribute_message | the message containing time stamps and file size using <a href="#-a---attributes">-a, --attributes</a> |
 | active_file_attributes | the attributes a file has set using <a href="#-a---attributes">-a, --attributes</a> |
 | missing_file_attributes | the attributes a file has not set using <a href="#-a---attributes">-a, --attributes</a> |
@@ -1409,9 +1433,11 @@ Valid Options are:
 | progressbar_missing | the progress that is still missing (displayed when using <a href="#--vise---visualizee">--vise, --visualizee</a> or reading large files) |
 | repl_prefix | the prefix displayed when using the cat_win REPL (cats) |
 | more_less_prompt | the prompt displayed when using <a href="#-m---more">-M, --more</a> or <a href="#-l---less">-L, --less</a> |
-| message_information | any informational message like update information |
-| message_important | any important message like large file sizes |
-| message_warning | any warning message like overwriting a file with itself |
+| debug | any debug information message |
+| info | any informational message |
+| warning | any warning message |
+| error | any error message |
+| critical | any critical error message |
 
 ### <a id="--config-clear---config-reset">--config-clear, --config-reset</a>
 

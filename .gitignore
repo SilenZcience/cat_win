@@ -69,7 +69,10 @@ MANIFEST
 .coverage
 reports/
 
+*.bin
+
 # development files
 debug/*
 debug.*
+debug_*
 .dev*

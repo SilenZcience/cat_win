@@ -1,10 +1,13 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 import os
+import sys
+from pathlib import Path
 
 from cat_win.tests.mocks.std import StdOutMock
+from cat_win.src.const.colorconstants import CKW
 from cat_win.src.service.helper.environment import on_windows_os
-from cat_win.src.service.fileattributes import _convert_size, get_file_meta_data, get_file_size, get_dir_size, get_file_mtime, get_file_ctime, print_meta, Signatures
+from cat_win.src.service.fileattributes import _convert_size, get_file_meta_data, get_file_size, get_dir_size, get_file_mtime, get_file_ctime, print_meta, Signatures, read_attribs, get_libmagic_file
 # import sys
 # sys.path.append('../cat_win')
 res_dir = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'res')
@@ -64,7 +67,13 @@ class TestFileAttributes(TestCase):
         self.assertEqual(_convert_size(1024*1024*1024*1024*1024*1024*1024*1024*1024), '1.0 ?')
 
     def test_get_file_meta_data(self):
-        meta_data = get_file_meta_data(__file__, '')
+        color_dic = {
+            CKW.ATTRIB: '',
+            CKW.ATTRIB_POSITIVE: '',
+            CKW.ATTRIB_NEGATIVE: '',
+            CKW.RESET_ALL: '',
+        }
+        meta_data = get_file_meta_data(__file__, color_dic)
         self.assertIn('Signature:', meta_data)
         self.assertIn('Size:', meta_data)
         self.assertIn('ATime:', meta_data)
@@ -92,7 +101,9 @@ class TestFileAttributes(TestCase):
                 self.assertIn('rwx', meta_data)
 
         meta_data = get_file_meta_data(
-            'randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|', '')
+            'randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|',
+            color_dic
+        )
         self.assertEqual(meta_data, '')
 
     def test_get_file_size(self):
@@ -116,11 +127,272 @@ class TestFileAttributes(TestCase):
             'randomFileThatHopefullyDoesNotExistWithWeirdCharsForSafety*!?\\/:<>|'), 0)
 
     def test_print_meta(self):
+        color_dic = {
+            CKW.ATTRIB: 'A',
+            CKW.ATTRIB_POSITIVE: 'B',
+            CKW.ATTRIB_NEGATIVE: 'C',
+            CKW.RESET_ALL: 'D',
+        }
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             Signatures.set_res_path('')
-            print_meta(__file__, ['A', 'B', 'C', 'D'])
+            print_meta(__file__, color_dic)
             self.assertIn('Signature:', fake_out.getvalue())
             self.assertIn('Size:', fake_out.getvalue())
-            self.assertIn('ATime:', fake_out.getvalue())
-            self.assertIn('MTime:', fake_out.getvalue())
-            self.assertIn('CTime:', fake_out.getvalue())
+            self.assertIn('AATime:', fake_out.getvalue())
+            self.assertIn('AMTime:', fake_out.getvalue())
+            self.assertIn('ACTime:', fake_out.getvalue())
+
+    def test_get_libmagic_file_returncode_nonzero(self):
+        """Test line 82: return '' when subprocess returncode != 0"""
+        with patch('cat_win.src.service.fileattributes.which', return_value='/usr/bin/file'):
+            with patch('subprocess.run') as mock_run:
+                mock_result = MagicMock()
+                mock_result.returncode = 1
+                mock_result.stdout = b''
+                mock_run.return_value = mock_result
+                result = get_libmagic_file('test.bin')
+                self.assertEqual(result, '')
+
+    def test_get_libmagic_file_initial_oserror(self):
+        """Test OSError on initial file command execution"""
+        with patch('cat_win.src.service.fileattributes.which', return_value='/usr/bin/file'):
+            with patch('subprocess.run', side_effect=OSError('Command failed')):
+                result = get_libmagic_file('test.bin')
+                self.assertEqual(result, '')
+
+    def test_get_libmagic_file_no_file_cmd(self):
+        def which_side_effect(cmd):
+            return None
+
+        with patch('cat_win.src.service.fileattributes.which', side_effect=which_side_effect):
+            result = get_libmagic_file('test.bin')
+            self.assertEqual(result, '')
+
+    def test_get_libmagic_file_git_cmd_not_found(self):
+        """Test when git is not found"""
+        def which_side_effect(cmd):
+            return None
+
+        with patch('cat_win.src.service.fileattributes.which', side_effect=which_side_effect):
+            result = get_libmagic_file('test.bin')
+            self.assertEqual(result, '')
+
+    def test_get_libmagic_file_path_resolve_oserror(self):
+        """Test line 138: OSError when resolving git path"""
+        def which_side_effect(cmd):
+            # None for file searches
+            if 'file' in cmd.lower():
+                return None
+            # Return a git path
+            if 'git' in cmd.lower():
+                return '/usr/bin/git'
+            return None
+
+        with patch('cat_win.src.service.fileattributes.which', side_effect=which_side_effect):
+            mock_path_instance = MagicMock()
+            mock_path_instance.resolve.side_effect = OSError('Path error')
+
+            with patch('cat_win.src.service.fileattributes.Path', return_value=mock_path_instance):
+                result = get_libmagic_file('test.bin')
+                self.assertEqual(result, '')
+
+    def test_get_libmagic_file_rglob_oserror(self):
+        """Test lines 156-168: OSError during rglob search"""
+        def which_side_effect(cmd):
+            if 'file' in cmd.lower():
+                return None
+            if 'git' in cmd.lower():
+                return '/usr/bin/git'
+            return None
+
+        with patch('cat_win.src.service.fileattributes.which', side_effect=which_side_effect):
+            mock_path_instance = MagicMock()
+            mock_path_instance.parents = [MagicMock(), MagicMock()]
+            mock_path_instance.parent.parent.rglob.side_effect = OSError('rglob failed')
+
+            with patch('cat_win.src.service.fileattributes.Path', return_value=mock_path_instance):
+                result = get_libmagic_file('test.bin')
+                self.assertEqual(result, '')
+
+    def test_get_libmagic_file_found_file_not_found(self):
+        """Test line 174: return '' when file not found after rglob"""
+        def which_side_effect(cmd):
+            if 'file' in cmd.lower():
+                return None
+            if 'git' in cmd.lower():
+                return '/usr/bin/git'
+            return None
+
+        with patch('cat_win.src.service.fileattributes.which', side_effect=which_side_effect):
+            mock_path_instance = MagicMock()
+            mock_path_instance.parents = [MagicMock(), MagicMock()]
+            # Both rglob calls return empty (no file found)
+            mock_path_instance.parent.parent.rglob.return_value = iter([])
+
+            with patch('cat_win.src.service.fileattributes.Path', return_value=mock_path_instance):
+                result = get_libmagic_file('test.bin')
+                self.assertEqual(result, '')
+
+    def test_get_libmagic_file_subprocess_oserror_check_true(self):
+        """Test lines 178-179: OSError in subprocess.run with check=True"""
+        def which_side_effect(cmd):
+            if 'file' in cmd.lower():
+                return None
+            if 'git' in cmd.lower():
+                return '/usr/bin/git'
+            return None
+
+        with patch('cat_win.src.service.fileattributes.which', side_effect=which_side_effect):
+            mock_path = MagicMock()
+            mock_path.parents = [MagicMock(), MagicMock()]
+
+            # rglob finds file
+            mock_found_file = MagicMock()
+            mock_path.parent.parent.rglob.return_value = iter([mock_found_file])
+
+            with patch('cat_win.src.service.fileattributes.Path', return_value=mock_path):
+                with patch('cat_win.src.service.fileattributes.subprocess.run', side_effect=OSError('Subprocess failed')):
+                    result = get_libmagic_file('test.bin')
+                    self.assertEqual(result, '')
+
+    def test_read_attribs_no_attribute(self):
+        """Test lines 205-206: return [] when st_file_attributes doesn't exist"""
+        with patch('os.stat') as mock_stat:
+            mock_stat.return_value = MagicMock(spec=[])  # No st_file_attributes
+            result = read_attribs('test.txt')
+            self.assertEqual(result, [])
+
+    def test_get_dir_size_oserror_on_scandir(self):
+        """Test lines 247-248: OSError handling in get_dir_size"""
+        with patch('os.scandir', side_effect=OSError('Directory error')):
+            result = get_dir_size('nonexistent_dir')
+            self.assertEqual(result, 0)
+
+    def test_get_dir_size_oserror_on_entry_stat(self):
+        """Test OSError when stat fails on entry"""
+        mock_entry = MagicMock()
+        mock_entry.is_file.return_value = True
+        mock_entry.stat.side_effect = OSError('Stat failed')
+
+        # Create a context manager mock
+        context_manager = MagicMock()
+        context_manager.__enter__.return_value = [mock_entry]
+        context_manager.__exit__.return_value = None
+
+        with patch('os.scandir', return_value=context_manager):
+            result = get_dir_size('dir')
+            self.assertEqual(result, 0)
+
+    def test_get_file_meta_data_file_attributes_formatting(self):
+        color_dic = {
+            CKW.ATTRIB: 'C',
+            CKW.ATTRIB_POSITIVE: 'P',
+            CKW.ATTRIB_NEGATIVE: 'N',
+            CKW.RESET_ALL: 'R',
+        }
+
+        # Test using a real file (avoiding complex mocking)
+        result = get_file_meta_data(__file__, color_dic)
+        # Verify basic structure is present
+        self.assertIn('Signature:', result)
+        self.assertIn('Size:', result)
+
+    def test_get_file_meta_data_windows_no_attribs(self):
+        """Test Windows path when no file attributes (lines 383-393)"""
+        color_dic = {
+            CKW.ATTRIB: '',
+            CKW.ATTRIB_POSITIVE: '',
+            CKW.ATTRIB_NEGATIVE: '',
+            CKW.RESET_ALL: '',
+        }
+
+        with patch('os.stat') as mock_stat:
+            mock_stat_result = MagicMock()
+            from stat import S_IFREG
+            mock_stat_result.st_mode = S_IFREG | 0o666
+            mock_stat_result.st_size = 1024
+            mock_stat_result.st_atime = 1500000000
+            mock_stat_result.st_mtime = 1500000000
+            mock_stat_result.st_ctime = 1500000000
+            mock_stat.return_value = mock_stat_result
+
+            with patch('cat_win.src.service.fileattributes.on_windows_os', True):
+                with patch('cat_win.src.service.fileattributes.WinStreams') as mock_win:
+                    mock_win.return_value.streams = []
+
+                    with patch('cat_win.src.service.fileattributes.read_attribs', return_value=[]):
+                        with patch('cat_win.src.service.fileattributes.Signatures.read_signature', return_value='-'):
+                            with patch('cat_win.src.service.fileattributes.get_libmagic_file', return_value=''):
+                                meta_data = get_file_meta_data('test.bin', color_dic)
+                                self.assertNotIn('Alternate Data Streams', meta_data)
+
+    def test_get_file_meta_data_windows_with_streams(self):
+        """Test Windows path with alternate data streams (lines 383-385)"""
+        color_dic = {
+            CKW.ATTRIB: '',
+            CKW.ATTRIB_POSITIVE: '',
+            CKW.ATTRIB_NEGATIVE: '',
+            CKW.RESET_ALL: '',
+        }
+
+        with patch('os.stat') as mock_stat:
+            mock_stat_result = MagicMock()
+            from stat import S_IFREG
+            mock_stat_result.st_mode = S_IFREG | 0o666
+            mock_stat_result.st_size = 1024
+            mock_stat_result.st_atime = 1500000000
+            mock_stat_result.st_mtime = 1500000000
+            mock_stat_result.st_ctime = 1500000000
+            mock_stat.return_value = mock_stat_result
+
+            with patch('cat_win.src.service.fileattributes.on_windows_os', True):
+                with patch('cat_win.src.service.fileattributes.WinStreams') as mock_win:
+                    mock_win.return_value.streams = [':Zone.Identifier:$DATA', ':custom:$DATA']
+
+                    with patch('cat_win.src.service.fileattributes.read_attribs', return_value=[]):
+                        with patch('cat_win.src.service.fileattributes.Signatures.read_signature', return_value='-'):
+                            with patch('cat_win.src.service.fileattributes.get_libmagic_file', return_value=''):
+                                meta_data = get_file_meta_data('test.bin', color_dic)
+                                self.assertIn('Alternate Data Streams', meta_data)
+                                self.assertIn(':Zone.Identifier:$DATA', meta_data)
+
+    def test_get_file_meta_data_windows_with_attributes(self):
+        """Test Windows path with file attributes (lines 391-393)"""
+        color_dic = {
+            CKW.ATTRIB: 'A',
+            CKW.ATTRIB_POSITIVE: 'P',
+            CKW.ATTRIB_NEGATIVE: 'N',
+            CKW.RESET_ALL: 'R',
+        }
+
+        with patch('os.stat') as mock_stat:
+            mock_stat_result = MagicMock()
+            from stat import S_IFREG
+            mock_stat_result.st_mode = S_IFREG | 0o666
+            mock_stat_result.st_size = 1024
+            mock_stat_result.st_atime = 1500000000
+            mock_stat_result.st_mtime = 1500000000
+            mock_stat_result.st_ctime = 1500000000
+            mock_stat.return_value = mock_stat_result
+
+            with patch('cat_win.src.service.fileattributes.on_windows_os', True):
+                with patch('cat_win.src.service.fileattributes.WinStreams') as mock_win:
+                    mock_win.return_value.streams = []
+
+                    # Mock attributes with some True, some False
+                    mock_attribs = [
+                        ['Archive', True],
+                        ['System', False],
+                        ['Hidden', True],
+                        ['Readonly', False],
+                        ['Indexed', True],
+                        ['Compressed', False],
+                        ['Encrypted', True]
+                    ]
+
+                    with patch('cat_win.src.service.fileattributes.read_attribs', return_value=mock_attribs):
+                        with patch('cat_win.src.service.fileattributes.Signatures.read_signature', return_value='-'):
+                            with patch('cat_win.src.service.fileattributes.get_libmagic_file', return_value=''):
+                                meta_data = get_file_meta_data('test.bin', color_dic)
+                                self.assertIn('Archive, Hidden, Indexed', meta_data)
+                                self.assertIn('System, Readonly, Compressed', meta_data)

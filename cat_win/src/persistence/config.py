@@ -11,7 +11,7 @@ import sys
 
 from cat_win.src.const.argconstants import ALL_ARGS
 from cat_win.src.const.defaultconstants import DKW
-from cat_win.src.service.helper.iohelper import err_print
+from cat_win.src.service.helper.iohelper import logger
 
 
 BOOL_POS_RESPONSE = ['TRUE','YES','Y','1']
@@ -20,31 +20,37 @@ BOOL_NEG_RESPONSE = ['FALSE','NO','N','0']
 
 def validator_string(_, d_h: bool=False) -> bool:
     if d_h:
-        err_print('Any UTF-8 String (unicode-escaped) without Nullbytes', priority=err_print.INFORMATION)
+        logger('Any UTF-8 String (unicode-escaped) without Nullbytes', priority=logger.INFO)
         return False
     return True
 
 def validator_int(value: str, d_h: bool=False) -> bool:
     if d_h:
-        err_print('Integers greater than Zero or Zero', priority=err_print.INFORMATION)
+        logger('Integers greater than Zero or Zero', priority=logger.INFO)
         return False
     return value.isdigit() and int(value) >= 0
 
 def validator_int_pos(value: str, d_h: bool=False) -> bool:
     if d_h:
-        err_print('Integers greater than Zero', priority=err_print.INFORMATION)
+        logger('Integers greater than Zero', priority=logger.INFO)
         return False
     return value.isdigit() and int(value) > 0
 
 def validator_bool(value: str, d_h: bool=False) -> bool:
     if d_h:
-        err_print(BOOL_POS_RESPONSE, '&', BOOL_NEG_RESPONSE, '(not case sensitive)', priority=err_print.INFORMATION)
+        logger(
+            BOOL_POS_RESPONSE, '&', BOOL_NEG_RESPONSE, '(not case sensitive)',
+            priority=logger.INFO
+        )
         return False
     return value.upper() in BOOL_POS_RESPONSE + BOOL_NEG_RESPONSE
 
 def validator_encoding(value: str, d_h: bool=False) -> bool:
     if d_h:
-        err_print('Valid Encoding Formats defined by the current Python Interpreter', priority=err_print.INFORMATION)
+        logger(
+            'Valid Encoding Formats defined by the current Python Interpreter',
+            priority=logger.INFO
+        )
         return False
     try:
         return codecs.lookup(value) is not None
@@ -64,12 +70,14 @@ class Config:
         DKW.STRIP_COLOR_ON_PIPE: True,
         DKW.IGNORE_UNKNOWN_BYTES: False,
         DKW.END_MARKER_SYMBOL: '$',
+        DKW.SQUEEZE_COLLAPSE_SUFFIXES: True,
         DKW.BLANK_REMOVE_WS_LINES: False,
         DKW.PEEK_SIZE: 5,
         DKW.SUMMARY_UNIQUE_ELEMENTS: False,
         DKW.STRINGS_MIN_SEQUENCE_LENGTH: 4,
         DKW.STRINGS_DELIMETER: '\n',
         DKW.GREP_CONTEXT_LINES: 0,
+        DKW.GREP_QUERY_SEPARATOR: ',',
         DKW.EDITOR_INDENTATION: '\t',
         DKW.EDITOR_AUTO_INDENT: False,
         DKW.HEX_EDITOR_COLUMNS: 16,
@@ -89,12 +97,14 @@ class Config:
         DKW.STRIP_COLOR_ON_PIPE: validator_bool,
         DKW.IGNORE_UNKNOWN_BYTES: validator_bool,
         DKW.END_MARKER_SYMBOL: validator_string,
+        DKW.SQUEEZE_COLLAPSE_SUFFIXES: validator_bool,
         DKW.BLANK_REMOVE_WS_LINES: validator_bool,
         DKW.PEEK_SIZE: validator_int_pos,
         DKW.SUMMARY_UNIQUE_ELEMENTS: validator_bool,
         DKW.STRINGS_MIN_SEQUENCE_LENGTH: validator_int_pos,
         DKW.STRINGS_DELIMETER: validator_string,
         DKW.GREP_CONTEXT_LINES: validator_int,
+        DKW.GREP_QUERY_SEPARATOR: validator_string,
         DKW.EDITOR_INDENTATION: validator_string,
         DKW.EDITOR_AUTO_INDENT: validator_bool,
         DKW.HEX_EDITOR_COLUMNS: validator_int_pos,
@@ -141,8 +151,8 @@ class Config:
             c_value_rep = repr(self.default_dic[element])
             if c_value_rep[0] not in ['"', "'"]:
                 c_value_rep = f"'{c_value_rep}'"
-            err_print(f"invalid config value '{value}' for '{element}'", priority=err_print.IMPORTANT)
-            err_print(f"resetting to {c_value_rep} ...", priority=err_print.IMPORTANT)
+            logger(f"invalid config value '{value}' for '{element}'", priority=logger.WARNING)
+            logger(f"resetting to {c_value_rep} ...", priority=logger.WARNING)
             self._save_config(element, self.default_dic[element])
             sys.exit(1)
 
@@ -198,27 +208,6 @@ class Config:
         """
         return shlex.split(self.const_dic.get(DKW.DEFAULT_COMMAND_LINE, ''))
 
-    def get_args(self, argv: list) -> list:
-        """
-        modifies the sys.argv parameter list depending on the custom commands and config settings.
-
-        Parameters:
-        argv (list):
-            sys.argv
-
-        Returns
-        new_argv (list):
-            the modified sys.argv to use
-        """
-        argv += self.get_cmd()
-        new_argv = []
-        for arg in argv:
-            if arg in self.custom_commands:
-                new_argv += self.custom_commands[arg][:]
-                continue
-            new_argv.append(arg)
-        return new_argv
-
     def load_config(self) -> dict:
         """
         Load the Const Configuration from the config file.
@@ -273,26 +262,26 @@ class Config:
         for index, element in enumerate(self.elements):
             config_menu += f"{index+1: <{index_offset}}: "
             config_menu += f"{element: <{element_offset}}"
-            if index % columns == columns-1:
+            if index % columns == columns-1 and index != len(self.elements)-1:
                 config_menu += '\n'
 
         print(config_menu)
 
-        print('-' * columns * (index_offset+element_offset))
+        print('-' * columns * (2+index_offset+element_offset))
 
         config_menu = ''
         for c_index, (command, value) in enumerate(self.custom_commands.items()):
             config_menu += f"{c_index+len(self.elements)+1: <{index_offset}}: "
             element = f"{command} = {' '.join(value)}"
             config_menu += f"{element: <{element_offset}}"
-            if c_index % columns == columns-1:
+            if c_index % columns == columns-1 and c_index != len(self.custom_commands)-1:
                 config_menu += '\n'
         if config_menu:
             print(config_menu)
         print(f"{len(self.elements)+len(self.custom_commands)+1: <{index_offset}}: ", end='')
-        print('<NEW CUSTOM COMMAND>')
+        print('<NEW CUSTOM COMMAND>', end='\n\n')
 
-    def _save_config(self, keyword: str, value: str = '', section: str = 'CONSTS'):
+    def _save_config(self, keyword: str, value: str = '', section: str = 'CONSTS') -> None:
         """
         write the value to the config-file
 
@@ -309,7 +298,7 @@ class Config:
                 self.config_parser.write(conf)
             print(f"Successfully updated config file:\n\t{self.config_file}")
         except OSError:
-            err_print(f"Could not write to config file:\n\t{self.config_file}", priority=err_print.WARNING)
+            logger(f"Could not write to config file:\n\t{self.config_file}", priority=logger.ERROR)
 
     def _save_config_element(self, keyword: str) -> None:
         print(f"Successfully selected element '{keyword}'")
@@ -325,13 +314,13 @@ class Config:
         value = None
         while not self.is_valid_value(value, keyword):
             if value is not None:
-                err_print(f"Something went wrong. Invalid option: '{value}'.", priority=err_print.IMPORTANT)
-                err_print('Valid Options are: ', end='', priority=err_print.IMPORTANT)
+                logger(f"Something went wrong. Invalid option: '{value}'.", priority=logger.WARNING)
+                logger('Valid Options are: ', end='', priority=logger.WARNING)
                 self.v_validation[keyword](None, True)
             try:
                 value = input('Input new value: ')
             except EOFError:
-                err_print('\nAborting due to End-of-File character...', priority=err_print.WARNING)
+                logger('\nAborting due to End-of-File character...', priority=logger.WARNING)
                 return
 
         self._save_config(keyword, value)
@@ -348,7 +337,7 @@ class Config:
         try:
             value = input('Input new value: ')
         except EOFError:
-            err_print('\nAborting due to End-of-File character...', priority=err_print.WARNING)
+            logger('\nAborting due to End-of-File character...', priority=logger.WARNING)
             return
 
         if not value:
@@ -361,8 +350,8 @@ class Config:
     def _save_config_add_custom_command(self) -> None:
         def validator_custom_command(value: str, d_h: bool=False) -> bool:
             if d_h:
-                err_print("The command needs to start with a '-' ", end='', priority=err_print.INFORMATION)
-                err_print('and cannot be a duplicate of an existing command', priority=err_print.INFORMATION)
+                logger("The command needs to start with a '-' ", end='', priority=logger.INFO)
+                logger('and cannot be a duplicate of an existing command', priority=logger.INFO)
                 return False
             if not value:
                 return False
@@ -377,12 +366,12 @@ class Config:
         value = None
         while not validator_custom_command(value):
             if value is not None:
-                err_print(f"Something went wrong. Invalid option: '{value}'.", priority=err_print.IMPORTANT)
+                logger(f"Something went wrong. Invalid option: '{value}'.", priority=logger.WARNING)
                 validator_custom_command(None, True)
             try:
                 value = input('Input new custom command: ')
             except EOFError:
-                err_print('\nAborting due to End-of-File character...', priority=err_print.WARNING)
+                logger('\nAborting due to End-of-File character...', priority=logger.WARNING)
                 return
 
         print(f"Successfully added new custom command '{value}'")
@@ -404,11 +393,14 @@ class Config:
             if keyword == '<NEW CUSTOM COMMAND>':
                 return self._save_config_add_custom_command()
             if keyword != '':
-                err_print(f"Something went wrong. Unknown keyword '{keyword}'", priority=err_print.IMPORTANT)
+                logger(
+                    f"Something went wrong. Unknown keyword '{keyword}'",
+                    priority=logger.WARNING
+                )
             try:
                 keyword = input('Input name or id of keyword to change: ')
             except EOFError:
-                err_print('\nAborting due to End-of-File character...', priority=err_print.WARNING)
+                logger('\nAborting due to End-of-File character...', priority=logger.WARNING)
                 return
             if keyword.isdigit():
                 if (
@@ -443,8 +435,11 @@ class Config:
             os.remove(self.config_file)
             print(f"Successfully removed config file:\n\t{self.config_file}")
         except FileNotFoundError:
-            err_print('No active config file has been found.', priority=err_print.WARNING)
+            logger('No active config file has been found.', priority=logger.ERROR)
         except PermissionError:
-            err_print(f"Permission denied! Error deleting config file:\n\t{self.config_file}", priority=err_print.WARNING)
+            logger(
+                f"Permission denied! Error deleting config file:\n\t{self.config_file}",
+                priority=logger.ERROR
+            )
         except OSError:
-            err_print('An unexpected error occured.', priority=err_print.WARNING)
+            logger('An unexpected error occured.', priority=logger.ERROR)

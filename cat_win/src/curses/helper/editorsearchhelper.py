@@ -16,7 +16,9 @@ class _SearchIterBase:
         self._start_x = editor.cpos.col
         self.yielded_result = False
         self.search = self.editor.search
-        self.search_parts = self.search.split(self.editor.line_sep) if isinstance(self.search, str) else []
+        self.search_parts = self.search.split(
+            self.editor.line_sep
+        ) if isinstance(self.search, str) else []
         self.s_len = len(self.search) if isinstance(self.search, str) else 0
         self.s_rows = []
         self.replace = self.editor.replace
@@ -154,7 +156,9 @@ class _SearchIterDown(_SearchIterBase):
                 if not content[row + len(self.search_parts) - 1].startswith(self.search_parts[-1]):
                     return -1
                 self.s_len = len(self.search_parts[0])
-                self.s_rows = [((row + i, 0), len(p)) for i, p in enumerate(self.search_parts[1:], 1)]
+                self.s_rows = [
+                    ((row + i, 0), len(p)) for i, p in enumerate(self.search_parts[1:], 1)
+                ]
                 return c
             return line.find(self.search)
         match_ = self.search.search(line)
@@ -235,8 +239,9 @@ class _SearchIterHexBase:
         self.wrapped = False
         self._start_y = editor.cpos.row
         self._start_x = editor.cpos.col + offset
-        self.search = bytes.fromhex(editor.search)
-        self.s_len = len(editor.search)
+        self.search = editor.search
+        self.s_len = len(self.search)
+        self.match_start_half = 0
 
         editor._build_file()
         row_bytes_list = [editor._get_current_state_bytes_row(i)
@@ -245,7 +250,9 @@ class _SearchIterHexBase:
         for rb in row_bytes_list:
             self._row_offsets.append(self._row_offsets[-1] + len(rb))
         self._file_bytes = b''.join(row_bytes_list)
+        self._file_hex = self._file_bytes.hex().upper()
         self._start_pos_flat = self._pos_to_flat(self._start_y, self._start_x)
+        self._start_pos_nibble = self._start_pos_flat * 2
 
     def __iter__(self):
         return self
@@ -257,6 +264,18 @@ class _SearchIterHexBase:
 
     def _pos_to_flat(self, row: int, col: int) -> int:
         return self._row_offsets[row] + col
+
+    def _pos_to_nibble(self, row: int, col: int) -> int:
+        return self._pos_to_flat(row, col) * 2
+
+    def _nibble_to_pos(self, nibble_idx: int) -> tuple:
+        row, col = self._flat_to_pos(nibble_idx // 2)
+        return (row, col, nibble_idx % 2)
+
+    def _set_match_start(self, nibble_idx: int) -> tuple:
+        row, col, start_half = self._nibble_to_pos(nibble_idx)
+        self.match_start_half = start_half
+        return (row, col)
 
     def _stop_if_past_original(self, row: int, f_col: int) -> tuple:
         raise NotImplementedError
@@ -281,23 +300,23 @@ class _SearchIterHexUp(_SearchIterHexBase):
         row = self.editor.cpos.row
         col = self.editor.cpos.col - self.offset
 
-        end_flat = self._pos_to_flat(row, col) + len(self.search)
+        end_nibble = self._pos_to_nibble(row, col) + self.s_len
 
         if self.wrapped:
-            found = self._file_bytes.rfind(self.search, self._start_pos_flat, end_flat)
+            found = self._file_hex.rfind(self.search, self._start_pos_nibble, end_nibble)
         elif self.editor.selecting:
-            sel_start_flat = self._pos_to_flat(*self.editor.selected_area[0])
-            found = self._file_bytes.rfind(self.search, sel_start_flat, end_flat)
+            sel_start_nibble = self._pos_to_nibble(*self.editor.selected_area[0])
+            found = self._file_hex.rfind(self.search, sel_start_nibble, end_nibble)
         else:
-            found = self._file_bytes.rfind(self.search, 0, end_flat)
+            found = self._file_hex.rfind(self.search, 0, end_nibble)
             if found < 0:
                 if self.editor.selecting:
                     raise StopIteration()
                 self.wrapped = True
-                found = self._file_bytes.rfind(self.search, self._start_pos_flat)
+                found = self._file_hex.rfind(self.search, self._start_pos_nibble)
 
         if found >= 0:
-            return self._stop_if_past_original(*self._flat_to_pos(found))
+            return self._stop_if_past_original(*self._set_match_start(found))
         raise StopIteration()
 
 class _SearchIterHexDown(_SearchIterHexBase):
@@ -316,23 +335,27 @@ class _SearchIterHexDown(_SearchIterHexBase):
     def __next__(self) -> tuple:
         row = self.editor.cpos.row
         col = self.editor.cpos.col + self.offset
-        start_flat = self._pos_to_flat(row, col)
+        start_nibble = self._pos_to_nibble(row, col)
 
         if self.wrapped:
-            found = self._file_bytes.find(self.search, start_flat, self._start_pos_flat + len(self.search))
+            found = self._file_hex.find(
+                self.search,
+                start_nibble,
+                self._start_pos_nibble + self.s_len
+            )
         elif self.editor.selecting:
-            sel_end_flat = self._pos_to_flat(*self.editor.selected_area[1])
-            found = self._file_bytes.find(self.search, start_flat, sel_end_flat)
+            sel_end_nibble = self._pos_to_nibble(*self.editor.selected_area[1])
+            found = self._file_hex.find(self.search, start_nibble, sel_end_nibble)
         else:
-            found = self._file_bytes.find(self.search, start_flat)
+            found = self._file_hex.find(self.search, start_nibble)
             if found < 0:
                 if self.editor.selecting:
                     raise StopIteration()
                 self.wrapped = True
-                found = self._file_bytes.find(self.search, 0, self._start_pos_flat + len(self.search))
+                found = self._file_hex.find(self.search, 0, self._start_pos_nibble + self.s_len)
 
         if found >= 0:
-            return self._stop_if_past_original(*self._flat_to_pos(found))
+            return self._stop_if_past_original(*self._set_match_start(found))
         raise StopIteration()
 
 

@@ -1,6 +1,7 @@
 from unittest import TestCase
 import os
 
+from cat_win.src.domain.contentbuffer import ContentBuffer
 from cat_win.src.service.strings import get_strings
 # import sys
 # sys.path.append('../cat_win')
@@ -9,9 +10,9 @@ from cat_win.src.service.strings import get_strings
 test_file_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'resources')
 test_file_path = os.path.join(test_file_dir, 'test.bin')
 with open(test_file_path, 'r', encoding='utf-8', errors='replace') as raw_f:
-    test_content = [('', line) for line in raw_f.read().splitlines()]
+    test_content = ContentBuffer.from_lines(raw_f.read().splitlines())
 with open(test_file_path, 'rb') as raw_f:
-    test_content_binary = [('', line) for line in raw_f.read().splitlines()]
+    test_content_binary = ContentBuffer.from_lines(raw_f.read().splitlines())
 
 class TestFile(TestCase):
     def test_get_strings_default(self):
@@ -90,7 +91,7 @@ _init
 .bss
 .comment"""
         output = get_strings(test_content, 4, '\n')
-        self.assertEqual(c_output, '\n'.join(map(lambda x: x[1], output)))
+        self.assertEqual(c_output, '\n'.join(map(lambda x: x[0], output)))
 
     def test_get_strings_long(self):
         # unix : "strings test.bin -n 20"
@@ -108,7 +109,7 @@ _ITM_deregisterTMCloneTable
 _ITM_registerTMCloneTable
 __cxa_finalize@GLIBC_2.2.5"""
         output = get_strings(test_content, 20, '\n')
-        self.assertEqual(c_output, '\n'.join(map(lambda x: x[1], output)))
+        self.assertEqual(c_output, '\n'.join(map(lambda x: x[0], output)))
 
     def test_get_strings_binary(self):
         # unix : "strings test.bin"
@@ -186,11 +187,11 @@ _init
 .bss
 .comment"""
         output = get_strings(test_content_binary, 4, '\n')
-        self.assertEqual(c_output, '\n'.join(map(lambda x: x[1], output)))
+        self.assertEqual(c_output, '\n'.join(map(lambda x: x[0], output)))
 
     def test_get_strings_final_line(self):
-        output = get_strings([('', '12345678')], 8, '\n')
-        self.assertEqual('12345678', '\n'.join(map(lambda x: x[1], output)))
+        output = get_strings(ContentBuffer.from_lines(['12345678']), 8, '\n')
+        self.assertEqual('12345678', '\n'.join(map(lambda x: x[0], output)))
 
-        output = get_strings([('', '12345678')], 9, '\n')
-        self.assertEqual('', '\n'.join(map(lambda x: x[1], output)))
+        output = get_strings(ContentBuffer.from_lines(['12345678']), 9, '\n')
+        self.assertEqual('', '\n'.join(map(lambda x: x[0], output)))
