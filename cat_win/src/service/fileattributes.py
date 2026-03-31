@@ -34,6 +34,7 @@ import math
 import os
 import subprocess
 
+from cat_win.src.const.colorconstants import CKW
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.winstreams import WinStreams
 
@@ -202,7 +203,7 @@ def get_libmagic_file(file: Path) -> str:
             check=True
         )
     except OSError:
-        return ""
+        return ''
     libmagic_out = sub.stdout.decode().strip()
     return libmagic_out.rpartition(':')[-1].lstrip()
 
@@ -334,83 +335,82 @@ def get_file_ctime(file: Path) -> float:
     except OSError:
         return 0.0
 
-def get_file_meta_data(file: Path, colors = None) -> str:
+def get_file_meta_data(file: Path, color_dic: dict) -> str:
     """
     calculate file metadata information.
 
     Parameters:
     file (Path):
         a string representation of a file (-path)
-    colors (list):
-        a list containing the ANSI-Colorcodes to display
-        the attributes like [RESET_ALL, ATTRIB, +ATTRIB, -ATTRIB]
+    color_dic (dict):
+        color dictionary containing all configured ANSI color values
 
     Returns:
     meta_data (str):
         representation containing file size, creation/modified/accessed time.
         on windows: also contains file attribute information
     """
-    if colors is None or len(colors) < 4:
-        colors = ['', '', '', '']
     try:
         stats = os.stat(file)
 
-        meta_data = f"{colors[1]}{file}{colors[0]}\n"
+        meta_data = f"{color_dic[CKW.ATTRIB]}{file}{color_dic[CKW.RESET_ALL]}\n"
 
-        meta_data += f"{colors[1]}{'Signature:' : <16}"
-        meta_data += f"{Signatures.read_signature(file)}{colors[0]}\n"
-        meta_data += f"{colors[1]}{'LibMagic:' : <16}"
-        meta_data += f"{get_libmagic_file(file)}{colors[0]}\n"
-        meta_data += f"{colors[1]}{'Size:' : <16}"
-        meta_data += f"{_convert_size(stats.st_size)} ({stats.st_size}){colors[0]}\n"
-        meta_data += f"{colors[1]}{'ATime:': <16}"
-        meta_data += f"{datetime.fromtimestamp(stats.st_atime)}{colors[0]}\n"
-        meta_data += f"{colors[1]}{'MTime:': <16}"
-        meta_data += f"{datetime.fromtimestamp(stats.st_mtime)}{colors[0]}\n"
-        meta_data += f"{colors[1]}{'CTime:': <16}"
+        meta_data += f"{color_dic[CKW.ATTRIB]}{'Signature:' : <16}"
+        meta_data += f"{Signatures.read_signature(file)}{color_dic[CKW.RESET_ALL]}\n"
+        meta_data += f"{color_dic[CKW.ATTRIB]}{'LibMagic:' : <16}"
+        meta_data += f"{get_libmagic_file(file)}{color_dic[CKW.RESET_ALL]}\n"
+        meta_data += f"{color_dic[CKW.ATTRIB]}{'Size:' : <16}"
+        meta_data += f"{_convert_size(stats.st_size)} ({stats.st_size}){color_dic[CKW.RESET_ALL]}\n"
+        meta_data += f"{color_dic[CKW.ATTRIB]}{'ATime:': <16}"
+        meta_data += f"{datetime.fromtimestamp(stats.st_atime)}{color_dic[CKW.RESET_ALL]}\n"
+        meta_data += f"{color_dic[CKW.ATTRIB]}{'MTime:': <16}"
+        meta_data += f"{datetime.fromtimestamp(stats.st_mtime)}{color_dic[CKW.RESET_ALL]}\n"
+        meta_data += f"{color_dic[CKW.ATTRIB]}{'CTime:': <16}"
         try:
-            meta_data += f"{datetime.fromtimestamp(stats.st_birthtime)}{colors[0]}\n"
+            meta_data += f"{datetime.fromtimestamp(stats.st_birthtime)}{color_dic[CKW.RESET_ALL]}\n"
         except AttributeError:
-            meta_data += f"{datetime.fromtimestamp(stats.st_ctime)}{colors[0]}\n"
+            meta_data += f"{datetime.fromtimestamp(stats.st_ctime)}{color_dic[CKW.RESET_ALL]}\n"
 
         perms = [
             (S_IRUSR, 'r'), (S_IWUSR, 'w'), (S_IXUSR, 'x'),  # User
             (S_IRGRP, 'r'), (S_IWGRP, 'w'), (S_IXGRP, 'x'),  # Group
             (S_IROTH, 'r'), (S_IWOTH, 'w'), (S_IXOTH, 'x'),  # Others
         ]
-        meta_data += f"{colors[1]}{'d' if S_ISDIR(stats.st_mode) else '-'}"
+        meta_data += f"{color_dic[CKW.ATTRIB]}{'d' if S_ISDIR(stats.st_mode) else '-'}"
         meta_data += f"{''.join([per if stats.st_mode & bit else '-' for bit, per in perms])} "
         meta_data += f"({oct(stats.st_mode)[-3:]})"
         if not on_windows_os:
             meta_data += f" {stats.st_nlink} {getpwuid(stats.st_uid).pw_name}"
-            meta_data += f" {getgrgid(stats.st_gid).gr_name}{colors[0]}\n"
+            meta_data += f" {getgrgid(stats.st_gid).gr_name}{color_dic[CKW.RESET_ALL]}\n"
             return meta_data
 
-        meta_data += f"{colors[0]}\n"
+        meta_data += f"{color_dic[CKW.RESET_ALL]}\n"
 
         file_handle = WinStreams(file)
         if file_handle.streams:
-            meta_data += f"{colors[1]}Alternate Data Streams:{colors[0]}\n"
+            meta_data += f"{color_dic[CKW.ATTRIB]}Alternate Data Streams:{color_dic[CKW.RESET_ALL]}\n"
             for stream in file_handle.streams:
-                meta_data += f"\t{colors[1]}- {stream}{colors[0]}\n"
+                meta_data += f"\t{color_dic[CKW.ATTRIB]}- {stream}{color_dic[CKW.RESET_ALL]}\n"
 
         attribs = read_attribs(file)
         if attribs:
-            meta_data += f"{colors[2]}+{', '.join(x for x, y in attribs if y)}{colors[0]}\n"
-            meta_data += f"{colors[3]}-{', '.join(x for x, y in attribs if not y)}{colors[0]}\n"
+            meta_data += f"{color_dic[CKW.ATTRIB_POSITIVE]}+"
+            meta_data += f"{', '.join(x for x, y in attribs if y)}{color_dic[CKW.RESET_ALL]}\n"
+            meta_data += f"{color_dic[CKW.ATTRIB_NEGATIVE]}-"
+            meta_data += f"{', '.join(x for x, y in attribs if not y)}{color_dic[CKW.RESET_ALL]}\n"
         return meta_data
     except OSError:
         return ''
 
-def print_meta(file: Path, colors: list) -> None:
+def print_meta(file: Path, color_dic: dict) -> None:
     """
     print the information retrieved by get_file_meta_data()
 
     Parameters:
     file (Path):
         a string representation of a file (-path)
-    colors (list):
-        [reset, attributes, positive_attr, negative_attr] color codes
+    color_dic (dict):
+        color dictionary containing all configured ANSI color values
     """
-    meta_data = get_file_meta_data(file, colors)
+    meta_data = get_file_meta_data(file, color_dic)
     print(meta_data)

@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from cat_win.src.domain.contentbuffer import ContentBuffer
 from cat_win.src.service.formatter import Formatter
 # import sys
 # sys.path.append('../cat_win')
@@ -28,35 +29,44 @@ class TestFormatter(TestCase):
     def test_format_format_json(self):
         in_put = '{"person":{"name":"Alice","age":25,"employees":[{"name":"Bob"},{"name:":"David"}]}}'
         expected_output = [
-            ('', '{'),
-            ('', '  "person": {'),
-            ('', '    "name": "Alice",'),
-            ('', '    "age": 25,'),
-            ('', '    "employees": ['),
-            ('', '      {'),
-            ('', '        "name": "Bob"'),
-            ('', '      },'),
-            ('', '      {'),
-            ('', '        "name:": "David"'),
-            ('', '      }'),
-            ('', '    ]'),
-            ('', '  }'),
-            ('', '}'),
+            ('{'),
+            ('  "person": {'),
+            ('    "name": "Alice",'),
+            ('    "age": 25,'),
+            ('    "employees": ['),
+            ('      {'),
+            ('        "name": "Bob"'),
+            ('      },'),
+            ('      {'),
+            ('        "name:": "David"'),
+            ('      }'),
+            ('    ]'),
+            ('  }'),
+            ('}'),
         ]
-        self.assertCountEqual(Formatter.format([('', in_put)]), expected_output)
+        self.assertCountEqual(
+            Formatter.format(ContentBuffer.from_lines([in_put])),
+            ContentBuffer.from_lines(expected_output)
+        )
 
     def test_format_format_xml(self):
         in_put = '<lib><book id="1"><title>Cats</title></book><book id="2"></book></lib>'
         expected_output = [
-            ('', '<?xml version="1.0" ?>'),
-            ('', '<lib>'),
-            ('', '  <book id="1">'),
-            ('', '    <title>Cats</title>'),
-            ('', '  </book>'),
-            ('', '  <book id="2"/>'),
-            ('', '</lib>'),
+            ('<?xml version="1.0" ?>'),
+            ('<lib>'),
+            ('  <book id="1">'),
+            ('    <title>Cats</title>'),
+            ('  </book>'),
+            ('  <book id="2"/>'),
+            ('</lib>'),
         ]
-        self.assertCountEqual(Formatter.format([('', in_put)]), expected_output)
+        self.assertCountEqual(
+            Formatter.format(ContentBuffer.from_lines([in_put])),
+            ContentBuffer.from_lines(expected_output)
+        )
 
     def test_format_format_invalid(self):
-        self.assertCountEqual(Formatter.format([('', '-')]), [('', '-')])
+        self.assertCountEqual(
+            Formatter.format(ContentBuffer.from_lines(['-'])),
+            ContentBuffer.from_lines(['-'])
+        )

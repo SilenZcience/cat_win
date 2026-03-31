@@ -57,6 +57,19 @@ class TestVisualizer(TestCase):
             Visualizer.display_data(dummy_gen(), Visualizer.get_color_byte_view)
             self.assertEqual(fake_out.getvalue(), expected_result)
 
+    def test_display_data_negative_byte_debug_mode(self):
+        backup = Visualizer.debug_mode
+        Visualizer.set_flags(True)
+
+        def dummy_gen():
+            yield [-1, 0]
+
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            Visualizer.display_data(dummy_gen(), Visualizer.get_color_byte_view)
+            self.assertIn('    \x1b[0m', fake_out.getvalue())
+
+        Visualizer.set_flags(backup)
+
     @patch('cat_win.src.service.helper.iohelper.IoHelper.read_file', lambda *_: b'1234')
     @patch('cat_win.src.service.helper.vishelper.SpaceFilling.get_scan_curve', lambda *_: 'get_scan_curve')
     def test_visualize_byte_view(self):
@@ -107,6 +120,25 @@ class TestVisualizer(TestCase):
             vis.visualize_digraph_dot_plot(files[0])
             self.assertIn('Min: 0, Avg: 0.003, Max: 7', fake_out.getvalue())
 
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.read_file', lambda *_: b'')
+    def test_visualize_digraph_dot_plot_empty_file(self):
+        files = [test_file_path]
+        vis = Visualizer(files)
+
+        with patch('builtins.print') as mock_print:
+            vis.visualize_digraph_dot_plot(files[0])
+            self.assertIn('Min: 0, Avg: 0.0, Max: 0', mock_print.call_args_list[-1][0][0])
+
+    @patch('cat_win.src.service.helper.iohelper.IoHelper.read_file', lambda *_: b'\x00\x01')
+    def test_visualize_digraph_dot_plot_without_zero_border(self):
+        files = [test_file_path]
+        vis = Visualizer(files)
+
+        with patch('cat_win.src.service.visualizer.sorted', lambda *_args, **_kwargs: [1] * 65536), \
+            patch('builtins.print') as mock_print:
+            vis.visualize_digraph_dot_plot(files[0])
+            self.assertIn('Min: 1, Avg: 0.0, Max: 1', mock_print.call_args_list[-1][0][0])
+
     def test_visualize_files(self):
         files = [test_file_path]
 
@@ -142,9 +174,9 @@ class TestVisualizer(TestCase):
             self.assertIn('Visualizing ', fake_out.getvalue())
 
     def test_set_flags(self):
-        backup = Visualizer.debug
+        backup = Visualizer.debug_mode
         Visualizer.set_flags(True)
-        self.assertTrue(Visualizer.debug)
+        self.assertTrue(Visualizer.debug_mode)
         Visualizer.set_flags(False)
-        self.assertFalse(Visualizer.debug)
+        self.assertFalse(Visualizer.debug_mode)
         Visualizer.set_flags(backup)

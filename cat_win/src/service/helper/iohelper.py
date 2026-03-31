@@ -6,56 +6,114 @@ from pathlib import Path
 import contextlib
 import ctypes
 import io
+import logging
 import os
 import sys
 
+from cat_win.src.const.colorconstants import CKW
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.progressbar import PBar
 
 
-class ErrorPrinter:
+class StatusLogger: # TODO: fix this mess, should be a real logger
     """
-    ErrorPrinter
+    StatusLogger
     """
-    INFORMATION, IMPORTANT, WARNING = range(1, 4)
+    DEBUG    = logging.DEBUG
+    INFO     = logging.INFO
+    WARNING  = logging.WARNING
+    ERROR    = logging.ERROR
+    CRITICAL = logging.CRITICAL
 
-    COLOR_INFORMATION: str = ''
-    COLOR_IMPORTANT: str = ''
-    COLOR_WARNING: str = ''
-    COLOR_RESET: str = ''
+    COLOR_DEBUG: str    = ''
+    COLOR_INFO: str     = ''
+    COLOR_WARNING: str  = ''
+    COLOR_ERROR: str    = ''
+    COLOR_CRITICAL: str = ''
+    COLOR_RESET: str    = ''
 
-    @staticmethod
-    def set_colors(info: str, important: str, warning: str, reset: str) -> None:
+    class _Formatter(logging.Formatter):
+        def __init__(self, error_printer: 'StatusLogger') -> None:
+            super().__init__('%(message)s')
+            self.error_printer = error_printer
+
+        def format(self, record: logging.LogRecord) -> str:
+            message = record.getMessage()
+            line_end = getattr(record, 'line_end', '\n')
+            color = self.error_printer.get_color(record.levelno)
+            reset = self.error_printer.COLOR_RESET if color else ''
+            return f"{color}{message}{reset}{line_end}"
+
+    def set_colors(self, color_dic: dict) -> None:
         """
         Set the colors for the error printer.
 
         Parameters
-        info (str):
-            color for information messages
-        important (str):
-            color for important messages
-        warning (str):
-            color for warning messages
-        reset (str):
-            color to reset to default
+        color_dic (dict):
+            color dictionary containing all configured ANSI color values
         """
-        ErrorPrinter.COLOR_INFORMATION = info
-        ErrorPrinter.COLOR_IMPORTANT = important
-        ErrorPrinter.COLOR_WARNING = warning
-        ErrorPrinter.COLOR_RESET = reset
+        StatusLogger.COLOR_DEBUG    = color_dic[CKW.DEBUG]
+        StatusLogger.COLOR_INFO     = color_dic[CKW.INFO]
+        StatusLogger.COLOR_WARNING  = color_dic[CKW.WARNING]
+        StatusLogger.COLOR_ERROR    = color_dic[CKW.ERROR]
+        StatusLogger.COLOR_CRITICAL = color_dic[CKW.CRITICAL]
+        StatusLogger.COLOR_RESET    = color_dic[CKW.RESET_ALL]
+        self.refresh_formatter()
 
     def clear_colors(self) -> None:
         """
         Clear all colors (set to empty strings).
         """
-        ErrorPrinter.COLOR_INFORMATION = ''
-        ErrorPrinter.COLOR_IMPORTANT = ''
-        ErrorPrinter.COLOR_WARNING = ''
-        ErrorPrinter.COLOR_RESET = ''
+        StatusLogger.COLOR_DEBUG    = ''
+        StatusLogger.COLOR_INFO     = ''
+        StatusLogger.COLOR_WARNING  = ''
+        StatusLogger.COLOR_ERROR    = ''
+        StatusLogger.COLOR_CRITICAL = ''
+        StatusLogger.COLOR_RESET    = ''
+        self.refresh_formatter()
 
     def __init__(self):
         self.log_to_file = False
         self.file_handle = None
+        self.logger = logging.getLogger('cat_win.logger')
+        self.logger.propagate = False
+        self.logger.setLevel(self.INFO)
+        self.handler = None
+        self._reconfigure_handler()
+
+    def get_color(self, priority: int) -> str:
+        return {
+            self.DEBUG: self.COLOR_DEBUG,
+            self.INFO: self.COLOR_INFO,
+            self.WARNING: self.COLOR_WARNING,
+            self.ERROR: self.COLOR_ERROR,
+            self.CRITICAL: self.COLOR_CRITICAL,
+        }.get(priority, '')
+
+    def refresh_formatter(self) -> None:
+        if self.handler is not None:
+            self.handler.setFormatter(self._Formatter(self))
+
+    def _reconfigure_handler(self) -> None:
+        if self.handler is not None:
+            self.logger.removeHandler(self.handler)
+            if isinstance(self.handler, logging.FileHandler):
+                self.handler.close()
+
+        if self.log_to_file:
+            log_file = Path(os.path.join(os.getcwd(), 'catw_debug.log'))
+            self.handler = logging.FileHandler(
+                log_file, mode='a', encoding='utf-8', errors='replace'
+            )
+        else:
+            self.handler = logging.StreamHandler(sys.stderr)
+        self.handler.terminator = ''
+        self.refresh_formatter()
+        self.logger.addHandler(self.handler)
+
+    def set_level(self, priority: int) -> None:
+        """Set the minimum logging level used by the error printer."""
+        self.logger.setLevel(priority)
 
     def set_log_to_file(self, log_to_file: bool = True) -> None:
         """
@@ -66,45 +124,40 @@ class ErrorPrinter:
             if True, log to file; if False, log to stderr
         """
         self.log_to_file = log_to_file
-        if log_to_file:
-            log_file = Path(os.path.join(os.getcwd(), 'catw_debug.log'))
-            self.file_handle = open(log_file, 'a', encoding='utf-8', errors='replace')
+        self._reconfigure_handler()
 
-    def __call__(self, *args, priority: int = 0, **kwargs) -> None:
+    def __call__(self, *args, priority: int = ERROR, **kwargs) -> None:
         """
         print to stderr.
         """
-        kwargs['file']  = self.file_handle if self.log_to_file else sys.stderr
-        kwargs['flush'] = True
-        backup_end = kwargs.get('end', '\n')
-        if priority:
-            kwargs['end'] = ''
-        if priority == ErrorPrinter.INFORMATION:
-            print(self.COLOR_INFORMATION, end='',   file=kwargs['file'])
-        elif priority == ErrorPrinter.IMPORTANT:
-            print(self.COLOR_IMPORTANT,   end='',   file=kwargs['file'])
-        elif priority == ErrorPrinter.WARNING:
-            print(self.COLOR_WARNING,     end='',   file=kwargs['file'])
-        print(*args, **kwargs)
-        if priority:
-            print(self.COLOR_RESET, end=backup_end, file=kwargs['file'])
+        sep = kwargs.pop('sep', ' ')
+        end = kwargs.pop('end', '\n')
+        kwargs.pop('file', None)
+        kwargs.pop('flush', None)
+        if kwargs:
+            raise TypeError(f"Unsupported keyword arguments: {', '.join(kwargs.keys())}")
+        message = sep.join(str(arg) for arg in args)
+        self.logger.log(priority, message, extra={'line_end': end})
 
     def close(self) -> None:
         """
         Close the file handle if logging to a file.
         """
-        if not hasattr(self, 'file_handle'):
+        if self.handler is None:
             return
-        if self.file_handle is None:
+        if isinstance(self.handler, logging.FileHandler):
+            self.logger.removeHandler(self.handler)
+            self.handler.close()
+            self.log_to_file = False
+            self.handler = None
+            self._reconfigure_handler()
             return
-        if self.file_handle.closed:
-            return
-        self.file_handle.close()
+        self.handler.flush()
 
     def __del__(self) -> None:
         self.close()
 
-err_print = ErrorPrinter()
+logger = StatusLogger()
 
 
 def path_parts(path: str) -> list:
@@ -148,7 +201,7 @@ def create_file(file: Path, content: str, file_encoding: str) -> bool:
     try:
         os.makedirs(file_dir, exist_ok=True)
     except OSError:
-        err_print(f"Error: The path '{file_dir}' could not be created.")
+        logger(f"Error: The path '{file_dir}' could not be created.", priority=logger.ERROR)
         # cleanup (delete the folders that have been created)
         for subpath in unknown_subpaths:
             try:
@@ -159,7 +212,7 @@ def create_file(file: Path, content: str, file_encoding: str) -> bool:
     try:
         IoHelper.write_file(file, content, file_encoding)
     except OSError:
-        err_print(f"Error: The file '{file}' could not be written.")
+        logger(f"Error: The file '{file}' could not be written.", priority=logger.ERROR)
         # cleanup (delete the folders that have been created)
         for subpath in unknown_subpaths:
             try:
@@ -216,7 +269,8 @@ class IoHelper:
                 p_bar(file_length)
             return src_content
         if not binary:
-            with open(src_file, 'r', encoding=file_encoding, errors=errors) as file:
+            # Keep original line endings instead of universal-newline normalization.
+            with open(src_file, 'r', encoding=file_encoding, errors=errors, newline='') as file:
                 src_content = file.read()
             return src_content
         # in case the file should be opened in binary mode:
@@ -384,8 +438,8 @@ class IoHelper:
         if content == '':
             user_input = ''
             try:
-                err_print('You are about to create an empty file. ', end='')
-                err_print('Do you want to continue?')
+                logger('You are about to create an empty file. ', end='', priority=logger.INFO)
+                logger('Do you want to continue?', priority=logger.INFO)
                 enter_char = '⏎'
 
                 try:
@@ -393,17 +447,23 @@ class IoHelper:
                         raise UnicodeEncodeError('', '', -1, -1, '')
                 except UnicodeEncodeError:
                     enter_char = 'ENTER'
-                err_print(f"[Y/{enter_char}] Yes, Continue       [N] No, Abort :", end='')
+                logger(
+                    f"[Y/{enter_char}] Yes, Continue       [N] No, Abort :", end='',
+                    priority=logger.INFO
+                )
                 user_input = input()
             except EOFError:
                 pass
             except UnicodeError:
-                err_print('Input is not recognized in the given encoding: ', end='')
-                err_print(file_encoding)
+                logger(
+                    'Input is not recognized in the given encoding: ', end='',
+                    priority=logger.ERROR
+                )
+                logger(file_encoding, priority=logger.ERROR)
                 user_input = 'N'
             finally:
                 if user_input and user_input.upper() != 'Y':
-                    err_print('Aborting...')
+                    logger('Aborting...', priority=logger.INFO)
                     file_list.clear()
 
         success_file_list = []
@@ -416,7 +476,7 @@ class IoHelper:
                 if create_file(file, content, file_encoding):
                     success_file_list.append(file)
             except OSError:
-                err_print(f"Error: The file '{file}' could not be written.")
+                logger(f"Error: The file '{file}' could not be written.", priority=logger.ERROR)
 
         return success_file_list
 
@@ -442,11 +502,14 @@ class IoHelper:
         if not file_list:
             return file_list
 
-        err_print('The given FILE(s)', end='')
-        err_print('', *file_list, sep='\n\t')
+        logger('The given FILE(s)', end='', priority=logger.INFO)
+        logger('', *file_list, sep='\n\t', priority=logger.INFO)
         eof_control_char = 'Z' if on_windows_os else 'D'
-        err_print('do/does not exist. Write the FILE(s) and finish with the ', end='')
-        err_print(f"^{eof_control_char}-suffix (Ctrl + {eof_control_char}):")
+        logger(
+            'do/does not exist. Write the FILE(s) and finish with the ', end='',
+            priority=logger.INFO
+        )
+        logger(f"^{eof_control_char}-suffix (Ctrl + {eof_control_char}):", priority=logger.INFO)
 
         std_input = ''.join(IoHelper.get_stdin_content(one_line))
 

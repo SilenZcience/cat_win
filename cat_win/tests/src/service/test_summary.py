@@ -2,20 +2,21 @@ from unittest import TestCase
 from unittest.mock import patch
 import os
 
+from cat_win.src.const.colorconstants import CKW
 from cat_win.tests.mocks.std import StdOutMock
 from cat_win.src.domain.file import File
-from cat_win.src.service.summary import Summary
+from cat_win.src.service.summary import Summary, _unique_list
 
 test_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'texts', 'test.txt')
 
 
 class TestSummary(TestCase):
     def test__unique_list(self):
-        self.assertListEqual(Summary._unique_list([1, 2, 3, 1, 2, 3]), [1, 2, 3])
-        self.assertListEqual(Summary._unique_list([1, 3, 3, 3, 2, 3]), [1, 3, 2])
-        self.assertListEqual(Summary._unique_list([]), [])
-        self.assertListEqual(Summary._unique_list([1]), [1])
-        self.assertListEqual(Summary._unique_list([5, 1]), [5, 1])
+        self.assertListEqual(_unique_list([1, 2, 3, 1, 2, 3]), [1, 2, 3])
+        self.assertListEqual(_unique_list([1, 3, 3, 3, 2, 3]), [1, 3, 2])
+        self.assertListEqual(_unique_list([]), [])
+        self.assertListEqual(_unique_list([1]), [1])
+        self.assertListEqual(_unique_list([5, 1]), [5, 1])
 
     def test_show_files_empty(self):
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
@@ -116,6 +117,7 @@ a: 13
 e: 13
 s: 9
 '\n': 7
+'\r': 7
 T: 7
 h: 7
 l: 6
@@ -162,3 +164,95 @@ x: 1
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             Summary.show_charcount([], 'utf-8')
             self.assertEqual('The char count could not be calculated.\n', fake_out.getvalue())
+
+    @patch('cat_win.src.service.summary.Summary.unique', True)
+    @patch('cat_win.src.service.summary.get_file_size', lambda *_: 10)
+    @patch('cat_win.src.service.summary._convert_size', lambda v: f'{v}B')
+    def test_show_files_non_empty_unique(self):
+        file_a = File('a.txt', 'A')
+        file_b = File('b.bin', 'B')
+        file_b.set_plaintext(False)
+        file_b.set_contains_queried(True)
+        file_b.set_file_size(3)
+
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            Summary.show_files([file_a, file_b, file_b], True)
+            output = fake_out.getvalue()
+            self.assertIn('found FILE(s):', output)
+            self.assertIn('  A', output)
+            self.assertIn('-*B', output)
+            self.assertIn('Sum:        13B', output)
+            self.assertIn('Amount:\t2', output)
+            self.assertEqual(file_a.file_size, 10)
+
+    @patch('cat_win.src.service.summary.Summary.unique', True)
+    @patch('cat_win.src.service.summary.IoHelper.read_file', lambda *_args, **_kwargs: 'alpha beta alpha')
+    def test_show_wordcount_unique_files(self):
+        dup_file = File('same.txt', 'same-display')
+
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            Summary.show_wordcount([dup_file, dup_file], 'utf-8')
+            output = fake_out.getvalue()
+            self.assertIn('The word count includes the following files:', output)
+            self.assertEqual(output.count('same-display'), 1)
+
+    @patch('cat_win.src.service.summary.IoHelper.read_file')
+    def test_show_wordcount_ignores_read_errors(self, mock_read_file):
+        def _read(path, **_kwargs):
+            if str(path) == 'bad.txt':
+                raise OSError('cannot read')
+            return 'ok ok'
+
+        mock_read_file.side_effect = _read
+        bad_file = File('bad.txt', 'bad-display')
+        good_file = File('good.txt', 'good-display')
+
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            Summary.show_wordcount([bad_file, good_file], 'utf-8')
+            output = fake_out.getvalue()
+            self.assertIn('The word count includes the following files:', output)
+            self.assertIn('good-display', output)
+            self.assertNotIn('bad-display', output)
+
+    @patch('cat_win.src.service.summary.Summary.unique', True)
+    @patch('cat_win.src.service.summary.IoHelper.read_file')
+    def test_show_charcount_unique_and_ignores_read_errors(self, mock_read_file):
+        def _read(path, **_kwargs):
+            if str(path) == 'bad-char.txt':
+                raise UnicodeError('decode fail')
+            return 'aa'
+
+        mock_read_file.side_effect = _read
+        bad_file = File('bad-char.txt', 'bad-char-display')
+        good_file = File('good-char.txt', 'good-char-display')
+
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            Summary.show_charcount([good_file, good_file, bad_file], 'utf-8')
+            output = fake_out.getvalue()
+            self.assertIn('The char count includes the following files:', output)
+            self.assertEqual(output.count('good-char-display'), 1)
+            self.assertNotIn('bad-char-display', output)
+
+    def test_set_flags(self):
+        backup = Summary.unique
+        Summary.set_flags(True)
+        self.assertTrue(Summary.unique)
+        Summary.set_flags(False)
+        self.assertFalse(Summary.unique)
+        Summary.set_flags(backup)
+
+    def test_set_colors(self):
+        backup_color = Summary.COLOR
+        backup_color_reset = Summary.COLOR_RESET
+        color_dic = {
+            CKW.SUMMARY: 'red',
+            CKW.RESET_ALL: 'reset'
+        }
+        Summary.set_colors(color_dic)
+        self.assertEqual(Summary.COLOR, 'red')
+        self.assertEqual(Summary.COLOR_RESET, 'reset')
+        color_dic = {
+            CKW.SUMMARY: backup_color,
+            CKW.RESET_ALL: backup_color_reset
+        }
+        Summary.set_colors(color_dic)

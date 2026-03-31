@@ -2,7 +2,10 @@
 strings
 """
 
-def get_strings(content: list, min_seq_len: int, delim: str) -> list:
+from cat_win.src.domain.contentbuffer import ContentBuffer
+
+
+def get_strings(content, min_seq_len: int, delim: str) -> ContentBuffer:
     """
     find all strings in any given file content.
 
@@ -18,10 +21,10 @@ def get_strings(content: list, min_seq_len: int, delim: str) -> list:
     new_content (list):
         the new file content containing all found strings [('', string), ...]
     """
-    content_type_raw = bool(content) and isinstance(content[0][1], bytes)
-    new_content = []
+    content_type_raw = bool(content) and isinstance(content[0][0], bytes)
+    new_content = ContentBuffer()
     new_string = ''
-    for _, line in content:
+    for line, _, _ in content:
         if content_type_raw:
             line = line.decode(errors='replace')
         new_line = []
@@ -36,6 +39,6 @@ def get_strings(content: list, min_seq_len: int, delim: str) -> list:
             new_line.append(new_string)
         new_string = ''
         for line in delim.join(new_line).splitlines():
-            new_content.append(('', line))
+            new_content.append(line)
 
     return new_content

@@ -3,7 +3,7 @@ clipboard
 """
 
 from cat_win.src.service.helper.environment import get_py_executable
-from cat_win.src.service.helper.iohelper import err_print
+from cat_win.src.service.helper.iohelper import logger
 
 
 class Clipboard:
@@ -51,7 +51,7 @@ class Clipboard:
             error_msg += 'Should you have any problem with either module, '
             error_msg += 'try to install a different one using '
             error_msg += f"'{get_py_executable()} -m pip install ...'"
-            err_print('\n', error_msg, sep='', priority=err_print.WARNING)
+            logger('\n', error_msg, sep='', priority=logger.WARNING)
             return False
         try:
             if __dependency == 3:
@@ -64,9 +64,9 @@ class Clipboard:
             Clipboard.put(content)
             return True
         except ImportError:
-            Clipboard._copy(content, __dependency-1, False or __clip_board_error)
+            return Clipboard._copy(content, __dependency-1, False or __clip_board_error)
         except Exception:
-            Clipboard._copy(content, __dependency-1, True or __clip_board_error)
+            return Clipboard._copy(content, __dependency-1, True or __clip_board_error)
 
     @staticmethod
     def put(content: str) -> bool:
@@ -88,7 +88,7 @@ class Clipboard:
         return Clipboard._copy(content)
 
     @staticmethod
-    def _paste(__dependency: int = 3, __clip_board_error: bool = False):
+    def _paste(__dependency: int = 3, __clip_board_error: bool = False) -> None:
         """
         import the clipboard by recursively checking which module exists and
         could be used, this function should only be called by Clipboard.get() and will only
@@ -99,10 +99,6 @@ class Clipboard:
             do not change!
         __clip_board_error (bool):
             do not change!
-
-        Returns:
-        (str|bytes):
-            the content of the clipboard
         """
         if __dependency == 0:
             if __clip_board_error:
@@ -114,7 +110,7 @@ class Clipboard:
             error_msg += 'Should you have any problem with either module, '
             error_msg += 'try to install a different one using '
             error_msg += f"'{get_py_executable()} -m pip install ...'"
-            err_print('\n', error_msg, sep='', priority=err_print.WARNING)
+            logger('\n', error_msg, sep='', priority=logger.WARNING)
             return
         try:
             if __dependency == 3:
@@ -130,7 +126,7 @@ class Clipboard:
             Clipboard._paste(__dependency-1, True or __clip_board_error)
 
     @staticmethod
-    def get():
+    def get() -> str:
         """
         entry point to recursive function _paste()
 

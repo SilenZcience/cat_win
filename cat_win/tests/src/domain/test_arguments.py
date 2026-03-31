@@ -79,6 +79,11 @@ class TestArguments(TestCase):
         self.assertListEqual(reduced_list,
                              [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b'), (ARGS_ENDS, 'd')])
 
+    def test_reduce_list_differentiable(self):
+        test_list = [(ARGS_REPLACE, '[a,b]'), (ARGS_REPLACE, '[c,a]'), (ARGS_REPLACE, '[a,b]')]
+        reduced_list = reduce_list(test_list)
+        self.assertListEqual(reduced_list, [(ARGS_REPLACE, '[a,b]'), (ARGS_REPLACE, '[c,a]'), (ARGS_REPLACE, '[a,b]')])
+
     def test_diff_list(self):
         test_list = [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')]
         reduced_list = diff_list(test_list, [(ARGS_ENDS, 'a'), (ARGS_LLENGTH, 'c')])
@@ -92,3 +97,23 @@ class TestArguments(TestCase):
         test_list = [(ARGS_REPLACE, '[a,b]'), (ARGS_REPLACE, '[c,a]'), (ARGS_REPLACE, '[a,b]')]
         reduced_list = diff_list(test_list, [(ARGS_REPLACE, '[a,b]'), (ARGS_REPLACE, '[a,b]')])
         self.assertListEqual(reduced_list, [(ARGS_REPLACE, '[c,a]')])
+
+    def test_len(self):
+        u_args = Arguments()
+        self.assertEqual(len(u_args), 0)
+        u_args.set_args([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
+        self.assertEqual(len(u_args), 2)
+
+    def test_iter(self):
+        u_args = Arguments()
+        self.assertListEqual(list(u_args), [])
+        u_args.set_args([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
+        self.assertListEqual(list(u_args), [(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
+
+    def test_getitem(self):
+        u_args = Arguments()
+        self.assertEqual(u_args[ARGS_NUMBER], False)
+        u_args.set_args([(ARGS_NUMBER, 'a'), (ARGS_LLENGTH, 'b')])
+        self.assertEqual(u_args[ARGS_NUMBER], True)
+        self.assertEqual(u_args[ARGS_LLENGTH], True)
+        self.assertEqual(u_args[ARGS_ENDS], False)

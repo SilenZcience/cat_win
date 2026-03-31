@@ -10,7 +10,7 @@ import sys
 from cat_win.src.const.colorconstants import ColorOptions, CKW
 from cat_win.src.const.escapecodes import ESC_CODE, color_code_256, color_code_truecolor
 from cat_win.src.const.regex import CONFIG_VALID_COLOR, CONFIG_VALID_ANSI
-from cat_win.src.service.helper.iohelper import err_print
+from cat_win.src.service.helper.iohelper import logger
 
 
 class CConfig:
@@ -26,6 +26,7 @@ class CConfig:
         CKW.NUMBER              : ColorOptions.Fore['GREEN'],
         CKW.FILE_PREFIX         : ColorOptions.Fore['LIGHTMAGENTA'],
         CKW.ENDS                : ColorOptions.Back['YELLOW'],
+        CKW.SQUEEZE             : ColorOptions.Fore['LIGHTCYAN'],
         CKW.CHARS               : ColorOptions.Fore['YELLOW'],
         CKW.SUMMARY             : ColorOptions.Fore['CYAN'],
         CKW.ATTRIB              : ColorOptions.Fore['CYAN'],
@@ -44,9 +45,11 @@ class CConfig:
         CKW.PROGRESSBAR_MISSING : ColorOptions.Fore['LIGHTMAGENTA'],
         CKW.REPL_PREFIX         : ColorOptions.Fore['MAGENTA'],
         CKW.MORE_LESS_PROMPT    : ColorOptions.Fore['GREEN'],
-        CKW.MESSAGE_INFORMATION : ColorOptions.Fore['LIGHTBLACK'],
-        CKW.MESSAGE_IMPORTANT   : ColorOptions.Fore['YELLOW'],
-        CKW.MESSAGE_WARNING     : ColorOptions.Fore['RED'],
+        CKW.DEBUG               : ColorOptions.Fore['LIGHTBLACK'],
+        CKW.INFO                : ColorOptions.Fore['LIGHTYELLOW'],
+        CKW.WARNING             : ColorOptions.Fore['YELLOW'],
+        CKW.ERROR               : ColorOptions.Fore['LIGHTRED'],
+        CKW.CRITICAL            : ColorOptions.Fore['RED'],
     }
     elements = [k for k in default_dic.keys() if 'reset' not in k]
 
@@ -92,8 +95,8 @@ class CConfig:
         if value.count('.') == 1:
             color_type, color = value.split('.')
             return ColorOptions.Fore[color] if color_type == 'Fore' else ColorOptions.Back[color]
-        err_print(f"invalid config value {repr(value)} for '{element}'", priority=err_print.IMPORTANT)
-        err_print(f"resetting to {repr(self.default_dic[element][1:])} ...", priority=err_print.IMPORTANT)
+        logger(f"invalid config value {repr(value)} for '{element}'", priority=logger.WARNING)
+        logger(f"resetting to {repr(self.default_dic[element][1:])} ...", priority=logger.WARNING)
         self._save_config(element, self.default_dic[element][1:])
         sys.exit(1)
 
@@ -148,8 +151,10 @@ class CConfig:
         index_offset = max(len(str(len(fore_options) + len(back_options))),
                            len(str(len(self.elements))))
 
-        longest_char_count = max(max(map(len, fore_options+back_options))+5,
-                                 max(map(len, self.elements)))
+        longest_char_count = max(
+            *map(lambda x: len(x) + 5, fore_options+back_options),
+            *map(len, self.elements)
+        )
         column_width = index_offset+4 + longest_char_count
         columns = max(h_width // column_width, 1)
         element_offset = longest_char_count + max(
@@ -208,7 +213,6 @@ class CConfig:
             1
         )
         config_menu = ''
-
         for index, element in enumerate(self.elements):
             config_menu += f"{index+1: <{index_offset}}: {self.color_dic[element]}"
             if self.color_dic[element] == ColorOptions.Fore['BLACK']:
@@ -224,8 +228,12 @@ class CConfig:
                 config_menu += f"{ColorOptions.Style['RESET']} "
             if index % columns == columns-1:
                 config_menu += '\n'
+            elif index == len(self.elements)-1:
+                config_menu += '\n'
 
         print(config_menu)
+
+
 
     def _save_config(self, keyword: str, value: str = ''):
         """
@@ -244,7 +252,7 @@ class CConfig:
                 self.config_parser.write(conf)
             print(f"Successfully updated config file:\n\t{self.config_file}")
         except OSError:
-            err_print(f"Could not write to config file:\n\t{self.config_file}", priority=err_print.WARNING)
+            logger(f"Could not write to config file:\n\t{self.config_file}", priority=logger.ERROR)
 
     def save_config(self) -> None:
         """
@@ -260,7 +268,7 @@ class CConfig:
             try:
                 keyword = input('Input name or id of the element to change: ')
             except EOFError:
-                err_print('\nAborting due to End-of-File character...', priority=err_print.WARNING)
+                logger('\nAborting due to End-of-File character...', priority=logger.WARNING)
                 return
             if keyword.isdigit():
                 keyword = self.elements[int(keyword)-1] if (
@@ -282,7 +290,7 @@ class CConfig:
             try:
                 color = input('Input new color: ')
             except EOFError:
-                err_print('\nAborting due to End-of-File character...', priority=err_print.WARNING)
+                logger('\nAborting due to End-of-File character...', priority=logger.WARNING)
                 return
             if color.isdigit():
                 color = color_options[int(color)-1] if (
@@ -301,13 +309,19 @@ class CConfig:
             color.startswith('Back') or
             (higher_bit_color and color.startswith('b'))
         ):
-            err_print(f"An Error occured: '{keyword}' can only be of style 'Fore'", priority=err_print.IMPORTANT)
+            logger(
+                f"An Error occured: '{keyword}' can only be of style 'Fore'",
+                priority=logger.WARNING
+            )
             return
         if keyword in self.exclusive_definitions['Back'] and (
             color.startswith('Fore') or
             (higher_bit_color and color.startswith('f'))
         ):
-            err_print(f"An Error occured: '{keyword}' can only be of style 'Back'", priority=err_print.IMPORTANT)
+            logger(
+                f"An Error occured: '{keyword}' can only be of style 'Back'",
+                priority=logger.WARNING
+            )
             return
 
         if higher_bit_color:

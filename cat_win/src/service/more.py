@@ -2,11 +2,11 @@
 more
 """
 from pathlib import Path
-
 import os
 import shutil
 import sys
 
+from cat_win.src.const.colorconstants import CKW
 from cat_win.src.const.escapecodes import ESC_CODE, CURSOR_START_ABOVE_1, ERASE_LINE
 from cat_win.src.service.helper.iohelper import IoHelper
 
@@ -15,8 +15,8 @@ class More:
     """
     implements 'more' behaviour
     """
-    color: str = ''
-    color_reset: str = ''
+    COLOR: str       = ''
+    COLOR_RESET: str = ''
 
     step_length = 0
     t_width = 120
@@ -40,18 +40,16 @@ class More:
             pass
 
     @staticmethod
-    def set_colors(color: str, color_reset: str) -> None:
+    def set_colors(color_dic: dict) -> None:
         """
         setup the colors to use in the more/less prompt.
 
         Parameters:
-        color (str):
-            the color to use (ansi escape)
-        color_reset (str)
-            the ansi esacpe to reset the color
+        color_dic (dict):
+            color dictionary containing all configured ANSI color values
         """
-        More.color = color
-        More.color_reset = color_reset
+        More.COLOR       = color_dic[CKW.MORE_LESS_PROMPT]
+        More.COLOR_RESET = color_dic[CKW.RESET_ALL]
 
     def __init__(self, lines: list = None) -> None:
         self.lines = lines if lines else []
@@ -118,11 +116,11 @@ class More:
         else:
             padding = '-' * ((More.t_width-7)//2)
             bottom_line = padding + 'cat_win' + '-' * (More.t_width-7-len(padding))
-        print(f"{More.color}{bottom_line[:len(bottom_line)*percentage//100]}{More.color_reset}{bottom_line[len(bottom_line)*percentage//100:]}", end='')
+        print(f"{More.COLOR}{bottom_line[:len(bottom_line)*percentage//100]}{More.COLOR_RESET}{bottom_line[len(bottom_line)*percentage//100:]}", end='')
         print(CURSOR_START_ABOVE_1, end='', flush=True) # move up to input() line
         try:
             user_input = input(
-                f"{More.color}-- More ({percentage: >2}%){('['+info+']') if info else ''} -- {More.color_reset}"
+                f"{More.COLOR}-- More ({percentage: >2}%){('['+info+']') if info else ''} -- {More.COLOR_RESET}"
             ).strip().upper()
         except EOFError:
             user_input = ''
@@ -195,13 +193,13 @@ class More:
                         if user_input == 'INTERRUPT':
                             raise KeyboardInterrupt
                         if user_input in ['?', 'H', 'HELP']:
-                            print(f"{More.color}H HELP       display this help message{More.color_reset}")
-                            print(f"{More.color}Q QUIT       quit{More.color_reset}")
-                            print(f"{More.color}N NEXT       skip to next file{More.color_reset}")
-                            print(f"{More.color}L LINE       display current line number{More.color_reset}")
-                            print(f"{More.color}D DOWN <x>   step x lines down{More.color_reset}")
-                            print(f"{More.color}S SKIP <x>   skip x lines{More.color_reset}")
-                            print(f"{More.color}J JUMP <x>   jump to line x{More.color_reset}")
+                            print(f"{More.COLOR}H HELP       display this help message{More.COLOR_RESET}")
+                            print(f"{More.COLOR}Q QUIT       quit{More.COLOR_RESET}")
+                            print(f"{More.COLOR}N NEXT       skip to next file{More.COLOR_RESET}")
+                            print(f"{More.COLOR}L LINE       display current line number{More.COLOR_RESET}")
+                            print(f"{More.COLOR}D DOWN <x>   step x lines down{More.COLOR_RESET}")
+                            print(f"{More.COLOR}S SKIP <x>   skip x lines{More.COLOR_RESET}")
+                            print(f"{More.COLOR}J JUMP <x>   jump to line x{More.COLOR_RESET}")
                             clear_size = 7
                             continue
                         if user_input in ['\x11', 'Q', 'QUIT']: # '\x11' = ^Q

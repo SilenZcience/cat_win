@@ -5,6 +5,8 @@ formatter
 import json
 import xml.dom.minidom
 
+from cat_win.src.domain.contentbuffer import ContentBuffer
+
 
 class Formatter:
     """
@@ -50,26 +52,26 @@ class Formatter:
             return content, False
 
     @staticmethod
-    def format(content: list) -> list:
+    def format(content: ContentBuffer) -> ContentBuffer:
         """
         format the given content.
 
         Parameters:
-        content (list):
-            the read content of a given file like [(prefix, line), ...]
+        content (ContentBuffer):
+            the read content of a given file
 
         Returns:
-        content (list):
-            the content; like [(prefix, line), ...]
+        content (ContentBuffer):
+            the content
         """
-        content_line = '\n'.join(x for _, x in content)
+        content_line = '\n'.join(x for x, _, _ in content)
 
         converted_content, converted = Formatter.format_json(content_line)
         if converted:
-            return [('', line) for line in converted_content.splitlines()]
+            return ContentBuffer.from_lines(converted_content.splitlines())
 
         converted_content, converted = Formatter.format_xml(content_line)
         if converted:
-            return [('', line) for line in converted_content.splitlines()]
+            return ContentBuffer.from_lines(converted_content.splitlines())
 
         return content

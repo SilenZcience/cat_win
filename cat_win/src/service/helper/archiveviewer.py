@@ -3,10 +3,10 @@ zipviewer & tarviewer
 """
 
 from pathlib import Path
-import zipfile
 import tarfile
+import zipfile
 
-from cat_win.src.service.helper.iohelper import err_print
+from cat_win.src.service.helper.iohelper import logger
 
 
 def display_archive(file: Path, size_converter) -> bool:
@@ -27,11 +27,17 @@ def display_archive(file: Path, size_converter) -> bool:
             with tarfile.open(file) as tar_file:
                 for file_info in tar_file:
                     file_info_list.append((file_info.name, str(size_converter(file_info.size))))
-            err_print(f"The file '{file}' has been detected to be a tar-file. ", end='', priority=err_print.INFORMATION)
-            err_print('The archive contains the following files:', priority=err_print.INFORMATION)
+            logger(
+                f"The file '{file}' has been detected to be a tar-file. ", end='',
+                priority=logger.INFO
+            )
+            logger('The archive contains the following files:', priority=logger.INFO)
             length_list = [max(len(_f) for _f in f_info) for f_info in zip(*file_info_list)]
             for name, size in file_info_list:
-                err_print(f"{name.ljust(length_list[0])} {size.rjust(length_list[1])}", priority=err_print.INFORMATION)
+                logger(
+                    f"{name.ljust(length_list[0])} {size.rjust(length_list[1])}",
+                    priority=logger.INFO
+                )
             return True
     except (tarfile.TarError, OSError, ValueError):
         pass
@@ -43,12 +49,18 @@ def display_archive(file: Path, size_converter) -> bool:
                     file_info_list.append((file_info.filename,
                                         str(size_converter(file_info.file_size)),
                                         str(size_converter(file_info.compress_size))))
-            err_print(f"The file '{file}' has been detected to be a zip-file. ", end='', priority=err_print.INFORMATION)
-            err_print('The archive contains the following files:', priority=err_print.INFORMATION)
+            logger(
+                f"The file '{file}' has been detected to be a zip-file. ", end='',
+                priority=logger.INFO
+            )
+            logger('The archive contains the following files:', priority=logger.INFO)
             length_list = [max(len(_f) for _f in f_info) for f_info in zip(*file_info_list)]
             for name, size, csize in file_info_list:
-                err_print(f"{name.ljust(length_list[0])} " + \
-                    f"{size.rjust(length_list[1])} {csize.rjust(length_list[2])}", priority=err_print.INFORMATION)
+                logger(
+                    f"{name.ljust(length_list[0])} " + \
+                    f"{size.rjust(length_list[1])} {csize.rjust(length_list[2])}",
+                    priority=logger.INFO
+                )
             return True
     except (zipfile.BadZipfile, OSError):
         pass

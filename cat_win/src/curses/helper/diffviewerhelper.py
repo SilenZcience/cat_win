@@ -32,7 +32,7 @@ class CustomDiffer(difflib.Differ):
     Custom Differ that only modifies the best_ratio and cutoff values in _fancy_replace
     """
 
-    def __init__(self, linejunk=None, charjunk=None, best_ratio=0.6, cutoff=0.75):
+    def __init__(self, linejunk=None, charjunk=None, best_ratio=0.6, cutoff=0.75) -> None:
         super().__init__(linejunk, charjunk)
         self.best_ratio = best_ratio
         self.cutoff = cutoff
@@ -144,12 +144,12 @@ class DifflibID:
     DELETE    = 2 # starts with '- '
     CHANGED   = 3 # either three or four lines with the prefixes ('-', '+', '?'), ('-', '?', '+') or ('-', '?', '+', '?') respectively
 
-class Difflib_Item:
+class DifflibItem:
     def __init__(self, line1: str, line2: str,
                  code: int = DifflibID.EQUAL,
                  lineno: str = '',
                  changes1: list = None,
-                 changes2: list = None):
+                 changes2: list = None) -> None:
         self.line1 = line1
         self.line2 = line2
         self.code = code
@@ -164,7 +164,7 @@ class DifflibParser:
 
     def __init__(self, text1: Sequence, text2: Sequence,
                  best_ratio: float = 0.74, cutoff: float = 0.75,
-                 linejunk=None, charjunk=None):
+                 linejunk=None, charjunk=None) -> None:
         self._ndiff = list(
             CustomDiffer(
                 linejunk, charjunk, best_ratio, cutoff
@@ -186,10 +186,10 @@ class DifflibParser:
 
         self.parse()
 
-    def get_diff(self):
+    def get_diff(self) -> list:
         return self._diff
 
-    def parse(self):
+    def parse(self) -> None:
         while self._c_lineno < len(self._ndiff):
             self.advance()
         self.count_equal = len(self._diff) - self.count_insert - self.count_delete - self.count_changed
@@ -202,11 +202,13 @@ class DifflibParser:
                 lineno += 1
             item.lineno = item.lineno.rjust(l_offset)
 
-    def advance(self):
+    def advance(self) -> None:
         c_line = self._ndiff[self._c_lineno]
 
-        c_line_no_tab = ''.join('�' if is_special_character(c) else c for c in c_line[2:].replace('\t', ' '))
-        cmp_line = Difflib_Item(
+        c_line_no_tab = ''.join(
+            '�' if is_special_character(c) else c for c in c_line[2:].replace('\t', ' ')
+        )
+        cmp_line = DifflibItem(
             c_line_no_tab,
             c_line_no_tab
         )
@@ -230,25 +232,31 @@ class DifflibParser:
         self._c_lineno += 1
         self._diff.append(cmp_line)
 
-    def _tryGetChangedLine(self, cmp_line: Difflib_Item) -> int:
+    def _tryGetChangedLine(self, cmp_line: DifflibItem) -> int:
         line_window = self._ndiff[self._c_lineno:self._c_lineno + 4]
         line_window_prefixes = [line[:2] for line in line_window]
 
         # case ('-', '?', '+', '?')
         if line_window_prefixes == ['- ', '? ', '+ ', '? ']:
-            cmp_line.line2    = ''.join('�' if is_special_character(c) else c for c in line_window[2][2:].replace('\t', ' '))
+            cmp_line.line2    = ''.join(
+                '�' if is_special_character(c) else c for c in line_window[2][2:].replace('\t', ' ')
+            )
             cmp_line.changes1 = [i for (i,c) in enumerate(line_window[1][2:]) if c in '-^']
             cmp_line.changes2 = [i for (i,c) in enumerate(line_window[3][2:]) if c in '+^']
             return 3
         # case ('-', '+', '?')
         if line_window_prefixes[:3] == ['- ', '+ ', '? ']:
-            cmp_line.line2    = ''.join('�' if is_special_character(c) else c for c in line_window[1][2:].replace('\t', ' '))
+            cmp_line.line2    = ''.join(
+                '�' if is_special_character(c) else c for c in line_window[1][2:].replace('\t', ' ')
+            )
             cmp_line.changes1 = []
             cmp_line.changes2 = [i for (i,c) in enumerate(line_window[2][2:]) if c in '+^']
             return 2
         # case ('-', '?', '+')
         if line_window_prefixes[:3] == ['- ', '? ', '+ ']:
-            cmp_line.line2    = ''.join('�' if is_special_character(c) else c for c in line_window[2][2:].replace('\t', ' '))
+            cmp_line.line2    = ''.join(
+                '�' if is_special_character(c) else c for c in line_window[2][2:].replace('\t', ' ')
+            )
             cmp_line.changes1 = [i for (i,c) in enumerate(line_window[1][2:]) if c in '-^']
             cmp_line.changes2 = []
             return 2

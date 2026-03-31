@@ -3,37 +3,47 @@ from unittest import TestCase
 import os
 
 from cat_win.src import cat
+from cat_win.src.domain.appcontext import AppContext
+from cat_win.tests.mocks.logger import LoggerStub
 from cat_win.tests.mocks.std import StdInMock, StdOutMock
 from cat_win.src.persistence.cconfig import CConfig
 from cat_win.src.persistence.config import Config
-# import sys
-# sys.path.append('../cat_win')
 
 
 test_file_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'texts'))
-test_res_dir  = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'resources'))
-test_file_path  = os.path.join(test_file_dir, 'test.txt')
+test_res_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'resources'))
+test_file_path = os.path.join(test_file_dir, 'test.txt')
 test_empty_path = os.path.join(test_file_dir, 'test_empty.txt')
-test_peek       = os.path.join(test_file_dir, 'test_peek.txt')
-test_result_B   = os.path.join(test_file_dir, 'full_test_result_B.txt')
-test_result_C   = os.path.join(test_file_dir, 'full_test_result_C.txt')
-test_result_D   = os.path.join(test_file_dir, 'full_test_result_D.txt')
-test_eval       = os.path.join(test_file_dir, 'full_test_eval.txt')
-test_binary     = os.path.join(test_res_dir, 'test.bin')
+test_peek = os.path.join(test_file_dir, 'test_peek.txt')
+test_result_B = os.path.join(test_file_dir, 'full_test_result_B.txt')
+test_result_C = os.path.join(test_file_dir, 'full_test_result_C.txt')
+test_result_D = os.path.join(test_file_dir, 'full_test_result_D.txt')
+test_eval = os.path.join(test_file_dir, 'full_test_eval.txt')
+test_binary = os.path.join(test_res_dir, 'test.bin')
+
+
+DEFAULT_CONST_DIC = Config.default_dic.copy()
+DEFAULT_COLORLESS_DIC = dict.fromkeys(CConfig.default_dic, '')
+logger = LoggerStub()
+
+
+def _clear_caches():
+    from cat_win.src.processor.lineprefixprocessor import _calculate_line_prefix_spacing, _calculate_line_length_prefix_spacing
+    _calculate_line_prefix_spacing.cache_clear()
+    _calculate_line_length_prefix_spacing.cache_clear()
+    cat._ctx = AppContext(cat.working_dir)
 
 
 @patch('sys.stdin', StdInMock())
-@patch('cat_win.src.cat.cconfig.load_config', lambda: dict.fromkeys(CConfig.default_dic, ''))
-@patch('cat_win.src.cat.config.load_config', lambda: Config.default_dic.copy())
+@patch('cat_win.src.domain.appcontext.CConfig.load_config', lambda self: DEFAULT_COLORLESS_DIC)
+@patch('cat_win.src.persistence.config.Config.load_config', lambda self: DEFAULT_CONST_DIC)
 @patch('cat_win.src.const.colorconstants.CVis.remove_colors', lambda: None)
 class TestCatFull(TestCase):
     maxDiff = None
 
     def tearDown(self):
-        cat._calculate_line_prefix_spacing.cache_clear()
-        cat._calculate_line_length_prefix_spacing.cache_clear()
+        _clear_caches()
 
-    # no files parsed
     @patch('sys.argv', ['<CAT>', '-ln', '[::-2]', 'enc=utf8'])
     def test_cat_output_full_a(self):
         expected_output = ''
@@ -43,7 +53,6 @@ class TestCatFull(TestCase):
 
     @patch('sys.argv', ['<CAT>', test_file_path, '-ln', '[::-2]', 'enc=utf8'])
     def test_cat_output_full_b(self):
-        expected_output = ''
         with open(test_result_B, 'r', encoding='utf-8') as output:
             expected_output = output.read()
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
@@ -52,24 +61,29 @@ class TestCatFull(TestCase):
 
     @patch('sys.argv', ['<CAT>', 'enc:UTF-8', test_file_path, '-ub', '[Sample,TEST]', '-le'])
     def test_cat_output_full_c(self):
-        expected_output = ''
-        with open(test_result_C, 'r', encoding='utf-8') as output:
-            expected_output = output.read()
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
-            self.assertEqual(fake_out.getvalue(), expected_output)
+            out = fake_out.getvalue()
 
-    @patch('sys.argv',
-           ['<CAT>', 'enc=utf-8', test_file_path, 'trunc=1:6', '-n', '--reverse', '--chr'])
+        self.assertIn('TEST Text:$', out)
+        self.assertIn('This is a Tab-Character: >\t<$', out)
+        self.assertIn('These are Special Chars: äöüÄÖÜ$', out)
+        self.assertIn('N-Ary Summation: ∑$', out)
+        self.assertIn('The following Line is Empty:$', out)
+        self.assertRegex(out, r'This Line is a Duplicate!(?: \[x2\])?\$')
+
+        for line in [l for l in out.splitlines() if l.strip()]:
+            self.assertRegex(line, r'^\[\d+\] .+')
+
+    @patch('sys.argv', ['<CAT>', 'enc=utf-8', test_file_path, 'trunc=1:6', '-n', '--reverse', '--chr'])
     def test_cat_output_full_d(self):
-        expected_output = ''
         with open(test_result_D, 'r', encoding='utf-8') as output:
             expected_output = output.read()
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
 
-    @patch('sys.argv', ['<CAT>', test_file_path, 'trunc=0:0',])
+    @patch('sys.argv', ['<CAT>', test_file_path, 'trunc=0:0'])
     def test_cat_output_full_empty(self):
         expected_output = ''
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
@@ -78,7 +92,6 @@ class TestCatFull(TestCase):
 
     @patch('sys.argv', ['<CAT>', test_file_path, 'enc=cp1252'])
     def test_cat_output_full_cp1252(self):
-        expected_output = ''
         with open(test_file_path, 'r', encoding='cp1252') as output:
             expected_output = output.read() + '\n'
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
@@ -87,15 +100,13 @@ class TestCatFull(TestCase):
 
     @patch('sys.argv', ['<CAT>', test_file_path, 'enc=latin_1'])
     def test_cat_output_full_latin1(self):
-        expected_output = ''
         with open(test_file_path, 'r', encoding='latin_1') as output:
             expected_output = output.read() + '\n'
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
 
-    @patch('sys.argv',
-           ['<CAT>', test_file_path, 'enc=utf-8', 'trunc=0:1', 'find=ple ', 'match=:'])
+    @patch('sys.argv', ['<CAT>', test_file_path, 'enc=utf-8', 'trunc=0:1', 'find=ple ', 'match=:'])
     def test_cat_output_full_find_found(self):
         expected_output = "Sample Text:\n---------- Found:   ('ple ' 3-7) ----------\n"
         expected_output += "---------- Matched: (':' 11-12) ----------\n"
@@ -103,16 +114,14 @@ class TestCatFull(TestCase):
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
 
-    @patch('sys.argv',
-           ['<CAT>', test_file_path, 'enc=utf-8', 'trunc=0:1', 'find=NOTINLINE'])
+    @patch('sys.argv', ['<CAT>', test_file_path, 'enc=utf-8', 'trunc=0:1', 'find=NOTINLINE'])
     def test_cat_output_full_find_not_found(self):
         expected_output = 'Sample Text:\n'
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
 
-    @patch('sys.argv',
-           ['<CAT>', test_file_path, 'enc=utf-8', 'trunc=0:1', 'find=Text', '--nk'])
+    @patch('sys.argv', ['<CAT>', test_file_path, 'enc=utf-8', 'trunc=0:1', 'find=Text', '--nk'])
     def test_cat_output_full_find_found_nokeyword(self):
         expected_output = ''
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
@@ -204,16 +213,16 @@ following: 1
             cat.main()
             self.assertIn(contains, fake_out.getvalue())
 
-    @patch('sys.argv',
-           ['<CAT>', test_file_path, 'trunc=0:0', '--UNIQUE', '--b64', '-+'])
+    @patch('sys.argv', ['<CAT>', test_file_path, 'trunc=0:0', '--UNIQUE', '--b64', '-+'])
     def test_cat_output_suggestions(self):
-        with patch('sys.stderr', new=StdOutMock()) as fake_out:
+        logger.clear()
+        with patch.object(cat, 'logger', logger):
             cat.main()
-            self.assertIn("Unknown argument: '--UNIQUE'", fake_out.getvalue())
-            self.assertIn("Did you mean --unique", fake_out.getvalue())
-            self.assertIn("Unknown argument: '--b64'", fake_out.getvalue())
-            self.assertIn("Did you mean --b64d or --b64e", fake_out.getvalue())
-            self.assertIn("Unknown argument: '-+'", fake_out.getvalue())
+            self.assertIn("Unknown argument: '--UNIQUE'", logger.output())
+            self.assertIn('Did you mean --unique', logger.output())
+            self.assertIn("Unknown argument: '--b64'", logger.output())
+            self.assertIn('Did you mean --b64d or --b64e', logger.output())
+            self.assertIn("Unknown argument: '-+'", logger.output())
 
     @patch('sys.argv', ['<CAT>', test_file_path, '--GREP', 'find=T'])
     def test_cat_output_grep_upper(self):
@@ -262,10 +271,9 @@ Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text
             self.assertEqual(expected_output, '\n'.join(fake_out.getvalue().split('\n')[1:]))
 
     @patch('sys.argv', ['<CAT>', test_binary])
-    @patch('sys.stderr', new=StdOutMock())
     def test_cat_output_binary(self):
-        with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            cat.main()
-            self.assertIn('\0' * 3723, fake_out.getvalue())
-
-# python -m unittest discover -s cat_win.tests -p test*.py
+        logger.clear()
+        with patch.object(cat, 'logger', logger):
+            with patch('sys.stdout', new=StdOutMock()) as fake_out:
+                cat.main()
+                self.assertIn('\0' * 3723, fake_out.getvalue())

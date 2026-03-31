@@ -21,7 +21,7 @@ def get_py_executable() -> str:
     py_dirname    = os.path.normcase(os.path.normpath(os.path.dirname(py_executable)))
     environ_paths = os.environ.get('PATH', '').split(os.pathsep)
 
-    def _paths_equal(p):
+    def _paths_equal(p) -> bool:
         return os.path.normcase(os.path.normpath(p)) == py_dirname
 
     if any(_paths_equal(p) for p in environ_paths):

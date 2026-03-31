@@ -3,11 +3,12 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
-## [1.11.0] - TBA
+## [2.0.0] - TBA
 
 ### Major Changes
 
-changed the -`w`, --`wordcount` parameter to --`wc`, --`wordcount`
+- changed the -`w`, --`wordcount` parameter to --`wc`, --`wordcount`
+- probably introduced a lot of new bugs.
 
 ### Minor Changes
 
@@ -15,9 +16,16 @@ changed the -`w`, --`wordcount` parameter to --`wc`, --`wordcount`
 - further improvements to the file selection menu inside the diffviewer.
 - added colored syntax highlighting to the editor. custom selections can be made when pressing `F4` to open the syntax highlighter manager.
 - expanded the editor-search to support multiple lines when searching for literal strings.
+- expanded the editor-transform action to support custom lambda-functions.
 - added `grep_context_lines` element to the config menu to define the amount of context line displayed before and after every grep-line.
-- added -`w`, --`watch` argument to watch files for changes and continuously update the output.
-- fixed a lot of coloring issues when multiple arguments apply color the same line.
+- added `grep_query_separator` element to the config menu to define the separator string between all found queries when using -`G`, --`GREP`.
+- added `squeeze_collapse_suffixes` element to the config menu to toggle the display of how many lines have been squeezed when using -`u`, --`unique`.
+- added `squeeze_counter` element to the color config to configure the color of the `squeeze_collapse_suffixes`
+- changed the message colors from `INFORMATION`, `IMPORTANT`, `WARNING` to `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL` to be aligned with the stdlib-logging module.
+- added -`w`, --`watch` argument to watch files for changes and continuously update the output (works in combination with the diffviewer).
+- added -`eol`, --`end-of-line` argument to display the eol-characters as line suffix.
+- fixed a lot of coloring issues when multiple arguments apply color to the same line.
+- added support for chaining of one-letter custom arguments.
 
 ### Bugfixes
 
@@ -27,6 +35,8 @@ changed the -`w`, --`wordcount` parameter to --`wc`, --`wordcount`
 - fixed visual Bugs in the curses applications.
 - fixed Bug in the cat-repl (cats) that would crash the application when using `!del` on an unknown search query.
 - fixed Bug where -`G`, --`GREP` would display the wrong output on previously colored lines.
+- fixed unexpected behaviour when using the echo argument -`E` within an argument chain.
+- fixed Bug where the usage of the clipboard would not correctly return a success indication resulting in wrong error messages.
 
 
 ## [1.10.6] - 2026-02-16

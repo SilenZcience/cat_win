@@ -12,7 +12,6 @@ class TmpFileHelper:
     """
     def __init__(self) -> None:
         self.tmp_files = []
-        self.tmp_count = 0
 
     def get_generated_temp_files(self) -> list:
         """
@@ -35,5 +34,4 @@ class TmpFileHelper:
         with tempfile.NamedTemporaryFile(delete=False) as f:
             tmp_file = Path(f.name)
         self.tmp_files.append(tmp_file)
-        self.tmp_count += 1
         return tmp_file

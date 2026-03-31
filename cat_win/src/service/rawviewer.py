@@ -2,8 +2,7 @@
 rawviewer
 """
 
-from pathlib import Path
-
+from cat_win.src.const.colorconstants import CKW
 from cat_win.src.service.helper.iohelper import IoHelper
 
 
@@ -89,26 +88,19 @@ def get_display_char_gen(file_encoding: str = 'utf-8', base: int = 16):
     return get_display_char
 
 
-def get_raw_view_lines_gen(file: Path, mode: str = 'X', colors: list = None,
-                           file_encoding: str = 'utf-8',
-                           file_truncate_slice: slice = None):
+def get_raw_view_lines_gen(ctx, file_index: int, mode: str = 'X'):
     """
     return the raw byte representation of a file in hexadecimal or binary
     line by line
 
     Parameters:
-    file (Path):
-        the file to use
+    ctx (AppContext):
+        the app context containing file and configuration information
+    file_index (int):
+        the index of the file in ctx.u_files
     mode (str):
         either 'x', 'X' for hexadecimal (lower- or upper case letters),
         or 'b' for binary
-    colors (list):
-        a list of two elements. Index 0 holds the color CKW.RAWVIEWER,
-        Index 1 holds the color CKW.RESET_ALL
-    file_encoding (str):
-        the encoding used (possibly for stdout)
-    file_truncate_slice (slice):
-        a slice to truncate the raw file content
 
     Yields:
     current_line (str):
@@ -118,15 +110,13 @@ def get_raw_view_lines_gen(file: Path, mode: str = 'X', colors: list = None,
     """
     if not (mode and mode in 'xXb'):
         mode = 'X'
-    if colors is None or len(colors) < 2:
-        colors = ['', '']
-    if file_truncate_slice is None:
-        file_truncate_slice = slice(None)
+    colors = [ctx.color_dic[CKW.RAWVIEWER], ctx.color_dic[CKW.RESET_ALL]]
+    file_truncate_slice = slice(*ctx.arg_parser.file_truncate)
 
-    get_display_char = get_display_char_gen(file_encoding)
+    get_display_char = get_display_char_gen(ctx.arg_parser.file_encoding)
 
     try:
-        raw_file_content = IoHelper.read_file(file, True)
+        raw_file_content = IoHelper.read_file(ctx.u_files[file_index].path, True)
         raw_file_content = raw_file_content[file_truncate_slice]
         raw_file_content_length = len(raw_file_content)
     except OSError as exc:
@@ -146,7 +136,7 @@ def get_raw_view_lines_gen(file: Path, mode: str = 'X', colors: list = None,
     for i, byte in enumerate(raw_file_content, start=1):
         line.append(byte)
         if not i % 16:
-            current_line +=  ' '.join(f"{b:0{repr_length}{mode}}" for b in line) + \
+            current_line += ' '.join(f"{b:0{repr_length}{mode}}" for b in line) + \
                             f" {colors[0]}#{colors[1]} " + \
                             ' '.join(map(get_display_char, line))
             yield current_line
@@ -154,11 +144,11 @@ def get_raw_view_lines_gen(file: Path, mode: str = 'X', colors: list = None,
                 current_line = f"{colors[0]}{i:0{8}X}{colors[1]} "
             line = []
     if line:
-        current_line +=  ' '.join(f"{b:0{repr_length}{mode}}" for b in line) + ' ' + \
+        current_line += ' '.join(f"{b:0{repr_length}{mode}}" for b in line) + ' ' + \
                         ' ' * ((repr_length + 1) * (16-len(line)) - 1) + \
                         f" {colors[0]}#{colors[1]} " + \
                         ' '.join(map(get_display_char, line))
         yield current_line
     if file_truncate_slice != slice(None):
         yield f"The raw file content was truncated to {file_truncate_slice}. " \
-              f"The adress information could be wrong."
+              f"The address information could be wrong."

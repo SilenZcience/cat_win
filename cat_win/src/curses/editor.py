@@ -15,15 +15,15 @@ import sys
 
 from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.const.regex import compile_re
-from cat_win.src.service.helper.editorsearchhelper import _SearchIterBase, search_iter_factory
-from cat_win.src.service.helper.editorhelper import History, Position, frepr, \
+from cat_win.src.curses.helper.editorsearchhelper import _SearchIterBase, search_iter_factory
+from cat_win.src.curses.helper.editorhelper import History, Position, frepr, \
     UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, \
         SELECT_HOTKEYS, HISTORY_HOTKEYS, INDENT_HOTKEYS, FUNCTION_HOTKEYS, HEX_BYTE_KEYS
-from cat_win.src.service.helper.diffviewerhelper import is_special_character
+from cat_win.src.curses.helper.diffviewerhelper import is_special_character
 from cat_win.src.service.helper.environment import on_windows_os
-from cat_win.src.service.helper.githelper import GitHelper
-from cat_win.src.service.helper.iohelper import IoHelper, err_print
-from cat_win.src.service.helper.syntaxhighlight import SyntaxHighlighter
+from cat_win.src.curses.helper.githelper import GitHelper
+from cat_win.src.service.helper.iohelper import IoHelper, logger
+from cat_win.src.curses.helper.syntaxhighlight import SyntaxHighlighter
 from cat_win.src.service.clipboard import Clipboard
 from cat_win.src.service.rawviewer import SPECIAL_CHARS
 
@@ -44,11 +44,11 @@ class Editor:
     file_encoding = 'utf-8'
 
     _SYNTAX_COLOR_IDS = {
-        'keyword': 10,
-        'string':  11,
-        'number':  12,
-        'comment': 13,
-        'builtin': 14,
+        'keyword': 200,
+        'string':  201,
+        'number':  202,
+        'comment': 203,
+        'builtin': 204,
     }
 
     def __init__(self, files: list, file_idx: int = 0, file_commit_hash = None) -> None:
@@ -153,7 +153,9 @@ class Editor:
                 self._build_file_upto(30)
                 self.unsaved_progress = False
             else:
-                self.window_content = GitHelper.get_git_file_content_at_commit(self.file, self.file_commit_hash)
+                self.window_content = GitHelper.get_git_file_content_at_commit(
+                    self.file, self.file_commit_hash
+                )
                 self.display_name = f"GIT: {self.display_name}"
                 self._f_content_gen = (line for line in [])
                 self.unsaved_progress = True
@@ -163,8 +165,7 @@ class Editor:
             self.unsaved_progress = True
             self.error_bar = str(exc)
             self.status_bar_size = 2
-            if self.debug_mode:
-                err_print(self.error_bar, priority=err_print.WARNING)
+            logger(self.error_bar, priority=logger.DEBUG)
         if not self.window_content:
             self.window_content.append('')
 
@@ -327,17 +328,17 @@ class Editor:
         if bstate & curses.BUTTON1_CLICKED:
             self.cpos.row = min(self.wpos.row+y, len(self.window_content)-1)
             self.cpos.col = min(self.wpos.col+x, len(self.window_content[self.cpos.row]))
-            # err_print(f" {x} {y} {bstate} CLICKED")
+            # logger(f" {x} {y} {bstate} CLICKED")
         elif bstate & curses.BUTTON1_PRESSED:
             self.spos.row = min(self.wpos.row+y, len(self.window_content)-1)
             self.spos.col = min(self.wpos.col+x, len(self.window_content[self.spos.row]))
-            # err_print(f" {x} {y} {bstate} PRESSED")
+            # logger(f" {x} {y} {bstate} PRESSED")
         elif bstate & curses.BUTTON1_RELEASED:
             self.selecting = True
             self.cpos.row = min(self.wpos.row+y, len(self.window_content)-1)
             self.cpos.col = min(self.wpos.col+x, len(self.window_content[self.cpos.row]))
-            # err_print(f" {x} {y} {bstate} RELEASED")
-            # err_print(f"Selected area: {self.spos.get_pos()} {self.cpos.get_pos()}")
+            # logger(f" {x} {y} {bstate} RELEASED")
+            # logger(f"Selected area: {self.spos.get_pos()} {self.cpos.get_pos()}")
 
         elif bstate & curses.BUTTON4_PRESSED:
             for _ in range(3):
@@ -698,9 +699,9 @@ class Editor:
         # windows-curses sometimes returns characters like '\ud83e\udd23' (e.g. emojis)
         # we can fix these with the utf-16 surrogatepass error-handler
         wchars = wchars_.encode('utf-16', 'surrogatepass').decode('utf-16')
-        if self.debug_mode and wchars != wchars_:
-            err_print(f"__DEBUG__: Changed {wchars_} to {wchars}", end=' ', priority=err_print.INFORMATION)
-            err_print(f"Length: {len(wchars)} Ord: {ord(wchars[0])}", priority=err_print.INFORMATION)
+        if wchars != wchars_:
+            logger(f"__DEBUG__: Changed {wchars_} to {wchars}", end=' ', priority=logger.DEBUG)
+            logger(f"Length: {len(wchars)} Ord: {ord(wchars[0])}", priority=logger.DEBUG)
         # in case the line has no text yet and tab is pressed, we indent with
         # the custom indentation
         if self.special_indentation != '\t' == wchars and \
@@ -755,8 +756,8 @@ class Editor:
         max_y, max_x = self.getxymax()
         msg = msg.replace('\0', '')
         error_bar_backup = self.error_bar
-        if self.debug_mode and tmp_error:
-            err_print(tmp_error, priority=err_print.IMPORTANT)
+        if tmp_error:
+            logger(tmp_error, priority=logger.WARNING)
         self.error_bar = tmp_error if tmp_error else self.error_bar
         try:
             if self.error_bar:
@@ -792,8 +793,7 @@ class Editor:
             self.unsaved_progress = True
             self.error_bar = str(exc)
             self.status_bar_size = 2
-            if self.debug_mode:
-                err_print(self.error_bar, priority=err_print.WARNING)
+            logger(self.error_bar, priority=logger.ERROR)
         return True
 
     def _action_transform(self) -> bool:
@@ -876,19 +876,50 @@ class Editor:
                 result_color = 2
                 content_window = self.selected_text
                 if w_query in bool_expressions:
-                    joined_content = '\n'.join(content_window)
+                    joined_content = self.line_sep.join(content_window)
                     query_truthy = bool_expressions[w_query](joined_content)
                     query_result = f"{w_query}? {query_truthy}"
                     query_result+= f" ({repr(joined_content)})"
                     result_color = 4 if query_truthy else 2
-                elif w_query in string_expressions:
-                    if not self.selecting:
-                        query_result = 'no area has been selected!'
+                    continue
+                if w_query in string_expressions:
+                    if (
+                        not self.selecting and self.cpos.col == len(self.window_content[self.cpos.row])
+                    ) or self.cpos.get_pos() == self.spos.get_pos():
+                        query_result = 'no valid area has been selected!'
                         continue
+                    if not self.selecting:
+                        self.spos.row = self.cpos.row
+                        self.spos.col = self.cpos.col + 1
                     new_content = [string_expressions[w_query](line) for line in content_window]
                     self._remove_chunk()
                     self._add_chunk(new_content)
                     break
+                if w_query.startswith('lambda'):
+                    try:
+                        lambda_func = eval(w_query)
+                        if not callable(lambda_func):
+                            raise ValueError('not a function')
+                        lambda_result = [lambda_func(line) for line in content_window]
+                        if all(isinstance(r, bool) for r in lambda_result):
+                            query_truthy = lambda_func(self.line_sep.join(content_window))
+                            query_result = f"{w_query}? {query_truthy}"
+                            query_result+= f" ({repr(self.line_sep.join(content_window))})"
+                            result_color = 4 if query_truthy else 2
+                        elif all(isinstance(r, str) for r in lambda_result):
+                            if (
+                                not self.selecting and self.cpos.col == len(self.window_content[self.cpos.row])
+                            ) or self.cpos.get_pos() == self.spos.get_pos():
+                                query_result = 'no valid area has been selected!'
+                                continue
+                            if not self.selecting:
+                                self.spos.row = self.cpos.row
+                                self.spos.col = self.cpos.col + 1
+                            self._remove_chunk()
+                            self._add_chunk(lambda_result)
+                            break
+                    except Exception as exc:
+                        query_result = f"Error evaluating lambda: {exc}"
                 else:
                     query_result = f"'{frepr(w_query)}' not found!"
         return True
@@ -1271,6 +1302,10 @@ class Editor:
         return True
 
     def _action_background(self) -> bool:
+        if on_windows_os: # TODO: this is weird
+            from cat_win.src.persistence.viewstate import save_view_state
+            save_view_state('viewstate.bin', self)
+            return False
         # only callable on UNIX
         curses.endwin()
         os.kill(os.getpid(), signal.SIGSTOP)
@@ -1325,8 +1360,7 @@ class Editor:
         (bool):
             indicates if the editor should keep running
         """
-        if self.debug_mode:
-            err_print('Interrupting...', priority=err_print.INFORMATION)
+        logger('Interrupting...', priority=logger.DEBUG)
         raise KeyboardInterrupt
 
     def _action_resize(self) -> bool:
@@ -1426,7 +1460,10 @@ class Editor:
                     color = self._get_color(9)
 
                 try:
-                    self.curse_window.addstr(row, 0, f"{display_name}".ljust(max_x)[nav_x:nav_x+max_x], color)
+                    self.curse_window.addstr(
+                        row, 0, f"{display_name}"[nav_x:nav_x+max_x].ljust(max_x),
+                        color
+                    )
                     self.curse_window.clrtoeol()
                 except curses.error:
                     break
@@ -1499,19 +1536,28 @@ class Editor:
                     file_selected_idx = selected_idx
 
                     try:
-                        file_commits = GitHelper.get_git_file_history(self.files[file_selected_idx][0])
+                        file_commits = GitHelper.get_git_file_history(
+                            self.files[file_selected_idx][0]
+                        )
                     except OSError:
                         file_commits = None
 
                     if file_commits:
-                        file_commits = [{'hash': '_LOCAL_', 'date': ' _Latest_ ', 'author': '_Local_', 'message': 'Use local file (not git)'}] + file_commits
+                        file_commits = [
+                            {
+                                'hash': '_LOCAL_', 'date': ' _Latest_ ',
+                                'author': '_Local_', 'message': 'Use local file (not git)'
+                            }
+                        ] + file_commits
                         mode = 'commits'
                         selected_idx = 0
                         if self.file_commit_hash is not None:
                             try:
                                 selected_idx = file_commits.index(self.file_commit_hash) if (
                                     isinstance(self.file_commit_hash, dict)
-                                ) else [item['hash'] for item in file_commits].index(self.file_commit_hash)
+                                ) else [
+                                    item['hash'] for item in file_commits
+                                ].index(self.file_commit_hash)
                             except ValueError:
                                 pass
                         nav_x = 0
@@ -1666,7 +1712,7 @@ class Editor:
                 try:
                     self.curse_window.addstr(
                         row, 0,
-                        f"Language mode: {available_plugins[entry_idx]} {extensions_by_name.get(available_plugins[entry_idx], '')}".ljust(max_x)[nav_x:nav_x+max_x],
+                        f"Language mode: {available_plugins[entry_idx]} {extensions_by_name.get(available_plugins[entry_idx], '')}"[nav_x:nav_x+max_x].ljust(max_x),
                         color
                     )
                     self.curse_window.clrtoeol()
@@ -1750,11 +1796,10 @@ class Editor:
             the char received and the possible action it means.
         """
         def debug_out(wchar_, key__, key_) -> None:
-            if self.debug_mode:
-                _debug_info = repr(chr(wchar_)) if isinstance(wchar_, int) else \
-                    ord(wchar_) if len(wchar_) == 1 else '-'
-                err_print(f"__DEBUG__: Received  {str(key_):<22}{_debug_info}" + \
-                    f"\t{str(key__):<15} \t{repr(wchar_)}", priority=err_print.INFORMATION)
+            _debug_info = repr(chr(wchar_)) if isinstance(wchar_, int) else \
+                ord(wchar_) if len(wchar_) == 1 else '-'
+            logger(f"__DEBUG__: Received  {str(key_):<22}{_debug_info}" + \
+                f"\t{str(key__):<15} \t{repr(wchar_)}", priority=logger.DEBUG)
         buffer: tuple = None
         while True:
             if buffer is not None:
@@ -1851,7 +1896,10 @@ class Editor:
         for row in range(max_y):
             brow = row + self.wpos.row
             if brow >= len(self.window_content):
-                self.curse_window.clrtobot()
+                for i_row in range(row, max_y):
+                    color = self._get_color(10)
+                    self.curse_window.addch(i_row, 0, '~', color)
+                    self.curse_window.clrtoeol()
                 break
 
             syntax_token_idx = 0
@@ -2065,17 +2113,17 @@ class Editor:
     def _init_highlighter_colors(self) -> None:
         if curses.can_change_color():
             # syntax-highlight keyword
-            curses.init_pair(10, curses.COLOR_CYAN   , -1)
+            curses.init_pair(200, curses.COLOR_CYAN   , -1)
             # syntax-highlight string
-            curses.init_pair(11, curses.COLOR_GREEN  , -1)
+            curses.init_pair(201, curses.COLOR_GREEN  , -1)
             # syntax-highlight number
-            curses.init_pair(12, curses.COLOR_RED+8  , -1)
+            curses.init_pair(202, curses.COLOR_RED+8  , -1)
             # syntax-highlight comment
-            curses.init_pair(13, curses.COLOR_BLACK+8, -1)
+            curses.init_pair(203, curses.COLOR_BLACK+8, -1)
             # syntax-highlight builtin
-            curses.init_pair(14, curses.COLOR_BLUE   , -1)
+            curses.init_pair(204, curses.COLOR_BLUE   , -1)
             if self._syntax_highlighter and self._syntax_highlighter.token_color_map:
-                new_color_id = max(self._SYNTAX_COLOR_IDS.values(), default=14) + 1
+                new_color_id = max(self._SYNTAX_COLOR_IDS.values(), default=204) + 1
                 for token_type, color in self._syntax_highlighter.token_color_map.items():
                     if token_type not in self._SYNTAX_COLOR_IDS:
                         self._SYNTAX_COLOR_IDS[token_type] = new_color_id
@@ -2087,7 +2135,9 @@ class Editor:
                         color_offset = 8
                     curses_color = getattr(curses, f'COLOR_{color.upper()}', None)
                     if curses_color is not None:
-                        curses.init_pair(self._SYNTAX_COLOR_IDS[token_type], curses_color + color_offset, -1)
+                        curses.init_pair(
+                            self._SYNTAX_COLOR_IDS[token_type], curses_color + color_offset, -1
+                        )
 
     def _init_screen(self) -> None:
         """
@@ -2126,41 +2176,51 @@ class Editor:
                 if os.isatty(sys.stdout.fileno()):
                     curses.use_default_colors()
                 # status_bar
-                curses.init_pair(1, curses.COLOR_BLACK  , curses.COLOR_WHITE )
+                curses.init_pair(1 , curses.COLOR_BLACK  , curses.COLOR_WHITE )
                 # error_bar
-                curses.init_pair(2, curses.COLOR_RED    , curses.COLOR_WHITE )
+                curses.init_pair(2 , curses.COLOR_RED    , curses.COLOR_WHITE )
                 # special char (not printable or ws) & prompts
-                curses.init_pair(3, curses.COLOR_WHITE  , curses.COLOR_RED   )
+                curses.init_pair(3 , curses.COLOR_WHITE  , curses.COLOR_RED   )
                 # tab-char & current match
-                curses.init_pair(4, curses.COLOR_BLACK  , curses.COLOR_GREEN )
+                curses.init_pair(4 , curses.COLOR_BLACK  , curses.COLOR_GREEN )
                 # selection
-                curses.init_pair(5, curses.COLOR_BLACK  , curses.COLOR_YELLOW)
+                curses.init_pair(5 , curses.COLOR_BLACK  , curses.COLOR_YELLOW)
                 # find & replace
-                curses.init_pair(6, curses.COLOR_WHITE  , curses.COLOR_BLUE  )
+                curses.init_pair(6 , curses.COLOR_WHITE  , curses.COLOR_BLUE  )
                 # correct transform query
-                curses.init_pair(7, curses.COLOR_GREEN  , curses.COLOR_WHITE )
+                curses.init_pair(7 , curses.COLOR_GREEN  , curses.COLOR_WHITE )
                 # file-selector, active file
-                curses.init_pair(8, curses.COLOR_MAGENTA, curses.COLOR_WHITE )
+                curses.init_pair(8 , curses.COLOR_MAGENTA, curses.COLOR_WHITE )
                 # file-selector, active file selected
-                curses.init_pair(9, curses.COLOR_MAGENTA, -1                 )
+                curses.init_pair(9 , curses.COLOR_MAGENTA, -1                 )
+                # ~ characters to indicate lines after the end of the file
+                curses.init_pair(10, curses.COLOR_BLUE   , -1                 )
         curses.raw()
         self.curse_window.nodelay(False)
 
-    def _open(self) -> None:
+    def _open(self, fg: bool = False) -> None:
         """
         init, run, deinit
         """
         try:
             self._init_screen()
             self._init_highlighter_colors()
-            self._build_file_upto()
+            if fg:
+                self.get_char = self._get_new_char()
+                if self.file_commit_hash is None:
+                    self._f_content_gen = IoHelper.yield_file(self.file, False, self.file_encoding)
+                    self._build_file()
+                else:
+                    self._f_content_gen = (line for line in [])
+            else:
+                self._build_file_upto()
             self._run()
         except (Exception, KeyboardInterrupt) as e:
             curses.endwin()
             if not self.unsaved_progress:
                 raise e
             if not isinstance(e, KeyboardInterrupt):
-                err_print('Oops..! Something went wrong.', priority=err_print.IMPORTANT)
+                logger('Oops..! Something went wrong.', priority=logger.ERROR)
             user_input = ''
             while user_input not in ['Y', 'J', 'N']:
                 user_input = input('Do you want to save the changes? [Y/N]').upper()
@@ -2168,19 +2228,24 @@ class Editor:
                 raise e
             self._action_save()
             if self.unsaved_progress:
-                err_print('Oops..! Something went wrong. The file could not be saved.', priority=err_print.IMPORTANT)
+                logger(
+                    'Oops..! Something went wrong. The file could not be saved.',
+                    priority=logger.ERROR
+                )
             else:
-                err_print('The file has been successfully saved.', priority=err_print.INFORMATION)
+                logger('The file has been successfully saved.', priority=logger.INFO)
             raise e
         finally:
             try: # cleanup - close file
                 self._f_content_gen.close()
             except StopIteration:
                 pass
+            except Exception as exc:
+                logger(f"Error while closing file: {exc}", priority=logger.ERROR)
             curses.endwin()
 
     @classmethod
-    def open(cls, files: list, skip_binary: bool = False) -> bool:
+    def open(cls, files: list, skip_binary: bool = False, fg_state = None) -> bool:
         """
         simple editor to change the contents of any provided file.
 
@@ -2189,6 +2254,8 @@ class Editor:
             list of tuples (file, display_name)
         skip_binary (bool):
             indicates if the Editor should skip non-plaintext files
+        fg_state:
+            the state of the previously opened editor that got put into background
 
         Returns:
         (bool):
@@ -2198,37 +2265,43 @@ class Editor:
             return False
 
         if CURSES_MODULE_ERROR:
-            err_print("The Editor could not be loaded. No Module 'curses' was found.", priority=err_print.INFORMATION)
+            logger(
+                "The Editor could not be loaded. No Module 'curses' was found.",
+                priority=logger.INFO
+            )
             if on_windows_os:
-                err_print('If you are on Windows OS, try pip-installing ', end='', priority=err_print.INFORMATION)
-                err_print("'windows-curses'.", priority=err_print.INFORMATION)
-            err_print(priority=err_print.INFORMATION)
+                logger(
+                    'If you are on Windows OS, try pip-installing ', end='',
+                    priority=logger.INFO
+                )
+                logger("'windows-curses'.", priority=logger.INFO)
+            logger(priority=logger.INFO)
             Editor.loading_failed = True
             return False
 
         changes_made = False
 
-        editor = cls(files)
-        if skip_binary and editor.error_bar:
-            return False
-        special_chars = dict(map(lambda x: (chr(x[0]), x[2]), SPECIAL_CHARS))
-        editor._set_special_chars(special_chars)
-
-        if on_windows_os:
-            # disable background feature on windows
-            editor._action_background = lambda *_: True
+        if fg_state is None:
+            editor = cls(files)
+            if skip_binary and editor.error_bar:
+                return False
+            special_chars = dict(map(lambda x: (chr(x[0]), x[2]), SPECIAL_CHARS))
+            editor._set_special_chars(special_chars)
         else:
+            editor = fg_state
+
+        if not on_windows_os:
             # ignore background signals on UNIX, since a custom background implementation exists
             signal.signal(signal.SIGTSTP, signal.SIG_IGN)
 
-        editor._open()
+        editor._open(fg=fg_state is not None)
         changes_made |= editor.changes_made
         while editor.open_next_idx is not None:
-            editor = cls(files, file_idx = editor.open_next_idx, file_commit_hash = editor.open_next_hash)
+            editor = cls(
+                files,
+                file_idx = editor.open_next_idx, file_commit_hash = editor.open_next_hash
+            )
             editor._set_special_chars(special_chars)
-            if on_windows_os:
-                # disable background feature on windows
-                editor._action_background = lambda *_: True
             editor._open()
             changes_made |= editor.changes_made
 
@@ -2259,7 +2332,7 @@ class Editor:
         Parameters:
         save_with_alt (bool):
             indicates whetcher the stdin pipe has been used (and therefor tampered)
-        debug_mode (bool)
+        debug_mode (bool):
             indicates if debug info should be displayed
         unicode_escaped_search (bool):
             indicates if the search should be unicode escaped

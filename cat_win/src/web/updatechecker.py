@@ -5,9 +5,8 @@ updatechecker
 import json
 import urllib.request
 
-from cat_win.src.const.colorconstants import CKW
 from cat_win.src.service.helper.environment import get_py_executable
-from cat_win.src.service.helper.iohelper import err_print
+from cat_win.src.service.helper.iohelper import logger
 from cat_win import __url__
 
 
@@ -37,7 +36,7 @@ def get_stable_package_version(package: str) -> str:
     Returns:
     (str):
         a version representation (latest stable package)
-        on Error: a zero version '0.0.0
+        on Error: a zero version '0.0.0'
     """
     try:
         with urllib.request.urlopen(f"https://pypi.org/pypi/{package}/json",
@@ -60,7 +59,7 @@ def get_latest_package_version(package: str) -> str:
     Returns:
     (str):
         a version representation (includes pre-releases)
-        on Error: a zero version '0.0.0
+        on Error: a zero version '0.0.0'
     """
     try:
         with urllib.request.urlopen(f"https://pypi.org/pypi/{package}/json",
@@ -178,7 +177,7 @@ def new_version_available(current_version: str, latest_version: str) -> int:
     return status
 
 
-def print_update_information(package: str, current_version: str, color_dic: dict) -> None:
+def print_update_information(package: str, current_version: str) -> None:
     """
     prints update information if there are any.
 
@@ -187,8 +186,6 @@ def print_update_information(package: str, current_version: str, color_dic: dict
         the package name to check
     current_version (str):
         a version representation as string of the current version
-    color_dic (dict):
-        a dictionary translating the color-keywords to ANSI-Colorcodes
     """
     latest_stable_version = get_stable_package_version(package)
     if latest_stable_version == current_version:
@@ -200,27 +197,27 @@ def print_update_information(package: str, current_version: str, color_dic: dict
     if status == STATUS_UP_TO_DATE:
         return
 
-    message, warning, info = '', '', ''
-
     if abs(status) == STATUS_STABLE_RELEASE_AVAILABLE:
-        message += f"{color_dic[CKW.MESSAGE_IMPORTANT]}"
-        message += f"A new stable release of {package} is available: v{latest_stable_version}"
-        message += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_IMPORTANT]}"
-        message += 'To update, run:'
-        message += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_IMPORTANT]}"
-        message += f"{get_py_executable()} -m pip install --upgrade {package}"
+        logger(
+            f"A new stable release of {package} is available: v{latest_stable_version}",
+            priority=logger.WARNING
+        )
+        logger('To update, run:', priority=logger.WARNING)
+        logger(
+            f"{get_py_executable()} -m pip install --upgrade {package}",
+            priority=logger.WARNING
+        )
     elif abs(status) == STATUS_PRE_RELEASE_AVAILABLE:
-        message += f"{color_dic[CKW.MESSAGE_INFORMATION]}"
-        message += f"A new pre-release of {package} is available: v{latest_stable_version}"
-    message += f"{color_dic[CKW.RESET_ALL]}"
+        logger(
+            f"A new pre-release of {package} is available: v{latest_stable_version}",
+            priority=logger.INFO
+        )
     if status < STATUS_UP_TO_DATE:
-        warning += 'Warning: Due to the drastic version increase, '
-        warning += 'backwards compatibility is no longer guaranteed!\n'
-        warning += 'You may experience fundamental differences.'
-    info += f"{color_dic[CKW.MESSAGE_INFORMATION]}Take a look at the changelog here:"
-    info += f"{color_dic[CKW.RESET_ALL]}\n{color_dic[CKW.MESSAGE_INFORMATION]}"
-    info += f"{__url__}/blob/main/CHANGELOG.md{color_dic[CKW.RESET_ALL]}"
-
-    print(message)
-    err_print(warning, priority=err_print.WARNING)
-    print(info)
+        logger(
+            'Warning: Due to the drastic version increase, '
+            'backwards compatibility is no longer guaranteed!',
+            priority=logger.CRITICAL
+        )
+        logger('You may experience fundamental differences.', priority=logger.CRITICAL)
+    logger('Take a look at the changelog here:', priority=logger.INFO)
+    logger(f"{__url__}/blob/main/CHANGELOG.md", priority=logger.INFO)

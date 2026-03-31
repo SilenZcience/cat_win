@@ -114,6 +114,7 @@ class CKW:
     FILE_PREFIX         = 'file_prefix'
 
     ENDS                = 'line_ends'
+    SQUEEZE             = 'squeeze_counter'
     CHARS               = 'special_chars'
 
     SUMMARY             = 'summary_message'
@@ -141,6 +142,8 @@ class CKW:
 
     MORE_LESS_PROMPT    = 'more_less_prompt'
 
-    MESSAGE_INFORMATION = 'message_information'
-    MESSAGE_IMPORTANT   = 'message_important'
-    MESSAGE_WARNING     = 'message_warning'
+    DEBUG               = 'debug'
+    INFO                = 'info'
+    WARNING             = 'warning'
+    ERROR               = 'error'
+    CRITICAL            = 'critical'

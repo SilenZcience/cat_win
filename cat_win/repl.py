@@ -14,7 +14,7 @@ except Exception as exc:
     print(exc, file=sys.stderr)
     sys.exit(1)
 
-def entry_point():
+def entry_point() -> None:
     """
     run the repl.
     """

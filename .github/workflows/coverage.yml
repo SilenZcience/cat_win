@@ -37,7 +37,7 @@ jobs:
           python -m pip install --upgrade -r ./workflowHelper/requirements-dev.txt
       - name: Generate Reports
         run: |
-          python -m coverage run -m pytest ./cat_win/tests/ --junitxml=./reports/pytest.xml
+          python -m coverage run --source=cat_win/src -m pytest ./cat_win/tests/ --junitxml=./reports/pytest.xml
           python -m coverage xml -o ./reports/coverage.xml
       - name: Show Missing Coverage
         run: |
