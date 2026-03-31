@@ -1303,6 +1303,7 @@ class Editor:
 
     def _action_background(self) -> bool:
         if on_windows_os: # TODO: this is weird
+            self._build_file()
             from cat_win.src.persistence.viewstate import save_view_state
             save_view_state('viewstate.bin', self)
             return False
@@ -2207,11 +2208,7 @@ class Editor:
             self._init_highlighter_colors()
             if fg:
                 self.get_char = self._get_new_char()
-                if self.file_commit_hash is None:
-                    self._f_content_gen = IoHelper.yield_file(self.file, False, self.file_encoding)
-                    self._build_file()
-                else:
-                    self._f_content_gen = (line for line in [])
+                self._f_content_gen = (line for line in [])
             else:
                 self._build_file_upto()
             self._run()

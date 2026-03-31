@@ -12,6 +12,7 @@ from cat_win.src.curses import hexeditor
 if hexeditor.CURSES_MODULE_ERROR:
     setattr(hexeditor, 'curses', None)
 from cat_win.src.curses.hexeditor import HexEditor
+from cat_win.src.persistence import viewstate
 
 ORIGINAL_HEXEDITOR_GETXYMAX = HexEditor.getxymax
 
@@ -23,6 +24,50 @@ logger = LoggerStub()
 @patch('cat_win.src.curses.hexeditor.curses', mm)
 class TestHexEditor(TestCase):
     maxDiff = None
+
+    def test_correct_save_and_load_viewstate(self):
+        with open(__file__, 'rb') as f:
+            self_content = f.read()
+        editor = HexEditor([(__file__, '')])
+        # self.assertListEqual(editor.hex_array, self_content.splitlines()[:30])
+        editor._build_file_upto(120)
+        # self.assertListEqual(editor.hex_array, self_content.splitlines()[:40])
+        saved_state = {}
+
+        def fake_save_view_state(_, view_obj):
+            saved_state.update({
+                'view_type': type(view_obj).__name__,
+                'state': viewstate._collect_state(view_obj),
+            })
+
+        def fake_load_view_state(_):
+            view_type = viewstate._VIEW_NAME_TO_TYPE[saved_state['view_type']]
+            restored = view_type.__new__(view_type)
+            restored.__dict__.update(saved_state['state'])
+            return restored
+
+        with patch('cat_win.src.persistence.viewstate.save_view_state', side_effect=fake_save_view_state), \
+             patch('cat_win.src.persistence.viewstate.load_view_state', side_effect=fake_load_view_state), \
+             patch('cat_win.src.curses.editor.on_windows_os', True):
+            self.assertFalse(editor._action_background())
+            restored_editor = viewstate.load_view_state('ignored')
+
+        self.assertEqual(saved_state['view_type'], 'HexEditor')
+        self.assertIsInstance(restored_editor, HexEditor)
+
+        with patch('cat_win.src.curses.hexeditor.HexEditor._run', lambda *args: None):
+            restored_editor._open(fg = True)
+        self.assertListEqual(editor.hex_array, restored_editor.hex_array)
+        restored_editor._build_file()
+        self.assertListEqual(editor.hex_array, restored_editor.hex_array)
+        editor._build_file()
+        self.assertListEqual(editor.hex_array, restored_editor.hex_array)
+        with patch('cat_win.src.service.helper.iohelper.IoHelper.write_file', MagicMock()) as mock_write_file:
+            restored_editor._action_save()
+            mock_write_file.assert_called_once_with(
+                __file__,
+                self_content,
+            )
 
     def test_hexeditor_unknown_file(self):
         editor = HexEditor([('', '')])
