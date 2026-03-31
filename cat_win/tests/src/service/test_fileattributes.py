@@ -155,10 +155,18 @@ class TestFileAttributes(TestCase):
 
     def test_get_libmagic_file_initial_oserror(self):
         """Test OSError on initial file command execution"""
-        with patch('cat_win.src.service.fileattributes.which', return_value='/usr/bin/file'):
+        with patch('cat_win.src.service.fileattributes.which', side_effect=['/usr/bin/file', '', '/usr/bin/git']):
             with patch('subprocess.run', side_effect=OSError('Command failed')):
-                result = get_libmagic_file('test.bin')
-                self.assertEqual(result, '')
+                with patch('cat_win.src.service.fileattributes.Path') as mock_path:
+                    root = MagicMock()
+                    root.parents = [root]
+                    root.parent = root
+                    root.rglob.side_effect = [[], iter(['file'])]
+                    mock_path.return_value.resolve.return_value = root
+                    # mock_path.return_value.parent.rglob.return_value = iter(['file'])
+                    # mock_path.return_value.parent.parent.rglob.return_value = iter(['file'])
+                    result = get_libmagic_file('test.bin')
+                    self.assertEqual(result, '')
 
     def test_get_libmagic_file_no_file_cmd(self):
         def which_side_effect(cmd):
