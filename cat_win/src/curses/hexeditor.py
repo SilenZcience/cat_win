@@ -840,6 +840,7 @@ class HexEditor:
 
     def _action_background(self) -> bool:
         if on_windows_os: # TODO: this is weird
+            self._build_file()
             from cat_win.src.persistence.viewstate import save_view_state
             save_view_state('viewstate.bin', self)
             return False
@@ -1510,11 +1511,7 @@ class HexEditor:
             self._init_screen()
             if fg:
                 self.decode_char = get_display_char_gen()
-                if self.file_commit_hash is None:
-                    self._f_content_gen = IoHelper.yield_file(self.file, True)
-                    self._build_file()
-                else:
-                    self._f_content_gen = (line for line in [])
+                self._f_content_gen = (line for line in [])
             self._run()
         except (Exception, KeyboardInterrupt) as e:
             curses.endwin()

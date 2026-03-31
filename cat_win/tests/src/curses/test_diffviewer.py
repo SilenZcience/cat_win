@@ -9,6 +9,7 @@ if dv_module.CURSES_MODULE_ERROR:
 from cat_win.src.curses.diffviewer import DiffViewer
 from cat_win.src.curses.helper.editorhelper import Position
 from cat_win.src.curses.helper.diffviewerhelper import DifflibID
+from cat_win.src.persistence import viewstate
 
 from cat_win.tests.mocks.diffviewer import (
     DummyDiffItem,
@@ -24,6 +25,7 @@ mm.error = Exception
 mm.BUTTON1_PRESSED = 1
 mm.BUTTON4_PRESSED = 2
 mm.BUTTON5_PRESSED = 4
+mm.COLORS = 255
 
 logger = LoggerStub()
 
@@ -64,6 +66,36 @@ class TestDiffViewer(TestCase):
         viewer._watch_text2 = []
         viewer._mtime_cache = [1, 2]
         return viewer
+
+    def test_correct_save_and_load_viewstate(self):
+        diffviewer = DiffViewer([(__file__, '')])
+        saved_state = {}
+
+        def fake_save_view_state(_, view_obj):
+            saved_state.update({
+                'view_type': type(view_obj).__name__,
+                'state': viewstate._collect_state(view_obj),
+            })
+
+        def fake_load_view_state(_):
+            view_type = viewstate._VIEW_NAME_TO_TYPE[saved_state['view_type']]
+            restored = view_type.__new__(view_type)
+            restored.__dict__.update(saved_state['state'])
+            return restored
+
+        with patch('cat_win.src.persistence.viewstate.save_view_state', side_effect=fake_save_view_state), \
+             patch('cat_win.src.persistence.viewstate.load_view_state', side_effect=fake_load_view_state), \
+             patch('cat_win.src.curses.editor.on_windows_os', True):
+            self.assertFalse(diffviewer._action_background())
+            restored_dv = viewstate.load_view_state('ignored')
+
+        self.assertEqual(saved_state['view_type'], 'DiffViewer')
+        self.assertIsInstance(restored_dv, DiffViewer)
+
+        with patch('cat_win.src.curses.diffviewer.DiffViewer._run', lambda *args: None):
+            restored_dv._open(fg = True)
+        self.assertEqual(diffviewer.difflibparser, restored_dv.difflibparser)
+
 
     def test_init_defaults_and_set_flags(self):
         with patch.object(DiffViewer, '_setup_file', lambda s: None):

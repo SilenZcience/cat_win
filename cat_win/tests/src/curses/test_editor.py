@@ -13,6 +13,7 @@ from cat_win.src.curses import editor
 if editor.CURSES_MODULE_ERROR:
     setattr(editor, 'curses', None)
 from cat_win.src.curses.editor import Editor
+from cat_win.src.persistence import viewstate
 
 ORIGINAL_EDITOR_GETXYMAX = Editor.getxymax
 
@@ -33,6 +34,44 @@ test_file_path_editor = os.path.join(test_file_dir, 'test_editor.txt')
 @patch('cat_win.src.service.helper.iohelper.IoHelper.get_newline', lambda *_: '\n')
 class TestEditor(TestCase):
     maxDiff = None
+
+    def test_correct_save_and_load_viewstate(self):
+        with open(__file__, 'r', encoding='utf-8') as f:
+            self_content = f.read()
+            if self_content.endswith('\n'):
+                self_content += '\n'
+        editor = Editor([(__file__, '')])
+        self.assertListEqual(editor.window_content, self_content.splitlines()[:30])
+        editor._build_file_upto(40)
+        self.assertListEqual(editor.window_content, self_content.splitlines()[:40])
+        saved_state = {}
+
+        def fake_save_view_state(_, view_obj):
+            saved_state.update({
+                'view_type': type(view_obj).__name__,
+                'state': viewstate._collect_state(view_obj),
+            })
+
+        def fake_load_view_state(_):
+            view_type = viewstate._VIEW_NAME_TO_TYPE[saved_state['view_type']]
+            restored = view_type.__new__(view_type)
+            restored.__dict__.update(saved_state['state'])
+            return restored
+
+        with patch('cat_win.src.persistence.viewstate.save_view_state', side_effect=fake_save_view_state), \
+             patch('cat_win.src.persistence.viewstate.load_view_state', side_effect=fake_load_view_state), \
+             patch('cat_win.src.curses.editor.on_windows_os', True):
+            self.assertFalse(editor._action_background())
+            restored_editor = viewstate.load_view_state('ignored')
+
+        self.assertEqual(saved_state['view_type'], 'Editor')
+        self.assertIsInstance(restored_editor, Editor)
+        self.assertListEqual(restored_editor.window_content, self_content.splitlines())
+
+        with patch('cat_win.src.curses.editor.Editor._run', lambda *args: None):
+            restored_editor._open(fg = True)
+        restored_editor._build_file()
+        self.assertListEqual(restored_editor.window_content, self_content.splitlines())
 
     def test_editor_special_chars(self):
         editor = Editor([(test_file_path_oneline, '')])
