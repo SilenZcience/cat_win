@@ -48,7 +48,7 @@ class TestHexEditor(TestCase):
 
         with patch('cat_win.src.persistence.viewstate.save_view_state', side_effect=fake_save_view_state), \
              patch('cat_win.src.persistence.viewstate.load_view_state', side_effect=fake_load_view_state), \
-             patch('cat_win.src.curses.editor.on_windows_os', True):
+             patch('cat_win.src.curses.hexeditor.on_windows_os', True):
             self.assertFalse(editor._action_background())
             restored_editor = viewstate.load_view_state('ignored')
 
