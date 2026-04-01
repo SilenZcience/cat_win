@@ -2,6 +2,7 @@ from copy import deepcopy
 from unittest.mock import patch, MagicMock
 from unittest import TestCase
 import runpy
+import importlib
 
 from cat_win.tests.mocks.edit import getxymax
 from cat_win.tests.mocks.error import ErrorDefGen
@@ -34,23 +35,31 @@ class TestHexEditor(TestCase):
         # self.assertListEqual(editor.hex_array, self_content.splitlines()[:40])
         saved_state = {}
 
-        def fake_save_view_state(_, view_obj):
+        def fake_save_view_state(view_obj):
             saved_state.update({
                 'view_type': type(view_obj).__name__,
+                'view_module': type(view_obj).__module__,
                 'state': viewstate._collect_state(view_obj),
             })
+            return True
 
-        def fake_load_view_state(_):
-            view_type = viewstate._VIEW_NAME_TO_TYPE[saved_state['view_type']]
+        def fake_load_view_state():
+            view_module_name = saved_state['view_module']
+            self.assertEqual(
+                viewstate._SUPPORTED_VIEWS.get(saved_state['view_type']),
+                view_module_name
+            )
+            view_module = importlib.import_module(view_module_name)
+            view_type = getattr(view_module, saved_state['view_type'])
             restored = view_type.__new__(view_type)
             restored.__dict__.update(saved_state['state'])
             return restored
 
-        with patch('cat_win.src.persistence.viewstate.save_view_state', side_effect=fake_save_view_state), \
+        with patch('cat_win.src.curses.hexeditor.save_view_state', side_effect=fake_save_view_state), \
              patch('cat_win.src.persistence.viewstate.load_view_state', side_effect=fake_load_view_state), \
              patch('cat_win.src.curses.hexeditor.on_windows_os', True):
             self.assertFalse(editor._action_background())
-            restored_editor = viewstate.load_view_state('ignored')
+            restored_editor = viewstate.load_view_state()
 
         self.assertEqual(saved_state['view_type'], 'HexEditor')
         self.assertIsInstance(restored_editor, HexEditor)
@@ -1614,9 +1623,9 @@ class TestHexEditor(TestCase):
         editor8 = HexEditor([('', '')])
         editor8.curse_window = MagicMock()
         with patch('cat_win.src.curses.hexeditor.on_windows_os', True):
-            with patch('cat_win.src.persistence.viewstate.save_view_state') as save_state:
+            with patch('cat_win.src.curses.hexeditor.save_view_state') as save_state:
                 self.assertFalse(editor8._action_background())
-        save_state.assert_called_once_with('viewstate.bin', editor8)
+        save_state.assert_called_once_with(editor8)
 
         editor9 = HexEditor([('', '')])
         editor9.curse_window = MagicMock()

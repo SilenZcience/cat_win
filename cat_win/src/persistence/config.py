@@ -11,6 +11,7 @@ import sys
 
 from cat_win.src.const.argconstants import ALL_ARGS
 from cat_win.src.const.defaultconstants import DKW
+from cat_win.src.persistence.xdgconfig import xdg_config
 from cat_win.src.service.helper.iohelper import logger
 
 
@@ -119,17 +120,12 @@ class Config:
 
     elements = list(default_dic.keys())
 
-    def __init__(self, working_dir: str) -> None:
+    def __init__(self) -> None:
         """
         Initialise the Config() object to load and save
         default parameters..
-
-        Parameters:
-        working_dir (str):
-            the working directory path of the package
         """
-        self.working_dir = working_dir
-        self.config_file = os.path.join(self.working_dir, 'cat.config')
+        self.config_file = xdg_config('cat.config', ensure_dir=True)
 
         self.config_parser = configparser.ConfigParser()
         self.const_dic = {}

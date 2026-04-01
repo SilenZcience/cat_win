@@ -24,6 +24,7 @@ from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.curses.helper.githelper import GitHelper
 from cat_win.src.service.helper.iohelper import IoHelper, logger
 from cat_win.src.curses.helper.syntaxhighlight import SyntaxHighlighter
+from cat_win.src.persistence.viewstate import save_view_state
 from cat_win.src.service.clipboard import Clipboard
 from cat_win.src.service.rawviewer import SPECIAL_CHARS
 
@@ -1302,11 +1303,12 @@ class Editor:
         return True
 
     def _action_background(self) -> bool:
-        if on_windows_os: # TODO: this is weird
+        if on_windows_os:
             self._build_file()
-            from cat_win.src.persistence.viewstate import save_view_state
-            save_view_state('viewstate.bin', self)
-            return False
+            success = save_view_state(self)
+            if not success:
+                self.error_bar = 'Error saving view state for backgrounding!'
+            return not success
         # only callable on UNIX
         curses.endwin()
         os.kill(os.getpid(), signal.SIGSTOP)

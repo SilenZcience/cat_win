@@ -191,6 +191,8 @@ ALL_ARGS = [
                 ARGS_HEX_EDITOR, show_arg_on_repl=False, section=10),
     ArgConstant('-?', '--diff', 'open two files in a simple side-by-side diff-viewer',
                 ARGS_DIFF, show_arg_on_repl=False, section=10),
+    ArgConstant('fg', '', 'continue a previously backgrounded session',
+                -1, show_arg_on_repl=False, section=10),
     ArgConstant('-M', '--more', 'page through the file step by step',
                 ARGS_MORE, show_arg_on_repl=False, section=10),
     ArgConstant('-L', '--less', 'page through the file step by step (lazy)',

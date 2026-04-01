@@ -31,7 +31,7 @@ def _clear_caches():
     from cat_win.src.processor.lineprefixprocessor import _calculate_line_prefix_spacing, _calculate_line_length_prefix_spacing
     _calculate_line_prefix_spacing.cache_clear()
     _calculate_line_length_prefix_spacing.cache_clear()
-    cat._ctx = AppContext(cat.working_dir)
+    cat._ctx = AppContext()
 
 
 @patch('sys.stdin', StdInMock())

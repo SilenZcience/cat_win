@@ -2,19 +2,17 @@
 Persist and restore curses view objects.
 """
 
-from pathlib import Path
+import importlib
 import pickle
 
-from cat_win.src.curses.diffviewer import DiffViewer
-from cat_win.src.curses.editor import Editor
-from cat_win.src.curses.hexeditor import HexEditor
+from cat_win.src.persistence.xdgconfig import xdg_config
+from cat_win.src.service.helper.iohelper import logger
 
 
-_SUPPORTED_VIEWS = (DiffViewer, Editor, HexEditor)
-_VIEW_NAME_TO_TYPE = {
-    'DiffViewer': DiffViewer,
-    'Editor'    : Editor,
-    'HexEditor' : HexEditor,
+_SUPPORTED_VIEWS = {
+    'DiffViewer': 'cat_win.src.curses.diffviewer',
+    'Editor'    : 'cat_win.src.curses.editor',
+    'HexEditor' : 'cat_win.src.curses.hexeditor',
 }
 
 
@@ -35,13 +33,54 @@ def _collect_state(view_obj) -> dict:
 
         if _is_pickleable(value):
             state[key] = value
+            logger(
+                f"Info: Collected attribute '{key}' for view state.",
+                priority=logger.DEBUG
+            )
         else:
             # Keep non-serializable runtime handles as empty placeholders.
-            # TODO: make this a debug statement
-            # print(f"Warning: Skipping non-serializable attribute '{key}' in view state.")
+            logger(
+                f"Warning: Skipping non-serializable attribute '{key}' in view state.",
+                priority=logger.DEBUG
+            )
             state[key] = None
 
     return state
+
+
+def _collect_class_state(view_obj) -> dict:
+    class_state = {}
+    view_type = type(view_obj)
+    for key, value in vars(view_type).items():
+        if key.startswith('__'):
+            continue
+        if isinstance(value, (staticmethod, classmethod, property)) or callable(value):
+            continue
+
+        if _is_pickleable(value):
+            class_state[key] = value
+            logger(
+                f"Info: Collected class attribute '{key}' for view state.",
+                priority=logger.DEBUG
+            )
+        else:
+            logger(
+                f"Warning: Skipping non-serializable class attribute '{key}' in view state.",
+                priority=logger.DEBUG
+            )
+    return class_state
+
+
+def _apply_class_state(view_type, class_state: dict) -> None:
+    for key, value in class_state.items():
+        if not isinstance(key, str) or key.startswith('__'):
+            continue
+        if not hasattr(view_type, key):
+            continue
+        current = getattr(view_type, key)
+        if isinstance(current, (staticmethod, classmethod, property)) or callable(current):
+            continue
+        setattr(view_type, key, value)
 
 
 class ViewStateWriter:
@@ -50,23 +89,22 @@ class ViewStateWriter:
     """
 
     @staticmethod
-    def save(file_path: str, view_obj) -> None:
-        if not isinstance(view_obj, _SUPPORTED_VIEWS):
+    def save(view_obj) -> None:
+        view_type_name = type(view_obj).__name__
+        view_module_name = type(view_obj).__module__
+        if _SUPPORTED_VIEWS.get(view_type_name) != view_module_name:
             raise TypeError(
                 'view_obj must be an instance of DiffViewer, Editor or HexEditor'
             )
 
         payload = {
-            'view_type': type(view_obj).__name__,
+            'view_type': view_type_name,
+            'view_module': view_module_name,
             'state': _collect_state(view_obj),
+            'class_state': _collect_class_state(view_obj),
         }
 
-        file_path = str(file_path)
-        out_path = Path(file_path)
-        if out_path.parent: # TODO: weird
-            out_path.parent.mkdir(parents=True, exist_ok=True)
-
-        with out_path.open('wb') as f_handle:
+        with xdg_config('viewstate_obj.bin', ensure_dir=True).open('wb') as f_handle:
             pickle.dump(payload, f_handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
@@ -76,34 +114,52 @@ class ViewStateLoader:
     """
 
     @staticmethod
-    def load(file_path: str):
-        with Path(file_path).open('rb') as f_handle:
+    def load():
+        with xdg_config('viewstate_obj.bin', ensure_dir=True).open('rb') as f_handle:
             payload = pickle.load(f_handle)
 
         view_type_name = payload.get('view_type')
+        view_module_name = payload.get('view_module')
         state = payload.get('state')
+        class_state = payload.get('class_state', {})
 
-        if view_type_name not in _VIEW_NAME_TO_TYPE:
+        if _SUPPORTED_VIEWS.get(view_type_name) != view_module_name:
             raise ValueError(f'Unsupported view type in state file: {view_type_name}')
         if not isinstance(state, dict):
             raise ValueError('Invalid state file: missing object state')
+        if not isinstance(class_state, dict):
+            raise ValueError('Invalid state file: malformed class state')
 
-        view_type = _VIEW_NAME_TO_TYPE[view_type_name]
+        view_module = importlib.import_module(view_module_name)
+        view_type = getattr(view_module, view_type_name)
+        _apply_class_state(view_type, class_state)
         view_obj = view_type.__new__(view_type)
         view_obj.__dict__.update(state)
-        # _rehydrate_runtime_members(view_obj)
+
         return view_obj
 
 
-def save_view_state(file_path: str, view_obj) -> None:
+def save_view_state(view_obj) -> bool:
     """
     Convenience wrapper for ViewStateWriter.save().
     """
-    ViewStateWriter.save(file_path, view_obj)
+    try:
+        ViewStateWriter.save(view_obj)
+    except (pickle.PickleError, AttributeError, TypeError, ValueError, OSError) as e:
+        logger(f"Error saving view state: {e}", priority=logger.ERROR)
+        return False
+    return True
 
 
-def load_view_state(file_path: str):
+def load_view_state():
     """
     Convenience wrapper for ViewStateLoader.load().
     """
-    return ViewStateLoader.load(file_path)
+    try:
+        return ViewStateLoader.load()
+    except (OSError, ValueError, TypeError) as e:
+        logger(f"Error loading view state: {e}", priority=logger.ERROR)
+        return None
+    except (EOFError, pickle.PickleError) as e:
+        logger(f"Error loading view state: {e} (file may be corrupted)", priority=logger.ERROR)
+        return None

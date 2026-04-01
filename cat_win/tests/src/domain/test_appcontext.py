@@ -10,9 +10,8 @@ from cat_win.src.persistence.config import Config
 
 class TestAppContext(TestCase):
     def test_appcontext_init(self):
-        app_context = AppContext('TestWorkingDir')
+        app_context = AppContext()
 
-        self.assertEqual(app_context.working_dir, 'TestWorkingDir')
         self.assertIsNotNone(app_context.cconfig)
         self.assertIsInstance(app_context.cconfig, CConfig)
         self.assertIsNotNone(app_context.config)
@@ -34,7 +33,7 @@ class TestAppContext(TestCase):
         self.assertEqual(app_context.echo_args, '')
 
     def test_appcontext_init_method(self):
-        app_context = AppContext('TestWorkingDir')
+        app_context = AppContext()
         app_context.init()
 
         self.assertIsNotNone(app_context.default_color_dic)

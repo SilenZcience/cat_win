@@ -46,16 +46,13 @@ class Signatures:
     signatures = None
 
     @staticmethod
-    def set_res_path(res_path: str) -> None:
+    def init() -> None:
         """
-        set the path to the signatures database
-
-        Parameters:
-        res_path (str):
-            the path to the signatures database
+        load the signatures database
         """
         try:
-            with open(res_path, 'r', encoding='utf-8') as sig:
+            db_path = Path(__file__).parent.parent.parent / 'res' / 'signatures.json'
+            with open(db_path, 'r', encoding='utf-8') as sig:
                 Signatures.signatures = json.load(sig)
         except (OSError, json.JSONDecodeError):
             Signatures.signatures = None
@@ -97,6 +94,8 @@ class Signatures:
         (str):
             the possible signatures of the file
         """
+        if Signatures.signatures is None:
+            Signatures.init()
         file_signature_primary = ''
         file_signature_secondary = []
         encountered_sig = set()
