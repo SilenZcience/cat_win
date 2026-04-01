@@ -44,7 +44,8 @@ def _show_help(repl: bool = False) -> None:
         relevant_section = False
         for arg in group:
             if arg.show_arg and (not repl or arg.show_arg_on_repl):
-                arg_descriptor = f'{arg.short_form}, {arg.long_form}'
+                arg_descriptor = arg.short_form
+                arg_descriptor+= (', ' + arg.long_form) * bool(arg.long_form)
                 if len(arg_descriptor) > 35:
                     arg_descriptor = arg_descriptor[:31] + '...'
                 help_message += f"\t{arg_descriptor: <35}{arg.arg_help}\n"
@@ -96,7 +97,15 @@ def _show_version(ctx, repl: bool = False) -> None:
     cat_version = f"{__project__} "
     if repl:
         cat_version += 'REPL '
-    cat_version += f"{__version__} - from {ctx.working_dir}\n"
+    working_dir = os.path.abspath(
+        os.path.join(
+            os.path.realpath(__file__),
+            os.pardir,
+            os.pardir,
+            os.pardir,
+        )
+    )
+    cat_version += f"{__version__} - from {working_dir}\n"
     version_message = '\n'
     version_message += '-' * len(cat_version) + '\n'
     version_message += cat_version

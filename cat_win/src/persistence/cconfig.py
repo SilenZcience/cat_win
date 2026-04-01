@@ -3,13 +3,13 @@ cconfig
 """
 
 import configparser
-import os
 import shutil
 import sys
 
 from cat_win.src.const.colorconstants import ColorOptions, CKW
 from cat_win.src.const.escapecodes import ESC_CODE, color_code_256, color_code_truecolor
 from cat_win.src.const.regex import CONFIG_VALID_COLOR, CONFIG_VALID_ANSI
+from cat_win.src.persistence.xdgconfig import xdg_config
 from cat_win.src.service.helper.iohelper import logger
 
 
@@ -53,17 +53,12 @@ class CConfig:
     }
     elements = [k for k in default_dic.keys() if 'reset' not in k]
 
-    def __init__(self, working_dir: str) -> None:
+    def __init__(self) -> None:
         """
         Initialise the CConfig() object to load and save
         the color configs.
-
-        Parameters:
-        working_dir (str):
-            the working directory path of the package
         """
-        self.working_dir = working_dir
-        self.config_file = os.path.join(self.working_dir, 'cat.config')
+        self.config_file = xdg_config('cat.config', ensure_dir=True)
 
         self.exclusive_definitions = {'Fore': [CKW.FOUND],  # can only be Foreground
                                       'Back': [CKW.MATCHED]}  # can only be Background

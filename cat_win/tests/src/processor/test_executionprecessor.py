@@ -57,7 +57,6 @@ class TestExecutionPrecessor(TestCase):
         ctx.known_dirs = []
         ctx.valid_urls = []
         ctx.echo_args = ''
-        ctx.working_dir = '/tmp/work'
         ctx.config = MagicMock()
         ctx.cconfig = MagicMock()
         return ctx

@@ -19,17 +19,18 @@ test_tar_file_path  = os.path.abspath(os.path.join(test_zip_file_dir, 'test.tar.
 
 class TestSignatures(TestCase):
     def test_read_signature_failed(self):
-        Signatures.set_res_path('')
-        self.assertEqual(Signatures.read_signature(__file__), 'lookup failed: Signatures not loaded')
-        Signatures.set_res_path(signatures_path)
+        with patch.object(Signatures, 'init'):
+            Signatures.signatures = None
+            self.assertEqual(Signatures.read_signature(__file__), 'lookup failed: Signatures not loaded')
+        Signatures.init()
         self.assertEqual(Signatures.read_signature(''), "lookup failed: [Errno 2] No such file or directory: ''")
 
     def test_read_signatures_empty(self):
-        Signatures.set_res_path(signatures_path)
+        Signatures.init()
         self.assertEqual(Signatures.read_signature(__file__), '-')
 
     def test_read_signatures(self):
-        Signatures.set_res_path(signatures_path)
+        Signatures.init()
         self.assertEqual(Signatures.read_signature(test_zip_file_path), 'application/x-zip-compressed(zip) [aar(aar)]')
         self.assertEqual(Signatures.read_signature(test_tar_file_path), 'application/x-gzip(gz) [application/gzip(tgz);tar.gz(tar.gz)]')
 
@@ -134,13 +135,14 @@ class TestFileAttributes(TestCase):
             CKW.RESET_ALL: 'D',
         }
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            Signatures.set_res_path('')
-            print_meta(__file__, color_dic)
-            self.assertIn('Signature:', fake_out.getvalue())
-            self.assertIn('Size:', fake_out.getvalue())
-            self.assertIn('AATime:', fake_out.getvalue())
-            self.assertIn('AMTime:', fake_out.getvalue())
-            self.assertIn('ACTime:', fake_out.getvalue())
+            with patch.object(Signatures, 'init'):
+                Signatures.signatures = None
+                print_meta(__file__, color_dic)
+                self.assertIn('Signature:', fake_out.getvalue())
+                self.assertIn('Size:', fake_out.getvalue())
+                self.assertIn('AATime:', fake_out.getvalue())
+                self.assertIn('AMTime:', fake_out.getvalue())
+                self.assertIn('ACTime:', fake_out.getvalue())
 
     def test_get_libmagic_file_returncode_nonzero(self):
         """Test line 82: return '' when subprocess returncode != 0"""

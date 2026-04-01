@@ -85,7 +85,6 @@ class TestCat(TestCase):
         ctx.known_dirs = []
         ctx.valid_urls = []
         ctx.echo_args = ''
-        ctx.working_dir = '/tmp/work'
         ctx.u_files = DummyUFiles([])
         return ctx
 
@@ -214,15 +213,14 @@ class TestCat(TestCase):
                                         with patch('cat_win.src.cat.HexEditor.set_flags') as hex_flags:
                                             with patch('cat_win.src.cat.More.set_flags') as more_flags:
                                                 with patch('cat_win.src.cat.More.set_colors') as more_colors:
-                                                    with patch('cat_win.src.cat.Signatures.set_res_path') as sig_path:
-                                                        with patch('cat_win.src.cat.Visualizer.set_flags') as vis_flags:
-                                                            with patch('cat_win.src.cat.Summary.set_flags') as sum_flags:
-                                                                with patch('cat_win.src.cat.Summary.set_colors') as sum_colors:
-                                                                    with patch('cat_win.src.cat.PBar.set_colors') as pbar_colors:
-                                                                        with patch('cat_win.src.cat.Converter.set_flags') as conv_flags:
-                                                                            with patch('cat_win.src.cat.Converter.set_colors') as conv_colors:
-                                                                                with patch.object(cat_module, 'logger') as logger_m:
-                                                                                    cat_module.init(repl=False)
+                                                    with patch('cat_win.src.cat.Visualizer.set_flags') as vis_flags:
+                                                        with patch('cat_win.src.cat.Summary.set_flags') as sum_flags:
+                                                            with patch('cat_win.src.cat.Summary.set_colors') as sum_colors:
+                                                                with patch('cat_win.src.cat.PBar.set_colors') as pbar_colors:
+                                                                    with patch('cat_win.src.cat.Converter.set_flags') as conv_flags:
+                                                                        with patch('cat_win.src.cat.Converter.set_colors') as conv_colors:
+                                                                            with patch.object(cat_module, 'logger') as logger_m:
+                                                                                cat_module.init(repl=False)
         pre.assert_called_once_with(ctx)
         logger_m.set_log_to_file.assert_called_once_with(True)
         logger_m.set_level.assert_called_once_with(logger_m.DEBUG)
@@ -235,7 +233,7 @@ class TestCat(TestCase):
         hex_flags.assert_called_once()
         more_flags.assert_called_once()
         more_colors.assert_called_once_with(ctx.color_dic)
-        sig_path.assert_called_once()
+        # Signatures.init() uses lazy loading and is only called when signatures are needed, not during init
         vis_flags.assert_called_once()
         sum_flags.assert_called_once()
         sum_colors.assert_called_once_with(ctx.color_dic)

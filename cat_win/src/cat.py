@@ -55,9 +55,8 @@ from cat_win import __url__
 
 
 coloramaInit(strip=False)
-working_dir = os.path.abspath(os.path.join(os.path.realpath(__file__), os.pardir, os.pardir))
 
-_ctx = AppContext(working_dir)
+_ctx = AppContext()
 
 
 
@@ -184,9 +183,6 @@ def init(repl: bool = False) -> None:
         _ctx.const_dic[DKW.MORE_STEP_LENGTH],
     )
     More.set_colors(_ctx.color_dic)
-    Signatures.set_res_path(
-        os.path.join(working_dir, 'res', 'signatures.json'),
-    )
     Visualizer.set_flags(
         _ctx.u_args[ARGS_DEBUG],
     )
@@ -213,7 +209,9 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
 
     if len(sys.argv) == 2 and sys.argv[1] == 'fg': # TODO: this is weird, but proof-of-concept
         from cat_win.src.persistence.viewstate import load_view_state
-        view_obj = load_view_state('viewstate.bin') # TODO: use an actual config folder (& for cat.config)
+        view_obj = load_view_state()
+        if view_obj is None:
+            return
         type(view_obj).open(view_obj.files, fg_state = view_obj)
         return
 

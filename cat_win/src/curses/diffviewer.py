@@ -14,14 +14,15 @@ import sys
 import time
 
 from cat_win.src.const.escapecodes import ESC_CODE
-from cat_win.src.service.fileattributes import get_file_size, _convert_size, \
-    get_file_mtime, get_file_ctime
-from cat_win.src.curses.helper.editorsearchhelper import search_iter_diff_factory
+from cat_win.src.curses.helper.diffviewerhelper import DifflibParser, DifflibID
 from cat_win.src.curses.helper.editorhelper import Position, frepr, \
     UNIFY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, FUNCTION_HOTKEYS
-from cat_win.src.service.helper.environment import on_windows_os
+from cat_win.src.curses.helper.editorsearchhelper import search_iter_diff_factory
 from cat_win.src.curses.helper.githelper import GitHelper
-from cat_win.src.curses.helper.diffviewerhelper import DifflibParser, DifflibID
+from cat_win.src.persistence.viewstate import save_view_state
+from cat_win.src.service.helper.environment import on_windows_os
+from cat_win.src.service.fileattributes import get_file_size, _convert_size, \
+    get_file_mtime, get_file_ctime
 from cat_win.src.service.helper.iohelper import IoHelper, logger
 
 
@@ -541,10 +542,11 @@ class DiffViewer:
         return True
 
     def _action_background(self) -> bool:
-        if on_windows_os: # TODO: this is weird
-            from cat_win.src.persistence.viewstate import save_view_state
-            save_view_state('viewstate.bin', self)
-            return False
+        if on_windows_os:
+            success = save_view_state(self)
+            if not success:
+                self.error_bar = 'Error saving view state for backgrounding!'
+            return not success
         # only callable on UNIX
         curses.endwin()
         os.kill(os.getpid(), signal.SIGSTOP)

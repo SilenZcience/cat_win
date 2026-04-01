@@ -17,8 +17,8 @@ class TestArgConstants(TestCase):
         self.assertEqual(len(set(parameters_id)), len(parameters_id))
 
     def test_no_concats(self):
-        parameters_short_form = [x.short_form for x in ALL_ARGS]
-        parameters_long_form = [x.long_form for x in ALL_ARGS]
+        parameters_short_form = [x.short_form for x in ALL_ARGS if x.arg_id != -1]
+        parameters_long_form = [x.long_form for x in ALL_ARGS if x.arg_id != -1]
         parameters = parameters_short_form + parameters_long_form
         for param in parameters:
             self.assertEqual(param[:1], '-')

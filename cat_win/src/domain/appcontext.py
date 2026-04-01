@@ -19,7 +19,7 @@ class AppContext:
     """Holds all mutable objects that belong to one catw / cats invocation."""
 
     __slots__ = (
-        'working_dir', 'cconfig', 'config',
+        'cconfig', 'config',
         'default_color_dic', 'color_dic', 'const_dic',
         'arg_parser', 'u_args', 'u_files',
         'args', 'unknown_args',
@@ -28,10 +28,9 @@ class AppContext:
         'content',
     )
 
-    def __init__(self, working_dir: str) -> None:
-        self.working_dir = working_dir
-        self.cconfig = CConfig(working_dir)
-        self.config = Config(working_dir)
+    def __init__(self) -> None:
+        self.cconfig = CConfig()
+        self.config = Config()
         # These are populated by setup(); kept as empty sentinels until then.
         self.default_color_dic: dict = {}
         self.color_dic: dict = {}

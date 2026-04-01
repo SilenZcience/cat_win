@@ -11,18 +11,20 @@ from cat_win.tests.mocks.std import StdOutMock
 
 
 test_file_dir = os.path.join(os.path.dirname(__file__), 'texts')
-config = CConfig(test_file_dir)
-config.load_config()
 logger = LoggerStub()
 
 
 @patch('sys.stdout', new=StdOutMock())
 @patch('shutil.get_terminal_size', lambda: (120, 30))
+@patch(
+    'cat_win.src.persistence.cconfig.xdg_config',
+    lambda fname, ensure_dir=False: os.path.join(test_file_dir, f'__test_{fname}')
+)
 class TestCConfig(TestCase):
     maxDiff = None
 
     def test__save_config_writes_value(self):
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         config_.config_parser.add_section('COLORS')
 
         with patch('builtins.open', mock_open()) as m_open:
@@ -36,7 +38,7 @@ class TestCConfig(TestCase):
     @patch('cat_win.src.persistence.cconfig.logger', logger)
     def test__save_config_oserror_logs(self):
         logger.clear()
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
 
         with patch('builtins.open', side_effect=OSError('Mocked Error')):
             config_._save_config(None)
@@ -44,7 +46,7 @@ class TestCConfig(TestCase):
         self.assertIn('Could not write to config file', logger.output())
 
     def test_convert_config_element_fore_back(self):
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         self.assertEqual(
             config_.convert_config_element('Fore.RED', CKW.FOUND),
             ColorOptions.Fore['RED']
@@ -55,21 +57,21 @@ class TestCConfig(TestCase):
         )
 
     def test_convert_config_element_ansi(self):
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         self.assertEqual(
             config_.convert_config_element('[31m', CKW.FOUND),
             '\033[31m'
         )
 
     def test_convert_config_element_8bit(self):
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         self.assertEqual(
             config_.convert_config_element('f196', CKW.FOUND),
             '\033[38;5;196m'
         )
 
     def test_convert_config_element_truecolor(self):
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         self.assertEqual(
             config_.convert_config_element('b1;2;3', CKW.MATCHED),
             '\033[48;2;1;2;3m'
@@ -78,7 +80,7 @@ class TestCConfig(TestCase):
     @patch('cat_win.src.persistence.cconfig.logger', logger)
     def test_convert_config_element_invalid_resets_and_exits(self):
         logger.clear()
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
 
         with patch.object(config_, '_save_config') as mock_save:
             with self.assertRaises(SystemExit):
@@ -89,7 +91,7 @@ class TestCConfig(TestCase):
         self.assertIn('resetting to', logger.output())
 
     def test_load_config_without_colors_section_uses_defaults(self):
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         with patch.object(config_.config_parser, 'read') as mock_read:
             colors = config_.load_config()
 
@@ -102,7 +104,7 @@ class TestCConfig(TestCase):
         self.assertIsNot(colors, config_.default_dic)
 
     def test_load_config_with_colors_section_parses_values(self):
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         config_.config_parser.add_section('COLORS')
         config_.config_parser.set('COLORS', CKW.FOUND, 'f196')
         config_.config_parser.set('COLORS', CKW.MATCHED, 'Back.YELLOW')
@@ -116,7 +118,7 @@ class TestCConfig(TestCase):
         self.assertEqual(colors[CKW.RESET_MATCHED], ColorOptions.Back['RESET'])
 
     def test_load_config_with_invalid_entry_falls_back_to_default(self):
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         config_.config_parser.add_section('COLORS')
         config_.config_parser.set('COLORS', CKW.FOUND, 'Fore.NOT_A_REAL_COLOR')
 
@@ -128,9 +130,10 @@ class TestCConfig(TestCase):
     def test__print_get_all_available_colors(self):
         all_color_options = list(ColorOptions.Fore.keys()) + list(ColorOptions.Back.keys())
         all_color_options = [k for k in all_color_options if k != 'RESET']
+        config_ = CConfig()
 
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            config._print_get_all_available_colors()
+            config_._print_get_all_available_colors()
             for i, k in enumerate(all_color_options, start=1):
                 self.assertIn(str(i), fake_out.getvalue())
                 self.assertIn(k, fake_out.getvalue())
@@ -139,7 +142,7 @@ class TestCConfig(TestCase):
         class_members = [attr for attr in dir(CKW) if not (
             callable(getattr(CKW, attr)) or attr.startswith('__') or attr.startswith('RESET')
         )]
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         config_.load_config()
         config_.color_dic[CKW.FOUND] = ColorOptions.Fore['BLACK']
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
@@ -149,7 +152,7 @@ class TestCConfig(TestCase):
                 self.assertIn(getattr(CKW, k), fake_out.getvalue())
 
     def test_save_config_selects_keyword_by_name(self):
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         config_.color_dic = config_.default_dic.copy()
 
         with patch.object(config_, '_print_all_available_elements'):
@@ -161,7 +164,7 @@ class TestCConfig(TestCase):
         mock_save.assert_called_once_with(CKW.FOUND, 'Fore.RED')
 
     def test_save_config_unknown_keyword_then_valid(self):
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         config_.color_dic = config_.default_dic.copy()
 
         with patch.object(config_, '_print_all_available_elements'):
@@ -175,7 +178,7 @@ class TestCConfig(TestCase):
         mock_save.assert_called_once_with(CKW.FOUND, 'Fore.RED')
 
     def test_save_config_selects_keyword_and_color_by_id(self):
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         config_.color_dic = config_.default_dic.copy()
         first_keyword = config_.elements[0]
 
@@ -188,7 +191,7 @@ class TestCConfig(TestCase):
         mock_save.assert_called_once_with(first_keyword, 'Fore.RED')
 
     def test_save_config_accepts_higher_bit_color(self):
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         config_.color_dic = config_.default_dic.copy()
 
         with patch.object(config_, '_print_all_available_elements'):
@@ -200,7 +203,7 @@ class TestCConfig(TestCase):
         mock_save.assert_called_once_with(CKW.LINE_LENGTH, 'f196')
 
     def test_save_config_accepts_custom_ansi_color(self):
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         config_.color_dic = config_.default_dic.copy()
 
         with patch.object(config_, '_print_all_available_elements'):
@@ -212,7 +215,7 @@ class TestCConfig(TestCase):
         mock_save.assert_called_once_with(CKW.LINE_LENGTH, '[31m')
 
     def test_save_config_unknown_option_then_valid(self):
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         config_.color_dic = config_.default_dic.copy()
 
         with patch.object(config_, '_print_all_available_elements'):
@@ -226,7 +229,7 @@ class TestCConfig(TestCase):
         mock_save.assert_called_once_with(CKW.FOUND, 'Fore.RED')
 
     def test_save_config_truecolor_path(self):
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         config_.color_dic = config_.default_dic.copy()
 
         with patch.object(config_, '_print_all_available_elements'):
@@ -240,7 +243,7 @@ class TestCConfig(TestCase):
     @patch('cat_win.src.persistence.cconfig.logger', logger)
     def test_save_config_rejects_back_for_fore_exclusive(self):
         logger.clear()
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         config_.color_dic = config_.default_dic.copy()
 
         with patch.object(config_, '_print_all_available_elements'):
@@ -255,7 +258,7 @@ class TestCConfig(TestCase):
     @patch('cat_win.src.persistence.cconfig.logger', logger)
     def test_save_config_rejects_fore_for_back_exclusive(self):
         logger.clear()
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         config_.color_dic = config_.default_dic.copy()
 
         with patch.object(config_, '_print_all_available_elements'):
@@ -270,7 +273,7 @@ class TestCConfig(TestCase):
     @patch('cat_win.src.persistence.cconfig.logger', logger)
     def test_save_config_keyword_input_eof(self):
         logger.clear()
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         config_.color_dic = config_.default_dic.copy()
 
         with patch.object(config_, '_print_all_available_elements'):
@@ -282,7 +285,7 @@ class TestCConfig(TestCase):
     @patch('cat_win.src.persistence.cconfig.logger', logger)
     def test_save_config_color_input_eof(self):
         logger.clear()
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         config_.color_dic = config_.default_dic.copy()
 
         with patch.object(config_, '_print_all_available_elements'):
@@ -297,9 +300,24 @@ class TestCConfig(TestCase):
 
     @patch('cat_win.src.persistence.cconfig.logger', logger)
     def test_reset_config(self):
-        config_ = CConfig(test_file_dir)
+        config_ = CConfig()
         config_.config_parser.add_section('COLORS')
         with patch.object(config_, '_save_config') as mock_save:
             config_.reset_config()
         self.assertNotIn('COLORS', config_.config_parser.sections())
         mock_save.assert_called_once_with(None)
+
+    def test_print_all_available_elements_adds_last_line_break(self):
+        config_ = CConfig()
+        config_.elements = ['A', 'B', 'C']
+        config_.color_dic = {element: ColorOptions.Fore['RED'] for element in config_.elements}
+
+        with patch('shutil.get_terminal_size', lambda: (9999, 30)):
+            with patch('sys.stdout', new=StdOutMock()) as fake_out:
+                config_._print_all_available_elements()
+
+        out = fake_out.getvalue()
+        self.assertIn('Here is a list of all available elements you may change:', out)
+        self.assertIn('A', out)
+        self.assertIn('B', out)
+        self.assertIn('C', out)

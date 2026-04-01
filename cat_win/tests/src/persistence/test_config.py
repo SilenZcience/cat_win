@@ -20,13 +20,15 @@ from cat_win.src.persistence.config import (
 
 
 test_file_dir = os.path.join(os.path.dirname(__file__), 'texts')
-config = Config(test_file_dir)
-config.load_config()
 logger = LoggerStub()
 
 
 @patch('sys.stdout', new=StdOutMock())
 @patch('shutil.get_terminal_size', lambda: (120, 30))
+@patch(
+    'cat_win.src.persistence.config.xdg_config',
+    lambda fname, ensure_dir=False: os.path.join(test_file_dir, f'__test_{fname}')
+)
 class TestConfig(TestCase):
     maxDiff = None
 
@@ -90,20 +92,21 @@ class TestConfig(TestCase):
         self.assertIn('Valid Encoding', logger.output())
 
     def test_convert_config_element(self):
-        self.assertEqual(config.convert_config_element('"15"', DKW.LARGE_FILE_SIZE), 15)
-        self.assertEqual(config.convert_config_element('"7"', DKW.LARGE_FILE_SIZE), 7)
-        self.assertEqual(config.convert_config_element('"15"', DKW.DEFAULT_COMMAND_LINE), "15")
-        self.assertEqual(config.convert_config_element('"false"', DKW.STRIP_COLOR_ON_PIPE), False)
-        self.assertEqual(config.convert_config_element('"FALSE"', DKW.STRIP_COLOR_ON_PIPE), False)
-        self.assertEqual(config.convert_config_element('"no"', DKW.STRIP_COLOR_ON_PIPE), False)
-        self.assertEqual(config.convert_config_element('"n"', DKW.STRIP_COLOR_ON_PIPE), False)
-        self.assertEqual(config.convert_config_element('"0"', DKW.STRIP_COLOR_ON_PIPE), False)
-        self.assertEqual(config.convert_config_element('"1"', DKW.STRIP_COLOR_ON_PIPE), True)
+        config_ = Config()
+        self.assertEqual(config_.convert_config_element('"15"', DKW.LARGE_FILE_SIZE), 15)
+        self.assertEqual(config_.convert_config_element('"7"', DKW.LARGE_FILE_SIZE), 7)
+        self.assertEqual(config_.convert_config_element('"15"', DKW.DEFAULT_COMMAND_LINE), "15")
+        self.assertEqual(config_.convert_config_element('"false"', DKW.STRIP_COLOR_ON_PIPE), False)
+        self.assertEqual(config_.convert_config_element('"FALSE"', DKW.STRIP_COLOR_ON_PIPE), False)
+        self.assertEqual(config_.convert_config_element('"no"', DKW.STRIP_COLOR_ON_PIPE), False)
+        self.assertEqual(config_.convert_config_element('"n"', DKW.STRIP_COLOR_ON_PIPE), False)
+        self.assertEqual(config_.convert_config_element('"0"', DKW.STRIP_COLOR_ON_PIPE), False)
+        self.assertEqual(config_.convert_config_element('"1"', DKW.STRIP_COLOR_ON_PIPE), True)
 
     @patch('cat_win.src.persistence.config.logger', logger)
     def test_convert_config_element_invalid_value_resets_and_exits(self):
         logger.clear()
-        config_ = Config(test_file_dir)
+        config_ = Config()
 
         with patch.object(config_, '_save_config') as mock_save:
             with self.assertRaises(SystemExit):
@@ -116,7 +119,7 @@ class TestConfig(TestCase):
     @patch('cat_win.src.persistence.config.logger', logger)
     def test_convert_config_element_unicode_error_resets_and_exits(self):
         logger.clear()
-        config_ = Config(test_file_dir)
+        config_ = Config()
 
         with patch.object(config_, '_save_config') as mock_save:
             with self.assertRaises(SystemExit):
@@ -129,34 +132,35 @@ class TestConfig(TestCase):
         self.assertIn("invalid config value", logger.output())
 
     def test_convert_config_element_unicode_escape_conversion(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
         self.assertEqual(
             config_.convert_config_element('"\\n"', DKW.STRINGS_DELIMETER),
             '\n'
         )
 
     def test_is_valid_value(self):
-        self.assertEqual(config.is_valid_value('', DKW.DEFAULT_COMMAND_LINE), True)
-        self.assertEqual(config.is_valid_value('', DKW.LARGE_FILE_SIZE), False)
-        self.assertEqual(config.is_valid_value('a', DKW.LARGE_FILE_SIZE), False)
-        self.assertEqual(config.is_valid_value('a', DKW.EDITOR_INDENTATION), True)
-        self.assertEqual(config.is_valid_value("5", DKW.STRINGS_MIN_SEQUENCE_LENGTH), True)
-        self.assertEqual(config.is_valid_value("5", DKW.LARGE_FILE_SIZE), True)
-        self.assertEqual(config.is_valid_value('TrUe', DKW.EDITOR_AUTO_INDENT), True)
-        self.assertEqual(config.is_valid_value('FaLSe', DKW.EDITOR_AUTO_INDENT), True)
-        self.assertEqual(config.is_valid_value('Yes', DKW.STRIP_COLOR_ON_PIPE), True)
-        self.assertEqual(config.is_valid_value('y', DKW.STRIP_COLOR_ON_PIPE), True)
-        self.assertEqual(config.is_valid_value('nO', DKW.STRIP_COLOR_ON_PIPE), True)
-        self.assertEqual(config.is_valid_value('n', DKW.STRIP_COLOR_ON_PIPE), True)
-        self.assertEqual(config.is_valid_value('0', DKW.STRIP_COLOR_ON_PIPE), True)
-        self.assertEqual(config.is_valid_value('1', DKW.STRIP_COLOR_ON_PIPE), True)
-        self.assertEqual(config.is_valid_value('tru', DKW.STRIP_COLOR_ON_PIPE), False)
-        self.assertEqual(config.is_valid_value(None, DKW.STRIP_COLOR_ON_PIPE), False)
-        self.assertEqual(config.is_valid_value('a\0b', DKW.STRIP_COLOR_ON_PIPE), False)
-        self.assertEqual(config.is_valid_value(r'\\\xawd', DKW.STRIP_COLOR_ON_PIPE), False)
+        config_ = Config()
+        self.assertEqual(config_.is_valid_value('', DKW.DEFAULT_COMMAND_LINE), True)
+        self.assertEqual(config_.is_valid_value('', DKW.LARGE_FILE_SIZE), False)
+        self.assertEqual(config_.is_valid_value('a', DKW.LARGE_FILE_SIZE), False)
+        self.assertEqual(config_.is_valid_value('a', DKW.EDITOR_INDENTATION), True)
+        self.assertEqual(config_.is_valid_value("5", DKW.STRINGS_MIN_SEQUENCE_LENGTH), True)
+        self.assertEqual(config_.is_valid_value("5", DKW.LARGE_FILE_SIZE), True)
+        self.assertEqual(config_.is_valid_value('TrUe', DKW.EDITOR_AUTO_INDENT), True)
+        self.assertEqual(config_.is_valid_value('FaLSe', DKW.EDITOR_AUTO_INDENT), True)
+        self.assertEqual(config_.is_valid_value('Yes', DKW.STRIP_COLOR_ON_PIPE), True)
+        self.assertEqual(config_.is_valid_value('y', DKW.STRIP_COLOR_ON_PIPE), True)
+        self.assertEqual(config_.is_valid_value('nO', DKW.STRIP_COLOR_ON_PIPE), True)
+        self.assertEqual(config_.is_valid_value('n', DKW.STRIP_COLOR_ON_PIPE), True)
+        self.assertEqual(config_.is_valid_value('0', DKW.STRIP_COLOR_ON_PIPE), True)
+        self.assertEqual(config_.is_valid_value('1', DKW.STRIP_COLOR_ON_PIPE), True)
+        self.assertEqual(config_.is_valid_value('tru', DKW.STRIP_COLOR_ON_PIPE), False)
+        self.assertEqual(config_.is_valid_value(None, DKW.STRIP_COLOR_ON_PIPE), False)
+        self.assertEqual(config_.is_valid_value('a\0b', DKW.STRIP_COLOR_ON_PIPE), False)
+        self.assertEqual(config_.is_valid_value(r'\\\xawd', DKW.STRIP_COLOR_ON_PIPE), False)
 
     def test_load_config_without_sections_uses_defaults(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
         with patch.object(config_.config_parser, 'read') as mock_read:
             consts = config_.load_config()
 
@@ -168,7 +172,7 @@ class TestConfig(TestCase):
         self.assertIsNot(consts, config_.default_dic)
 
     def test_load_config_with_sections_parses_values(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
         config_.config_parser.add_section('COMMANDS')
         config_.config_parser.set('COMMANDS', '-x', '"-a -b"')
         config_.config_parser.add_section('CONSTS')
@@ -183,7 +187,7 @@ class TestConfig(TestCase):
         self.assertEqual(consts[DKW.DEFAULT_FILE_ENCODING], config_.default_dic[DKW.DEFAULT_FILE_ENCODING])
 
     def test_load_config_missing_const_key_falls_back_to_default(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
         config_.config_parser.add_section('COMMANDS')
         config_.config_parser.add_section('CONSTS')
         config_.config_parser.set('CONSTS', DKW.DEFAULT_COMMAND_LINE, '"-n"')
@@ -194,11 +198,12 @@ class TestConfig(TestCase):
         self.assertEqual(consts[DKW.LARGE_FILE_SIZE], config_.default_dic[DKW.LARGE_FILE_SIZE])
 
     def test_get_cmd(self):
-        config.const_dic[DKW.DEFAULT_COMMAND_LINE] = '-nl "find= "'
-        self.assertListEqual(config.get_cmd(), ['-nl', 'find= '])
+        config_ = Config()
+        config_.const_dic[DKW.DEFAULT_COMMAND_LINE] = '-nl "find= "'
+        self.assertListEqual(config_.get_cmd(), ['-nl', 'find= '])
 
     def test__print_all_available_elements(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
         config_.load_config()
         for i in range(1, 11):
             config_.custom_commands[f'custom{i}'] = ['-a', '-b']
@@ -213,7 +218,7 @@ class TestConfig(TestCase):
     @patch('cat_win.src.persistence.config.logger', logger)
     def test__save_config(self):
         logger.clear()
-        config_ = Config(test_file_dir)
+        config_ = Config()
         config_.config_parser.add_section('CONSTS')
         with patch('builtins.open', ErrorDefGen.get_def(OSError("Mocked Error"))):
             config_._save_config('test', 'val ue')
@@ -223,7 +228,7 @@ class TestConfig(TestCase):
 
 
     def test_save_config_selects_element_by_name(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
         with patch.object(config_, '_print_all_available_elements'):
             with patch.object(config_, '_save_config_element') as mock_save_element:
                 with patch('builtins.input', side_effect=[DKW.DEFAULT_COMMAND_LINE]):
@@ -231,7 +236,7 @@ class TestConfig(TestCase):
         mock_save_element.assert_called_once_with(DKW.DEFAULT_COMMAND_LINE)
 
     def test_save_config_selects_element_by_id(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
         with patch.object(config_, '_print_all_available_elements'):
             with patch.object(config_, '_save_config_element') as mock_save_element:
                 with patch('builtins.input', side_effect=['1']):
@@ -239,7 +244,7 @@ class TestConfig(TestCase):
         mock_save_element.assert_called_once_with(config_.elements[0])
 
     def test_save_config_selects_custom_command_by_name(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
         config_.custom_commands['-x'] = ['-a', '-b']
         with patch.object(config_, '_print_all_available_elements'):
             with patch.object(config_, '_save_config_custom_command') as mock_save_custom:
@@ -248,7 +253,7 @@ class TestConfig(TestCase):
         mock_save_custom.assert_called_once_with('-x')
 
     def test_save_config_selects_custom_command_by_id(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
         config_.custom_commands['-x'] = ['-a', '-b']
         custom_id = str(len(config_.elements) + 1)
 
@@ -259,7 +264,7 @@ class TestConfig(TestCase):
         mock_save_custom.assert_called_once_with('-x')
 
     def test_save_config_selects_new_custom_command(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
         new_custom_id = str(len(config_.elements) + 1)
 
         with patch.object(config_, '_print_all_available_elements'):
@@ -271,7 +276,7 @@ class TestConfig(TestCase):
     @patch('cat_win.src.persistence.config.logger', logger)
     def test_save_config_unknown_keyword_then_valid(self):
         logger.clear()
-        config_ = Config(test_file_dir)
+        config_ = Config()
 
         with patch.object(config_, '_print_all_available_elements'):
             with patch.object(config_, '_save_config_element') as mock_save_element:
@@ -284,7 +289,7 @@ class TestConfig(TestCase):
     @patch('cat_win.src.persistence.config.logger', logger)
     def test_save_config_eof(self):
         logger.clear()
-        config_ = Config(test_file_dir)
+        config_ = Config()
 
         with patch.object(config_, '_print_all_available_elements'):
             with patch('builtins.input', side_effect=EOFError):
@@ -294,7 +299,7 @@ class TestConfig(TestCase):
         self.assertIn('End-of-File', logger.output())
 
     def test__save_config_element_valid_input(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
         keyword = DKW.LARGE_FILE_SIZE
         config_.const_dic[keyword] = config_.default_dic[keyword]
 
@@ -307,7 +312,7 @@ class TestConfig(TestCase):
     @patch('cat_win.src.persistence.config.logger', logger)
     def test__save_config_element_retries_on_invalid_value(self):
         logger.clear()
-        config_ = Config(test_file_dir)
+        config_ = Config()
         keyword = DKW.LARGE_FILE_SIZE
         config_.const_dic[keyword] = config_.default_dic[keyword]
 
@@ -321,7 +326,7 @@ class TestConfig(TestCase):
     @patch('cat_win.src.persistence.config.logger', logger)
     def test__save_config_element_eof(self):
         logger.clear()
-        config_ = Config(test_file_dir)
+        config_ = Config()
         keyword = DKW.LARGE_FILE_SIZE
         config_.const_dic[keyword] = config_.default_dic[keyword]
 
@@ -333,7 +338,7 @@ class TestConfig(TestCase):
         self.assertIn('End-of-File', logger.output())
 
     def test__save_config_custom_command_with_value(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
         config_.custom_commands['-mycmd'] = ['-a', '-b']
 
         with patch('builtins.input', side_effect=['-n 10']):
@@ -343,7 +348,7 @@ class TestConfig(TestCase):
         mock_save.assert_called_once_with('-mycmd', '-n 10', 'COMMANDS')
 
     def test__save_config_custom_command_empty_value_removes(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
         config_.custom_commands['-mycmd'] = ['-a', '-b']
         config_.config_parser.add_section('COMMANDS')
         config_.config_parser.set('COMMANDS', '-mycmd', '"-a -b"')
@@ -356,7 +361,7 @@ class TestConfig(TestCase):
         mock_save.assert_called_once_with(None)
 
     def test__save_config_custom_command_forwarded(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
 
         with patch('builtins.input', side_effect=['-n 10']):
             with patch.object(config_, '_save_config') as mock_save:
@@ -367,7 +372,7 @@ class TestConfig(TestCase):
     @patch('cat_win.src.persistence.config.logger', logger)
     def test__save_config_custom_command_eof(self):
         logger.clear()
-        config_ = Config(test_file_dir)
+        config_ = Config()
         config_.custom_commands['-mycmd'] = ['-a', '-b']
 
         with patch('builtins.input', side_effect=EOFError):
@@ -378,7 +383,7 @@ class TestConfig(TestCase):
         self.assertIn('End-of-File', logger.output())
 
     def test__save_config_add_custom_command_valid(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
 
         with patch('builtins.input', side_effect=['-my-new-cmd']):
             with patch.object(config_, '_save_config_custom_command') as mock_save_custom:
@@ -389,7 +394,7 @@ class TestConfig(TestCase):
     @patch('cat_win.src.persistence.config.logger', logger)
     def test__save_config_add_custom_command_invalid_then_valid(self):
         logger.clear()
-        config_ = Config(test_file_dir)
+        config_ = Config()
 
         with patch('builtins.input', side_effect=['not-a-command', '-my-new-cmd']):
             with patch.object(config_, '_save_config_custom_command') as mock_save_custom:
@@ -400,7 +405,7 @@ class TestConfig(TestCase):
 
     @patch('cat_win.src.persistence.config.logger', logger)
     def test__save_config_add_custom_command_rejects_duplicates(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
         config_.custom_commands['-my-new-cmd'] = ['-a']
 
         with patch('builtins.input', side_effect=['-my-new-cmd', '-my-other-cmd']):
@@ -411,7 +416,7 @@ class TestConfig(TestCase):
 
     @patch('cat_win.src.persistence.config.logger', logger)
     def test__save_config_add_custom_command_rejects_existing_arg(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
         existing_arg = ALL_ARGS[0].short_form
 
         with patch('builtins.input', side_effect=[existing_arg, '-my-new-cmd']):
@@ -423,7 +428,7 @@ class TestConfig(TestCase):
     @patch('cat_win.src.persistence.config.logger', logger)
     def test__save_config_add_custom_command_eof(self):
         logger.clear()
-        config_ = Config(test_file_dir)
+        config_ = Config()
 
         with patch('builtins.input', side_effect=EOFError):
             with patch.object(config_, '_save_config_custom_command') as mock_save_custom:
@@ -434,7 +439,7 @@ class TestConfig(TestCase):
 
     @patch('cat_win.src.persistence.config.logger', logger)
     def test_reset_config(self):
-        config_ = Config(test_file_dir)
+        config_ = Config()
         with patch('builtins.open', ErrorDefGen.get_def(OSError("Mocked Error"))):
             config_.reset_config()
         self.assertIn('Could not write', logger.output())
@@ -454,22 +459,23 @@ class TestConfig(TestCase):
     @patch('cat_win.src.persistence.config.logger', logger)
     def test_remove_config(self):
         logger.clear()
+        config_ = Config()
         with patch('os.remove', ErrorDefGen.get_def(FileNotFoundError("Mocked Error"))):
-            config.remove_config()
+            config_.remove_config()
             self.assertIn('No active config file has been found.', logger.output())
 
         logger.clear()
         with patch('os.remove', ErrorDefGen.get_def(PermissionError("Mocked Error"))):
-            config.remove_config()
+            config_.remove_config()
             self.assertIn('Permission denied', logger.output())
 
         logger.clear()
         with patch('os.remove', ErrorDefGen.get_def(OSError("Mocked Error"))):
-            config.remove_config()
+            config_.remove_config()
             self.assertIn('unexpected error', logger.output())
 
         logger.clear()
         with patch('os.remove', lambda x: None):
             with patch('sys.stdout', new=StdOutMock()) as fake_out:
-                config.remove_config()
+                config_.remove_config()
                 self.assertIn('Successfull', fake_out.getvalue())
