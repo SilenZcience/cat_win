@@ -8,6 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Major Changes
 
 - changed the -`w`, --`wordcount` parameter to --`wc`, --`wordcount`
+- changed the config path from the install directory to a platform dependant config home (AppData,XDG_CONFIG_HOME,Application Support).
 - probably introduced a lot of new bugs.
 
 ### Minor Changes
@@ -25,6 +26,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added -`w`, --`watch` argument to watch files for changes and continuously update the output (works in combination with the diffviewer).
 - added -`eol`, --`end-of-line` argument to display the eol-characters as line suffix.
 - fixed a lot of coloring issues when multiple arguments apply color to the same line.
+- added `fg` command to continue a previous curses session that got sent to the background.
 - added support for chaining of one-letter custom arguments.
 
 ### Bugfixes
