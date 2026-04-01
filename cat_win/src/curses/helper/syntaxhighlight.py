@@ -55,6 +55,21 @@ class SyntaxHighlighter:
         self.state_token_map = state_token_map
         self.token_color_map = token_color_map
 
+    def __eq__(self, other):
+        if not isinstance(other, SyntaxHighlighter):
+            return NotImplemented
+        return (
+            self.plain_pattern == other.plain_pattern and
+            self.plain_group_to_token == other.plain_group_to_token and
+            self.simple_string_pattern == other.simple_string_pattern and
+            self.line_comment_prefixes == other.line_comment_prefixes and
+            self.multiline_delimiters == other.multiline_delimiters and
+            self.multiline_end_map == other.multiline_end_map and
+            self.delimiter_escape_char == other.delimiter_escape_char and
+            self.state_token_map == other.state_token_map and
+            self.token_color_map == other.token_color_map
+        )
+
     @staticmethod
     def register(
             name: str,
@@ -163,12 +178,12 @@ class SyntaxHighlighter:
         }
 
         if lex_keywords:
-            word_pattern = '|'.join(sorted(lex_keywords, key=len, reverse=True))
+            word_pattern = '|'.join(sorted(lex_keywords, key=lambda x: (-len(x), x)))
             i = 'i' * lex_keywords_case_insensitive
             parts.append(fr"(?P<keyword>\b(?{i}:" + word_pattern + r")\b)")
 
         if lex_builtins:
-            word_pattern = '|'.join(sorted(lex_builtins, key=len, reverse=True))
+            word_pattern = '|'.join(sorted(lex_builtins, key=lambda x: (-len(x), x)))
             i = 'i' * lex_builtins_case_insensitive
             parts.append(fr"(?P<builtin>\b(?{i}:" + word_pattern + r")\b(?=\s*\())")
 
