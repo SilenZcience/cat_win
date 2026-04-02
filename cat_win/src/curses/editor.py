@@ -24,8 +24,9 @@ from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.curses.helper.githelper import GitHelper
 from cat_win.src.service.helper.iohelper import IoHelper, logger
 from cat_win.src.curses.helper.syntaxhighlight import SyntaxHighlighter
-from cat_win.src.persistence.viewstate import save_view_state
+from cat_win.src.persistence.viewstate import save_view_state, get_view_state_time
 from cat_win.src.service.clipboard import Clipboard
+from cat_win.src.service.fileattributes import get_file_mtime
 from cat_win.src.service.rawviewer import SPECIAL_CHARS
 
 
@@ -2211,6 +2212,8 @@ class Editor:
             if fg:
                 self.get_char = self._get_new_char()
                 self._f_content_gen = (line for line in [])
+                if self.file_commit_hash is None and get_view_state_time() < get_file_mtime(self.file):
+                    self.error_bar = 'Out-Of-Sync Error: The file has been modified since backgrounding.'
             else:
                 self._build_file_upto()
             self._run()

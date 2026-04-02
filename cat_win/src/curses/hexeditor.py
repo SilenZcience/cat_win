@@ -20,9 +20,10 @@ from cat_win.src.curses.helper.editorhelper import Position, frepr, \
         FUNCTION_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.curses.helper.githelper import GitHelper
-from cat_win.src.persistence.viewstate import save_view_state
+from cat_win.src.persistence.viewstate import save_view_state, get_view_state_time
 from cat_win.src.service.helper.iohelper import IoHelper, logger
 from cat_win.src.service.clipboard import Clipboard
+from cat_win.src.service.fileattributes import get_file_mtime
 from cat_win.src.service.rawviewer import get_display_char_gen
 
 
@@ -1514,6 +1515,8 @@ class HexEditor:
             if fg:
                 self.decode_char = get_display_char_gen()
                 self._f_content_gen = (line for line in [])
+                if self.file_commit_hash is None and get_view_state_time() < get_file_mtime(self.file):
+                    self.error_bar = 'Out-Of-Sync Error: The file has been modified since backgrounding.'
             self._run()
         except (Exception, KeyboardInterrupt) as e:
             curses.endwin()

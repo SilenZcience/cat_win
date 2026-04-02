@@ -139,6 +139,16 @@ class ViewStateLoader:
         return view_obj
 
 
+def get_view_state_time() -> float:
+    """
+    Get the creation time of the view state file.
+    """
+    try:
+        return xdg_config('viewstate_obj.bin').stat().st_mtime
+    except OSError:
+        return 0.0
+
+
 def save_view_state(view_obj) -> bool:
     """
     Convenience wrapper for ViewStateWriter.save().
