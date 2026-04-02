@@ -19,7 +19,7 @@ from cat_win.src.curses.helper.editorhelper import Position, frepr, \
     UNIFY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, FUNCTION_HOTKEYS
 from cat_win.src.curses.helper.editorsearchhelper import search_iter_diff_factory
 from cat_win.src.curses.helper.githelper import GitHelper
-from cat_win.src.persistence.viewstate import save_view_state
+from cat_win.src.persistence.viewstate import save_view_state, get_view_state_time
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.fileattributes import get_file_size, _convert_size, \
     get_file_mtime, get_file_ctime
@@ -1477,6 +1477,13 @@ class DiffViewer:
         """
         try:
             self._init_screen()
+            if fg:
+                if (
+                    self.file_commit_hashes[0] is None and get_view_state_time() < get_file_mtime(self.diff_files[0])
+                ) or (
+                    self.file_commit_hashes[1] is None and get_view_state_time() < get_file_mtime(self.diff_files[1])
+                ):
+                    self.error_bar = 'Out-Of-Sync Error: At least one of the files has been modified since backgrounding.'
             self._run()
         except (Exception, KeyboardInterrupt) as e:
             curses.endwin()
