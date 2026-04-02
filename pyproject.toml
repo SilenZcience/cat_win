@@ -58,10 +58,6 @@ cfix = [
     "colorama~=0.4.0; platform_system=='Windows'",
 ]
 
-[tool.flit.sdist]
-exclude = [
-    "**/**.config",
-]
 
 [project.scripts]
 catw = "cat_win.__main__:entry_point"
@@ -75,8 +71,8 @@ Download = "https://github.com/SilenZcience/cat_win/tarball/master"
 Github = "https://github.com/SilenZcience/cat_win"
 Issues = "https://github.com/SilenZcience/cat_win/issues"
 
-[tool.pytest.ini_options]
-filterwarnings = [
-    "ignore::DeprecationWarning",
-    "ignore::PendingDeprecationWarning",
-]
+# [tool.pytest.ini_options]
+# filterwarnings = [
+#     "ignore::DeprecationWarning",
+#     "ignore::PendingDeprecationWarning",
+# ]
