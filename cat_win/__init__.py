@@ -1,4 +1,4 @@
-"""Advanced Text-Processing and -Analytics Command Line Toolset made in Python."""
+"""Advanced Text-Processing and -Analytics CLI Toolset."""
 
 __project__ = 'cat_win'
 __version__ = '1.10.6'

@@ -26,7 +26,7 @@
       <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/cat_win.logo.png" width="25%"/>
    </p>
    <p align="center">
-      Advanced Text-Processing and -Analytics Command Line Toolset made in Python
+      Advanced Text-Processing and -Analytics CLI Toolset
       <br/>
       <a href="https://github.com/SilenZcience/cat_win/blob/main/cat_win/src/cat.py">
          <strong>Explore the code »</strong>
@@ -94,13 +94,15 @@
 [![GitHub-Issues]](https://github.com/SilenZcience/cat_win/issues)
 <!-- [![Compile-and-Push]](https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml) -->
 
-This project copies the fundamental framework of the most essential command-line tools from Unix and translates its features to an OS Independent program using Python.</br>
-The project includes the basic functionality of subject areas like 'cat', 'echo', 'grep', 'ls', 'base64', 'xxd', ...
+This project provides a cohesive collection of command-line utilities, designed to cover a broad range of everyday file and text processing tasks.
+It spans functionality across areas such as file inspection, text output, pattern searching, encoding/decoding, and binary data handling, and much *much* <a href="#usage">more</a> ...
 
-Additionally, it includes an **editor** and a **hex editor**, as well as the feature to visualize data in various ways.
-It enables the user to manipulate the content of any given file, displaying meta-data, calculating checksums, converting hexadecimal, decimal, octal and binary numbers within any text, and much *much* <a href="#usage">more</a> ...
+In addition to its command-line tools, the project includes interactive terminal applications built with curses, featuring a fully functional **text editor**, a **hex editor**, and a **diff viewer**.
+These components enable direct, in-terminal manipulation and analysis of data.
 
-This project does not aim to exactly replicate existing tools or their specific functionalities but rather to deliver essential core features in a user-friendly manner, providing straightforward access to helpful and valuable tools. It is purposefully designed to be lightweight and offer a streamlined, accessible solution to engage with powerful utilities by providing a practical and effective resource for users seeking core functionality without unnecessary overhead.
+This project does not aim to exactly replicate existing tools or their specific functionalities but rather to deliver essential core features in a user-friendly manner.
+It is purposefully designed to be lightweight and offer a wide range of functionality without unnecessary overhead.
+The design focus lies with minimal dependencies and maximal compatibility across different platforms and Python versions, ensuring that it can be easily installed and used in most environments.
 
 <div id="made-with"></div>
 
