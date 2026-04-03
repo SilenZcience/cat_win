@@ -15,66 +15,39 @@ from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.progressbar import PBar
 
 
-class StatusLogger: # TODO: fix this mess, should be a real logger
-    """
-    StatusLogger
-    """
+class StatusLogger:
+    """Simple logging wrapper with ANSI color support for status/error messages."""
+
     DEBUG    = logging.DEBUG
     INFO     = logging.INFO
     WARNING  = logging.WARNING
     ERROR    = logging.ERROR
     CRITICAL = logging.CRITICAL
 
-    COLOR_DEBUG: str    = ''
-    COLOR_INFO: str     = ''
-    COLOR_WARNING: str  = ''
-    COLOR_ERROR: str    = ''
-    COLOR_CRITICAL: str = ''
-    COLOR_RESET: str    = ''
-
     class _Formatter(logging.Formatter):
-        def __init__(self, error_printer: 'StatusLogger') -> None:
-            super().__init__('%(message)s')
-            self.error_printer = error_printer
+        """ANSI color formatter for log messages."""
+        def __init__(self, logger_ref: 'StatusLogger') -> None:
+            super(StatusLogger._Formatter, self).__init__('%(message)s')
+            self.logger_ref = logger_ref
 
         def format(self, record: logging.LogRecord) -> str:
             message = record.getMessage()
             line_end = getattr(record, 'line_end', '\n')
-            color = self.error_printer.get_color(record.levelno)
-            reset = self.error_printer.COLOR_RESET if color else ''
+            color = self.logger_ref.get_color(record.levelno)
+            reset = self.logger_ref.colors['reset'] if color else ''
             return f"{color}{message}{reset}{line_end}"
-
-    def set_colors(self, color_dic: dict) -> None:
-        """
-        Set the colors for the error printer.
-
-        Parameters
-        color_dic (dict):
-            color dictionary containing all configured ANSI color values
-        """
-        StatusLogger.COLOR_DEBUG    = color_dic[CKW.DEBUG]
-        StatusLogger.COLOR_INFO     = color_dic[CKW.INFO]
-        StatusLogger.COLOR_WARNING  = color_dic[CKW.WARNING]
-        StatusLogger.COLOR_ERROR    = color_dic[CKW.ERROR]
-        StatusLogger.COLOR_CRITICAL = color_dic[CKW.CRITICAL]
-        StatusLogger.COLOR_RESET    = color_dic[CKW.RESET_ALL]
-        self.refresh_formatter()
-
-    def clear_colors(self) -> None:
-        """
-        Clear all colors (set to empty strings).
-        """
-        StatusLogger.COLOR_DEBUG    = ''
-        StatusLogger.COLOR_INFO     = ''
-        StatusLogger.COLOR_WARNING  = ''
-        StatusLogger.COLOR_ERROR    = ''
-        StatusLogger.COLOR_CRITICAL = ''
-        StatusLogger.COLOR_RESET    = ''
-        self.refresh_formatter()
 
     def __init__(self):
         self.log_to_file = False
         self.file_handle = None
+        self.colors = {
+            'debug'   : '',
+            'info'    : '',
+            'warning' : '',
+            'error'   : '',
+            'critical': '',
+            'reset'   : '',
+        }
         self.logger = logging.getLogger('cat_win.logger')
         self.logger.propagate = False
         self.logger.setLevel(self.INFO)
@@ -82,79 +55,103 @@ class StatusLogger: # TODO: fix this mess, should be a real logger
         self._reconfigure_handler()
 
     def get_color(self, priority: int) -> str:
+        """Get ANSI color code for logging level."""
         return {
-            self.DEBUG: self.COLOR_DEBUG,
-            self.INFO: self.COLOR_INFO,
-            self.WARNING: self.COLOR_WARNING,
-            self.ERROR: self.COLOR_ERROR,
-            self.CRITICAL: self.COLOR_CRITICAL,
+            self.DEBUG:    self.colors['debug'],
+            self.INFO:     self.colors['info'],
+            self.WARNING:  self.colors['warning'],
+            self.ERROR:    self.colors['error'],
+            self.CRITICAL: self.colors['critical'],
         }.get(priority, '')
 
+    def set_colors(self, color_dic: dict) -> None:
+        """Set ANSI colors for different log levels from color dictionary."""
+        self.colors['debug']    = color_dic[CKW.DEBUG]
+        self.colors['info']     = color_dic[CKW.INFO]
+        self.colors['warning']  = color_dic[CKW.WARNING]
+        self.colors['error']    = color_dic[CKW.ERROR]
+        self.colors['critical'] = color_dic[CKW.CRITICAL]
+        self.colors['reset']    = color_dic[CKW.RESET_ALL]
+        self.refresh_formatter()
+
+    def clear_colors(self) -> None:
+        """Clear all ANSI colors (set to empty strings)."""
+        self.colors = dict.fromkeys(self.colors, '')
+        self.refresh_formatter()
+
     def refresh_formatter(self) -> None:
+        """Update the formatter on the current handler."""
         if self.handler is not None:
             self.handler.setFormatter(self._Formatter(self))
 
+    def _close_handler(self) -> None:
+        """Close and remove the current handler."""
+        if self.handler is None:
+            return
+        self.logger.removeHandler(self.handler)
+        if isinstance(self.handler, logging.FileHandler):
+            self.handler.close()
+        else:
+            self.handler.flush()
+        if self.file_handle is not None:
+            self.file_handle.close()
+            self.file_handle = None
+        self.handler = None
+
     def _reconfigure_handler(self) -> None:
-        if self.handler is not None:
-            self.logger.removeHandler(self.handler)
-            if isinstance(self.handler, logging.FileHandler):
-                self.handler.close()
+        """Reconfigure the logging handler."""
+        self._close_handler()
 
         if self.log_to_file:
             log_file = Path(os.path.join(os.getcwd(), 'catw_debug.log'))
-            self.handler = logging.FileHandler(
-                log_file, mode='a', encoding='utf-8', errors='replace'
-            )
+            try:
+                self.handler = logging.FileHandler(
+                    log_file, mode='a', encoding='utf-8', errors='replace'
+                )
+            except TypeError:
+                # Python < 3.9 does not support the `errors` argument
+                self.file_handle = open(
+                    log_file, mode='a', encoding='utf-8', errors='replace'
+                )
+                self.handler = logging.StreamHandler(self.file_handle)
         else:
             self.handler = logging.StreamHandler(sys.stderr)
+
         self.handler.terminator = ''
         self.refresh_formatter()
         self.logger.addHandler(self.handler)
 
     def set_level(self, priority: int) -> None:
-        """Set the minimum logging level used by the error printer."""
+        """Set the minimum logging level."""
         self.logger.setLevel(priority)
 
     def set_log_to_file(self, log_to_file: bool = True) -> None:
-        """
-        Set the logging mode to use a file or stderr.
-
-        Parameters:
-        log_to_file (bool):
-            if True, log to file; if False, log to stderr
-        """
+        """Set logging destination: file (True) or stderr (False)."""
         self.log_to_file = log_to_file
         self._reconfigure_handler()
 
-    def __call__(self, *args, priority: int = ERROR, **kwargs) -> None:
-        """
-        print to stderr.
-        """
+    def __call__(self, *args, **kwargs) -> None:
+        """Log a message (callable interface mimicking print)."""
+        priority = kwargs.pop('priority', self.ERROR)
         sep = kwargs.pop('sep', ' ')
         end = kwargs.pop('end', '\n')
         kwargs.pop('file', None)
         kwargs.pop('flush', None)
+
         if kwargs:
             raise TypeError(f"Unsupported keyword arguments: {', '.join(kwargs.keys())}")
+
         message = sep.join(str(arg) for arg in args)
         self.logger.log(priority, message, extra={'line_end': end})
 
     def close(self) -> None:
-        """
-        Close the file handle if logging to a file.
-        """
-        if self.handler is None:
-            return
-        if isinstance(self.handler, logging.FileHandler):
-            self.logger.removeHandler(self.handler)
-            self.handler.close()
-            self.log_to_file = False
-            self.handler = None
-            self._reconfigure_handler()
-            return
-        self.handler.flush()
+        """Close the logging handler and clean up resources."""
+        self._close_handler()
+        self.log_to_file = False
+        self._reconfigure_handler()
 
     def __del__(self) -> None:
+        """Ensure cleanup when object is garbage collected."""
         self.close()
 
 logger = StatusLogger()

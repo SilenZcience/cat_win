@@ -26,8 +26,8 @@ class TestStdInHelper(TestCase):
     def test_status_logger_formatter_and_get_color(self):
         sl = StatusLogger()
         try:
-            sl.COLOR_INFO = '[I]'
-            sl.COLOR_RESET = '[/]'
+            sl.colors['info'] = '[I]'
+            sl.colors['reset'] = '[/]'
             formatter = sl._Formatter(sl)
             record = logging.LogRecord('cat_win', logging.INFO, __file__, 1, 'msg', (), None)
             record.line_end = ''
@@ -50,22 +50,22 @@ class TestStdInHelper(TestCase):
             }
             with patch.object(sl, 'refresh_formatter') as mock_refresh:
                 sl.set_colors(color_dic)
-                self.assertEqual(StatusLogger.COLOR_DEBUG, 'd')
-                self.assertEqual(StatusLogger.COLOR_INFO, 'i')
-                self.assertEqual(StatusLogger.COLOR_WARNING, 'w')
-                self.assertEqual(StatusLogger.COLOR_ERROR, 'e')
-                self.assertEqual(StatusLogger.COLOR_CRITICAL, 'c')
-                self.assertEqual(StatusLogger.COLOR_RESET, 'r')
+                self.assertEqual(sl.colors['debug'], 'd')
+                self.assertEqual(sl.colors['info'], 'i')
+                self.assertEqual(sl.colors['warning'], 'w')
+                self.assertEqual(sl.colors['error'], 'e')
+                self.assertEqual(sl.colors['critical'], 'c')
+                self.assertEqual(sl.colors['reset'], 'r')
                 mock_refresh.assert_called_once_with()
 
             with patch.object(sl, 'refresh_formatter') as mock_refresh:
                 sl.clear_colors()
-                self.assertEqual(StatusLogger.COLOR_DEBUG, '')
-                self.assertEqual(StatusLogger.COLOR_INFO, '')
-                self.assertEqual(StatusLogger.COLOR_WARNING, '')
-                self.assertEqual(StatusLogger.COLOR_ERROR, '')
-                self.assertEqual(StatusLogger.COLOR_CRITICAL, '')
-                self.assertEqual(StatusLogger.COLOR_RESET, '')
+                self.assertEqual(sl.colors['debug'], '')
+                self.assertEqual(sl.colors['info'], '')
+                self.assertEqual(sl.colors['warning'], '')
+                self.assertEqual(sl.colors['error'], '')
+                self.assertEqual(sl.colors['critical'], '')
+                self.assertEqual(sl.colors['reset'], '')
                 mock_refresh.assert_called_once_with()
         finally:
             sl.close()
