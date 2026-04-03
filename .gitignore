@@ -73,6 +73,7 @@ reports/
 
 # development files
 debug/*
-debug.*
-debug_*
+debug*
 .dev*
+
+*.log
