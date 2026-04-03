@@ -130,7 +130,7 @@ def _resolve_unknown_files(ctx) -> None:
 def preprocess_context(ctx) -> None:
     """Parse CLI input and store all derived runtime values into AppContext."""
     args, unknown_args, echo_args = ctx.arg_parser.get_arguments(
-        sys.argv[:] + ctx.config.get_cmd()
+        ctx.config.get_cmd()
     )
     ctx.args = args
     ctx.unknown_args = unknown_args

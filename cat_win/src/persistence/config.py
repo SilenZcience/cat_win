@@ -202,7 +202,11 @@ class Config:
         (list):
             the default command line splitted using shell like syntax
         """
-        return shlex.split(self.const_dic.get(DKW.DEFAULT_COMMAND_LINE, ''))
+        argv = sys.argv[:]
+        argv = argv[:1] + shlex.split(
+            self.const_dic.get(DKW.DEFAULT_COMMAND_LINE, '')
+        ) + argv[1:]
+        return argv
 
     def load_config(self) -> dict:
         """

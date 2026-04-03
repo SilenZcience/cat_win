@@ -200,7 +200,11 @@ class TestConfig(TestCase):
     def test_get_cmd(self):
         config_ = Config()
         config_.const_dic[DKW.DEFAULT_COMMAND_LINE] = '-nl "find= "'
-        self.assertListEqual(config_.get_cmd(), ['-nl', 'find= '])
+        with patch('sys.argv', ['cat_win', '--existing', 'arg']):
+            self.assertListEqual(
+                config_.get_cmd(),
+                ['cat_win', '-nl', 'find= ', '--existing', 'arg']
+            )
 
     def test__print_all_available_elements(self):
         config_ = Config()
