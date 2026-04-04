@@ -1477,8 +1477,9 @@ class HexEditor:
             curses.start_color()
         finally:
             if curses.can_change_color():
-                if os.isatty(sys.stdout.fileno()):
+                if not on_windows_os:
                     curses.use_default_colors()
+                bg_color = -1
                 # status_bar
                 curses.init_pair(1 , curses.COLOR_BLACK  , curses.COLOR_WHITE )
                 # error_bar
@@ -1487,8 +1488,19 @@ class HexEditor:
                 curses.init_pair(3 , curses.COLOR_WHITE  , curses.COLOR_RED   )
                 # selected byte
                 curses.init_pair(4 , curses.COLOR_BLACK  , curses.COLOR_WHITE )
-                # edited byte
-                curses.init_pair(5 , curses.COLOR_RED    , -1                 )
+                try:
+                    # edited byte
+                    curses.init_pair(5 , curses.COLOR_RED, bg_color           )
+                except curses.error:
+                    logger(
+                        'Your terminal does not support default background color. '
+                        'Syntax highlighting might look weird. '
+                        'Consider switching to a different terminal or adjusting its settings.',
+                        priority=logger.DEBUG
+                    )
+                    bg_color = curses.COLOR_BLACK
+                    # edited byte
+                    curses.init_pair(5 , curses.COLOR_RED, bg_color           )
                 # selected and edited byte
                 curses.init_pair(6 , curses.COLOR_RED    , curses.COLOR_WHITE )
                 # selected area
@@ -1502,7 +1514,7 @@ class HexEditor:
                 # file-selector, active file
                 curses.init_pair(11, curses.COLOR_MAGENTA, curses.COLOR_WHITE )
                 # file-selector, active file selected
-                curses.init_pair(12, curses.COLOR_MAGENTA, -1                 )
+                curses.init_pair(12, curses.COLOR_MAGENTA, bg_color           )
         curses.raw()
         self.curse_window.nodelay(False)
 

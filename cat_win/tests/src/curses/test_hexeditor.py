@@ -1459,7 +1459,7 @@ class TestHexEditor(TestCase):
         editor.curse_window = MagicMock()
 
         with patch('cat_win.src.curses.hexeditor.sys.version_info', (3, 8, 0)):
-            with patch('cat_win.src.curses.hexeditor.os.isatty', return_value=True):
+            with patch('cat_win.src.curses.hexeditor.on_windows_os', False):
                 editor._init_screen()
         self.assertTrue(mm.use_default_colors.called)
 
