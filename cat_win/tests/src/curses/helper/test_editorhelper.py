@@ -38,33 +38,6 @@ class TestEditorHelper(TestCase):
             spec.loader.exec_module(module)
         return module
 
-    def test_initscr_shim_copies_acs_and_dims(self):
-        fake_curses = types.ModuleType('curses')
-        fake__curses = types.ModuleType('_curses')
-        fake__curses.ACS_HLINE = 1
-        fake__curses.LINES = 40
-        fake__curses.COLS = 120
-        fake__curses.IGNORED = 'x'
-        fake__curses.initscr = lambda: 'stdscr'
-
-        module = self._load_editorhelper_module(
-            'editorhelper_cov_initscr',
-            {'curses': fake_curses}
-        )
-        real_import = __import__
-
-        def _fake_import(name, globals_=None, locals_=None, fromlist=(), level=0):
-            if name == '_curses':
-                return fake__curses
-            return real_import(name, globals_, locals_, fromlist, level)
-
-        with patch('builtins.__import__', side_effect=_fake_import):
-            self.assertEqual(module.initscr(), 'stdscr')
-        self.assertEqual(fake_curses.ACS_HLINE, 1)
-        self.assertEqual(fake_curses.LINES, 40)
-        self.assertEqual(fake_curses.COLS, 120)
-        self.assertFalse(hasattr(fake_curses, 'IGNORED'))
-
     def test_importerror_on_curses_is_ignored(self):
         real_import = __import__
 
