@@ -601,7 +601,7 @@ class DiffViewer:
         self.curse_window.clear()
         return True
 
-    def _action_file_selection(self) -> bool:
+    def _action_file_selection(self) -> bool: # TODO: extract this logic into helper (DRY) and make this a real file manager at this point, with going back and forth "..(cd)", include mouse logic
         """
         handles the file selection action.
 
@@ -1405,8 +1405,9 @@ class DiffViewer:
             curses.start_color()
         finally:
             if curses.can_change_color():
-                if os.isatty(sys.stdout.fileno()):
+                if not on_windows_os:
                     curses.use_default_colors()
+                bg_color = -1
                 # status_bar
                 curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
                 # error_bar
@@ -1431,10 +1432,21 @@ class DiffViewer:
                         curses.init_pair(6, curses.COLOR_BLACK, curses.COLOR_RED)
                 else:
                     curses.init_pair(6, curses.COLOR_BLACK, curses.COLOR_RED)
-                # default color
-                curses.init_pair(7, curses.COLOR_WHITE  , -1)
+                try:
+                    # default color
+                    curses.init_pair(7, curses.COLOR_WHITE  , bg_color)
+                except curses.error:
+                    logger(
+                        'Your terminal does not support default background color. '
+                        'Syntax highlighting might look weird. '
+                        'Consider switching to a different terminal or adjusting its settings.',
+                        priority=logger.DEBUG
+                    )
+                    bg_color = curses.COLOR_BLACK
+                    # default color
+                    curses.init_pair(7, curses.COLOR_WHITE  , bg_color)
                 # lineno color & file-selector, active file selected
-                curses.init_pair(8, curses.COLOR_MAGENTA, -1)
+                curses.init_pair(8, curses.COLOR_MAGENTA, bg_color)
                 # gray background
                 if curses.COLORS >= 16:
                     try:

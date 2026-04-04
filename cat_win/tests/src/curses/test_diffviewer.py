@@ -962,7 +962,7 @@ class TestDiffViewer(TestCase):
             return None
 
         mm.init_pair = MagicMock(side_effect=init_pair_side_effect)
-        with patch('cat_win.src.curses.diffviewer.os.isatty', return_value=True):
+        with patch('cat_win.src.curses.diffviewer.on_windows_os', False):
             di._init_screen()
         self.assertTrue(mm.use_default_colors.called)
 

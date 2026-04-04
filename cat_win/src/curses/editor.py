@@ -1941,7 +1941,10 @@ class Editor:
                     cur_char = '�'
                     color = self._get_color(3)
 
-                self.curse_window.addstr(row, col, cur_char, color)
+                try:
+                    self.curse_window.addstr(row, col, cur_char, color)
+                except curses.error:
+                    self.curse_window.addch(row, col, ord(cur_char), self._get_color(3))
 
             self.curse_window.clrtoeol()
             self.curse_window.move(row+1, 0)
@@ -2116,16 +2119,21 @@ class Editor:
 
     def _init_highlighter_colors(self) -> None:
         if curses.can_change_color():
-            # syntax-highlight keyword
-            curses.init_pair(200, curses.COLOR_CYAN   , -1)
+            bg_color = -1
+            try:
+                # syntax-highlight keyword
+                curses.init_pair(200, curses.COLOR_CYAN, bg_color)
+            except curses.error:
+                bg_color = curses.COLOR_BLACK
+                curses.init_pair(200, curses.COLOR_CYAN, bg_color)
             # syntax-highlight string
-            curses.init_pair(201, curses.COLOR_GREEN  , -1)
+            curses.init_pair(201, curses.COLOR_GREEN   , bg_color)
             # syntax-highlight number
-            curses.init_pair(202, curses.COLOR_RED+8  , -1)
+            curses.init_pair(202, curses.COLOR_RED+8   , bg_color)
             # syntax-highlight comment
-            curses.init_pair(203, curses.COLOR_BLACK+8, -1)
+            curses.init_pair(203, curses.COLOR_BLACK+8 , bg_color)
             # syntax-highlight builtin
-            curses.init_pair(204, curses.COLOR_BLUE   , -1)
+            curses.init_pair(204, curses.COLOR_BLUE    , bg_color)
             if self._syntax_highlighter and self._syntax_highlighter.token_color_map:
                 new_color_id = max(self._SYNTAX_COLOR_IDS.values(), default=204) + 1
                 for token_type, color in self._syntax_highlighter.token_color_map.items():
@@ -2177,8 +2185,9 @@ class Editor:
             curses.start_color()
         finally:
             if curses.can_change_color():
-                if os.isatty(sys.stdout.fileno()):
+                if not on_windows_os:
                     curses.use_default_colors()
+                bg_color = -1
                 # status_bar
                 curses.init_pair(1 , curses.COLOR_BLACK  , curses.COLOR_WHITE )
                 # error_bar
@@ -2195,10 +2204,21 @@ class Editor:
                 curses.init_pair(7 , curses.COLOR_GREEN  , curses.COLOR_WHITE )
                 # file-selector, active file
                 curses.init_pair(8 , curses.COLOR_MAGENTA, curses.COLOR_WHITE )
-                # file-selector, active file selected
-                curses.init_pair(9 , curses.COLOR_MAGENTA, -1                 )
+                try:
+                    # file-selector, active file selected
+                    curses.init_pair(9 , curses.COLOR_MAGENTA, bg_color       )
+                except curses.error:
+                    logger(
+                        'Your terminal does not support default background color. '
+                        'Syntax highlighting might look weird. '
+                        'Consider switching to a different terminal or adjusting its settings.',
+                        priority=logger.DEBUG
+                    )
+                    bg_color = curses.COLOR_BLACK
+                    # file-selector, active file selected
+                    curses.init_pair(9 , curses.COLOR_MAGENTA, bg_color       )
                 # ~ characters to indicate lines after the end of the file
-                curses.init_pair(10, curses.COLOR_BLUE   , -1                 )
+                curses.init_pair(10, curses.COLOR_BLUE       , bg_color       )
         curses.raw()
         self.curse_window.nodelay(False)
 
