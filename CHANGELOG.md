@@ -32,9 +32,12 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Bugfixes
 
 - fixed Bug where the diffviewer would crash on empty files.
-- fixed bug where the the diffviewer would not correctly open the next selected file/hash.
-- fixed bug where the diffviewer would not correctly jump to the next diff when pressing `F2`.
+- fixed Bug where the the diffviewer would not correctly open the next selected file/hash.
+- fixed Bug where the diffviewer would not correctly jump to the next diff when pressing `F2`.
+- fixed Bug where the editor would crash on certain special characters.
+- fixed Bug where the editor would crash on linux when undoing certain actions.
 - fixed visual Bugs in the curses applications.
+- fixed Bug where the curses application would not work as expected when the std-streams were redirected.
 - fixed Bug in the cat-repl (cats) that would crash the application when using `!del` on an unknown search query.
 - fixed Bug where -`G`, --`GREP` would display the wrong output on previously colored lines.
 - fixed unexpected behaviour when using the echo argument -`E` within an argument chain.
