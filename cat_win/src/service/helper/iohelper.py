@@ -538,13 +538,27 @@ class IoHelper:
         try:
             if replace_stdin:
                 stdin_backup = os.dup(sys.stdin.fileno())
-                ttyin = os.open('CONIN$' if on_windows_os else '/dev/tty', os.O_RDONLY)
-                os.dup2(ttyin, sys.stdin.fileno())
+                try:
+                    ttyin = os.open('CONIN$' if on_windows_os else '/dev/tty', os.O_RDONLY)
+                    os.dup2(ttyin, sys.stdin.fileno())
+                except OSError:
+                    # No interactive TTY is available (e.g. CI); keep original stdin.
+                    os.close(stdin_backup)
+                    stdin_backup = None
+                    ttyin = None
+                    replace_stdin = False
 
             if replace_stdout:
                 stdout_backup = os.dup(sys.stdout.fileno())
-                ttyout = os.open('CONOUT$' if on_windows_os else '/dev/tty', os.O_WRONLY)
-                os.dup2(ttyout, sys.stdout.fileno())
+                try:
+                    ttyout = os.open('CONOUT$' if on_windows_os else '/dev/tty', os.O_WRONLY)
+                    os.dup2(ttyout, sys.stdout.fileno())
+                except OSError:
+                    # No interactive TTY is available (e.g. CI); keep original stdout.
+                    os.close(stdout_backup)
+                    stdout_backup = None
+                    ttyout = None
+                    replace_stdout = False
 
             if replace_stdin and getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS') and on_windows_os:
                 # for pyinstaller:
