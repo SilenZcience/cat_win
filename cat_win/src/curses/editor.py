@@ -291,7 +291,7 @@ class Editor:
             self.window_content[self.cpos.row] += line
             self.unsaved_progress = True
             self.deleted_line = True
-            return wchars
+            return '\n'
         return None
 
     def _key_ctl_backspace(self, _) -> str:
@@ -1941,7 +1941,7 @@ class Editor:
                     cur_char = '�'
                     color = self._get_color(3)
 
-                self.curse_window.addch(row, col, cur_char, color)
+                self.curse_window.addstr(row, col, cur_char, color)
 
             self.curse_window.clrtoeol()
             self.curse_window.move(row+1, 0)
