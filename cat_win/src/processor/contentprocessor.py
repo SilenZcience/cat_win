@@ -353,7 +353,7 @@ def edit_content(file_index: int, line_offset: int, ctx) -> None:
         ctx.u_files[file_index].set_contains_queried(found_queried)
 
     if ctx.u_args[ARGS_MORE]:
-        stepper.step_through(ctx.u_args[ARGS_STDIN])
+        stepper.step_through()
 
     if ctx.u_args[ARGS_CLIP]:
         Clipboard.clipboard += '\n'.join(

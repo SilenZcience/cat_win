@@ -178,7 +178,7 @@ class TestOutputProcessor(TestCase):
             with patch('cat_win.src.processor.outputprocessor.replace_queries_in_line', return_value=('abc', 'abc')):
                 with patch('cat_win.src.processor.outputprocessor._build_ansi_restore', return_value=({}, set())):
                     with patch('cat_win.src.processor.outputprocessor._map_display_pos', side_effect=lambda line, pos: pos):
-                        with patch('cat_win.src.processor.outputprocessor.IoHelper.dup_stdin', _noop_cm):
+                        with patch('cat_win.src.processor.outputprocessor.IoHelper.dup_stdstreams', _noop_cm):
                             with patch('cat_win.src.processor.outputprocessor.input', side_effect=EOFError()) as inp:
                                 with patch('cat_win.src.processor.outputprocessor.print') as p:
                                     found = op.print_file(ctx, StepperStub(), 0)
@@ -274,7 +274,7 @@ class TestOutputProcessor(TestCase):
         )
         with patch('cat_win.src.processor.outputprocessor.QueryManager', return_value=qm):
             with patch('cat_win.src.processor.outputprocessor.replace_queries_in_line', return_value=('abc', 'abc')):
-                with patch('cat_win.src.processor.outputprocessor.IoHelper.dup_stdin', _noop_cm):
+                with patch('cat_win.src.processor.outputprocessor.IoHelper.dup_stdstreams', _noop_cm):
                     with patch('cat_win.src.processor.outputprocessor.input', side_effect=UnicodeDecodeError('utf-8', b'', 0, 1, 'x')):
                         with patch('cat_win.src.processor.outputprocessor.print') as p:
                             op.print_file(ctx, StepperStub(), 0)

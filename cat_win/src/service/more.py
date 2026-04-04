@@ -267,13 +267,9 @@ class More:
             line_index += 1
             i_length = self._build_file_upto(line_index+max(More.t_height, step_length))
 
-    def step_through(self, dup_needed: bool = False) -> None:
+    def step_through(self) -> None:
         """
         step through the lines and wait for user input.
-
-        Parameters:
-        dup_needed (bool):
-            indicates if the stdin-dup is needed
         """
         if not os.isatty(sys.stdout.fileno()):
             print(*self.lines, sep='\n')
@@ -282,5 +278,5 @@ class More:
         # in case the terminal size is used
         More.set_flags(More.step_length)
 
-        with IoHelper.dup_stdin(dup_needed):
+        with IoHelper.dup_stdstreams():
             self._step_through()
