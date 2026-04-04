@@ -304,7 +304,7 @@ def print_file(ctx, stepper, excluded_by_peek: int) -> bool:
             found_sth = True
 
         if found_sth and not u_args[ARGS_MORE]:
-            with IoHelper.dup_stdin(u_args[ARGS_STDIN]):
+            with IoHelper.dup_stdstreams():
                 try:
                     # fails when using --stdin mode because stdin sends EOF without
                     # prompting the user → dup stdin guards against that

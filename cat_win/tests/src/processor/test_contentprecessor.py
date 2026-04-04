@@ -195,7 +195,7 @@ class TestContentPrecessor(TestCase):
         ctx.known_files = ['k1']
         ctx.u_args[ARGS_EDITOR] = True
         with patch('cat_win.src.processor.contentprecessor.Editor.open') as eo:
-            with patch('cat_win.src.processor.contentprecessor.IoHelper.dup_stdin', _noop_cm):
+            with patch('cat_win.src.processor.contentprecessor.IoHelper.dup_stdstreams', _noop_cm):
                 handled = pre._open_editors(ctx)
         self.assertTrue(handled)
         self.assertEqual(eo.call_count, 2)
@@ -206,7 +206,7 @@ class TestContentPrecessor(TestCase):
         ctx2.u_args.find_first = MagicMock(side_effect=[None, (ARGS_HEX_EDITOR, True)])
         with patch('cat_win.src.processor.contentprecessor.Editor.open'):
             with patch('cat_win.src.processor.contentprecessor.HexEditor.open') as ho:
-                with patch('cat_win.src.processor.contentprecessor.IoHelper.dup_stdin', _noop_cm):
+                with patch('cat_win.src.processor.contentprecessor.IoHelper.dup_stdstreams', _noop_cm):
                     handled = pre._open_editors(ctx2)
         self.assertTrue(handled)
         self.assertEqual(ho.call_count, 2)
@@ -215,7 +215,7 @@ class TestContentPrecessor(TestCase):
         ctx = self._ctx()
         self.assertFalse(pre._open_diff_view(ctx))
         ctx.known_files = ['k1']
-        with patch('cat_win.src.processor.contentprecessor.IoHelper.dup_stdin', _noop_cm):
+        with patch('cat_win.src.processor.contentprecessor.IoHelper.dup_stdstreams', _noop_cm):
             with patch('cat_win.src.processor.contentprecessor.DiffViewer.open') as dv:
                 self.assertTrue(pre._open_diff_view(ctx))
         dv.assert_called_once()

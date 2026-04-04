@@ -515,26 +515,41 @@ class IoHelper:
 
     @staticmethod
     @contextlib.contextmanager
-    def dup_stdin(dup: bool = True):
+    def dup_stdstreams():
         """
-        dup the stdin so the user can interact while also piping into cat.
+        dup the std streams so the user can interact while also piping into cat.
+        """
+        replace_stdin = False
+        replace_stdout = False
+        stdin_backup = None
+        stdout_backup = None
+        ttyin = None
+        ttyout = None
 
-        Parameters:
-        dup (bool):
-            if this is false the function will not do anything.
-            only implemented to eliminate repeated code somewhere else
-        """
-        if not dup:
-            yield
-            return
-        stdin_backup = os.dup(sys.stdin.fileno())
         try:
-            tty = os.open('CONIN$' if on_windows_os else '/dev/tty', os.O_RDONLY)
-            os.dup2(tty, sys.stdin.fileno())
-            if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS') and on_windows_os:
+            replace_stdin = not os.isatty(sys.stdin.fileno())
+        except (OSError, ValueError):
+            replace_stdin = False
+        try:
+            replace_stdout = not os.isatty(sys.stdout.fileno())
+        except (OSError, ValueError):
+            replace_stdout = False
+
+        try:
+            if replace_stdin:
+                stdin_backup = os.dup(sys.stdin.fileno())
+                ttyin = os.open('CONIN$' if on_windows_os else '/dev/tty', os.O_RDONLY)
+                os.dup2(ttyin, sys.stdin.fileno())
+
+            if replace_stdout:
+                stdout_backup = os.dup(sys.stdout.fileno())
+                ttyout = os.open('CONOUT$' if on_windows_os else '/dev/tty', os.O_WRONLY)
+                os.dup2(ttyout, sys.stdout.fileno())
+
+            if replace_stdin and getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS') and on_windows_os:
                 # for pyinstaller:
-    # stdin, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
-    # None security, OPEN_EXISTING, 0 flags, None template
+                # stdin, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+                # None security, OPEN_EXISTING, 0 flags, None template
                 conin_handle = ctypes.windll.kernel32.CreateFileW(
                     "CONIN$", 0x80000000, 3, None, 3, 0, None
                 ) # os.dup2 does not work on pyinstaller
@@ -543,4 +558,17 @@ class IoHelper:
                 # without user interaction being recognized
             yield
         finally:
-            os.dup2(stdin_backup, sys.stdin.fileno())
+            if stdin_backup is not None:
+                try:
+                    os.dup2(stdin_backup, sys.stdin.fileno())
+                finally:
+                    os.close(stdin_backup)
+            if stdout_backup is not None:
+                try:
+                    os.dup2(stdout_backup, sys.stdout.fileno())
+                finally:
+                    os.close(stdout_backup)
+            if ttyin is not None:
+                os.close(ttyin)
+            if ttyout is not None:
+                os.close(ttyout)

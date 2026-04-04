@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 import inspect
 import io
 import logging
@@ -404,33 +404,47 @@ class TestStdInHelper(TestCase):
         mock_write.assert_called_once_with(['f1'], 'ab', 'utf-8')
         self.assertIn('The given FILE(s)', logger_stub.output())
 
-    def test_dup_stdin_internal_paths(self):
-        with patch('cat_win.src.service.helper.iohelper.os.dup', return_value=11) as mock_dup:
-            with patch('cat_win.src.service.helper.iohelper.os.open', return_value=22) as mock_open:
-                with patch('cat_win.src.service.helper.iohelper.os.dup2') as mock_dup2:
-                    with IoHelper.dup_stdin(True):
-                        pass
+    def test_dup_stdstreams_internal_paths(self):
+        with patch('cat_win.src.service.helper.iohelper.os.isatty', return_value=False):
+            with patch('cat_win.src.service.helper.iohelper.os.dup', side_effect=[11, 12]) as mock_dup:
+                with patch('cat_win.src.service.helper.iohelper.os.open', side_effect=[21, 22]) as mock_open:
+                    with patch('cat_win.src.service.helper.iohelper.os.dup2') as mock_dup2:
+                        with patch('cat_win.src.service.helper.iohelper.os.close'):
+                            with IoHelper.dup_stdstreams():
+                                pass
 
-        mock_dup.assert_called_once()
+        self.assertEqual(mock_dup.call_count, 2)
         self.assertTrue(mock_open.called)
         self.assertGreaterEqual(mock_dup2.call_count, 2)
 
-    def test_dup_stdin_pyinstaller_windows_branch(self):
+    def test_dup_stdstreams_pyinstaller_windows_branch(self):
         fake_kernel = SimpleNamespace()
-        fake_kernel.CreateFileW = lambda *args: 123
-        fake_kernel.SetStdHandle = lambda *_args: 1
+        fake_kernel.CreateFileW = Mock(return_value=123)
+        fake_kernel.SetStdHandle = Mock(return_value=1)
         fake_ctypes = SimpleNamespace(windll=SimpleNamespace(kernel32=fake_kernel))
 
         with patch('cat_win.src.service.helper.iohelper.on_windows_os', True):
             with patch('cat_win.src.service.helper.iohelper.ctypes', fake_ctypes):
                 with patch('cat_win.src.service.helper.iohelper.getattr', side_effect=lambda obj, name, default=None: True if name == 'frozen' else getattr(obj, name, default)):
                     with patch('cat_win.src.service.helper.iohelper.hasattr', return_value=True):
-                        with patch('cat_win.src.service.helper.iohelper.os.dup', return_value=11):
-                            with patch('cat_win.src.service.helper.iohelper.os.open', return_value=22):
-                                with patch('cat_win.src.service.helper.iohelper.os.dup2'):
-                                    with IoHelper.dup_stdin(True):
-                                        pass
+                        with patch('cat_win.src.service.helper.iohelper.os.isatty', side_effect=[False, True]):
+                            with patch('cat_win.src.service.helper.iohelper.os.dup', return_value=11):
+                                with patch('cat_win.src.service.helper.iohelper.os.open', return_value=22):
+                                    with patch('cat_win.src.service.helper.iohelper.os.dup2'):
+                                        with patch('cat_win.src.service.helper.iohelper.os.close'):
+                                            with IoHelper.dup_stdstreams():
+                                                pass
 
-    def test_dup_stdin_do_not_dup(self):
-        with IoHelper.dup_stdin(False) as dup:
-            self.assertEqual(dup, None)
+        fake_kernel.SetStdHandle.assert_called_once_with(-10, 123)
+
+    def test_dup_stdstreams_do_not_dup(self):
+        with patch('cat_win.src.service.helper.iohelper.os.isatty', return_value=True):
+            with patch('cat_win.src.service.helper.iohelper.os.dup') as mock_dup:
+                with patch('cat_win.src.service.helper.iohelper.os.open') as mock_open:
+                    with patch('cat_win.src.service.helper.iohelper.os.dup2') as mock_dup2:
+                        with IoHelper.dup_stdstreams() as dup:
+                            self.assertEqual(dup, None)
+
+        mock_dup.assert_not_called()
+        mock_open.assert_not_called()
+        mock_dup2.assert_not_called()

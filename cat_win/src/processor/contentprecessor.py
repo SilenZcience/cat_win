@@ -161,12 +161,13 @@ def materialize_context_sources(ctx, tmp_file_helper) -> None:
 def _open_editors(ctx) -> bool:
     if ctx.u_args.find_first(ARGS_EDITOR, ARGS_HEX_EDITOR, True) is not None:
         if not ctx.u_args[ARGS_STDIN] and ctx.unknown_files:
-            Editor.open(
-                [(f, ctx.u_files.get_file_display_name(f)) for f in ctx.unknown_files],
-                ctx.u_args[ARGS_PLAIN_ONLY],
-            )
+            with IoHelper.dup_stdstreams():
+                Editor.open(
+                    [(f, ctx.u_files.get_file_display_name(f)) for f in ctx.unknown_files],
+                    ctx.u_args[ARGS_PLAIN_ONLY],
+                )
         if ctx.known_files:
-            with IoHelper.dup_stdin(ctx.u_args[ARGS_STDIN]):
+            with IoHelper.dup_stdstreams():
                 Editor.open(
                     [(f, ctx.u_files.get_file_display_name(f)) for f in ctx.known_files],
                     ctx.u_args[ARGS_PLAIN_ONLY],
@@ -174,11 +175,12 @@ def _open_editors(ctx) -> bool:
         return bool(ctx.unknown_files or ctx.known_files)
     if ctx.u_args.find_first(ARGS_HEX_EDITOR, ARGS_EDITOR, True) is not None:
         if not ctx.u_args[ARGS_STDIN] and ctx.unknown_files:
-            HexEditor.open(
-                [(f, ctx.u_files.get_file_display_name(f)) for f in ctx.unknown_files]
-            )
+            with IoHelper.dup_stdstreams():
+                HexEditor.open(
+                    [(f, ctx.u_files.get_file_display_name(f)) for f in ctx.unknown_files]
+                )
         if ctx.known_files:
-            with IoHelper.dup_stdin(ctx.u_args[ARGS_STDIN]):
+            with IoHelper.dup_stdstreams():
                 HexEditor.open(
                     [(f, ctx.u_files.get_file_display_name(f)) for f in ctx.known_files]
                 )
@@ -190,7 +192,7 @@ def _open_editors(ctx) -> bool:
 def _open_diff_view(ctx) -> bool:
     if not ctx.known_files:
         return False
-    with IoHelper.dup_stdin(ctx.u_args[ARGS_STDIN]):
+    with IoHelper.dup_stdstreams():
         DiffViewer.open(
             [(f, ctx.u_files.get_file_display_name(f)) for f in ctx.known_files]
         )
@@ -243,7 +245,7 @@ def _page_files_lazily(ctx) -> bool:
             'ignore' if ctx.const_dic[DKW.IGNORE_UNKNOWN_BYTES] else 'replace',
         )
         try:
-            stepper.step_through(ctx.u_args[ARGS_STDIN])
+            stepper.step_through()
         except SystemExit:
             break
     return True
