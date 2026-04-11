@@ -39,12 +39,12 @@ jobs:
         run: |
           git config --global core.autocrlf true
       - name: Git Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: 'dev'
       - name: Install Python ${{ matrix.python-version }}
         id: python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
