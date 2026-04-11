@@ -15,16 +15,16 @@ import sys
 
 from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.const.regex import compile_re
-from cat_win.src.curses.helper.editorsearchhelper import _SearchIterBase, search_iter_factory
+from cat_win.src.curses.helper.diffviewerhelper import is_special_character
 from cat_win.src.curses.helper.editorhelper import History, Position, frepr, \
     UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, \
         SELECT_HOTKEYS, HISTORY_HOTKEYS, INDENT_HOTKEYS, FUNCTION_HOTKEYS, HEX_BYTE_KEYS
-from cat_win.src.curses.helper.diffviewerhelper import is_special_character
-from cat_win.src.service.helper.environment import on_windows_os
+from cat_win.src.curses.helper.editorsearchhelper import _SearchIterBase, search_iter_factory
 from cat_win.src.curses.helper.githelper import GitHelper
-from cat_win.src.service.helper.iohelper import IoHelper, logger
 from cat_win.src.curses.helper.syntaxhighlight import SyntaxHighlighter
 from cat_win.src.persistence.viewstate import save_view_state, get_view_state_time
+from cat_win.src.service.helper.environment import on_windows_os
+from cat_win.src.service.helper.iohelper import IoHelper, logger
 from cat_win.src.service.clipboard import Clipboard
 from cat_win.src.service.fileattributes import get_file_mtime
 from cat_win.src.service.rawviewer import SPECIAL_CHARS
@@ -1937,14 +1937,12 @@ class Editor:
                 if self.selecting and sel_from <= (brow, bcol) < sel_to:
                     color = self._get_color(5)
 
-                if is_special_character(cur_char):
-                    cur_char = '�'
-                    color = self._get_color(3)
-
                 try:
-                    self.curse_window.addstr(row, col, cur_char, color)
-                except curses.error:
-                    self.curse_window.addch(row, col, ord(cur_char), self._get_color(3))
+                    if is_special_character(cur_char):
+                        raise TypeError
+                    self.curse_window.addch(row, col, cur_char, color)
+                except TypeError:
+                    self.curse_window.addch(row, col, '�', self._get_color(3))
 
             self.curse_window.clrtoeol()
             self.curse_window.move(row+1, 0)
@@ -2148,7 +2146,7 @@ class Editor:
                     curses_color = getattr(curses, f'COLOR_{color.upper()}', None)
                     if curses_color is not None:
                         curses.init_pair(
-                            self._SYNTAX_COLOR_IDS[token_type], curses_color + color_offset, -1
+                            self._SYNTAX_COLOR_IDS[token_type], curses_color + color_offset, bg_color
                         )
 
     def _init_screen(self) -> None:
