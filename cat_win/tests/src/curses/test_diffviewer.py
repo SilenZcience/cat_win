@@ -335,7 +335,7 @@ class TestDiffViewer(TestCase):
         dv.diff_files = ['a.txt', 'a.txt']
         dv.display_names = ['A', 'A']
         dv._get_next_char = MagicMock(side_effect=[('', b'_move_key_down'), ('', b'_key_enter')])
-        with patch('cat_win.src.curses.diffviewer.GitHelper.get_git_file_history', return_value=None):
+        with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', return_value=None):
             keep_running = dv._action_file_selection()
         self.assertFalse(keep_running)
         self.assertEqual(dv.open_next_idxs, [1, 0])
@@ -353,7 +353,7 @@ class TestDiffViewer(TestCase):
             ('', b'_move_key_down'),
             ('', b'_key_enter'),
         ])
-        with patch('cat_win.src.curses.diffviewer.GitHelper.get_git_file_history', side_effect=[[commit_a], [commit_b]]):
+        with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', side_effect=[[commit_a], [commit_b]]):
             keep_running2 = dv2._action_file_selection()
         self.assertFalse(keep_running2)
         self.assertEqual(dv2.open_next_idxs, [0, 1])
@@ -371,7 +371,7 @@ class TestDiffViewer(TestCase):
             (ESC_CODE, b'_key_string'),
         ])
         commit = {'hash': 'aaaa1111', 'date': '2024-01-01', 'author': 'me', 'message': 'A'}
-        with patch('cat_win.src.curses.diffviewer.GitHelper.get_git_file_history', side_effect=[[commit], [commit]]):
+        with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', side_effect=[[commit], [commit]]):
             keep_running = dv._action_file_selection()
         self.assertTrue(keep_running)
 
@@ -564,7 +564,7 @@ class TestDiffViewer(TestCase):
             ('', b'_action_background'),
             (' ', b'_action_file_selection'),
         ])
-        with patch('cat_win.src.curses.diffviewer.GitHelper.get_git_file_history', return_value=None):
+        with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', return_value=None):
             keep_running = dv._action_file_selection()
         self.assertFalse(keep_running)
         self.assertTrue(dv._action_resize.called)
@@ -583,7 +583,7 @@ class TestDiffViewer(TestCase):
             return original_addstr(*args, **kwargs)
 
         dv2.curse_window.addstr = addstr_once_fail
-        with patch('cat_win.src.curses.diffviewer.GitHelper.get_git_file_history', return_value=None):
+        with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', return_value=None):
             self.assertTrue(dv2._action_file_selection())
 
     def test_function_help_overflow_and_overview_git_branches(self):
@@ -709,7 +709,7 @@ class TestDiffViewer(TestCase):
             ('', b'_move_key_left'),
             ('', b'_key_enter'),
         ])
-        with patch('cat_win.src.curses.diffviewer.GitHelper.get_git_file_history', side_effect=[[commit_x], [commit_y]]):
+        with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', side_effect=[[commit_x], [commit_y]]):
             keep_running = dv._action_file_selection()
         self.assertFalse(keep_running)
         self.assertIsNotNone(dv.open_next_idxs)
@@ -910,14 +910,14 @@ class TestDiffViewer(TestCase):
         dv3.files = [('a.txt', 'A'), ('b.txt', 'B')]
         dv3._get_next_char = MagicMock(side_effect=[('', b'_key_enter'), ('', b'_indent_tab'), ('', b'_move_key_up'), (ESC_CODE, b'_key_string'), (ESC_CODE, b'_key_string')])
         c = {'hash': 'h', 'date': '2024', 'author': 'u', 'message': 'm'}
-        with patch('cat_win.src.curses.diffviewer.GitHelper.get_git_file_history', side_effect=[[c], None]):
+        with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', side_effect=[[c], None]):
             self.assertTrue(dv3._action_file_selection())
 
         dv4 = self._mk_viewer()
         dv4.files = [('a.txt', 'A'), ('b.txt', 'B')]
         dv4._get_next_char = MagicMock(side_effect=[('', b'_key_enter')])
-        with patch('cat_win.src.curses.diffviewer.GitHelper.get_git_file_history', side_effect=OSError('git')):
-            self.assertFalse(dv4._action_file_selection())
+        with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', side_effect=OSError('git')):
+            self.assertTrue(dv4._action_file_selection())
 
         dv5 = self._mk_viewer()
         dv5.file_commit_hashes = ('1234567', {'hash': 'abcdef0', 'date': '2024-01-01 00:00:00', 'author': 'u', 'message': 'm'})

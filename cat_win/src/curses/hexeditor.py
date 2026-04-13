@@ -19,6 +19,7 @@ from cat_win.src.curses.helper.editorhelper import Position, frepr, \
     UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, SELECT_HOTKEYS, \
         FUNCTION_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.service.helper.environment import on_windows_os
+from cat_win.src.curses.helper.fileselectionhelper import run_file_selection
 from cat_win.src.curses.helper.githelper import GitHelper
 from cat_win.src.persistence.viewstate import save_view_state, get_view_state_time
 from cat_win.src.service.helper.iohelper import IoHelper, logger
@@ -923,208 +924,16 @@ class HexEditor:
         (bool):
             indicates if the editor should keep running
         """
-
-        curses.curs_set(0)
-        self.curse_window.clear()
-
-        def _find_current_idx(target_file: Path, target_display: str) -> int:
-            try:
-                return self.files.index((target_file, target_display))
-            except ValueError:
-                for idx, (file_path, _) in enumerate(self.files):
-                    if file_path == target_file:
-                        return idx
-            return 0
-
-        selected_idx = _find_current_idx(self.file, self.display_name)
-
-        max_y, max_x = self.getxymax()
-        max_y += self.status_bar_size + 1
-        nav_x, nav_y = 0, max(0, min(selected_idx - max_y // 2, len(self.files) - max_y))
-
-        mode = 'files'
-        file_commits = None
-        file_selected_idx = selected_idx
-
-        wchar, key = '', b''
-        while str(wchar) != ESC_CODE:
-            if mode == 'files':
-                data_list = self.files
-                maxlen_displayname = max(
-                    (len(display_name) for _, display_name in self.files[nav_y:nav_y+max_y]),
-                    default=0
-                )
-            else:
-                data_list = file_commits or []
-                maxlen_displayname = max((
-                    len(f"{commit['hash'][:7]} | {commit['date'][:10]} | {commit['author']} | {commit['message']}")
-                    for commit in data_list[nav_y:nav_y+max_y]
-                ), default=0)
-
-            self.curse_window.move(max_y, 0)
-            self.curse_window.clrtoeol()
-            for row in range(max_y):
-                entry_idx = row + nav_y
-                if entry_idx >= len(data_list):
-                    break
-
-                if mode == 'files':
-                    file_path, display_name = data_list[entry_idx]
-                    is_selected = selected_idx == entry_idx
-                    is_current = file_path == self.file
-                else:
-                    commit = data_list[entry_idx]
-                    display_name = f"{commit['hash'][:7]} | {commit['date'][:10]} | {commit['author']} | {commit['message']}"
-                    is_selected = selected_idx == entry_idx
-
-                    current_hash = self.file_commit_hash
-                    if isinstance(current_hash, dict):
-                        current_hash = current_hash.get('hash')
-                    is_current = (
-                        self.files[file_selected_idx][0] == self.file and (
-                            (commit['hash'] == '_LOCAL_' and current_hash is None) or
-                            (commit['hash'] == current_hash)
-                        )
-                    )
-
-                color = 0
-                if is_selected and is_current:
-                    color = self._get_color(11)
-                elif is_selected:
-                    color = self._get_color(1)
-                elif is_current:
-                    color = self._get_color(12)
-
-                try:
-                    self.curse_window.addstr(
-                        row, 0, f"{display_name}"[nav_x:nav_x+max_x].ljust(max_x),
-                        color
-                    )
-                    self.curse_window.clrtoeol()
-                except curses.error:
-                    break
-                if row == max_y - 1:
-                    if len(data_list) > max_y + nav_y:
-                        self.curse_window.addstr(row+1, 0, '...')
-                        self.curse_window.clrtoeol()
-                    break
-
-            if mode == 'files':
-                status_msg = 'Select file to open. Confirm with <Enter> or <Space>.'
-            else:
-                status_msg = 'Select commit (or go back with <Escape>). Confirm with <Enter> or <Space>.'
-
-            try:
-                self.curse_window.addstr(
-                    max_y+1, 0,
-                    status_msg[:max_x].ljust(max_x),
-                    self._get_color(1)
-                )
-            except curses.error:
-                pass
-
-            self.curse_window.refresh()
-
-            wchar, key = self._get_next_char()
-            if key in ACTION_HOTKEYS:
-                if key in [b'_action_quit', b'_action_interrupt']:
-                    break
-                if key == b'_action_file_selection':
-                    wchar, key = ' ', b'_key_string'
-                if key == b'_action_background':
-                    getattr(self, key.decode(), lambda *_: False)()
-                if key == b'_action_resize':
-                    getattr(self, key.decode(), lambda *_: False)()
-                    max_y, max_x = self.getxymax()
-                    max_y += self.status_bar_size + 1
-            if key in MOVE_HOTKEYS:
-                list_len = len(data_list)
-                if list_len == 0:
-                    continue
-
-                if key == b'_move_key_up':
-                    selected_idx = max(0, selected_idx - 1)
-                    nav_y = min(nav_y, selected_idx)
-                elif key == b'_move_key_ctl_up':
-                    selected_idx = max(0, selected_idx - 10)
-                    nav_y = min(nav_y, selected_idx)
-                elif key == b'_move_key_down':
-                    selected_idx = min(list_len - 1, selected_idx + 1)
-                    if selected_idx >= nav_y + max_y - 1:
-                        nav_y = selected_idx - max_y + 1
-                elif key == b'_move_key_ctl_down':
-                    selected_idx = min(list_len - 1, selected_idx + 10)
-                    if selected_idx >= nav_y + max_y - 1:
-                        nav_y = selected_idx - max_y + 1
-                elif key == b'_move_key_left':
-                    nav_x = max(0, nav_x - 1)
-                elif key == b'_move_key_ctl_left':
-                    nav_x = max(0, nav_x - 10)
-                elif key == b'_move_key_right':
-                    nav_x = max(0, min(maxlen_displayname - max_x, nav_x + 1))
-                elif key == b'_move_key_ctl_right':
-                    nav_x = max(0, min(maxlen_displayname - max_x, nav_x + 10))
-
-            if key == b'_key_enter' or (key == b'_key_string' and wchar == ' '):
-                if mode == 'files':
-                    file_selected_idx = selected_idx
-
-                    try:
-                        file_commits = GitHelper.get_git_file_history(
-                            self.files[file_selected_idx][0]
-                        )
-                    except OSError:
-                        file_commits = None
-
-                    if file_commits:
-                        file_commits = [
-                            {
-                                'hash': '_LOCAL_', 'date': ' _Latest_ ',
-                                'author': '_Local_', 'message': 'Use local file (not git)'
-                            }
-                        ] + file_commits
-                        mode = 'commits'
-                        selected_idx = 0
-                        if self.file_commit_hash is not None:
-                            try:
-                                selected_idx = file_commits.index(self.file_commit_hash) if (
-                                    isinstance(self.file_commit_hash, dict)
-                                ) else [
-                                    item['hash'] for item in file_commits
-                                ].index(self.file_commit_hash)
-                            except ValueError:
-                                pass
-                        nav_x = 0
-                        nav_y = 0
-                        self.curse_window.clear()
-                    else:
-                        current_idx = _find_current_idx(self.file, self.display_name)
-                        if file_selected_idx != current_idx:
-                            self.open_next_idx = file_selected_idx
-                        break
-                else:
-                    current_idx = _find_current_idx(self.file, self.display_name)
-
-                    current_hash = None if (
-                        file_commits and file_commits[selected_idx]['hash'] == '_LOCAL_'
-                    ) else (
-                        file_commits[selected_idx] if file_commits else None
-                    )
-
-                    if file_selected_idx != current_idx or self.file_commit_hash != current_hash:
-                        self.open_next_idx = file_selected_idx
-                        self.open_next_hash = current_hash
-                    break
-
-            if mode == 'commits' and str(wchar) == ESC_CODE:
-                mode = 'files'
-                wchar = ''
-                selected_idx = file_selected_idx
-                nav_x = 0
-                nav_y = max(0, min(selected_idx - max_y // 2, len(self.files) - max_y))
-
-        self.curse_window.clear()
-        return True if self.open_next_idx is None else self._action_quit()
+        selection_changed = run_file_selection(
+            self,
+            status_bar_offset=1,
+            color_map={
+                'selected_current': 11,
+                'selected': 1,
+                'current': 12,
+            },
+        )
+        return True if not selection_changed else self._action_quit()
 
     def _function_help(self) -> None:
         curses.curs_set(0)

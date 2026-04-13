@@ -1027,7 +1027,7 @@ class TestHexEditor(TestCase):
             ('', b'_move_key_down'),
             ('', b'_key_enter'),
         ]).__next__
-        with patch('cat_win.src.curses.hexeditor.GitHelper.get_git_file_history', return_value=None):
+        with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', return_value=None):
             self.assertFalse(editor._action_file_selection())
         self.assertEqual(editor.open_next_idx, 1)
 
@@ -1043,7 +1043,7 @@ class TestHexEditor(TestCase):
             ('', b'_action_quit'),
         ]).__next__
         commit = {'hash': 'abc1234', 'date': '2024-01-01', 'author': 'u', 'message': 'm'}
-        with patch('cat_win.src.curses.hexeditor.GitHelper.get_git_file_history', return_value=[commit]):
+        with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', return_value=[commit]):
             self.assertTrue(editor2._action_file_selection())
 
         editor3 = HexEditor([('', '')])
@@ -1208,7 +1208,7 @@ class TestHexEditor(TestCase):
             ('', b'_move_key_ctl_left'),
             ('', b'_key_enter'),
         ]).__next__
-        with patch('cat_win.src.curses.hexeditor.GitHelper.get_git_file_history', return_value=[commit]):
+        with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', return_value=[commit]):
             self.assertTrue(editor._action_file_selection())
 
         editor2 = HexEditor([(__file__, '')])
@@ -1295,7 +1295,7 @@ class TestHexEditor(TestCase):
             ('', b'_move_key_up'),
             ('', b'_key_enter'),
         ]).__next__
-        with patch('cat_win.src.curses.hexeditor.GitHelper.get_git_file_history', return_value=[commit]):
+        with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', return_value=[commit]):
             self.assertFalse(editor3._action_file_selection())
         self.assertEqual(editor3.open_next_idx, 0)
         self.assertIsNone(editor3.open_next_hash)
@@ -1427,7 +1427,7 @@ class TestHexEditor(TestCase):
             ('', b'_key_enter'),
         ]).__next__
         with patch.object(editor, '_action_background', return_value=True):
-            with patch('cat_win.src.curses.hexeditor.GitHelper.get_git_file_history', side_effect=OSError('no git')):
+            with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', side_effect=OSError('no git')):
                 self.assertTrue(editor._action_file_selection())
         editor.getxymax = old_getxymax
 
@@ -1706,7 +1706,7 @@ class TestHexEditor(TestCase):
         ]).__next__
 
         with patch.object(editor2, '_action_background', return_value=True):
-            with patch('cat_win.src.curses.hexeditor.GitHelper.get_git_file_history', side_effect=OSError('nogit')):
+            with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', side_effect=OSError('nogit')):
                 self.assertFalse(editor2._action_file_selection())
 
     def test_final_remaining_find_and_file_selection_branches_4(self):

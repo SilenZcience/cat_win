@@ -18,6 +18,7 @@ from cat_win.src.curses.helper.diffviewerhelper import DifflibParser, DifflibID
 from cat_win.src.curses.helper.editorhelper import Position, frepr, \
     UNIFY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, FUNCTION_HOTKEYS
 from cat_win.src.curses.helper.editorsearchhelper import search_iter_diff_factory
+from cat_win.src.curses.helper.fileselectionhelper import run_file_selection
 from cat_win.src.curses.helper.githelper import GitHelper
 from cat_win.src.persistence.viewstate import save_view_state, get_view_state_time
 from cat_win.src.service.helper.environment import on_windows_os
@@ -601,7 +602,7 @@ class DiffViewer:
         self.curse_window.clear()
         return True
 
-    def _action_file_selection(self) -> bool: # TODO: extract this logic into helper (DRY) and make this a real file manager at this point, with going back and forth "..(cd)", include mouse logic
+    def _action_file_selection(self) -> bool:
         """
         handles the file selection action.
 
@@ -609,278 +610,18 @@ class DiffViewer:
         (bool):
             indicates if the editor should keep running
         """
-
-        curses.curs_set(0)
-        self.curse_window.clear()
-
-
-        def _find_current_idx(target_file: Path, target_display: str) -> int:
-            try:
-                return self.files.index((target_file, target_display))
-            except ValueError:
-                for idx, (file_path, _) in enumerate(self.files):
-                    if file_path == target_file:
-                        return idx
-            return 0
-
-        selected_idx = [
-            _find_current_idx(self.diff_files[0], self.display_names[0]),
-            _find_current_idx(self.diff_files[1], self.display_names[1])
-        ]
-
-        max_y, max_x = self.getxymax()
-        max_y += self.status_bar_size - 2
-        nav_x = [0, 0]
-        nav_y = [
-            max(0, min(selected_idx[0] - max_y // 2, len(self.files) - max_y)),
-            max(0, min(selected_idx[1] - max_y // 2, len(self.files) - max_y))
-        ]
-        active_list = 0
-
-        # Selection mode: 'files' or 'commits'
-        mode = 'files'
-        file_commits = [None, None]
-        file_selected_idxs: list = None
-
-        wchar, key = '', b''
-        while str(wchar) != ESC_CODE:
-            list_width = max(1, (max_x - 3) // 2)
-            right_x = list_width + 3
-
-            if mode == 'files':
-                data_lists = [self.files, self.files]
-                maxlen_displayname = [
-                    max(
-                        (len(display_name)
-                         for _, display_name in self.files[nav_y[0]:nav_y[0]+max_y]
-                        ), default=0),
-                    max(
-                        (len(display_name)
-                         for _, display_name in self.files[nav_y[1]:nav_y[1]+max_y]
-                        ), default=0)
-                ]
-            else:
-                data_lists = [file_commits[0] or [], file_commits[1] or []]
-                maxlen_displayname = [0, 0]
-                for side in (0, 1):
-                    if data_lists[side]:
-                        maxlen_displayname[side] = max(
-                            (len(f"{c['hash'][:7]} | {c['date'][:10]} | {c['author']} | {c['message']}")
-                             for c in data_lists[side][nav_y[side]:nav_y[side]+max_y]),
-                            default=0
-                        )
-
-            self.curse_window.move(max_y, 0)
-            self.curse_window.clrtoeol()
-            for row in range(max_y):
-                for side in (0, 1):
-                    entry_idx = row + nav_y[side]
-                    if entry_idx >= len(data_lists[side]):
-                        continue
-
-                    if mode == 'files':
-                        _, display_name = data_lists[side][entry_idx]
-                        is_selected = selected_idx[side] == entry_idx
-                        is_current = self.files[entry_idx][0] == self.diff_files[side]
-                    else:
-                        commit = data_lists[side][entry_idx]
-                        display_name = f"{commit['hash'][:7]} | {commit['date'][:10]} | {commit['author']} | {commit['message']}"
-                        is_selected = selected_idx[side] == entry_idx
-
-                        current_hash = self.file_commit_hashes[side]
-                        if isinstance(current_hash, dict):
-                            current_hash = current_hash.get('hash')
-                        is_current = (
-                            self.files[file_selected_idxs[side]][0] == self.diff_files[side] and (
-                                (commit['hash'] == '_LOCAL_' and current_hash is None) or
-                                (commit['hash'] == current_hash)
-                            )
-                        )
-
-                    color = 0
-                    if is_selected and is_current:
-                        color = self._get_color(13) if side == active_list else self._get_color(14)
-                    elif is_selected:
-                        color = self._get_color(1) if side == active_list else self._get_color(15)
-                    elif is_current:
-                        color = self._get_color(8)
-
-                    start_x = 0 if side == 0 else right_x
-                    offset_x = nav_x[side]
-                    text = f"{display_name}"[offset_x:offset_x+list_width].ljust(list_width)
-                    try:
-                        self.curse_window.addstr(row, start_x, text, color)
-                    except curses.error:
-                        break
-
-                if row == max_y - 1:
-                    if len(data_lists[0]) > max_y + nav_y[0]:
-                        self.curse_window.addstr(row + 1, 0, '...')
-                    if len(data_lists[1]) > max_y + nav_y[1]:
-                        self.curse_window.addstr(row + 1, right_x, '...')
-                    self.curse_window.clrtoeol()
-                    break
-            self.curse_window.clrtobot()
-
-            if mode == 'files':
-                status_msg = 'Select two files. Tab/Shift+Tab switch list. Confirm with <Enter> or <Space>.'
-            else:
-                status_msg = 'Select commits (or go back with <Escape>). Tab/Shift+Tab switch list. Confirm with <Enter> or <Space>.'
-
-            try:
-                self.curse_window.addstr(
-                    max_y+1, 0,
-                    status_msg[:max_x].ljust(max_x),
-                    self._get_color(1)
-                )
-            except curses.error:
-                pass
-
-            self.curse_window.refresh()
-
-            wchar, key = self._get_next_char()
-            if key in ACTION_HOTKEYS:
-                if key in [b'_action_quit', b'_action_interrupt']:
-                    break
-                if key == b'_action_file_selection':
-                    wchar, key = ' ', b'_key_string'
-                if key == b'_action_background':
-                    getattr(self, key.decode(), lambda *_: False)()
-                if key == b'_action_resize':
-                    getattr(self, key.decode(), lambda *_: False)()
-                    max_y, max_x = self.getxymax()
-                    max_y += self.status_bar_size - 2
-            if key in [b'_indent_tab', b'_indent_btab']:
-                active_list = 1 - active_list
-            if key in [b'_select_key_left', b'_select_key_right']:
-                active_list = 1 - active_list
-                selected_idx[active_list] = min(
-                    selected_idx[1 - active_list],
-                    len(data_lists[active_list]) - 1
-                )
-                nav_y[active_list] = min(nav_y[active_list], selected_idx[active_list])
-                if selected_idx[active_list] >= nav_y[active_list] + max_y - 1:
-                    nav_y[active_list] = selected_idx[active_list] - max_y + 1
-            if key in MOVE_HOTKEYS:
-                list_len = len(data_lists[active_list])
-                if list_len == 0:
-                    continue
-
-                if key == b'_move_key_up':
-                    selected_idx[active_list] = max(0, selected_idx[active_list] - 1)
-                    nav_y[active_list] = min(nav_y[active_list], selected_idx[active_list])
-                elif key == b'_move_key_ctl_up':
-                    selected_idx[active_list] = max(0, selected_idx[active_list] - 10)
-                    nav_y[active_list] = min(nav_y[active_list], selected_idx[active_list])
-                elif key == b'_move_key_down':
-                    selected_idx[active_list] = min(list_len - 1, selected_idx[active_list] + 1)
-                    if selected_idx[active_list] >= nav_y[active_list] + max_y - 1:
-                        nav_y[active_list] = selected_idx[active_list] - max_y + 1
-                elif key == b'_move_key_ctl_down':
-                    selected_idx[active_list] = min(list_len - 1, selected_idx[active_list] + 10)
-                    if selected_idx[active_list] >= nav_y[active_list] + max_y - 1:
-                        nav_y[active_list] = selected_idx[active_list] - max_y + 1
-                elif key == b'_move_key_left':
-                    nav_x[active_list] = max(0, nav_x[active_list] - 1)
-                elif key == b'_move_key_ctl_left':
-                    nav_x[active_list] = max(0, nav_x[active_list] - 10)
-                elif key == b'_move_key_right':
-                    nav_x[active_list] = max(
-                        0,
-                        min(maxlen_displayname[active_list] - list_width, nav_x[active_list] + 1)
-                    )
-                elif key == b'_move_key_ctl_right':
-                    nav_x[active_list] = max(
-                        0,
-                        min(maxlen_displayname[active_list] - list_width, nav_x[active_list] + 10)
-                    )
-
-            if key == b'_key_enter' or (key == b'_key_string' and wchar == ' '):
-                if mode == 'files':
-                    file_selected_idxs = [selected_idx[0], selected_idx[1]]
-
-                    for side in (0, 1):
-                        file_path = self.files[file_selected_idxs[side]][0]
-                        try:
-                            file_commits[side] = GitHelper.get_git_file_history(file_path)
-                        except OSError:
-                            file_commits[side] = None
-
-                    if file_commits[0] or file_commits[1]:
-                        if file_commits[0]:
-                            file_commits[0] = [
-                                {
-                                    'hash': '_LOCAL_', 'date': ' _Latest_ ',
-                                    'author': '_Local_', 'message': 'Use local file (not git)'
-                                }
-                            ] + file_commits[0]
-                        if file_commits[1]:
-                            file_commits[1] = [
-                                {
-                                    'hash': '_LOCAL_', 'date': ' _Latest_ ',
-                                    'author': '_Local_', 'message': 'Use local file (not git)'
-                                }
-                            ] + file_commits[1]
-                        mode = 'commits'
-                        selected_idx = [0, 0]
-                        for side in (0, 1):
-                            if self.file_commit_hashes[side] is not None:
-                                try:
-                                    selected_idx[side] = file_commits[side].index(self.file_commit_hashes[side]) if (
-                                        isinstance(self.file_commit_hashes[side], dict)
-                                    ) else [
-                                        item['hash'] for item in file_commits[side]
-                                    ].index(self.file_commit_hashes[side])
-                                except ValueError:
-                                    pass
-                        nav_x = [0, 0]
-                        nav_y = [0, 0]
-                        active_list = 0
-                        self.curse_window.clear()
-                    else:
-                        current_idxs = (
-                            _find_current_idx(self.diff_files[0], self.display_names[0]),
-                            _find_current_idx(self.diff_files[1], self.display_names[1])
-                        )
-                        if file_selected_idxs != current_idxs:
-                            self.open_next_idxs = file_selected_idxs
-                        break
-                else:
-                    current_idxs = (
-                        _find_current_idx(self.diff_files[0], self.display_names[0]),
-                        _find_current_idx(self.diff_files[1], self.display_names[1])
-                    )
-
-                    current_hashes = (
-                        None if (
-                            file_commits[0] and file_commits[0][selected_idx[0]]['hash'] == '_LOCAL_'
-                        ) else (
-                            file_commits[0][selected_idx[0]] if file_commits[0] else None
-                        ),
-                        None if (
-                            file_commits[1] and file_commits[1][selected_idx[1]]['hash'] == '_LOCAL_'
-                        ) else (
-                            file_commits[1][selected_idx[1]] if file_commits[1] else None
-                        )
-                    )
-
-                    if tuple(file_selected_idxs) != current_idxs or tuple(self.file_commit_hashes) != current_hashes:
-                        self.open_next_idxs = file_selected_idxs
-                        self.open_next_hashes = current_hashes
-                    break
-
-            if mode == 'commits' and str(wchar) == ESC_CODE:
-                mode = 'files'
-                wchar = ''
-                selected_idx = file_selected_idxs if file_selected_idxs else selected_idx
-                nav_x = [0, 0]
-                nav_y = [
-                    max(0, min(selected_idx[0] - max_y // 2, len(self.files) - max_y)),
-                    max(0, min(selected_idx[1] - max_y // 2, len(self.files) - max_y))
-                ]
-
-        self.curse_window.clear()
-        return self.open_next_idxs is None
+        return not run_file_selection(
+            self,
+            split_panel=True,
+            status_bar_offset=-2,
+            color_map={
+                'selected_current_active': 13,
+                'selected_current_inactive': 14,
+                'selected_active': 1,
+                'selected_inactive': 15,
+                'current': 8,
+            },
+        )
 
     def _function_help(self) -> None:
         self.curse_window.clear()
