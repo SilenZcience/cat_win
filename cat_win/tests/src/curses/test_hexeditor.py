@@ -21,8 +21,9 @@ mm = MagicMock()
 logger = LoggerStub()
 
 @patch.object(hexeditor, 'logger', logger)
-@patch('cat_win.src.curses.hexeditor.HexEditor.getxymax', getxymax)
+@patch('cat_win.src.curses.helper.fileselectionhelper.curses', mm)
 @patch('cat_win.src.curses.hexeditor.curses', mm)
+@patch('cat_win.src.curses.hexeditor.HexEditor.getxymax', getxymax)
 class TestHexEditor(TestCase):
     maxDiff = None
 
