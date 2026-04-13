@@ -31,6 +31,7 @@ mm.COLORS = 255
 logger = LoggerStub()
 
 
+@patch('cat_win.src.curses.helper.fileselectionhelper.curses', mm)
 @patch('cat_win.src.curses.diffviewer.curses', mm)
 class TestDiffViewer(TestCase):
     def _mk_viewer(self):
