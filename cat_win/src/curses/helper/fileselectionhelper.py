@@ -5,7 +5,10 @@ fileselectionhelper
 from pathlib import Path
 import sys
 
-import curses
+try:
+    import curses
+except ImportError:
+    pass
 
 from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.curses.helper.editorhelper import ACTION_HOTKEYS, MOVE_HOTKEYS
