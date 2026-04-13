@@ -2,6 +2,11 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from cat_win.src.const.escapecodes import ESC_CODE
+
+
+from cat_win.src.curses.helper import fileselectionhelper
+if fileselectionhelper.CURSES_MODULE_ERROR:
+    setattr(fileselectionhelper, 'curses', None)
 from cat_win.src.curses.helper.fileselectionhelper import run_file_selection
 
 
