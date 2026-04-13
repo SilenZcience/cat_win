@@ -1589,6 +1589,22 @@ class Editor:
                     nav_x = max(0, min(maxlen_displayname - max_x, nav_x + 1))
                 elif key == b'_move_key_ctl_right':
                     nav_x = max(0, min(maxlen_displayname - max_x, nav_x + 10))
+                elif key == b'_move_key_mouse':
+                    _, x, y, _, bstate = curses.getmouse()
+                    if bstate & curses.BUTTON1_PRESSED or bstate & curses.BUTTON1_CLICKED or bstate & curses.BUTTON1_DOUBLE_CLICKED:
+                        if y < max_y and x < max_x:
+                            selected_idx = min(list_len - 1, nav_y + y)
+                            if selected_idx >= nav_y + max_y -1:
+                                nav_y = selected_idx - max_y + 1
+                            if bstate & curses.BUTTON1_DOUBLE_CLICKED:
+                                key = b'_key_enter'
+                    elif bstate & curses.BUTTON4_PRESSED:
+                        selected_idx = max(0, selected_idx - 1)
+                        nav_y = min(nav_y, selected_idx)
+                    elif bstate & curses.BUTTON5_PRESSED:
+                        selected_idx = min(list_len - 1, selected_idx + 1)
+                        if selected_idx >= nav_y + max_y - 1:
+                            nav_y = selected_idx - max_y + 1
 
             if key == b'_key_enter' or (key == b'_key_string' and wchar == ' '):
                 _syntax_highlighter = SyntaxHighlighter.get_plugin(available_plugins[selected_idx])
