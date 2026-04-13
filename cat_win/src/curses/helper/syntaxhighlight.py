@@ -322,7 +322,7 @@ SyntaxHighlighter.register(
     },
     lex_builtins=tuple((f for f in dir(builtins) if not f.startswith('_'))),
     number_pattern=r"""
-(?<![0-9A-Za-z_.$+\-])
+(?<![0-9A-Za-z_.$])
 (?:
     0[bB][01](?:_?[01])* |
     0[oO][0-7](?:_?[0-7])* |
@@ -336,7 +336,7 @@ SyntaxHighlighter.register(
         [jJ]
     )
 )
-(?![0-9A-Za-z_.$+\-])
+(?![0-9A-Za-z_.$])
 """,
     simple_string_pattern=r"(['\"])(?:\\.|(?!\1)[^\\\n])*\1",
     line_comment_prefixes=('#',),
@@ -388,14 +388,14 @@ SyntaxHighlighter.register(
         'symbols': 'symbols',
     },
     number_pattern=r"""
-(?<![0-9A-Za-z_$+\-.])
+(?<![0-9A-Za-z_.$])
 (?:
     0[bB][01](?:_?[01])*[lL]? |
     0[xX][0-9a-fA-F](?:_?[0-9a-fA-F])*[lL]? |
     \d(?:_?\d)*(?:\.\d(?:_?\d)*)?(?:[eE][+-]?\d(?:_?\d)*)?[fFdDlL]? |
     \.\d(?:_?\d)*(?:[eE][+-]?\d(?:_?\d)*)?[fFdD]?
 )
-(?![0-9A-Za-z_$+\-.])
+(?![0-9A-Za-z_.$])
 """,
     simple_string_pattern=r"(['\"])(?:\\.|(?!\1)[^\\\n])*\1",
     line_comment_prefixes=('//',),
@@ -494,13 +494,13 @@ SyntaxHighlighter.register(
         'symbols': 'symbols',
     },
     number_pattern=r"""
-(?<![0-9A-Za-z_+\-.])
+(?<![0-9A-Za-z_.$])
 (?:
     0[xX][0-9a-fA-F]* |
     \d+(?:\.\d*)?(?:[eE][+-]?\d*)? |
     \.\d+(?:[eE][+-]?\d*)?
 )
-(?![0-9A-Za-z_+\-.])
+(?![0-9A-Za-z_.$])
 """,
     simple_string_pattern=r"(['\"])(?:\\.|(?!\1)[^\\\n])*\1",
     line_comment_prefixes=(';',),
@@ -583,7 +583,7 @@ SyntaxHighlighter.register(
         'charclass': 'charclass',
     },
     number_pattern=r"""
-(?<![0-9A-Za-z_.$+\-])
+(?<![0-9A-Za-z_.$])
 (?:
     0[bB][01](?:_?[01])*(?:[uU](?:ll?|LL?)?|(?:ll?|LL?)[uU]?)? |
     0[xX][0-9a-fA-F](?:_?[0-9a-fA-F])*(?:[uU](?:ll?|LL?)?|(?:ll?|LL?)[uU]?)? |
@@ -591,7 +591,7 @@ SyntaxHighlighter.register(
     \d(?:_?\d)*(?:\.\d(?:_?\d)*)?(?:[eE][+-]?\d(?:_?\d)*)?(?:[uU](?:ll?|LL?)?|(?:ll?|LL?)[uU]?|[fFlL])? |
     \.\d(?:_?\d)*(?:[eE][+-]?\d(?:_?\d)*)?[fFlL]?
 )
-(?![0-9A-Za-z_.$+\-])
+(?![0-9A-Za-z_.$])
 """,
     simple_string_pattern=r"(['\"])(?:\\.|(?!\1)[^\\\n])*\1",
     line_comment_prefixes=('//',),
@@ -635,13 +635,13 @@ SyntaxHighlighter.register(
         'const': 'const',
     },
     number_pattern=r"""
-(?<![0-9A-Za-z_.])
+(?<![0-9A-Za-z_.$])
 (?:
     0[xX][0-9a-fA-F]+ |
     \d+(?:\.\d*)?(?:[eE][+-]?\d+)? |
     \.\d+(?:[eE][+-]?\d+)?
 )
-(?![0-9A-Za-z_.])
+(?![0-9A-Za-z_.$])
 """,
     simple_string_pattern=r"(['\"])(?:\\.|(?!\1)[^\\\n])*\1",
     line_comment_prefixes=('--',),
@@ -699,14 +699,14 @@ SyntaxHighlighter.register(
         'symbols': 'symbols',
     },
     number_pattern=r"""
-(?<![0-9A-Za-z_.])
+(?<![0-9A-Za-z_.$])
 (?:
     0[bB][01][01_]*(?:_?(?:i8|i16|i32|i64|i128|isize|u8|u16|u32|u64|u128|usize))? |
     0[oO][0-7][0-7_]*(?:_?(?:i8|i16|i32|i64|i128|isize|u8|u16|u32|u64|u128|usize))? |
     0[xX][0-9a-fA-F][0-9a-fA-F_]*(?:_?(?:i8|i16|i32|i64|i128|isize|u8|u16|u32|u64|u128|usize))? |
     \d[\d_]*(?:\.[\d_]+)?(?:[eE][+-]?[\d_]+)?(?:_?(?:f32|f64|i8|i16|i32|i64|i128|isize|u8|u16|u32|u64|u128|usize))?
 )
-(?![0-9A-Za-z_.])
+(?![0-9A-Za-z_.$])
 """,
     simple_string_pattern=r'"(?:\\.|[^"\\\n])*"',
     line_comment_prefixes=('//',),
