@@ -1173,7 +1173,7 @@ class TestEditor(TestCase):
             ('', b'_move_key_down'),
             ('', b'_key_enter'),
         ])
-        with patch('cat_win.src.curses.editor.GitHelper.get_git_file_history', return_value=None):
+        with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', return_value=None):
             self.assertFalse(ed._action_file_selection())
         self.assertEqual(ed.open_next_idx, 1)
 
@@ -1188,7 +1188,7 @@ class TestEditor(TestCase):
             ('\x1b', b'_key_string'),
             ('', b'_action_quit'),
         ])
-        with patch('cat_win.src.curses.editor.GitHelper.get_git_file_history', return_value=[commit]):
+        with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', return_value=[commit]):
             self.assertTrue(ed2._action_file_selection())
 
         ed3 = Editor([(test_file_path_editor, 'A')])
@@ -1351,7 +1351,7 @@ class TestEditor(TestCase):
             ('', b'_move_key_ctl_left'),
             ('', b'_key_enter'),
         ])
-        with patch('cat_win.src.curses.editor.GitHelper.get_git_file_history', return_value=None):
+        with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', return_value=None):
             self.assertTrue(ed2._action_file_selection())
 
     def test_syntax_selection_navigation_and_init_highlighter_colors_extra_branches(self):
@@ -1808,7 +1808,7 @@ class TestEditor(TestCase):
             return None
         edfs.curse_window.addstr.side_effect = addstr_side
         with patch.object(edfs, '_action_background', return_value=True):
-            with patch('cat_win.src.curses.editor.GitHelper.get_git_file_history', side_effect=OSError('nogit')):
+            with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', side_effect=OSError('nogit')):
                 self.assertTrue(edfs._action_file_selection())
 
         mm.resize_term.side_effect = mm.error
@@ -2054,7 +2054,7 @@ class TestEditor(TestCase):
         edfs.curse_window.addstr.side_effect = addstr_side
         commit = {'hash': 'abc1234', 'date': '2024-01-01', 'author': 'u', 'message': 'm'}
         with patch.object(edfs, '_action_background', return_value=True):
-            with patch('cat_win.src.curses.editor.GitHelper.get_git_file_history', return_value=[commit]):
+            with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', return_value=[commit]):
                 self.assertFalse(edfs._action_file_selection())
 
     def test_editor_action_background_unix_path(self):
@@ -2410,7 +2410,7 @@ class TestEditor(TestCase):
             return None
 
         ed2.curse_window.addstr.side_effect = _file_addstr_side
-        with patch('cat_win.src.curses.editor.GitHelper.get_git_file_history', return_value=None):
+        with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', return_value=None):
             self.assertTrue(ed2._action_file_selection())
 
         # _function_sel_highlight: empty-list move continue + action quit + status error
