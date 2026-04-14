@@ -14,6 +14,7 @@ import sys
 import time
 
 from cat_win.src.const.escapecodes import ESC_CODE
+from cat_win.src.const.regex import RE_CUTOFF
 from cat_win.src.curses.helper.diffviewerhelper import DifflibParser, DifflibID
 from cat_win.src.curses.helper.editorhelper import Position, frepr, \
     UNIFY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, FUNCTION_HOTKEYS
@@ -282,8 +283,11 @@ class DiffViewer:
             indicates if the diffviewer should keep running
         """
         wchar, l_jmp = '', ''
+        cursor_idx = 0
         while str(wchar).upper() not in [ESC_CODE, 'N']:
-            self._action_render_scr(f"Confirm: [y]es, [n]o - Jump to line: {l_jmp}␣")
+            self._action_render_scr(
+                f"Confirm: [y]es, [n]o - Jump to line: {l_jmp[:cursor_idx]}␣{l_jmp[cursor_idx:]}"
+            )
             wchar, key = self._get_next_char()
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
@@ -295,14 +299,33 @@ class DiffViewer:
                 if key == b'_action_resize':
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
-            if not isinstance(wchar, str):
+
+            if key == b'_move_key_left':
+                cursor_idx = max(0, cursor_idx - 1)
+            elif key == b'_move_key_ctl_left':
+                cursor_idx = max(0, cursor_idx - 10)
+            elif key == b'_move_key_right':
+                cursor_idx = min(len(l_jmp), cursor_idx + 1)
+            elif key == b'_move_key_ctl_right':
+                cursor_idx = min(len(l_jmp), cursor_idx + 10)
+
+            if key == b'_key_string' and not isinstance(wchar, str):
                 continue
+
             if key == b'_key_backspace':
-                l_jmp = l_jmp[:-1]
+                if cursor_idx:
+                    l_jmp = l_jmp[:cursor_idx-1] + l_jmp[cursor_idx:]
+                    cursor_idx -= 1
             elif key == b'_key_ctl_backspace':
-                l_jmp = ''
+                l_jmp = l_jmp[cursor_idx:]
+                cursor_idx = 0
+            elif key == b'_key_dc':
+                l_jmp = l_jmp[:cursor_idx] + l_jmp[cursor_idx+1:]
+            elif key == b'_key_dl':
+                l_jmp = l_jmp[:cursor_idx]
             elif key == b'_key_string' and wchar.isdigit():
-                l_jmp += wchar
+                l_jmp = l_jmp[:cursor_idx] + wchar + l_jmp[cursor_idx:]
+                cursor_idx += 1
             elif (key == b'_key_string' and wchar.upper() in ['Y', 'J']) or \
                 key == b'_key_enter':
                 if l_jmp:
@@ -326,13 +349,14 @@ class DiffViewer:
         """
         wchar, sub_s, tmp_error = '', '', ''
         key, running = b'_key_enter', False
+        cursor_idx = 0
         while str(wchar) != ESC_CODE:
             if not find_next:
                 pre_s = ''
                 if self.search:
                     pre_s = f" [{repr(self.search)[1:-1]}]"
                 self._action_render_scr(
-                    f"Confirm: 'ENTER' - Search for{pre_s}: {frepr(sub_s)}␣",
+                    f"Confirm: 'ENTER' - Search for{pre_s}: {frepr(sub_s[:cursor_idx])}␣{frepr(sub_s[cursor_idx:])}",
                     tmp_error
                 )
                 wchar, key = self._get_next_char()
@@ -353,16 +377,37 @@ class DiffViewer:
                 if key == b'_action_resize':
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
-            if not isinstance(wchar, str):
+
+            if key == b'_move_key_left':
+                cursor_idx = max(0, cursor_idx - 1)
+            elif key == b'_move_key_ctl_left':
+                cursor_idx = max(0, cursor_idx - 10)
+            elif key == b'_move_key_right':
+                cursor_idx = min(len(sub_s), cursor_idx + 1)
+            elif key == b'_move_key_ctl_right':
+                cursor_idx = min(len(sub_s), cursor_idx + 10)
+
+            if key == b'_key_string' and not isinstance(wchar, str):
                 continue
+
             if key == b'_key_backspace':
-                sub_s = sub_s[:-1]
+                if cursor_idx:
+                    sub_s = sub_s[:cursor_idx-1] + sub_s[cursor_idx:]
+                    cursor_idx -= 1
             elif key == b'_key_ctl_backspace':
-                t_p = sub_s[-1:].isalnum()
-                while sub_s and sub_s[-1:].isalnum() == t_p:
-                    sub_s = sub_s[:-1]
+                t_p = sub_s[cursor_idx-1:cursor_idx].isalnum()
+                while cursor_idx and sub_s[cursor_idx-1:cursor_idx].isalnum() == t_p:
+                    sub_s = sub_s[:cursor_idx-1] + sub_s[cursor_idx:]
+                    cursor_idx -= 1
+            elif key == b'_key_dc':
+                sub_s = sub_s[:cursor_idx] + sub_s[cursor_idx+1:]
+            elif key == b'_key_dl':
+                tp = sub_s[cursor_idx:cursor_idx+1].isalnum()
+                while cursor_idx < len(sub_s) and sub_s[cursor_idx:cursor_idx+1].isalnum() == tp:
+                    sub_s = sub_s[:cursor_idx] + sub_s[cursor_idx+1:]
             elif key == b'_key_string':
-                sub_s += wchar
+                sub_s = sub_s[:cursor_idx] + wchar + sub_s[cursor_idx:]
+                cursor_idx += 1
             elif key == b'_key_enter':
                 self.search = sub_s if sub_s else self.search
                 if not self.search:
@@ -450,9 +495,10 @@ class DiffViewer:
             indicates if the editor should keep running
         """
         wchar, cutoff = '', ''
+        cursor_idx = 0
         while str(wchar) != ESC_CODE:
             self._action_render_scr(
-                f"Confirm: 'ENTER' - Cutoff Ratio [{self.difflibparser_cutoff}]: {cutoff}␣"
+                f"Confirm: 'ENTER' - Cutoff Ratio [{self.difflibparser_cutoff}]: {cutoff[:cursor_idx]}␣{cutoff[cursor_idx:]}"
             )
             wchar, key = self._get_next_char()
             if key in ACTION_HOTKEYS:
@@ -465,21 +511,35 @@ class DiffViewer:
                 if key == b'_action_resize':
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
-            if not isinstance(wchar, str):
+
+            if key == b'_move_key_left':
+                cursor_idx = max(0, cursor_idx - 1)
+            elif key == b'_move_key_ctl_left':
+                cursor_idx = max(0, cursor_idx - 10)
+            elif key == b'_move_key_right':
+                cursor_idx = min(len(cutoff), cursor_idx + 1)
+            elif key == b'_move_key_ctl_right':
+                cursor_idx = min(len(cutoff), cursor_idx + 10)
+
+            if key == b'_key_string' and not isinstance(wchar, str):
                 continue
-            if key == b'_key_backspace':
-                cutoff = cutoff[:-1]
+
+            elif key == b'_key_backspace':
+                if cursor_idx:
+                    cutoff = cutoff[:cursor_idx-1] + cutoff[cursor_idx:]
+                    cursor_idx -= 1
             elif key == b'_key_ctl_backspace':
-                cutoff = ''
+                cutoff = cutoff[cursor_idx:]
+                cursor_idx = 0
+            elif key == b'_key_dc':
+                cutoff = cutoff[:cursor_idx] + cutoff[cursor_idx+1:]
+            elif key == b'_key_dl':
+                cutoff = cutoff[:cursor_idx]
             elif key == b'_key_string':
-                if cutoff == '1':
-                    continue
-                if not cutoff and wchar in '10.':
-                    cutoff += wchar
-                elif wchar == '.' and '.' not in cutoff:
-                    cutoff += wchar
-                elif '.' in cutoff[:2] and wchar.isdigit():
-                    cutoff += wchar
+                new_cutoff = cutoff[:cursor_idx] + wchar + cutoff[cursor_idx:]
+                if RE_CUTOFF.fullmatch(new_cutoff):
+                    cutoff = new_cutoff
+                    cursor_idx += 1
             elif key == b'_key_enter':
                 if cutoff:
                     self.difflibparser_cutoff = float(0 if cutoff=='.' else cutoff)

@@ -78,6 +78,11 @@ RE_EVAL = re.compile(
 )
 
 
+RE_CUTOFF = re.compile(
+    r"0+|1|0*\.[0-9]*"
+)
+
+
 def compile_re(pattern: str, ignore_case: bool):
     """
     compile a regular expression
