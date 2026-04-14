@@ -593,8 +593,11 @@ class HexEditor:
             indicates if the editor should keep running
         """
         wchar, l_jmp = '', ''
+        cursor_idx = 0
         while str(wchar).upper() not in [ESC_CODE, 'N']:
-            self._action_render_scr(f"Confirm: [y]es, [n]o - Jump to byte: 0x{l_jmp}␣")
+            self._action_render_scr(
+                f"Confirm: [y]es, [n]o - Jump to byte: 0x{l_jmp[:cursor_idx]}␣{l_jmp[cursor_idx:]}"
+            )
             wchar, key = self._get_next_char()
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
@@ -610,14 +613,33 @@ class HexEditor:
                 if key == b'_action_resize':
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
-            if not isinstance(wchar, str):
+
+            if key == b'_move_key_left':
+                cursor_idx = max(0, cursor_idx - 1)
+            elif key == b'_move_key_ctl_left':
+                cursor_idx = max(0, cursor_idx - 10)
+            elif key == b'_move_key_right':
+                cursor_idx = min(len(l_jmp), cursor_idx + 1)
+            elif key == b'_move_key_ctl_right':
+                cursor_idx = min(len(l_jmp), cursor_idx + 10)
+
+            if key == b'_key_string' and not isinstance(wchar, str):
                 continue
-            if key == b'_key_backspace':
-                l_jmp = l_jmp[:-1]
+
+            elif key == b'_key_backspace':
+                if cursor_idx:
+                    l_jmp = l_jmp[:cursor_idx-1] + l_jmp[cursor_idx:]
+                    cursor_idx -= 1
             elif key == b'_key_ctl_backspace':
-                l_jmp = ''
+                l_jmp = l_jmp[cursor_idx:]
+                cursor_idx = 0
+            elif key == b'_key_dc':
+                l_jmp = l_jmp[:cursor_idx] + l_jmp[cursor_idx+1:]
+            elif key == b'_key_dl':
+                l_jmp = l_jmp[:cursor_idx]
             elif key == b'_key_string' and wchar.upper() in HEX_BYTE_KEYS:
-                l_jmp += wchar
+                l_jmp = l_jmp[:cursor_idx] + wchar.upper() + l_jmp[cursor_idx:]
+                cursor_idx += 1
             elif (key == b'_key_string' and wchar.upper() in ['Y', 'J']) or \
                 key == b'_key_enter':
                 if l_jmp:
@@ -639,6 +661,7 @@ class HexEditor:
         sub_s_encoded = self.search
         wchar, sub_s, tmp_error= '', '', ''
         key, running = b'_key_enter', False
+        cursor_idx = 0
         while str(wchar) != ESC_CODE:
             if not find_next:
                 pre_s = ''
@@ -650,7 +673,7 @@ class HexEditor:
                         except ValueError:
                             pass
                 self._action_render_scr(
-                    f"Confirm: 'ENTER' - Search for{pre_s}: {bm_ind}{frepr(sub_s)}␣",
+                    f"Confirm: 'ENTER' - Search for{pre_s}: {bm_ind}{frepr(sub_s[:cursor_idx])}␣{frepr(sub_s[cursor_idx:])}",
                     tmp_error
                 )
                 wchar, key = self._get_next_char()
@@ -680,18 +703,40 @@ class HexEditor:
                 if key == b'_action_resize':
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
-            if not isinstance(wchar, str):
+
+            if key == b'_move_key_left':
+                cursor_idx = max(0, cursor_idx - 1)
+            elif key == b'_move_key_ctl_left':
+                cursor_idx = max(0, cursor_idx - 10)
+            elif key == b'_move_key_right':
+                cursor_idx = min(len(sub_s), cursor_idx + 1)
+            elif key == b'_move_key_ctl_right':
+                cursor_idx = min(len(sub_s), cursor_idx + 10)
+
+            if key == b'_key_string' and not isinstance(wchar, str):
                 continue
-            if key == b'_key_backspace':
-                sub_s = sub_s[:-1]
+
+            elif key == b'_key_backspace':
+                if cursor_idx:
+                    sub_s = sub_s[:cursor_idx-1] + sub_s[cursor_idx:]
+                    cursor_idx -= 1
             elif key == b'_key_ctl_backspace':
-                t_p = sub_s[-1:].isalpha()
-                while sub_s and sub_s[-1:].isalpha() == t_p:
-                    sub_s = sub_s[:-1]
+                t_p = sub_s[cursor_idx-1:cursor_idx].isalpha()
+                while cursor_idx and sub_s[cursor_idx-1:cursor_idx].isalpha() == t_p:
+                    sub_s = sub_s[:cursor_idx-1] + sub_s[cursor_idx:]
+                    cursor_idx -= 1
+            elif key == b'_key_dc':
+                sub_s = sub_s[:cursor_idx] + sub_s[cursor_idx+1:]
+            elif key == b'_key_dl':
+                tp = sub_s[cursor_idx:cursor_idx+1].isalpha()
+                while cursor_idx < len(sub_s) and sub_s[cursor_idx:cursor_idx+1].isalpha() == tp:
+                    sub_s = sub_s[:cursor_idx] + sub_s[cursor_idx+1:]
             elif key == b'_key_string' and not search_byte_mode:
-                sub_s += wchar
+                sub_s = sub_s[:cursor_idx] + wchar + sub_s[cursor_idx:]
+                cursor_idx += 1
             elif key == b'_key_string' and wchar.upper() in HEX_BYTE_KEYS:
-                sub_s += wchar.upper()
+                sub_s = sub_s[:cursor_idx] + wchar.upper() + sub_s[cursor_idx:]
+                cursor_idx += 1
             elif key == b'_key_enter':
                 self.search = sub_s if sub_s else self.search
                 if not self.search:
@@ -797,8 +842,11 @@ class HexEditor:
             indicates if the editor should keep running
         """
         wchar, i_chars = '', ''
+        cursor_idx = 0
         while str(wchar) != ESC_CODE:
-            self._action_render_scr(f"Confirm: 'ENTER' - Insert char(s): {frepr(i_chars)}␣")
+            self._action_render_scr(
+                f"Confirm: 'ENTER' - Insert char(s): {frepr(i_chars[:cursor_idx])}␣{frepr(i_chars[cursor_idx:])}"
+            )
             wchar, key = self._get_next_char()
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
@@ -814,16 +862,37 @@ class HexEditor:
                 if key == b'_action_resize':
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
-            if not isinstance(wchar, str):
+
+            if key == b'_move_key_left':
+                cursor_idx = max(0, cursor_idx - 1)
+            elif key == b'_move_key_ctl_left':
+                cursor_idx = max(0, cursor_idx - 10)
+            elif key == b'_move_key_right':
+                cursor_idx = min(len(i_chars), cursor_idx + 1)
+            elif key == b'_move_key_ctl_right':
+                cursor_idx = min(len(i_chars), cursor_idx + 10)
+
+            if key == b'_key_string' and not isinstance(wchar, str):
                 continue
+
             if key == b'_key_backspace':
-                i_chars = i_chars[:-1]
+                if cursor_idx:
+                    i_chars = i_chars[:cursor_idx-1] + i_chars[cursor_idx:]
+                    cursor_idx -= 1
             elif key == b'_key_ctl_backspace':
-                t_p = i_chars[-1:].isalnum()
-                while i_chars and i_chars[-1:].isalnum() == t_p:
-                    i_chars = i_chars[:-1]
+                t_p = i_chars[cursor_idx-1:cursor_idx].isalnum()
+                while cursor_idx and i_chars[cursor_idx-1:cursor_idx].isalnum() == t_p:
+                    i_chars = i_chars[:cursor_idx-1] + i_chars[cursor_idx:]
+                    cursor_idx -= 1
+            elif key == b'_key_dc':
+                i_chars = i_chars[:cursor_idx] + i_chars[cursor_idx+1:]
+            elif key == b'_key_dl':
+                tp = i_chars[cursor_idx:cursor_idx+1].isalnum()
+                while cursor_idx < len(i_chars) and i_chars[cursor_idx:cursor_idx+1].isalnum() == tp:
+                    i_chars = i_chars[:cursor_idx] + i_chars[cursor_idx+1:]
             elif key == b'_key_string':
-                i_chars += wchar
+                i_chars = i_chars[:cursor_idx] + wchar + i_chars[cursor_idx:]
+                cursor_idx += 1
             elif key == b'_key_enter':
                 i_chars = i_chars.encode('utf-16', 'surrogatepass').decode('utf-16')
                 if HexEditor.unicode_escaped_insert:

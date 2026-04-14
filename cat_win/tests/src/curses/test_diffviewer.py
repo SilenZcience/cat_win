@@ -223,6 +223,40 @@ class TestDiffViewer(TestCase):
         dv3._action_insert()
         self.assertEqual(dv3.difflibparser_cutoff, 0.8)
 
+    def test_action_jump_supports_cursor_move_and_middle_insert(self):
+        dv = self._mk_viewer()
+        dv.difflibparser.last_lineno = 999
+        dv.diff_items = [
+            DummyDiffItem('1', 'a', 'a', DifflibID.EQUAL),
+            DummyDiffItem('2', 'b', 'b', DifflibID.EQUAL),
+            DummyDiffItem('3', 'c', 'c', DifflibID.EQUAL),
+            DummyDiffItem('4', 'c', 'c', DifflibID.EQUAL),
+            DummyDiffItem('5', 'c', 'c', DifflibID.EQUAL),
+            DummyDiffItem('6', 'c', 'c', DifflibID.EQUAL),
+            DummyDiffItem('7', 'c', 'c', DifflibID.EQUAL),
+            DummyDiffItem('8', 'c', 'c', DifflibID.EQUAL),
+            DummyDiffItem('9', 'c', 'c', DifflibID.EQUAL),
+            DummyDiffItem('10', 'c', 'c', DifflibID.EQUAL),
+            DummyDiffItem('11', 'c', 'c', DifflibID.EQUAL),
+            DummyDiffItem('12', 'c', 'c', DifflibID.EQUAL),
+        ]
+        dv._get_next_char = MagicMock(side_effect=[
+            ('4', b'_key_string'),
+            ('3', b'_key_string'),
+            ('', b'_move_key_left'),
+            ('', b'_key_dc'),
+            ('2', b'_key_string'),
+            ('', b'_move_key_left'),
+            ('', b'_key_dl'),
+            ('1', b'_key_string'),
+            ('', b'_move_key_left'),
+            ('', b'_key_backspace'),
+            ('1', b'_key_string'),
+            ('', b'_key_enter'),
+        ])
+        dv._action_jump()
+        self.assertEqual(dv.rpos.row, 10)
+
     def test_action_reload_watch_quit_interrupt_resize(self):
         dv = self._mk_viewer()
         dv._setup_file = MagicMock()

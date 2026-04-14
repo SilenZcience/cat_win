@@ -845,8 +845,12 @@ class Editor:
 
         wchar, w_query, query_result = '', '', ''
         result_color = 2
+        cursor_idx = 0
         while str(wchar).upper() != ESC_CODE:
-            self._action_render_scr(f"Query: {frepr(w_query)}␣", query_result, result_color)
+            self._action_render_scr(
+                f"Query: {frepr(w_query[:cursor_idx])}␣{frepr(w_query[cursor_idx:])}",
+                query_result, result_color
+            )
             wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
@@ -863,16 +867,37 @@ class Editor:
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
                     curses.curs_set(0)
-            if not isinstance(wchar, str):
+
+            if key == b'_move_key_left':
+                cursor_idx = max(0, cursor_idx - 1)
+            elif key == b'_move_key_ctl_left':
+                cursor_idx = max(0, cursor_idx - 10)
+            elif key == b'_move_key_right':
+                cursor_idx = min(len(w_query), cursor_idx + 1)
+            elif key == b'_move_key_ctl_right':
+                cursor_idx = min(len(w_query), cursor_idx + 10)
+
+            if key == b'_key_string' and not isinstance(wchar, str):
                 continue
-            if key == b'_key_string':
-                w_query += wchar
+
             elif key == b'_key_backspace':
-                w_query = w_query[:-1]
+                if cursor_idx:
+                    w_query = w_query[:cursor_idx-1] + w_query[cursor_idx:]
+                    cursor_idx -= 1
             elif key == b'_key_ctl_backspace':
-                t_p = w_query[-1:].isalnum()
-                while w_query and w_query[-1:].isalnum() == t_p:
-                    w_query = w_query[:-1]
+                t_p = w_query[cursor_idx-1:cursor_idx].isalnum()
+                while cursor_idx and w_query[cursor_idx-1:cursor_idx].isalnum() == t_p:
+                    w_query = w_query[:cursor_idx-1] + w_query[cursor_idx:]
+                    cursor_idx -= 1
+            elif key == b'_key_dc':
+                w_query = w_query[:cursor_idx] + w_query[cursor_idx+1:]
+            elif key == b'_key_dl':
+                t_p = w_query[cursor_idx:cursor_idx+1].isalnum()
+                while cursor_idx < len(w_query) and w_query[cursor_idx:cursor_idx+1].isalnum() == t_p:
+                    w_query = w_query[:cursor_idx] + w_query[cursor_idx+1:]
+            elif key == b'_key_string':
+                w_query = w_query[:cursor_idx] + wchar + w_query[cursor_idx:]
+                cursor_idx += len(wchar)
             elif key == b'_key_enter':
                 w_query = w_query.casefold()
                 if w_query == 'exit':
@@ -939,8 +964,11 @@ class Editor:
         curses.curs_set(0)
 
         wchar, l_jmp = '', ''
+        cursor_idx = 0
         while str(wchar).upper() not in [ESC_CODE, 'N']:
-            self._action_render_scr(f"Confirm: [y]es, [n]o - Jump to line: {l_jmp}␣")
+            self._action_render_scr(
+                f"Confirm: [y]es, [n]o - Jump to line: {l_jmp[:cursor_idx]}␣{l_jmp[cursor_idx:]}"
+            )
             wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
@@ -957,14 +985,33 @@ class Editor:
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
                     curses.curs_set(0)
-            if not isinstance(wchar, str):
+
+            if key == b'_move_key_left':
+                cursor_idx = max(0, cursor_idx - 1)
+            elif key == b'_move_key_ctl_left':
+                cursor_idx = max(0, cursor_idx - 10)
+            elif key == b'_move_key_right':
+                cursor_idx = min(len(l_jmp), cursor_idx + 1)
+            elif key == b'_move_key_ctl_right':
+                cursor_idx = min(len(l_jmp), cursor_idx + 10)
+
+            if key == b'_key_string' and not isinstance(wchar, str):
                 continue
-            if key == b'_key_backspace':
-                l_jmp = l_jmp[:-1]
+
+            elif key == b'_key_backspace':
+                if cursor_idx:
+                    l_jmp = l_jmp[:cursor_idx-1] + l_jmp[cursor_idx:]
+                    cursor_idx -= 1
             elif key == b'_key_ctl_backspace':
-                l_jmp = ''
+                l_jmp = l_jmp[cursor_idx:]
+                cursor_idx = 0
+            elif key == b'_key_dc':
+                l_jmp = l_jmp[:cursor_idx] + l_jmp[cursor_idx+1:]
+            elif key == b'_key_dl':
+                l_jmp = l_jmp[:cursor_idx]
             elif key == b'_key_string' and wchar.isdigit():
-                l_jmp += wchar
+                l_jmp = l_jmp[:cursor_idx] + wchar + l_jmp[cursor_idx:]
+                cursor_idx += len(wchar)
             elif (key == b'_key_string' and wchar.upper() in ['Y', 'J']) or \
                 key == b'_key_enter':
                 if l_jmp:
@@ -987,6 +1034,7 @@ class Editor:
         search_regex = not isinstance(self.search, str)
         wchar, sub_s, tmp_error = '', '', ''
         key, running = b'_key_enter', False
+        cursor_idx = 0
         while str(wchar) != ESC_CODE:
             if not find_next:
                 pre_s = ''
@@ -996,7 +1044,7 @@ class Editor:
                     pre_s = f" re:[{repr(self.search.pattern)[1:-1]}]"
                 rep_r = 'Match' if search_regex else 'Search for'
                 self._action_render_scr(
-                    f"Confirm: 'ENTER' - {rep_r}{pre_s}: {frepr(sub_s)}␣",
+                    f"Confirm: 'ENTER' - {rep_r}{pre_s}: {frepr(sub_s[:cursor_idx])}␣{frepr(sub_s[cursor_idx:])}",
                     tmp_error
                 )
                 wchar, key = next(self.get_char)
@@ -1021,16 +1069,37 @@ class Editor:
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
                     curses.curs_set(0)
-            if not isinstance(wchar, str):
+
+            if key == b'_move_key_left':
+                cursor_idx = max(0, cursor_idx - 1)
+            elif key == b'_move_key_ctl_left':
+                cursor_idx = max(0, cursor_idx - 10)
+            elif key == b'_move_key_right':
+                cursor_idx = min(len(sub_s), cursor_idx + 1)
+            elif key == b'_move_key_ctl_right':
+                cursor_idx = min(len(sub_s), cursor_idx + 10)
+
+            if key == b'_key_string' and not isinstance(wchar, str):
                 continue
-            if key == b'_key_backspace':
-                sub_s = sub_s[:-1]
+
+            elif key == b'_key_backspace':
+                if cursor_idx:
+                    sub_s = sub_s[:cursor_idx-1] + sub_s[cursor_idx:]
+                    cursor_idx -= 1
             elif key == b'_key_ctl_backspace':
-                t_p = sub_s[-1:].isalnum()
-                while sub_s and sub_s[-1:].isalnum() == t_p:
-                    sub_s = sub_s[:-1]
+                t_p = sub_s[cursor_idx-1:cursor_idx].isalnum()
+                while cursor_idx and sub_s[cursor_idx-1:cursor_idx].isalnum() == t_p:
+                    sub_s = sub_s[:cursor_idx-1] + sub_s[cursor_idx:]
+                    cursor_idx -= 1
+            elif key == b'_key_dc':
+                sub_s = sub_s[:cursor_idx] + sub_s[cursor_idx+1:]
+            elif key == b'_key_dl':
+                t_p = sub_s[cursor_idx:cursor_idx+1].isalnum()
+                while cursor_idx < len(sub_s) and sub_s[cursor_idx:cursor_idx+1].isalnum() == t_p:
+                    sub_s = sub_s[:cursor_idx] + sub_s[cursor_idx+1:]
             elif key == b'_key_string':
-                sub_s += wchar
+                sub_s = sub_s[:cursor_idx] + wchar + sub_s[cursor_idx:]
+                cursor_idx += len(wchar)
             elif key == b'_key_enter':
                 self.search = sub_s if sub_s else self.search
                 if not self.search:
@@ -1112,6 +1181,7 @@ class Editor:
         replace_all = False
         wchar, sub_s, tmp_error = '', '', ''
         key, running = b'_key_enter', False
+        cursor_idx = 0
         while str(wchar) != ESC_CODE:
             if not replace_next:
                 pre_s = '[]'
@@ -1122,7 +1192,7 @@ class Editor:
                 pre_r = f" [{repr(self.replace)[1:-1]}]" if self.replace else ''
                 rep_a = 'ALL ' if replace_all else ''
                 self._action_render_scr(
-                    f"Confirm: 'ENTER' - Replace {rep_a}{pre_s} with{pre_r}: {frepr(sub_s)}␣",
+                    f"Confirm: 'ENTER' - Replace {rep_a}{pre_s} with{pre_r}: {frepr(sub_s[:cursor_idx])}␣{frepr(sub_s[cursor_idx:])}",
                     tmp_error
                 )
                 wchar, key = next(self.get_char)
@@ -1154,16 +1224,37 @@ class Editor:
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
                     curses.curs_set(0)
-            if not isinstance(wchar, str):
+
+            if key == b'_move_key_left':
+                cursor_idx = max(0, cursor_idx - 1)
+            elif key == b'_move_key_ctl_left':
+                cursor_idx = max(0, cursor_idx - 10)
+            elif key == b'_move_key_right':
+                cursor_idx = min(len(sub_s), cursor_idx + 1)
+            elif key == b'_move_key_ctl_right':
+                cursor_idx = min(len(sub_s), cursor_idx + 10)
+
+            if key == b'_key_string' and not isinstance(wchar, str):
                 continue
-            if key == b'_key_backspace':
-                sub_s = sub_s[:-1]
+
+            elif key == b'_key_backspace':
+                if cursor_idx:
+                    sub_s = sub_s[:cursor_idx-1] + sub_s[cursor_idx:]
+                    cursor_idx -= 1
             elif key == b'_key_ctl_backspace':
-                t_p = sub_s[-1:].isalnum()
-                while sub_s and sub_s[-1:].isalnum() == t_p:
-                    sub_s = sub_s[:-1]
+                t_p = sub_s[cursor_idx-1:cursor_idx].isalnum()
+                while cursor_idx and sub_s[cursor_idx-1:cursor_idx].isalnum() == t_p:
+                    sub_s = sub_s[:cursor_idx-1] + sub_s[cursor_idx:]
+                    cursor_idx -= 1
+            elif key == b'_key_dc':
+                sub_s = sub_s[:cursor_idx] + sub_s[cursor_idx+1:]
+            elif key == b'_key_dl':
+                t_p = sub_s[cursor_idx:cursor_idx+1].isalnum()
+                while cursor_idx < len(sub_s) and sub_s[cursor_idx:cursor_idx+1].isalnum() == t_p:
+                    sub_s = sub_s[:cursor_idx] + sub_s[cursor_idx+1:]
             elif key == b'_key_string':
-                sub_s += wchar
+                sub_s = sub_s[:cursor_idx] + wchar + sub_s[cursor_idx:]
+                cursor_idx += len(wchar)
             elif key == b'_key_enter':
                 if not self.search:
                     tmp_error = 'unspecified search!'
@@ -1259,9 +1350,12 @@ class Editor:
         """
         tmp_error_bar = ''
         wchar, i_bytes = '', ''
+        cursor_idx = 0
         while str(wchar) != ESC_CODE:
-            self._action_render_scr(f"Confirm: 'ENTER' - Insert byte(s): 0x{i_bytes}␣",
-                                    tmp_error_bar)
+            self._action_render_scr(
+                f"Confirm: 'ENTER' - Insert byte(s): 0x{i_bytes[:cursor_idx]}␣{i_bytes[cursor_idx:]}",
+                tmp_error_bar
+            )
             wchar, key = next(self.get_char)
             if key in ACTION_HOTKEYS:
                 if key in [b'_action_quit', b'_action_interrupt']:
@@ -1277,16 +1371,37 @@ class Editor:
                 if key == b'_action_resize':
                     getattr(self, key.decode(), lambda *_: False)()
                     self._render_scr()
-            if not isinstance(wchar, str):
+
+            if key == b'_move_key_left':
+                cursor_idx = max(0, cursor_idx - 1)
+            elif key == b'_move_key_ctl_left':
+                cursor_idx = max(0, cursor_idx - 10)
+            elif key == b'_move_key_right':
+                cursor_idx = min(len(i_bytes), cursor_idx + 1)
+            elif key == b'_move_key_ctl_right':
+                cursor_idx = min(len(i_bytes), cursor_idx + 10)
+
+            if key == b'_key_string' and not isinstance(wchar, str):
                 continue
+
             if key == b'_key_backspace':
-                i_bytes = i_bytes[:-1]
+                if cursor_idx:
+                    i_bytes = i_bytes[:cursor_idx-1] + i_bytes[cursor_idx:]
+                    cursor_idx -= 1
             elif key == b'_key_ctl_backspace':
-                t_p = i_bytes[-1:].isalpha()
-                while i_bytes and i_bytes[-1:].isalpha() == t_p:
-                    i_bytes = i_bytes[:-1]
+                t_p = i_bytes[cursor_idx-1:cursor_idx].isalpha()
+                while cursor_idx and i_bytes[cursor_idx-1:cursor_idx].isalpha() == t_p:
+                    i_bytes = i_bytes[:cursor_idx-1] + i_bytes[cursor_idx:]
+                    cursor_idx -= 1
+            elif key == b'_key_dc':
+                i_bytes = i_bytes[:cursor_idx] + i_bytes[cursor_idx+1:]
+            elif key == b'_key_dl':
+                t_p = i_bytes[cursor_idx:cursor_idx+1].isalpha()
+                while cursor_idx < len(i_bytes) and i_bytes[cursor_idx:cursor_idx+1].isalpha() == t_p:
+                    i_bytes = i_bytes[:cursor_idx] + i_bytes[cursor_idx+1:]
             elif key == b'_key_string' and all(wch in HEX_BYTE_KEYS for wch in wchar.upper()):
-                i_bytes += wchar.upper()
+                i_bytes = i_bytes[:cursor_idx] + wchar.upper() + i_bytes[cursor_idx:]
+                cursor_idx += len(wchar)
             elif key == b'_key_enter':
                 try:
                     i_string = bytes.fromhex(i_bytes).decode(self.file_encoding)
