@@ -18,6 +18,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added colored syntax highlighting to the editor. custom selections can be made when pressing `F4` to open the syntax highlighter manager.
 - expanded the editor-search to support multiple lines when searching for literal strings.
 - expanded the editor-transform action to support custom lambda-functions.
+- added cursor movement to all actions inside all curses applications.
 - added `grep_context_lines` element to the config menu to define the amount of context line displayed before and after every grep-line.
 - added `grep_query_separator` element to the config menu to define the separator string between all found queries when using -`G`, --`GREP`.
 - added `squeeze_collapse_suffixes` element to the config menu to toggle the display of how many lines have been squeezed when using -`u`, --`unique`.
