@@ -17,7 +17,7 @@ from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.curses.helper.editorsearchhelper import search_iter_hex_factory
 from cat_win.src.curses.helper.editorhelper import Position, frepr, \
     UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, SELECT_HOTKEYS, \
-        FUNCTION_HOTKEYS, HEX_BYTE_KEYS
+        FUNCTION_HOTKEYS, HEX_BYTE_KEYS, SCROLL_HOTKEYS
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.curses.helper.fileselectionhelper import run_file_selection
 from cat_win.src.curses.helper.githelper import GitHelper
@@ -75,6 +75,7 @@ class HexEditor:
         self.error_bar = ''
         self.unsaved_progress = False
         self.changes_made = False
+        self.scrolling = False
         self.selecting = False
 
         self.top_line = '┌' + '─' * 10 + '┬' + '─' * (HexEditor.columns * 3 + 1) + '┬' + \
@@ -352,10 +353,17 @@ class HexEditor:
             self.cpos.set_pos(self.selected_area[0])
         self.cpos.row -= 1
 
+    def _scroll_key_up(self) -> None:
+        self.wpos.row = max(self.wpos.row - 1, 0)
+
     def _move_key_down(self) -> None:
         if self.selecting:
             self.cpos.set_pos(self.selected_area[1])
         self.cpos.row += 1
+
+    def _scroll_key_down(self) -> None:
+        max_y, _ = self.getxymax()
+        self.wpos.row = min(self.wpos.row + 1, max(0, len(self.hex_array)-max_y))
 
     def _move_key_ctl_left(self) -> None:
         if self.selecting:
@@ -400,12 +408,20 @@ class HexEditor:
         self.cpos.row -= max_y
         self.wpos.row = max(self.wpos.row-max_y, 0)
 
+    def _scroll_key_page_up(self) -> None:
+        max_y, _ = self.getxymax()
+        self.wpos.row = max(self.wpos.row-max_y, 0)
+
     def _move_key_page_down(self) -> None:
         if self.selecting:
             self.cpos.set_pos(self.selected_area[1])
         max_y, _ = self.getxymax()
         self.cpos.row += max_y
         self._build_file_upto(max_y+self.cpos.row+2)
+
+    def _scroll_key_page_down(self) -> None:
+        max_y, _ = self.getxymax()
+        self.wpos.row = min(self.wpos.row+max_y, max(0, len(self.hex_array)-max_y))
 
     def _select_key_page_up(self) -> None:
         self.selecting = False
@@ -1110,14 +1126,15 @@ class HexEditor:
         self.cpos.col = min(self.cpos.col, len(self.hex_array[self.cpos.row])-1)
         self.cpos.col = max(self.cpos.col, 0)
 
-        if self.cpos.row < self.wpos.row:
-            self.wpos.row = self.cpos.row
-        elif self.cpos.row >= self.wpos.row + max_y:
-            self.wpos.row = self.cpos.row - max_y + 1
-        # if self.cpos.col < self.wpos.col:
-        #     self.wpos.col = self.cpos.col
-        # elif self.cpos.col >= self.wpos.col + max_x:
-        #     self.wpos.col = self.cpos.col - max_x + 1
+        if not self.scrolling:
+            if self.cpos.row < self.wpos.row:
+                self.wpos.row = self.cpos.row
+            elif self.cpos.row >= self.wpos.row + max_y:
+                self.wpos.row = self.cpos.row - max_y + 1
+            # if self.cpos.col < self.wpos.col:
+            #     self.wpos.col = self.cpos.col
+            # elif self.cpos.col >= self.wpos.col + max_x:
+            #     self.wpos.col = self.cpos.col - max_x + 1
 
     def _render_title_offset(self, max_x: int) -> None:
         # Draw Title:
@@ -1148,12 +1165,14 @@ class HexEditor:
             self.curse_window.addstr(len(hex_section)+2, 0, self.bot_line[:max_x])
         self.curse_window.clrtobot()
 
-    def _render_highlight_selection(self) -> None:
+    def _render_highlight_selection(self, max_y: int) -> None:
         # only highlight if the file has content
         if not self.hex_array[self.cpos.row]:
             return
         # Highlight Selection
         cursor_y = self.cpos.row-self.wpos.row+2
+        if cursor_y < 2 or cursor_y > max_y+1:
+            return
         try:
             self.curse_window.chgat(cursor_y, 13 + self.cpos.col*3,
                                     2, self._get_color(4))
@@ -1280,18 +1299,19 @@ class HexEditor:
         render the curses window.
         """
         max_y, max_x = self.getxymax()
-        self._build_file_upto(max_y+self.cpos.row+2)
+        self._build_file_upto(max_y+max(self.cpos.row, self.wpos.row)+2)
 
         self._fix_cursor_position(max_y)
 
         self._render_title_offset(max_x)
         self._render_draw_rows(max_y, max_x)
-        self._render_highlight_selection()
+        self._render_highlight_selection(max_y)
         self._render_highlight_edits(max_y)
         self._render_highlight_selected_area(max_y)
         self._render_search_items(max_y)
         self._render_status_bar(max_y, max_x)
 
+        self.scrolling = False
         self.curse_window.refresh()
 
     def _run(self) -> None:
@@ -1311,6 +1331,9 @@ class HexEditor:
             elif key in ACTION_HOTKEYS:
                 running &= getattr(self, key.decode(), lambda *_: True)()
             elif key in MOVE_HOTKEYS | FUNCTION_HOTKEYS:
+                getattr(self, key.decode(), lambda *_: None)()
+            elif key in SCROLL_HOTKEYS:
+                self.scrolling = True
                 getattr(self, key.decode(), lambda *_: None)()
             # select bytes:
             if key in SELECT_HOTKEYS:

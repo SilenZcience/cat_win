@@ -17,7 +17,7 @@ from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.const.regex import RE_CUTOFF
 from cat_win.src.curses.helper.diffviewerhelper import DifflibParser, DifflibID
 from cat_win.src.curses.helper.editorhelper import Position, frepr, \
-    UNIFY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, FUNCTION_HOTKEYS
+    UNIFY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, FUNCTION_HOTKEYS, SCROLL_HOTKEYS
 from cat_win.src.curses.helper.editorsearchhelper import search_iter_diff_factory
 from cat_win.src.curses.helper.fileselectionhelper import run_file_selection
 from cat_win.src.curses.helper.githelper import GitHelper
@@ -185,7 +185,7 @@ class DiffViewer:
         handles mouse events.
         """
         _, _, y, _, b_state = curses.getmouse()
-        if b_state & curses.BUTTON1_PRESSED:
+        if b_state & curses.BUTTON1_PRESSED or b_state & curses.BUTTON1_CLICKED:
             self.rpos.row = min(self.wpos.row + y, len(self.diff_items)-1)
             self._ensure_rpos_visible()
         elif b_state & curses.BUTTON4_PRESSED:
@@ -198,16 +198,28 @@ class DiffViewer:
     def _move_key_left(self) -> None:
         self.wpos.col -= 1
 
+    def _scroll_key_left(self) -> None:
+        self.wpos.col -= 1
+
     def _move_key_right(self) -> None:
+        self.wpos.col += 1
+
+    def _scroll_key_right(self) -> None:
         self.wpos.col += 1
 
     def _move_key_up(self) -> None:
         self.rpos.row = max(self.rpos.row-1, 0)
         self._ensure_rpos_visible()
 
+    def _scroll_key_up(self) -> None:
+        self.wpos.row -= 1
+
     def _move_key_down(self) -> None:
         self.rpos.row = min(self.rpos.row+1, len(self.diff_items)-1)
         self._ensure_rpos_visible()
+
+    def _scroll_key_down(self) -> None:
+        self.wpos.row += 1
 
     def _move_key_ctl_left(self) -> None:
         self.wpos.col -= 10
@@ -228,12 +240,23 @@ class DiffViewer:
         self.rpos.row = max(self.rpos.row-max_y, 0)
         self._ensure_rpos_visible()
 
+    def _scroll_key_page_up(self) -> None:
+        max_y, _ = self.getxymax()
+        self.wpos.row -= max_y
+
     def _move_key_page_down(self) -> None:
         max_y, _ = self.getxymax()
         self.rpos.row = min(self.rpos.row+max_y, len(self.diff_items)-1)
         self._ensure_rpos_visible()
 
+    def _scroll_key_page_down(self) -> None:
+        max_y, _ = self.getxymax()
+        self.wpos.row += max_y
+
     def _move_key_end(self) -> None:
+        self.wpos.col = self.lllen() - self.half_width
+
+    def _scroll_key_end(self) -> None:
         self.wpos.col = self.lllen() - self.half_width
 
     def _move_key_ctl_end(self) -> None:
@@ -242,6 +265,9 @@ class DiffViewer:
         self.wpos.col = self.lllen() - self.half_width
 
     def _move_key_home(self) -> None:
+        self.wpos.col = 0
+
+    def _scroll_key_home(self) -> None:
         self.wpos.col = 0
 
     def _move_key_ctl_home(self) -> None:
@@ -1166,7 +1192,7 @@ class DiffViewer:
 
             if key in ACTION_HOTKEYS:
                 running &= getattr(self, key.decode(), lambda *_: True)()
-            elif key in MOVE_HOTKEYS | FUNCTION_HOTKEYS:
+            elif key in MOVE_HOTKEYS | FUNCTION_HOTKEYS | SCROLL_HOTKEYS:
                 getattr(self, key.decode(), lambda *_: None)()
 
         if watch_active:
