@@ -2251,11 +2251,11 @@ class Editor:
 
         changes_made = False
 
+        special_chars = dict(map(lambda x: (chr(x[0]), x[2]), SPECIAL_CHARS))
         if fg_state is None:
             editor = cls(files)
             if skip_binary and editor.error_bar:
                 return False
-            special_chars = dict(map(lambda x: (chr(x[0]), x[2]), SPECIAL_CHARS))
             editor._set_special_chars(special_chars)
         else:
             editor = fg_state
