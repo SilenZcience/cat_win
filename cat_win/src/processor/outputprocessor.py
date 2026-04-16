@@ -1,11 +1,5 @@
 """
-printer
-
-Core output pipeline: applies search/replace/grep highlighting and emits
-lines to stdout (or to the More stepper for paged output).
-
-All mutable state is passed explicitly so this module has no module-level
-side effects and can be imported without initialising cat.py's globals.
+outputprocessor
 """
 
 from collections import deque
@@ -85,7 +79,18 @@ def print_excluded_by_peek(ctx, excluded_by_peek: int) -> None:
 
 
 def print_raw_view(ctx, file_index: int, mode: str) -> None:
-    """Print a hex or binary byte-view of one file."""
+    """
+    Print a hex or binary byte-view of one file.
+
+    Parameters:
+    ctx (AppContext):
+        the app context
+    file_index (int):
+        index of the file to print in ctx.u_files
+    mode (str):
+        either 'x', 'X' for hexadecimal (lower- or upper case letters),
+        or 'b' for binary
+    """
     queue = []
     skipped = 0
 

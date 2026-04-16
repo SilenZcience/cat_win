@@ -1,9 +1,5 @@
 """
 fileprocessor
-
-Handles reading individual files and iterating over the full file list.
-All mutable state is received through an AppContext so this module has no
-module-level side effects and does not import cat.py.
 """
 
 from time import sleep
@@ -34,11 +30,19 @@ from cat_win.src.service.helper.archiveviewer import display_archive
 from cat_win.src.service.helper.iohelper import IoHelper, logger
 
 
-def edit_file(file_index: int, ctx) -> None:
-    """Read and process one file, dispatching to the appropriate renderer."""
+def edit_file(ctx, file_index: int) -> None:
+    """
+    Read and process one file, dispatching to the appropriate processor.
+
+    Parameters:
+    ctx (AppContext):
+        The current invocation context, containing parsed arguments and other state.
+    file_index (int):
+        The index of the file in ctx.u_files to process.
+    """
     if ctx.u_args[ARGS_RAW]:
         raw_content = IoHelper.read_file(ctx.u_files[file_index].path, True)
-        edit_raw_content(raw_content, file_index, ctx)
+        edit_raw_content(ctx, raw_content, file_index)
         return
 
     file_size = -1 if (
@@ -90,11 +94,19 @@ def edit_file(file_index: int, ctx) -> None:
             logger('Operation failed! Try using the enc=X parameter.', priority=logger.ERROR)
             return
 
-    edit_content(file_index, 0, ctx)
+    edit_content(ctx, file_index, 0)
 
 
-def decode_files_base64(tmp_file_helper, ctx) -> None:
-    """Decode every file in ctx.u_files from base64 into a temporary file."""
+def decode_files_base64(ctx, tmp_file_helper) -> None:
+    """
+    Decode every file in ctx.u_files from base64 into a temporary file.
+
+    Parameters:
+    ctx (AppContext):
+        The current invocation context, containing parsed arguments and other state.
+    tmp_file_helper (TempFileHelper):
+        A helper for generating temporary file paths.
+    """
     for i, file in enumerate(ctx.u_files):
         try:
             tmp_file_path = tmp_file_helper.generate_temp_file_name()
@@ -120,7 +132,13 @@ def decode_files_base64(tmp_file_helper, ctx) -> None:
 
 
 def edit_files(ctx) -> None:
-    """Iterate over all files in ctx.u_files and process each one."""
+    """
+    Iterate over all files in ctx.u_files and process each one.
+
+    Parameters:
+    ctx (AppContext):
+        The current invocation context, containing parsed arguments and other state.
+    """
     start = len(ctx.u_files) - 1 if ctx.u_args[ARGS_REVERSE] else 0
     end = -1 if ctx.u_args[ARGS_REVERSE] else len(ctx.u_files)
     step = -1 if ctx.u_args[ARGS_REVERSE] else 1
@@ -134,7 +152,7 @@ def edit_files(ctx) -> None:
 
     def _process(i: int) -> None:
         if raw_view_mode is None:
-            edit_file(i, ctx)
+            edit_file(ctx, i)
         else:
             print_raw_view(ctx, i, raw_view_mode)
 

@@ -1,9 +1,5 @@
 """
 contentprocessor
-
-Handles the per-line transformation pipeline and file-content editing.
-All mutable state is received through an AppContext so this module has no
-module-level side effects and does not import cat.py.
 """
 
 from datetime import datetime
@@ -69,7 +65,15 @@ except SyntaxError:
 
 
 def _ansi_aware_slice_line(param: tuple, reset_all: str):
-    """Create a line-slicer that cuts by plain-text positions and preserves ANSI state."""
+    """
+    Create a line-slicer that cuts by plain-text positions and preserves ANSI state.
+
+    Parameters:
+    param (tuple):
+        the slice parameters (start, stop, step)
+    reset_all (str):
+        the ANSI code to reset all styles (e.g., '\x1b[0m')
+    """
     slice_obj = slice(*param)
 
     def _slice_line(line: str) -> str: # TODO: what about negative step in slice?
@@ -108,8 +112,7 @@ def _ansi_aware_slice_line(param: tuple, reset_all: str):
 
 
 @register_pro(ARGS_CUT)
-def _apply_cut(param: tuple, ctx) -> None:
-    """Slice each line (prefix unchanged). Operates in-place on ctx.content."""
+def _apply_cut(ctx, param: tuple) -> None:
     slice_line = _ansi_aware_slice_line(param, ctx.color_dic[CKW.RESET_ALL])
     ctx.content.lines[:] = [
         slice_line(line) for line in ctx.content.lines
@@ -117,8 +120,7 @@ def _apply_cut(param: tuple, ctx) -> None:
 
 
 @register_pro(ARGS_ENDS)
-def _apply_ends(_param, ctx) -> None:
-    """Append end marker to each suffix. Operates in-place on ctx.content."""
+def _apply_ends(ctx, _param) -> None:
     emarker = (
         ctx.color_dic[CKW.ENDS]
         + ctx.const_dic[DKW.END_MARKER_SYMBOL]
@@ -129,8 +131,7 @@ def _apply_ends(_param, ctx) -> None:
 
 
 @register_pro(ARGS_CHR)
-def _apply_chr(_param, ctx) -> None:
-    """Replace special characters with visual markers. Operates in-place on ctx.content."""
+def _apply_chr(ctx, _param) -> None:
     for c_id, char, _, possible in SPECIAL_CHARS:
         if not possible:
             continue
@@ -141,8 +142,7 @@ def _apply_chr(_param, ctx) -> None:
 
 
 @register_pro(ARGS_SQUEEZE)
-def _apply_squeeze(_param, ctx) -> None:
-    """Collapse consecutive duplicate lines and annotate run-count in suffix."""
+def _apply_squeeze(ctx, _param) -> None:
     new_lines = []
     new_prefixes = []
     new_suffixes = []
@@ -171,26 +171,22 @@ def _apply_squeeze(_param, ctx) -> None:
 
 
 @register_pro(ARGS_REVERSE)
-def _apply_reverse(_param, ctx) -> None:
-    """Reverse content. Operates in-place on ctx.content."""
+def _apply_reverse(ctx, _param) -> None:
     ctx.content.reverse()
 
 
 @register_pro(ARGS_SORT)
-def _apply_sort_alpha(_param, ctx) -> None:
-    """Sort lines alphabetically. Operates in-place on ctx.content."""
+def _apply_sort_alpha(ctx, _param) -> None:
     ctx.content.sort(key=lambda l: l[0].casefold())
 
 
 @register_pro(ARGS_SSORT)
-def _apply_sort_length(_param, ctx) -> None:
-    """Sort lines by length. Operates in-place on ctx.content."""
+def _apply_sort_length(ctx, _param) -> None:
     ctx.content.sort(key=lambda l: len(l[0]))
 
 
 @register_pro(ARGS_BLANK)
-def _apply_blank(_param, ctx) -> None:
-    """Remove blank lines. Operates in-place on ctx.content."""
+def _apply_blank(ctx, _param) -> None:
     strip_obj = None if ctx.const_dic[DKW.BLANK_REMOVE_WS_LINES] else ''
     ctx.content.filter(
         lambda line, _, __: line.strip(strip_obj)
@@ -198,20 +194,17 @@ def _apply_blank(_param, ctx) -> None:
 
 
 @register_pro(ARGS_EVAL)
-def _apply_eval(param: str, ctx) -> None:
-    """Evaluate lines. Modifies ctx.content in-place."""
+def _apply_eval(ctx, param: str) -> None:
     ctx.content = comp_eval(ctx.content, param, remove_ansi_codes_from_line)
 
 
 @register_pro(ARGS_HEX, ARGS_DEC, ARGS_OCT, ARGS_BIN)
-def _apply_convert(param: str, ctx) -> None:
-    """Convert lines. Modifies ctx.content in-place."""
+def _apply_convert(ctx, param: str) -> None:
     ctx.content = comp_conv(ctx.content, param, remove_ansi_codes_from_line)
 
 
 @register_pro(ARGS_REPLACE)
-def _apply_replace(param: tuple, ctx) -> None:
-    """Replace text in lines. Operates in-place on ctx.content."""
+def _apply_replace(ctx, param: tuple) -> None:
     replace_this, replace_with = param
     ctx.content.lines[:] = [
         replace_queries_in_line(
@@ -224,7 +217,6 @@ def _apply_replace(param: tuple, ctx) -> None:
 
 
 def _apply_eol_suffixes(ctx) -> None:
-    """Build ContentBuffer rows as (line, prefix, suffix) with EOL markers in suffix."""
     ctx.content.suffixes[:] = [
         ctx.color_dic[CKW.CHARS] + (
             '<CRLF>' if line.endswith('\r\n') else
@@ -239,11 +231,21 @@ def _apply_eol_suffixes(ctx) -> None:
     ]
 
 
-def edit_raw_content(raw_content: bytes, file_index: int, ctx) -> None:
-    """Write raw binary content, honouring --strings and --b64e."""
+def edit_raw_content(ctx, raw_content: bytes, file_index: int) -> None:
+    """
+    Write raw binary content, honouring --strings and --b64e.
+
+    Parameters:
+    ctx (AppContext):
+        the current invocation context
+    raw_content (bytes):
+        the raw content to write
+    file_index (int):
+        index into ctx.u_files; negative values indicate the REPL
+    """
     if ctx.u_args[ARGS_STRINGS]:
         ctx.content = ContentBuffer.from_lines([raw_content])
-        edit_content(file_index, 0, ctx)
+        edit_content(ctx, file_index, 0)
         return
     if ctx.u_args[ARGS_B64E]:
         encoded = encode_base64(raw_content, True)
@@ -254,17 +256,17 @@ def edit_raw_content(raw_content: bytes, file_index: int, ctx) -> None:
     sys.stdout.buffer.write(raw_content)
 
 
-def edit_content(file_index: int, line_offset: int, ctx) -> None:
+def edit_content(ctx, file_index: int, line_offset: int) -> None:
     """
     Apply all active transformation parameters to ctx.content and print it.
 
     Parameters:
+    ctx (AppContext):
+        the current invocation context (ctx.content must be pre-populated)
     file_index (int):
         index into ctx.u_files; negative values indicate the REPL
     line_offset (int):
         line-number offset when running in REPL mode
-    ctx (AppContext):
-        the current invocation context (ctx.content must be pre-populated)
     """
     if not (
         ctx.content or
@@ -323,7 +325,7 @@ def edit_content(file_index: int, line_offset: int, ctx) -> None:
     for arg, param in ctx.u_args:
         handler = PRO_CONTENT_ACTIONS.get(arg)
         if handler is not None:
-            handler(param, ctx)
+            handler(ctx, param)
 
     if ctx.u_args[ARGS_LLENGTH]:
         ctx.content.prefixes[:] = [

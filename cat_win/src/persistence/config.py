@@ -197,6 +197,7 @@ class Config:
     def get_cmd(self) -> list:
         """
         split the default command line string correctly into a parameter list
+        and inserts the default command line set in the config.
 
         Returns
         (list):
@@ -290,6 +291,8 @@ class Config:
             the keyword in self.elements
         value (str):
             the value to write
+        section (str):
+            the section to write to (CONSTS or COMMANDS)
         """
         if keyword is not None:
             self.config_parser.set(section, keyword, f'"{value}"')

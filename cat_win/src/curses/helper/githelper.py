@@ -8,6 +8,9 @@ import subprocess
 
 
 class GitHelper:
+    """
+    A helper class for interacting with Git repositories.
+    """
     GIT_CMD_FAILED: bool = False
 
     @staticmethod

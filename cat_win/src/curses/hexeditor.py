@@ -669,6 +669,9 @@ class HexEditor:
         """
         handles the find in editor action.
 
+        find_next (int):
+            if 0, opens the find prompt; if 1, finds the next occurrence; if -1, finds the previous occurrence
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -1080,7 +1083,7 @@ class HexEditor:
         """
         get next char
 
-        Returns
+        Returns:
         (wchar, key) (tuple):
             the char received and the possible action it means.
         """
@@ -1103,7 +1106,7 @@ class HexEditor:
         c_id (int):
             the id of the color to grab
 
-        Returns
+        Returns:
         (int):
             the curses.color
         """
@@ -1422,6 +1425,10 @@ class HexEditor:
     def _open(self, fg: bool = False) -> None:
         """
         init, run, deinit
+
+        Parameters:
+        fg (bool):
+            indicates if the editor is opened from background (True) or not (False)
         """
         try:
             self._init_screen()
@@ -1528,6 +1535,8 @@ class HexEditor:
             indicates if debug info should be displayed
         unicode_escaped_search (bool):
             indicates if the search should be unicode escaped
+        unicode_escaped_insert (bool):
+            indicates if the inserted text should be unicode escaped
         columns (int):
             defines how many columns the editor should have
         """

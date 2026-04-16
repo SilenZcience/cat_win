@@ -1,8 +1,8 @@
 """
 DiffViewer
 """
+
 from datetime import datetime
-from pathlib import Path
 try:
     import curses
     CURSES_MODULE_ERROR = False
@@ -368,6 +368,10 @@ class DiffViewer:
     def _action_find(self, find_next: int = 0) -> bool:
         """
         handles the find in diffviewer action.
+
+        Parameters:
+        find_next (int):
+            if 0, opens the find prompt; if 1, finds the next occurrence; if -1, finds the previous occurrence
 
         Returns:
         (bool):
@@ -1313,6 +1317,10 @@ class DiffViewer:
     def _open(self, fg: bool = False) -> None:
         """
         init, run, deinit
+
+        Parameters:
+        fg (bool):
+            indicates if the diffviewer got opened from background
         """
         try:
             self._init_screen()

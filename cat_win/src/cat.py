@@ -99,7 +99,17 @@ sys.excepthook = exception_handler
 
 
 def show_unknown_args_suggestions(repl: bool = False) -> list:
-    """Display unknown arguments and return Levenshtein-based suggestions."""
+    """
+    Display unknown arguments and return Levenshtein-based suggestions.
+
+    Parameters:
+    repl (bool):
+        True when invoked from the REPL entry point, which may filter which args to suggest.
+
+    Returns:
+    arg_suggestions (list):
+        List of tuples containing unknown arguments and their suggested replacements.
+    """
     if repl:
         arg_options = [
             (arg.short_form, arg.long_form)
@@ -117,7 +127,9 @@ def show_unknown_args_suggestions(repl: bool = False) -> list:
 
 
 def init_colors() -> None:
-    """Set the active colour dictionary based on output-mode flags."""
+    """
+    Set the active color dictionary based on output-mode flags.
+    """
     if _ctx.u_args[ARGS_NOCOL] or sys.stdout.closed or \
         (not os.isatty(sys.stdout.fileno()) and _ctx.const_dic[DKW.STRIP_COLOR_ON_PIPE]):
         _ctx.color_dic = dict.fromkeys(_ctx.color_dic, '')
@@ -231,7 +243,7 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
         logger('This may require a lot of time and resources.', priority=logger.WARNING)
 
     if _ctx.u_args[ARGS_B64D]:
-        _fp_decode_files_base64(tmp_file_helper, _ctx)
+        _fp_decode_files_base64(_ctx, tmp_file_helper)
 
     if len(_ctx.u_files):
         _ctx.u_files.generate_values(
@@ -248,7 +260,9 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
 
 @contextmanager
 def managed_tmp_file_helper():
-    """Create and clean up temporary files for one command execution."""
+    """
+    Create and clean up temporary files for one command execution.
+    """
     tmp_file_helper = TmpFileHelper()
     try:
         yield tmp_file_helper
@@ -257,13 +271,17 @@ def managed_tmp_file_helper():
 
 
 def main() -> None:
-    """Entry point for the catw command."""
+    """
+    Entry point for the catw command.
+    """
     with managed_tmp_file_helper() as tmp_file_helper:
         handle_args(tmp_file_helper)
 
 
 def repl_main() -> None:
-    """Launch the dedicated REPL module with the current app context."""
+    """
+    Entry point for the REPL.
+    """
     with managed_tmp_file_helper():
         init(repl=True)
         repl_module.repl_main(

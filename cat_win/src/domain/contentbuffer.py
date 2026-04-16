@@ -1,8 +1,5 @@
 """
 contentbuffer
-
-Data container for content processing that keeps prefixes and lines in
-separate synchronized lists.
 """
 
 
@@ -20,6 +17,21 @@ class ContentBuffer:
 
     @classmethod
     def from_lines(cls, lines, default_prefix='', default_suffix='') -> None:
+        """
+        Create a ContentBuffer from a sequence of lines.
+
+        Parameters:
+        lines (Iterable[str]):
+            the lines to include in the buffer.
+        default_prefix (str):
+            the default prefix for each line.
+        default_suffix (str):
+            the default suffix for each line.
+
+        Returns:
+        (ContentBuffer):
+            a new ContentBuffer containing the specified lines.
+        """
         line_list = list(lines)
         return cls(
             line_list,
@@ -29,6 +41,17 @@ class ContentBuffer:
 
     @classmethod
     def from_rows(cls, rows) -> None:
+        """
+        Create a ContentBuffer from a sequence of rows.
+
+        Parameters:
+        rows (Iterable[Tuple[str, ...]]):
+            the rows to include in the buffer.
+
+        Returns:
+        (ContentBuffer):
+            a new ContentBuffer containing the specified rows.
+        """
         prefixes = []
         lines = []
         suffixes = []
@@ -53,6 +76,17 @@ class ContentBuffer:
 
     @classmethod
     def ensure(cls, content):
+        """
+        Ensure that the given content is a ContentBuffer.
+
+        Parameters:
+        content (Union[ContentBuffer, Iterable[Tuple[str, ...]]]):
+            the content to ensure is a ContentBuffer.
+
+        Returns:
+        (ContentBuffer):
+            a ContentBuffer containing the specified content.
+        """
         if isinstance(content, cls):
             return content
         return cls.from_rows(content)
@@ -87,16 +121,39 @@ class ContentBuffer:
                 self.suffixes == value.suffixes)
 
     def append(self, line, prefix='', suffix='') -> None:
+        """
+        Append a line to the buffer.
+
+        Parameters:
+        line (str):
+            the line to append.
+        prefix (str):
+            the prefix for the line.
+        suffix (str):
+            the suffix for the line.
+        """
         self.lines.append(line)
         self.prefixes.append(prefix)
         self.suffixes.append(suffix)
 
     def reverse(self) -> None:
+        """
+        Reverse the order of lines in the buffer.
+        """
         self.lines.reverse()
         self.prefixes.reverse()
         self.suffixes.reverse()
 
     def sort(self, key=None, reverse=False) -> None:
+        """
+        Sort the lines in the buffer.
+
+        Parameters:
+        key (Callable[[Tuple[str, str, str], Any]):
+            a function to extract a comparison key from each line.
+        reverse (bool):
+            whether to sort in reverse order.
+        """
         idx = list(range(len(self.lines)))
         if key is None:
             raise NotImplementedError('Sorting without a key is not supported.')
@@ -106,6 +163,13 @@ class ContentBuffer:
         self.suffixes = [self.suffixes[i] for i in idx]
 
     def filter(self, predicate):
+        """
+        filter the lines in the buffer by a predicate.
+
+        Parameters:
+        predicate (Callable[[Tuple[str, str, str], bool]):
+            a function that takes a line and returns True if it should be included.
+        """
         lines = []
         prefixes = []
         suffixes = []
@@ -120,7 +184,18 @@ class ContentBuffer:
         return self
 
     def map(self, mapper):
-        """Apply mapper to each line and return a new ContentBuffer. mapper(line, prefix, suffix) -> new_line."""
+        """
+        Apply mapper to each line and return a new ContentBuffer.
+        mapper(line, prefix, suffix) -> new_line.
+
+        Parameters:
+        mapper (Callable[[Tuple[str, str, str], Tuple[str, str, str]]]):
+            a function that takes a line and returns a new line.
+
+        Returns:
+        (ContentBuffer):
+            a new ContentBuffer containing the mapped lines.
+        """
         lines = []
         prefixes = []
         suffixes = []

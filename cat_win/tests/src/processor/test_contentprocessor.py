@@ -91,7 +91,7 @@ class TestContentProcessor(TestCase):
 
         ctx = self._ctx()
         ctx.content = ContentBuffer.from_lines(['abcd'])
-        pro._apply_cut((1, 3, 1), ctx)
+        pro._apply_cut(ctx, (1, 3, 1))
         self.assertEqual(ctx.content.lines, ['bc'])
 
     def test_ansi_aware_slice_line_empty_and_reset_transition(self):
@@ -109,51 +109,51 @@ class TestContentProcessor(TestCase):
         ctx = self._ctx()
         ctx.content = ContentBuffer.from_rows([('A', 'p', 's'), ('A', 'p2', 's2'), ('', 'p3', 's3')])
 
-        pro._apply_ends(None, ctx)
+        pro._apply_ends(ctx, None)
         self.assertTrue(ctx.content.suffixes[0].endswith('<E>$<RST>'))
 
         with patch.object(pro, 'SPECIAL_CHARS', [(9, 'I', None, True)]):
             ctx.content = ContentBuffer.from_lines(['a\tb'])
-            pro._apply_chr(None, ctx)
+            pro._apply_chr(ctx, None)
             self.assertIn('^I', ctx.content.lines[0])
 
         with patch.object(pro, 'SPECIAL_CHARS', [(9, 'I', None, False)]):
             ctx.content = ContentBuffer.from_lines(['a\tb'])
-            pro._apply_chr(None, ctx)
+            pro._apply_chr(ctx, None)
             self.assertEqual(ctx.content.lines, ['a\tb'])
 
         ctx.content = ContentBuffer.from_rows([('z', '1', ''), ('a', '2', ''), ('a', '3', ''), ('', '4', '')])
-        pro._apply_blank(None, ctx)
+        pro._apply_blank(ctx, None)
         self.assertNotIn('', ctx.content.lines)
-        pro._apply_squeeze(None, ctx)
+        pro._apply_squeeze(ctx, None)
         self.assertEqual(ctx.content.lines, ['z', 'a'])
         self.assertIn('[x2]', ''.join(ctx.content.suffixes))
-        pro._apply_reverse(None, ctx)
+        pro._apply_reverse(ctx, None)
         self.assertEqual(ctx.content.lines, ['a', 'z'])
-        pro._apply_sort_alpha(None, ctx)
+        pro._apply_sort_alpha(ctx, None)
         self.assertEqual(ctx.content.lines, ['a', 'z'])
-        pro._apply_sort_length(None, ctx)
+        pro._apply_sort_length(ctx, None)
         self.assertEqual(ctx.content.lines[0], 'a')
 
         ctx.const_dic[DKW.SQUEEZE_COLLAPSE_SUFFIXES] = False
         ctx.content = ContentBuffer.from_rows([('k', '1', 's1'), ('k', '2', 's2')])
-        pro._apply_squeeze(None, ctx)
+        pro._apply_squeeze(ctx, None)
         self.assertEqual(ctx.content.suffixes, ['s1'])
 
         ctx.content = ContentBuffer.from_lines(['hello there'])
-        pro._apply_replace(('there', 'world'), ctx)
+        pro._apply_replace(ctx, ('there', 'world'))
         self.assertIn('world', ctx.content.lines[0])
         self.assertIn('<R>', ctx.content.lines[0])
 
     def test_apply_eval_and_convert(self):
         ctx = self._ctx()
         with patch('cat_win.src.processor.contentprocessor.comp_eval', return_value=ContentBuffer.from_lines(['E'])) as ce:
-            pro._apply_eval('expr', ctx)
+            pro._apply_eval(ctx, 'expr')
         ce.assert_called_once()
         self.assertEqual(ctx.content.lines, ['E'])
 
         with patch('cat_win.src.processor.contentprocessor.comp_conv', return_value=ContentBuffer.from_lines(['C'])) as cc:
-            pro._apply_convert('hex', ctx)
+            pro._apply_convert(ctx, 'hex')
         cc.assert_called_once()
         self.assertEqual(ctx.content.lines, ['C'])
 
@@ -167,18 +167,18 @@ class TestContentProcessor(TestCase):
     def test_edit_raw_content_branches(self):
         ctx = self._ctx(args={ARGS_STRINGS: True})
         with patch('cat_win.src.processor.contentprocessor.edit_content') as ec:
-            pro.edit_raw_content(b'abc', 0, ctx)
-        ec.assert_called_once_with(0, 0, ctx)
+            pro.edit_raw_content(ctx, b'abc', 0)
+        ec.assert_called_once_with(ctx, 0, 0)
 
         ctx = self._ctx(args={ARGS_B64E: True, ARGS_CLIP: True})
         with patch('cat_win.src.processor.contentprocessor.encode_base64', return_value='ENC'):
             with patch('cat_win.src.processor.contentprocessor.print'):
-                pro.edit_raw_content(b'abc', 0, ctx)
+                pro.edit_raw_content(ctx, b'abc', 0)
         self.assertIn('ENC', pro.Clipboard.clipboard)
 
         ctx = self._ctx()
         with patch('cat_win.src.processor.contentprocessor.sys.stdout.buffer.write') as wr:
-            pro.edit_raw_content(b'raw', 0, ctx)
+            pro.edit_raw_content(ctx, b'raw', 0)
         wr.assert_called_once_with(b'raw')
 
     def test_edit_content_self_pipe_warning_early_return(self):
@@ -189,7 +189,7 @@ class TestContentProcessor(TestCase):
         with patch('cat_win.src.processor.contentprocessor.os.isatty', return_value=False):
             with patch('cat_win.src.processor.contentprocessor.get_file_mtime', return_value=now_ts):
                 with patch.object(pro, 'logger', logger_stub):
-                    pro.edit_content(0, 0, ctx)
+                    pro.edit_content(ctx, 0, 0)
         self.assertGreaterEqual(logger_stub.call_count, 1)
 
     def test_edit_content_full_flow_prefixes_peek_more_clip_and_b64(self):
@@ -212,7 +212,7 @@ class TestContentProcessor(TestCase):
                 with patch('cat_win.src.processor.contentprocessor.get_file_prefix', side_effect=lambda _c, p, _i, hyper=False: ('H' if hyper else 'F') + p):
                     with patch('cat_win.src.processor.contentprocessor.print_file', return_value=True):
                         with patch('cat_win.src.processor.contentprocessor.More') as more_cls:
-                            pro.edit_content(0, 0, ctx)
+                            pro.edit_content(ctx, 0, 0)
         self.assertEqual(ctx.u_files[0].contains_queried, True)
         self.assertGreaterEqual(more_cls.return_value.step_through.call_count, 1)
         self.assertIn('F', pro.Clipboard.clipboard)
@@ -223,7 +223,7 @@ class TestContentProcessor(TestCase):
         ctx = self._ctx(args={ARGS_B64E: True})
         with patch('cat_win.src.processor.contentprocessor.print_file', return_value=False):
             with patch('cat_win.src.processor.contentprocessor.encode_base64', return_value='ENCODED'):
-                pro.edit_content(0, 0, ctx)
+                pro.edit_content(ctx, 0, 0)
         self.assertEqual(ctx.content.lines, ['ENCODED'])
 
     def test_edit_content_strings_specific_formats_slice_and_ffile_prefix(self):
@@ -246,7 +246,7 @@ class TestContentProcessor(TestCase):
                 with patch('cat_win.src.processor.contentprocessor.get_file_prefix', side_effect=lambda _c, p, _i, hyper=False: ('H' if hyper else 'F') + p) as gfp:
                     with patch('cat_win.src.processor.contentprocessor.print_file', return_value=False):
                         with patch('cat_win.src.processor.contentprocessor.More'):
-                            pro.edit_content(0, 0, ctx)
+                            pro.edit_content(ctx, 0, 0)
         gs.assert_called_once()
         ff.assert_called_once()
         self.assertEqual(len(ctx.content), 2)

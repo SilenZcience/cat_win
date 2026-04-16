@@ -65,16 +65,11 @@ class Converter:
     @staticmethod
     def set_flags(debug: bool) -> None:
         """
-        set the colors to use.
+        set the flags to use.
 
         Parameters:
         debug (bool):
             indicates if debug output should be displayed
-        colors (list[str]):
-            the colors to use, 3 elements needed:
-            Index 0 -> EVALULATION
-            Index 1 -> CONVERSION
-            INDEX 2 -> RESET
         """
         Converter.debug_mode = debug
 

@@ -62,12 +62,13 @@ def read_url(url: str, _rec: bool = False) -> bytes:
     """
     Simply reads the contents of an url.
 
-    Parameters (str):
+    Parameters:
+    url (str):
         the url to open
     _rec (bool):
         indicates recursion depth 0/1
 
-    Returns
+    Returns:
     (bytes):
         the contents of the url; on error: a custom error message
     """

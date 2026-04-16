@@ -37,7 +37,7 @@ class Files:
         """
         return the display name of a file. Expects self.temp_files to be set already.
 
-        Parameters_
+        Parameters:
         file (str):
             a path of a file
 
@@ -61,7 +61,7 @@ class Files:
         """
         determine if a file is a temporary file.
 
-        Parameters_
+        Parameters:
         file_index (int):
             the index of the file in self.files
 

@@ -13,6 +13,14 @@ def is_special_character(char: str) -> bool:
     """
     Check if character is problematic (wide, emoji, control, combining)
     https://www.unicode.org/reports/tr44/#General_Category_Values
+
+    Parameters:
+    char (str):
+        The character to check
+
+    Returns:
+    (bool):
+        True if the character is special, False otherwise
     """
     category = unicodedata.category(char)
     # Replace if it's:
@@ -177,9 +185,9 @@ class DifflibParser:
         self._diff = []
         self._c_lineno = 0
 
-        self.count_equal = 0
-        self.count_insert = 0
-        self.count_delete = 0
+        self.count_equal   = 0
+        self.count_insert  = 0
+        self.count_delete  = 0
         self.count_changed = 0
 
         self.last_lineno = 0
@@ -187,11 +195,17 @@ class DifflibParser:
         self.parse()
 
     def get_diff(self) -> list:
+        """
+        get parsed diff as list of DifflibItem
+        """
         return self._diff
 
     def parse(self) -> None:
+        """
+        Parse the diff output into a list of DifflibItem objects.
+        """
         while self._c_lineno < len(self._ndiff):
-            self.advance()
+            self._advance()
         self.count_equal = len(self._diff) - self.count_insert - self.count_delete - self.count_changed
         self.last_lineno = len(self._diff) - self.count_insert
         l_offset = len(str(self.last_lineno))
@@ -202,7 +216,7 @@ class DifflibParser:
                 lineno += 1
             item.lineno = item.lineno.rjust(l_offset)
 
-    def advance(self) -> None:
+    def _advance(self) -> None:
         c_line = self._ndiff[self._c_lineno]
 
         c_line_no_tab = ''.join(

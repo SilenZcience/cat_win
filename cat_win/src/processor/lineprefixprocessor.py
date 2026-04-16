@@ -1,15 +1,5 @@
 """
 lineprefixprocessor
-
-Dedicated processor for building line-related prefixes.
-
-
-Pure utility functions for ANSI-stripping and line-prefix formatting.
-
-All stateful values (colours, placeholder widths) are passed as explicit
-parameters so the lru_cache keys fully determine each output.  The callers
-in cat.py supply the current global state at call time — the functions
-themselves never read any module-level globals.
 """
 
 from functools import lru_cache
@@ -61,6 +51,11 @@ def _calculate_line_prefix_spacing(
         include a numeric file index in the prefix
     file_char_length (int):
         digit-width of the file index
+
+    Returns:
+    (str):
+        A format string for the line prefix, with placeholders for the file index
+        and line number as needed.
     """
     line_prefix = ' ' * (max_line_ph - line_char_length)
 
@@ -98,6 +93,11 @@ def _calculate_line_length_prefix_spacing(
         color_dic[CKW.LINE_LENGTH]
     reset_color (str):
         color_dic[CKW.RESET_ALL]
+
+    Returns:
+    (str):
+        A format string for the line-length prefix, with a placeholder for the
+        line length.
     """
     length_prefix = '[' + ' ' * (max_ll_ph - line_char_length) + '%i]'
     return '%s' + ll_color + length_prefix + reset_color + ' '
@@ -105,7 +105,21 @@ def _calculate_line_length_prefix_spacing(
 
 
 def get_line_prefix(ctx, line_num: int, index: int) -> str:
-    """Return the formatted line-number prefix for line_num / file index."""
+    """
+    Return the formatted line-number prefix for line_num / file index.
+
+    Parameters:
+    ctx (AppContext):
+        The current invocation context, containing parsed arguments and other state.
+    line_num (int):
+        The line number for which to generate the prefix.
+    index (int):
+        The index of the file in ctx.u_files for which to generate the prefix.
+
+    Returns:
+    (str):
+        The formatted line-number prefix for the given line number and file index.
+    """
     num_color = ctx.color_dic[CKW.NUMBER]
     reset = ctx.color_dic[CKW.RESET_ALL]
     if ctx.u_args[ARGS_FILE_PREFIX]:
@@ -132,7 +146,21 @@ def get_line_prefix(ctx, line_num: int, index: int) -> str:
 
 
 def get_line_length_prefix(ctx, prefix: str, line) -> str:
-    """Return prefix extended with the line-length annotation."""
+    """
+    Return prefix extended with the line-length annotation.
+
+    Parameters:
+    ctx (AppContext):
+        The current invocation context, containing parsed arguments and other state.
+    prefix (str):
+        The existing line prefix to extend with the line-length annotation.
+    line (str or bytes):
+        The line for which to calculate the length annotation.  Can be a string
+
+    Returns:
+    (str):
+        The input prefix extended with the line-length annotation.
+    """
     if not ctx.u_args[ARGS_NOCOL] and isinstance(line, str):
         line = remove_ansi_codes_from_line(line)
     return _calculate_line_length_prefix_spacing(
@@ -144,7 +172,26 @@ def get_line_length_prefix(ctx, prefix: str, line) -> str:
 
 
 def get_file_prefix(ctx, prefix: str, file_index: int, hyper: bool = False) -> str:
-    """Return prefix extended with the filename annotation."""
+    """
+    Return prefix extended with the filename annotation.
+
+    Parameters:
+    ctx (AppContext):
+        The current invocation context, containing parsed arguments and other state.
+    prefix (str):
+        The existing line prefix to extend with the filename annotation.
+    file_index (int):
+        The index of the file in ctx.u_files for which to generate the prefix.
+    hyper (bool):
+         Whether to format the file prefix as a hyperlink (using the file URI scheme).
+          If True, the file path will be formatted as a hyperlink and backslashes will
+          be replaced with forward slashes for compatibility with the file URI scheme.
+
+    Returns:
+    (str):
+        The input prefix extended with the filename annotation, formatted as a hyperlink
+        if hyper is True.
+    """
     if file_index < 0:
         return prefix
     file = f"{FILE_URI_PREFIX * hyper}{ctx.u_files[file_index].displayname}"

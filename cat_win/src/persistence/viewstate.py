@@ -1,5 +1,5 @@
 """
-Persist and restore curses view objects.
+viewstate
 """
 
 import importlib
@@ -90,6 +90,13 @@ class ViewStateWriter:
 
     @staticmethod
     def save(view_obj) -> None:
+        """
+        saves the state of the given view object to a file in the XDG config directory.
+
+        Parameters:
+        view_obj (Diffviewer | Editor | HexEditor):
+            the object whose state should be saved. Must be an instance of DiffViewer, Editor or HexEditor.
+        """
         view_type_name = type(view_obj).__name__
         view_module_name = type(view_obj).__module__
         if _SUPPORTED_VIEWS.get(view_type_name) != view_module_name:
@@ -115,6 +122,13 @@ class ViewStateLoader:
 
     @staticmethod
     def load():
+        """
+        loads the state of a view object from a file in the XDG config directory and recreates the view object.
+
+        Returns:
+        (Diffviewer | Editor | HexEditor):
+            the recreated view object, or None if loading failed.
+        """
         with xdg_config('viewstate_obj.bin', ensure_dir=True).open('rb') as f_handle:
             payload = pickle.load(f_handle)
 
@@ -152,6 +166,14 @@ def get_view_state_time() -> float:
 def save_view_state(view_obj) -> bool:
     """
     Convenience wrapper for ViewStateWriter.save().
+
+    Parameters:
+    view_obj (Diffviewer | Editor | HexEditor):
+            the object whose state should be saved. Must be an instance of DiffViewer, Editor or HexEditor.
+
+    Returns:
+    (bool):
+        True if the view state was saved successfully, False otherwise.
     """
     try:
         ViewStateWriter.save(view_obj)
@@ -164,12 +186,14 @@ def save_view_state(view_obj) -> bool:
 def load_view_state():
     """
     Convenience wrapper for ViewStateLoader.load().
+
+    Returns:
+    (Diffviewer | Editor | HexEditor):
+        the recreated view object, or None if loading failed.
     """
     try:
         return ViewStateLoader.load()
     except (OSError, ValueError, TypeError) as e:
         logger(f"Error loading view state: {e}", priority=logger.ERROR)
-        return None
     except (EOFError, pickle.PickleError) as e:
         logger(f"Error loading view state: {e} (file may be corrupted)", priority=logger.ERROR)
-        return None

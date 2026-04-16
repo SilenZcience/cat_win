@@ -1,7 +1,5 @@
 """
 contentposteccor
-
-Post-processing stage for after-display actions, cleanup, and diagnostics.
 """
 
 import os
@@ -113,7 +111,13 @@ def _copy_to_clipboard(_ctx) -> None:
 
 
 def run_post_content_actions(ctx) -> None:
-    """Run actions that are intended to happen after file-content display."""
+    """
+    Run actions that are intended to happen after file-content display.
+
+    Parameters:
+    ctx (AppContext):
+        The application context.
+    """
     executed_handlers = set()
     for arg_id, _ in ctx.u_args:
         handler = POST_CONTENT_ACTIONS.get(arg_id)
@@ -124,7 +128,15 @@ def run_post_content_actions(ctx) -> None:
 
 
 def finalize_context(ctx, tmp_file_helper) -> None:
-    """Run post-processing actions based on active arguments."""
+    """
+    Finalize the application context.
+
+    Parameters:
+    ctx (AppContext):
+        The application context.
+    tmp_file_helper (TmpFileHelper):
+        The temporary file helper.
+    """
     if ctx.u_args[ARGS_DEBUG]:
         _print_cache_debug_info(ctx)
 
