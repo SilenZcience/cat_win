@@ -1074,7 +1074,7 @@ class TestHexEditor(TestCase):
         editor4 = HexEditor([(__file__, '')])
         editor4.curse_window = MagicMock()
         editor4.curse_window.chgat.side_effect = mm.error
-        editor4._render_highlight_selection()
+        editor4._render_highlight_selection(5)
 
         editor4.hex_array_edit[0][0] = '21'
         editor4.curse_window.addstr.side_effect = mm.error
