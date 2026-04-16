@@ -1,8 +1,5 @@
 """
 executionpreprocessor
-
-Handles startup and control arguments that short-circuit normal execution
-before the content pipeline begins.
 """
 from datetime import datetime
 from itertools import groupby
@@ -31,6 +28,10 @@ from cat_win import __project__, __version__, __sysversion__, __author__, __url_
 def _show_help(repl: bool = False) -> None:
     """
     Show the Help message and exit.
+
+    Parameters:
+    repl (bool):
+        Whether the help message is for the REPL or not. Defaults to False.
     """
     if repl:
         help_message = 'Usage: cats [OPTION]...\n'
@@ -90,9 +91,13 @@ def _show_help(repl: bool = False) -> None:
         print_update_information(__project__, __version__)
 
 
-def _show_version(ctx, repl: bool = False) -> None:
+def _show_version(repl: bool = False) -> None:
     """
     Show the Version message and exit.
+
+    Parameters:
+    repl (bool):
+        Whether to show REPL-specific version information. Defaults to False.
     """
     cat_version = f"{__project__} "
     if repl:
@@ -125,6 +130,12 @@ def _show_version(ctx, repl: bool = False) -> None:
 def _show_debug(ctx, unknown_args: list) -> None:
     """
     Print all necessary debug information.
+
+    Parameters:
+    ctx (AppContext):
+        The current invocation context, containing parsed arguments and other state.
+    unknown_args (list):
+        A list of unknown arguments that were not parsed successfully.
     """
     logger('================================================ '
         'DEBUG ================================================', priority=logger.DEBUG)
@@ -184,7 +195,17 @@ def _save_color_config(ctx) -> None:
 def run_startup_actions(
         ctx, repl: bool, arg_suggestions: list
 ) -> None:
-    """Handle startup actions like help/version/config before the main pipeline."""
+    """
+    Handle startup actions like help/version/config before the main pipeline.
+
+    Parameters:
+    ctx (AppContext).
+        The current invocation context, containing parsed arguments and other state.
+    repl (bool):
+        Whether the current execution is in REPL mode or not.
+    arg_suggestions (list):
+        A list of argument suggestions for the user, used in debug output.
+    """
     if ctx.u_args[ARGS_DEBUG]:
         _show_debug(ctx, arg_suggestions)
 
@@ -195,7 +216,7 @@ def run_startup_actions(
         raise SystemExit(0)
 
     if ctx.u_args[ARGS_VERSION]:
-        _show_version(ctx, repl)
+        _show_version(repl)
         raise SystemExit(0)
 
     for arg_id, _ in ctx.u_args:

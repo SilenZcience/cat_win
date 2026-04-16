@@ -254,4 +254,11 @@ class Visualizer:
 
     @staticmethod
     def set_flags(debug: bool) -> None:
+        """
+        set the flags for the visualizer.
+
+        Parameters:
+        debug (bool):
+            indicates if debug mode should be enabled
+        """
         Visualizer.debug_mode = debug

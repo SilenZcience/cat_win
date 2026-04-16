@@ -10,7 +10,17 @@ from cat_win.src.const.regex import RE_ANSI_CSI
 
 @lru_cache(maxsize=256)
 def remove_ansi_codes_from_line(line: str) -> str:
-    """Return *line* with all ANSI CSI escape sequences stripped."""
+    """
+    Return *line* with all ANSI CSI escape sequences stripped.
+
+    Parameters:
+    line (str):
+        the string to strip ANSI codes from
+
+    Returns:
+    (str):
+        the input string with all ANSI CSI codes removed
+    """
     return RE_ANSI_CSI.sub('', line)
 
 
@@ -21,6 +31,16 @@ def _map_display_pos(display_str: str, plain_pos: int) -> int:
 
     ANSI escape sequences are skipped first; the plain-character count is
     incremented only for non-escape bytes.
+
+    Parameters:
+    display_str (str):
+        the string containing ANSI codes to map a position in
+    plain_pos (int):
+        the character position in the ANSI-stripped version of *display_str* to map
+
+    Returns:
+    i (int):
+        the corresponding character position in *display_str* itself
     """
     plain_count = 0
     i = 0
@@ -50,6 +70,14 @@ def _build_ansi_restore(reset_all: str, display_str: str) -> tuple:
         the ANSI escape sequence that resets all SGR attributes
     display_str (str):
         the line text to scan
+
+    Returns:
+    (tuple):
+        restore (dict):
+            mapping each plain-text character index to the string of ANSI codes that
+            are active just before that character
+        ansi_set (set):
+            a set of plain-text positions preceded by at least one ANSI code
     """
     restore = {}
     active = []
@@ -84,8 +112,10 @@ def find_literals(sub: str, _s: str, ignore_case: bool):
     Parameters:
     sub (str):
         the substring to search for
-    s (str):
+    _s (str):
         the string to search in
+    ignore_case (bool):
+        whether to ignore case when searching for sub in _s
 
     Yields:
     (list):
@@ -101,12 +131,12 @@ def find_literals(sub: str, _s: str, ignore_case: bool):
 
 def find_regex(pattern, _s: str):
     """
-    Generate lists containing the position of pattern in s.
+    Generate lists containing the position of pattern in _s.
 
     Parameters:
     pattern (re_pattern):
         the regex pattern to search for
-    s (str):
+    _s (str):
         the string to search in
 
     Yields:
@@ -118,7 +148,7 @@ def find_regex(pattern, _s: str):
 
 def replace_queries_in_line(
         line: str, queries: list, replacements: list, color_dic: dict
-) -> str:
+) -> tuple:
     """
     Replace all occurences of the queries in line with the replace color.
 
@@ -126,13 +156,15 @@ def replace_queries_in_line(
     line (str):
         the string in which to search for all occurences of
         self.kw_literals and self.kw_regex
-    queries (set):
-        the set of queries to search for
+    queries (list):
+        the list of queries to search for
+    replacements (list):
+        the list of replacement strings to replace the queries with, in the same order
     color_dic (dict):
         color dictionary containing all configured ANSI color values
 
     Returns:
-    (tuple):
+    (display_line, plain_line) (tuple):
         containing the new replaced line with color codes and plain
     """
     plain_line = remove_ansi_codes_from_line(line)

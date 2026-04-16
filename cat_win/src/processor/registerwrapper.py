@@ -1,3 +1,7 @@
+"""
+registerwrapper
+"""
+
 
 def _wrapper_factory(action_map):
     def register(*arg_ids: int):

@@ -5,21 +5,21 @@ strings
 from cat_win.src.domain.contentbuffer import ContentBuffer
 
 
-def get_strings(content, min_seq_len: int, delim: str) -> ContentBuffer:
+def get_strings(content: ContentBuffer, min_seq_len: int, delim: str) -> ContentBuffer:
     """
     find all strings in any given file content.
 
     Parameters:
-    content (list):
-        the file content [('', line), ...]
+    content (ContentBuffer):
+        the file contentbuffer object to search for strings in
     min_seq_len (int):
         the minimum required length of a string
     delim (str):
         the delimeter to display the found strings on the same line
 
     Returns:
-    new_content (list):
-        the new file content containing all found strings [('', string), ...]
+    new_content (ContentBuffer):
+        the new file contentbuffer containing all found strings [('', string), ...]
     """
     content_type_raw = bool(content) and isinstance(content[0][0], bytes)
     new_content = ContentBuffer()

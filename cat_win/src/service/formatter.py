@@ -27,8 +27,7 @@ class Formatter:
         """
         try:
             return json.dumps(json.loads(content), indent=2), True
-        except (json.JSONDecodeError,
-                FileNotFoundError):
+        except (json.JSONDecodeError, FileNotFoundError):
             return content, False
 
     @staticmethod
@@ -46,9 +45,7 @@ class Formatter:
         """
         try:
             return xml.dom.minidom.parseString(content).toprettyxml(indent=' ' * 2), True
-        except (xml.parsers.expat.ExpatError,
-                xml.dom.DOMException,
-                FileNotFoundError):
+        except (xml.parsers.expat.ExpatError, xml.dom.DOMException, FileNotFoundError):
             return content, False
 
     @staticmethod
@@ -62,7 +59,7 @@ class Formatter:
 
         Returns:
         content (ContentBuffer):
-            the content
+            the (possibly formatted) content
         """
         content_line = '\n'.join(x for x, _, _ in content)
 

@@ -119,6 +119,9 @@ class Arguments:
             the first arg to compare
         arg_id2 (int):
             the second arg to compare
+        is_first (bool):
+            if False, return the first of the two args that was passed in,
+            if True, return the first arg if it was passed in before the second one else None
 
         Returns:
         (tuple|None):

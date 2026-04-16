@@ -1025,6 +1025,10 @@ class Editor:
         """
         handles the find in editor action.
 
+        Parameters:
+        find_next (int):
+            if 0, opens the find prompt; if 1, finds the next occurrence; if -1, finds the previous occurrence
+
         Returns:
         (bool):
             indicates if the editor should keep running
@@ -1171,6 +1175,10 @@ class Editor:
     def _action_replace(self, replace_next: int = 0) -> bool:
         """
         handles the replace in editor action.
+
+        Parameters:
+        replace_next (int):
+            if 0, opens the replace prompt; if 1, replaces the next occurrence; if -1, replaces the previous occurrence
 
         Returns:
         (bool):
@@ -2161,6 +2169,10 @@ class Editor:
     def _open(self, fg: bool = False) -> None:
         """
         init, run, deinit
+
+        Parameters:
+        fg (bool):
+            indicates if the editor is opened from background (True) or not (False)
         """
         try:
             self._init_screen()
@@ -2294,6 +2306,8 @@ class Editor:
             indicates if debug info should be displayed
         unicode_escaped_search (bool):
             indicates if the search should be unicode escaped
+        unicode_escaped_replace (bool):
+            indicates if the replace should be unicode escaped
         file_encoding (str):
             the file encoding to use when opening a file
         """

@@ -92,8 +92,7 @@ def only_numeric(_s: str) -> int:
 
 def only_alpha(_s: str) -> str:
     """
-    strips every numeric character of a string and
-    appends 'z' for comparison.
+    strips every numeric character of a string.
 
     Parameters:
     s (str):

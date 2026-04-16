@@ -12,6 +12,18 @@ from cat_win.src.service.helper.iohelper import IoHelper
 
 
 def _unique_list(_l: list) -> list:
+    """
+    Returns a list of unique elements from the input list.
+    Keeps the order.
+
+    Parameters:
+    _l (list):
+        the list to filter for unique elements
+
+    Returns:
+    unique_elements (list):
+        a list of unique elements from the input list
+    """
     unique_elements = []
     for _i in _l:
         if _i in unique_elements:

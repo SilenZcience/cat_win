@@ -227,6 +227,16 @@ class _SearchIterDown(_SearchIterBase):
 
 
 def search_iter_factory(*args, downwards: bool = True) -> _SearchIterBase:
+    """
+    Create a search iterator for editor items.
+
+    Parameters:
+    *args:
+        Arguments to pass to the search iterator constructor.
+    downwards (bool):
+        If True, creates a search iterator that searches downwards.
+        If False, creates a search iterator that searches upwards.
+    """
     if downwards:
         return _SearchIterDown(*args)
     return _SearchIterUp(*args)
@@ -360,6 +370,16 @@ class _SearchIterHexDown(_SearchIterHexBase):
 
 
 def search_iter_hex_factory(*args, downwards: bool = True) -> _SearchIterHexBase:
+    """
+    Create a search iterator for hex-editor items.
+
+    Parameters:
+    *args:
+        Arguments to pass to the search iterator constructor.
+    downwards (bool):
+        If True, creates a search iterator that searches downwards.
+        If False, creates a search iterator that searches upwards.
+    """
     if downwards:
         return _SearchIterHexDown(*args)
     return _SearchIterHexUp(*args)
@@ -505,6 +525,16 @@ class _SearchIterDiffDown(_SearchIterDiffBase):
 
 
 def search_iter_diff_factory(*args, downwards: bool = True) -> _SearchIterDiffBase:
+    """
+    Create a search iterator for diff items.
+
+    Parameters:
+    *args:
+        Arguments to pass to the search iterator constructor.
+    downwards (bool):
+        If True, creates a search iterator that searches downwards.
+        If False, creates a search iterator that searches upwards.
+    """
     if downwards:
         return _SearchIterDiffDown(*args)
     return _SearchIterDiffUp(*args)

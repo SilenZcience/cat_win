@@ -1,10 +1,5 @@
 """
-catcontext
-
-AppContext bundles every piece of mutable per-run state that was previously
-scattered as module-level globals in cat.py.  A single module-level instance
-(_ctx) is created when cat.py is imported; setup() re-initialises it before
-each run so there are no global-statement mutations anywhere.
+appcontext
 """
 
 from cat_win.src.argparser import ArgParser
@@ -16,7 +11,9 @@ from cat_win.src.persistence.config import Config
 
 
 class AppContext:
-    """Holds all mutable objects that belong to one catw / cats invocation."""
+    """
+    Holds all mutable objects that belong to one catw / cats invocation.
+    """
 
     __slots__ = (
         'cconfig', 'config',
@@ -52,7 +49,9 @@ class AppContext:
         self.content = None
 
     def init(self) -> None:
-        """Reload configs and create fresh per-run objects and runtime lists."""
+        """
+        Reload configs and create fresh per-run objects and runtime lists.
+        """
         self.default_color_dic = self.cconfig.load_config()
         self.color_dic = self.default_color_dic.copy()
         self.const_dic = self.config.load_config()

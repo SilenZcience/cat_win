@@ -90,6 +90,45 @@ class SyntaxHighlighter:
             delimiter_escape_char: str = '\\',
             token_color_map: dict = None,
     ) -> None:
+        """
+        register a syntax highlighter plugin for a language, identified by name and/or file extensions.
+
+        Parameters:
+        name (str):
+            Unique name for the plugin/language. Used for lookup and display.
+        extensions (tuple):
+            File extensions associated with this language (e.g. '.py', '.java'). Used for lookup.
+        lex_keywords (tuple):
+            List of keywords to highlight.
+        lex_keywords_case_insensitive (bool):
+            Whether keyword matching should be case-insensitive.
+        lex_builtins (tuple):
+            List of built-in identifiers to highlight.
+        lex_builtins_case_insensitive (bool):
+            Whether built-in identifier matching should be case-insensitive.
+        number_pattern (str):
+            Regular expression pattern for matching numbers.
+        extra_plain_patterns (tuple):
+            Additional patterns for plain text tokens.
+        extra_group_to_token (dict):
+            Mapping of additional regex groups to token types.
+        simple_string_pattern (str):
+            Regular expression pattern for matching simple strings.
+        line_comment_prefixes (tuple):
+            Prefixes for line comments.
+        multiline_delimiters (tuple):
+            Delimiters for multiline structures (e.g. comments, multiline strings).
+        multiline_end_delimiters (dict):
+            Mapping of multiline delimiters to their end delimeter.
+        multiline_delimiters_case_insensitive (bool):
+            Whether multiline delimiter matching should be case-insensitive.
+        state_token_map (dict):
+            Mapping of states to token types.
+        delimiter_escape_char (str):
+            Character used to escape delimiters.
+        token_color_map (dict):
+            Mapping of token types to colors.
+        """
         if not name:
             raise ValueError("register requires 'name'")
         if not extensions:
@@ -147,6 +186,16 @@ class SyntaxHighlighter:
 
     @staticmethod
     def get_plugin(language_key: str):
+        """
+        Get a registered SyntaxHighlighter plugin by language name or file extension.
+
+        Parameters:
+        language_key (str):
+            The language name or file extension to look up.
+
+        Returns:
+            SyntaxHighlighter instance if found, else None.
+        """
         if not language_key:
             return None
         lookup_key = str(language_key).casefold()
@@ -155,6 +204,14 @@ class SyntaxHighlighter:
 
     @staticmethod
     def get_available_plugins() -> tuple:
+        """
+        Get a list of all available syntax highlighter plugins.
+
+        Returns:
+        (tuple(dict, dict)):
+            - The first dictionary maps language names to their corresponding SyntaxHighlighter instances.
+            - The second dictionary maps file extensions to their corresponding SyntaxHighlighter instances.
+        """
         return (
             dict(sorted(SyntaxHighlighter._plugins_by_name.items())),
             SyntaxHighlighter._extensions_by_name
@@ -202,6 +259,19 @@ class SyntaxHighlighter:
         return re.compile('|'.join(parts)), group_to_token
 
     def tokenize_line(self, line: str, state=None) -> tuple:
+        """
+        Tokenize a single line of code.
+
+        Parameters:
+        line (str):
+            The line of code to tokenize.
+        state (Any, optional):
+            The current state for multi-line tokenization.
+
+        Returns:
+        (tuple):
+            A tuple containing the list of tokens and the updated state.
+        """
         tokens = []
         idx = 0
         active_state = state

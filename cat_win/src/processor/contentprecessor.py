@@ -1,9 +1,5 @@
 """
 contentpreccesor
-
-Pre-processing stage for the application pipeline. It parses runtime inputs,
-populates AppContext-owned state, materializes temporary content sources,
-and handles short-circuit actions that run before file-content editing.
 """
 
 import sys
@@ -128,7 +124,15 @@ def _resolve_unknown_files(ctx) -> None:
 
 
 def preprocess_context(ctx) -> None:
-    """Parse CLI input and store all derived runtime values into AppContext."""
+    """
+    Parse CLI input and store all derived runtime values into AppContext.
+
+    Parameters:
+    ctx (AppContext):
+        The application context to populate with parsed arguments, known files,
+        unknown files, and valid URLs. This function updates the context in-place
+        based on the command-line inputs and configuration.
+    """
     args, unknown_args, echo_args = ctx.arg_parser.get_arguments(
         ctx.config.get_cmd()
     )
@@ -144,7 +148,15 @@ def preprocess_context(ctx) -> None:
 
 
 def materialize_context_sources(ctx, tmp_file_helper) -> None:
-    """Create temporary files from active content-source arguments."""
+    """
+    Create temporary files from active content-source arguments.
+
+    Parameters:
+    ctx (AppContext):
+        The application context
+    tmp_file_helper (TempFileHelper):
+        Helper for generating temporary file names and managing temp files.
+    """
     handlers = {
         ARGS_ECHO: _materialize_echo,
         ARGS_URI: _materialize_urls,
@@ -275,7 +287,17 @@ def _show_charcount_only(ctx) -> bool:
 
 
 def run_pre_content_actions(ctx) -> bool:
-    """Run pre-content actions that short-circuit before file-content editing."""
+    """
+    Run pre-content actions that short-circuit before file-content editing.
+
+    Parameters:
+    ctx (AppContext):
+        The application context.
+
+    Returns:
+    handled (bool):
+        True if any pre-content action was executed, False otherwise.
+    """
     handled = False
     executed_handlers = set()
     for arg_id, _ in ctx.u_args:

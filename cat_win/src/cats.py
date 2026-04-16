@@ -24,7 +24,9 @@ from cat_win import __project__, __url__, __version__
 
 
 class ReplCommandHandler:
-    """Handle !-prefixed commands inside the cats REPL."""
+    """
+    Handle !-prefixed commands inside the cats REPL.
+    """
 
     def __init__(self, ctx, refresh_colors, show_unknown_args) -> None:
         self._session_start = monotonic()
@@ -36,7 +38,17 @@ class ReplCommandHandler:
         self.exit_repl = False
 
     def exec(self, cmd: str) -> bool:
-        """Check whether cmd is a REPL command and execute it if so."""
+        """
+        Check whether cmd is a REPL command and execute it if so.
+
+        Parameters:
+        cmd (str):
+            The command to check and execute.
+
+        Returns:
+        (bool):
+            True if cmd was a REPL command and was executed, False otherwise.
+        """
         if not cmd.startswith('!'):
             return False
         line_split = shlex.split(cmd[1:])
@@ -104,7 +116,17 @@ class ReplCommandHandler:
 
 
 def repl_main(ctx, init_colors, show_unknown_args) -> None:
-    """Run the cats REPL using the provided app callbacks and context."""
+    """
+    Run the cats REPL.
+
+    Parameters:
+    ctx (AppContext):
+        The application context.
+    init_colors (function):
+        Function to initialize the REPL colors.
+    show_unknown_args (function):
+        Function to show the currently active unknown arguments.
+    """
     repl_prefix = f"{ctx.color_dic[CKW.REPL_PREFIX]}>>> {ctx.color_dic[CKW.RESET_ALL]}"
     oneline = ctx.u_args[ARGS_ONELINE]
 
@@ -139,7 +161,7 @@ def repl_main(ctx, init_colors, show_unknown_args) -> None:
             stripped_line = stripped_line[:1].replace('\\', '') + stripped_line[1:]
             if stripped_line:
                 ctx.content = ContentBuffer.from_lines([stripped_line])
-                edit_content(-1, i - command_count, ctx)
+                edit_content(ctx, -1, i - command_count)
                 if ctx.u_args[ARGS_CLIP]:
                     Clipboard.put(remove_ansi_codes_from_line(Clipboard.clipboard))
                     Clipboard.clear()

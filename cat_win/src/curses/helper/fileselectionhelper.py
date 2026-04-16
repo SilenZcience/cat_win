@@ -47,7 +47,7 @@ def run_file_selection(
     handles the shared file selection action.
 
     Parameters:
-    owner:
+    owner (HexEditor | Editor | Diffviewer):
         the curses application instance that owns the selection state
     split_panel (bool):
         use the diffviewer style two-panel selector instead of the single panel list

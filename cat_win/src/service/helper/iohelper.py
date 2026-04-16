@@ -16,7 +16,9 @@ from cat_win.src.service.helper.progressbar import PBar
 
 
 class StatusLogger:
-    """Simple logging wrapper with ANSI color support for status/error messages."""
+    """
+    Logging wrapper for status/error messages.
+    """
 
     DEBUG    = logging.DEBUG
     INFO     = logging.INFO
@@ -25,12 +27,25 @@ class StatusLogger:
     CRITICAL = logging.CRITICAL
 
     class _Formatter(logging.Formatter):
-        """ANSI color formatter for log messages."""
+        """
+        ANSI color formatter for log messages.
+        """
         def __init__(self, logger_ref: 'StatusLogger') -> None:
             super(StatusLogger._Formatter, self).__init__('%(message)s')
             self.logger_ref = logger_ref
 
         def format(self, record: logging.LogRecord) -> str:
+            """
+            Format a log record with ANSI colors.
+
+            Parameters:
+            record (logging.LogRecord):
+                the log record to format
+
+            Returns:
+            (str):
+                the formatted log message with ANSI colors
+            """
             message = record.getMessage()
             line_end = getattr(record, 'line_end', '\n')
             color = self.logger_ref.get_color(record.levelno)
@@ -55,7 +70,17 @@ class StatusLogger:
         self._reconfigure_handler()
 
     def get_color(self, priority: int) -> str:
-        """Get ANSI color code for logging level."""
+        """
+        Get ANSI color code for logging level.
+
+        Parameters:
+        priority (int):
+            the logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL)
+
+        Returns:
+        (str):
+            the ANSI color code associated with the logging level, or an empty string if not set
+        """
         return {
             self.DEBUG:    self.colors['debug'],
             self.INFO:     self.colors['info'],
@@ -65,7 +90,13 @@ class StatusLogger:
         }.get(priority, '')
 
     def set_colors(self, color_dic: dict) -> None:
-        """Set ANSI colors for different log levels from color dictionary."""
+        """
+        Set ANSI colors for different log levels from color dictionary.
+
+        Paramters:
+        color_dic (dict):
+            color dictionary containing all configured ANSI color values
+        """
         self.colors['debug']    = color_dic[CKW.DEBUG]
         self.colors['info']     = color_dic[CKW.INFO]
         self.colors['warning']  = color_dic[CKW.WARNING]
@@ -75,17 +106,23 @@ class StatusLogger:
         self.refresh_formatter()
 
     def clear_colors(self) -> None:
-        """Clear all ANSI colors (set to empty strings)."""
+        """
+        Clear all ANSI colors (set to empty strings).
+        """
         self.colors = dict.fromkeys(self.colors, '')
         self.refresh_formatter()
 
     def refresh_formatter(self) -> None:
-        """Update the formatter on the current handler."""
+        """
+        Update the formatter on the current handler.
+        """
         if self.handler is not None:
             self.handler.setFormatter(self._Formatter(self))
 
     def _close_handler(self) -> None:
-        """Close and remove the current handler."""
+        """
+        Close and remove the current handler.
+        """
         if self.handler is None:
             return
         self.logger.removeHandler(self.handler)
@@ -99,7 +136,9 @@ class StatusLogger:
         self.handler = None
 
     def _reconfigure_handler(self) -> None:
-        """Reconfigure the logging handler."""
+        """
+        Reconfigure the logging handler.
+        """
         self._close_handler()
 
         if self.log_to_file:
@@ -122,16 +161,36 @@ class StatusLogger:
         self.logger.addHandler(self.handler)
 
     def set_level(self, priority: int) -> None:
-        """Set the minimum logging level."""
+        """
+        Set the minimum logging level.
+
+        Parameters:
+        priority (int):
+            the logging level to set (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL)
+        """
         self.logger.setLevel(priority)
 
     def set_log_to_file(self, log_to_file: bool = True) -> None:
-        """Set logging destination: file (True) or stderr (False)."""
+        """
+        Set logging destination: file (True) or stderr (False).
+
+        Parameters:
+        log_to_file (bool):
+            True to log to file, False to log to stderr
+        """
         self.log_to_file = log_to_file
         self._reconfigure_handler()
 
     def __call__(self, *args, **kwargs) -> None:
-        """Log a message (callable interface mimicking print)."""
+        """
+        Log a message (callable interface mimicking print).
+
+        Parameters:
+        *args:
+            the messages to log
+        **kwargs:
+            additional keyword arguments for logging
+        """
         priority = kwargs.pop('priority', self.ERROR)
         sep = kwargs.pop('sep', ' ')
         end = kwargs.pop('end', '\n')
@@ -145,13 +204,17 @@ class StatusLogger:
         self.logger.log(priority, message, extra={'line_end': end})
 
     def close(self) -> None:
-        """Close the logging handler and clean up resources."""
+        """
+        Close the logging handler and clean up resources.
+        """
         self._close_handler()
         self.log_to_file = False
         self._reconfigure_handler()
 
     def __del__(self) -> None:
-        """Ensure cleanup when object is garbage collected."""
+        """
+        Ensure cleanup when object is garbage collected.
+        """
         self.close()
 
 logger = StatusLogger()
@@ -330,6 +393,8 @@ class IoHelper:
         Parameters:
         file (Path):
             a file (-path) as string representation
+        default (str):
+            the default line ending to return if the file cannot be read or does not contain a line ending
 
         Returns:
         (str):
@@ -517,7 +582,7 @@ class IoHelper:
     @contextlib.contextmanager
     def dup_stdstreams():
         """
-        dup the std streams so the user can interact while also piping into cat.
+        dup the std streams so the user can interact while also piping.
         """
         replace_stdin = False
         replace_stdout = False

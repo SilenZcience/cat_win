@@ -273,7 +273,7 @@ class TestCat(TestCase):
         materialize.assert_called_once_with(ctx, tmp_helper)
         self.assertEqual(len(ctx.u_files.set_files_calls), 1)
         self.assertEqual(ctx.u_files.generate_values_calls, [(True, True)])
-        dec_b64.assert_called_once_with(tmp_helper, ctx)
+        dec_b64.assert_called_once_with(ctx, tmp_helper)
         edit_files.assert_called_once_with(ctx)
         post.assert_called_once_with(ctx)
         self.assertIn('large amount of data', logger_stub.output())

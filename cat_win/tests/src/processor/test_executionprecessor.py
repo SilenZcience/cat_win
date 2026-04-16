@@ -113,11 +113,10 @@ class TestExecutionPrecessor(TestCase):
         update.assert_called_once()
 
     def test_show_version_with_install_time(self):
-        ctx = self._mk_ctx()
         with patch('cat_win.src.processor.executionprecessor.get_file_ctime', return_value=0):
             with patch('cat_win.src.processor.executionprecessor.print_update_information') as update:
                 with patch('builtins.print') as p:
-                    _show_version(ctx, repl=True)
+                    _show_version(repl=True)
 
         printed = self._printed_text(p)
         self.assertIn('REPL', printed)
@@ -125,11 +124,10 @@ class TestExecutionPrecessor(TestCase):
         update.assert_called_once()
 
     def test_show_version_handles_ctime_oserror(self):
-        ctx = self._mk_ctx()
         with patch('cat_win.src.processor.executionprecessor.get_file_ctime', side_effect=OSError):
             with patch('cat_win.src.processor.executionprecessor.print_update_information'):
                 with patch('builtins.print') as p:
-                    _show_version(ctx, repl=False)
+                    _show_version(repl=False)
 
         printed = self._printed_text(p)
         self.assertIn('Installtime:\t-', printed.replace(' ', ''))
@@ -189,7 +187,7 @@ class TestExecutionPrecessor(TestCase):
         with patch('cat_win.src.processor.executionprecessor._show_version') as show_version:
             with self.assertRaises(SystemExit):
                 run_startup_actions(ctx, repl=False, arg_suggestions=[])
-        show_version.assert_called_once_with(ctx, False)
+        show_version.assert_called_once_with(False)
 
     def test_run_startup_actions_debug_then_return_when_no_handlers(self):
         args = DummyStartupArgs(overrides={ARGS_DEBUG: True}, ordered_args=[(999999, '--noop')])

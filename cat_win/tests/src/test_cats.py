@@ -125,7 +125,7 @@ class TestReplMain(TestCase):
                                 repl_main(ctx, init_colors=MagicMock(), show_unknown_args=MagicMock())
 
         from_lines.assert_called_once_with(['hello'])
-        edit_content.assert_called_once_with(-1, 0, ctx)
+        edit_content.assert_called_once_with(ctx, -1, 0)
         self.assertEqual(ctx.content, 'BUF')
 
     def test_repl_main_b64_clip_and_pipe_echo(self):
@@ -145,7 +145,7 @@ class TestReplMain(TestCase):
                                                     repl_main(ctx, init_colors=MagicMock(), show_unknown_args=MagicMock())
 
         b64.assert_called_once_with('ZGF0YQ==', True, 'utf-8')
-        edit_content.assert_called_once_with(-1, 0, ctx)
+        edit_content.assert_called_once_with(ctx, -1, 0)
         strip_ansi.assert_called_once_with('ansi')
         cb_put.assert_called_once_with('clean')
         cb_clear.assert_called_once()
@@ -164,7 +164,7 @@ class TestReplMain(TestCase):
                                 repl_main(ctx, init_colors=MagicMock(), show_unknown_args=MagicMock())
 
         from_lines.assert_called_once_with(['!help'])
-        edit_content.assert_called_once_with(-1, 0, ctx)
+        edit_content.assert_called_once_with(ctx, -1, 0)
 
     def test_repl_main_refreshes_color_caches_on_add_command(self):
         ctx = self._mk_ctx()
