@@ -5,28 +5,29 @@ fileattributes
 from datetime import datetime
 from pathlib import Path
 from shutil import which
+from stat import FILE_ATTRIBUTE_ARCHIVE as A
+from stat import FILE_ATTRIBUTE_COMPRESSED as C
+from stat import FILE_ATTRIBUTE_ENCRYPTED as E
+from stat import FILE_ATTRIBUTE_HIDDEN as H
+from stat import FILE_ATTRIBUTE_NOT_CONTENT_INDEXED as I
+from stat import FILE_ATTRIBUTE_READONLY as R
+from stat import FILE_ATTRIBUTE_SYSTEM as S
 from stat import (
-    FILE_ATTRIBUTE_ARCHIVE as A,
-    FILE_ATTRIBUTE_SYSTEM as S,
-    FILE_ATTRIBUTE_HIDDEN as H,
-    FILE_ATTRIBUTE_READONLY as R,
-    FILE_ATTRIBUTE_NOT_CONTENT_INDEXED as I,
-    FILE_ATTRIBUTE_COMPRESSED as C,
-    FILE_ATTRIBUTE_ENCRYPTED as E,
-    S_IRUSR,
-    S_IWUSR,
-    S_IXUSR,
     S_IRGRP,
-    S_IWGRP,
-    S_IXGRP,
     S_IROTH,
-    S_IWOTH,
-    S_IXOTH,
+    S_IRUSR,
     S_ISDIR,
+    S_IWGRP,
+    S_IWOTH,
+    S_IWUSR,
+    S_IXGRP,
+    S_IXOTH,
+    S_IXUSR
 )
+
 try:
-    from pwd import getpwuid
     from grp import getgrgid
+    from pwd import getpwuid
 except ImportError:
     pass
 import json

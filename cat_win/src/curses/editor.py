@@ -3,6 +3,7 @@ editor
 """
 
 from pathlib import Path
+
 try:
     import curses
     CURSES_MODULE_ERROR = False
@@ -15,19 +16,36 @@ import sys
 
 from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.const.regex import compile_re
-from cat_win.src.curses.helper.editorsearchhelper import _SearchIterBase, search_iter_factory
-from cat_win.src.curses.helper.editorhelper import History, Position, frepr, \
-    UNIFY_HOTKEYS, KEY_HOTKEYS, ACTION_HOTKEYS, SCROLL_HOTKEYS, MOVE_HOTKEYS, \
-        SELECT_HOTKEYS, HISTORY_HOTKEYS, INDENT_HOTKEYS, FUNCTION_HOTKEYS, HEX_BYTE_KEYS
 from cat_win.src.curses.helper.diffviewerhelper import is_special_character
+from cat_win.src.curses.helper.editorhelper import (
+    ACTION_HOTKEYS,
+    FUNCTION_HOTKEYS,
+    HEX_BYTE_KEYS,
+    HISTORY_HOTKEYS,
+    INDENT_HOTKEYS,
+    KEY_HOTKEYS, MOVE_HOTKEYS,
+    SCROLL_HOTKEYS,
+    SELECT_HOTKEYS,
+    UNIFY_HOTKEYS,
+    History,
+    Position,
+    frepr
+)
+from cat_win.src.curses.helper.editorsearchhelper import (
+    _SearchIterBase,
+    search_iter_factory
+)
 from cat_win.src.curses.helper.fileselectionhelper import run_file_selection
 from cat_win.src.curses.helper.githelper import GitHelper
-from cat_win.src.service.helper.environment import on_windows_os
-from cat_win.src.service.helper.iohelper import IoHelper, logger
 from cat_win.src.curses.helper.syntaxhighlight import SyntaxHighlighter
-from cat_win.src.persistence.viewstate import save_view_state, get_view_state_time
+from cat_win.src.persistence.viewstate import (
+    get_view_state_time,
+    save_view_state
+)
 from cat_win.src.service.clipboard import Clipboard
 from cat_win.src.service.fileattributes import get_file_mtime
+from cat_win.src.service.helper.environment import on_windows_os
+from cat_win.src.service.helper.iohelper import IoHelper, logger
 from cat_win.src.service.rawviewer import SPECIAL_CHARS
 
 

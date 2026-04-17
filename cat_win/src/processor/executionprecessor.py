@@ -1,28 +1,37 @@
 """
 executionpreprocessor
 """
-from datetime import datetime
-from itertools import groupby
 import os
 import sys
+from datetime import datetime
+from itertools import groupby
 
+from cat_win import (
+    __author__,
+    __project__,
+    __sysversion__,
+    __url__,
+    __version__
+)
 from cat_win.src.const.argconstants import (
+    ALL_ARGS,
     ARGS_CCONFIG,
     ARGS_CCONFIG_FLUSH,
     ARGS_CONFIG,
     ARGS_CONFIG_FLUSH,
     ARGS_CONFIG_REMOVE,
-    ARGS_HELP,
-    ARGS_VERSION,
     ARGS_DEBUG,
-    ALL_ARGS
+    ARGS_HELP,
+    ARGS_VERSION
 )
-from cat_win.src.processor.registerwrapper import STARTUP_ACTIONS, register_startup
+from cat_win.src.processor.registerwrapper import (
+    STARTUP_ACTIONS,
+    register_startup
+)
 from cat_win.src.service.fileattributes import get_file_ctime
-from cat_win.src.service.more import More
 from cat_win.src.service.helper.iohelper import logger
+from cat_win.src.service.more import More
 from cat_win.src.web.updatechecker import print_update_information
-from cat_win import __project__, __version__, __sysversion__, __author__, __url__
 
 
 def _show_help(repl: bool = False) -> None:

@@ -2,13 +2,17 @@
 more
 """
 
-from pathlib import Path
 import os
 import shutil
 import sys
+from pathlib import Path
 
 from cat_win.src.const.colorconstants import CKW
-from cat_win.src.const.escapecodes import ESC_CODE, CURSOR_START_ABOVE_1, ERASE_LINE
+from cat_win.src.const.escapecodes import (
+    CURSOR_START_ABOVE_1,
+    ERASE_LINE,
+    ESC_CODE
+)
 from cat_win.src.service.helper.iohelper import IoHelper
 
 

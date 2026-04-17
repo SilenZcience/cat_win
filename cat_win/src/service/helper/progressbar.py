@@ -8,7 +8,7 @@ import shutil
 import sys
 
 from cat_win.src.const.colorconstants import CKW
-from cat_win.src.const.escapecodes import CURSOR_VISIBLE, CURSOR_INVISIBLE
+from cat_win.src.const.escapecodes import CURSOR_INVISIBLE, CURSOR_VISIBLE
 
 
 class PBar:

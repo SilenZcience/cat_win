@@ -8,7 +8,6 @@ import pickle
 from cat_win.src.persistence.xdgconfig import xdg_config
 from cat_win.src.service.helper.iohelper import logger
 
-
 _SUPPORTED_VIEWS = {
     'DiffViewer': 'cat_win.src.curses.diffviewer',
     'Editor'    : 'cat_win.src.curses.editor',

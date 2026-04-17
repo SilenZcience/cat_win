@@ -6,7 +6,6 @@ import os
 import platform
 import sys
 
-
 on_windows_os = platform.system() == 'Windows'
 
 def get_py_executable() -> str:

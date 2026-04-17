@@ -2,19 +2,19 @@
 fileprocessor
 """
 
-from time import sleep
 import os
 import sys
+from time import sleep
 
 from cat_win.src.const.argconstants import (
     ARGS_BINVIEW,
     ARGS_DIFF,
+    ARGS_EOL,
     ARGS_HEXVIEW,
     ARGS_PLAIN_ONLY,
     ARGS_RAW,
     ARGS_REVERSE,
-    ARGS_WATCH,
-    ARGS_EOL,
+    ARGS_WATCH
 )
 from cat_win.src.const.defaultconstants import DKW
 from cat_win.src.domain.contentbuffer import ContentBuffer
@@ -24,10 +24,10 @@ from cat_win.src.processor.contentprocessor import (
 )
 from cat_win.src.processor.outputprocessor import print_raw_view
 from cat_win.src.service.cbase64 import decode_base64
-from cat_win.src.service.fileattributes import get_file_mtime, _convert_size
-from cat_win.src.service.querymanager import remove_ansi_codes_from_line
+from cat_win.src.service.fileattributes import _convert_size, get_file_mtime
 from cat_win.src.service.helper.archiveviewer import display_archive
 from cat_win.src.service.helper.iohelper import IoHelper, logger
+from cat_win.src.service.querymanager import remove_ansi_codes_from_line
 
 
 def edit_file(ctx, file_index: int) -> None:

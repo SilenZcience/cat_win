@@ -7,20 +7,20 @@ import shlex
 import sys
 from time import monotonic
 
+from cat_win import __project__, __url__, __version__
 from cat_win.src.const.argconstants import ARGS_B64D, ARGS_CLIP, ARGS_ONELINE
 from cat_win.src.const.colorconstants import CKW
 from cat_win.src.domain.contentbuffer import ContentBuffer
 from cat_win.src.processor.contentprocessor import edit_content
 from cat_win.src.processor.lineprefixprocessor import (
     _calculate_line_length_prefix_spacing,
-    _calculate_line_prefix_spacing,
+    _calculate_line_prefix_spacing
 )
 from cat_win.src.service.cbase64 import decode_base64
 from cat_win.src.service.clipboard import Clipboard
-from cat_win.src.service.querymanager import remove_ansi_codes_from_line
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.iohelper import IoHelper
-from cat_win import __project__, __url__, __version__
+from cat_win.src.service.querymanager import remove_ansi_codes_from_line
 
 
 class ReplCommandHandler:

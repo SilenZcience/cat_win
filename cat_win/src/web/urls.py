@@ -2,8 +2,8 @@
 urls
 """
 
-import urllib.request
 import urllib.parse
+import urllib.request
 
 from cat_win.src.const.regex import DJANGO_VALID_URL_PATTERN
 

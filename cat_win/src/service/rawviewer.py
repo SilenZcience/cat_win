@@ -5,7 +5,6 @@ rawviewer
 from cat_win.src.const.colorconstants import CKW
 from cat_win.src.service.helper.iohelper import IoHelper
 
-
 SPECIAL_CHARS = [
     ( 0, 'NUL', '␀', True), # ^@ \0 null
     # ( 1, 'SOH', '␁', False), # ^A start of heading

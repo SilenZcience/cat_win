@@ -2,9 +2,9 @@
 zipviewer & tarviewer
 """
 
-from pathlib import Path
 import tarfile
 import zipfile
+from pathlib import Path
 
 from cat_win.src.service.helper.iohelper import logger
 

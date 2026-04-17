@@ -3,6 +3,7 @@ DiffViewer
 """
 
 from datetime import datetime
+
 try:
     import curses
     CURSES_MODULE_ERROR = False
@@ -15,16 +16,31 @@ import time
 
 from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.const.regex import RE_CUTOFF
-from cat_win.src.curses.helper.diffviewerhelper import DifflibParser, DifflibID
-from cat_win.src.curses.helper.editorhelper import Position, frepr, \
-    UNIFY_HOTKEYS, ACTION_HOTKEYS, MOVE_HOTKEYS, FUNCTION_HOTKEYS, SCROLL_HOTKEYS
-from cat_win.src.curses.helper.editorsearchhelper import search_iter_diff_factory
+from cat_win.src.curses.helper.diffviewerhelper import DifflibID, DifflibParser
+from cat_win.src.curses.helper.editorhelper import (
+    ACTION_HOTKEYS,
+    FUNCTION_HOTKEYS,
+    MOVE_HOTKEYS,
+    SCROLL_HOTKEYS,
+    UNIFY_HOTKEYS,
+    Position,
+    frepr
+)
+from cat_win.src.curses.helper.editorsearchhelper import \
+    search_iter_diff_factory
 from cat_win.src.curses.helper.fileselectionhelper import run_file_selection
 from cat_win.src.curses.helper.githelper import GitHelper
-from cat_win.src.persistence.viewstate import save_view_state, get_view_state_time
+from cat_win.src.persistence.viewstate import (
+    get_view_state_time,
+    save_view_state
+)
+from cat_win.src.service.fileattributes import (
+    _convert_size,
+    get_file_ctime,
+    get_file_mtime,
+    get_file_size
+)
 from cat_win.src.service.helper.environment import on_windows_os
-from cat_win.src.service.fileattributes import get_file_size, _convert_size, \
-    get_file_mtime, get_file_ctime
 from cat_win.src.service.helper.iohelper import IoHelper, logger
 
 

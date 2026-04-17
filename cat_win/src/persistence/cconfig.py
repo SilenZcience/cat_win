@@ -6,9 +6,13 @@ import configparser
 import shutil
 import sys
 
-from cat_win.src.const.colorconstants import ColorOptions, CKW
-from cat_win.src.const.escapecodes import ESC_CODE, color_code_256, color_code_truecolor
-from cat_win.src.const.regex import CONFIG_VALID_COLOR, CONFIG_VALID_ANSI
+from cat_win.src.const.colorconstants import CKW, ColorOptions
+from cat_win.src.const.escapecodes import (
+    ESC_CODE,
+    color_code_256,
+    color_code_truecolor
+)
+from cat_win.src.const.regex import CONFIG_VALID_ANSI, CONFIG_VALID_COLOR
 from cat_win.src.persistence.xdgconfig import xdg_config
 from cat_win.src.service.helper.iohelper import logger
 

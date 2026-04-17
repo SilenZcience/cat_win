@@ -2,25 +2,30 @@
 argparser
 """
 
-from pathlib import Path
 import glob
 import os
+from pathlib import Path
 
-from cat_win.src.const.argconstants import ALL_ARGS, ARGS_CUT, ARGS_REPLACE, ARGS_ECHO
+from cat_win.src.const.argconstants import (
+    ALL_ARGS,
+    ARGS_CUT,
+    ARGS_ECHO,
+    ARGS_REPLACE
+)
 from cat_win.src.const.regex import (
-    compile_re,
+    RE_CUT,
     RE_ENCODING,
-    RE_Q_MATCH,
+    RE_F_IND,
     RE_M_ATCH,
     RE_Q_FIND,
-    RE_F_IND,
+    RE_Q_MATCH,
     RE_Q_REPLACE,
-    RE_R_EPLACE,
     RE_Q_TRUNC,
-    RE_T_RUNC,
-    RE_CUT,
+    RE_R_EPLACE,
     RE_REPLACE,
-    RE_REPLACE_COMMA
+    RE_REPLACE_COMMA,
+    RE_T_RUNC,
+    compile_re
 )
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.web.urls import sep_valid_urls
