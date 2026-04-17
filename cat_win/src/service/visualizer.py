@@ -2,14 +2,13 @@
 visualizer
 """
 
+import shutil
 from functools import lru_cache
 from pathlib import Path
-import shutil
 
 from cat_win.src.const.colorconstants import CVis
 from cat_win.src.service.helper.iohelper import IoHelper
-from cat_win.src.service.helper.vishelper import SpaceFilling, Entropy
-
+from cat_win.src.service.helper.vishelper import Entropy, SpaceFilling
 
 GRAY_SCALE_VECTOR    = r"█▓▒░ "
 

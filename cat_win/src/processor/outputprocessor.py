@@ -8,23 +8,22 @@ from cat_win.src.const.argconstants import (
     ARGS_GREP,
     ARGS_GREP_ONLY,
     ARGS_MORE,
-    ARGS_NOKEYWORD,
     ARGS_NOBREAK,
     ARGS_NOCOL,
-    ARGS_STDIN,
-    ARGS_PEEK,
+    ARGS_NOKEYWORD,
+    ARGS_PEEK
 )
 from cat_win.src.const.colorconstants import CKW
 from cat_win.src.const.defaultconstants import DKW
+from cat_win.src.service.helper.iohelper import IoHelper
 from cat_win.src.service.querymanager import (
     QueryManager,
-    replace_queries_in_line,
-    remove_ansi_codes_from_line,
+    _build_ansi_restore,
     _map_display_pos,
-    _build_ansi_restore
+    remove_ansi_codes_from_line,
+    replace_queries_in_line
 )
 from cat_win.src.service.rawviewer import get_raw_view_lines_gen
-from cat_win.src.service.helper.iohelper import IoHelper
 
 
 def _print_excluded_by_peek(prefix_len: int, excluded_by_peek: int, color_dic: dict) -> None:

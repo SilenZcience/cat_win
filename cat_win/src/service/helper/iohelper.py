@@ -2,13 +2,13 @@
 iohelper
 """
 
-from pathlib import Path
 import contextlib
 import ctypes
 import io
 import logging
 import os
 import sys
+from pathlib import Path
 
 from cat_win.src.const.colorconstants import CKW
 from cat_win.src.service.helper.environment import on_windows_os

@@ -2,9 +2,9 @@
 checksum
 """
 
-from pathlib import Path
 import hashlib
 import zlib
+from pathlib import Path
 
 from cat_win.src.const.colorconstants import CKW
 

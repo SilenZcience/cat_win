@@ -7,12 +7,11 @@ from functools import lru_cache
 from cat_win.src.const.argconstants import (
     ARGS_FILE_PREFIX,
     ARGS_NOCOL,
-    ARGS_NUMBER,
+    ARGS_NUMBER
 )
 from cat_win.src.const.colorconstants import CKW
-from cat_win.src.service.querymanager import remove_ansi_codes_from_line
 from cat_win.src.service.helper.environment import on_windows_os
-
+from cat_win.src.service.querymanager import remove_ansi_codes_from_line
 
 FILE_URI_PREFIX = 'file://' + '/' * on_windows_os
 

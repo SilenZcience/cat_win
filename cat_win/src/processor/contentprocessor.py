@@ -2,12 +2,13 @@
 contentprocessor
 """
 
-from datetime import datetime
 import os
 import sys
+from datetime import datetime
 
 from cat_win.src.const.argconstants import (
     ARGS_B64E,
+    ARGS_BIN,
     ARGS_BLANK,
     ARGS_CHR,
     ARGS_CLIP,
@@ -16,14 +17,13 @@ from cat_win.src.const.argconstants import (
     ARGS_ENDS,
     ARGS_EOL,
     ARGS_EVAL,
-    ARGS_FILE_PREFIX,
     ARGS_FFILE_PREFIX,
+    ARGS_FILE_PREFIX,
     ARGS_HEX,
     ARGS_LLENGTH,
     ARGS_MORE,
     ARGS_NUMBER,
     ARGS_OCT,
-    ARGS_BIN,
     ARGS_PEEK,
     ARGS_REPLACE,
     ARGS_REVERSE,
@@ -31,8 +31,7 @@ from cat_win.src.const.argconstants import (
     ARGS_SPECIFIC_FORMATS,
     ARGS_SQUEEZE,
     ARGS_SSORT,
-    ARGS_STDIN,
-    ARGS_STRINGS,
+    ARGS_STRINGS
 )
 from cat_win.src.const.colorconstants import CKW
 from cat_win.src.const.defaultconstants import DKW
@@ -40,28 +39,32 @@ from cat_win.src.domain.contentbuffer import ContentBuffer
 from cat_win.src.processor.lineprefixprocessor import (
     get_file_prefix,
     get_line_length_prefix,
-    get_line_prefix,
+    get_line_prefix
 )
 from cat_win.src.processor.outputprocessor import print_file
-from cat_win.src.processor.registerwrapper import PRO_CONTENT_ACTIONS, register_pro
+from cat_win.src.processor.registerwrapper import (
+    PRO_CONTENT_ACTIONS,
+    register_pro
+)
 from cat_win.src.service.cbase64 import encode_base64
 from cat_win.src.service.clipboard import Clipboard
 from cat_win.src.service.fileattributes import get_file_mtime
 from cat_win.src.service.formatter import Formatter
+from cat_win.src.service.helper.iohelper import logger
 from cat_win.src.service.more import More
 from cat_win.src.service.querymanager import (
-    remove_ansi_codes_from_line,
-    replace_queries_in_line,
+    _build_ansi_restore,
     _map_display_pos,
-    _build_ansi_restore
+    remove_ansi_codes_from_line,
+    replace_queries_in_line
 )
 from cat_win.src.service.rawviewer import SPECIAL_CHARS
 from cat_win.src.service.strings import get_strings
-from cat_win.src.service.helper.iohelper import logger
+
 try:
-    from cat_win.src.service.helper.utility import comp_eval, comp_conv
+    from cat_win.src.service.helper.utility import comp_conv, comp_eval
 except SyntaxError:
-    from cat_win.src.service.helper.utilityold import comp_eval, comp_conv
+    from cat_win.src.service.helper.utilityold import comp_conv, comp_eval
 
 
 def _ansi_aware_slice_line(param: tuple, reset_all: str):

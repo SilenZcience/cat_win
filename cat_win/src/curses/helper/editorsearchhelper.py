@@ -1,6 +1,7 @@
 """
 editorsearchhelper
 """
+
 import bisect
 import re
 

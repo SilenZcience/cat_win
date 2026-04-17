@@ -14,7 +14,6 @@ from cat_win.src.const.defaultconstants import DKW
 from cat_win.src.persistence.xdgconfig import xdg_config
 from cat_win.src.service.helper.iohelper import logger
 
-
 BOOL_POS_RESPONSE = ['TRUE','YES','Y','1']
 BOOL_NEG_RESPONSE = ['FALSE','NO','N','0']
 

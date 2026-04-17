@@ -5,10 +5,9 @@ updatechecker
 import json
 import urllib.request
 
+from cat_win import __url__
 from cat_win.src.service.helper.environment import get_py_executable
 from cat_win.src.service.helper.iohelper import logger
-from cat_win import __url__
-
 
 # UNSAFE:
 # UPDATE MAY INCLUDE FUNDAMENTAL CHANGES

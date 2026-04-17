@@ -6,7 +6,6 @@ import builtins
 import keyword
 import re
 
-
 TOKEN_KEYWORD = 'keyword'
 TOKEN_BUILTIN = 'builtin'
 TOKEN_NUMBER  = 'number'

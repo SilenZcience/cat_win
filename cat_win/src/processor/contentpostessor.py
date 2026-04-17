@@ -7,25 +7,28 @@ import os
 from cat_win.src.const.argconstants import (
     ARGS_CHARCOUNT,
     ARGS_CLIP,
+    ARGS_DEBUG,
     ARGS_DIRECTORIES,
     ARGS_FFILES,
     ARGS_FILES,
     ARGS_SSUM,
     ARGS_SUM,
-    ARGS_WORDCOUNT,
-    ARGS_DEBUG,
+    ARGS_WORDCOUNT
 )
 from cat_win.src.curses.helper.diffviewerhelper import is_special_character
 from cat_win.src.processor.lineprefixprocessor import (
-    _calculate_line_prefix_spacing,
     _calculate_line_length_prefix_spacing,
+    _calculate_line_prefix_spacing
 )
-from cat_win.src.processor.registerwrapper import POST_CONTENT_ACTIONS, register_post
+from cat_win.src.processor.registerwrapper import (
+    POST_CONTENT_ACTIONS,
+    register_post
+)
 from cat_win.src.service.clipboard import Clipboard
+from cat_win.src.service.helper.iohelper import logger
 from cat_win.src.service.querymanager import remove_ansi_codes_from_line
 from cat_win.src.service.summary import Summary
 from cat_win.src.service.visualizer import Visualizer
-from cat_win.src.service.helper.iohelper import logger
 
 
 def _print_cache_debug_info(ctx) -> None:

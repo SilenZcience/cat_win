@@ -6,7 +6,6 @@ import os
 import sys
 from pathlib import Path
 
-
 ENV_OVERRIDE = "CAT_WIN_CONFIG_DIR"
 
 

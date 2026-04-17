@@ -6,22 +6,24 @@ try:
     from colorama import init as coloramaInit
 except ImportError:
     nop = lambda *_, **__: None; coloramaInit = nop
-from contextlib import contextmanager
 import os
 import sys
+from contextlib import contextmanager
 
+from cat_win import __url__
+from cat_win.src import cats as repl_module
 from cat_win.src.const.argconstants import (
     ALL_ARGS,
+    ARGS_B64D,
     ARGS_DEBUG,
     ARGS_DEBUG_LOG,
+    ARGS_LLENGTH,
     ARGS_NOCOL,
-    ARGS_WATCH,
-    ARGS_STDIN,
-    ARGS_B64D,
-    ARGS_SUM,
-    ARGS_SSUM,
     ARGS_NUMBER,
-    ARGS_LLENGTH
+    ARGS_SSUM,
+    ARGS_STDIN,
+    ARGS_SUM,
+    ARGS_WATCH
 )
 from cat_win.src.const.colorconstants import CKW, CVis
 from cat_win.src.const.defaultconstants import DKW
@@ -29,30 +31,29 @@ from cat_win.src.curses.diffviewer import DiffViewer
 from cat_win.src.curses.editor import Editor
 from cat_win.src.curses.hexeditor import HexEditor
 from cat_win.src.domain.appcontext import AppContext
+from cat_win.src.processor.contentpostessor import (
+    finalize_context,
+    run_post_content_actions
+)
 from cat_win.src.processor.contentprecessor import (
-    preprocess_context,
     materialize_context_sources,
-    run_pre_content_actions,
+    preprocess_context,
+    run_pre_content_actions
 )
-from cat_win.src.processor.contentpostessor import finalize_context, run_post_content_actions
 from cat_win.src.processor.executionprecessor import run_startup_actions
-from cat_win.src.processor.fileprocessor import (
-    decode_files_base64 as _fp_decode_files_base64,
-    edit_files as _fp_edit_files,
-)
+from cat_win.src.processor.fileprocessor import \
+    decode_files_base64 as _fp_decode_files_base64
+from cat_win.src.processor.fileprocessor import edit_files as _fp_edit_files
 from cat_win.src.service.converter import Converter
-from cat_win.src.service.fileattributes import get_file_size, Signatures
-from cat_win.src.service.more import More
-from cat_win.src.service.summary import Summary
-from cat_win.src.service.visualizer import Visualizer
+from cat_win.src.service.fileattributes import get_file_size
 from cat_win.src.service.helper.environment import on_windows_os
 from cat_win.src.service.helper.iohelper import logger
 from cat_win.src.service.helper.levenshtein import calculate_suggestions
 from cat_win.src.service.helper.progressbar import PBar
 from cat_win.src.service.helper.tmpfilehelper import TmpFileHelper
-from cat_win.src import cats as repl_module
-from cat_win import __url__
-
+from cat_win.src.service.more import More
+from cat_win.src.service.summary import Summary
+from cat_win.src.service.visualizer import Visualizer
 
 coloramaInit(strip=False)
 

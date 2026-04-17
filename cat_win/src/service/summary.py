@@ -7,7 +7,11 @@ from itertools import groupby
 
 from cat_win.src.const.colorconstants import CKW
 from cat_win.src.const.regex import RE_TOKENIZER
-from cat_win.src.service.fileattributes import get_file_size, get_dir_size, _convert_size
+from cat_win.src.service.fileattributes import (
+    _convert_size,
+    get_dir_size,
+    get_file_size
+)
 from cat_win.src.service.helper.iohelper import IoHelper
 
 

@@ -2,9 +2,9 @@
 githelper
 """
 
-from pathlib import Path
 import os
 import subprocess
+from pathlib import Path
 
 
 class GitHelper:

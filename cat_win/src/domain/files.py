@@ -2,9 +2,9 @@
 files
 """
 
+import heapq
 from functools import lru_cache
 from pathlib import Path
-import heapq
 
 from cat_win.src.domain.file import File
 from cat_win.src.service.helper.iohelper import IoHelper

@@ -9,8 +9,8 @@ from cat_win.src.const.argconstants import (
     ARGS_CHECKSUM,
     ARGS_DATA,
     ARGS_DDIRECTORIES,
-    ARGS_DOTFILES,
     ARGS_DIFF,
+    ARGS_DOTFILES,
     ARGS_ECHO,
     ARGS_EDITOR,
     ARGS_FFILES,
@@ -31,13 +31,16 @@ from cat_win.src.const.argconstants import (
     ARGS_VISUALIZE_E,
     ARGS_VISUALIZE_H,
     ARGS_VISUALIZE_Z,
-    ARGS_WWORDCOUNT,
+    ARGS_WWORDCOUNT
 )
 from cat_win.src.const.defaultconstants import DKW
 from cat_win.src.curses.diffviewer import DiffViewer
 from cat_win.src.curses.editor import Editor
 from cat_win.src.curses.hexeditor import HexEditor
-from cat_win.src.processor.registerwrapper import  register_pre, PRE_CONTENT_ACTIONS
+from cat_win.src.processor.registerwrapper import (
+    PRE_CONTENT_ACTIONS,
+    register_pre
+)
 from cat_win.src.service.checksum import print_checksum
 from cat_win.src.service.fileattributes import print_meta
 from cat_win.src.service.helper.iohelper import IoHelper
