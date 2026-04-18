@@ -814,7 +814,7 @@ class DiffViewer:
             'Time modified:',
             (
                 f"{datetime.fromtimestamp(self._mtime_cache[0])}"
-                if self._mtime_cache[0] is None else 'N/A'
+                if self._mtime_cache[0] is not None else 'N/A'
             ),
             '',
             'Time created:',
@@ -856,7 +856,7 @@ class DiffViewer:
             'Time modified:',
             (
                 f"{datetime.fromtimestamp(self._mtime_cache[1])}"
-                if self._mtime_cache[1] is None else 'N/A'
+                if self._mtime_cache[1] is not None else 'N/A'
             ),
             '',
             'Time created:',
