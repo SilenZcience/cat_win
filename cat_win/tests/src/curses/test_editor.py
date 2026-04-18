@@ -2063,10 +2063,12 @@ class TestEditor(TestCase):
         ed.curse_window = MagicMock()
         with patch('cat_win.src.curses.editor.on_windows_os', False):
             with patch('cat_win.src.curses.editor.signal.SIGSTOP', 19, create=True):
-                with patch('cat_win.src.curses.editor.curses.endwin') as endwin_call:
-                    with patch('cat_win.src.curses.editor.os.kill') as kill_call:
-                        with patch.object(ed, '_init_screen') as init_call:
-                            self.assertTrue(ed._action_background())
+                with patch('cat_win.src.curses.editor.save_view_state') as save_state:
+                    with patch('cat_win.src.curses.editor.curses.endwin') as endwin_call:
+                        with patch('cat_win.src.curses.editor.os.kill') as kill_call:
+                            with patch.object(ed, '_init_screen') as init_call:
+                                self.assertTrue(ed._action_background())
+        save_state.assert_called_once_with(ed)
         endwin_call.assert_called_once()
         kill_call.assert_called_once()
         init_call.assert_called_once()

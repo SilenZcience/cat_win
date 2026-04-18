@@ -459,10 +459,12 @@ class TestDiffViewer(TestCase):
         dv = self._mk_viewer()
         with patch('cat_win.src.curses.diffviewer.on_windows_os', False):
             with patch('cat_win.src.curses.diffviewer.signal.SIGSTOP', 19, create=True):
-                with patch('cat_win.src.curses.diffviewer.curses.endwin') as endwin_call:
-                    with patch('cat_win.src.curses.diffviewer.os.kill') as kill_call:
-                        with patch.object(dv, '_init_screen') as init_call:
-                            self.assertTrue(dv._action_background())
+                with patch('cat_win.src.curses.diffviewer.save_view_state') as save_state:
+                    with patch('cat_win.src.curses.diffviewer.curses.endwin') as endwin_call:
+                        with patch('cat_win.src.curses.diffviewer.os.kill') as kill_call:
+                            with patch.object(dv, '_init_screen') as init_call:
+                                self.assertTrue(dv._action_background())
+        save_state.assert_called_once_with(dv)
         endwin_call.assert_called_once()
         kill_call.assert_called_once()
         init_call.assert_called_once()

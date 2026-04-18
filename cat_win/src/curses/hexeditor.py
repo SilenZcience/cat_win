@@ -942,11 +942,11 @@ class HexEditor:
         return True
 
     def _action_background(self) -> bool:
+        self._build_file()
+        success = save_view_state(self)
+        if not success:
+            self.error_bar = 'Error saving view state for backgrounding!'
         if on_windows_os:
-            self._build_file()
-            success = save_view_state(self)
-            if not success:
-                self.error_bar = 'Error saving view state for backgrounding!'
             return not success
         # only callable on UNIX
         curses.endwin()
