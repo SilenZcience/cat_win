@@ -1659,10 +1659,12 @@ class TestHexEditor(TestCase):
         editor.curse_window = MagicMock()
         with patch('cat_win.src.curses.hexeditor.on_windows_os', False):
             with patch('cat_win.src.curses.hexeditor.signal.SIGSTOP', 19, create=True):
-                with patch('cat_win.src.curses.hexeditor.curses.endwin') as endwin_call:
-                    with patch('cat_win.src.curses.hexeditor.os.kill') as kill_call:
-                        with patch.object(editor, '_init_screen') as init_call:
-                            self.assertTrue(editor._action_background())
+                with patch('cat_win.src.curses.hexeditor.save_view_state') as save_state:
+                    with patch('cat_win.src.curses.hexeditor.curses.endwin') as endwin_call:
+                        with patch('cat_win.src.curses.hexeditor.os.kill') as kill_call:
+                            with patch.object(editor, '_init_screen') as init_call:
+                                self.assertTrue(editor._action_background())
+        save_state.assert_called_once_with(editor)
         endwin_call.assert_called_once()
         kill_call.assert_called_once()
         init_call.assert_called_once()

@@ -649,10 +649,10 @@ class DiffViewer:
         return True
 
     def _action_background(self) -> bool:
+        success = save_view_state(self)
+        if not success:
+            self.error_bar = 'Error saving view state for backgrounding!'
         if on_windows_os:
-            success = save_view_state(self)
-            if not success:
-                self.error_bar = 'Error saving view state for backgrounding!'
             return not success
         # only callable on UNIX
         curses.endwin()
