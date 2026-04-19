@@ -2,6 +2,7 @@
 fileselectionhelper
 """
 
+import os
 import sys
 from pathlib import Path
 
@@ -78,6 +79,86 @@ def run_file_selection(
                     return idx
         return 0
 
+    def _path_parts(path_value) -> tuple:
+        parts = Path(str(path_value)).parts
+        return tuple(parts) if parts else (str(path_value),)
+
+    def _entry_sort_key(name: str) -> tuple:
+        # Keep stable, case-insensitive ordering that works for mixed path styles.
+        return (name.casefold(), name)
+
+    owner_file_parts = [_path_parts(file_path) for file_path, _ in owner.files]
+
+    use_path_parts = len(owner.files) >= 15
+
+    def _build_flat_entries() -> list:
+        entries = []
+        for owner_idx, (file_path, display_name) in enumerate(owner.files):
+            file_path = Path(str(file_path))
+            file_name = file_path.name
+            label = display_name if display_name else file_name
+            if display_name and os.path.exists(display_name):
+                label = f"{file_name} | {file_path.parent}{os.sep}"
+            entries.append({
+                'kind': 'file',
+                'owner_idx': owner_idx,
+                'name': file_name,
+                'label': label,
+                'parts': owner_file_parts[owner_idx],
+            })
+        return entries
+
+    def _build_file_entries(current_dir_parts: tuple) -> list:
+        dirs = set()
+        files = []
+
+        for owner_idx, parts in enumerate(owner_file_parts):
+            if len(parts) <= len(current_dir_parts):
+                continue
+            if parts[:len(current_dir_parts)] != current_dir_parts:
+                continue
+
+            next_part = parts[len(current_dir_parts)]
+            if len(parts) == len(current_dir_parts) + 1:
+                display_name = owner.files[owner_idx][1]
+                label = display_name if display_name else next_part
+                if display_name and os.path.exists(display_name):
+                    label = f"{next_part} | {Path(display_name).parent}{os.sep}"
+
+                files.append((next_part, {
+                    'kind': 'file',
+                    'owner_idx': owner_idx,
+                    'name': next_part,
+                    'label': label,
+                }))
+            else:
+                dirs.add(next_part)
+
+        entries = []
+        if current_dir_parts:
+            entries.append({
+                'kind': 'up',
+                'owner_idx': None,
+                'name': '..',
+                'label': '..',
+                'parts': current_dir_parts[:-1],
+            })
+
+        for dir_name in sorted(dirs, key=_entry_sort_key):
+            entries.append({
+                'kind': 'dir',
+                'owner_idx': None,
+                'name': dir_name,
+                'label': f"{dir_name}{os.sep}",
+                'parts': current_dir_parts + (dir_name,),
+            })
+
+        files.sort(key=lambda item: _entry_sort_key(item[0]))
+        for _, entry in files:
+            entry['parts'] = owner_file_parts[entry['owner_idx']]
+            entries.append(entry)
+        return entries
+
     selection_changed = False
 
     def _get_next_char() -> tuple:
@@ -109,15 +190,36 @@ def run_file_selection(
     def _current_commit_hash(side: int):
         return owner.file_commit_hashes[side] if split_panel else owner.file_commit_hash
 
-    selected_idx = [
-        _find_current_idx(_current_file(side), _current_display(side))
-        for side in range(panel_count)
-    ]
+    file_dirs = []
+    if use_path_parts:
+        for side in range(panel_count):
+            file_parts = _path_parts(_current_file(side))
+            # Start in the current file's directory, similar to a file explorer.
+            file_dirs.append(file_parts[:-1])
+
+        for side in range(panel_count):
+            if not _build_file_entries(file_dirs[side]):
+                file_dirs[side] = ()
+        file_view_entries = [_build_file_entries(file_dirs[side]) for side in range(panel_count)]
+    else:
+        file_dirs = [() for _ in range(panel_count)]
+        file_view_entries = [_build_flat_entries() for _ in range(panel_count)]
+
+    def _find_entry_idx_by_owner_idx(entries: list, owner_idx: int) -> int:
+        for idx, entry in enumerate(entries):
+            if entry['kind'] == 'file' and entry['owner_idx'] == owner_idx:
+                return idx
+        return 0
+
+    selected_idx = []
+    for side in range(panel_count):
+        current_owner_idx = _find_current_idx(_current_file(side), _current_display(side))
+        selected_idx.append(_find_entry_idx_by_owner_idx(file_view_entries[side], current_owner_idx))
     max_y, max_x = owner.getxymax()
     max_y += owner.status_bar_size + status_bar_offset
     nav_x = [0 for _ in range(panel_count)]
     nav_y = [
-        max(0, min(selected_idx[side] - max_y // 2, len(owner.files) - max_y))
+        max(0, min(selected_idx[side] - max_y // 2, len(file_view_entries[side]) - max_y))
         for side in range(panel_count)
     ]
     active_list = 0
@@ -129,6 +231,26 @@ def run_file_selection(
         if split_panel:
             return tuple(selected) != tuple(current)
         return selected[0] != current[0]
+
+    def _clamp_file_selection(side: int) -> None:
+        list_len = len(file_view_entries[side])
+        if list_len == 0:
+            selected_idx[side] = 0
+            nav_y[side] = 0
+            nav_x[side] = 0
+            return
+        selected_idx[side] = min(max(selected_idx[side], 0), list_len - 1)
+        if selected_idx[side] < nav_y[side]:
+            nav_y[side] = selected_idx[side]
+        elif selected_idx[side] >= nav_y[side] + max_y - 1:
+            nav_y[side] = selected_idx[side] - max_y + 1
+        nav_y[side] = max(0, nav_y[side])
+
+    def _refresh_file_entries(side: int, selected_owner_idx: int = None) -> None:
+        file_view_entries[side] = _build_file_entries(file_dirs[side])
+        if selected_owner_idx is not None:
+            selected_idx[side] = _find_entry_idx_by_owner_idx(file_view_entries[side], selected_owner_idx)
+        _clamp_file_selection(side)
 
     def _hash_selection_changed(current_hashes: list) -> bool:
         if split_panel:
@@ -166,6 +288,17 @@ def run_file_selection(
             return owner._get_color(color_map['current'])
         return 0
 
+    def _hint_parts_for_target(current_dir_parts: tuple, target_parts: tuple):
+        if not target_parts:
+            return None
+        if target_parts[:len(current_dir_parts)] == current_dir_parts:
+            if len(target_parts) > len(current_dir_parts):
+                return current_dir_parts + (target_parts[len(current_dir_parts)],)
+            return None
+        if current_dir_parts:
+            return current_dir_parts[:-1]
+        return None
+
     wchar, key = '', b''
     while str(wchar) != ESC_CODE:
         if split_panel:
@@ -177,15 +310,30 @@ def run_file_selection(
             panel_widths = [max_x]
 
         if mode == 'files':
-            data_lists = [owner.files for _ in range(panel_count)]
+            data_lists = [file_view_entries[side] for side in range(panel_count)]
         else:
             data_lists = [file_commits[side] or [] for side in range(panel_count)]
+
+        selected_hint_parts = [None for _ in range(panel_count)]
+        current_hint_parts = [None for _ in range(panel_count)]
+        if mode == 'files' and use_path_parts:
+            for side in range(panel_count):
+                current_target_parts = _path_parts(_current_file(side))
+                selected_target_parts = None
+
+                if data_lists[side] and selected_idx[side] < len(data_lists[side]):
+                    selected_entry = data_lists[side][selected_idx[side]]
+                    if selected_entry['kind'] == 'file':
+                        selected_target_parts = owner_file_parts[selected_entry['owner_idx']]
+
+                selected_hint_parts[side] = _hint_parts_for_target(file_dirs[side], selected_target_parts)
+                current_hint_parts[side] = _hint_parts_for_target(file_dirs[side], current_target_parts)
 
         maxlen_displayname = []
         for side in range(panel_count):
             visible = data_lists[side][nav_y[side]:nav_y[side]+max_y]
             if mode == 'files':
-                maxlen_displayname.append(max((len(display_name) for _, display_name in visible), default=0))
+                maxlen_displayname.append(max((len(entry['label']) for entry in visible), default=0))
             else:
                 maxlen_displayname.append(max((len(_format_commit(commit)) for commit in visible), default=0))
 
@@ -195,12 +343,33 @@ def run_file_selection(
             for side in range(panel_count):
                 entry_idx = row + nav_y[side]
                 if entry_idx >= len(data_lists[side]):
+                    try:
+                        owner.curse_window.addstr(
+                            row,
+                            panel_starts[side],
+                            ' ' * panel_widths[side],
+                            0
+                        )
+                    except curses_error:
+                        pass
                     continue
 
                 if mode == 'files':
-                    _, display_name = data_lists[side][entry_idx]
+                    entry = data_lists[side][entry_idx]
+                    display_name = entry['label']
                     is_selected = selected_idx[side] == entry_idx
-                    is_current = owner.files[entry_idx][0] == _current_file(side)
+                    is_current = (
+                        entry['kind'] == 'file' and
+                        owner.files[entry['owner_idx']][0] == _current_file(side) and
+                        owner.files[entry['owner_idx']][1] == _current_display(side)
+                    )
+
+                    if use_path_parts and entry['kind'] in ('up', 'dir'):
+                        entry_parts = entry.get('parts')
+                        if selected_hint_parts[side] is not None and entry_parts == selected_hint_parts[side]:
+                            is_selected = True
+                        if current_hint_parts[side] is not None and entry_parts == current_hint_parts[side]:
+                            is_current = True
                 else:
                     commit = data_lists[side][entry_idx]
                     display_name = _format_commit(commit)
@@ -344,7 +513,37 @@ def run_file_selection(
 
         if key == b'_key_enter' or (key == b'_key_string' and wchar == ' '):
             if mode == 'files':
-                file_selected_idxs = selected_idx.copy()
+                active_entries = data_lists[active_list]
+                active_entry = None
+                if active_entries:
+                    active_entry = active_entries[selected_idx[active_list]]
+
+                if use_path_parts and active_entry and active_entry['kind'] in ('dir', 'up'):
+                    if active_entry['kind'] == 'up':
+                        file_dirs[active_list] = file_dirs[active_list][:-1]
+                    else:
+                        file_dirs[active_list] = file_dirs[active_list] + (active_entry['name'],)
+                    nav_x[active_list] = 0
+                    nav_y[active_list] = 0
+                    selected_idx[active_list] = 0
+                    _refresh_file_entries(active_list)
+                    continue
+
+                if split_panel and use_path_parts:
+                    if not all(
+                        data_lists[side] and data_lists[side][selected_idx[side]]['kind'] == 'file'
+                        for side in range(panel_count)
+                    ):
+                        for side in range(panel_count):
+                            if not data_lists[side] or data_lists[side][selected_idx[side]]['kind'] != 'file':
+                                active_list = side
+                                break
+                        continue
+
+                file_selected_idxs = [
+                    data_lists[side][selected_idx[side]]['owner_idx']
+                    for side in range(panel_count)
+                ]
 
                 for side in range(panel_count):
                     file_path = owner.files[file_selected_idxs[side]][0]
@@ -405,10 +604,12 @@ def run_file_selection(
         if mode == 'commits' and str(wchar) == ESC_CODE:
             mode = 'files'
             wchar = ''
-            selected_idx = file_selected_idxs.copy() if file_selected_idxs else selected_idx
+            if use_path_parts and file_selected_idxs:
+                for side in range(panel_count):
+                    _refresh_file_entries(side, selected_owner_idx=file_selected_idxs[side])
             nav_x = [0 for _ in range(panel_count)]
             nav_y = [
-                max(0, min(selected_idx[side] - max_y // 2, len(owner.files) - max_y))
+                max(0, min(selected_idx[side] - max_y // 2, len(file_view_entries[side]) - max_y))
                 for side in range(panel_count)
             ]
 
