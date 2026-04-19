@@ -143,9 +143,9 @@ class TestFileSelectionHelper(TestCase):
             self.assertFalse(run_file_selection(owner))
 
         rendered_texts = [
-            call.args[2]
+            call[0][2]
             for call in owner.curse_window.addstr.call_args_list
-            if len(call.args) >= 3 and isinstance(call.args[2], str)
+            if len(call[0]) >= 3 and isinstance(call[0][2], str)
         ]
         # Path-parts mode renders directory entries with a trailing path separator.
         self.assertTrue(any(text.strip().endswith(os.sep) for text in rendered_texts))
@@ -175,9 +175,9 @@ class TestFileSelectionHelper(TestCase):
             self.assertTrue(run_file_selection(owner))
 
         rendered_texts = [
-            call.args[2]
+            call[0][2]
             for call in owner.curse_window.addstr.call_args_list
-            if len(call.args) >= 3 and isinstance(call.args[2], str)
+            if len(call[0]) >= 3 and isinstance(call[0][2], str)
         ]
         self.assertFalse(any(text.strip().endswith(os.sep) for text in rendered_texts))
         self.assertEqual(owner.open_next_idx, 2)
