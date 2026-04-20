@@ -1617,7 +1617,7 @@ class Editor:
             return
         self._action_replace(-1)
 
-    def _function_sel_highlight(self) -> None:
+    def _function_sel_highlight(self) -> None: # TODO: add option to disable highlighting
         curses.curs_set(0)
         self.curse_window.clear()
 

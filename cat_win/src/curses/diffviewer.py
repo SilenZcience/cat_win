@@ -273,7 +273,7 @@ class DiffViewer:
         self.wpos.col = self.lllen() - self.half_width
 
     def _scroll_key_end(self) -> None:
-        self.wpos.col = self.lllen() - self.half_width
+        self.wpos.row = max(0, len(self.diff_items)-self.getxymax()[0])
 
     def _move_key_ctl_end(self) -> None:
         self.rpos.row = max(len(self.diff_items)-1, 0)
@@ -284,7 +284,7 @@ class DiffViewer:
         self.wpos.col = 0
 
     def _scroll_key_home(self) -> None:
-        self.wpos.col = 0
+        self.wpos.row = 0
 
     def _move_key_ctl_home(self) -> None:
         self.rpos.row = 0

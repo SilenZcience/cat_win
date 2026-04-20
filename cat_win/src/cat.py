@@ -220,7 +220,7 @@ def handle_args(tmp_file_helper: TmpFileHelper) -> None:
     """
     init(repl=False)
 
-    if len(sys.argv) == 2 and sys.argv[1] == 'fg': # TODO: this is weird, but proof-of-concept
+    if len(sys.argv) == 2 and sys.argv[1] == 'fg': # TODO: this is weird, but proof-of-concept, also ignores --debug etc ...
         from cat_win.src.persistence.viewstate import load_view_state
         view_obj = load_view_state()
         if view_obj is None:

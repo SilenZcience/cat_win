@@ -453,6 +453,10 @@ class HexEditor:
     def _select_key_end(self) -> None:
         self._move_key_end()
 
+    def _scroll_key_end(self) -> None:
+        self._build_file()
+        self.wpos.row = max(0, len(self.hex_array)-self.getxymax()[0])
+
     def _move_key_home(self) -> None:
         self.cpos.col = 0
 
@@ -462,6 +466,9 @@ class HexEditor:
 
     def _select_key_home(self) -> None:
         self._move_key_home()
+
+    def _scroll_key_home(self) -> None:
+        self.wpos.row = 0
 
     def _insert_byte(self, wchar: str) -> None:
         if wchar == ' ':
