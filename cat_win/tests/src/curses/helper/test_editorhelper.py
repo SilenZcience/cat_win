@@ -28,10 +28,10 @@ class TestEditorHelper(TestCase):
         self.assertEqual(pos.get_pos(), (7, 11))
 
     def _load_editorhelper_module(self, module_name, modules):
-        file_path = os.path.join(
-            os.getcwd(),
-            'cat_win', 'src', 'curses', 'helper', 'editorhelper.py'
-        )
+        file_path = os.path.normpath(os.path.join(
+            os.path.dirname(__file__),
+            '..', '..', '..', '..', 'src', 'curses', 'helper', 'editorhelper.py'
+        ))
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
         with patch.dict(sys.modules, modules, clear=False):
@@ -46,10 +46,10 @@ class TestEditorHelper(TestCase):
                 raise ImportError('forced')
             return real_import(name, globals_, locals_, fromlist, level)
 
-        file_path = os.path.join(
-            os.getcwd(),
-            'cat_win', 'src', 'curses', 'helper', 'editorhelper.py'
-        )
+        file_path = os.path.normpath(os.path.join(
+            os.path.dirname(__file__),
+            '..', '..', '..', '..', 'src', 'curses', 'helper', 'editorhelper.py'
+        ))
         spec = importlib.util.spec_from_file_location('editorhelper_cov_no_curses', file_path)
         module = importlib.util.module_from_spec(spec)
         with patch('builtins.__import__', side_effect=_fake_import):
