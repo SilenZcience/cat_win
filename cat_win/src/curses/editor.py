@@ -1617,7 +1617,7 @@ class Editor:
             return
         self._action_replace(-1)
 
-    def _function_sel_highlight(self) -> None: # TODO: add option to disable highlighting
+    def _function_sel_highlight(self) -> None:
         curses.curs_set(0)
         self.curse_window.clear()
 
@@ -1749,10 +1749,12 @@ class Editor:
 
             if key == b'_key_enter' or (key == b'_key_string' and wchar == ' '):
                 _syntax_highlighter = SyntaxHighlighter.get_plugin(available_plugins[selected_idx])
+                self._syntax_cache.clear()
                 if _syntax_highlighter != self._syntax_highlighter:
                     self._syntax_highlighter = _syntax_highlighter
-                    self._syntax_cache.clear()
                     self._init_highlighter_colors()
+                else:
+                    self._syntax_highlighter = None
                 break
 
     def _get_new_char(self):
