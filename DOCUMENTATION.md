@@ -89,6 +89,7 @@
             <li><a href="#----edit">-!, --edit</a></li>
             <li><a href="#----hexedit">-#, --hexedit</a></li>
             <li><a href="#-?---diff">-?, --diff</a></li>
+            <li><a href="#fg">fg</a></li>
             <li><a href="#-m---more">-M, --more</a></li>
             <li><a href="#-l---less">-L, --less</a></li>
             <li><a href="#-b---raw">-B, --raw</a></li>
@@ -189,6 +190,7 @@
 | *<a href="#----edit">-!, --edit</a>* | open each file in a simple editor |❌|
 | *<a href="#----hexedit">-#, --hexedit</a>* | open each file in a simple hex-editor |❌|
 | *<a href="#-?---diff">-?, --diff</a>* | open two files in a simple side-by-side diff-viewer |❌|
+| *<a href="#fg">fg</a>* | continue a previously backgrounded session |❌|
 | *<a href="#-m---more">-M, --more</a>* | page through the file step by step |❌|
 | *<a href="#-l---less">-L, --less</a>* | page through the file step by step (lazy)|❌|
 | *<a href="#-b---raw">-B, --raw</a>* | open the file as raw bytes |❌|
@@ -283,7 +285,7 @@ Author:         Silas A. Kraume
 
 ### <a id="--debug---debug">--debug, --debug</a>
 
-Displays debug Information before and after the Code Execution.
+Displays debug Information throughout the Code Execution.
 This Argument is not shown in the Default Help Message and is provided for Developers/Development.
 
 ### <a id="--debuglog---debug-log">--debuglog, --debug-log</a>
@@ -410,7 +412,6 @@ When toggling the `blank_remove_ws_lines` Element in the Config Menu (<a href="#
 Only displays the first and last 5 Lines of each File.
 Between the Beginning and End of the File will be displayed how many Lines have been skipped.
 Useful for getting a quick Impression of how Data in a given File is structured.
-This Argument is ignored when provided alongside with Queries for Substrings of Patterns or the <a href="#-m---more">-M, --more</a> Parameter.
 Does nothing when the File has at most 10 Lines.
 The `peek_size` Element in the Config Menu (<a href="#--config---config">--config, --config</a>) defines how many Lines to display.
 
@@ -446,6 +447,8 @@ Line 1 From Test1
 ### <a id="-u---unique">-u, --unique</a>
 
 Suppresses repeated Lines if they occur exactly one after the other.
+Additionally displays a Linesuffix indicating how many Lines have been collapsed.
+This Behaviour can be changed using the `squeeze_collapse_suffixes` Element in the Config Menu (<a href="#--config---config">--config, --config</a>).
 
 ```console
 > catw test.txt
@@ -457,7 +460,7 @@ This is a line!
 ```
 ```console
 > catw test.txt --unique
-This is a line!
+This is a line! [x3]
 This is also a line!
 This is a line!
 ```
@@ -523,10 +526,16 @@ Everything passed in after this Argument will be handled as its own File.
 It is not possible to break out of this State therefor this Parameter must be used last.
 The Input is unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_echo` is set to `true` but in Case of an unicode-error the Input will simply be used literally.
 This way it is possible to define new Lines (\\n) or other special Characters.
+The handled Text begins instantly after using this Argument, even when chaining the Argument.
 
 ```console
 > catw -l --echo -n The last 'Parameter' does not count!\nThis is not a newline!
 [57] -n The last Parameter does not count!\nThis is not a newline, unless the config option is set!
+```
+
+```console
+> catw -Eln test
+ln test
 ```
 
 ### <a id="----stdin">-, --stdin</a>
@@ -717,8 +726,10 @@ u: 1
 
 Skips every Line that does not contain any matched Patterns or queried Substrings.
 Literals or Patterns to look for can be set using the <a href="#findx-findx">find=X, find&#42889;X</a> and <a href="#matchx-matchx">match=X, match&#42889;X</a> Keywords.
+Additionally the Config Element `grep_context_lines` can be set to define how many Lines before and after each Match will be displayed in order to provide Context.
 Using this Argument in Uppercase (-G, --GREP) will ONLY display the parts of each Line that matched any Pattern or Literal.
 Should multiple Queries be found in the same Line they will be seperated by Comma.
+The Seperator can be changed using the `grep_query_separator` Config Element.
 The Uppercase Variant of this Parameter has Priority (over the Lowercase Variant as well as <a href="#--nk---nokeyword">--nk, --nokeyword</a>).
 
 ```console
@@ -763,12 +774,12 @@ If the libmagic file Command is available (inside the PATH or Git install Direct
 > catw test.txt -a
 <Path>/test.txt
 Signature:      -
+LibMagic:       ASCII text, with CRLF line terminators
 Size:           1.55 KB
 ATime:          YYYY-MM-DD HH:MM:SS.
 MTime:          YYYY-MM-DD HH:MM:SS.
 CTime:          YYYY-MM-DD HH:MM:SS.
 -rw-rw-rw- (666)
-<Path>/test.txt: ASCII text, with CRLF line terminators
 +Archive, Indexed
 -System, Hidden, Readonly, Compressed, Encrypted
 ```
@@ -776,12 +787,12 @@ CTime:          YYYY-MM-DD HH:MM:SS.
 > catw test.txt -a
 <Path>/test.txt
 Signature:      -
+LibMagic:       ASCII text, with CRLF line terminators
 Size:           1.55 KB
 ATime:          YYYY-MM-DD HH:MM:SS.
 MTime:          YYYY-MM-DD HH:MM:SS.
 CTime:          YYYY-MM-DD HH:MM:SS.
 -rwxrwxrwx 1 user user
-<Path>/test.txt: ASCII text, with CRLF line terminators
 ```
 
 ### <a id="-m---checksum">-m, --checksum</a>
@@ -968,7 +979,7 @@ Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text
 <a id="edit"></a>
 ### <a id="----edit">-!, --edit</a>
 
-Opens a simple Editor to write/edit the Content of any provided File one by one.
+Opens a simple Editor to write/edit the Content of any provided File.
 Not-existing Files will be opened first and existing Ones will be able to be edited after that.
 The Editor will not save Changes automatically.
 Files will be saved with the Text Encoding defined by <a href="#encx-encx">enc=X, enc&#42889;X</a>.
@@ -1014,7 +1025,7 @@ The currently supported Key Bindings are as follows:
 | <kbd>Save/^S</kbd> | - | - | save changes | save changes |
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
 ||||||
-| <kbd>Background/^B</kbd> | - | - | put the editor in the background</br>(UNIX only) | - |
+| <kbd>Background/^B</kbd> | - | - | put the editor in the background</br>(on Windows it can be reopened using <a href="#fg">fg</a>) | - |
 | <kbd>Interrupt/^D</kbd> | - | - | interrupt program | - |
 | <kbd>Quit/^Q</kbd> | - | - | close editor</br>(prompt to save, if neccessary) | - |
 
@@ -1052,7 +1063,7 @@ The currently supported Key Bindings are as follows:
 
 ### <a id="----hexedit">-#, --hexedit</a>
 
-Opens a simple Hex-Editor to write/edit the Content of any provided File one by one.
+Opens a simple Hex-Editor to write/edit the Content of any provided File.
 Not-existing Files will be opened first and existing Ones will be able to be edited after that.
 The Editor will not save Changes automatically.
 Note that ^D (Ctrl-D) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
@@ -1062,10 +1073,10 @@ The currently supported Key Bindings are as follows:
 
 | Key(s) | default behaviour | shift click | control click | alt click |
 |--------|:-----------------:|:-----------:|:-------------:|:---------:|
-| <kbd>Arrows</kbd> | move cursor by byte | select area by byte | move cursor multiple bytes | - |
-| <kbd>Page Up/Down</kbd> | move cursor by page | select area by page | move cursor by page | - |
-| <kbd>Home/Pos</kbd> | move cursor to start of line | select area to start of line | move cursor to start of file | - |
-| <kbd>End</kbd> | move cursor to end of line | select area to end of line | move cursor to end of file | - |
+| <kbd>Arrows</kbd> | move cursor by byte | select area by byte | move cursor multiple bytes | scroll cursor by byte |
+| <kbd>Page Up/Down</kbd> | move cursor by page | select area by page | move cursor by page | scroll cursor by page |
+| <kbd>Home/Pos</kbd> | move cursor to start of line | select area to start of line | move cursor to start of file | scroll cursor to start of file |
+| <kbd>End</kbd> | move cursor to end of line | select area to end of line | move cursor to end of file | scroll cursor to end of file |
 ||||||
 | <kbd>0-9</kbd> <kbd>A-F</kbd> | edit the current byte | - | - | - |
 | <kbd><</kbd> | insert a new byte to the left | - | - | - |
@@ -1089,24 +1100,23 @@ The currently supported Key Bindings are as follows:
 | <kbd>Save/^S</kbd> | - | - | save changes | save changes |
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the file | - |
 ||||||
-| <kbd>Background/^B</kbd> | - | - | put the hex-editor in the background</br>(UNIX only) | - |
+| <kbd>Background/^B</kbd> | - | - | put the hex-editor in the background</br>(on Windows it can be reopened using <a href="#fg">fg</a>) | - |
 | <kbd>Interrupt/^D</kbd> | - | - | interrupt program | - |
 | <kbd>Quit/^Q</kbd> | - | - | close hex-editor</br>(prompt to save, if neccessary) | - |
 
 ### <a id="-?---diff">-?, --diff</a>
 
 Opens a simple Diff-Viewer to see the specific Differences between two Files.
-When multiple File are provided the Diff-Viewer will display the Files in Pairs of Two in the Order they were provided.
-If a File has no Pair to compare itself with, it will try to compare against the Git History.
+If a single File is provided, it will try to compare against the Git History.
 On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module.
 The currently supported Key Bindings are as follows:
 
 | Key(s) | default behaviour | shift click | control click | alt click |
 |--------|:-----------------:|:-----------:|:-------------:|:---------:|
-| <kbd>Arrows</kbd> | move view-window by one character | - | move view-window by ten characters | - |
-| <kbd>Page Up/Down</kbd> | move view-window by page | - | move view-window by page | - |
-| <kbd>Home/Pos</kbd> | move view-window to start of line | - | move view-window to start of file | - |
-| <kbd>End</kbd> | move view-window to end of line | - | move view-window to end of file | - |
+| <kbd>Arrows</kbd> | move view-window by one line | - | move view-window by ten lines | scroll view-window by one line |
+| <kbd>Page Up/Down</kbd> | move view-window by page | - | move view-window by page | scroll view-window by page |
+| <kbd>Home/Pos</kbd> | move view-window to start of line | - | move view-window to start of file | scroll view-window to start of file |
+| <kbd>End</kbd> | move view-window to end of line | - | move view-window to end of file | scroll view-window to end of file |
 ||||||
 | <kbd>Help/F1</kbd> | display a help message | display info overview | open file manager | - |
 ||||||
@@ -1118,9 +1128,15 @@ The currently supported Key Bindings are as follows:
 ||||||
 | <kbd>Reload/^R</kbd> | - | - | prompt to reload the diff | - |
 ||||||
-| <kbd>Background/^B</kbd> | - | - | put the diff-viewer in the background</br>(UNIX only) | - |
+| <kbd>Background/^B</kbd> | - | - | put the diff-viewer in the background</br>(on Windows it can be reopened using <a href="#fg">fg</a>) | - |
 | <kbd>Interrupt/^D</kbd> | - | - | interrupt program | - |
 | <kbd>Quit/^Q</kbd> | - | - | close diff-viewer | - |
+
+### <a href="#fg">fg</a>
+
+Continues a previously backgrounded Session of <a id="----edit">-!, --edit</a>, <a id="----hexedit">-#, --hexedit</a> or <a id="-?---diff">-?, --diff</a> (the curses Applications).
+When using <kbd>Background/^B</kbd> in any of these Applications, the State will be saved to Disk.
+At any Point can the Session be reinstated since the saved State persists even through System reboot.
 
 ### <a id="-m---more">-M, --more</a>
 
@@ -1305,6 +1321,7 @@ Copies the entire Output to the Clipboard additionally to printing it to the Std
 
 Continuously keep tracking if the given Files have been changed/modified in which Case the Output will be freshly generated again.
 This endless cycle can be terminated via KeyboardInterrupt after which the execution will continue as usual.
+Works well in Combinations with <a id="-?---diff">-?, --diff</a>.
 
 ```console
 > catw status.log -w F=error -g
