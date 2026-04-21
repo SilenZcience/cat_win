@@ -96,27 +96,32 @@
 [![GitHub-Issues]](https://github.com/SilenZcience/cat_win/issues)
 <!-- [![Compile-and-Push]](https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml) -->
 
-**A collection of command-line utilities and terminal applications for everyday file and text processing workflows.**
+**A collection of command-line utilities for everyday file and text processing workflows.**
 
 - File inspection and manipulation
 - Text output and transformation
 - Searching and filtering
 - Encoding and decoding tools
 
+**Interactive Terminal Applications (Built with `curses`)**
+
 - 📝 Text editor
 - 🔢 Hex editor
 - 🔍 Diff viewer
 
----
+
 
 <div id="design-goals"></div>
 
 ### Design Goals
 
-- <img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3af/512.gif" width="12" /> **Lightweight** – no unnecessary overhead
-- <img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3af/512.gif" width="12" /> **Cross-platform** – works across different environments
-- <img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3af/512.gif" width="12" /> **Minimal dependencies** – easy to install anywhere
-- <img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3af/512.gif" width="12" /> **Maximal compatibility** – supports Python/PyPy >= 3.6
+<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3af/512.gif" width="12" /> **Lightweight** – no unnecessary overhead
+</br>
+<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3af/512.gif" width="12" /> **Cross-platform** – works across different environments
+</br>
+<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3af/512.gif" width="12" /> **Minimal dependencies** – easy to install anywhere
+</br>
+<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3af/512.gif" width="12" /> **Maximal compatibility** – supports Python/PyPy >= 3.6
 
 <div id="philosophy"></div>
 
