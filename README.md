@@ -48,6 +48,8 @@
       <li>
          <a href="#about-the-project">About The Project</a>
          <ul>
+            <li><a href="#design-goals">Design Goals</a></li>
+            <li><a href="#philosophy">Philosophy</a></li>
             <li><a href="#made-with">Made With</a></li>
          </ul>
       </li>
@@ -94,15 +96,35 @@
 [![GitHub-Issues]](https://github.com/SilenZcience/cat_win/issues)
 <!-- [![Compile-and-Push]](https://github.com/SilenZcience/cat_win/actions/workflows/build_executable.yml) -->
 
-This project provides a cohesive collection of command-line utilities, designed to cover a broad range of everyday file and text processing tasks.
-It spans functionality across areas such as file inspection, text output, pattern searching, encoding/decoding, and binary data handling, and much *much* <a href="#usage">more</a> ...
+**A collection of command-line utilities and terminal applications for everyday file and text processing workflows.**
 
-In addition to its command-line tools, the project includes interactive terminal applications built with curses, featuring a fully functional **text editor**, a **hex editor**, and a **diff viewer**.
-These components enable direct, in-terminal manipulation and analysis of data.
+- File inspection and manipulation
+- Text output and transformation
+- Searching and filtering
+- Encoding and decoding tools
 
-This project does not aim to exactly replicate existing tools or their specific functionalities but rather to deliver essential core features in a user-friendly manner.
-It is purposefully designed to be lightweight and offer a wide range of functionality without unnecessary overhead.
-The design focus lies with minimal dependencies and maximal compatibility across different platforms and Python versions, ensuring that it can be easily installed and used in most environments.
+- 📝 Text editor
+- 🔢 Hex editor
+- 🔍 Diff viewer
+
+---
+
+<div id="design-goals"></div>
+
+### Design Goals
+
+- <img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3af/512.gif" width="12" /> **Lightweight** – no unnecessary overhead
+- <img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3af/512.gif" width="12" /> **Cross-platform** – works across different environments
+- <img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3af/512.gif" width="12" /> **Minimal dependencies** – easy to install anywhere
+- <img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3af/512.gif" width="12" /> **Maximal compatibility** – supports Python/PyPy >= 3.6
+
+<div id="philosophy"></div>
+
+### Philosophy
+
+This project focuses on delivering **essential functionality** in a clean and user-friendly way.
+</br>
+It is **not intended to exactly replicate existing tools**, but instead provide a cohesive toolkit for common tasks.
 
 <div id="made-with"></div>
 
@@ -346,3 +368,5 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 [License]: https://img.shields.io/pypi/l/cat_win
 
 [GitHub-SilenZcience]: https://img.shields.io/badge/GitHub-SilenZcience-orange
+
+<!-- https://googlefonts.github.io/noto-emoji-animation/ -->
