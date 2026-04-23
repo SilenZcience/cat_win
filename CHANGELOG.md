@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [2.0.1] - TBA
+
+### Bugfixes
+
+- fixed Bug where using the `replace=`, `replace:` parameter would crash.
+- fixed Bug where replacing overlapping matches would result in unexpected output.
+
+
 ## [2.0.0] - 2026-04-20
 
 ### Major Changes
