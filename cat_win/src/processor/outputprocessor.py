@@ -185,7 +185,7 @@ def print_file(ctx, stepper, excluded_by_peek: int) -> bool:
             line,
             arg_parser.file_queries,
             arg_parser.file_queries_replacement,
-            color_dic[CKW.REPLACE]
+            color_dic
         )
 
         intervals, f_keywords, m_keywords = string_finder.find_keywords(plain_line)
