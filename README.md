@@ -121,7 +121,7 @@
 </br>
 <img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3af/512.gif" width="12" /> **Minimal dependencies** – easy to install anywhere
 </br>
-<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3af/512.gif" width="12" /> **Maximal compatibility** – supports Python/PyPy >= 3.6
+<img unselectable="on" pointer-events="none" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3af/512.gif" width="12" /> **Maximal compatibility** – supports Python/PyPy >= 3.6 and binary executables
 
 <div id="philosophy"></div>
 
