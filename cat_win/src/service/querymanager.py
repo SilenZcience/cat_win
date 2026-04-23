@@ -129,6 +129,30 @@ def find_literals(sub: str, _s: str, ignore_case: bool):
         yield [i, i+_l]
         i = _s.find(sub, i+1)
 
+def find_literals_no_overlap(sub: str, _s: str, ignore_case: bool):
+    """
+    Generate lists containing the position of sub in s (non-overlapping).
+
+    Parameters:
+    sub (str):
+        the substring to search for
+    _s (str):
+        the string to search in
+    ignore_case (bool):
+        whether to ignore case when searching for sub in _s
+
+    Yields:
+    (list):
+        containing the start and end indeces like [start, end]
+    """
+    if ignore_case:
+        sub, _s = sub.lower(), _s.lower()
+    _l = len(sub)
+    i = _s.find(sub)
+    while i != -1:
+        yield [i, i+_l]
+        i = _s.find(sub, i+max(1, _l))
+
 def find_regex(pattern, _s: str):
     """
     Generate lists containing the position of pattern in _s.
@@ -174,7 +198,7 @@ def replace_queries_in_line(
         query, ignore_case = queries[q_idx]
         ansi_restore, _ = _build_ansi_restore(color_dic[CKW.RESET_ALL], display_line)
         if isinstance(query, str):
-            matches = list(find_literals(query, plain_line, ignore_case))
+            matches = list(find_literals_no_overlap(query, plain_line, ignore_case))
             disp_pos = [
                 (_map_display_pos(display_line, f_s), _map_display_pos(display_line, f_e))
                 for f_s, f_e in matches
