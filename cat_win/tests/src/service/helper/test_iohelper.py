@@ -425,12 +425,11 @@ class TestStdInHelper(TestCase):
 
         with patch('cat_win.src.service.helper.iohelper.on_windows_os', True):
             with patch('cat_win.src.service.helper.iohelper.ctypes', fake_ctypes):
-                with patch('cat_win.src.service.helper.iohelper.getattr', side_effect=lambda obj, name, default=None: True if name == 'frozen' else getattr(obj, name, default)):
-                    with patch('cat_win.src.service.helper.iohelper.hasattr', return_value=True):
-                        with patch('cat_win.src.service.helper.iohelper.os.isatty', side_effect=[False, True]):
-                            with patch('cat_win.src.service.helper.iohelper.os.dup', return_value=11):
-                                with patch('cat_win.src.service.helper.iohelper.os.open', return_value=22):
-                                    with patch('cat_win.src.service.helper.iohelper.os.dup2'):
+                with patch('cat_win.src.service.helper.iohelper.on_pyinstaller', True):
+                    with patch('cat_win.src.service.helper.iohelper.os.isatty', side_effect=[False, True]):
+                        with patch('cat_win.src.service.helper.iohelper.os.dup', return_value=11):
+                            with patch('cat_win.src.service.helper.iohelper.os.open', return_value=22):
+                                with patch('cat_win.src.service.helper.iohelper.os.dup2'):
                                         with patch('cat_win.src.service.helper.iohelper.os.close'):
                                             with IoHelper.dup_stdstreams():
                                                 pass
