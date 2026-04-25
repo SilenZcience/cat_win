@@ -11,7 +11,10 @@ import sys
 from pathlib import Path
 
 from cat_win.src.const.colorconstants import CKW
-from cat_win.src.service.helper.environment import on_windows_os
+from cat_win.src.service.helper.environment import (
+    on_pyinstaller,
+    on_windows_os
+)
 from cat_win.src.service.helper.progressbar import PBar
 
 
@@ -625,7 +628,7 @@ class IoHelper:
                     ttyout = None
                     replace_stdout = False
 
-            if replace_stdin and getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS') and on_windows_os:
+            if replace_stdin and on_pyinstaller and on_windows_os:
                 # for pyinstaller:
                 # stdin, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
                 # None security, OPEN_EXISTING, 0 flags, None template

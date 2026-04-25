@@ -6,7 +6,11 @@ import os
 import platform
 import sys
 
-on_windows_os = platform.system() == 'Windows'
+
+on_pyinstaller = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
+on_windows_os  = platform.system() == 'Windows'
+on_mac_os      = platform.system() == 'Darwin'
+
 
 def get_py_executable() -> str:
     """
