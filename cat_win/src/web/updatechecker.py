@@ -6,7 +6,12 @@ import json
 import urllib.request
 
 from cat_win import __url__
-from cat_win.src.service.helper.environment import get_py_executable
+from cat_win.src.service.helper.environment import (
+    get_py_executable,
+    on_pyinstaller,
+    on_windows_os,
+    on_mac_os
+)
 from cat_win.src.service.helper.iohelper import logger
 
 # UNSAFE:
@@ -200,11 +205,21 @@ def print_update_information(package: str, current_version: str) -> None:
             f"A new stable release of {package} is available: v{latest_stable_version}",
             priority=logger.WARNING
         )
-        logger('To update, run:', priority=logger.WARNING)
-        logger(
-            f"{get_py_executable()} -m pip install --upgrade {package}",
-            priority=logger.WARNING
-        )
+        if not on_pyinstaller:
+            logger('To update, run:', priority=logger.WARNING)
+            logger(
+                f"{get_py_executable()} -m pip install --upgrade {package}",
+                priority=logger.WARNING
+            )
+        else:
+            logger('To update, download:', priority=logger.WARNING)
+            bin_url = f"{__url__}/tree/binaries/bin/"
+            if on_windows_os:
+                logger(f"{bin_url}windows", priority=logger.WARNING)
+            elif on_mac_os:
+                logger(f"{bin_url}darwin", priority=logger.WARNING)
+            else:
+                logger(f"{bin_url}linux", priority=logger.WARNING)
     elif abs(status) == STATUS_PRE_RELEASE_AVAILABLE:
         logger(
             f"A new pre-release of {package} is available: v{latest_stable_version}",
