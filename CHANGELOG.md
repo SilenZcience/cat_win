@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [2.0.2] - TBA
+
+### Bugfixes
+
+- fixed Bug where the syntax highlighter inside the editor was not correctly restored when using `fg`.
+
+
 ## [2.0.1] - 2026-04-24
 
 ### Bugfixes
