@@ -98,7 +98,8 @@ class Editor:
         self.line_sep = '\n'
         self.window_content = []
         self._syntax_cache: dict = {}
-        self._syntax_highlighter = SyntaxHighlighter.get_plugin(Path(self.file).suffix.casefold())
+        self._syntax_highlighter_key = Path(self.file).suffix.casefold()
+        self._syntax_highlighter = SyntaxHighlighter.get_plugin(self._syntax_highlighter_key)
 
         self.special_chars: dict = {}
         self.search  = '' # str | re.Pattern
@@ -1748,9 +1749,11 @@ class Editor:
                             nav_y = selected_idx - max_y + 1
 
             if key == b'_key_enter' or (key == b'_key_string' and wchar == ' '):
-                _syntax_highlighter = SyntaxHighlighter.get_plugin(available_plugins[selected_idx])
+                _syntax_highlighter_key = available_plugins[selected_idx]
+                _syntax_highlighter = SyntaxHighlighter.get_plugin(_syntax_highlighter_key)
                 self._syntax_cache.clear()
                 if _syntax_highlighter != self._syntax_highlighter:
+                    self._syntax_highlighter_key = _syntax_highlighter_key
                     self._syntax_highlighter = _syntax_highlighter
                     self._init_highlighter_colors()
                 else:
@@ -2200,6 +2203,7 @@ class Editor:
             if fg:
                 self.get_char = self._get_new_char()
                 self._f_content_gen = (line for line in [])
+                self._syntax_highlighter = SyntaxHighlighter.get_plugin(self._syntax_highlighter_key)
                 if self.file_commit_hash is None and get_view_state_time() < get_file_mtime(self.file):
                     self.error_bar = 'Out-Of-Sync Error: The file has been modified since backgrounding.'
             else:
