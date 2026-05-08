@@ -270,10 +270,13 @@ class Editor:
             return None
         if self.cpos.col < len(self.window_content[self.cpos.row]):
             cur_col = self.cpos.col
-            t_p = self.window_content[self.cpos.row][cur_col].isalnum()
+            c_char = self.window_content[self.cpos.row][cur_col]
+            t_p = c_char.isalnum() or c_char in ('_',)
             while cur_col < len(self.window_content[self.cpos.row]) and \
-                t_p == self.window_content[self.cpos.row][cur_col].isalnum():
+                t_p == (c_char.isalnum() or c_char in ('_',)):
                 cur_col += 1
+                if cur_col < len(self.window_content[self.cpos.row]):
+                    c_char = self.window_content[self.cpos.row][cur_col]
             deleted = self.window_content[self.cpos.row][self.cpos.col:cur_col]
             self.window_content[self.cpos.row] = (
                 self.window_content[self.cpos.row][:self.cpos.col] + \
@@ -320,10 +323,14 @@ class Editor:
         if self.cpos.col:
             old_col = self.cpos.col
             self.cpos.col -= 1
-            t_p = self.window_content[self.cpos.row][self.cpos.col].isalnum()
-            while self.cpos.col > 0 and \
-                t_p == self.window_content[self.cpos.row][self.cpos.col-1].isalnum():
-                self.cpos.col -= 1
+            c_char = self.window_content[self.cpos.row][self.cpos.col]
+            t_p = c_char.isalnum() or c_char in ('_',)
+            while self.cpos.col > 0:
+                c_char = self.window_content[self.cpos.row][self.cpos.col-1]
+                if t_p == (c_char.isalnum() or c_char in ('_',)):
+                    self.cpos.col -= 1
+                else:
+                    break
             deleted = self.window_content[self.cpos.row][self.cpos.col:old_col]
             self.window_content[self.cpos.row] = \
                 self.window_content[self.cpos.row][:self.cpos.col] + \
@@ -362,6 +369,15 @@ class Editor:
             self.cpos.col = min(self.wpos.col+x, len(self.window_content[self.cpos.row]))
             # logger(f" {x} {y} {bstate} RELEASED")
             # logger(f"Selected area: {self.spos.get_pos()} {self.cpos.get_pos()}")
+        elif bstate & curses.BUTTON1_DOUBLE_CLICKED:
+            self.selecting = False
+            self.cpos.row = min(self.wpos.row+y, len(self.window_content)-1)
+            self.cpos.col = min(self.wpos.col+x+1, len(self.window_content[self.cpos.row]))
+            self._move_key_ctl_left()
+            self.spos.set_pos(self.cpos.get_pos())
+            self._move_key_ctl_right()
+            self.selecting = True
+            # logger(f" {x} {y} {bstate} DOUBLE_CLICKED")
 
         elif bstate & curses.BUTTON4_PRESSED:
             for _ in range(3):
@@ -407,12 +423,14 @@ class Editor:
             self.cpos.col = 0
         elif self.cpos.col > 1:
             self.cpos.col -= 2
-            t_p = self.window_content[self.cpos.row][self.cpos.col].isalnum()
-            while self.cpos.col > 0 and \
-                t_p == self.window_content[self.cpos.row][self.cpos.col].isalnum():
-                self.cpos.col -= 1
-            if self.cpos.col:
-                self.cpos.col += 1
+            c_char = self.window_content[self.cpos.row][self.cpos.col]
+            t_p = c_char.isalnum() or c_char in ('_',)
+            while self.cpos.col > 0:
+                c_char = self.window_content[self.cpos.row][self.cpos.col-1]
+                if t_p == (c_char.isalnum() or c_char in ('_',)):
+                    self.cpos.col -= 1
+                else:
+                    break
         elif self.cpos.row:
             self.cpos.row -= 1
             self.cpos.col = len(self.window_content[self.cpos.row])
@@ -424,10 +442,13 @@ class Editor:
             self.cpos.col = len(self.window_content[self.cpos.row])
         elif self.cpos.col < len(self.window_content[self.cpos.row])-1:
             self.cpos.col += 1
-            t_p = self.window_content[self.cpos.row][self.cpos.col].isalnum()
+            c_char = self.window_content[self.cpos.row][self.cpos.col]
+            t_p = c_char.isalnum() or c_char in ('_',)
             while self.cpos.col < len(self.window_content[self.cpos.row]) and \
-                t_p == self.window_content[self.cpos.row][self.cpos.col].isalnum():
+                t_p == (c_char.isalnum() or c_char in ('_',)):
                 self.cpos.col += 1
+                if self.cpos.col < len(self.window_content[self.cpos.row]):
+                    c_char = self.window_content[self.cpos.row][self.cpos.col]
         elif self.cpos.row < len(self.window_content)-1:
             self.cpos.row += 1
             self.cpos.col = 0
