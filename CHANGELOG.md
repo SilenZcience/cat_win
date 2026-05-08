@@ -5,9 +5,15 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 ## [2.0.2] - TBA
 
+### Minor Changes
+
+- added mouse doubleclick to the editor to instantly select the word at the mouse position.
+- included the underscore symbol ('_') as part of a word using ctrl-backspace, ctrl-delete, ctrl-left or ctrl-right inside the editor.
+
 ### Bugfixes
 
 - fixed Bug where the syntax highlighter inside the editor was not correctly restored when using `fg`.
+- fixed minor rendering issue in the hexeditor.
 
 
 ## [2.0.1] - 2026-04-24
