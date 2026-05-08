@@ -1161,7 +1161,9 @@ class HexEditor:
     def _render_title_offset(self, max_x: int) -> None:
         # Draw Title:
         self.curse_window.addstr(0, 0, self.top_offset[:max_x])
+        self.curse_window.clrtoeol()
         self.curse_window.addstr(1, 0, self.top_line[:max_x])
+        self.curse_window.clrtoeol()
 
     def _render_draw_rows(self, max_y: int, max_x: int) -> None:
         # Draw Rows
