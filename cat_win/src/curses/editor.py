@@ -801,7 +801,7 @@ class Editor:
         msg = msg.replace('\0', '')
         error_bar_backup = self.error_bar
         if tmp_error:
-            logger(tmp_error, priority=logger.WARNING)
+            logger(tmp_error, priority=logger.DEBUG)
         self.error_bar = tmp_error if tmp_error else self.error_bar
         try:
             if self.error_bar:

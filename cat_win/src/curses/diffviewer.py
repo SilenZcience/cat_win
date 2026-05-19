@@ -156,7 +156,7 @@ class DiffViewer:
         except (OSError, UnicodeError) as exc:
             self.error_bar = str(exc)
             self.status_bar_size = 2
-            logger(self.error_bar, priority=logger.WARNING)
+            logger(self.error_bar, priority=logger.DEBUG)
             self.difflibparser = self.difflibparser_bak = DifflibParser(
                 [],
                 [],
@@ -638,7 +638,7 @@ class DiffViewer:
         except (OSError, UnicodeError) as exc:
             self.error_bar = str(exc)
             self.status_bar_size = 2
-            logger(self.error_bar, priority=logger.WARNING)
+            logger(self.error_bar, priority=logger.DEBUG)
             self.difflibparser = self.difflibparser_bak = DifflibParser(
                 [],
                 [],
@@ -1351,7 +1351,7 @@ class DiffViewer:
         except (Exception, KeyboardInterrupt) as e:
             curses.endwin()
             if not isinstance(e, KeyboardInterrupt):
-                logger('Oops..! Something went wrong.', priority=logger.WARNING)
+                logger('Oops..! Something went wrong.', priority=logger.ERROR)
             raise e
         finally:
             curses.endwin()
