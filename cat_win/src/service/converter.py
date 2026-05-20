@@ -6,44 +6,90 @@ from cat_win.src.const.colorconstants import CKW
 from cat_win.src.const.regex import RE_EVAL
 
 
-def __hex_to_dec__(value: str) -> str:
-    return str(int(value, 16))
+# def __hex_to_dec__(value: str) -> str:
+#     return str(int(value, 16))
 
-def __hex_to_oct__(value: str, leading: bool = False) -> str:
-    return __dec_to_oct__(int(value, 16), leading)
+# def __hex_to_oct__(value: str, leading: bool = False) -> str:
+#     return __dec_to_oct__(int(value, 16), leading)
 
-def __hex_to_bin__(value: str, leading: bool = False) -> str:
-    return __dec_to_bin__(int(value, 16), leading)
-
-
-def __dec_to_hex__(value: int, leading: bool = False) -> str:
-    return f"{value:#x}" if leading else f"{value:x}"
-
-def __dec_to_oct__(value: int, leading: bool = False) -> str:
-    return f"{value:#o}" if leading else f"{value:o}"
-
-def __dec_to_bin__(value: int, leading: bool = False) -> str:
-    return f"{value:#b}" if leading else f"{value:b}"
+# def __hex_to_bin__(value: str, leading: bool = False) -> str:
+#     return __dec_to_bin__(int(value, 16), leading)
 
 
-def __oct_to_hex__(value: str, leading: bool = False) -> str:
-    return __dec_to_hex__(int(value, 8), leading)
+# def __dec_to_hex__(value: int, leading: bool = False) -> str:
+#     return f"{value:#x}" if leading else f"{value:x}"
 
-def __oct_to_dec__(value: str) -> str:
-    return str(int(value, 8))
+# def __dec_to_oct__(value: int, leading: bool = False) -> str:
+#     return f"{value:#o}" if leading else f"{value:o}"
 
-def __oct_to_bin__(value: str, leading: bool = False) -> str:
-    return __dec_to_bin__(int(value, 8), leading)
+# def __dec_to_bin__(value: int, leading: bool = False) -> str:
+#     return f"{value:#b}" if leading else f"{value:b}"
 
 
-def __bin_to_hex__(value: str, leading: bool = False) -> str:
-    return __dec_to_hex__(int(value, 2), leading)
+# def __oct_to_hex__(value: str, leading: bool = False) -> str:
+#     return __dec_to_hex__(int(value, 8), leading)
 
-def __bin_to_dec__(value: str) -> str:
-    return str(int(value, 2))
+# def __oct_to_dec__(value: str) -> str:
+#     return str(int(value, 8))
 
-def __bin_to_oct__(value: str, leading: bool = False) -> str:
-    return __dec_to_oct__(int(value, 2), leading)
+# def __oct_to_bin__(value: str, leading: bool = False) -> str:
+#     return __dec_to_bin__(int(value, 8), leading)
+
+
+# def __bin_to_hex__(value: str, leading: bool = False) -> str:
+#     return __dec_to_hex__(int(value, 2), leading)
+
+# def __bin_to_dec__(value: str) -> str:
+#     return str(int(value, 2))
+
+# def __bin_to_oct__(value: str, leading: bool = False) -> str:
+#     return __dec_to_oct__(int(value, 2), leading)
+
+
+def __int_to_bytes__(value: int) -> bytes:
+    bits_needed = max(1, value.bit_length() + int(value < 0))
+    length = max(8, 1 << ((bits_needed - 1).bit_length())) // 8
+    return value.to_bytes(length, 'big', signed=(value < 0))
+
+
+def __int_to_bin__(data: bytes, leading: bool = False) -> str:
+    u_value = int.from_bytes(data, 'big', signed=False)
+    width = len(data) * 8
+    payload = f"{u_value:0{width}b}"
+    return '0b' * leading + payload
+
+
+def __int_to_oct__(data: bytes, leading: bool = False) -> str:
+    u_value = int.from_bytes(data, 'big', signed=False)
+    return '0o' * leading + f"{u_value:o}"
+
+
+def __int_to_signed__(data: bytes) -> str:
+    return str(int.from_bytes(data, 'big', signed=True))
+
+
+def __int_to_unsigned__(data: bytes) -> str:
+    return str(int.from_bytes(data, 'big', signed=False))
+
+
+def __int_to_hex__(data: bytes, leading: bool = False) -> str:
+    u_value = int.from_bytes(data, 'big', signed=False)
+    return '0x' * leading + f"{u_value:x}".upper()
+
+
+def __int_to_utf8__(data: bytes) -> str:
+    return data.decode('utf-8', errors='replace')
+
+
+def __format_conversion_line__(value: int, leading: bool = False) -> str:
+    data = __int_to_bytes__(value)
+    return f"{Converter.COLOR_CONVERSION}[" + \
+        f"Bin {__int_to_bin__(data, leading)}; " + \
+            f"Oct {__int_to_oct__(data, leading)}; " + \
+                f"Int {__int_to_signed__(data)}/{__int_to_unsigned__(data)}; " + \
+                    f"Hex {__int_to_hex__(data, leading)}; " + \
+                        f"Utf8 {repr(__int_to_utf8__(data))[1:-1]}" + \
+                            f"]{Converter.COLOR_RESET}"
 
 
 class Converter:
@@ -247,9 +293,7 @@ class Converter:
         (str):
             the converted string
         """
-        return f"{Converter.COLOR_CONVERSION}[Bin: {__hex_to_bin__(value, leading)}, Oct: " + \
-            f"{__hex_to_oct__(value, leading)}, Dec: {__hex_to_dec__(value)}]" + \
-                f"{Converter.COLOR_RESET}"
+        return __format_conversion_line__(int(value, 16), leading)
 
 
     @staticmethod
@@ -268,10 +312,7 @@ class Converter:
         (str):
             the converted string
         """
-        value = int(value)
-        return f"{Converter.COLOR_CONVERSION}[Bin: {__dec_to_bin__(value, leading)}, Oct: " + \
-            f"{__dec_to_oct__(value, leading)}, Hex: " + \
-                f"{__dec_to_hex__(value, leading)}]{Converter.COLOR_RESET}"
+        return __format_conversion_line__(int(value), leading)
 
     @staticmethod
     def c_from_oct(value: str, leading: bool = False) -> str:
@@ -289,9 +330,7 @@ class Converter:
         (str):
             the converted string
         """
-        return f"{Converter.COLOR_CONVERSION}[Bin: {__oct_to_bin__(value, leading)}, Dec: " + \
-            f"{__oct_to_dec__(value)}, Hex: {__oct_to_hex__(value, leading)}]" + \
-                f"{Converter.COLOR_RESET}"
+        return __format_conversion_line__(int(value, 8), leading)
 
     @staticmethod
     def c_from_bin(value: str, leading: bool = False) -> str:
@@ -309,6 +348,4 @@ class Converter:
         (str):
             the converted string
         """
-        return f"{Converter.COLOR_CONVERSION}[Oct: {__bin_to_oct__(value, leading)}, Dec: " + \
-            f"{__bin_to_dec__(value)}, Hex: {__bin_to_hex__(value, leading)}]" + \
-                f"{Converter.COLOR_RESET}"
+        return __format_conversion_line__(int(value, 2), leading)

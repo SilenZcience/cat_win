@@ -97,9 +97,9 @@ class TestConverterComp(TestCase):
             ('0x1001'),
         ]
         test_content_out = [
-            ('30', '', ' [Bin: 0b11110, Oct: 0o36, Hex: 0x1e]'),
-            ('48', '', ' [Bin: 0b110000, Oct: 0o60, Hex: 0x30]'),
-            ('1001', '', ' [Bin: 0b1111101001, Oct: 0o1751, Hex: 0x3e9]'),
+            ('30', '', r" [Bin 0b00011110; Oct 0o36; Int 30/30; Hex 0x1E; Utf8 \x1e]"),
+            ('48', '', ' [Bin 0b00110000; Oct 0o60; Int 48/48; Hex 0x30; Utf8 0]'),
+            ('1001', '', r" [Bin 0b0000001111101001; Oct 0o1751; Int 1001/1001; Hex 0x3E9; Utf8 \x03�]"),
         ]
         new_content = comp_conv(ContentBuffer.from_rows(test_content_in), '--dec', cleaner)
         self.assertEqual(new_content, ContentBuffer.from_rows(test_content_out))
@@ -117,12 +117,12 @@ class TestConverterComp(TestCase):
             ('0x1001'),
         ]
         test_content_out = [
-            ('30', '', ' [Bin: 0b110000, Oct: 0o60, Dec: 48]'),
-            ('48', '', 'test [Bin: 0b1001000, Oct: 0o110, Dec: 72]'),
-            ('abc', '5+5', ' [Bin: 0b101010111100, Oct: 0o5274, Dec: 2748]'),
-            ('1001', '', ' [Bin: 0b1000000000001, Oct: 0o10001, Dec: 4097]'),
-            ('0b1001', '', ' [Bin: 0b10110001000000000001, Oct: 0o2610001, Dec: 724993]'),
-            ('0x1001', '', ' [Bin: 0b1000000000001, Oct: 0o10001, Dec: 4097]'),
+            ('30', '', ' [Bin 0b00110000; Oct 0o60; Int 48/48; Hex 0x30; Utf8 0]'),
+            ('48', '', 'test [Bin 0b01001000; Oct 0o110; Int 72/72; Hex 0x48; Utf8 H]'),
+            ('abc', '5+5', r" [Bin 0b0000101010111100; Oct 0o5274; Int 2748/2748; Hex 0xABC; Utf8 \n�]"),
+            ('1001', '', r" [Bin 0b0001000000000001; Oct 0o10001; Int 4097/4097; Hex 0x1001; Utf8 \x10\x01]"),
+            ('0b1001', '', r" [Bin 0b00000000000010110001000000000001; Oct 0o2610001; Int 724993/724993; Hex 0xB1001; Utf8 \x00\x0b\x10\x01]"),
+            ('0x1001', '', r" [Bin 0b0001000000000001; Oct 0o10001; Int 4097/4097; Hex 0x1001; Utf8 \x10\x01]"),
         ]
         new_content = comp_conv(ContentBuffer.from_rows(test_content_in), '--hex', cleaner)
         self.assertEqual(new_content, ContentBuffer.from_rows(test_content_out))
@@ -140,8 +140,8 @@ class TestConverterComp(TestCase):
             ('0x1001'),
         ]
         test_content_out = [
-            ('30', '', ' [Bin: 0b11000, Dec: 24, Hex: 0x18]'),
-            ('1001', '', ' [Bin: 0b1000000001, Dec: 513, Hex: 0x201]'),
+            ('30', '', r" [Bin 0b00011000; Oct 0o30; Int 24/24; Hex 0x18; Utf8 \x18]"),
+            ('1001', '', r" [Bin 0b0000001000000001; Oct 0o1001; Int 513/513; Hex 0x201; Utf8 \x02\x01]"),
         ]
         new_content = comp_conv(ContentBuffer.from_rows(test_content_in), '--oct', cleaner)
         self.assertEqual(new_content, ContentBuffer.from_rows(test_content_out))
@@ -159,8 +159,8 @@ class TestConverterComp(TestCase):
             ('0x1001'),
         ]
         test_content_out = [
-            ('1001', '', ' [Oct: 0o11, Dec: 9, Hex: 0x9]'),
-            ('0b1001', '', ' [Oct: 0o11, Dec: 9, Hex: 0x9]'),
+            ('1001', '', r" [Bin 0b00001001; Oct 0o11; Int 9/9; Hex 0x9; Utf8 \t]"),
+            ('0b1001', '', r" [Bin 0b00001001; Oct 0o11; Int 9/9; Hex 0x9; Utf8 \t]"),
         ]
         new_content = comp_conv(ContentBuffer.from_rows(test_content_in), '--bin', cleaner)
         self.assertEqual(new_content, ContentBuffer.from_rows(test_content_out))

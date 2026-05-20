@@ -158,7 +158,7 @@ class TestCatFull(TestCase):
 
     @patch('sys.argv', ['<CAT>', 'enc=utf-8', '--eval', '--dec', test_eval])
     def test_cat_output_full_eval(self):
-        expected_output = '14 [Bin: 0b1110, Oct: 0o16, Hex: 0xe]\n'
+        expected_output = '32 [Bin 0b00100000; Oct 0o40; Int 32/32; Hex 0x20; Utf8  ]\n'
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
