@@ -9,11 +9,12 @@ Start of documentation: 2023-02-16 / v1.1.0
 
 - added mouse doubleclick to the editor to instantly select the word at the mouse position.
 - included the underscore symbol ('_') as part of a word using ctrl-backspace, ctrl-delete, ctrl-left or ctrl-right inside the editor.
+- changed the output of the mathematical parameters (--`bin`, --`oct`, --`dec`, --`hex`) to include signed and unsigned values aswell as utf-8 character representation.
 
 ### Bugfixes
 
 - fixed Bug where the syntax highlighter inside the editor was not correctly restored when using `fg`.
-- fixed minor rendering issue in the hexeditor.
+- fixed minor rendering issue in the curses applications.
 
 
 ## [2.0.1] - 2026-04-24
