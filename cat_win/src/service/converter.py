@@ -86,7 +86,7 @@ def __format_conversion_line__(value: int, leading: bool = False) -> str:
     return f"{Converter.COLOR_CONVERSION}[" + \
         f"Bin {__int_to_bin__(data, leading)}; " + \
             f"Oct {__int_to_oct__(data, leading)}; " + \
-                f"Int {__int_to_signed__(data)}/{__int_to_unsigned__(data)}; " + \
+                f"Int{len(data)*8} {__int_to_signed__(data)}/{__int_to_unsigned__(data)}; " + \
                     f"Hex {__int_to_hex__(data, leading)}; " + \
                         f"Utf8 {repr(__int_to_utf8__(data))[1:-1]}" + \
                             f"]{Converter.COLOR_RESET}"

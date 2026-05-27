@@ -158,7 +158,7 @@ class TestCatFull(TestCase):
 
     @patch('sys.argv', ['<CAT>', 'enc=utf-8', '--eval', '--dec', test_eval])
     def test_cat_output_full_eval(self):
-        expected_output = '32 [Bin 0b00100000; Oct 0o40; Int 32/32; Hex 0x20; Utf8  ]\n'
+        expected_output = '32 [Bin 0b00100000; Oct 0o40; Int8 32/32; Hex 0x20; Utf8  ]\n'
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             self.assertEqual(fake_out.getvalue(), expected_output)
@@ -250,7 +250,7 @@ This Line is a Duplicate!
     @patch('sys.argv', ['<CAT>', test_file_path, '--peek', '--hexview'])
     def test_cat_output_raw(self):
         expected_output = """\
-Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text                   
+Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20
 00000000 53 61 6d 70 6c 65 20 54 65 78 74 3a 0d 0a 54 68 # S a m p l e   T e x t : ␍ ␤ T h
 00000010 69 73 20 69 73 20 61 20 54 61 62 2d 43 68 61 72 # i s   i s   a   T a b - C h a r
 00000020 61 63 74 65 72 3a 20 3e 09 3c 0d 0a 54 68 65 73 # a c t e r :   > ␉ < ␍ ␤ T h e s
