@@ -99,6 +99,8 @@ are: 1
 following: 1
 äöüÄÖÜ: 1
 ∑: 1
+
+<Sum>: 42
 """
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             Summary.show_wordcount([File(test_file_path, '')], 'utf-8')
@@ -155,6 +157,8 @@ x: 1
 ö: 1
 ü: 1
 ∑: 1
+
+<Sum>: 181
 """
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             Summary.show_charcount([File(test_file_path, '')], 'utf-8')

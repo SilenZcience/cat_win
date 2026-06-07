@@ -222,6 +222,7 @@ class Summary:
                 sorted_group
             )
             print('\n' + '\n'.join(formatted_word_count), end='')
+        print(f"\n\n{Summary.COLOR}<Sum>{Summary.COLOR_RESET}: {Summary.COLOR}{sum(word_count.values())}{Summary.COLOR_RESET}")
         print(Summary.COLOR_RESET)
 
     @staticmethod
@@ -270,4 +271,5 @@ class Summary:
                 sorted_group
             )
             print('\n' + '\n'.join(formatted_char_count), end='')
+        print(f"\n\n{Summary.COLOR}<Sum>{Summary.COLOR_RESET}: {Summary.COLOR}{sum(char_count.values())}{Summary.COLOR_RESET}")
         print(Summary.COLOR_RESET)
