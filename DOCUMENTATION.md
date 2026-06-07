@@ -656,6 +656,7 @@ Lines (Sum): 4
 Displays a Summary of all Tokens/Words found in the given Files and how frequent they occured.
 The Output will be sorted by the Frequency of Occurrence starting with the most common Word.
 In Addition the used Files will be displayed beforehand.
+Finally the Sum of all Tokens is displayed.
 Using this Argument in Uppercase (-W, --WORDCOUNT) will ONLY display this Message and stop Code Execution.
 
 ```console
@@ -681,6 +682,8 @@ not: 1
 same: 1
 the: 1
 true: 1
+
+<Sum>: 33
 ```
 
 ### <a id="--cc---charcount">--cc, --charcount</a>
@@ -689,6 +692,7 @@ Displays a Summary of all Chars/Letters found in the given Files and how frequen
 Whitespace Chars like Spaces and Tabs will be wrapped with quotes.
 The Output will be sorted by the Frequency of Occurrence starting with the most common Char.
 In Addition the used Files will be displayed beforehand.
+Finally the Sum of all Chars is displayed.
 Using this Argument in Uppercase (--CC, --CHARCOUNT) will ONLY display this Message and stop Code Execution.
 
 ```console
@@ -718,6 +722,8 @@ w: 2
 m: 1
 n: 1
 u: 1
+
+<Sum>: 122
 ```
 
 - - - -
