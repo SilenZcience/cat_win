@@ -1799,6 +1799,7 @@ class Editor:
             f"{'^R':<{coff}}reload file",
             f"{'Ctrl+F1':<{coff}}open file manager",
             f"{'F4':<{coff}}open syntax highlighter selection",
+            f"{'F5/ALT_M':<{coff}}open context menu",
             '',
             f"{'^B':<{coff}}put editor in background",
             f"{'^D':<{coff}}interrupt/force close",

@@ -1010,7 +1010,8 @@ The currently supported Key Bindings are as follows:
 | <kbd>Delete</kbd> | delete char on the right | delete char on the right | delete word on the right | delete char on the right |
 ||||||
 | <kbd>Help/F1</kbd> | display a help message | - | open file manager | - |
-| <kbd>Selecthighlighting/F4</kbd> | open syntax highlight selection | - | - | - |
+| <kbd>SelectHighlighting/F4</kbd> | open syntax highlight selection | - | - | - |
+| <kbd>F5/ALT_M</kbd> | open context menu | - | - | open context menu |
 ||||||
 | <kbd>SelectAll/^A</kbd> | - | - | select the entire file | - |
 | <kbd>Copy/^C</kbd> | - | - | copy selected text | - |
