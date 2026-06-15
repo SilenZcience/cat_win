@@ -509,10 +509,8 @@ class Editor:
             menu_x = self.cpos.col
         if menu_y < 0:
             menu_y = self.cpos.row
-        menu_x = min(menu_x, max_x - width - 1)
-        menu_y = min(menu_y, max_y - height - 1)
-        menu_x = max(0, menu_x)
-        menu_y = max(0, menu_y)
+        menu_x = max(0, min(menu_x - self.wpos.col, max_x - width - 1))
+        menu_y = max(0, min(menu_y - self.wpos.row, max_y - height - 1))
 
         selected_idx = 0
         _last_mx = _last_my = -1
@@ -543,21 +541,21 @@ class Editor:
             return mbstate, in_menu
 
         while True:
-            self.curse_window.addch (menu_y, menu_x, '+')
-            self.curse_window.addstr(menu_y, menu_x + 1, '-' * (width - 2))
-            self.curse_window.addch (menu_y, menu_x + width - 1, '+')
+            self.curse_window.addch (menu_y, menu_x, '╔')
+            self.curse_window.addstr(menu_y, menu_x + 1, '═' * (width - 2))
+            self.curse_window.addch (menu_y, menu_x + width - 1, '╗')
             for i in range(1, height - 1):
                 item_idx = i - 1
                 color = curses.A_REVERSE if item_idx == selected_idx else 0
-                self.curse_window.addstr(menu_y + i, menu_x, '| ')
+                self.curse_window.addstr(menu_y + i, menu_x, '║ ')
                 self.curse_window.addstr(
                     menu_y + i, menu_x + 2,
                     items[item_idx].ljust(max_item_len), color
                 )
-                self.curse_window.addstr(menu_y + i, menu_x + width - 2, ' |')
-            self.curse_window.addch (menu_y + height - 1, menu_x, '+')
-            self.curse_window.addstr(menu_y + height - 1, menu_x + 1, '-' * (width - 2))
-            self.curse_window.addch (menu_y + height - 1, menu_x + width - 1, '+')
+                self.curse_window.addstr(menu_y + i, menu_x + width - 2, ' ║')
+            self.curse_window.addch (menu_y + height - 1, menu_x, '╚')
+            self.curse_window.addstr(menu_y + height - 1, menu_x + 1, '═' * (width - 2))
+            self.curse_window.addch (menu_y + height - 1, menu_x + width - 1, '╝')
             self.curse_window.refresh()
 
             try:
@@ -569,7 +567,9 @@ class Editor:
                 handle_mouse(True)
                 continue
 
-            if str(wchar).upper() == ESC_CODE or key == b'_action_quit':
+            if str(wchar).upper() == ESC_CODE or key in (
+                b'_action_quit', b'_function_context_menu'
+            ):
                 break
 
             mbstate, in_menu = handle_mouse()
