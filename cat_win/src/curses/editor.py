@@ -400,6 +400,7 @@ class Editor:
         line = self.window_content[self.cpos.row]
         del self.window_content[self.cpos.row]
         self.cpos.row -= 1
+        self.spos.row -= 1
         self.window_content.insert(self.cpos.row, line)
         return line
 
@@ -410,6 +411,7 @@ class Editor:
         line = self.window_content[self.cpos.row]
         del self.window_content[self.cpos.row]
         self.cpos.row += 1
+        self.spos.row += 1
         self.window_content.insert(self.cpos.row, line)
         return line
 
@@ -458,6 +460,7 @@ class Editor:
         pre_selecting = self.selecting
         if remove:
             action_text = self._context_edit_line_remove(None)
+            self.selecting = False
             self.history.add(b'_context_edit_line_remove', True,
                                 pre_cpos, self.cpos.get_pos(),
                                 pre_spos, self.spos.get_pos(),
