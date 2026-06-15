@@ -757,6 +757,7 @@ SyntaxHighlighter.register(
         r"(?P<lifetime>'[A-Za-z_][A-Za-z0-9_]*\b)",
         r"(?P<macro_call>\b[A-Za-z_][A-Za-z0-9_]*!)",
         r"(?P<symbols>[\[\]\{\}\(\)\+\-\*\/\=\%\<\>\&\|\^\~\.\!\?\:\,\;\@\#])",
+        r"(?P<crateattr>(?<=\[)(?:\\.|[^\]\\\n])*(?=\]))",
     ),
     extra_group_to_token={
         'decl_keyword': 'decl_keyword',
@@ -766,6 +767,7 @@ SyntaxHighlighter.register(
         'lifetime': 'lifetime',
         'macro_call': 'macro_call',
         'symbols': 'symbols',
+        'crateattr': 'crateattr',
     },
     number_pattern=r"""
 (?<![0-9A-Za-z_.$])
@@ -792,5 +794,6 @@ SyntaxHighlighter.register(
         'lifetime': 'yellow',
         'macro_call': 'blue',
         'symbols': 'lightcyan',
+        'crateattr': 'lightyellow',
     }
 )
