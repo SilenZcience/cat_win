@@ -2026,6 +2026,15 @@ class Editor:
                         break
 
             self.curse_window.nodelay(False)
+            if isinstance(wchar, str) and len(wchar) == 2 and wchar[0] == '\x1b':
+                if wchar[1].isalpha():
+                    _key = b'ALT_' + wchar[1].upper().encode()
+                    alt_action = UNIFY_HOTKEYS.get(_key)
+                    if alt_action is not None:
+                        key = alt_action
+                    wchar = 320 + ord(wchar[1].lower())
+                else:
+                    wchar = wchar[1]
             debug_out(wchar, _key, key)
             yield (wchar, key)
 
