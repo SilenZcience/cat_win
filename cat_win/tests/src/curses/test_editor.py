@@ -622,6 +622,164 @@ class TestEditor(TestCase):
         self.assertEqual(editor._indent_btab(':)\0:)\0'), '\0:)\0')
         self.assertListEqual(editor.window_content, ['line 1', 'line 2'])
 
+    def test_editor_context_move_line(self):
+        editor = Editor([(test_file_path, '')])
+        editor.cpos.set_pos((0,8))
+        editor._context_move_line(-1)
+
+        editor.cpos.set_pos((4,8))
+        editor._context_move_line(-1)
+        editor._context_move_line(-1)
+        editor._context_move_line(-1)
+        self.assertListEqual(editor.window_content, [
+            'Sample Text:',
+            'The following Line is Empty:',
+            'This is a Tab-Character: >\t<',
+            'These are Special Chars: äöüÄÖÜ',
+            'N-Ary Summation: ∑',
+            '',
+            'This Line is a Duplicate!',
+            'This Line is a Duplicate!'
+        ])
+        editor.cpos.set_pos((7,8))
+        editor._context_move_line(1)
+
+        editor.cpos.set_pos((4,8))
+        editor._context_move_line(1)
+        editor._context_move_line(1)
+        editor._context_move_line(1)
+        self.assertListEqual(editor.window_content, [
+            'Sample Text:',
+            'The following Line is Empty:',
+            'This is a Tab-Character: >\t<',
+            'These are Special Chars: äöüÄÖÜ',
+            '',
+            'This Line is a Duplicate!',
+            'This Line is a Duplicate!',
+            'N-Ary Summation: ∑',
+        ])
+        editor._history_undo()
+        editor._history_undo()
+        editor._history_undo()
+        editor._history_undo()
+        editor._history_undo()
+        editor._history_undo()
+        editor._history_redo()
+        editor._history_redo()
+        editor._history_redo()
+        editor._history_redo()
+        editor._history_redo()
+        editor._history_redo()
+        editor._history_undo()
+        editor._history_undo()
+        editor._history_undo()
+        editor._history_undo()
+        editor._history_undo()
+        editor._history_undo()
+        self.assertListEqual(editor.window_content, [
+            'Sample Text:',
+            'This is a Tab-Character: >\t<',
+            'These are Special Chars: äöüÄÖÜ',
+            'N-Ary Summation: ∑',
+            'The following Line is Empty:',
+            '',
+            'This Line is a Duplicate!',
+            'This Line is a Duplicate!'
+        ])
+
+    def test_editor_context_double_line(self):
+        editor = Editor([(test_file_path, '')])
+        editor.cpos.set_pos((4,8))
+        editor._context_double_line(False)
+        editor._context_double_line(False)
+        self.assertListEqual(editor.window_content, [
+            'Sample Text:',
+            'This is a Tab-Character: >\t<',
+            'These are Special Chars: äöüÄÖÜ',
+            'N-Ary Summation: ∑',
+            'The following Line is Empty:',
+            'The following Line is Empty:',
+            'The following Line is Empty:',
+            '',
+            'This Line is a Duplicate!',
+            'This Line is a Duplicate!'
+        ])
+        editor.cpos.set_pos((7,8))
+        editor._context_double_line(True)
+        editor._context_double_line(True)
+        self.assertListEqual(editor.window_content, [
+            'Sample Text:',
+            'This is a Tab-Character: >\t<',
+            'These are Special Chars: äöüÄÖÜ',
+            'N-Ary Summation: ∑',
+            'The following Line is Empty:',
+            'The following Line is Empty:',
+            'The following Line is Empty:',
+            'This Line is a Duplicate!'
+        ])
+
+        editor._history_undo()
+        editor._history_undo()
+        editor._history_undo()
+        editor._history_undo()
+        editor._history_redo()
+        editor._history_redo()
+        editor._history_redo()
+        editor._history_redo()
+        editor._history_redo()
+        editor._history_undo()
+        editor._history_undo()
+        editor._history_undo()
+        editor._history_undo()
+        self.assertListEqual(editor.window_content, [
+            'Sample Text:',
+            'This is a Tab-Character: >\t<',
+            'These are Special Chars: äöüÄÖÜ',
+            'N-Ary Summation: ∑',
+            'The following Line is Empty:',
+            '',
+            'This Line is a Duplicate!',
+            'This Line is a Duplicate!'
+        ])
+
+    def test_editor_context_double_line_edge_case(self):
+        editor = Editor([(test_file_path, '')])
+        editor.cpos.set_pos((7,3))
+        editor._context_double_line(True)
+        self.assertListEqual(editor.window_content, [
+            'Sample Text:',
+            'This is a Tab-Character: >\t<',
+            'These are Special Chars: äöüÄÖÜ',
+            'N-Ary Summation: ∑',
+            'The following Line is Empty:',
+            '',
+            'This Line is a Duplicate!',
+        ])
+        self.assertEqual(editor.cpos.get_pos(), (6,3))
+        editor._history_undo()
+        self.assertListEqual(editor.window_content, [
+            'Sample Text:',
+            'This is a Tab-Character: >\t<',
+            'These are Special Chars: äöüÄÖÜ',
+            'N-Ary Summation: ∑',
+            'The following Line is Empty:',
+            '',
+            'This Line is a Duplicate!',
+            'This Line is a Duplicate!',
+        ])
+        self.assertEqual(editor.cpos.get_pos(), (7,3))
+        editor._history_redo()
+        self.assertListEqual(editor.window_content, [
+            'Sample Text:',
+            'This is a Tab-Character: >\t<',
+            'These are Special Chars: äöüÄÖÜ',
+            'N-Ary Summation: ∑',
+            'The following Line is Empty:',
+            '',
+            'This Line is a Duplicate!',
+        ])
+        self.assertEqual(editor.cpos.get_pos(), (6,3))
+
     def test_editor_key_remove_add_selected(self):
         editor = Editor([(test_file_path, '')])
         editor.spos.set_pos((4,8))

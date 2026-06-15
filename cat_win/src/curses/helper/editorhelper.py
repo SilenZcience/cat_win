@@ -171,6 +171,9 @@ UNIFY_HOTKEYS = {
     b'KEY_F(13)'    : b'_function_overview',
     b'KEY_F(14)'    : b'_function_replace_r',
     b'KEY_F(15)'    : b'_function_search_r',
+
+    b'ALT_M'        : b'_function_context_menu',
+    b'KEY_F(5)'     : b'_function_context_menu',
 } # translates key-inputs to pre-defined actions/methods
 
 KEY_HOTKEYS      = set(v for v in UNIFY_HOTKEYS.values() if v.startswith(b'_key'     ))
@@ -193,17 +196,21 @@ REVERSE_ACTION = {
     b'_key_enter'          : b'_key_backspace',
     b'_key_remove_chunk'   : b'_key_add_chunk',
     b'_key_add_chunk'      : b'_key_remove_chunk',
-    b'_key_replace_search' : b'_key_replace_search_'
+    b'_key_replace_search' : b'_key_replace_search_',
+    b'_key_move_line_up'   : b'_key_move_line_down',
+    b'_key_move_line_down' : b'_key_move_line_up',
 } # defines the counter action if no line was deleted
 
 REVERSE_ACTION_MULTI_LINE = {
-    b'_key_dc'             : b'_key_enter',
-    b'_key_dl'             : b'_key_enter',
-    b'_key_backspace'      : b'_key_enter',
-    b'_key_ctl_backspace'  : b'_key_enter',
-    b'_indent_tab'         : b'_indent_btab',
-    b'_key_remove_chunk'   : b'_key_add_chunk',
-    b'_key_add_chunk'      : b'_key_remove_chunk',
+    b'_key_dc'                      : b'_key_enter',
+    b'_key_dl'                      : b'_key_enter',
+    b'_key_backspace'               : b'_key_enter',
+    b'_key_ctl_backspace'           : b'_key_enter',
+    b'_indent_tab'                  : b'_indent_btab',
+    b'_key_remove_chunk'            : b'_key_add_chunk',
+    b'_key_add_chunk'               : b'_key_remove_chunk',
+    b'_context_edit_line_remove'    : b'_context_edit_line_duplicate',
+    b'_context_edit_line_duplicate' : b'_context_edit_line_remove',
 } # defines the counter action if a line was deleted
 
 ACTION_STACKABLE = {

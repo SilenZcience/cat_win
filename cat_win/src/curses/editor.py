@@ -352,14 +352,15 @@ class Editor:
         """
         handles mouse events.
         """
-        self.selecting = False
         _, x, y, _, bstate = curses.getmouse()
         logger(f"Mouse clicked at {x} {y} with state {bstate}", priority=logger.DEBUG)
         if bstate & curses.BUTTON1_CLICKED:
+            self.selecting = False
             self.cpos.row = min(self.wpos.row+y, len(self.window_content)-1)
             self.cpos.col = min(self.wpos.col+x, len(self.window_content[self.cpos.row]))
             # logger(f" {x} {y} {bstate} CLICKED")
         elif bstate & curses.BUTTON1_PRESSED:
+            self.selecting = False
             self.spos.row = min(self.wpos.row+y, len(self.window_content)-1)
             self.spos.col = min(self.wpos.col+x, len(self.window_content[self.spos.row]))
             # logger(f" {x} {y} {bstate} PRESSED")
@@ -379,12 +380,214 @@ class Editor:
             self.selecting = True
             # logger(f" {x} {y} {bstate} DOUBLE_CLICKED")
 
+        elif bstate & curses.BUTTON3_CLICKED or bstate & curses.BUTTON3_RELEASED:
+            self._function_context_menu(x, y)
+            # logger(f" {x} {y} {bstate} PRESSED")
+
         elif bstate & curses.BUTTON4_PRESSED:
+            self.selecting = False
             for _ in range(3):
                 self._move_key_up()
         elif bstate & curses.BUTTON5_PRESSED:
+            self.selecting = False
             for _ in range(3):
                 self._move_key_down()
+
+    def _key_move_line_up(self, _) -> str:
+        if self.cpos.row == 0:
+            return None
+        self.unsaved_progress = True
+        line = self.window_content[self.cpos.row]
+        del self.window_content[self.cpos.row]
+        self.cpos.row -= 1
+        self.window_content.insert(self.cpos.row, line)
+        return line
+
+    def _key_move_line_down(self, _) -> str:
+        if self.cpos.row == len(self.window_content)-1:
+            return None
+        self.unsaved_progress = True
+        line = self.window_content[self.cpos.row]
+        del self.window_content[self.cpos.row]
+        self.cpos.row += 1
+        self.window_content.insert(self.cpos.row, line)
+        return line
+
+    def _context_move_line(self, dir: int = 0) -> None:
+        if not dir:
+            return
+        pre_cpos = self.cpos.get_pos()
+        pre_spos = self.spos.get_pos()
+        pre_selecting = self.selecting
+        if dir < 0:
+            action_text = self._key_move_line_up(dir)
+            key_action = b'_key_move_line_up'
+        elif dir > 0:
+            action_text = self._key_move_line_down(dir)
+            key_action = b'_key_move_line_down'
+        self.history.add(key_action, False,
+                            pre_cpos, self.cpos.get_pos(),
+                            pre_spos, self.spos.get_pos(),
+                            pre_selecting, self.selecting,
+                            action_text)
+
+    def _context_edit_line_remove(self, _, original_row: int = None) -> str:
+        line = self.window_content[self.cpos.row]
+        del self.window_content[self.cpos.row]
+        if self.cpos.row >= len(self.window_content):
+            self.cpos.row = len(self.window_content) - 1
+        if self.spos.row >= len(self.window_content):
+            self.spos.row = len(self.window_content) - 1
+
+        return line
+
+    def _context_edit_line_duplicate(self, line: str, original_row: int = None) -> str:
+        if line is None:
+            line = self.window_content[self.cpos.row]
+        if original_row is not None:
+            self.window_content.insert(min(original_row, len(self.window_content)), line)
+        else:
+            self.window_content.insert(self.cpos.row, line)
+        return line
+
+    def _context_double_line(self, remove: bool = None) -> None:
+        if remove is None:
+            return
+        pre_cpos = self.cpos.get_pos()
+        pre_spos = self.spos.get_pos()
+        pre_selecting = self.selecting
+        if remove:
+            action_text = self._context_edit_line_remove(None)
+            self.history.add(b'_context_edit_line_remove', True,
+                                pre_cpos, self.cpos.get_pos(),
+                                pre_spos, self.spos.get_pos(),
+                                pre_selecting, self.selecting,
+                                action_text, pre_cpos[0])
+        else:
+            action_text = self._context_edit_line_duplicate(None)
+            self.history.add(b'_context_edit_line_duplicate', True,
+                                pre_cpos, self.cpos.get_pos(),
+                                pre_spos, self.spos.get_pos(),
+                                pre_selecting, self.selecting,
+                                action_text)
+
+    def _function_context_menu(self, menu_x: int = -1, menu_y: int = -1) -> None:
+        _context_menu: dict = {}
+        def _action_select_line():
+            self.cpos.col = 0
+            self.spos.set_pos(self.cpos.get_pos())
+            self._select_key_end()
+            self.selecting = True
+
+        if not self.selecting or self.cpos.row == self.spos.row:
+            _context_menu.update({
+                'Select Line'   : _action_select_line,
+                'Move Line Up'  : lambda: self._context_move_line(-1),
+                'Move Line Down': lambda: self._context_move_line( 1),
+                'Duplicate Line': lambda: self._context_double_line(False),
+                'Remove Line'   : lambda: self._context_double_line(True ),
+            })
+
+        if self.selecting:
+            _context_menu.update({
+                'Cut' :   self._action_cut,
+                'Copy':  self._action_copy,
+            })
+        _context_menu.update({
+            'Paste': self._action_paste,
+        })
+
+        items = list(_context_menu.keys())
+
+        max_y, max_x = self.curse_window.getmaxyx()
+
+        max_item_len = max(len(item) for item in items)
+        width = max_item_len + 4
+        height = len(items) + 2
+
+        if menu_x < 0:
+            menu_x = self.cpos.col
+        if menu_y < 0:
+            menu_y = self.cpos.row
+        menu_x = min(menu_x, max_x - width - 1)
+        menu_y = min(menu_y, max_y - height - 1)
+        menu_x = max(0, menu_x)
+        menu_y = max(0, menu_y)
+
+        selected_idx = 0
+        _last_mx = _last_my = -1
+        curses.curs_set(0)
+        self.curse_window.nodelay(True)
+        sys.stdout.write('\x1b[?1003h') # enable mouse tracking in xterm (changes mousemask)
+        sys.stdout.flush()
+
+        def handle_mouse(set_select: bool = False) -> tuple:
+            nonlocal selected_idx, _last_mx, _last_my
+            try:
+                _, mx, my, _, mbstate = curses.getmouse()
+            except curses.error:
+                # getmouse() fails on xterm, if no mouse event present
+                return 0, False
+            in_menu = (
+                menu_x <= mx <= menu_x + width and
+                menu_y <= my < menu_y + height
+            )
+            # logger(f"Mouse event at {mx} {my} with state {mbstate}, in_menu={in_menu}, set_select={set_select}", priority=logger.DEBUG)
+            mouse_moved = (mx != _last_mx or my != _last_my)
+            _last_mx, _last_my = mx, my
+
+            # windows: no explicit event, but mouse was moved
+            # xterm: explicit event for mouse move, but only if mouse tracking enabled (see above)
+            if set_select and mouse_moved or mbstate & curses.REPORT_MOUSE_POSITION:
+                selected_idx = max(0, min(my - menu_y - 1, len(items)-1))
+            return mbstate, in_menu
+
+        while True:
+            self.curse_window.addch (menu_y, menu_x, '+')
+            self.curse_window.addstr(menu_y, menu_x + 1, '-' * (width - 2))
+            self.curse_window.addch (menu_y, menu_x + width - 1, '+')
+            for i in range(1, height - 1):
+                item_idx = i - 1
+                color = curses.A_REVERSE if item_idx == selected_idx else 0
+                self.curse_window.addstr(menu_y + i, menu_x, '| ')
+                self.curse_window.addstr(
+                    menu_y + i, menu_x + 2,
+                    items[item_idx].ljust(max_item_len), color
+                )
+                self.curse_window.addstr(menu_y + i, menu_x + width - 2, ' |')
+            self.curse_window.addch (menu_y + height - 1, menu_x, '+')
+            self.curse_window.addstr(menu_y + height - 1, menu_x + 1, '-' * (width - 2))
+            self.curse_window.addch (menu_y + height - 1, menu_x + width - 1, '+')
+            self.curse_window.refresh()
+
+            try:
+                self.curse_window.nodelay(True)
+                wchar, key = next(self.get_char)
+            except (curses.error, StopIteration):
+                # on windows no event is triggered on mouse move (curses.ERR), but mouse is still pollable
+                self.get_char = self._get_new_char()
+                handle_mouse(True)
+                continue
+
+            if str(wchar).upper() == ESC_CODE or key == b'_action_quit':
+                break
+
+            mbstate, in_menu = handle_mouse()
+
+            if key == b'_move_key_up' or mbstate & curses.BUTTON4_PRESSED:
+                selected_idx = (selected_idx - 1) % len(items)
+            elif key == b'_move_key_down' or mbstate & curses.BUTTON5_PRESSED:
+                selected_idx = (selected_idx + 1) % len(items)
+            elif in_menu and (
+                mbstate & curses.BUTTON1_CLICKED or mbstate & curses.BUTTON1_RELEASED
+            ) or key == b'_key_enter':
+                _context_menu[items[selected_idx]]()
+                break
+
+        curses.mousemask(-1) # restore mousemask to default (works better than disabling manually)
+        self.curse_window.nodelay(False)
+        # curses.curs_set(1)
+        self._render_scr()
 
     def _move_key_left(self) -> None:
         if self.selecting:
@@ -2065,7 +2268,9 @@ class Editor:
                             self.spos.set_pos(self.cpos.get_pos())
                         getattr(self, key.decode(), lambda *_: None)()
                         self.selecting = True
-                    elif key not in (INDENT_HOTKEYS | HISTORY_HOTKEYS) and key != b'_move_key_mouse':
+                    elif key not in (
+                        INDENT_HOTKEYS | HISTORY_HOTKEYS
+                    ) and key not in (b'_move_key_mouse', b'_function_context_menu'):
                         self.selecting = False
 
                     self._enforce_boundaries(key)
