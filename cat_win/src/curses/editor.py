@@ -123,6 +123,18 @@ class Editor:
         # second cursor for selection area
         self.spos = Position(0, 0)
 
+        self._context_menu: dict = {
+            'Select Line'   : [self._action_select_line, 0],
+            'Move Line Up'  : [lambda: self._context_move_line(-1), 0],
+            'Move Line Down': [lambda: self._context_move_line( 1), 0],
+            'Duplicate Line': [lambda: self._context_double_line(False), 0],
+            'Remove Line'   : [lambda: self._context_double_line(True ), 0],
+            'Cut'           : [self._action_cut,   0],
+            'Copy'          : [self._action_copy,  0],
+            'Paste'         : [self._action_paste, 0],
+        }
+        self._context_menu_last = None
+
         self._setup_file()
 
     @property
@@ -474,33 +486,34 @@ class Editor:
                                 pre_selecting, self.selecting,
                                 action_text)
 
+    def _action_select_line(self):
+        self.cpos.col = 0
+        self.spos.set_pos(self.cpos.get_pos())
+        self._select_key_end()
+        self.selecting = True
+
     def _function_context_menu(self, menu_x: int = -1, menu_y: int = -1) -> None:
-        _context_menu: dict = {}
-        def _action_select_line():
-            self.cpos.col = 0
-            self.spos.set_pos(self.cpos.get_pos())
-            self._select_key_end()
-            self.selecting = True
+        _context_menu: dict = self._context_menu.copy()
 
-        if not self.selecting or self.cpos.row == self.spos.row:
-            _context_menu.update({
-                'Select Line'   : _action_select_line,
-                'Move Line Up'  : lambda: self._context_move_line(-1),
-                'Move Line Down': lambda: self._context_move_line( 1),
-                'Duplicate Line': lambda: self._context_double_line(False),
-                'Remove Line'   : lambda: self._context_double_line(True ),
-            })
+        if self.selecting and self.cpos.row != self.spos.row:
+            _context_menu.pop('Select Line', None)
+            _context_menu.pop('Move Line Up', None)
+            _context_menu.pop('Move Line Down', None)
+            _context_menu.pop('Duplicate Line', None)
+            _context_menu.pop('Remove Line', None)
+        if not self.selecting:
+            _context_menu.pop('Cut', None)
+            _context_menu.pop('Copy', None)
 
-        if self.selecting:
-            _context_menu.update({
-                'Cut' :   self._action_cut,
-                'Copy':  self._action_copy,
-            })
-        _context_menu.update({
-            'Paste': self._action_paste,
-        })
-
-        items = list(_context_menu.keys())
+        items = list(
+            map(
+                lambda x: x[0],
+                sorted(
+                    _context_menu.items(),
+                    key=lambda x: x[1][1]-10*(self._context_menu_last == x[0])
+                )
+            )
+        )
 
         max_y, max_x = self.curse_window.getmaxyx()
 
@@ -584,7 +597,10 @@ class Editor:
             elif in_menu and (
                 mbstate & curses.BUTTON1_CLICKED or mbstate & curses.BUTTON1_RELEASED
             ) or key == b'_key_enter':
-                _context_menu[items[selected_idx]]()
+                _context_menu_item = items[selected_idx]
+                _context_menu[_context_menu_item][0]()
+                _context_menu[_context_menu_item][1] -= 1
+                self._context_menu_last = _context_menu_item
                 break
 
         curses.mousemask(-1) # restore mousemask to default (works better than disabling manually)
