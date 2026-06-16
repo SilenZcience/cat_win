@@ -529,7 +529,10 @@ class Editor:
         menu_y = max(0, min(menu_y - self.wpos.row, max_y - height - 1))
 
         selected_idx = 0
-        _last_mx = _last_my = -1
+        try:
+            _, _last_mx, _last_my, _, _ = curses.getmouse()
+        except curses.error:
+            _last_mx = _last_my = -1
         curses.curs_set(0)
         self.curse_window.nodelay(True)
         sys.stdout.write('\x1b[?1003h') # enable mouse tracking in xterm (changes mousemask)
