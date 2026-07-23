@@ -11,6 +11,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - included the underscore symbol ('_') as part of a word using ctrl-backspace, ctrl-delete, ctrl-left or ctrl-right inside the editor.
 - changed the output of the mathematical parameters (--`bin`, --`oct`, --`dec`, --`hex`) to include signed and unsigned values aswell as utf-8 character representation.
 - added a context menu to the editor by pressing the `F5` or `ALT_M` hotkey or using the mouse rightclick.
+- cat_win will now detect simple rar-archives and display the contained files.
 
 ### Bugfixes
 
