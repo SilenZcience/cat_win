@@ -10,10 +10,10 @@ from pathlib import Path
 from cat_win.src.service.helper.iohelper import logger
 
 # ------------------------------ RAR v5 File Spec ------------------------------
-# 0x0000 +8   Signature (Magic)                 52 61 72 21 1A 07 01 00
+# 0x0000  +8  Signature (Magic)                 52 61 72 21 1A 07 01 00
 
 # Main Header
-# 0x0008 +4   Header CRC32
+# 0x0008  +4  Header CRC32
 #         +v  Header Size
 #         +v  Header Type (1 = Main)
 #         +v  Header Flags
@@ -69,10 +69,10 @@ from cat_win.src.service.helper.iohelper import logger
 # ------------------------------------------------------------------------------
 
 # ------------------------------ RAR v4 File Spec ------------------------------
-# 0x0000 +7   Signature (Magic)                 52 61 72 21 1A 07 00
+# 0x0000  +7  Signature (Magic)                 52 61 72 21 1A 07 00
 
 # Main Archive Header
-# 0x0007 +2   Header CRC16
+# 0x0007  +2  Header CRC16
 #         +1  Header Type (0x73 = Main)
 #         +2  Header Flags
 #         +2  Header Size
