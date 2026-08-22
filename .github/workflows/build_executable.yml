@@ -44,30 +44,9 @@ jobs:
           ${{ env.bin }} -h
           ${{ env.bin }} -v
           ${{ env.bin }} -p ${{ env.bin }} -R --debug
-      - name: Show Changes
-        run: |
-          git status
-      - name: Stash Changes
-        run: |
-          git config --local user.name 'github-actions[bot]'
-          git config --local user.email 'github-actions[bot]@users.noreply.github.com'
-          git add ./temp/*
-          git stash -- temp
-          git clean -df
-          git restore .
-      - name: Fetch Binaries Branch
-        run: |
-          git fetch origin binaries
-          git checkout binaries
-          git stash pop
-      - name: Copy To Bin
-        run: |
-          python -c "import sys; import shutil; shutil.copytree('./temp', './bin', dirs_exist_ok=True)"
-      - name: Commit & Push
-        run: |
-          git add ./bin/*
-          git reset ./temp/*
-          git status
-          git commit -m "🤖Compiled Binary for ${{ matrix.os }}."
-          git push origin HEAD:binaries
-        continue-on-error: true
+      - name: Upload Artifact ${{ matrix.os }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: catw-${{ matrix.os }}
+          path: temp/
+          if-no-files-found: error
