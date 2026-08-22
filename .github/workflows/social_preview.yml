@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: 'main'
+          lfs: true
       - name: Install Python 3.10
         id: python
         uses: actions/setup-python@v6
