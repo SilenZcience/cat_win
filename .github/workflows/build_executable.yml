@@ -2,6 +2,8 @@ name: Compile Binaries
 
 on:
   workflow_dispatch:
+  release:
+    types: [published]
 
 jobs:
   build:
@@ -51,3 +53,41 @@ jobs:
           name: catw-${{ env.platform_dir }}
           path: temp/${{ env.platform_dir }}/
           if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+          merge-multiple: false
+      - name: Stamp Filenames with Platform
+        run: |
+          mkdir out
+          for d in artifacts/*/
+          do
+            plat="${d#artifacts/catw-}"
+            plat="${plat%/}"
+            for f in "$d"catw* "$d"cats*
+            do
+              [ -e "$f" ] || continue
+              base=$(basename "$f")
+              if [[ "$base" == *.exe ]]
+              then
+                cp "$f" "out/${base%.exe}-${plat}.exe"
+              else
+                cp "$f" "out/${base}-${plat}"
+              fi
+            done
+          done
+          ls -la out
+      - name: Attach to latest Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=$(gh release view --json tagName --jq '.tagName')
+          gh release upload "$TAG" out/* --clobber
