@@ -23,7 +23,7 @@
 <div align="center">
 <h2 align="center"><b>cat_win</b></h2>
    <p align="center">
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/cat_win.logo.png" width="25%"/>
+      <img src="img/cat_win.logo.png" width="25%"/>
    </p>
    <p align="center">
       Advanced Text-Processing and -Analytics CLI Toolset
@@ -187,12 +187,12 @@ which can also be installed after the fact to patch the problem.
 
 Direct Download:
 </br>
-[Windows - __catw.exe__](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/windows/catw.exe) </br>
-[Windows - __cats.exe__ (REPL)](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/windows/cats.exe) </br>
-[Linux - __catw__](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/linux/catw) </br>
-[Linux - __cats__ (REPL)](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/linux/cats) </br>
-[MacOS - __catw__](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/darwin/catw) </br>
-[MacOS - __cats__ (REPL)](https://raw.githubusercontent.com/SilenZcience/cat_win/binaries/bin/darwin/cats) </br>
+[Windows - __catw.exe__](https://github.com/SilenZcience/cat_win/releases/latest/download/catw-windows.exe) </br>
+[Windows - __cats.exe__ (REPL)](https://github.com/SilenZcience/cat_win/releases/latest/download/cats-windows.exe) </br>
+[Linux - __catw__](https://github.com/SilenZcience/cat_win/releases/latest/download/catw-linux) </br>
+[Linux - __cats__ (REPL)](https://github.com/SilenZcience/cat_win/releases/latest/download/cats-linux) </br>
+[MacOS - __catw__](https://github.com/SilenZcience/cat_win/releases/latest/download/catw-darwin) </br>
+[MacOS - __cats__ (REPL)](https://github.com/SilenZcience/cat_win/releases/latest/download/cats-darwin) </br>
 
 (compiled using PyInstaller) </br>
 It is recommended to add the file path(s) to your system-environment `PATH`-variables.
@@ -249,38 +249,38 @@ Interactively manipulate standard input.
    </br>
 
    <p float="left">
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/examplew1.png" width="49%"/>
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/examplew2.png" width="49%"/>
+      <img src="img/examplew1.png" width="49%"/>
+      <img src="img/examplew2.png" width="49%"/>
    </p>
 
    <p float="left">
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/examplew3.png" width="49%"/>
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/examplew4.png" width="49%"/>
+      <img src="img/examplew3.png" width="49%"/>
+      <img src="img/examplew4.png" width="49%"/>
    </p>
 
    <p float="left">
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/examplew5.png" width="49%"/>
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/examplew6.png" width="49%"/>
+      <img src="img/examplew5.png" width="49%"/>
+      <img src="img/examplew6.png" width="49%"/>
    </p>
 
    <p float="left">
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/examplew7.png" width="49%"/>
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/examplew8.png" width="49%"/>
+      <img src="img/examplew7.png" width="49%"/>
+      <img src="img/examplew8.png" width="49%"/>
    </p>
 
    <p float="left">
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/examplew9.png" width="49%"/>
+      <img src="img/examplew9.png" width="49%"/>
    </p>
 
    - - - -
 
    <p float="left">
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/examples1.png" width="49%"/>
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/examples2.png" width="49%"/>
+      <img src="img/examples1.png" width="49%"/>
+      <img src="img/examples2.png" width="49%"/>
    </p>
 
    <p float="left">
-      <img src="https://raw.githubusercontent.com/SilenZcience/cat_win/main/img/examples3.png" width="49%"/>
+      <img src="img/examples3.png" width="49%"/>
    </p>
 
 </details>
