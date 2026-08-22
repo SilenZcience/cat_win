@@ -13,6 +13,7 @@ jobs:
         os: [macos-latest, windows-latest, ubuntu-latest]
     env:
       bin: ${{ matrix.os == 'macos-latest' && './temp/darwin/catw' || matrix.os == 'windows-latest' && './temp/windows/catw.exe' || './temp/linux/catw' }}
+      platform_dir: ${{ matrix.os == 'macos-latest' && 'darwin' || matrix.os == 'windows-latest' && 'windows' || 'linux' }}
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
@@ -44,9 +45,17 @@ jobs:
           ${{ env.bin }} -h
           ${{ env.bin }} -v
           ${{ env.bin }} -p ${{ env.bin }} -R --debug
-      - name: Upload Artifact ${{ matrix.os }}
+      - name: Upload Artifact catw-${{ env.platform_dir }}
         uses: actions/upload-artifact@v7
         with:
-          name: catw-${{ matrix.os }}
-          path: temp/
+          name: catw-${{ env.platform_dir }}
+          path: temp/${{ env.platform_dir }}/catw*
           if-no-files-found: error
+          archive: false
+      - name: Upload Artifact cats-${{ env.platform_dir }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: cats-${{ env.platform_dir }}
+          path: temp/${{ env.platform_dir }}/cats*
+          if-no-files-found: error
+          archive: false
