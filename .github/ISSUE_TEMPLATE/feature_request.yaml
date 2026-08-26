@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: "
-        <img src='img/cat_win.logo.png' align='left' width='80' height='80'>
+        <img src='https://media.githubusercontent.com/media/SilenZcience/cat_win/main/img/cat_win.logo.png' align='left' width='80' height='80'>
         Thank you for finding the time to propose a new feature!"
   - type: textarea
     attributes:

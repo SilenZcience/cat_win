@@ -23,7 +23,7 @@
 <div align="center">
 <h2 align="center"><b>cat_win</b></h2>
    <p align="center">
-      <img src="img/cat_win.logo.png" width="25%"/>
+      <img src="https://media.githubusercontent.com/media/SilenZcience/cat_win/main/img/cat_win.logo.png" width="25%"/>
    </p>
    <p align="center">
       Advanced Text-Processing and -Analytics CLI Toolset
@@ -249,38 +249,38 @@ Interactively manipulate standard input.
    </br>
 
    <p float="left">
-      <img src="img/examplew1.png" width="49%"/>
-      <img src="img/examplew2.png" width="49%"/>
+      <img src="https://media.githubusercontent.com/media/SilenZcience/cat_win/main/img/examplew1.png" width="49%"/>
+      <img src="https://media.githubusercontent.com/media/SilenZcience/cat_win/main/img/examplew2.png" width="49%"/>
    </p>
 
    <p float="left">
-      <img src="img/examplew3.png" width="49%"/>
-      <img src="img/examplew4.png" width="49%"/>
+      <img src="https://media.githubusercontent.com/media/SilenZcience/cat_win/main/img/examplew3.png" width="49%"/>
+      <img src="https://media.githubusercontent.com/media/SilenZcience/cat_win/main/img/examplew4.png" width="49%"/>
    </p>
 
    <p float="left">
-      <img src="img/examplew5.png" width="49%"/>
-      <img src="img/examplew6.png" width="49%"/>
+      <img src="https://media.githubusercontent.com/media/SilenZcience/cat_win/main/img/examplew5.png" width="49%"/>
+      <img src="https://media.githubusercontent.com/media/SilenZcience/cat_win/main/img/examplew6.png" width="49%"/>
    </p>
 
    <p float="left">
-      <img src="img/examplew7.png" width="49%"/>
-      <img src="img/examplew8.png" width="49%"/>
+      <img src="https://media.githubusercontent.com/media/SilenZcience/cat_win/main/img/examplew7.png" width="49%"/>
+      <img src="https://media.githubusercontent.com/media/SilenZcience/cat_win/main/img/examplew8.png" width="49%"/>
    </p>
 
    <p float="left">
-      <img src="img/examplew9.png" width="49%"/>
+      <img src="https://media.githubusercontent.com/media/SilenZcience/cat_win/main/img/examplew9.png" width="49%"/>
    </p>
 
    - - - -
 
    <p float="left">
-      <img src="img/examples1.png" width="49%"/>
-      <img src="img/examples2.png" width="49%"/>
+      <img src="https://media.githubusercontent.com/media/SilenZcience/cat_win/main/img/examples1.png" width="49%"/>
+      <img src="https://media.githubusercontent.com/media/SilenZcience/cat_win/main/img/examples2.png" width="49%"/>
    </p>
 
    <p float="left">
-      <img src="img/examples3.png" width="49%"/>
+      <img src="https://media.githubusercontent.com/media/SilenZcience/cat_win/main/img/examples3.png" width="49%"/>
    </p>
 
 </details>
