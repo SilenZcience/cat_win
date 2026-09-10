@@ -296,7 +296,7 @@ Interactively manipulate standard input.
 ```py
 > cats --eval --dec
 > >>> 0xF * 5
-75 [Bin: 0b1001011, Oct: 0o113, Hex: 0x4b]
+75 [Bin 0b01001011; Oct 0o113; Int8 75/75; Hex 0x4B; Utf8 K]
 > >>> ...
 ```
 
