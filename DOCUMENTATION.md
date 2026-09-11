@@ -179,10 +179,10 @@
 | *<a href="#--b64d---b64d">--b64d, --b64d</a>* | decode the input from base64 |✔|
 | *<a href="#--b64e---b64e">--b64e, --b64e</a>* | encode the input to base64 |✔|
 | *<a href="#--eval---eval">--eval, --EVAL</a>* | evaluate simple mathematical equations |✔|
-| *<a href="#--hex---hex">--hex, --HEX</a>* | convert hexadecimal numbers to binary, octal and decimal |✔|
-| *<a href="#--dec---dec">--dec, --DEC</a>* | convert decimal numbers to binary, octal and hexadecimal |✔|
-| *<a href="#--oct---oct">--oct, --oct</a>* | convert octal numbers to binary, decimal and hexadecimal |✔|
-| *<a href="#--bin---bin">--bin, --BIN</a>* | convert binary numbers to octal, decimal and hexadecimal |✔|
+| *<a href="#--hex---hex">--hex, --HEX</a>* | convert hexadecimal numbers to binary, octal, decimal and utf-8 |✔|
+| *<a href="#--dec---dec">--dec, --DEC</a>* | convert decimal numbers to binary, octal, hexadecimal and utf-8 |✔|
+| *<a href="#--oct---oct">--oct, --oct</a>* | convert octal numbers to binary, decimal, hexadecimal and utf-8 |✔|
+| *<a href="#--bin---bin">--bin, --BIN</a>* | convert binary numbers to octal, decimal, hexadecimal and utf-8 |✔|
 ||||
 | *<a href="#--binview---binview">--binview, --binview</a>* | display the raw byte representation in binary |❌|
 | *<a href="#--hexview---hexview">--hexview, --HEXVIEW</a>* | display the raw byte representation in hexadecimal |❌|
@@ -379,10 +379,10 @@ Note that the special Char ␛ will not be displayed as ^ESC because it is neede
 ^SUB^SUB^NUL^SUB^SUB^TAB^BEL
 ```
 
-### <a id="#--eol---end-of-line">--eol, --end-of-line</a>
+### <a id="--eol---end-of-line">--eol, --end-of-line</a>
 
 Displayes the end-of-line character used after each line.
-Uses the same color as <a href="--chr---char">--chr, --char</a>.
+Uses the same color as <a href="#--chr---char">--chr, --char</a>.
 
 ```console
 > catw test.txt --eol
@@ -567,7 +567,7 @@ Line 1
 ### <a id="-u---url">-U, --url</a>
 
 When using this Parameter it is possible to provide URLs as Arguments.
-Should an URL not have a Scheme (http(s):// or fttp(s):// ...) the Default Scheme (https://) is being used.
+Should an URL not have a Scheme (http(s):// or ftp(s):// ...) the Default Scheme (https://) is being used.
 Provided URLs are simply curl'd and handled as its own File.
 When not providing a raw Data URL the Content will include the HTML Elements.
 
@@ -657,7 +657,7 @@ Displays a Summary of all Tokens/Words found in the given Files and how frequent
 The Output will be sorted by the Frequency of Occurrence starting with the most common Word.
 In Addition the used Files will be displayed beforehand.
 Finally the Sum of all Tokens is displayed.
-Using this Argument in Uppercase (-W, --WORDCOUNT) will ONLY display this Message and stop Code Execution.
+Using this Argument in Uppercase (--WC, --WORDCOUNT) will ONLY display this Message and stop Code Execution.
 
 ```console
 > catw test.txt
@@ -877,73 +877,77 @@ Calculate: 0 !
 
 ### <a id="--hex---hex">--hex, --HEX</a>
 
-If a Line only contains a hexadecimal Number this Parameter will append the equivalent Value in Binary, Octal and Decimal.
+If a Line only contains a hexadecimal Number this Parameter will display the equivalent Value in Binary, Octal, Decimal (signed/unsigned Integer), Hexadecimal and Utf-8 Representation.
+The signed/unsigned Integer Representation is displayed as `Int<N>` where `<N>` is the Amount of Bits used to store the Number (Int8, Int16, Int32 or Int64).
 Negative Numbers are allowed.
 Numbers are allowed to start with the Prefix 0x.
 When using the Uppercase Variant (--HEX) the Numbers will not include their Prefixes (like 0x, 0b or 0o).
 
 ```console
 > catw test.txt --hex
-FF [Bin: 0b11111111, Oct: 0o377, Dec: 255]
-0x610 [Bin: 0b11000010000, Oct: 0o3020, Dec: 1552]
+FF [Bin 0b11111111; Oct 0o377; Int8 -1/255; Hex 0xFF; Utf8 �]
+0x610 [Bin 0b0000011000010000; Oct 0o3020; Int16 1552/1552; Hex 0x610; Utf8 \x06\x10]
 ```
 ```console
 > catw test.txt --HEX
-FF [Bin: 11111111, Oct: 377, Dec: 255]
-0x610 [Bin: 11000010000, Oct: 3020, Dec: 1552]
+FF [Bin 11111111; Oct 377; Int8 -1/255; Hex FF; Utf8 �]
+0x610 [Bin 0000011000010000; Oct 3020; Int16 1552/1552; Hex 610; Utf8 \x06\x10]
 ```
 
 ### <a id="--dec---dec">--dec, --DEC</a>
 
-If a Line only contains a decimal Number this Parameter will append the equivalent Value in Binary, Octal and Hexadecimal.
+If a Line only contains a decimal Number this Parameter will display the equivalent Value in Binary, Octal, Decimal (signed/unsigned Integer), Hexadecimal and Utf-8 Representation.
+The signed/unsigned Integer Representation is displayed as `Int<N>` where `<N>` is the Amount of Bits used to store the Number (Int8, Int16, Int32 or Int64).
 Negative Numbers are allowed.
 When using the Uppercase Variant (--DEC) the Numbers will not include their Prefixes (like 0x, 0b or 0o).
 
 ```console
 > catw test.txt --dec
-255 [Bin: 0b11111111, Oct: 0o377, Hex: 0xff]
-1552 [Bin: 0b11000010000, Oct: 0o3020, Hex: 0x610]
+255 [Bin 0b11111111; Oct 0o377; Int8 -1/255; Hex 0xFF; Utf8 �]
+1552 [Bin 0b0000011000010000; Oct 0o3020; Int16 1552/1552; Hex 0x610; Utf8 \x06\x10]
 ```
 ```console
 > catw test.txt --DEC
-255 [Bin: 11111111, Oct: 377, Hex: ff]
-1552 [Bin: 11000010000, Oct: 3020, Hex: 610]
+255 [Bin 11111111; Oct 377; Int8 -1/255; Hex FF; Utf8 �]
+1552 [Bin 0000011000010000; Oct 3020; Int16 1552/1552; Hex 610; Utf8 \x06\x10]
 ```
 
 ### <a id="--oct---oct">--oct, --OCT</a>
 
-If a Line only contains an octal Number this Parameter will append the equivalent Value in Binary, Decimal and Hexadecimal.
+If a Line only contains an octal Number this Parameter will display the equivalent Value in Binary, Octal, Decimal (signed/unsigned Integer), Hexadecimal and Utf-8 Representation.
+The signed/unsigned Integer Representation is displayed as `Int<N>` where `<N>` is the Amount of Bits used to store the Number (Int8, Int16, Int32 or Int64).
 Negative Numbers are allowed.
 Numbers are allowed to start with the Prefix 0o.
 When using the Uppercase Variant (--OCT) the Numbers will not include their Prefixes (like 0x, 0b or 0o).
 
 ```console
 > catw test.txt --oct
-0o377 [Bin: 0b11111111, Dec: 255, Hex: 0xff]
-3020 [Bin: 0b11000010000, Dec: 1552, Hex: 0x610]
+0o377 [Bin 0b11111111; Oct 0o377; Int8 -1/255; Hex 0xFF; Utf8 �]
+3020 [Bin 0b0000011000010000; Oct 0o3020; Int16 1552/1552; Hex 0x610; Utf8 \x06\x10]
 ```
 ```console
 > catw test.txt --OCT
-0o377 [Bin: 11111111, Dec: 255, Hex: ff]
-3020 [Bin: 11000010000, Dec: 1552, Hex: 610]
+0o377 [Bin 11111111; Oct 377; Int8 -1/255; Hex FF; Utf8 �]
+3020 [Bin 0000011000010000; Oct 3020; Int16 1552/1552; Hex 610; Utf8 \x06\x10]
 ```
 
 ### <a id="--bin---bin">--bin, --BIN</a>
 
-If a Line only contains a binary Number this Parameter will append the equivalent Value in Octal, Decimal and Hexadecimal.
+If a Line only contains a binary Number this Parameter will display the equivalent Value in Binary, Octal, Decimal (signed/unsigned Integer), Hexadecimal and Utf-8 Representation.
+The signed/unsigned Integer Representation is displayed as `Int<N>` where `<N>` is the Amount of Bits used to store the Number (Int8, Int16, Int32 or Int64).
 Negative Numbers are allowed.
 Numbers are allowed to start with the Prefix 0b.
 When using the Uppercase Variant (--BIN) the Numbers will not include their Prefixes (like 0x, 0b or 0o).
 
 ```console
 > catw test.txt --bin
-11111111 [Oct: 0o377, Dec: 255, Hex: 0xff]
-0b11000010000 [Oct: 0o3020, Dec: 1552, Hex: 0x610]
+11111111 [Bin 0b11111111; Oct 0o377; Int8 -1/255; Hex 0xFF; Utf8 �]
+0b11000010000 [Bin 0b0000011000010000; Oct 0o3020; Int16 1552/1552; Hex 0x610; Utf8 \x06\x10]
 ```
 ```console
 > catw test.txt --BIN
-11111111 [Oct: 377, Dec: 255, Hex: ff]
-0b11000010000 [Oct: 3020, Dec: 1552, Hex: 610]
+11111111 [Bin 11111111; Oct 377; Int8 -1/255; Hex FF; Utf8 �]
+0b11000010000 [Bin 0000011000010000; Oct 3020; Int16 1552/1552; Hex 610; Utf8 \x06\x10]
 ```
 
 - - - -
@@ -1381,9 +1385,9 @@ Using --nocolor will disable all Colors and only display the Output in plain mon
 
 Displays a User interactive Config Menu allowing the User to change specific Default Parameters.
 Stops Code Execution after finishing the Configuration.
-The Config File will be saved to the installation Directory of cat_win which is by Default the Python Directory.
-This means that uninstalling cat_win may result in the Config File being left over.
-When using the Windows Executables this Parameter will have no (long term) Effect.
+The Config File will be saved to a platform dependant Config Home:
+on Windows the AppData Directory, on macOS the Application Support Directory and on Linux the XDG_CONFIG_HOME Directory.
+The Location can be overridden by setting the `CAT_WIN_CONFIG_DIR` Environment Variable.
 Valid Options are:
 | Option | Description | Example | Default |
 |--------|-------------|---------|---------|
@@ -1424,9 +1428,9 @@ Accepted Input for disabling a Setting: `false, no, n, 0`
 
 Displays a User interactive Config Menu allowing the User to change the Colors for specific Elements and Arguments.
 Stops Code Execution after finishing the Configuration.
-The Config File will be saved to the installation Directory of cat_win which is by Default the Python Directory.
-This means that uninstalling cat_win may result in the Config File being left over.
-When using the Windows Executables this Parameter will have no (long term) Effect.
+The Config File will be saved to a platform dependant Config Home:
+on Windows the AppData Directory, on macOS the Application Support Directory and on Linux the XDG_CONFIG_HOME Directory.
+The Location can be overridden by setting the `CAT_WIN_CONFIG_DIR` Environment Variable.
 8-bit Colors can be used by entering the corresponding Color IDs (0-255) with the Prefix `f` for Foreground or `b` for Background.
 24-bit Colors (Truecolor) can be used by entering the RGB values seperated by Comma with the Prefix `f` for Foreground or `b` for Background.
 Thus a valid Input would also be defined by the Format `<f/b>[0-255]` or `<f/b>[0-255];[0-255];[0-255]` respectively.

@@ -169,13 +169,13 @@ ALL_ARGS = [
                 ARGS_B64E, section=8),
     ArgConstant('--eval', '--EVAL', 'evaluate simple mathematical equations',
                 ARGS_EVAL, section=8),
-    ArgConstant('--hex', '--HEX', 'convert hexadecimal numbers to binary, octal and decimal',
+    ArgConstant('--hex', '--HEX', 'convert hexadecimal numbers to binary, octal, decimal, utf-8',
                 ARGS_HEX, section=8),
-    ArgConstant('--dec', '--DEC', 'convert decimal numbers to binary, octal and hexadecimal',
+    ArgConstant('--dec', '--DEC', 'convert decimal numbers to binary, octal, hexadecimal, utf-8',
                 ARGS_DEC, section=8),
-    ArgConstant('--oct', '--OCT', 'convert octal numbers to binary, decimal and hexadecimal',
+    ArgConstant('--oct', '--OCT', 'convert octal numbers to binary, decimal, hexadecimal, utf-8',
                 ARGS_OCT, section=8),
-    ArgConstant('--bin', '--BIN', 'convert binary numbers to octal, decimal and hexadecimal',
+    ArgConstant('--bin', '--BIN', 'convert binary numbers to octal, decimal, hexadecimal, utf-8',
                 ARGS_BIN, section=8),
 
     # raw-view
