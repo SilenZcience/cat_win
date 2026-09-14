@@ -129,7 +129,7 @@
 
 This project focuses on delivering **essential functionality** in a clean and user-friendly way.
 </br>
-It is **not intended to exactly replicate existing tools**, but instead provide a cohesive toolkit for common tasks.
+It is **not intended to exactly replicate existing tools**, but to provide a cohesive toolkit for common tasks.
 
 <div id="made-with"></div>
 
