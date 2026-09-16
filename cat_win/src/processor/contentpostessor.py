@@ -63,7 +63,7 @@ def _print_cache_debug_info(ctx) -> None:
         cache_info += f"misses:{misses.ljust(max_val[2])}"
         cache_info += f"maxsize:{maxsize.ljust(max_val[3])}"
         cache_info += f"currsize:{currsize.ljust(max_val[4])}"
-        cache_info += f"full:{100 * int(currsize) / int(maxsize):6.2f}%"
+        cache_info += f"full:{100 * int(currsize) / max(1, int(maxsize)):6.2f}%"
         logger(cache_info, priority=logger.DEBUG)
 
 

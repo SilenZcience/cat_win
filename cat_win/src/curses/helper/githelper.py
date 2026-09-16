@@ -26,7 +26,7 @@ class GitHelper:
                 stderr=subprocess.PIPE,
                 check=False
             ).stdout.decode().strip()
-        except subprocess.CalledProcessError as exc:
+        except (OSError, subprocess.CalledProcessError)as exc:
             GitHelper.GIT_CMD_FAILED = True
             raise OSError('git command failed, skipping git operations') from exc
 
@@ -79,7 +79,7 @@ class GitHelper:
                 stderr=subprocess.PIPE,
                 check=True
             ).stdout.decode().splitlines()
-        except subprocess.CalledProcessError as exc:
+        except (OSError, subprocess.CalledProcessError) as exc:
             GitHelper.GIT_CMD_FAILED = True
             raise OSError('git command failed, skipping git operations') from exc
 
@@ -150,7 +150,7 @@ class GitHelper:
                 check=True
             )
             return result.stdout
-        except subprocess.CalledProcessError as exc:
+        except (OSError, subprocess.CalledProcessError) as exc:
             GitHelper.GIT_CMD_FAILED = True
             raise OSError('git command failed, skipping git operations') from exc
 

@@ -164,7 +164,7 @@ def get_libmagic_file(file: Path) -> str:
                 return ''
             libmagic_out = sub.stdout.decode().strip()
             return libmagic_out.rpartition(':')[-1].lstrip()
-        except OSError:
+        except (OSError, subprocess.CalledProcessError):
             pass
 
     # fallback: try to find git.exe and locate file.exe inside the Git installation
@@ -202,7 +202,7 @@ def get_libmagic_file(file: Path) -> str:
             stderr=subprocess.PIPE,
             check=True
         )
-    except OSError:
+    except (OSError, subprocess.CalledProcessError):
         return ''
     libmagic_out = sub.stdout.decode().strip()
     return libmagic_out.rpartition(':')[-1].lstrip()
