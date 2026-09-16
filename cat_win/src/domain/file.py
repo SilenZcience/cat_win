@@ -41,7 +41,7 @@ class File:
         set the file size
 
         Parameters:
-        file_size (bool):
+        file_size (int):
             set the file_size attribute
         """
         self.file_size = file_size
@@ -50,4 +50,6 @@ class File:
         return hash(self.path)
 
     def __eq__(self, value: object) -> bool:
+        if not hasattr(value, 'path'):
+            return False
         return self.path == value.path
