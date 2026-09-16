@@ -48,7 +48,7 @@ class PBar:
         length_ -= len(self.suffix)
         length_ -= 4 # 2 spaces and 1 '%' and 1 buffer at the end
         length_ -= (4+decimals) # '100.' -> 4 + decimals
-        length_  = max(0, min(length_, length))
+        length_  = max(0, min(length_, length) if length > 0 else length_)
         self.length = length_
         self.fill_l = fill_l
         self.fill_r = fill_r
@@ -79,12 +79,16 @@ class PBar:
         iteration (int):
             the current progress iteration
         """
-        if iteration < 0 or iteration > self.total:
-            iteration = self.total
-        percentage = min(100 * (iteration / float(self.total)), 100.0)
+        if self.total == 0:
+            percentage = 100.0
+            length_l = self.length
+        else:
+            if iteration < 0 or iteration > self.total:
+                iteration = self.total
+            percentage = min(100 * (iteration / float(self.total)), 100.0)
+            length_l = int(self.length * iteration // self.total)
         percent_color = PBar.COLOR_DONE if percentage == 100.0 else PBar.COLOR_MISSING
         percent = f"{percentage:{4+self.decimals}.{self.decimals}f}"
-        length_l = int(self.length * iteration // self.total)
         bars = f"{PBar.COLOR_DONE}{self.fill_l * length_l}{PBar.COLOR_MISSING}{self.fill_r * (self.length - length_l)}"
         progress = f"\r{self.prefix} {bars} {percent_color}{percent}%{PBar.COLOR_RESET}{self.suffix}"
         print(progress, end='', flush=True)

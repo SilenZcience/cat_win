@@ -74,6 +74,34 @@ class TestPBar(TestCase):
             self.assertIn('XX', fake_out.getvalue())
             self.assertIn('\b \b', fake_out.getvalue())
 
+    @patch('os.isatty', OSAttyDefGen.get_def({1: True}))
+    @patch('cat_win.src.service.helper.progressbar.CURSOR_VISIBLE', '')
+    @patch('cat_win.src.service.helper.progressbar.CURSOR_INVISIBLE', '')
+    @patch('cat_win.src.service.helper.progressbar.PBar.COLOR_DONE', '')
+    @patch('cat_win.src.service.helper.progressbar.PBar.COLOR_MISSING', '')
+    @patch('cat_win.src.service.helper.progressbar.PBar.COLOR_RESET', '')
+    def test_pbar_total_zero(self):
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            with PBar(0, prefix='', suffix='',
+                  length=2, fill_l='X', fill_r='_').init() as p_bar:
+                p_bar(0)
+            self.assertEqual(fake_out.getvalue(), '\r XX 100.0%\n')
+
+    @patch('os.isatty', OSAttyDefGen.get_def({1: True}))
+    @patch('cat_win.src.service.helper.progressbar.CURSOR_VISIBLE', '')
+    @patch('cat_win.src.service.helper.progressbar.CURSOR_INVISIBLE', '')
+    @patch('cat_win.src.service.helper.progressbar.PBar.COLOR_DONE', '')
+    @patch('cat_win.src.service.helper.progressbar.PBar.COLOR_MISSING', '')
+    @patch('cat_win.src.service.helper.progressbar.PBar.COLOR_RESET', '')
+    def test_pbar_default_length_is_full_width(self):
+        with patch('sys.stdout', new=StdOutMock()) as fake_out:
+            with PBar(2, prefix='', suffix='',
+                  length=-1, fill_l='X', fill_r='_').init() as p_bar:
+                p_bar(2)
+            output = fake_out.getvalue()
+            self.assertIn('XX', output)
+            self.assertNotIn('\r _ 100.0%', output)
+
     def test_pbar_set_colors(self):
         color_dic = {
             CKW.PROGRESSBAR_DONE: '\033[92m',
