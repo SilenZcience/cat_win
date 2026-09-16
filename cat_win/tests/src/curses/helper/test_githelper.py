@@ -101,6 +101,22 @@ class GithelperTest(TestCase):
 
     @patch('cat_win.src.curses.helper.githelper.GitHelper._get_repo_root', return_value='/repo')
     @patch('subprocess.run')
+    def test_get_git_file_history_rename_path(self, mock_run, _):
+        rel_path = os.path.relpath('/repo/src/file.txt', '/repo')
+        old_path = os.path.join('src', 'old_name.txt')
+        h1 = 'a' * 40
+        mock_run.return_value = Mock(stdout=(
+            f'{h1}|2024-01-01 10:00:00 +0000|User A|Msg A\n'
+            f'R100\t{old_path}\t{rel_path}\n'
+        ).encode())
+
+        commits = GitHelper.get_git_file_history(Path('/repo/src/file.txt'))
+
+        self.assertEqual(len(commits), 1)
+        self.assertEqual(commits[0]['file_path'], rel_path)
+
+    @patch('cat_win.src.curses.helper.githelper.GitHelper._get_repo_root', return_value='/repo')
+    @patch('subprocess.run')
     def test_get_git_file_history_skips_invalid_hash_line(self, mock_run, _):
         rel_path = os.path.relpath('/repo/src/file.txt', '/repo')
         h1 = 'a' * 40

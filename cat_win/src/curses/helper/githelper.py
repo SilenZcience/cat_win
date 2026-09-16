@@ -103,7 +103,9 @@ class GitHelper:
                 status_line = log_output[i + 1].strip()
                 if status_line:
                     status_parts = status_line.split('\t')
-                    if len(status_parts) >= 2:
+                    if status_parts and status_parts[0].startswith('R') and len(status_parts) >= 3:
+                        file_path_at_commit = status_parts[2]
+                    elif len(status_parts) >= 2:
                         file_path_at_commit = status_parts[1]
 
             commits.append({
