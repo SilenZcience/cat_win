@@ -393,6 +393,13 @@ class Editor:
             # logger(f" {x} {y} {bstate} DOUBLE_CLICKED")
 
         elif bstate & curses.BUTTON3_CLICKED or bstate & curses.BUTTON3_RELEASED:
+            if not self.selecting or (
+                self.wpos.row+y < self.selected_area[0][0] or self.wpos.row+y > self.selected_area[1][0]
+            ):
+                self.selecting = False
+                self.cpos.row = min(self.wpos.row+y, len(self.window_content)-1)
+                self.cpos.col = min(self.wpos.col+x, len(self.window_content[self.cpos.row]))
+                self._render_scr()
             self._function_context_menu(x, y)
             # logger(f" {x} {y} {bstate} PRESSED")
 
