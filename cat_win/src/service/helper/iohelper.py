@@ -2,6 +2,7 @@
 iohelper
 """
 
+import codecs
 import contextlib
 import ctypes
 import io
@@ -317,6 +318,7 @@ class IoHelper:
         """
         if file_length >= 0 and not binary:
             src_content, src_length = '', 0
+            decoder = codecs.getincrementaldecoder(file_encoding)(errors)
             with PBar(
                 file_length, prefix='Reading file',
                 length=100, fill_l='━', fill_r='╺', erase=True, decimals=5
@@ -324,11 +326,12 @@ class IoHelper:
                 buf_reader = io.BufferedReader(file, buffer_size=262144000) # 250MB
                 while True:
                     byte_chunk = buf_reader.read(262144000)
-                    src_length += 262144000
                     if not byte_chunk:
                         break
+                    src_length += len(byte_chunk)
                     p_bar(src_length)
-                    src_content += byte_chunk.decode(file_encoding, errors)
+                    src_content += decoder.decode(byte_chunk)
+                src_content += decoder.decode(b'', final=True)
                 p_bar(file_length)
             return src_content
         if not binary:

@@ -192,6 +192,28 @@ class TestStdInHelper(TestCase):
                 with patch('cat_win.src.service.helper.iohelper.io.BufferedReader', lambda f, buffer_size: f):
                     self.assertEqual(IoHelper.read_file('dummy.txt', binary=False, file_length=3), 'abc')
 
+    def test_read_file_chunked_decode_split_multibyte(self):
+        class SplitBinaryFile:
+            def __init__(self):
+                self.chunks = iter([b'\xc3', b'\xa4Hello'])
+
+            def read(self, _size=-1):
+                return next(self.chunks, b'')
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_exc):
+                return False
+
+        with patch('cat_win.src.service.helper.iohelper.PBar', PBarMock):
+            with patch('builtins.open', return_value=SplitBinaryFile()):
+                with patch('cat_win.src.service.helper.iohelper.io.BufferedReader', lambda f, buffer_size: f):
+                    self.assertEqual(
+                        IoHelper.read_file('dummy.txt', binary=False, file_length=7),
+                        'äHello'
+                    )
+
     def test_yield_file(self):
         gen = IoHelper.yield_file(__file__)
         for line in gen:
