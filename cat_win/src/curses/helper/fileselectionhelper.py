@@ -454,6 +454,11 @@ def run_file_selection(
             if selected_idx[active_list] >= nav_y[active_list] + max_y - 1:
                 nav_y[active_list] = selected_idx[active_list] - max_y + 1
 
+        if key == b'_select_key_up':
+            key = b'_move_key_up'
+        elif key == b'_select_key_down':
+            key = b'_move_key_down'
+
         if key in MOVE_HOTKEYS:
             list_len = len(data_lists[active_list])
             if list_len == 0:
