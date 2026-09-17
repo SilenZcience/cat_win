@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file. <br>
 Start of documentation: 2023-02-16 / v1.1.0
 
+## [2.0.3] - TBA
+
+### Minor Changes
+
+- added `diff_strip_whitespace` element to the config menu to strip leading and trailing whitespace from the file contents when using the DiffViewer.
+
+### Bugfixes
+
+- fixed Crash when loading a files git history of a renamed file.
+- fixed Crash when visualizing an empty file.
+- fixed corrupted encoding on large files.
+
+
 ## [2.0.2] - 2026-08-22
 
 ### Minor Changes
