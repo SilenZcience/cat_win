@@ -173,6 +173,7 @@ def init(repl: bool = False) -> None:
         _ctx.u_args[ARGS_DEBUG],
         _ctx.u_args[ARGS_WATCH],
         _ctx.arg_parser.file_encoding,
+        _ctx.const_dic[DKW.DIFF_STRIP_WHITESPACE],
     )
     Editor.set_indentation(
         _ctx.const_dic[DKW.EDITOR_INDENTATION],

@@ -21,6 +21,7 @@ class DKW:
     STRINGS_DELIMETER = 'strings_delimeter'
     GREP_CONTEXT_LINES = 'grep_context_lines'
     GREP_QUERY_SEPARATOR = 'grep_query_separator'
+    DIFF_STRIP_WHITESPACE = 'diff_strip_whitespace'
     EDITOR_INDENTATION = 'editor_indentation'
     EDITOR_AUTO_INDENT = 'editor_auto_indent'
     HEX_EDITOR_COLUMNS = 'hex_editor_columns'

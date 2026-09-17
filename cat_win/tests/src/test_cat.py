@@ -65,6 +65,7 @@ class TestCat(TestCase):
             color_dic=dict(color_map),
             const_dic={
                 DKW.STRIP_COLOR_ON_PIPE: False,
+                DKW.DIFF_STRIP_WHITESPACE: False,
                 DKW.LARGE_FILE_SIZE: 100,
                 DKW.EDITOR_INDENTATION: '  ',
                 DKW.EDITOR_AUTO_INDENT: True,

@@ -113,10 +113,44 @@ class TestDiffViewer(TestCase):
         self.assertEqual(d.diff_files, ['a', 'b'])
         self.assertEqual(d.display_names, ['A', 'B'])
 
-        DiffViewer.set_flags(True, True, 'cp1252')
+        DiffViewer.set_flags(True, True, 'cp1252', True)
         self.assertTrue(DiffViewer.debug_mode)
         self.assertTrue(DiffViewer.watch_mode)
         self.assertEqual(DiffViewer.file_encoding, 'cp1252')
+        self.assertTrue(DiffViewer.strip_whitespace)
+        DiffViewer.set_flags(False, False, 'utf-8', False)
+        self.assertFalse(DiffViewer.strip_whitespace)
+
+    def test_normalize_lines(self):
+        DiffViewer.strip_whitespace = True
+        self.assertListEqual(
+            DiffViewer._normalize_lines(['  abc  ', '  def  ']),
+            ['abc', 'def']
+        )
+        DiffViewer.strip_whitespace = False
+        self.assertListEqual(
+            DiffViewer._normalize_lines(['  abc  ', '  def  ']),
+            ['  abc  ', '  def  ']
+        )
+
+    def test_setup_file_strip_whitespace(self):
+        DiffViewer.strip_whitespace = True
+        try:
+            with patch('cat_win.src.curses.diffviewer.IoHelper.read_file',
+                       side_effect=['  l1  \n  l2  ', '  r1  \n  r2  ']):
+                with patch('cat_win.src.curses.diffviewer.get_file_mtime',
+                           side_effect=[10, 20]):
+                    with patch('cat_win.src.curses.diffviewer.DifflibParser',
+                               return_value=DummyDifflibParser(
+                                   [DummyDiffItem('1', 'l1', 'r1', DifflibID.CHANGED)],
+                                   last_lineno=1)) as mock_parser:
+                        dv = DiffViewer([('a.txt', 'A'), ('b.txt', 'B')])
+        finally:
+            DiffViewer.strip_whitespace = False
+
+        args, _ = mock_parser.call_args
+        self.assertEqual(args[0], ['l1', 'l2'])
+        self.assertEqual(args[1], ['r1', 'r2'])
 
     def test_setup_file_success_and_error_branches(self):
         with patch('cat_win.src.curses.diffviewer.IoHelper.read_file', side_effect=['l1\nl2', 'r1\nr2']):

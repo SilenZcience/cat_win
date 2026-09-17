@@ -56,6 +56,8 @@ class DiffViewer:
 
     file_encoding = 'utf-8'
 
+    strip_whitespace = False
+
     def __init__(
             self, files: list,
             file_idxs: tuple = None, file_commit_hashes: tuple = (None, None)
@@ -105,6 +107,24 @@ class DiffViewer:
 
         self._setup_file()
 
+    @staticmethod
+    def _normalize_lines(lines: list) -> list:
+        """
+        strip leading and trailing whitespace from each line if
+        the strip_whitespace flag is enabled.
+
+        Parameters:
+        lines (list):
+            the lines to normalize
+
+        Returns:
+        (list):
+            the normalized lines
+        """
+        if DiffViewer.strip_whitespace:
+            return [line.strip() for line in lines]
+        return lines
+
     def _setup_file(self) -> None:
         """
         setup the diffviewer content screen by reading the given file.
@@ -139,6 +159,9 @@ class DiffViewer:
                 except OSError as exc:
                     text2 = []
                     self.display_names[1] = f'<GIT_ERROR> {str(exc)}'
+
+            text1 = DiffViewer._normalize_lines(text1)
+            text2 = DiffViewer._normalize_lines(text2)
 
             self._watch_text2 = text2
             self.difflibparser = self.difflibparser_bak = DifflibParser(
@@ -617,6 +640,7 @@ class DiffViewer:
             ).splitlines()
         except (OSError, UnicodeError):
             return False
+        new_text2 = DiffViewer._normalize_lines(new_text2)
         old_text2 = self._watch_text2
         self._watch_text2 = new_text2
         self._mtime_cache[0] = self._mtime_cache[1]
@@ -1404,7 +1428,7 @@ class DiffViewer:
             diffviewer._open()
 
     @staticmethod
-    def set_flags(debug_mode: bool, watch_mode: bool, file_encoding: str) -> None:
+    def set_flags(debug_mode: bool, watch_mode: bool, file_encoding: str, strip_whitespace: bool = False) -> None:
         """
         set the config flags for the Diffviewer
 
@@ -1415,7 +1439,10 @@ class DiffViewer:
             indicates if the diffviewer should watch for changes
         file_encoding (str):
             the file encoding to use when opening a file
+        strip_whitespace (bool):
+            indicates if whitespace should be stripped when diffing
         """
         DiffViewer.debug_mode = debug_mode
         DiffViewer.watch_mode = watch_mode
         DiffViewer.file_encoding = file_encoding
+        DiffViewer.strip_whitespace = strip_whitespace
