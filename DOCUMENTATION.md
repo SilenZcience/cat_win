@@ -1405,6 +1405,7 @@ Valid Options are:
 | strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the <a href="#--strings---strings">--strings, --strings</a> Parameter) | \| | \\n |
 | grep_context_lines | set the amount of context lines visible before and after every </br> grep-line when using <a href="#-g---grep">-g, --grep</a> | 5 | 0 |
 | grep_query_separator | define the separator string between all found queries when using <a href="#-g---grep">-G, --GREP</a> | \n | , |
+| diff_strip_whitespace | strip leading and trailing whitespace from the file contents when using the DiffViewer (<a href="#-?---diff">-?, --diff</a>) to ignore whitespace-only differences | true | false |
 | editor_indentation | set the Indentation used in the Editor (<a href="#----edit">-!, --edit</a>)</br> when pressing ↹ on an empty Line | <b>␣ ␣ ␣ ␣</b> | ↹ |
 | editor_auto_indent | set whether the Editor (<a href="#----edit">-!, --edit</a>) should auto indent or not | true | false |
 | hex_editor_columns | set the amount of columns per row in the HexEditor (<a href="#----hexedit">-#, --hexedit</a>) | 8 | 16 |
