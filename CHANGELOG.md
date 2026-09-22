@@ -14,6 +14,8 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fixed Crash when loading a files git history of a renamed file.
 - fixed Crash when visualizing an empty file.
 - fixed corrupted encoding on large files.
+- fixed --`nc`, --`nocolor` not working correctly when adding or deleting it inside of the cat-repl (cats).
+- fixed broken cat-repl (cats) behaviour on unix systems.
 
 
 ## [2.0.2] - 2026-08-22
