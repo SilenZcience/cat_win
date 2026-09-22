@@ -180,11 +180,19 @@ class TestCat(TestCase):
         ctx = self._mk_base_ctx(u_args=args)
         with patch.object(cat_module, '_ctx', ctx):
             with patch('cat_win.src.cat.CVis.remove_colors') as rm_colors:
-                with patch.object(cat_module, 'logger') as logger_m:
-                    cat_module.init_colors()
+                with patch('cat_win.src.cat.More.set_colors') as more_colors:
+                    with patch('cat_win.src.cat.Summary.set_colors') as sum_colors:
+                        with patch('cat_win.src.cat.PBar.set_colors') as pbar_colors:
+                            with patch('cat_win.src.cat.Converter.set_colors') as conv_colors:
+                                with patch.object(cat_module, 'logger') as logger_m:
+                                    cat_module.init_colors()
         self.assertTrue(all(v == '' for v in ctx.color_dic.values()))
         rm_colors.assert_called_once()
         logger_m.clear_colors.assert_called_once()
+        more_colors.assert_called_once_with(ctx.color_dic)
+        sum_colors.assert_called_once_with(ctx.color_dic)
+        pbar_colors.assert_called_once_with(ctx.color_dic)
+        conv_colors.assert_called_once_with(ctx.color_dic)
 
     def test_init_colors_uses_default_and_sets_logger_colors(self):
         args = self._mk_handle_args({ARGS_NOCOL: False, ARGS_DEBUG_LOG: False})
@@ -195,10 +203,18 @@ class TestCat(TestCase):
             with patch('cat_win.src.cat.os.isatty', return_value=True):
                 with patch('cat_win.src.cat.sys.stdout.fileno', return_value=1):
                     with patch('cat_win.src.cat.sys.stderr.fileno', return_value=2):
-                        with patch.object(cat_module, 'logger') as logger_m:
-                            cat_module.init_colors()
+                        with patch('cat_win.src.cat.More.set_colors') as more_colors:
+                            with patch('cat_win.src.cat.Summary.set_colors') as sum_colors:
+                                with patch('cat_win.src.cat.PBar.set_colors') as pbar_colors:
+                                    with patch('cat_win.src.cat.Converter.set_colors') as conv_colors:
+                                        with patch.object(cat_module, 'logger') as logger_m:
+                                            cat_module.init_colors()
         self.assertEqual(ctx.color_dic, ctx.default_color_dic)
         logger_m.set_colors.assert_called_once_with(ctx.default_color_dic)
+        more_colors.assert_called_once_with(ctx.default_color_dic)
+        sum_colors.assert_called_once_with(ctx.default_color_dic)
+        pbar_colors.assert_called_once_with(ctx.default_color_dic)
+        conv_colors.assert_called_once_with(ctx.default_color_dic)
 
     def test_init_calls_all_subsystem_setups(self):
         args = DummyStartupArgs(overrides={ARGS_DEBUG: True, ARGS_DEBUG_LOG: True, ARGS_STDIN: False, ARGS_WATCH: False}, ordered_args=[(ARGS_DEBUG, '-d')])
@@ -213,15 +229,11 @@ class TestCat(TestCase):
                                     with patch('cat_win.src.cat.Editor.set_flags') as ed_flags:
                                         with patch('cat_win.src.cat.HexEditor.set_flags') as hex_flags:
                                             with patch('cat_win.src.cat.More.set_flags') as more_flags:
-                                                with patch('cat_win.src.cat.More.set_colors') as more_colors:
-                                                    with patch('cat_win.src.cat.Visualizer.set_flags') as vis_flags:
-                                                        with patch('cat_win.src.cat.Summary.set_flags') as sum_flags:
-                                                            with patch('cat_win.src.cat.Summary.set_colors') as sum_colors:
-                                                                with patch('cat_win.src.cat.PBar.set_colors') as pbar_colors:
-                                                                    with patch('cat_win.src.cat.Converter.set_flags') as conv_flags:
-                                                                        with patch('cat_win.src.cat.Converter.set_colors') as conv_colors:
-                                                                            with patch.object(cat_module, 'logger') as logger_m:
-                                                                                cat_module.init(repl=False)
+                                                with patch('cat_win.src.cat.Visualizer.set_flags') as vis_flags:
+                                                    with patch('cat_win.src.cat.Summary.set_flags') as sum_flags:
+                                                        with patch('cat_win.src.cat.Converter.set_flags') as conv_flags:
+                                                            with patch.object(cat_module, 'logger') as logger_m:
+                                                                cat_module.init(repl=False)
         pre.assert_called_once_with(ctx)
         logger_m.set_log_to_file.assert_called_once_with(True)
         logger_m.set_level.assert_called_once_with(logger_m.DEBUG)
@@ -233,14 +245,10 @@ class TestCat(TestCase):
         ed_flags.assert_called_once()
         hex_flags.assert_called_once()
         more_flags.assert_called_once()
-        more_colors.assert_called_once_with(ctx.color_dic)
         # Signatures.init() uses lazy loading and is only called when signatures are needed, not during init
         vis_flags.assert_called_once()
         sum_flags.assert_called_once()
-        sum_colors.assert_called_once_with(ctx.color_dic)
-        pbar_colors.assert_called_once_with(ctx.color_dic)
         conv_flags.assert_called_once()
-        conv_colors.assert_called_once_with(ctx.color_dic)
 
     def test_handle_args_full_flow(self):
         args = self._mk_handle_args({ARGS_B64D: True, ARGS_SUM: True, ARGS_SSUM: False, ARGS_NUMBER: False, ARGS_LLENGTH: True})

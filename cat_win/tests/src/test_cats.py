@@ -113,10 +113,23 @@ class TestReplMain(TestCase):
             color_dic={CKW.REPL_PREFIX: '<RP>', CKW.RESET_ALL: '<RST>'},
         )
 
+    @staticmethod
+    def _iter_input(lines):
+        """
+        create a fake input() that yields the given lines, then raises EOFError.
+        """
+        lines = iter(lines)
+        def _fake_input(_prompt=''):
+            try:
+                return next(lines)
+            except StopIteration:
+                raise EOFError
+        return _fake_input
+
     def test_repl_main_command_and_text_flow(self):
         ctx = self._mk_ctx()
-        lines = ['!help\n', 'hello\n', '!exit\n']
-        with patch('cat_win.src.cats.IoHelper.get_stdin_content', return_value=iter(lines)):
+        lines = ['!help', 'hello', '!exit']
+        with patch('builtins.input', side_effect=self._iter_input(lines)):
             with patch('cat_win.src.cats.sys.stdin.fileno', return_value=0):
                 with patch('cat_win.src.cats.os.isatty', return_value=True):
                     with patch('cat_win.src.cats.ContentBuffer.from_lines', return_value='BUF') as from_lines:
@@ -154,8 +167,8 @@ class TestReplMain(TestCase):
 
     def test_repl_main_escaped_leading_bang_is_treated_as_text(self):
         ctx = self._mk_ctx()
-        lines = ['\\!help\n', '!exit\n']
-        with patch('cat_win.src.cats.IoHelper.get_stdin_content', return_value=iter(lines)):
+        lines = ['\\!help', '!exit']
+        with patch('builtins.input', side_effect=self._iter_input(lines)):
             with patch('cat_win.src.cats.sys.stdin.fileno', return_value=0):
                 with patch('cat_win.src.cats.os.isatty', return_value=True):
                     with patch('cat_win.src.cats.ContentBuffer.from_lines', return_value='BUF') as from_lines:
@@ -175,7 +188,7 @@ class TestReplMain(TestCase):
 
         with patch('cat_win.src.cats._calculate_line_prefix_spacing.cache_clear') as clear_lp:
             with patch('cat_win.src.cats._calculate_line_length_prefix_spacing.cache_clear') as clear_ll:
-                with patch('cat_win.src.cats.IoHelper.get_stdin_content', return_value=iter(['!add --num\n', '!exit\n'])):
+                with patch('builtins.input', side_effect=self._iter_input(['!add --num', '!exit'])):
                     with patch('cat_win.src.cats.sys.stdin.fileno', return_value=0):
                         with patch('cat_win.src.cats.os.isatty', return_value=True):
                             with patch('builtins.print'):
@@ -187,8 +200,8 @@ class TestReplMain(TestCase):
     def test_repl_main_output_unchanged(self):
         """Adapted from test_cat_repl_output_unchanged: basic text input should pass through unchanged."""
         ctx = self._mk_ctx()
-        lines = ['abc\n', 'xyz\n', '!exit\n']
-        with patch('cat_win.src.cats.IoHelper.get_stdin_content', return_value=iter(lines)):
+        lines = ['abc', 'xyz', '!exit']
+        with patch('builtins.input', side_effect=self._iter_input(lines)):
             with patch('cat_win.src.cats.sys.stdin.fileno', return_value=0):
                 with patch('cat_win.src.cats.os.isatty', return_value=True):
                     with patch('cat_win.src.cats.ContentBuffer.from_lines', return_value='BUF') as from_lines:
@@ -203,8 +216,8 @@ class TestReplMain(TestCase):
         """Adapted from test_cat_repl_unknown_param: unknown command should be reported."""
         ctx = self._mk_ctx()
         wrong_cmd = '!xyz'
-        lines = [wrong_cmd + '\n', '!exit\n']
-        with patch('cat_win.src.cats.IoHelper.get_stdin_content', return_value=iter(lines)):
+        lines = [wrong_cmd, '!exit']
+        with patch('builtins.input', side_effect=self._iter_input(lines)):
             with patch('cat_win.src.cats.sys.stdin.fileno', return_value=0):
                 with patch('cat_win.src.cats.os.isatty', return_value=True):
                     with patch('builtins.print') as p:
@@ -215,8 +228,8 @@ class TestReplMain(TestCase):
     def test_repl_main_help_param(self):
         """Adapted from test_cat_repl_help_param: !help should display help info."""
         ctx = self._mk_ctx()
-        lines = ['!help\n', '!exit\n']
-        with patch('cat_win.src.cats.IoHelper.get_stdin_content', return_value=iter(lines)):
+        lines = ['!help', '!exit']
+        with patch('builtins.input', side_effect=self._iter_input(lines)):
             with patch('cat_win.src.cats.sys.stdin.fileno', return_value=0):
                 with patch('cat_win.src.cats.os.isatty', return_value=True):
                     with patch('builtins.print') as p:
@@ -230,8 +243,8 @@ class TestReplMain(TestCase):
         """Adapted from test_cat_repl_add_param: !add command should apply parameters."""
         ctx = self._mk_ctx()
         ctx.arg_parser.set_args([(1, '-l'), (2, '-n')])
-        lines = ['abc\n', '!add -ln\n', 'abc\n', '!exit\n']
-        with patch('cat_win.src.cats.IoHelper.get_stdin_content', return_value=iter(lines)):
+        lines = ['abc', '!add -ln', 'abc', '!exit']
+        with patch('builtins.input', side_effect=self._iter_input(lines)):
             with patch('cat_win.src.cats.sys.stdin.fileno', return_value=0):
                 with patch('cat_win.src.cats.os.isatty', return_value=True):
                     with patch('cat_win.src.cats.ContentBuffer.from_lines', return_value='BUF'):
@@ -246,8 +259,8 @@ class TestReplMain(TestCase):
         ctx = self._mk_ctx(u_args=DummyReplArgs(overrides={ARGS_ONELINE: False, ARGS_B64D: False, ARGS_CLIP: False},
                                                active_args=[(1, '-l'), (2, '-n')]))
         ctx.arg_parser.set_args([(1, '-l')])
-        lines = ['abc\n', '!del -l\n', 'abc\n', '!exit\n']
-        with patch('cat_win.src.cats.IoHelper.get_stdin_content', return_value=iter(lines)):
+        lines = ['abc', '!del -l', 'abc', '!exit']
+        with patch('builtins.input', side_effect=self._iter_input(lines)):
             with patch('cat_win.src.cats.sys.stdin.fileno', return_value=0):
                 with patch('cat_win.src.cats.os.isatty', return_value=True):
                     with patch('cat_win.src.cats.ContentBuffer.from_lines', return_value='BUF'):
@@ -262,8 +275,8 @@ class TestReplMain(TestCase):
         ctx = self._mk_ctx()
         ctx.arg_parser.file_queries = [('test', False)]
         ctx.arg_parser.set_args([(1, '-l'), (2, '-n')])
-        lines = ['!see\n', '!exit\n']
-        with patch('cat_win.src.cats.IoHelper.get_stdin_content', return_value=iter(lines)):
+        lines = ['!see', '!exit']
+        with patch('builtins.input', side_effect=self._iter_input(lines)):
             with patch('cat_win.src.cats.sys.stdin.fileno', return_value=0):
                 with patch('cat_win.src.cats.os.isatty', return_value=True):
                     with patch('builtins.print') as p:
@@ -282,8 +295,8 @@ class TestReplMain(TestCase):
                 ctx.arg_parser.set_args([(1, '-l'), (2, '-n')])
         ctx.arg_parser.gen_arguments = _gen
 
-        lines = ['!clear\n', '!see\n', '!exit\n']
-        with patch('cat_win.src.cats.IoHelper.get_stdin_content', return_value=iter(lines)):
+        lines = ['!clear', '!see', '!exit']
+        with patch('builtins.input', side_effect=self._iter_input(lines)):
             with patch('cat_win.src.cats.sys.stdin.fileno', return_value=0):
                 with patch('cat_win.src.cats.os.isatty', return_value=True):
                     with patch('builtins.print') as p:
@@ -295,8 +308,8 @@ class TestReplMain(TestCase):
     def test_repl_main_exit(self):
         """Adapted from test_cat_repl_exit: !exit command should stop processing input."""
         ctx = self._mk_ctx()
-        lines = ['abc\n', '!exit\n', 'abc\n']
-        with patch('cat_win.src.cats.IoHelper.get_stdin_content', return_value=iter(lines)):
+        lines = ['abc', '!exit', 'abc']
+        with patch('builtins.input', side_effect=self._iter_input(lines)):
             with patch('cat_win.src.cats.sys.stdin.fileno', return_value=0):
                 with patch('cat_win.src.cats.os.isatty', return_value=True):
                     with patch('cat_win.src.cats.ContentBuffer.from_lines', return_value='BUF') as from_lines:
@@ -309,8 +322,8 @@ class TestReplMain(TestCase):
     def test_repl_main_cmd_escape(self):
         """Adapted from test_cat_repl_cmd_escape: escaped ! should be treated as text, not command."""
         ctx = self._mk_ctx()
-        lines = ['\\!exit\n', 'test\n', '!exit\n']
-        with patch('cat_win.src.cats.IoHelper.get_stdin_content', return_value=iter(lines)):
+        lines = ['\\!exit', 'test', '!exit']
+        with patch('builtins.input', side_effect=self._iter_input(lines)):
             with patch('cat_win.src.cats.sys.stdin.fileno', return_value=0):
                 with patch('cat_win.src.cats.os.isatty', return_value=True):
                     with patch('cat_win.src.cats.ContentBuffer.from_lines', return_value='BUF') as from_lines:
@@ -324,8 +337,8 @@ class TestReplMain(TestCase):
     def test_repl_main_cmd_escape_backslash(self):
         """Adapted from test_cat_repl_cmd_escape: multiple backslashes should be handled correctly."""
         ctx = self._mk_ctx()
-        lines = ['\\' * 5 + 'test\n', '!exit\n']
-        with patch('cat_win.src.cats.IoHelper.get_stdin_content', return_value=iter(lines)):
+        lines = ['\\' * 5 + 'test', '!exit']
+        with patch('builtins.input', side_effect=self._iter_input(lines)):
             with patch('cat_win.src.cats.sys.stdin.fileno', return_value=0):
                 with patch('cat_win.src.cats.os.isatty', return_value=True):
                     with patch('cat_win.src.cats.ContentBuffer.from_lines', return_value='BUF') as from_lines:

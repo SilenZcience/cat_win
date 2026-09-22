@@ -129,7 +129,8 @@ def show_unknown_args_suggestions(repl: bool = False) -> list:
 
 def init_colors() -> None:
     """
-    Set the active color dictionary based on output-mode flags.
+    Set the active color dictionary based on output-mode flags and
+    propagate it to the color-aware subsystems.
     """
     if _ctx.u_args[ARGS_NOCOL] or sys.stdout.closed or \
         (not os.isatty(sys.stdout.fileno()) and _ctx.const_dic[DKW.STRIP_COLOR_ON_PIPE]):
@@ -142,6 +143,10 @@ def init_colors() -> None:
         logger.clear_colors()
     else:
         logger.set_colors(_ctx.default_color_dic)
+    More.set_colors(_ctx.color_dic)
+    Summary.set_colors(_ctx.color_dic)
+    PBar.set_colors(_ctx.color_dic)
+    Converter.set_colors(_ctx.color_dic)
 
 
 def init(repl: bool = False) -> None:
@@ -196,19 +201,15 @@ def init(repl: bool = False) -> None:
     More.set_flags(
         _ctx.const_dic[DKW.MORE_STEP_LENGTH],
     )
-    More.set_colors(_ctx.color_dic)
     Visualizer.set_flags(
         _ctx.u_args[ARGS_DEBUG],
     )
     Summary.set_flags(
         _ctx.const_dic[DKW.SUMMARY_UNIQUE_ELEMENTS],
     )
-    Summary.set_colors(_ctx.color_dic)
-    PBar.set_colors(_ctx.color_dic)
     Converter.set_flags(
         _ctx.u_args[ARGS_DEBUG],
     )
-    Converter.set_colors(_ctx.color_dic)
 
 
 def handle_args(tmp_file_helper: TmpFileHelper) -> None:

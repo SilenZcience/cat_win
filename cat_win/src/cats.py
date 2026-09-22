@@ -3,6 +3,10 @@ repl
 """
 
 import os
+try:
+    import readline
+except ImportError:
+    pass
 import shlex
 import sys
 from time import monotonic
@@ -29,6 +33,7 @@ class ReplCommandHandler:
     """
 
     def __init__(self, ctx, refresh_colors, show_unknown_args) -> None:
+        self.ctx = ctx
         self._session_start = monotonic()
         self._u_args = ctx.u_args
         self._arg_parser = ctx.arg_parser
@@ -36,6 +41,13 @@ class ReplCommandHandler:
         self._show_unknown_args = show_unknown_args
         self.last_cmd = ''
         self.exit_repl = False
+        self.repl_prefix = ReplCommandHandler.build_repl_prefix(ctx)
+
+    @staticmethod
+    def build_repl_prefix(ctx) -> str:
+        _color = ctx.color_dic[CKW.REPL_PREFIX]
+        _reset = ctx.color_dic[CKW.RESET_ALL]
+        return f"\001{_color}\002>>> \001{_reset}\002" if (_color or _reset) else ">>> "
 
     def exec(self, cmd: str) -> bool:
         """
@@ -83,6 +95,7 @@ class ReplCommandHandler:
         self._u_args.add_args(self._arg_parser.get_args())
         self._show_unknown_args()
         self._refresh_colors()
+        self.repl_prefix = ReplCommandHandler.build_repl_prefix(self.ctx)
         added = [
             arg for _, arg in self._arg_parser.get_args()
         ] if self._arg_parser.get_args() else 'parameter(s)'
@@ -92,6 +105,7 @@ class ReplCommandHandler:
         self._arg_parser.gen_arguments([''] + cmd, True)
         self._u_args.delete_args(self._arg_parser.get_args())
         self._refresh_colors()
+        self.repl_prefix = ReplCommandHandler.build_repl_prefix(self.ctx)
         removed = [
             arg for _, arg in self._arg_parser.get_args()
         ] if self._arg_parser.get_args() else 'parameter(s)'
@@ -127,7 +141,6 @@ def repl_main(ctx, init_colors, show_unknown_args) -> None:
     show_unknown_args (function):
         Function to show the currently active unknown arguments.
     """
-    repl_prefix = f"{ctx.color_dic[CKW.REPL_PREFIX]}>>> {ctx.color_dic[CKW.RESET_ALL]}"
     oneline = ctx.u_args[ARGS_ONELINE]
 
     def _refresh_repl_colors() -> None:
@@ -141,15 +154,40 @@ def repl_main(ctx, init_colors, show_unknown_args) -> None:
         show_unknown_args=lambda: show_unknown_args(repl=True),
     )
     command_count = 0
+    isatty = os.isatty(sys.stdin.fileno())
 
     print(__project__, 'v' + __version__, 'REPL', '(' + __url__ + ')', end=' - ')
     print("Use 'catw' to handle files.")
     print("Type '!help' for more information.")
 
-    print(repl_prefix, end='', flush=True)
-    for i, line in enumerate(IoHelper.get_stdin_content(oneline)):
+    def _stdin_lines():
+        """
+        The readline-backed input() is only used for interactive (tty) sessions.
+        Otherwise use IoHelper.get_stdin_content() to read from stdin in a non-interactive way.
+
+        Yields:
+        line (str):
+            the lines read from stdin
+        """
+        if isatty:
+            while True:
+                try:
+                    line = input(cmd.repl_prefix)
+                except EOFError:
+                    return
+                if not line:
+                    return
+                yield line
+                if oneline:
+                    return
+        else:
+            yield from IoHelper.get_stdin_content(oneline)
+
+    if not isatty:
+        print(cmd.repl_prefix, end='', flush=True)
+    for i, line in enumerate(_stdin_lines()):
         stripped_line = line.rstrip('\r\n')
-        if not os.isatty(sys.stdin.fileno()):
+        if not isatty:
             print(stripped_line)
         if cmd.exec(stripped_line):
             command_count += 1
@@ -165,5 +203,5 @@ def repl_main(ctx, init_colors, show_unknown_args) -> None:
                 if ctx.u_args[ARGS_CLIP]:
                     Clipboard.put(remove_ansi_codes_from_line(Clipboard.clipboard))
                     Clipboard.clear()
-        if not oneline:
-            print(repl_prefix, end='', flush=True)
+        if not oneline and not isatty:
+            print(cmd.repl_prefix, end='', flush=True)
