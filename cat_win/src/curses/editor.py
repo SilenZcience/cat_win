@@ -14,7 +14,7 @@ import re
 import signal
 import sys
 
-from cat_win.src.const.escapecodes import ESC_CODE
+from cat_win.src.const.escapecodes import ESC_CODE, DECSCUSR_CURSOR_STYLE_STEADY
 from cat_win.src.const.regex import compile_re
 from cat_win.src.curses.helper.diffviewerhelper import is_special_character
 from cat_win.src.curses.helper.editorhelper import (
@@ -56,6 +56,8 @@ class Editor:
     loading_failed = False
     special_indentation = '\t'
     auto_indent = False
+
+    cursor_style = 'bar'
 
     save_with_alt = False
     debug_mode = False
@@ -1701,6 +1703,7 @@ class Editor:
         if on_windows_os:
             return not success
         # only callable on UNIX
+        self._set_terminal_cursor_style()
         curses.endwin()
         os.kill(os.getpid(), signal.SIGSTOP)
         self._init_screen()
@@ -2376,6 +2379,27 @@ class Editor:
                             self._SYNTAX_COLOR_IDS[token_type], curses_color + color_offset, bg_color
                         )
 
+    @staticmethod
+    def _set_terminal_cursor_style(style: str = 'default') -> None:
+        """
+        set the terminal's cursor style via DECSCUSR.
+
+        Parameters:
+        style (str):
+            the style to set the cursor to. Can be one of:
+            - 'default' (terminal default)
+            - 'block' (block cursor)
+            - 'underline' (underline cursor)
+            - 'bar' (bar cursor)
+        """
+        try:
+            sys.stdout.write(DECSCUSR_CURSOR_STYLE_STEADY.get(
+                style, DECSCUSR_CURSOR_STYLE_STEADY['default']
+            ))
+            sys.stdout.flush()
+        except (OSError, ValueError):
+            pass
+
     def _init_screen(self) -> None:
         """
         init and define curses
@@ -2446,6 +2470,7 @@ class Editor:
                 curses.init_pair(10, curses.COLOR_BLUE       , bg_color       )
         curses.raw()
         self.curse_window.nodelay(False)
+        self._set_terminal_cursor_style(Editor.cursor_style)
 
     def _open(self, fg: bool = False) -> None:
         """
@@ -2495,6 +2520,7 @@ class Editor:
             except Exception as exc:
                 logger(f"Error while closing file: {exc}", priority=logger.ERROR)
             curses.endwin()
+            self._set_terminal_cursor_style()
 
     @classmethod
     def open(cls, files: list, skip_binary: bool = False, fg_state = None) -> bool:
