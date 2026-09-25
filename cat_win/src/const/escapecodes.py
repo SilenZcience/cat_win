@@ -86,10 +86,10 @@ def cursor_move_x(x: int, direction: str) -> str:
         the escape code
     """
     map_direction = {
-        'up':    'A',
-        'down':  'B',
+        'up'   : 'A',
+        'down' : 'B',
         'right': 'C',
-        'left':  'D',
+        'left' : 'D',
     }
     return f"{ESC_CODE}[{x}{map_direction.get(direction, 'A')}"
 
@@ -122,3 +122,14 @@ ERASE_SCREEN             = f"{ESC_CODE}[2J"
 ERASE_LINE_FROM_CURSOR   = f"{ESC_CODE}[0K"
 ERASE_LINE_TO_CURSOR     = f"{ESC_CODE}[1K"
 ERASE_LINE               = f"{ESC_CODE}[2K"
+
+DECSCUSR_STYLE_DEFAULT   = f"{ESC_CODE}[0 q"
+DECSCUSR_STYLE_BLOCK     = f"{ESC_CODE}[2 q"
+DECSCUSR_STYLE_UNDERLINE = f"{ESC_CODE}[4 q"
+DECSCUSR_STYLE_BAR       = f"{ESC_CODE}[6 q"
+DECSCUSR_CURSOR_STYLE_STEADY = {
+    'default'  : DECSCUSR_STYLE_DEFAULT,
+    'block'    : DECSCUSR_STYLE_BLOCK,
+    'underline': DECSCUSR_STYLE_UNDERLINE,
+    'bar'      : DECSCUSR_STYLE_BAR,
+}
