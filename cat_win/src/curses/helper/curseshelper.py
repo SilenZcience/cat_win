@@ -1,6 +1,9 @@
 """
-editorhelper
+curseshelper
 """
+
+import contextlib
+import os
 
 
 UNIFY_HOTKEYS = {
@@ -240,6 +243,29 @@ def frepr(string: str) -> str:
     format repr
     """
     return ''.join(ESCAPE_MAP.get(c, c) for c in string)
+
+
+@contextlib.contextmanager
+def hide_windows_terminal_session():
+    """
+    hide the Windows Terminal session id while
+    the curses console is initialized.
+
+    windows-curses 2.4.x recognizes Windows Terminal by the environment
+    variable 'WT_SESSION' and switches its rendering into ANSI mode
+    (pdcscrn.c: pdc_wt / pdc_ansi).
+    I want my acrylic background tho instead of plain black...
+
+    Yields:
+    (None):
+        while 'WT_SESSION' is not visible for the C extension
+    """
+    session_id = os.environ.pop('WT_SESSION', None)
+    try:
+        yield
+    finally:
+        if session_id is not None:
+            os.environ['WT_SESSION'] = session_id
 
 
 class Position:

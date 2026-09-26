@@ -14,10 +14,10 @@ import re
 import signal
 import sys
 
-from cat_win.src.const.escapecodes import ESC_CODE, DECSCUSR_CURSOR_STYLE_STEADY
+from cat_win.src.const.escapecodes import ESC_CODE, DECSCUSR_CURSOR_STYLE
 from cat_win.src.const.regex import compile_re
 from cat_win.src.curses.helper.diffviewerhelper import is_special_character
-from cat_win.src.curses.helper.editorhelper import (
+from cat_win.src.curses.helper.curseshelper import (
     ACTION_HOTKEYS,
     FUNCTION_HOTKEYS,
     HEX_BYTE_KEYS,
@@ -29,7 +29,8 @@ from cat_win.src.curses.helper.editorhelper import (
     UNIFY_HOTKEYS,
     History,
     Position,
-    frepr
+    frepr,
+    hide_windows_terminal_session
 )
 from cat_win.src.curses.helper.editorsearchhelper import (
     _SearchIterBase,
@@ -57,7 +58,7 @@ class Editor:
     special_indentation = '\t'
     auto_indent = False
 
-    cursor_style = 'bar'
+    cursor_style = 'bar_blink'
 
     save_with_alt = False
     debug_mode = False
@@ -2399,19 +2400,19 @@ class Editor:
             - 'underline' (underline cursor)
             - 'bar' (bar cursor)
         """
-        try:
-            sys.stdout.write(DECSCUSR_CURSOR_STYLE_STEADY.get(
-                style, DECSCUSR_CURSOR_STYLE_STEADY['default']
-            ))
-            sys.stdout.flush()
-        except (OSError, ValueError):
-            pass
+        code = DECSCUSR_CURSOR_STYLE.get(
+            style, DECSCUSR_CURSOR_STYLE['default']
+        )
+        # on Windows the sequence has to go into the *active* screen buffer,
+        # since sys.stdout still points at the original buffer of the console
+        IoHelper.write_cs_to_console_buffer(code)
 
     def _init_screen(self) -> None:
         """
         init and define curses
         """
-        self.curse_window = curses.initscr()
+        with hide_windows_terminal_session():
+            self.curse_window = curses.initscr()
 
         # Turn off echoing of keys, and enter cbreak mode,
         # where no buffering is performed on keyboard input

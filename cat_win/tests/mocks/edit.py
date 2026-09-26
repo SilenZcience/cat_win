@@ -2,7 +2,7 @@
 edit
 """
 
-from cat_win.src.curses.helper.editorhelper import Position
+from cat_win.src.curses.helper.curseshelper import Position
 
 def getxymax(*_, **__) -> tuple:
     return (30, 120)

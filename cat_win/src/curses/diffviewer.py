@@ -17,14 +17,15 @@ import time
 from cat_win.src.const.escapecodes import ESC_CODE
 from cat_win.src.const.regex import RE_CUTOFF
 from cat_win.src.curses.helper.diffviewerhelper import DifflibID, DifflibParser
-from cat_win.src.curses.helper.editorhelper import (
+from cat_win.src.curses.helper.curseshelper import (
     ACTION_HOTKEYS,
     FUNCTION_HOTKEYS,
     MOVE_HOTKEYS,
     SCROLL_HOTKEYS,
     UNIFY_HOTKEYS,
     Position,
-    frepr
+    frepr,
+    hide_windows_terminal_session
 )
 from cat_win.src.curses.helper.editorsearchhelper import \
     search_iter_diff_factory
@@ -1246,7 +1247,8 @@ class DiffViewer:
         """
         init and define curses
         """
-        self.curse_window = curses.initscr()
+        with hide_windows_terminal_session():
+            self.curse_window = curses.initscr()
         curses.curs_set(0)
 
         # Turn off echoing of keys, and enter cbreak mode,

@@ -8,7 +8,7 @@ from cat_win.src.curses import diffviewer as dv_module
 if dv_module.CURSES_MODULE_ERROR:
     setattr(dv_module, 'curses', None)
 from cat_win.src.curses.diffviewer import DiffViewer
-from cat_win.src.curses.helper.editorhelper import Position
+from cat_win.src.curses.helper.curseshelper import Position
 from cat_win.src.curses.helper.diffviewerhelper import DifflibID
 from cat_win.src.persistence import viewstate
 

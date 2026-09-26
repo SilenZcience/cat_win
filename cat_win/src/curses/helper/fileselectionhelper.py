@@ -13,7 +13,7 @@ except ImportError:
     CURSES_MODULE_ERROR = True
 
 from cat_win.src.const.escapecodes import ESC_CODE
-from cat_win.src.curses.helper.editorhelper import ACTION_HOTKEYS, MOVE_HOTKEYS
+from cat_win.src.curses.helper.curseshelper import ACTION_HOTKEYS, MOVE_HOTKEYS
 from cat_win.src.curses.helper.githelper import GitHelper
 
 

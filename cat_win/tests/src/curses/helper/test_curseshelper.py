@@ -5,16 +5,16 @@ import os
 import sys
 import types
 
-from cat_win.src.curses.helper import editorhelper
-if not hasattr(editorhelper, 'curses'):
-    setattr(editorhelper, 'curses', None)
-from cat_win.src.curses.helper.editorhelper import Position, History, frepr
+from cat_win.src.curses.helper import curseshelper
+if not hasattr(curseshelper, 'curses'):
+    setattr(curseshelper, 'curses', None)
+from cat_win.src.curses.helper.curseshelper import Position, History, frepr
 from cat_win.tests.mocks.edit import EditorHistoryMock
 
 mm = MagicMock()
 
-@patch('cat_win.src.curses.helper.editorhelper.curses', mm)
-class TestEditorHelper(TestCase):
+@patch('cat_win.src.curses.helper.curseshelper.curses', mm)
+class TestCursesHelper(TestCase):
     def test_frepr(self):
         self.assertEqual(frepr('test'), 'test')
         self.assertEqual(frepr('test\ntest'), 'test\\ntest')
@@ -27,10 +27,10 @@ class TestEditorHelper(TestCase):
         pos.set_pos((7, 11))
         self.assertEqual(pos.get_pos(), (7, 11))
 
-    def _load_editorhelper_module(self, module_name, modules):
+    def _load_curseshelper_module(self, module_name, modules):
         file_path = os.path.normpath(os.path.join(
             os.path.dirname(__file__),
-            '..', '..', '..', '..', 'src', 'curses', 'helper', 'editorhelper.py'
+            '..', '..', '..', '..', 'src', 'curses', 'helper', 'curseshelper.py'
         ))
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
@@ -48,9 +48,9 @@ class TestEditorHelper(TestCase):
 
         file_path = os.path.normpath(os.path.join(
             os.path.dirname(__file__),
-            '..', '..', '..', '..', 'src', 'curses', 'helper', 'editorhelper.py'
+            '..', '..', '..', '..', 'src', 'curses', 'helper', 'curseshelper.py'
         ))
-        spec = importlib.util.spec_from_file_location('editorhelper_cov_no_curses', file_path)
+        spec = importlib.util.spec_from_file_location('curseshelper_cov_no_curses', file_path)
         module = importlib.util.module_from_spec(spec)
         with patch('builtins.__import__', side_effect=_fake_import):
             spec.loader.exec_module(module)
@@ -58,7 +58,7 @@ class TestEditorHelper(TestCase):
         self.assertFalse(hasattr(module, 'curses'))
 
 
-@patch('cat_win.src.curses.helper.editorhelper.curses', mm)
+@patch('cat_win.src.curses.helper.curseshelper.curses', mm)
 class TestHistory(TestCase):
     def _mk(self, stack_size=20):
         return History(stack_size=stack_size), EditorHistoryMock()
@@ -194,7 +194,7 @@ class TestHistory(TestCase):
 
     def test_undo_asserts_when_reverse_action_missing(self):
         history, editor = self._mk()
-        broken_action = editorhelper._Action(
+        broken_action = curseshelper._Action(
             b'_not_mapped',
             False,
             (0, 0), (0, 1),

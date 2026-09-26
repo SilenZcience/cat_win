@@ -448,6 +448,43 @@ class IoHelper:
                 raise OSError('Not all bytes could be written to the file.')
         return src_file
 
+    @staticmethod
+    def write_cs_to_console_buffer(text: str) -> bool:
+        """
+        write an escape sequence into the active console screen buffer.
+
+        windows-curses (PDCurses) creates a new screen buffer,
+        while the handle behind sys.stdout stays bound to the original.
+        'CONOUT$' always refers to the active buffer being rendered.
+
+        Parameters:
+        text (str):
+            escape sequence to write
+            (DECSCUSR sequence from DECSCUSR_CURSOR_STYLE - escapecodes)
+
+        Returns:
+        (bool):
+            True if the sequence was written to the active screen buffer
+        """
+        if not on_windows_os:
+            try:
+                sys.stdout.write(text)
+                sys.stdout.flush()
+                return True
+            except (OSError, ValueError):
+                return False
+        try:
+            import msvcrt
+            set_console_mode = ctypes.windll.kernel32.SetConsoleMode
+            set_console_mode.argtypes = [ctypes.c_void_p, ctypes.c_ulong]
+            with open('CONOUT$', 'w', encoding='utf-8') as console:
+# 0x0007 is ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING
+                set_console_mode(msvcrt.get_osfhandle(console.fileno()), 0x0007)
+                console.write(text)
+            return True
+        except OSError:
+            return False
+
 
     @staticmethod
     def get_stdin_content(one_line: bool = False, raw: bool = False):
