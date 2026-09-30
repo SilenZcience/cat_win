@@ -3,11 +3,10 @@ from unittest.mock import patch
 import os
 
 from cat_win.src.const.colorconstants import CKW
+from cat_win.tests.fixtures import create_sample_file
 from cat_win.tests.mocks.std import StdOutMock
 from cat_win.src.domain.file import File
 from cat_win.src.service.summary import Summary, _unique_list
-
-test_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'texts', 'test.txt')
 
 
 class TestSummary(TestCase):
@@ -72,6 +71,7 @@ Lines (Sum): 111
             self.assertEqual(fake_out.getvalue(), output)
 
     def test_show_wordcount(self):
+        crlf_file_path = create_sample_file(self, '\r\n')
         output = r"""
 :: 5
 is: 4
@@ -103,7 +103,7 @@ following: 1
 <Sum>: 42
 """
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            Summary.show_wordcount([File(test_file_path, '')], 'utf-8')
+            Summary.show_wordcount([File(crlf_file_path, '')], 'utf-8')
             self.assertIn(output, fake_out.getvalue())
 
     def test_show_wordcount_empty(self):
@@ -112,6 +112,7 @@ following: 1
             self.assertEqual('The word count could not be calculated.\n', fake_out.getvalue())
 
     def test_show_charcount(self):
+        crlf_file_path = create_sample_file(self, '\r\n')
         output = r"""
 ' ': 23
 i: 15
@@ -161,7 +162,7 @@ x: 1
 <Sum>: 181
 """
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            Summary.show_charcount([File(test_file_path, '')], 'utf-8')
+            Summary.show_charcount([File(crlf_file_path, '')], 'utf-8')
             self.assertIn(output, fake_out.getvalue())
 
     def test_show_charcount_empty(self):

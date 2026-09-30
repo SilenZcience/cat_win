@@ -5,15 +5,16 @@ import os
 
 from cat_win.src.const.colorconstants import CKW
 from cat_win.src.domain.file import File
+from cat_win.tests.fixtures import create_sample_file
 from cat_win.tests.mocks.error import ErrorDefGen
 from cat_win.src.service.rawviewer import get_display_char_gen, get_raw_view_lines_gen
 
 
-test_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'texts', 'test.txt')
-
-
 class TestRawViewer(TestCase):
     maxDiff = None
+
+    def setUp(self):
+        self.crlf_file_path = create_sample_file(self, '\r\n')
 
     @staticmethod
     def _ctx(path: str, colors: dict = None, encoding: str = 'utf-8', truncate: list = None):
@@ -65,7 +66,7 @@ Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text\x20\x20\
 000000B0 20 61 20 44 75 70 6C 69 63 61 74 65 21          #   a   D u p l i c a t e !"""
 
         self.assertEqual(
-            '\n'.join(get_raw_view_lines_gen(self._ctx(test_file_path), 0, 'ERROR')),
+            '\n'.join(get_raw_view_lines_gen(self._ctx(self.crlf_file_path), 0, 'ERROR')),
             expected_result
         )
 
@@ -86,7 +87,7 @@ Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text\x20\x20\
 000000B0 20 61 20 44 75 70 6c 69 63 61 74 65 21          #   a   D u p l i c a t e !"""
 
         self.assertEqual(
-            '\n'.join(get_raw_view_lines_gen(self._ctx(test_file_path), 0, 'x')),
+            '\n'.join(get_raw_view_lines_gen(self._ctx(self.crlf_file_path), 0, 'x')),
             expected_result
         )
 
@@ -107,7 +108,7 @@ Address  00       01       02       03       04       05       06       07      
 000000B0 00100000 01100001 00100000 01000100 01110101 01110000 01101100 01101001 01100011 01100001 01110100 01100101 00100001                            #   a   D u p l i c a t e !"""
 
         self.assertEqual(
-            '\n'.join(get_raw_view_lines_gen(self._ctx(test_file_path), 0, 'b')),
+            '\n'.join(get_raw_view_lines_gen(self._ctx(self.crlf_file_path), 0, 'b')),
             expected_result
         )
 
@@ -129,7 +130,7 @@ Address  00       01       02       03       04       05       06       07      
 
         self.assertEqual(
             '\n'.join(get_raw_view_lines_gen(
-                self._ctx(test_file_path, {
+                self._ctx(self.crlf_file_path, {
                     CKW.RAWVIEWER: '*',
                     CKW.RESET_ALL: '!',
                 }),
@@ -155,7 +156,7 @@ Address  00       01       02       03       04       05       06       07      
 
     def test_encoding_error(self):
         result = '\n'.join(get_raw_view_lines_gen(
-            self._ctx(test_file_path, encoding='utf-16'),
+            self._ctx(self.crlf_file_path, encoding='utf-16'),
             0,
             'X'
         ))
@@ -171,7 +172,7 @@ Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text\x20\x20\
 The raw file content was truncated to slice(2, 8, None). The address information could be wrong."""
         with patch('cat_win.src.service.helper.iohelper.IoHelper.read_file', lambda *_: b'1234567890'):
             result = '\n'.join(get_raw_view_lines_gen(
-                self._ctx(test_file_path, truncate=[2, 8]),
+                self._ctx(self.crlf_file_path, truncate=[2, 8]),
                 0,
                 'X'
             ))

@@ -35,9 +35,6 @@ jobs:
           - os: ubuntu-22.04
             python-version: '3.7'
     steps:
-      - name: Set Windows Line Ending
-        run: |
-          git config --global core.autocrlf true
       - name: Git Checkout
         uses: actions/checkout@v6
         with:

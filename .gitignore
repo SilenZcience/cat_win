@@ -70,6 +70,7 @@ MANIFEST
 reports/
 
 *.bin
+!cat_win/tests/resources/*.bin
 
 # development files
 debug/*

@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
-import os
 
+from cat_win.tests.fixtures import create_sample_file
 from cat_win.tests.mocks.std import StdOutMock
 from cat_win.src.const.colorconstants import CKW
 from cat_win.src.service.checksum import get_checksum_from_file, print_checksum
@@ -9,11 +9,11 @@ from cat_win.src.service.checksum import get_checksum_from_file, print_checksum
 # sys.path.append('../cat_win')
 
 
-test_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'texts', 'test.txt')
-
-
 class TestChecksum(TestCase):
     maxDiff = None
+
+    def setUp(self):
+        self.test_file_path = create_sample_file(self, '\r\n')
 
     def test_checksum(self):
         color_dic = {CKW.CHECKSUM: '', CKW.RESET_ALL: ''}
@@ -26,7 +26,7 @@ class TestChecksum(TestCase):
         expected_output += '\tSHA512:  bf35256e790288a6dbf93b7327e1f97840349e0490'
         expected_output += 'b48848273663d34ad493e73a325df6725d7b0d5eb680d751bfe3c'
         expected_output += 'c49bd82ce9e8527412ce2cc8355a391a1\n'
-        self.assertEqual(get_checksum_from_file(test_file_path, color_dic), expected_output)
+        self.assertEqual(get_checksum_from_file(self.test_file_path, color_dic), expected_output)
 
     def test_checksum_colored(self):
         color_dic = {CKW.CHECKSUM: 'X', CKW.RESET_ALL: 'Y'}
@@ -39,7 +39,7 @@ class TestChecksum(TestCase):
         expected_output += '\tXSHA512:  bf35256e790288a6dbf93b7327e1f97840349e0490b'
         expected_output += '48848273663d34ad493e73a325df6725d7b0d5eb680d751bfe3cc49'
         expected_output += 'bd82ce9e8527412ce2cc8355a391a1Y\n'
-        self.assertEqual(get_checksum_from_file(test_file_path, color_dic), expected_output)
+        self.assertEqual(get_checksum_from_file(self.test_file_path, color_dic), expected_output)
 
     def test_checksum_invalid_file(self):
         self.assertIn(
@@ -49,7 +49,7 @@ class TestChecksum(TestCase):
 
     def test_print_checksum(self):
         color_dic = {CKW.CHECKSUM: 'X', CKW.RESET_ALL: 'Y'}
-        expected_output = f"XChecksum of '{test_file_path}':Y\n"
+        expected_output = f"XChecksum of '{self.test_file_path}':Y\n"
         expected_output += '\tXCRC32:   C7222F64Y\n'
         expected_output += '\tXMD5:     0f85f8d2b6783c06d40755ab54906862Y\n'
         expected_output += '\tXSHA1:    1c50f01c5be5fc4795817e14f5deccbd51bf0934Y\n'
@@ -59,5 +59,5 @@ class TestChecksum(TestCase):
         expected_output += '48848273663d34ad493e73a325df6725d7b0d5eb680d751bfe3cc49'
         expected_output += 'bd82ce9e8527412ce2cc8355a391a1Y\n\n'
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            print_checksum(test_file_path, color_dic)
+            print_checksum(self.test_file_path, color_dic)
             self.assertEqual(fake_out.getvalue(), expected_output)

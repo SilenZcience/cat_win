@@ -4,6 +4,7 @@ import os
 
 from cat_win.src import cat
 from cat_win.src.domain.appcontext import AppContext
+from cat_win.tests.fixtures import create_sample_file
 from cat_win.tests.mocks.logger import LoggerStub
 from cat_win.tests.mocks.std import StdInMock, StdOutMock
 from cat_win.src.persistence.cconfig import CConfig
@@ -247,8 +248,8 @@ This Line is a Duplicate!
             cat.main()
             self.assertEqual(expected_output, fake_out.getvalue())
 
-    @patch('sys.argv', ['<CAT>', test_file_path, '--peek', '--hexview'])
     def test_cat_output_raw(self):
+        crlf_file_path = create_sample_file(self, '\r\n')
         expected_output = """\
 Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20
 00000000 53 61 6d 70 6c 65 20 54 65 78 74 3a 0d 0a 54 68 # S a m p l e   T e x t : ␍ ␤ T h
@@ -266,9 +267,10 @@ Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text\x20\x20\
 000000B0 20 61 20 44 75 70 6c 69 63 61 74 65 21          #   a   D u p l i c a t e !
 
 """
-        with patch('sys.stdout', new=StdOutMock()) as fake_out:
-            cat.main()
-            self.assertEqual(expected_output, '\n'.join(fake_out.getvalue().split('\n')[1:]))
+        with patch('sys.argv', ['<CAT>', crlf_file_path, '--peek', '--hexview']):
+            with patch('sys.stdout', new=StdOutMock()) as fake_out:
+                cat.main()
+                self.assertEqual(expected_output, '\n'.join(fake_out.getvalue().split('\n')[1:]))
 
     @patch('sys.argv', ['<CAT>', test_binary])
     def test_cat_output_binary(self):

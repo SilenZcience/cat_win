@@ -6,6 +6,7 @@ import logging
 import os
 from types import SimpleNamespace
 
+from cat_win.tests.fixtures import create_temp_file, sample_text
 from cat_win.tests.mocks.std import StdInMock
 from cat_win.tests.mocks.logger import LoggerStub
 from cat_win.tests.mocks.pbar import PBarMock
@@ -14,7 +15,6 @@ from cat_win.src.service.helper.iohelper import IoHelper, StatusLogger, create_f
 
 
 test_file_dir = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'texts')
-test_file_path  = os.path.join(test_file_dir, 'test.txt')
 test_file_path_empty = os.path.join(test_file_dir, 'test_empty.txt')
 test_file_path_oneline = os.path.join(test_file_dir, 'test_oneline.txt')
 
@@ -259,10 +259,16 @@ class TestStdInHelper(TestCase):
             self.assertEqual(list(IoHelper.yield_file('dummy', binary=True)), [65, 66])
 
     def test_get_newline(self):
-        self.assertEqual(IoHelper.get_newline(test_file_path), '\r\n')
+        crlf_file = create_temp_file(self, sample_text('\r\n'))
+        lf_file = create_temp_file(self, sample_text('\n'))
+
+        self.assertEqual(IoHelper.get_newline(crlf_file), '\r\n')
+        self.assertEqual(IoHelper.get_newline(lf_file), '\n')
+        self.assertEqual(IoHelper.get_newline(crlf_file, 'x'), '\r\n')
+        self.assertEqual(IoHelper.get_newline(lf_file, 'x'), '\n')
+
         self.assertEqual(IoHelper.get_newline(test_file_path_empty), '\n')
         self.assertEqual(IoHelper.get_newline(test_file_path_oneline), '\n')
-        self.assertEqual(IoHelper.get_newline(test_file_path, 'x'), '\r\n')
         self.assertEqual(IoHelper.get_newline(test_file_path_empty, 'x'), 'x')
         self.assertEqual(IoHelper.get_newline(test_file_path_oneline, 'x'), 'x')
 
