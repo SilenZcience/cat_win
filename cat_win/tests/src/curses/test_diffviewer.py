@@ -1,5 +1,6 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
+import os
 import runpy
 import importlib
 
@@ -17,16 +18,18 @@ from cat_win.tests.mocks.diffviewer import (
     DummyDifflibParser,
     DummyWindow,
 )
+from cat_win.tests.mocks.curses import CursesMock
 from cat_win.tests.mocks.logger import LoggerStub
 
 
-mm = MagicMock()
-mm.A_UNDERLINE = 1
-mm.error = Exception
-mm.BUTTON1_PRESSED = 1
-mm.BUTTON4_PRESSED = 2
-mm.BUTTON5_PRESSED = 4
-mm.COLORS = 255
+mm = CursesMock(
+    A_UNDERLINE=1,
+    error=Exception,
+    BUTTON1_PRESSED=1,
+    BUTTON4_PRESSED=2,
+    BUTTON5_PRESSED=4,
+    COLORS=255
+)
 
 logger = LoggerStub()
 
@@ -34,6 +37,9 @@ logger = LoggerStub()
 @patch('cat_win.src.curses.helper.fileselectionhelper.curses', mm)
 @patch('cat_win.src.curses.diffviewer.curses', mm)
 class TestDiffViewer(TestCase):
+    def setUp(self):
+        mm.reset()
+
     def _mk_viewer(self):
         viewer = DiffViewer.__new__(DiffViewer)
         viewer.curse_window = DummyWindow()
@@ -514,6 +520,23 @@ class TestDiffViewer(TestCase):
         with patch('cat_win.src.curses.diffviewer.os.isatty', return_value=False):
             dv._init_screen()
         self.assertEqual(dv._get_color(1), 99)
+
+    def test_init_screen_hides_wt_session_from_curses(self):
+        dv = self._mk_viewer()
+        dv.curse_window = DummyWindow()
+        mm.COLORS = 16
+        visible_during_initscr = []
+
+        def initscr_side_effect(*_args, **_kwargs):
+            visible_during_initscr.append(os.environ.get('WT_SESSION'))
+            return dv.curse_window
+
+        mm.initscr.side_effect = initscr_side_effect
+        with patch.dict(os.environ, {'WT_SESSION': 'session-id'}, clear=False):
+            dv._init_screen()
+            session_after_init = os.environ.get('WT_SESSION')
+        self.assertEqual(visible_during_initscr, [None])
+        self.assertEqual(session_after_init, 'session-id')
 
     def test_move_helpers_and_ensure_visible_extra(self):
         dv = self._mk_viewer()

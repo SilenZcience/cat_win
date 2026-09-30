@@ -1,9 +1,11 @@
 from unittest import TestCase
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch, mock_open
+import contextlib
 import inspect
 import io
 import logging
 import os
+import sys
 from types import SimpleNamespace
 
 from cat_win.tests.fixtures import create_temp_file, sample_text
@@ -23,6 +25,9 @@ stdin_mock = StdInMock()
 
 @patch('sys.stdin', stdin_mock)
 class TestStdInHelper(TestCase):
+    def setUp(self):
+        stdin_mock.set_content('')
+
     def test_status_logger_formatter_and_get_color(self):
         sl = StatusLogger()
         try:
@@ -475,3 +480,105 @@ class TestStdInHelper(TestCase):
         mock_dup.assert_not_called()
         mock_open.assert_not_called()
         mock_dup2.assert_not_called()
+
+def _fake_console_patches():
+    """
+    create the patches needed to fake the Windows console environment
+    of IoHelper.write_cs_to_console_buffer.
+
+    'ctypes.windll' only exists on Windows and 'msvcrt' neither exists
+    on UNIX nor is imported on module level, hence both are replaced.
+
+    Returns:
+    (tuple):
+        the SetConsoleMode mock and a list of patches to activate
+    """
+    set_console_mode = Mock(return_value=1)
+    fake_ctypes = SimpleNamespace(
+        windll=SimpleNamespace(kernel32=SimpleNamespace(SetConsoleMode=set_console_mode)),
+        c_void_p='c_void_p',
+        c_ulong='c_ulong'
+    )
+    fake_msvcrt = SimpleNamespace(get_osfhandle=lambda _fd: 4711)
+    patches = [
+        patch('cat_win.src.service.helper.iohelper.on_windows_os', True),
+        patch('cat_win.src.service.helper.iohelper.ctypes', fake_ctypes),
+        patch.dict(sys.modules, {'msvcrt': fake_msvcrt})
+    ]
+    return set_console_mode, patches
+
+
+class TestWriteCsToConsoleBuffer(TestCase):
+    """
+    covers IoHelper.write_cs_to_console_buffer
+
+    On Windows the escape sequence has to be written into the active
+    console screen buffer, since 'sys.stdout' stays bound to the original
+    buffer of the console. 'CONOUT$' always refers to the active buffer.
+    """
+    def test_non_windows_writes_sequence_into_stdout(self):
+        stdout = Mock()
+        with patch('cat_win.src.service.helper.iohelper.on_windows_os', False):
+            with patch('sys.stdout', stdout):
+                result = IoHelper.write_cs_to_console_buffer('\x1b[2 q')
+        self.assertTrue(result)
+        stdout.write.assert_called_once_with('\x1b[2 q')
+        stdout.flush.assert_called_once_with()
+
+    def test_non_windows_returns_false_on_oserror(self):
+        stdout = Mock()
+        stdout.write.side_effect = OSError
+        with patch('cat_win.src.service.helper.iohelper.on_windows_os', False):
+            with patch('sys.stdout', stdout):
+                result = IoHelper.write_cs_to_console_buffer('\x1b[2 q')
+        self.assertFalse(result)
+        stdout.flush.assert_not_called()
+
+    def test_non_windows_returns_false_on_valueerror(self):
+        # e.g. stdout has already been closed
+        stdout = Mock()
+        stdout.write.side_effect = ValueError
+        with patch('cat_win.src.service.helper.iohelper.on_windows_os', False):
+            with patch('sys.stdout', stdout):
+                result = IoHelper.write_cs_to_console_buffer('\x1b[2 q')
+        self.assertFalse(result)
+        stdout.flush.assert_not_called()
+
+    def test_windows_writes_sequence_into_active_console_buffer(self):
+        set_console_mode, patches = _fake_console_patches()
+        opener = mock_open()
+        patches.append(patch('builtins.open', opener))
+        with contextlib.ExitStack() as stack:
+            for console_patch in patches:
+                stack.enter_context(console_patch)
+            result = IoHelper.write_cs_to_console_buffer('\x1b[6 q')
+        self.assertTrue(result)
+        opener.assert_called_once_with('CONOUT$', 'w', encoding='utf-8')
+        opener.return_value.write.assert_called_once_with('\x1b[6 q')
+        set_console_mode.assert_called_once_with(4711, 0x0007)
+        # ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING
+        self.assertEqual(set_console_mode.argtypes, ['c_void_p', 'c_ulong'])
+
+    def test_windows_ignores_stdout(self):
+        _set_console_mode, patches = _fake_console_patches()
+        patches.append(patch('builtins.open', mock_open()))
+        stdout = Mock()
+        with contextlib.ExitStack() as stack:
+            for console_patch in patches:
+                stack.enter_context(console_patch)
+            with patch('sys.stdout', stdout):
+                result = IoHelper.write_cs_to_console_buffer('\x1b[6 q')
+        self.assertTrue(result)
+        stdout.write.assert_not_called()
+        stdout.flush.assert_not_called()
+
+    def test_windows_returns_false_if_console_is_unavailable(self):
+        set_console_mode, patches = _fake_console_patches()
+        patches.append(patch('builtins.open', side_effect=OSError))
+        with contextlib.ExitStack() as stack:
+            for console_patch in patches:
+                stack.enter_context(console_patch)
+            result = IoHelper.write_cs_to_console_buffer('\x1b[6 q')
+        self.assertFalse(result)
+        # the mode is only altered once the console could be opened
+        set_console_mode.assert_not_called()

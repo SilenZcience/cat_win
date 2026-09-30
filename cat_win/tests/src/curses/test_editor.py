@@ -6,6 +6,7 @@ import runpy
 import importlib
 
 from cat_win.tests.mocks.edit import getxymax
+from cat_win.tests.mocks.curses import CursesMock
 from cat_win.tests.mocks.error import ErrorDefGen
 from cat_win.tests.mocks.logger import LoggerStub
 from cat_win.tests.mocks.std import IoHelperMock
@@ -14,12 +15,12 @@ from cat_win.src.curses import editor
 if editor.CURSES_MODULE_ERROR:
     setattr(editor, 'curses', None)
 from cat_win.src.curses.editor import Editor
+from cat_win.src.const.escapecodes import DECSCUSR_CURSOR_STYLE
 from cat_win.src.persistence import viewstate
 
 ORIGINAL_EDITOR_GETXYMAX = Editor.getxymax
 
-mm = MagicMock()
-mm.error = Exception
+mm = CursesMock(error=Exception)
 logger = LoggerStub()
 
 test_file_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'texts')
@@ -36,6 +37,9 @@ test_file_path_editor = os.path.join(test_file_dir, 'test_editor.txt')
 @patch('cat_win.src.service.helper.iohelper.IoHelper.get_newline', lambda *_: '\n')
 class TestEditor(TestCase):
     maxDiff = None
+
+    def setUp(self):
+        mm.reset()
 
     def test_correct_save_and_load_viewstate(self):
         with open(__file__, 'r', encoding='utf-8') as f:
@@ -1273,6 +1277,41 @@ class TestEditor(TestCase):
         editor.curse_window = MagicMock()
         with patch('cat_win.src.curses.editor.Editor._run', lambda *args: None):
             self.assertEqual(editor._open(), None)
+
+    def test__set_terminal_cursor_style_falls_back_to_default(self):
+        with patch('cat_win.src.service.helper.iohelper.IoHelper.write_cs_to_console_buffer') as write_cs:
+            Editor._set_terminal_cursor_style()
+            Editor._set_terminal_cursor_style('not-a-cursor-style')
+        self.assertEqual(
+            [call[0][0] for call in write_cs.call_args_list],
+            [DECSCUSR_CURSOR_STYLE['default'], DECSCUSR_CURSOR_STYLE['default']]
+        )
+
+    def test__init_screen_hides_wt_session_from_curses(self):
+        ed = Editor([(test_file_path_oneline, 'A')])
+        visible_during_initscr = []
+
+        def initscr_side_effect(*_args, **_kwargs):
+            visible_during_initscr.append(os.environ.get('WT_SESSION'))
+            return MagicMock()
+
+        mm.initscr.side_effect = initscr_side_effect
+        with patch.dict(os.environ, {'WT_SESSION': 'session-id'}, clear=False):
+            with patch('cat_win.src.service.helper.iohelper.IoHelper.write_cs_to_console_buffer') as write_cs:
+                ed._init_screen()
+                session_after_init = os.environ.get('WT_SESSION')
+        self.assertEqual(visible_during_initscr, [None])
+        self.assertEqual(session_after_init, 'session-id')
+        write_cs.assert_called_once_with(DECSCUSR_CURSOR_STYLE[Editor.cursor_style])
+
+    def test__open_resets_cursor_style_on_exit(self):
+        ed = Editor([('', '')])
+        ed.curse_window = MagicMock()
+        ed._init_screen = MagicMock()
+        with patch('cat_win.src.curses.editor.Editor._run', lambda *args: None):
+            with patch('cat_win.src.service.helper.iohelper.IoHelper.write_cs_to_console_buffer') as write_cs:
+                self.assertIsNone(ed._open())
+        write_cs.assert_called_once_with(DECSCUSR_CURSOR_STYLE['default'])
 
     @patch('cat_win.src.curses.editor.CURSES_MODULE_ERROR', new=True)
     @patch('cat_win.src.curses.editor.on_windows_os', new=True)

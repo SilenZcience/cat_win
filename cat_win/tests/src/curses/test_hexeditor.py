@@ -1,9 +1,11 @@
 from copy import deepcopy
 from unittest.mock import patch, MagicMock
 from unittest import TestCase
+import os
 import runpy
 import importlib
 
+from cat_win.tests.mocks.curses import CursesMock
 from cat_win.tests.mocks.edit import getxymax
 from cat_win.tests.mocks.error import ErrorDefGen
 from cat_win.tests.mocks.logger import LoggerStub
@@ -17,7 +19,7 @@ from cat_win.src.persistence import viewstate
 
 ORIGINAL_HEXEDITOR_GETXYMAX = HexEditor.getxymax
 
-mm = MagicMock()
+mm = CursesMock(error=Exception)
 logger = LoggerStub()
 
 @patch.object(hexeditor, 'logger', logger)
@@ -26,6 +28,9 @@ logger = LoggerStub()
 @patch('cat_win.src.curses.hexeditor.HexEditor.getxymax', getxymax)
 class TestHexEditor(TestCase):
     maxDiff = None
+
+    def setUp(self):
+        mm.reset()
 
     def test_correct_save_and_load_viewstate(self):
         with open(__file__, 'rb') as f:
@@ -1454,6 +1459,22 @@ class TestHexEditor(TestCase):
             editor._render_status_bar(2, 20)
         finally:
             mm.error = old_error
+
+    def test__init_screen_hides_wt_session_from_curses(self):
+        editor = HexEditor([('', '')])
+        editor.curse_window = MagicMock()
+        visible_during_initscr = []
+
+        def initscr_side_effect(*_args, **_kwargs):
+            visible_during_initscr.append(os.environ.get('WT_SESSION'))
+            return editor.curse_window
+
+        mm.initscr.side_effect = initscr_side_effect
+        with patch.dict(os.environ, {'WT_SESSION': 'session-id'}, clear=False):
+            editor._init_screen()
+            session_after_init = os.environ.get('WT_SESSION')
+        self.assertEqual(visible_during_initscr, [None])
+        self.assertEqual(session_after_init, 'session-id')
 
     def test_init_open_and_unix_open_loop_extra_branches_2(self):
         editor = HexEditor([('', '')])
