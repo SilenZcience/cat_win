@@ -1380,7 +1380,8 @@ class DiffViewer:
                 logger('Oops..! Something went wrong.', priority=logger.ERROR)
             raise e
         finally:
-            curses.endwin()
+            if not curses.isendwin():
+                curses.endwin()
 
     @classmethod
     def open(cls, files: list, fg_state = None) -> None:

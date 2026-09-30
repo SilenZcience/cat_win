@@ -2255,14 +2255,19 @@ class Editor:
                                    max(self.cpos.col-self.wpos.col, 0))
         except curses.error:
             pass
-        curses.curs_set(
-            not self.scrolling or not (
-                self.cpos.row < self.wpos.row or \
-                self.cpos.col < self.wpos.col or \
-                self.cpos.row >= self.wpos.row+max_y or \
-                self.cpos.col >= self.wpos.col+max_x
-            )
+        show_cursor = not self.scrolling and not (
+            self.cpos.row < self.wpos.row or \
+            self.cpos.col < self.wpos.col or \
+            self.cpos.row >= self.wpos.row+max_y or \
+            self.cpos.col >= self.wpos.col+max_x
         )
+        curses.curs_set(show_cursor)
+        if show_cursor:
+            # ncurses re-emits 'cnorm' (CSI ?12l = cursor blinking off)
+            # whenever curs_set(1) is called, which overrides
+            # the configured DECSCUSR style.
+            # re-assert it so that blinking styles actually blink.
+            self._set_terminal_cursor_style(Editor.cursor_style)
 
         self.scrolling = False
         self.curse_window.refresh()
@@ -2527,7 +2532,8 @@ class Editor:
                 pass
             except Exception as exc:
                 logger(f"Error while closing file: {exc}", priority=logger.ERROR)
-            curses.endwin()
+            if not curses.isendwin():
+                curses.endwin()
             self._set_terminal_cursor_style()
 
     @classmethod

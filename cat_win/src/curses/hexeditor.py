@@ -1486,7 +1486,10 @@ class HexEditor:
                 self._f_content_gen.close()
             except StopIteration:
                 pass
-            curses.endwin()
+            except Exception as exc:
+                logger(f"Error while closing file: {exc}", priority=logger.ERROR)
+            if not curses.isendwin():
+                curses.endwin()
 
     @classmethod
     def open(cls, files: list, fg_state = None) -> bool:
