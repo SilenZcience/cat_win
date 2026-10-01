@@ -1061,11 +1061,11 @@ class DiffViewer:
                 break
             self.curse_window.clrtoeol()
 
+            empty_color  = self._get_color(7)
             sep_color    = self._get_color(8)
-            equal_color  = self._get_color(7)
-            empty_color  = self._get_color(9)
-            delete_color = self._get_color(6)
+            equal_color  = self._get_color(9)
             insert_color = self._get_color(4)
+            delete_color = self._get_color(6)
             if brow == self.rpos.row:
                 self.curse_window.chgat(row, 0, max_x, self._get_color(1))
                 sep_color    = self._get_color(1)
@@ -1306,8 +1306,8 @@ class DiffViewer:
                 else:
                     curses.init_pair(6, curses.COLOR_BLACK, curses.COLOR_RED)
                 try:
-                    # default color
-                    curses.init_pair(7, curses.COLOR_WHITE  , bg_color)
+                    # gray/empty background
+                    curses.init_pair(7, curses.COLOR_BLACK, bg_color)
                 except curses.error:
                     logger(
                         'Your terminal does not support default background color. '
@@ -1316,18 +1316,18 @@ class DiffViewer:
                         priority=logger.DEBUG
                     )
                     bg_color = curses.COLOR_BLACK
-                    # default color
-                    curses.init_pair(7, curses.COLOR_WHITE  , bg_color)
+                    # gray/empty background
+                    if curses.COLORS >= 16:
+                        try:
+                            curses.init_pair(7, curses.COLOR_BLACK, bg_color+8)
+                        except curses.error:
+                            curses.init_pair(7, curses.COLOR_BLACK, bg_color)
+                    else:
+                        curses.init_pair(7, curses.COLOR_BLACK  , bg_color)
                 # lineno color & file-selector, active file selected
                 curses.init_pair(8, curses.COLOR_MAGENTA, bg_color)
-                # gray background
-                if curses.COLORS >= 16:
-                    try:
-                        curses.init_pair(9, curses.COLOR_BLACK, curses.COLOR_BLACK+8)
-                    except curses.error:
-                        curses.init_pair(9, curses.COLOR_BLACK, curses.COLOR_BLACK)
-                else:
-                    curses.init_pair(9, curses.COLOR_BLACK, curses.COLOR_BLACK)
+                # default color (equal)
+                curses.init_pair(9, curses.COLOR_WHITE  , bg_color)
                 # prompts
                 curses.init_pair(10, curses.COLOR_WHITE  , curses.COLOR_RED  )
                 # find

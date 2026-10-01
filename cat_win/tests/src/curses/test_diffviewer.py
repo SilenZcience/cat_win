@@ -1050,7 +1050,7 @@ class TestDiffViewer(TestCase):
         raised_for = set()
 
         def init_pair_side_effect(pair_id, *_args):
-            if pair_id in (4, 6, 9, 14, 15) and pair_id not in raised_for:
+            if pair_id in (4, 6, 7, 14, 15) and pair_id not in raised_for:
                 raised_for.add(pair_id)
                 raise mm.error
             return None
