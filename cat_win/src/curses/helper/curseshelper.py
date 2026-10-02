@@ -4,6 +4,15 @@ curseshelper
 
 import contextlib
 import os
+import signal
+
+try:
+    import curses
+    CURSES_MODULE_ERROR = False
+except ImportError:
+    CURSES_MODULE_ERROR = True
+
+SIGWINCH = getattr(signal, 'SIGWINCH', None)
 
 
 UNIFY_HOTKEYS = {
@@ -266,6 +275,60 @@ def hide_windows_terminal_session():
     finally:
         if session_id is not None:
             os.environ['WT_SESSION'] = session_id
+
+
+def release_sigwinch() -> None:
+    """
+    the readline module installs its own SIGWINCH handler first
+    breaking ncurses -> hand SIGWINCH back to ncurses.
+    """
+    if SIGWINCH is None:
+        return
+    try:
+        signal.signal(SIGWINCH, signal.SIG_DFL)
+    except (ValueError, OSError):
+        pass # not the main thread / not permitted ...
+
+
+def resize_term(window: object) -> bool:
+    """
+    resize the curses window to the actual size of the terminal.
+
+    Parameters:
+    window (curses.window):
+        the window to resize
+
+    Returns:
+    (bool):
+        indicates if the window was resized
+    """
+    if CURSES_MODULE_ERROR:
+        return False # should not happen
+
+    if SIGWINCH is None:
+        # windows does not have any readline problem in the first place
+        # it also does not work with os.get_terminal_size() ...
+        lines, columns = window.getmaxyx()
+    else:
+        try:
+            columns, lines = os.get_terminal_size()
+        except (OSError, AttributeError):
+            return False
+
+        # nothing to do
+        if lines <= 0 or columns <= 0 or window.getmaxyx() == (lines, columns):
+            return False
+
+    # resize_term() and not resizeterm():
+    # resizeterm() queues another KEY_RESIZE,
+    # which would make this handler trigger itself forever
+    try:
+        curses.resize_term(lines, columns)
+    except curses.error:
+        return False
+
+    window.clear()
+    return True
 
 
 class Position:

@@ -25,7 +25,9 @@ from cat_win.src.curses.helper.curseshelper import (
     UNIFY_HOTKEYS,
     Position,
     frepr,
-    hide_windows_terminal_session
+    hide_windows_terminal_session,
+    release_sigwinch,
+    resize_term
 )
 from cat_win.src.curses.helper.editorsearchhelper import \
     search_iter_diff_factory
@@ -725,12 +727,8 @@ class DiffViewer:
         (bool):
             indicates if the diffviewer should keep running
         """
-        try:
-            curses.resize_term(*self.curse_window.getmaxyx())
-        except curses.error:
-            pass
+        resize_term(self.curse_window)
         self.half_width = (self.getxymax()[1]-3-self.l_offset) // 2
-        self.curse_window.clear()
         return True
 
     def _action_file_selection(self) -> bool:
@@ -1248,6 +1246,7 @@ class DiffViewer:
         init and define curses
         """
         with hide_windows_terminal_session():
+            release_sigwinch()
             self.curse_window = curses.initscr()
         curses.curs_set(0)
 

@@ -30,7 +30,9 @@ from cat_win.src.curses.helper.curseshelper import (
     History,
     Position,
     frepr,
-    hide_windows_terminal_session
+    hide_windows_terminal_session,
+    release_sigwinch,
+    resize_term
 )
 from cat_win.src.curses.helper.editorsearchhelper import (
     _SearchIterBase,
@@ -1776,11 +1778,7 @@ class Editor:
         (bool):
             indicates if the editor should keep running
         """
-        try:
-            curses.resize_term(*self.curse_window.getmaxyx())
-        except curses.error:
-            pass
-        self.curse_window.clear()
+        resize_term(self.curse_window)
         return True
 
     def _action_file_selection(self) -> bool:
@@ -2417,6 +2415,7 @@ class Editor:
         init and define curses
         """
         with hide_windows_terminal_session():
+            release_sigwinch()
             self.curse_window = curses.initscr()
 
         # Turn off echoing of keys, and enter cbreak mode,

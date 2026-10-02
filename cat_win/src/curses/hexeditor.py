@@ -24,7 +24,9 @@ from cat_win.src.curses.helper.curseshelper import (
     UNIFY_HOTKEYS,
     Position,
     frepr,
-    hide_windows_terminal_session
+    hide_windows_terminal_session,
+    release_sigwinch,
+    resize_term
 )
 from cat_win.src.curses.helper.editorsearchhelper import \
     search_iter_hex_factory
@@ -1017,11 +1019,7 @@ class HexEditor:
         (bool):
             indicates if the editor should keep running
         """
-        try:
-            curses.resize_term(*self.curse_window.getmaxyx())
-        except curses.error:
-            pass
-        self.curse_window.clear()
+        resize_term(self.curse_window)
         return True
 
     def _action_file_selection(self) -> bool:
@@ -1374,6 +1372,7 @@ class HexEditor:
         init and define curses
         """
         with hide_windows_terminal_session():
+            release_sigwinch()
             self.curse_window = curses.initscr()
         curses.curs_set(0)
 
