@@ -7,6 +7,10 @@ try:
 except ImportError:
     nop = lambda *_, **__: None; coloramaInit = nop
 import os
+try:
+    import readline
+except ImportError:
+    pass
 import sys
 from contextlib import contextmanager
 
