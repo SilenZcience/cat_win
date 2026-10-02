@@ -1188,7 +1188,9 @@ class TestEditor(TestCase):
     def test__action_resize(self):
         editor = Editor([('', '')])
         editor.curse_window = MagicMock()
-        self.assertEqual(editor._action_resize(), True)
+        with patch('cat_win.src.curses.editor.resize_term') as resize_term:
+            self.assertEqual(editor._action_resize(), True)
+        resize_term.assert_called_once_with(editor.curse_window)
 
     def test__get_color(self):
         editor = Editor([('', '')])
@@ -1529,7 +1531,8 @@ class TestEditor(TestCase):
         with patch.object(ed, '_render_scr') as render_scr:
             with patch.object(ed, '_get_clipboard', return_value='abc'):
                 with patch('cat_win.src.curses.editor.search_iter_factory', side_effect=ValueError('bad search: ')):
-                    self.assertTrue(ed._action_find())
+                    with patch('cat_win.src.curses.editor.resize_term'):
+                        self.assertTrue(ed._action_find())
         self.assertTrue(render_scr.called)
 
         ed2 = Editor([(test_file_path_editor, 'A')])
@@ -1905,7 +1908,8 @@ class TestEditor(TestCase):
         with patch.object(ed, '_get_clipboard', return_value='12a'):
             with patch.object(ed, '_action_background', return_value=True):
                 with patch.object(ed, '_render_scr') as rs:
-                    self.assertTrue(ed._action_jump())
+                    with patch('cat_win.src.curses.editor.resize_term'):
+                        self.assertTrue(ed._action_jump())
         self.assertTrue(rs.called)
 
         edf = Editor([('', '')])
@@ -1977,7 +1981,8 @@ class TestEditor(TestCase):
         with patch.object(edq, '_action_background', return_value=True):
             with patch.object(edq, '_action_save', return_value=True):
                 with patch.object(edq, '_render_scr') as rs4:
-                    self.assertFalse(edq._action_quit())
+                    with patch('cat_win.src.curses.editor.resize_term'):
+                        self.assertFalse(edq._action_quit())
         self.assertTrue(rs4.called)
 
         edfs = Editor([(test_file_path_editor, 'A')])
@@ -2009,11 +2014,10 @@ class TestEditor(TestCase):
             with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', side_effect=OSError('nogit')):
                 self.assertTrue(edfs._action_file_selection())
 
-        mm.resize_term.side_effect = mm.error
-        try:
+        # a resize that could not be done must not take the editor down
+        with patch('cat_win.src.curses.editor.resize_term') as resize_term:
+            resize_term.return_value = False
             self.assertTrue(edfs._action_resize())
-        finally:
-            mm.resize_term.side_effect = None
 
     def test_editor_ui_runtime_and_open_unix_branches_3(self):
         ed = Editor([(test_file_path_editor, 'A')])
@@ -2034,7 +2038,8 @@ class TestEditor(TestCase):
         with patch.object(ed, '_action_background', return_value=True):
             with patch('cat_win.src.curses.editor.SyntaxHighlighter.get_available_plugins', return_value=({'None': None, 'Py': plugin}, {'None': '', 'Py': '.py'})):
                 with patch('cat_win.src.curses.editor.SyntaxHighlighter.get_plugin', return_value=plugin):
-                    ed._function_sel_highlight()
+                    with patch('cat_win.src.curses.editor.resize_term'):
+                        ed._function_sel_highlight()
 
         ed2 = Editor([('', '')])
         ed2.curse_window = MagicMock()
@@ -2110,7 +2115,8 @@ class TestEditor(TestCase):
         with patch.object(ed, '_get_clipboard', return_value='exit'):
             with patch.object(ed, '_action_background', return_value=True):
                 with patch.object(ed, '_render_scr'):
-                    self.assertTrue(ed._action_transform())
+                    with patch('cat_win.src.curses.editor.resize_term'):
+                        self.assertTrue(ed._action_transform())
 
         class DummySearch:
             def __init__(self, vals, s_len=2, s_rows=None):
@@ -2142,7 +2148,8 @@ class TestEditor(TestCase):
             with patch.object(edf, '_render_scr'):
                 with patch('cat_win.src.curses.editor.search_iter_factory',
                            side_effect=[DummySearch([(0, 0)]), DummySearch([(999, 0)])]):
-                    self.assertTrue(edf._action_find())
+                    with patch('cat_win.src.curses.editor.resize_term'):
+                        self.assertTrue(edf._action_find())
 
         edf2 = Editor([('', '')])
         edf2.curse_window = MagicMock()
@@ -2186,7 +2193,8 @@ class TestEditor(TestCase):
             with patch.object(edr, '_action_background', return_value=True):
                 with patch.object(edr, '_render_scr'):
                     with patch('cat_win.src.curses.editor.search_iter_factory', return_value=DummyReplaceSearch()):
-                        self.assertTrue(edr._action_replace())
+                        with patch('cat_win.src.curses.editor.resize_term'):
+                            self.assertTrue(edr._action_replace())
 
     def test_editor_reload_insert_background_and_file_selection_remaining_4(self):
         ed = Editor([('', '')])
@@ -2199,7 +2207,8 @@ class TestEditor(TestCase):
         with patch.object(ed, '_action_background', return_value=True):
             with patch.object(ed, '_render_scr'):
                 with patch.object(ed, '_setup_file'):
-                    self.assertTrue(ed._action_reload())
+                    with patch('cat_win.src.curses.editor.resize_term'):
+                        self.assertTrue(ed._action_reload())
 
         edi = Editor([('', '')])
         edi.curse_window = MagicMock()
@@ -2212,7 +2221,8 @@ class TestEditor(TestCase):
         with patch.object(edi, '_action_background', return_value=True):
             with patch.object(edi, '_get_clipboard', return_value='4142'):
                 with patch.object(edi, '_render_scr'):
-                    self.assertTrue(edi._action_insert())
+                    with patch('cat_win.src.curses.editor.resize_term'):
+                        self.assertTrue(edi._action_insert())
 
         edb = Editor([('', '')])
         edb.curse_window = MagicMock()
@@ -2253,7 +2263,8 @@ class TestEditor(TestCase):
         commit = {'hash': 'abc1234', 'date': '2024-01-01', 'author': 'u', 'message': 'm'}
         with patch.object(edfs, '_action_background', return_value=True):
             with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', return_value=[commit]):
-                self.assertFalse(edfs._action_file_selection())
+                with patch('cat_win.src.curses.editor.resize_term'):
+                    self.assertFalse(edfs._action_file_selection())
 
     def test_editor_action_background_unix_path(self):
         ed = Editor([('', '')])
@@ -2287,7 +2298,8 @@ class TestEditor(TestCase):
         with patch.object(ed, '_action_background', return_value=True):
             with patch('cat_win.src.curses.editor.SyntaxHighlighter.get_available_plugins', return_value=({'None': None, 'Py': 'p1', 'Js': 'p2', 'Txt': 'p3'}, {'None': '', 'Py': '.py', 'Js': '.js', 'Txt': '.txt'})):
                 with patch('cat_win.src.curses.editor.SyntaxHighlighter.get_plugin', return_value=MagicMock()):
-                    ed._function_sel_highlight()
+                    with patch('cat_win.src.curses.editor.resize_term'):
+                        ed._function_sel_highlight()
 
         ed2 = Editor([('', '')])
         ed2.curse_window = MagicMock()
@@ -2340,11 +2352,10 @@ class TestEditor(TestCase):
                 with patch.object(ed4, '_get_new_char', return_value=quit_gen()):
                     ed4._run()
 
-        mm.resize_term.side_effect = mm.error
-        try:
+        # a resize that could not be done must not take the editor down
+        with patch('cat_win.src.curses.editor.resize_term') as resize_term:
+            resize_term.return_value = False
             self.assertTrue(ed4._action_resize())
-        finally:
-            mm.resize_term.side_effect = None
 
         ed5 = Editor([('', '')])
         ed5.curse_window = MagicMock()
@@ -2537,7 +2548,8 @@ class TestEditor(TestCase):
         with patch.object(edr1, '_action_background', return_value=True):
             with patch.object(edr1, '_render_scr'):
                 with patch('cat_win.src.curses.editor.search_iter_factory', side_effect=ValueError('bad')):
-                    self.assertTrue(edr1._action_replace())
+                    with patch('cat_win.src.curses.editor.resize_term'):
+                        self.assertTrue(edr1._action_replace())
 
         # _action_replace: selecting + next direction branch
         edr2 = Editor([('', '')])

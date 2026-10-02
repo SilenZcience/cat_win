@@ -323,8 +323,22 @@ class TestDiffViewer(TestCase):
 
         dvr = self._mk_viewer()
         dvr.curse_window.getmaxyx = lambda: (40, 130)
-        mm.resize_term.side_effect = mm.error
-        self.assertTrue(dvr._action_resize())
+        with patch('cat_win.src.curses.diffviewer.resize_term') as resize_term:
+            resize_term.return_value = False
+            self.assertTrue(dvr._action_resize())
+        resize_term.assert_called_once_with(dvr.curse_window)
+
+    def test__action_resize_recomputes_half_width_after_resizing(self):
+        for resized in (True, False):
+            dv = self._mk_viewer()
+            dv.curse_window = DummyWindow()
+            dv.getxymax = MagicMock(return_value=(0, 130, 0))
+            dv.l_offset = 0
+            with patch('cat_win.src.curses.diffviewer.resize_term') as resize_term:
+                resize_term.return_value = resized
+                self.assertTrue(dv._action_resize())
+            self.assertEqual(dv.half_width, (130 - 3 - 0) // 2)
+
 
     def test_file_selection_help_overview_and_search_functions(self):
         dv = self._mk_viewer()

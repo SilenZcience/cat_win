@@ -893,7 +893,9 @@ class TestHexEditor(TestCase):
     def test__action_resize(self):
         editor = HexEditor([('', '')])
         editor.curse_window = MagicMock()
-        self.assertEqual(editor._action_resize(), True)
+        with patch('cat_win.src.curses.hexeditor.resize_term') as resize_term:
+            self.assertEqual(editor._action_resize(), True)
+        resize_term.assert_called_once_with(editor.curse_window)
 
     def test__get_next_char(self):
         editor = HexEditor([('', '')])
@@ -1162,7 +1164,8 @@ class TestHexEditor(TestCase):
         with patch.object(editor3, '_action_background', return_value=True):
             with patch.object(editor3, '_render_scr') as render_scr:
                 with patch.object(editor3, '_setup_file') as setup_file:
-                    self.assertTrue(editor3._action_reload())
+                    with patch('cat_win.src.curses.hexeditor.resize_term'):
+                        self.assertTrue(editor3._action_reload())
         self.assertTrue(render_scr.called)
         self.assertTrue(setup_file.called)
 
@@ -1345,7 +1348,8 @@ class TestHexEditor(TestCase):
         with patch.object(editor, '_get_clipboard', return_value='f2zz'):
             with patch.object(editor, '_action_background', return_value=True):
                 with patch.object(editor, '_render_scr') as render_scr:
-                    self.assertTrue(editor._action_jump())
+                    with patch('cat_win.src.curses.hexeditor.resize_term'):
+                        self.assertTrue(editor._action_jump())
         self.assertTrue(render_scr.called)
 
         editor2 = HexEditor([('', '')])
@@ -1367,7 +1371,8 @@ class TestHexEditor(TestCase):
         with patch.object(editor2, '_get_clipboard', return_value='A'):
             with patch.object(editor2, '_action_background', return_value=True):
                 with patch.object(editor2, '_render_scr') as render_scr2:
-                    self.assertTrue(editor2._action_find())
+                    with patch('cat_win.src.curses.hexeditor.resize_term'):
+                        self.assertTrue(editor2._action_find())
         self.assertTrue(render_scr2.called)
 
         editor3 = HexEditor([('', '')])
@@ -1394,7 +1399,8 @@ class TestHexEditor(TestCase):
             ]).__next__
             with patch.object(editor4, '_action_background', return_value=True):
                 with patch.object(editor4, '_render_scr') as render_scr3:
-                    self.assertTrue(editor4._action_insert())
+                    with patch('cat_win.src.curses.hexeditor.resize_term'):
+                        self.assertTrue(editor4._action_insert())
             self.assertTrue(render_scr3.called)
         finally:
             HexEditor.unicode_escaped_insert = backup_insert
@@ -1661,18 +1667,20 @@ class TestHexEditor(TestCase):
         with patch.object(editor9, '_action_background', return_value=True):
             with patch.object(editor9, '_action_save', return_value=True):
                 with patch.object(editor9, '_render_scr') as rs:
-                    self.assertFalse(editor9._action_quit())
+                    with patch('cat_win.src.curses.hexeditor.resize_term'):
+                        self.assertFalse(editor9._action_quit())
         self.assertTrue(rs.called)
 
         old_error = mm.error
         try:
             mm.error = Exception
-            mm.resize_term.side_effect = mm.error
-            editor10 = HexEditor([('', '')])
-            editor10.curse_window = MagicMock()
-            self.assertTrue(editor10._action_resize())
+            # a resize that could not be done must not take the editor down
+            with patch('cat_win.src.curses.hexeditor.resize_term') as resize_term:
+                resize_term.return_value = False
+                editor10 = HexEditor([('', '')])
+                editor10.curse_window = MagicMock()
+                self.assertTrue(editor10._action_resize())
         finally:
-            mm.resize_term.side_effect = None
             mm.error = old_error
 
     def test_hexeditor_action_background_unix_path(self):
@@ -1731,7 +1739,8 @@ class TestHexEditor(TestCase):
 
         with patch.object(editor2, '_action_background', return_value=True):
             with patch('cat_win.src.curses.helper.fileselectionhelper.GitHelper.get_git_file_history', side_effect=OSError('nogit')):
-                self.assertFalse(editor2._action_file_selection())
+                with patch('cat_win.src.curses.hexeditor.resize_term'):
+                    self.assertFalse(editor2._action_file_selection())
 
     def test_final_remaining_find_and_file_selection_branches_4(self):
         editor = HexEditor([('', '')])
