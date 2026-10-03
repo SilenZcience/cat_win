@@ -61,7 +61,7 @@ class ReplCommandHandler:
         (bool):
             True if cmd was a REPL command and was executed, False otherwise.
         """
-        if not cmd.startswith('!'):
+        if not cmd.startswith('!') or not cmd[1:]:
             return False
         line_split = shlex.split(cmd[1:])
         self.last_cmd = line_split[0]
@@ -174,8 +174,6 @@ def repl_main(ctx, init_colors, show_unknown_args) -> None:
                 try:
                     line = input(cmd.repl_prefix)
                 except EOFError:
-                    return
-                if not line:
                     return
                 yield line
                 if oneline:
