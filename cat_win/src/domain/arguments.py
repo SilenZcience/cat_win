@@ -5,6 +5,18 @@ arguments
 from cat_win.src.const.argconstants import DIFFERENTIABLE_ARGS
 
 
+class Param(str):
+    __slots__ = ('argument',)
+
+    def __new__(cls, param: str, argument: str = None):
+        self = super().__new__(cls, param)
+        self.argument = argument
+        return self
+
+    def __repr__(self):
+        return repr(str(self))
+
+
 def reduce_list(args: list) -> list:
     """
     remove duplicate args regardless if shortform or
@@ -75,6 +87,7 @@ class Arguments:
     def __init__(self) -> None:
         self.args: list = []  # list of all used parameters: format [(id, param),...]
         self.args_id: dict = {}
+        self.args_val: dict = {} # arg_id -> argument
 
     def set_args(self, args: list) -> None:
         """
@@ -85,8 +98,12 @@ class Arguments:
             the args to set
         """
         self.args = reduce_list(args)
-        for arg_id, _ in self.args:
+        self.args_id = {}
+        self.args_val = {}
+        for arg_id, param in self.args:
             self.args_id[arg_id] = True
+            if arg_id not in self.args_val:
+                self.args_val[arg_id] = getattr(param, 'argument', param)
 
     def add_args(self, args: list) -> None:
         """
@@ -96,7 +113,6 @@ class Arguments:
         args (list):
             the args to add
         """
-        self.args_id = {}
         self.set_args(self.args + args)
 
     def delete_args(self, args: list) -> None:
@@ -107,7 +123,6 @@ class Arguments:
         args (list):
             the list of args to delete
         """
-        self.args_id = {}
         self.set_args(diff_list(self.args, args))
 
     def find_first(self, arg_id1: int, arg_id2: int, is_first: bool = False) -> tuple:
@@ -136,6 +151,21 @@ class Arguments:
                 return (arg_id1, param)
             if a_id == arg_id2:
                 return None if is_first else (arg_id2, param)
+
+    def find_arg_value(self, arg_id: int):
+        """
+        retrieve the argument that was passed in for a param.
+
+        Parameters:
+        arg_id (int):
+            the id of the param to look for
+
+        Returns:
+        (str|None):
+            the argument belonging to the param, None if it was passed
+            in without one or takes no argument at all
+        """
+        return self.args_val.get(arg_id)
 
     def __getitem__(self, o: int) -> bool:
         return self.args_id.get(o, False)
