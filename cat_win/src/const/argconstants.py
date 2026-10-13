@@ -11,7 +11,7 @@ class ArgConstant:
             arg_help: str,
             arg_id: int,
             show_arg: bool = True, show_arg_on_repl: bool = True,
-            section: int = -1
+            section: int = -1, takes_value: str = None, metavar: str = None
     ) -> None:
         self.short_form = short_form
         self.long_form = long_form
@@ -21,6 +21,9 @@ class ArgConstant:
         self.show_arg_on_repl = show_arg_on_repl
 
         self.section = section
+        self.takes_value = takes_value
+        # display-only value placeholder (e.g. '<STREAM>'), independent of parsing
+        self.metavar = metavar
 
 
 # informational
@@ -62,8 +65,10 @@ ARGS_CCONFIG_FLUSH, ARGS_CONFIG_REMOVE       = range(1303, 1305)
 # streams
 ARGS_RECONFIGURE, ARGS_RECONFIGURE_IN      = range(1400, 1402)
 ARGS_RECONFIGURE_OUT, ARGS_RECONFIGURE_ERR = range(1402, 1404)
+# installation
+ARGS_SUDO_ALLOW, ARGS_MAN, ARGS_COMPLETION = range(1500, 1503)
 
-ARGS_CUT, ARGS_REPLACE = range(1500, 1502)
+ARGS_CUT, ARGS_REPLACE = range(1600, 1602)
 
 DIFFERENTIABLE_ARGS = [ARGS_CUT, ARGS_REPLACE]
 
@@ -73,7 +78,7 @@ ALL_ARGS = [
                 ARGS_HELP, section=0),
     ArgConstant('-v', '--version', 'output version information and exit',
                 ARGS_VERSION, section=0),
-    ArgConstant('--debug', '--debug', 'show debug information',
+    ArgConstant('--debug', '', 'show debug information',
                 ARGS_DEBUG, show_arg=False, section=0),
     ArgConstant('--debuglog', '--debug-log', 'log debug information to file',
                 ARGS_DEBUG_LOG, show_arg=False, section=0),
@@ -105,7 +110,7 @@ ALL_ARGS = [
                 ARGS_REVERSE, show_arg_on_repl=False, section=3),
     ArgConstant('-u', '--unique', 'suppress repeated output lines',
                 ARGS_SQUEEZE, show_arg_on_repl=False, section=3),
-    ArgConstant('--sort', '--sort', 'sort all lines alphabetically',
+    ArgConstant('--sort', '', 'sort all lines alphabetically',
                 ARGS_SORT, show_arg_on_repl=False, section=3),
     ArgConstant('--sortl', '--sortlength', 'sort all lines by length',
                 ARGS_SSORT, show_arg_on_repl=False, section=3),
@@ -145,6 +150,12 @@ ALL_ARGS = [
                 ARGS_CCHARCOUNT, show_arg=False, section=5),
 
     # search and match
+    ArgConstant('find=X', 'find:X', 'find/query a substring X in the given files',
+                -1, section=6),
+    ArgConstant('match=X', 'match:X', 'find/query a pattern X in the given files',
+                -1, section=6),
+    ArgConstant('replace=X', 'replace:X', 'replace queried substrings/patterns in the given files',
+                -1, section=6),
     ArgConstant('-g', '--grep', 'only show lines containing queried keywords or patterns',
                 ARGS_GREP, section=6),
     ArgConstant('-G', '--GREP', 'only show found and matched substrings',
@@ -159,13 +170,13 @@ ALL_ARGS = [
                 ARGS_DATA, show_arg_on_repl=False, section=7),
     ArgConstant('-m', '--checksum', 'show the checksums of all files',
                 ARGS_CHECKSUM, show_arg_on_repl=False, section=7),
-    ArgConstant('--strings', '--strings', 'print the sequences of printable characters',
+    ArgConstant('--strings', '', 'print the sequences of printable characters',
                 ARGS_STRINGS, section=7),
 
     # numbers
-    ArgConstant('--b64d', '--b64d', 'decode the input from base64',
+    ArgConstant('--b64d', '', 'decode the input from base64',
                 ARGS_B64D, section=8),
-    ArgConstant('--b64e', '--b64e', 'encode the input to base64',
+    ArgConstant('--b64e', '', 'encode the input to base64',
                 ARGS_B64E, section=8),
     ArgConstant('--eval', '--EVAL', 'evaluate simple mathematical equations',
                 ARGS_EVAL, section=8),
@@ -179,7 +190,7 @@ ALL_ARGS = [
                 ARGS_BIN, section=8),
 
     # raw-view
-    ArgConstant('--binview', '--binview', 'display the raw byte representation in binary',
+    ArgConstant('--binview', '', 'display the raw byte representation in binary',
                 ARGS_BINVIEW, show_arg_on_repl=False, section=9),
     ArgConstant('--hexview', '--HEXVIEW', 'display the raw byte representation in hexadecimal',
                 ARGS_HEXVIEW, show_arg_on_repl=False, section=9),
@@ -201,8 +212,8 @@ ALL_ARGS = [
                 ARGS_RAW, show_arg_on_repl=False, section=10),
 
     # visualize
-    ArgConstant('--vis[bzh]', '--visualize[bhz]', 'visualize the data using space-filling curves',
-                -1, show_arg_on_repl=False, section=11),
+    ArgConstant('--vis', '--visualize', 'visualize the data using space-filling curves',
+                -1, show_arg_on_repl=False, section=11, metavar='CURVE'),
     ArgConstant('--visb', '--visualizeb', 'visualize the data using scan curve byte view',
                 ARGS_VISUALIZE_B, show_arg=False, section=11),
     ArgConstant('--visz', '--visualizez', 'visualize the data using z-order curve byte view',
@@ -227,9 +238,9 @@ ALL_ARGS = [
                 ARGS_NOCOL, section=12),
 
     # configuration
-    ArgConstant('--config', '--config', 'change default parameters',
+    ArgConstant('--config', '', 'change default parameters',
                 ARGS_CONFIG, section=13),
-    ArgConstant('--cconfig', '--cconfig', 'change color configuration',
+    ArgConstant('--cconfig', '', 'change color configuration',
                 ARGS_CCONFIG, section=13),
     ArgConstant('--config-clear', '--config-reset', 'reset the config to default settings',
                 ARGS_CONFIG_FLUSH, section=13),
@@ -238,14 +249,63 @@ ALL_ARGS = [
     ArgConstant('--config-remove', '--cconfig-remove', 'remove the config-file',
                 ARGS_CONFIG_REMOVE, section=13),
 
-    # streams
-    ArgConstant('-R', '--R', 'reconfigure the stdin and stdout with the parsed encoding',
-                ARGS_RECONFIGURE, show_arg=False, section=14),
+    # (stream) encoding
+    ArgConstant('enc=X', 'enc:X', 'set file encoding to X (default is utf-8)',
+                -1, section=14),
+    ArgConstant('-R', '--R', 'reconfigure the std-streams with the parsed encoding',
+                ARGS_RECONFIGURE, section=14, metavar='STREAM'),
     ArgConstant('--Rin', '--Rin', 'reconfigure the stdin with the parsed encoding',
                 ARGS_RECONFIGURE_IN, show_arg=False, section=14),
     ArgConstant('--Rout', '--Rout', 'reconfigure the stdout with the parsed encoding',
                 ARGS_RECONFIGURE_OUT, show_arg=False, section=14),
     ArgConstant('--Rerr', '--Rerr', 'reconfigure the stderr with the parsed encoding',
                 ARGS_RECONFIGURE_ERR, show_arg=False, section=14),
+
+    # installation
+    ArgConstant('--generate-man', '', 'print the man page and how to install it',
+                ARGS_MAN, show_arg_on_repl=False, section=15),
+    ArgConstant('--generate-completion', '',
+                'print a shell completion script and how to install it',
+                ARGS_COMPLETION, takes_value='SHELL',
+                show_arg_on_repl=False, section=15),
+    ArgConstant('--generate-sudoshim', '',
+                'print a shim so sudo can find cat_win and how to install it',
+                ARGS_SUDO_ALLOW, takes_value='SCRIPT',
+                show_arg_on_repl=False, section=15),
+
+    # text transforms
+    ArgConstant('trunc=X:Y', 'trunc:X:Y', 'truncate file to lines X and Y (python-like)',
+                -1, show_arg_on_repl=False, section=16),
+    ArgConstant('[A,B]', '', 'replace A with B in every line',
+                -1, section=16),
+    ArgConstant('[A:B:C]', '', 'python-like string indexing syntax (line by line)',
+                -1, section=16),
 ]
 ALL_ARGS.sort(key=lambda x:x.section)
+
+SECTION_NAMES = {
+     0: 'General Information',
+     1: 'Line Prefix',
+     2: 'Special Characters',
+     3: 'Line Manipulation',
+     4: 'Input Types',
+     5: 'Summaries',
+     6: 'Search and Match',
+     7: 'Meta Information',
+     8: 'Mathematical',
+     9: 'Byte Representation',
+    10: 'Editors & Pagers',
+    11: 'Visualization',
+    12: 'Behavioural',
+    13: 'Configuration',
+    14: '(Stream) Encoding',
+    15: 'Installation',
+    16: 'Text Transforms',
+}
+
+VALUE_DESCRIPTIONS = {
+    'SHELL' : ("the target shell", ('bash', 'fish', 'zsh')),
+    'SCRIPT': ("the target script", ('catw', 'cats')),
+    'STREAM': ("the target stream (default: stdin & stdout)", ('in', 'out', 'err')),
+    'CURVE' : ("the target curve (scan, z-order, hilbert)", ('b', 'z', 'h')),
+}
