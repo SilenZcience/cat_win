@@ -2,41 +2,33 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from cat_win.src.const.argconstants import (
-    ARGS_CCONFIG,
-    ARGS_CCONFIG_FLUSH,
-    ARGS_CONFIG,
-    ARGS_CONFIG_FLUSH,
+    ARGS_COMPLETION,
     ARGS_CONFIG_REMOVE,
     ARGS_DEBUG,
     ARGS_HELP,
+    ARGS_SUDO_ALLOW,
     ARGS_VERSION,
 )
+from cat_win.src.const.colorconstants import CKW
 from cat_win.src.processor import executionprecessor
 from cat_win.src.processor.executionprecessor import (
+    _show_sudoshim,
     _remove_config,
     _reset_color_config,
     _reset_config,
     _save_color_config,
     _save_config,
+    _show_completion,
     _show_debug,
     _show_help,
+    _show_man,
     _show_version,
     run_startup_actions,
 )
 from cat_win.tests.mocks.argparser import DummyArgParser
-from cat_win.tests.mocks.args import DummyStartupArgs
+from cat_win.tests.mocks.args import DummyArgConstant, DummyStartupArgs
 from cat_win.tests.mocks.ctx import DummyCtx
 from cat_win.tests.mocks.logger import LoggerStub
-
-
-class _Arg:
-    def __init__(self, section, show_arg, show_arg_on_repl, short_form, long_form, arg_help):
-        self.section = section
-        self.show_arg = show_arg
-        self.show_arg_on_repl = show_arg_on_repl
-        self.short_form = short_form
-        self.long_form = long_form
-        self.arg_help = arg_help
 
 
 class TestExecutionPrecessor(TestCase):
@@ -51,7 +43,18 @@ class TestExecutionPrecessor(TestCase):
         return ''.join(parts)
 
     def _mk_ctx(self, u_args=None):
-        ctx = DummyCtx(u_args=u_args if u_args is not None else DummyStartupArgs(), arg_parser=DummyArgParser())
+        color_dic = {
+            CKW.RESET_ALL: '\x1b[0m',
+            'cyan': '\x1b[36m',
+            'yellow': '\x1b[33m',
+            'magenta': '\x1b[35m',
+            'green': '\x1b[32m',
+        }
+        ctx = DummyCtx(
+            u_args=u_args if u_args is not None else DummyStartupArgs(),
+            color_dic=color_dic,
+            arg_parser=DummyArgParser(),
+        )
         ctx.known_files = []
         ctx.unknown_files = []
         ctx.known_dirs = []
@@ -63,14 +66,14 @@ class TestExecutionPrecessor(TestCase):
 
     def test_show_help_uses_more_and_prints_update_non_repl(self):
         fake_args = [
-            _Arg(0, True, True, '-a', '--alpha', 'alpha help'),
-            _Arg(1, True, True, '-b', '--beta', 'beta help'),
-            _Arg(-1, True, True, '-x', '--hidden', 'hidden help'),
+            DummyArgConstant('-a', '--alpha', 'alpha help', 0, section=0),
+            DummyArgConstant('-b', '--beta', 'beta help', 1, section=1),
+            DummyArgConstant('-x', '--hidden', 'hidden help', -1),
         ]
         with patch.object(executionprecessor, 'ALL_ARGS', fake_args):
             with patch('cat_win.src.processor.executionprecessor.More') as more_cls:
                 with patch('cat_win.src.processor.executionprecessor.print_update_information') as update:
-                    _show_help(False)
+                    _show_help(self._mk_ctx(), False)
 
         more_cls.assert_called_once()
         more_cls.return_value.step_through.assert_called_once()
@@ -78,38 +81,80 @@ class TestExecutionPrecessor(TestCase):
 
     def test_show_help_repl_filters_repl_only_entries(self):
         fake_args = [
-            _Arg(0, True, True, '-a', '--alpha', 'alpha help'),
-            _Arg(0, True, False, '-b', '--beta', 'beta help'),
+            DummyArgConstant('-a', '--alpha', 'alpha help', 0, section=0),
+            DummyArgConstant('-b', '--beta', 'beta help', 0, show_arg_on_repl=False, section=0),
         ]
         with patch.object(executionprecessor, 'ALL_ARGS', fake_args):
             with patch('cat_win.src.processor.executionprecessor.More') as more_cls:
                 with patch('cat_win.src.processor.executionprecessor.print_update_information'):
-                    _show_help(True)
+                    _show_help(self._mk_ctx(), True)
 
         help_lines = more_cls.call_args[0][0]
         rendered = '\n'.join(help_lines)
-        self.assertIn('cats [OPTION]', rendered)
+        self.assertIn('Interactively manipulate standard input.', rendered)
         self.assertIn('--alpha', rendered)
         self.assertNotIn('--beta', rendered)
 
     def test_show_help_truncates_long_argument_descriptor(self):
         fake_args = [
-            _Arg(0, True, True, '-x', '--' + 'verylongargumentname' * 3, 'desc'),
+            DummyArgConstant('-x', '--' + 'verylongargumentname' * 3, 'desc', 0, section=0),
         ]
         with patch.object(executionprecessor, 'ALL_ARGS', fake_args):
             with patch('cat_win.src.processor.executionprecessor.More') as more_cls:
                 with patch('cat_win.src.processor.executionprecessor.print_update_information'):
-                    _show_help(False)
+                    _show_help(self._mk_ctx(), False)
 
         rendered = '\n'.join(more_cls.call_args[0][0])
         self.assertIn('...', rendered)
+
+    def test_show_help_renders_metavar_with_value_description(self):
+        arg = DummyArgConstant('-R', '--R', 'reconfigure streams', 0, section=0)
+        arg.metavar = 'STREAM'
+        with patch.object(executionprecessor, 'ALL_ARGS', [arg]):
+            with patch('cat_win.src.processor.executionprecessor.More') as more_cls:
+                with patch('cat_win.src.processor.executionprecessor.print_update_information'):
+                    _show_help(self._mk_ctx(), False)
+
+        rendered = '\n'.join(more_cls.call_args[0][0])
+        self.assertIn('\x1b[35m<STREAM>', rendered)
+        self.assertIn('the target stream (default: stdin & stdout)', rendered)
+
+    def test_show_help_metavar_follows_double_dash_short_form(self):
+        arg = DummyArgConstant('--vis', '--visualize', 'visualize', 0, section=0)
+        arg.metavar = 'CURVE'
+        with patch.object(executionprecessor, 'ALL_ARGS', [arg]):
+            with patch('cat_win.src.processor.executionprecessor.More') as more_cls:
+                with patch('cat_win.src.processor.executionprecessor.print_update_information'):
+                    _show_help(self._mk_ctx(), False)
+
+        rendered = '\n'.join(more_cls.call_args[0][0])
+        marker = '\x1b[35m<CURVE>\x1b[0m'
+        # the metavar follows both the '--' short form and the long form
+        self.assertEqual(rendered.count(marker), 2)
+        # yellow must be restored for the long form after the magenta metavar
+        self.assertIn(f'{marker}\x1b[3m\x1b[33m, --visualize', rendered)
+
+    def test_show_help_truncation_preserves_value_placeholder_color(self):
+        # name is long enough that truncation cuts into the magenta '[=SHELL]' marker
+        arg = DummyArgConstant('--' + 'x' * 24, '', 'completion', 0, section=0)
+        arg.takes_value = 'SHELL'
+        with patch.object(executionprecessor, 'ALL_ARGS', [arg]):
+            with patch('cat_win.src.processor.executionprecessor.More') as more_cls:
+                with patch('cat_win.src.processor.executionprecessor.print_update_information'):
+                    _show_help(self._mk_ctx(), False)
+
+        rendered = '\n'.join(more_cls.call_args[0][0])
+        self.assertIn('...', rendered)
+        # the marker is cut off, but the magenta opening code must survive
+        self.assertNotIn('[=SHELL]', rendered)
+        self.assertIn('\x1b[35m[=', rendered)
 
     def test_show_help_always_prints_update_even_if_more_fails(self):
         with patch('cat_win.src.processor.executionprecessor.More') as more_cls:
             more_cls.return_value.step_through.side_effect = RuntimeError('stop')
             with patch('cat_win.src.processor.executionprecessor.print_update_information') as update:
                 with self.assertRaises(RuntimeError):
-                    _show_help(False)
+                    _show_help(self._mk_ctx(), False)
         update.assert_called_once()
 
     def test_show_version_with_install_time(self):
@@ -173,14 +218,14 @@ class TestExecutionPrecessor(TestCase):
             with self.assertRaises(SystemExit) as ex:
                 run_startup_actions(ctx, repl=False, arg_suggestions=[])
         self.assertEqual(ex.exception.code, 0)
-        show_help.assert_called_once_with(False)
+        show_help.assert_called_once_with(ctx, False)
 
     def test_run_startup_actions_help_flag(self):
         ctx = self._mk_ctx(u_args=DummyStartupArgs(overrides={ARGS_HELP: True}, ordered_args=[(ARGS_HELP, '--help')]))
         with patch('cat_win.src.processor.executionprecessor._show_help') as show_help:
             with self.assertRaises(SystemExit):
                 run_startup_actions(ctx, repl=True, arg_suggestions=[])
-        show_help.assert_called_once_with(True)
+        show_help.assert_called_once_with(ctx, True)
 
     def test_run_startup_actions_version_flag(self):
         ctx = self._mk_ctx(u_args=DummyStartupArgs(overrides={ARGS_VERSION: True}, ordered_args=[(ARGS_VERSION, '--version')]))
@@ -211,3 +256,31 @@ class TestExecutionPrecessor(TestCase):
         ctx = self._mk_ctx(u_args=args)
         ctx.known_files = ['file']
         run_startup_actions(ctx, repl=False, arg_suggestions=[])
+
+    def test_show_man_raises_system_exit_with_the_exit_code(self):
+        ctx = self._mk_ctx()
+        with patch('cat_win.src.processor.executionprecessor.show_man', return_value=1) as show_man:
+            with self.assertRaises(SystemExit) as ex:
+                _show_man(ctx)
+        show_man.assert_called_once_with()
+        self.assertEqual(ex.exception.code, 1)
+
+    def test_show_completion_passes_the_shell_argument(self):
+        ctx = self._mk_ctx(u_args=MagicMock())
+        ctx.u_args.find_arg_value.return_value = 'fish'
+        with patch('cat_win.src.processor.executionprecessor.show_completion', return_value=2) as show_completion:
+            with self.assertRaises(SystemExit) as ex:
+                _show_completion(ctx)
+        ctx.u_args.find_arg_value.assert_called_once_with(ARGS_COMPLETION)
+        show_completion.assert_called_once_with('fish')
+        self.assertEqual(ex.exception.code, 2)
+
+    def test_show_sudoshim_passes_the_script_argument(self):
+        ctx = self._mk_ctx(u_args=MagicMock())
+        ctx.u_args.find_arg_value.return_value = 'cats'
+        with patch('cat_win.src.processor.executionprecessor.show_shim', return_value=3) as show_shim:
+            with self.assertRaises(SystemExit) as ex:
+                _show_sudoshim(ctx)
+        ctx.u_args.find_arg_value.assert_called_once_with(ARGS_SUDO_ALLOW)
+        show_shim.assert_called_once_with('cats')
+        self.assertEqual(ex.exception.code, 3)

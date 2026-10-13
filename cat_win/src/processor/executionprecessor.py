@@ -11,7 +11,8 @@ from cat_win import (
     __project__,
     __sysversion__,
     __url__,
-    __version__
+    __version__,
+    __doc__
 )
 from cat_win.src.const.argconstants import (
     ALL_ARGS,
@@ -20,10 +21,26 @@ from cat_win.src.const.argconstants import (
     ARGS_CONFIG,
     ARGS_CONFIG_FLUSH,
     ARGS_CONFIG_REMOVE,
+    ARGS_COMPLETION,
     ARGS_DEBUG,
     ARGS_HELP,
-    ARGS_VERSION
+    ARGS_MAN,
+    ARGS_SUDO_ALLOW,
+    ARGS_VERSION,
+    SECTION_NAMES,
+    VALUE_DESCRIPTIONS
 )
+from cat_win.src.const.colorconstants import CKW
+from cat_win.src.const.escapecodes import (
+    GRAPHIC_BOLD,
+    GRAPHIC_ITALIC,
+    GRAPHIC_RESET,
+    GRAPHIC_UNDERLINE,
+)
+from cat_win.src.const.regex import RE_ANSI_CSI
+from cat_win.src.installation.completion import show_completion
+from cat_win.src.installation.manpage import show_man
+from cat_win.src.installation.sudoshim import show_shim
 from cat_win.src.processor.registerwrapper import (
     STARTUP_ACTIONS,
     register_startup
@@ -31,71 +48,153 @@ from cat_win.src.processor.registerwrapper import (
 from cat_win.src.service.fileattributes import get_file_ctime
 from cat_win.src.service.helper.iohelper import logger
 from cat_win.src.service.more import More
+from cat_win.src.service.querymanager import remove_ansi_codes_from_line
 from cat_win.src.web.updatechecker import print_update_information
 
 
-def _show_help(repl: bool = False) -> None:
+def _show_help(ctx, repl: bool = False) -> None:
     """
     Show the Help message and exit.
 
     Parameters:
+    ctx (AppContext):
+        The current invocation context, holding the active color dictionary.
     repl (bool):
         Whether the help message is for the REPL or not. Defaults to False.
     """
+    COLUMN = 35
+
+    colors = ctx.color_dic
+    reset = colors[CKW.RESET_ALL] or GRAPHIC_RESET
+    bold_cyan = GRAPHIC_BOLD + colors['cyan']
+    italic_yellow = GRAPHIC_ITALIC + colors['yellow']
+
+    def colored(text: str, style: str) -> str:
+        return f"{style}{text}{reset}"
+
+    def pad(text: str, width: int) -> str:
+        return text + ' ' * max(0, width - len(remove_ansi_codes_from_line(text)))
+
+    def fit(text: str, width: int) -> str:
+        if len(remove_ansi_codes_from_line(text)) <= width:
+            return text
+        kept = []
+        count = 0
+        pos = 0
+        while pos < len(text) and count < width-3:
+            ansi = RE_ANSI_CSI.match(text, pos)
+            if ansi:
+                kept.append(ansi.group())
+                pos = ansi.end()
+                continue
+            kept.append(text[pos])
+            pos += 1
+            count += 1
+        # keep escape codes that immediately close the last copied style
+        while pos < len(text):
+            ansi = RE_ANSI_CSI.match(text, pos)
+            if not ansi:
+                break
+            kept.append(ansi.group())
+            pos = ansi.end()
+        return ''.join(kept) + '...'
+
+    help_message = colored(f"{__project__} v{__version__} -- {__doc__}", bold_cyan) + '\n'
     if repl:
-        help_message = 'Usage: cats [OPTION]...\n'
         help_message += 'Interactively manipulate standard input.\n\n'
     else:
-        help_message = 'Usage: catw [FILE]... [OPTION]...\n'
-        help_message += 'Concatenate FILE(s) to standard output.\n\n'
-    for section_id, group in groupby(ALL_ARGS, lambda x: x.section):
+        help_message += 'concatenate, inspect, transform and explore FILE(s) from the terminal.\n\n'
+
+    help_message += colored('Usage', bold_cyan) + '\n'
+    if repl:
+        help_message += (
+            f"{GRAPHIC_UNDERLINE}{colored('cats', colors['green'])} "
+            f"{colored('[OPTION]...', colors['magenta'])}\n\n"
+        )
+    else:
+        help_message += (
+            f"{GRAPHIC_UNDERLINE}{colored('catw', colors['green'])} "
+            f"{colored('[FILE]...', colors['magenta'])} "
+            f"{colored('[OPTION]...', colors['magenta'])}\n"
+        )
+        help_message += 'options may be combined with file arguments.\n\n'
+
+    for section_id, group in groupby(ALL_ARGS, lambda arg: arg.section):
         if section_id < 0:
             continue
-        relevant_section = False
+
+        entries = []
+        values_taken = []
         for arg in group:
-            if arg.show_arg and (not repl or arg.show_arg_on_repl):
-                arg_descriptor = arg.short_form
-                arg_descriptor+= (', ' + arg.long_form) * bool(arg.long_form)
-                if len(arg_descriptor) > 35:
-                    arg_descriptor = arg_descriptor[:31] + '...'
-                help_message += f"\t{arg_descriptor: <35}{arg.arg_help}\n"
-                relevant_section = True
-        help_message += '\n' * relevant_section
-    help_message += f"\t{'-R, --R<stream>': <35}"
-    help_message += 'reconfigure the std-stream(s) with the parsed encoding\n'
-    help_message += "\t<stream> == 'in'/'out'/'err' (default is stdin & stdout)\n"
+            if not arg.show_arg or (repl and not arg.show_arg_on_repl):
+                continue
+
+            # a '--' short form is itself a long-style option and gets the
+            # metavar too, e.g. '--vis<CURVE>, --visualize<CURVE>'
+            magenta = colors['magenta']
+            name_parts = [(arg.short_form, italic_yellow)]
+            if arg.takes_value:
+                name_parts.append((f"[={arg.takes_value}]", magenta))
+            if arg.metavar and (arg.short_form.startswith('--') or not arg.long_form):
+                name_parts.append((f"<{arg.metavar}>", magenta))
+            if arg.long_form:
+                name_parts.append((f", {arg.long_form}", italic_yellow))
+                if arg.takes_value:
+                    name_parts.append((f"[={arg.takes_value}]", magenta))
+                if arg.metavar:
+                    name_parts.append((f"<{arg.metavar}>", magenta))
+            # merge adjacent parts of the same style, so a plain run is colored
+            # once and the yellow is restored after every magenta placeholder
+            name = ''.join(
+                colored(''.join(text for text, _ in part), style)
+                for style, part in groupby(name_parts, key=lambda p: p[1])
+            )
+            name = fit(name, COLUMN - 2)
+            if not name.endswith(reset):
+                name += reset
+
+            entries.append(f"\t{pad(name, COLUMN)}{arg.arg_help}\n")
+            value_taken = arg.takes_value or arg.metavar
+            if value_taken:
+                values_taken.append(value_taken)
+
+        if not entries:
+            continue
+
+        help_message += colored(SECTION_NAMES[section_id], bold_cyan) + '\n'
+        help_message += ''.join(entries)
+        for value_taken in values_taken:
+            value_desc = ' '.join(map(str, VALUE_DESCRIPTIONS[value_taken]))
+            help_message += f"\t{pad(colored(value_taken, colors['magenta']), COLUMN)}{value_desc}\n"
+        help_message += '\n'
+
     help_message += '\n'
-    help_message += f"\t{'enc=X, enc:X'    : <35}set file encoding to X (default is utf-8)\n"
-    help_message += f"\t{'find=X, find:X'  : <35}find/query a substring X in the given files\n"
-    help_message += f"\t{'match=X, match:X': <35}find/query a pattern X in the given files\n"
-    help_message += f"\t{'replace=X, replace:X': <35}replace queried substring(s)/pattern(s) in the given files\n"
-    if not repl:
-        help_message += f"\t{'trunc=X:Y, trunc:X:Y': <35}"
-        help_message += 'truncate file to lines X and Y (python-like)\n'
-    help_message += '\n'
-    help_message += f"\t{'[a,b]': <35}replace a with b in every line\n"
-    help_message += f"\t{'[a:b:c]': <35}python-like string indexing syntax (line by line)\n"
-    help_message += '\n'
-    help_message += 'Examples:\n'
+    help_message += colored('Examples', bold_cyan) + '\n'
     if repl:
-        help_message += '\tcats --ln --dec\n'
-        help_message += '\t> >>> 12345\n'
-        help_message += '\t1) [53] 12345 {Hexadecimal: 0x3039; Binary: 0b11000000111001}\n'
-        help_message += '\t> >>> !help\n'
-        help_message += '\t> ...\n'
+        repl_examples = [
+            'cats --ln --dec',
+            '> >>> 12345',
+            '1) [53] 12345 {Hexadecimal: 0x3039; Binary: 0b11000000111001}',
+            '> >>> !help',
+            '> ...',
+        ]
+        help_message += ''.join(f"\t{colored(line, colors['green'])}\n" for line in repl_examples)
     else:
-        help_message += f"\t{'catw f g -r' : <35}"
-        help_message += "Output g's contents in reverse order, then f's content in reverse order\n"
-        help_message += f"\t{'catw f g -ne': <35}"
-        help_message += "Output f's, then g's content, "
-        help_message += 'while numerating and showing the end of lines\n'
-        help_message += f"\t{'catw f trunc=a:b:c': <35}"
-        help_message += "Output f's content starting at line a, ending at line b, stepping c\n"
+        examples = [
+            ('catw f g -r', "Output g's contents in reverse order, then f's content in reverse order"),
+            ('catw f g -r -ne', 'Output f\'s, then g\'s content, while numerating and showing the end of lines'),
+            ('catw f trunc=a:b:c', "Output f's content starting at line a, ending at line b, stepping c"),
+        ]
+        help_message += ''.join(
+            f"\t{pad(colored(command, colors['green']), COLUMN)}{description}\n"
+            for command, description in examples
+        )
     help_message += '\n'
-    help_message += 'Documentation:\n'
+    help_message += colored('Documentation', bold_cyan) + '\n'
     help_message += f"\t{__url__}/blob/main/DOCUMENTATION.md"
+
     try:
-        (More(help_message.splitlines())).step_through()
+        More(help_message.splitlines()).step_through()
     finally:
         print_update_information(__project__, __version__)
 
@@ -180,6 +279,18 @@ def _show_debug(ctx, unknown_args: list) -> None:
     logger('==================================================='
               '====================================================', priority=logger.DEBUG)
 
+@register_startup(ARGS_MAN)
+def _show_man(ctx) -> None:
+    raise SystemExit(show_man())
+
+@register_startup(ARGS_COMPLETION)
+def _show_completion(ctx) -> None:
+    raise SystemExit(show_completion(ctx.u_args.find_arg_value(ARGS_COMPLETION)))
+
+@register_startup(ARGS_SUDO_ALLOW)
+def _show_sudoshim(ctx) -> None:
+    raise SystemExit(show_shim(ctx.u_args.find_arg_value(ARGS_SUDO_ALLOW)))
+
 @register_startup(ARGS_CONFIG_REMOVE)
 def _remove_config(ctx) -> None:
     ctx.config.remove_config()
@@ -221,7 +332,7 @@ def run_startup_actions(
     if (
         len(ctx.known_files) + len(ctx.unknown_files) + len(ctx.u_args) == 0 and not repl
     ) or ctx.u_args[ARGS_HELP]:
-        _show_help(repl)
+        _show_help(ctx, repl)
         raise SystemExit(0)
 
     if ctx.u_args[ARGS_VERSION]:
