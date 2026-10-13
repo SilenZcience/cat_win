@@ -112,3 +112,22 @@ class DummyReplArgs(dict):
         for arg in args_to_delete:
             if arg in self.args:
                 self.args.remove(arg)
+
+
+class DummyArgConstant:
+    def __init__(
+            self, short_form, long_form,
+            arg_help,
+            arg_id,
+            show_arg=True, show_arg_on_repl=True,
+            section=-1, takes_value=None, metavar=None
+    ):
+        self.short_form = short_form
+        self.long_form = long_form
+        self.arg_help = arg_help
+        self.arg_id = arg_id
+        self.show_arg = show_arg
+        self.show_arg_on_repl = show_arg_on_repl
+        self.section = section
+        self.takes_value = takes_value
+        self.metavar = metavar
