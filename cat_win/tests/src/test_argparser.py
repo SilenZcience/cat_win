@@ -2,8 +2,16 @@ from unittest import TestCase
 from unittest.mock import patch
 import os
 
-from cat_win.src.const.argconstants import ARGS_CUT, ARGS_REPLACE, ARGS_ECHO
+from cat_win.src.const.argconstants import (
+    ARGS_COMPLETION,
+    ARGS_CUT,
+    ARGS_ECHO,
+    ARGS_NUMBER,
+    ARGS_REPLACE,
+    ARGS_SUDO_ALLOW
+)
 from cat_win.src.argparser import ArgParser, IS_FILE, IS_DIR, IS_PATTERN
+from cat_win.src.domain.arguments import Arguments
 # import sys
 # sys.path.append('../cat_win')
 
@@ -417,6 +425,94 @@ class TestArgParser(TestCase):
 
         args, _, _ = arg_parser.get_arguments(['CAT', r'[\ud800,a]'])
         self.assertEqual(args, [(ARGS_REPLACE, (r'\ud800', 'a'))])
+
+    def test_long_form_value_on_flag_without_value_is_unknown(self):
+        # '--debug' does not take a value, so this stays an unknown argument
+        arg_parser = ArgParser()
+
+        args, unknown_args, _ = arg_parser.get_arguments(
+            ['CAT', '--debug=1']
+        )
+
+        self.assertEqual(args, [])
+        self.assertEqual(unknown_args, ['--debug=1'])
+
+    def test_takes_value_param_keeps_its_arg_with_it(self):
+        arg_parser = ArgParser()
+
+        args, _, _ = arg_parser.get_arguments(['CAT', '--generate-completion=bash'])
+
+        self.assertEqual(args, [(ARGS_COMPLETION, '--generate-completion')])
+        self.assertEqual(len(args[0]), 2)
+        self.assertEqual(args[0][1].argument, 'bash')
+
+    def test_takes_value_param_arg_is_found_through_u_args(self):
+        arg_parser = ArgParser()
+
+        args, _, _ = arg_parser.get_arguments(['CAT', '--generate-completion=bash', '-n'])
+        u_args = Arguments()
+        u_args.set_args(args)
+
+        self.assertEqual(u_args[ARGS_COMPLETION], True)
+        self.assertEqual(u_args.find_arg_value(ARGS_COMPLETION), 'bash')
+        self.assertEqual(u_args[ARGS_NUMBER], True)
+        self.assertIsNone(u_args.find_arg_value(ARGS_NUMBER))
+
+    def test_takes_value_param_passed_bare_has_no_arg(self):
+        arg_parser = ArgParser()
+
+        args, _, _ = arg_parser.get_arguments(['CAT', '--generate-completion'])
+        u_args = Arguments()
+        u_args.set_args(args)
+
+        self.assertEqual(args, [(ARGS_COMPLETION, '--generate-completion')])
+        self.assertEqual(u_args[ARGS_COMPLETION], True)
+        self.assertIsNone(u_args.find_arg_value(ARGS_COMPLETION))
+
+    def test_takes_value_param_is_deleted_in_repl(self):
+        arg_parser = ArgParser()
+
+        args, _, _ = arg_parser.get_arguments(
+            ['CAT', '-n', '--generate-completion=bash', '--generate-sudoshim=cats']
+        )
+        u_args = Arguments()
+        u_args.set_args(args)
+
+        arg_parser.gen_arguments(['', '--generate-completion=bash'], delete=True)
+        u_args.delete_args(arg_parser.get_args())
+
+        self.assertEqual(u_args.args, [(ARGS_NUMBER, '-n'),
+                                       (ARGS_SUDO_ALLOW, '--generate-sudoshim')])
+        self.assertIsNone(u_args.find_arg_value(ARGS_COMPLETION))
+        self.assertEqual(u_args.find_arg_value(ARGS_SUDO_ALLOW), 'cats')
+
+    def test_takes_value_param_is_deleted_in_repl_without_its_argument(self):
+        arg_parser = ArgParser()
+
+        args, _, _ = arg_parser.get_arguments(['CAT', '--generate-completion=bash', '-n'])
+        u_args = Arguments()
+        u_args.set_args(args)
+
+        arg_parser.gen_arguments(['', '--generate-completion'], delete=True)
+        u_args.delete_args(arg_parser.get_args())
+
+        self.assertEqual(u_args.args, [(ARGS_NUMBER, '-n')])
+        self.assertNotIn(ARGS_COMPLETION, u_args.args_val)
+
+    def test_takes_value_param_delete_leaves_the_arg_of_others_alone(self):
+        arg_parser = ArgParser()
+
+        args, _, _ = arg_parser.get_arguments(
+            ['CAT', '--generate-completion=bash', '--generate-sudoshim=cats']
+        )
+        u_args = Arguments()
+        u_args.set_args(args)
+
+        arg_parser.gen_arguments(['', '--generate-sudoshim=cats'], delete=True)
+        u_args.delete_args(arg_parser.get_args())
+
+        self.assertEqual(u_args.find_arg_value(ARGS_SUDO_ALLOW), None)
+        self.assertEqual(u_args.find_arg_value(ARGS_COMPLETION), 'bash')
 
     def test_custom_command_complicated_expands_and_stops_at_echo(self):
         custom_commands = {'-1': ['-b', '-lnEwtf', 'test']}

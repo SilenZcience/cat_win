@@ -12,6 +12,7 @@ from cat_win.src.const.argconstants import (
     ARGS_ECHO,
     ARGS_REPLACE
 )
+from cat_win.src.domain.arguments import Param
 from cat_win.src.const.regex import (
     RE_CUT,
     RE_ENCODING,
@@ -399,8 +400,20 @@ class ArgParser:
             if arg.arg_id < 0:
                 continue
             if param in (arg.short_form, arg.long_form):
-                self._args.append((arg.arg_id, param))
+                self._args.append((arg.arg_id, Param(param)))
                 return arg.arg_id == ARGS_ECHO
+            if arg.takes_value is not None:
+                arg_value = None
+                if arg.short_form and arg.short_form.startswith(
+                    '--'
+                ) and param.startswith(arg.short_form + '='):
+                    arg_value = param[len(arg.short_form) + 1:]
+                elif arg.long_form and param.startswith(arg.long_form + '='):
+                    arg_value = param[len(arg.long_form) + 1:]
+                if arg_value is not None:
+                    param_name = param[:param.index('=')]
+                    self._args.append((arg.arg_id, Param(param_name, arg_value)))
+                    return False
 
         param = self._expand_user(param)
         if self._add_path_struct(param):
