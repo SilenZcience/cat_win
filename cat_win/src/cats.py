@@ -23,6 +23,13 @@ from cat_win.src.service.helper.iohelper import IoHelper
 from cat_win.src.service.querymanager import remove_ansi_codes_from_line
 
 
+if not on_windows_os:
+    try:
+        import readline
+    except ImportError:
+        pass
+
+
 class ReplCommandHandler:
     """
     Handle !-prefixed commands inside the cats REPL.
@@ -151,12 +158,6 @@ def repl_main(ctx, init_colors, show_unknown_args) -> None:
     )
     command_count = 0
     isatty = os.isatty(sys.stdin.fileno())
-
-    if isatty and not on_windows_os:
-        try:
-            import readline
-        except ImportError:
-            pass
 
     print(__project__, 'v' + __version__, 'REPL', '(' + __url__ + ')', end=' - ')
     print("Use 'catw' to handle files.")
