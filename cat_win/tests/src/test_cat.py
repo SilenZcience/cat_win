@@ -18,18 +18,10 @@ from cat_win.src.const.colorconstants import CKW
 from cat_win.src.const.defaultconstants import DKW
 from cat_win.src import cat as cat_module
 from cat_win.tests.mocks.argparser import DummyArgParser
-from cat_win.tests.mocks.args import DummyStartupArgs
+from cat_win.tests.mocks.args import DummyArgConstant, DummyStartupArgs
 from cat_win.tests.mocks.ctx import DummyCtx
 from cat_win.tests.mocks.logger import LoggerStub
 from cat_win.tests.mocks.ufiles import DummyUFiles
-
-
-class _ArgDef:
-    def __init__(self, arg_id, short_form, long_form, show_arg_on_repl=True):
-        self.arg_id = arg_id
-        self.short_form = short_form
-        self.long_form = long_form
-        self.show_arg_on_repl = show_arg_on_repl
 
 
 class TestCat(TestCase):
@@ -155,7 +147,10 @@ class TestCat(TestCase):
         ctx = self._mk_base_ctx()
         ctx.arg_parser._unknown_args = ['--x']
         logger_stub = LoggerStub()
-        fake_args = [_ArgDef(1, '-a', '--alpha', True), _ArgDef(2, '-b', '--beta', False)]
+        fake_args = [
+            DummyArgConstant('-a', '--alpha', '', 1, show_arg_on_repl=True),
+            DummyArgConstant('-b', '--beta', '', 2, show_arg_on_repl=False),
+        ]
         suggestions = [('--x', [('--alpha', 1)])]
         with patch.object(cat_module, '_ctx', ctx):
             with patch.object(cat_module, 'ALL_ARGS', fake_args):
@@ -168,7 +163,10 @@ class TestCat(TestCase):
     def test_show_unknown_args_suggestions_non_repl_uses_all_args(self):
         ctx = self._mk_base_ctx()
         ctx.arg_parser._unknown_args = ['--x']
-        fake_args = [_ArgDef(1, '-a', '--alpha', True), _ArgDef(2, '-b', '--beta', False)]
+        fake_args = [
+            DummyArgConstant('-a', '--alpha', '', 1, show_arg_on_repl=True),
+            DummyArgConstant('-b', '--beta', '', 2, show_arg_on_repl=False),
+        ]
         with patch.object(cat_module, '_ctx', ctx):
             with patch.object(cat_module, 'ALL_ARGS', fake_args):
                 with patch.object(cat_module, 'calculate_suggestions', return_value=[]) as calc:
