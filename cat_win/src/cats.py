@@ -3,10 +3,6 @@ repl
 """
 
 import os
-try:
-    import readline
-except ImportError:
-    pass
 import shlex
 import sys
 from time import monotonic
@@ -155,6 +151,12 @@ def repl_main(ctx, init_colors, show_unknown_args) -> None:
     )
     command_count = 0
     isatty = os.isatty(sys.stdin.fileno())
+
+    if isatty and not on_windows_os:
+        try:
+            import readline
+        except ImportError:
+            pass
 
     print(__project__, 'v' + __version__, 'REPL', '(' + __url__ + ')', end=' - ')
     print("Use 'catw' to handle files.")
