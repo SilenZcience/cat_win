@@ -125,9 +125,14 @@ class CConfig:
             self.color_dic = self.default_dic.copy()
 
         # The Reset Codes should always be the same
-        self.color_dic[CKW.RESET_ALL] = ColorOptions.Style['RESET']
-        self.color_dic[CKW.RESET_FOUND] = ColorOptions.Fore['RESET']
+        self.color_dic[CKW.RESET_ALL]     = ColorOptions.Style['RESET']
+        self.color_dic[CKW.RESET_FOUND]   = ColorOptions.Fore['RESET']
         self.color_dic[CKW.RESET_MATCHED] = ColorOptions.Back['RESET']
+
+        self.color_dic['green']   = ColorOptions.Fore['GREEN'] # TODO: this is ugly af, but works for now
+        self.color_dic['yellow']  = ColorOptions.Fore['YELLOW']
+        self.color_dic['magenta'] = ColorOptions.Fore['MAGENTA']
+        self.color_dic['cyan']    = ColorOptions.Fore['CYAN']
 
         return self.color_dic
 

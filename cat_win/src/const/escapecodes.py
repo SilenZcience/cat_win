@@ -139,3 +139,14 @@ DECSCUSR_CURSOR_STYLE = {
     'bar_blink'      : DECSCUSR_STYLE_BAR_BLINK,
     'bar'            : DECSCUSR_STYLE_BAR,
 }
+
+GRAPHIC_BOLD          = f"{ESC_CODE}[1m"
+# GRAPHIC_DIM           = f"{ESC_CODE}[2m"
+GRAPHIC_ITALIC        = f"{ESC_CODE}[3m"
+GRAPHIC_UNDERLINE     = f"{ESC_CODE}[4m"
+# GRAPHIC_BLINKING      = f"{ESC_CODE}[5m"
+# GRAPHIC_INVERSE       = f"{ESC_CODE}[7m"
+# GRAPHIC_HIDDEN        = f"{ESC_CODE}[8m"
+# GRAPHIC_STRIKETHROUGH = f"{ESC_CODE}[9m"
+# neutralises ONLY the graphic attributes above (bold, italic, underline)
+GRAPHIC_RESET         = f"{ESC_CODE}[22;23;24m"
