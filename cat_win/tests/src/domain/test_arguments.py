@@ -11,29 +11,29 @@ from cat_win.src.domain.arguments import Arguments, Param, reduce_list, diff_lis
 
 class TestParam(TestCase):
     def test_is_a_string_in_every_regard(self):
-        param = Param('--completion', 'bash')
+        param = Param('--generate-completion', 'bash')
         self.assertIsInstance(param, str)
-        self.assertEqual(param, '--completion')
-        self.assertEqual(str(param), '--completion')
-        self.assertEqual(repr(param), repr('--completion'))
-        self.assertEqual('{0}'.format(param), '--completion')
-        self.assertEqual('--completion {0}'.format(param), '--completion --completion')
-        self.assertEqual(param.startswith('--comp'), True)
-        self.assertEqual(param.split('='), ['--completion'])
-        self.assertEqual({'--completion': 1}[param], 1)
-        self.assertEqual([p for p in param], list('--completion'))
+        self.assertEqual(param, '--generate-completion')
+        self.assertEqual(str(param), '--generate-completion')
+        self.assertEqual(repr(param), repr('--generate-completion'))
+        self.assertEqual('{0}'.format(param), '--generate-completion')
+        self.assertEqual('--generate-completion {0}'.format(param), '--generate-completion --generate-completion')
+        self.assertEqual(param.startswith('--gene'), True)
+        self.assertEqual(param.split('='), ['--generate-completion'])
+        self.assertEqual({'--generate-completion': 1}[param], 1)
+        self.assertEqual([p for p in param], list('--generate-completion'))
 
     def test_carries_its_argument(self):
-        self.assertEqual(Param('--completion', 'bash').argument, 'bash')
+        self.assertEqual(Param('--generate-completion', 'bash').argument, 'bash')
         self.assertEqual(Param('--number', '3').argument, '3')
-        self.assertIsNone(Param('--completion').argument)
+        self.assertIsNone(Param('--generate-completion').argument)
 
     def test_argument_does_not_make_it_an_arbitrary_string(self):
         with self.assertRaises(AttributeError):
-            Param('--completion').nonsense = 1
+            Param('--generate-completion').nonsense = 1
 
     def test_equal_params_compare_by_param_alone(self):
-        self.assertEqual(Param('--completion', 'bash'), Param('--completion', 'fish'))
+        self.assertEqual(Param('--generate-completion', 'bash'), Param('--generate-completion', 'fish'))
 
 
 class TestArguments(TestCase):
@@ -157,13 +157,13 @@ class TestArguments(TestCase):
 
     def test_find_arg_value_returns_the_argument(self):
         u_args = Arguments()
-        u_args.set_args([(ARGS_COMPLETION, Param('--completion', 'bash'))])
+        u_args.set_args([(ARGS_COMPLETION, Param('--generate-completion', 'bash'))])
         self.assertEqual(u_args[ARGS_COMPLETION], True)
         self.assertEqual(u_args.find_arg_value(ARGS_COMPLETION), 'bash')
 
     def test_find_arg_value_is_none_for_a_param_without_an_argument(self):
         u_args = Arguments()
-        u_args.set_args([(ARGS_COMPLETION, Param('--completion'))])
+        u_args.set_args([(ARGS_COMPLETION, Param('--generate-completion'))])
         self.assertEqual(u_args[ARGS_COMPLETION], True)
         self.assertIsNone(u_args.find_arg_value(ARGS_COMPLETION))
 

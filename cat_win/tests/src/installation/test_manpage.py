@@ -74,18 +74,18 @@ class TestBuildMan(TestCase):
         self.assertIn('.B fg\n.br\nBackground session.', page)
 
     def test_appends_the_takes_value_suffix_to_every_form(self):
-        fake_args = [DummyArgConstant('-c', '--completion', 'completion', 200,
+        fake_args = [DummyArgConstant('-c', '--generate-completion', 'completion', 200,
                           section=15, takes_value='SHELL')]
         with patch.object(mp, 'ALL_ARGS', fake_args):
             page = build_man()
-        self.assertIn('.B \\&-c=SHELL, \\&--completion=SHELL', page)
+        self.assertIn('.B \\&-c=SHELL, \\&--generate-completion=SHELL', page)
 
 
 class TestInstallHint(TestCase):
     def test_explains_the_install_and_removal_commands(self):
         hint = install_hint()
         self.assertIn('to install the man page, run:', hint)
-        self.assertIn('catw --man > ', hint)
+        self.assertIn('catw --generate-man > ', hint)
         self.assertIn(MAN_DIR, hint)
         self.assertIn('rm -f', hint)
         self.assertIn('man catw', hint)

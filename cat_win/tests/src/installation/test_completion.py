@@ -98,7 +98,7 @@ class TestGenerateBash(TestCase):
 
     def test_adds_value_options_without_duplicates(self):
         fake_args = [
-            DummyArgConstant('-c', '--completion', 'completion', 100, takes_value='SHELL'),
+            DummyArgConstant('-c', '--generate-completion', 'completion', 100, takes_value='SHELL'),
             DummyArgConstant('--eq', '--eq', 'self duplicate', 101, takes_value='SHELL'),
             DummyArgConstant('mode=x', '', 'operand with value', 102, takes_value='SHELL'),
         ]
@@ -141,7 +141,7 @@ class TestGenerateZsh(TestCase):
 
     def test_renders_value_and_plain_options_diffently(self):
         fake_args = [
-            DummyArgConstant('-c', '--completion', 'completion', 200, takes_value='SHELL'),
+            DummyArgConstant('-c', '--generate-completion', 'completion', 200, takes_value='SHELL'),
             DummyArgConstant('-n', '--number', 'number', 201),
             DummyArgConstant('', '-w', 'long only', 0),
         ]
@@ -164,7 +164,7 @@ class TestGenerateFish(TestCase):
             DummyArgConstant('-n', '--number', 'number all lines', 0),
             DummyArgConstant('-r', '', 'reverse', 1),
             DummyArgConstant('', '--nick', 'nickname', 2),
-            DummyArgConstant('-c', '--completion', 'completion', 200, takes_value='SHELL'),
+            DummyArgConstant('-c', '--generate-completion', 'completion', 200, takes_value='SHELL'),
         ]
         with patch.object(cpl, 'ALL_ARGS', fake_args):
             script = generate_fish()
@@ -176,7 +176,7 @@ class TestGenerateFish(TestCase):
 
 class TestBuildCompletion(TestCase):
     def test_dispatches_to_the_matching_generator(self):
-        self.assertIn('catw --completion=bash', build_completion('bash'))
+        self.assertIn('catw --generate-completion=bash', build_completion('bash'))
         self.assertIn('#compdef catw cats', build_completion('zsh'))
         self.assertIn('# fish completion for cat_win', build_completion('fish'))
 
@@ -204,7 +204,7 @@ class TestInstallHint(TestCase):
     def test_explains_the_install_commands_for_a_shell(self):
         hint = install_hint('bash')
         self.assertIn('to install the completion script for bash, run:', hint)
-        self.assertIn('catw --completion=bash > ', hint)
+        self.assertIn('catw --generate-completion=bash > ', hint)
         self.assertIn('mkdir -p', hint)
 
     def test_zsh_gets_the_extra_fpath_hint(self):
