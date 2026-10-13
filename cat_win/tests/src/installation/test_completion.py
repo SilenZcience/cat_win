@@ -204,7 +204,7 @@ class TestInstallHint(TestCase):
     def test_explains_the_install_commands_for_a_shell(self):
         hint = install_hint('bash')
         self.assertIn('to install the completion script for bash, run:', hint)
-        self.assertIn('catw --generate-completion=bash > ', hint)
+        self.assertIn('catw --generate-completion=bash ', hint)
         self.assertIn('mkdir -p', hint)
 
     def test_zsh_gets_the_extra_fpath_hint(self):

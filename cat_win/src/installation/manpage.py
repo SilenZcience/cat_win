@@ -137,7 +137,7 @@ def install_hint():
     """
     return f"to install the man page, run:\n" \
            f"  mkdir -p {MAN_DIR}\n" \
-           f"  catw --generate-man > {os.path.join(MAN_DIR, 'catw.1')}\n\n" \
+           f"  catw --generate-man 2>/dev/null > {os.path.join(MAN_DIR, 'catw.1')}\n\n" \
            f"if 'man catw' does not work, the directory is not on the man search path.\n" \
            f"add it to MANPATH in your shell profile:\n" \
            f"  export MANPATH=\"{os.path.dirname(MAN_DIR)}:$MANPATH\"\n\n" \

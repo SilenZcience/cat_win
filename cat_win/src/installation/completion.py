@@ -292,10 +292,12 @@ def install_hint(shell: str) -> str:
     target_dir = os.path.dirname(target)
     install = f"to install the completion script for {shell}, run:\n" \
               f"  mkdir -p {target_dir}\n" \
-              f"  catw --generate-completion={shell} > {target}\n"
+              f"  catw --generate-completion={shell} 2>/dev/null > {target}\n"
     if shell == 'zsh':
         install += f"  # zsh needs the directory on $fpath in ~/.zshrc:\n"
-        install += f"  #   fpath=(\"{target_dir}\" $fpath)\n"
+        install += f"  #   fpath=(\"{target_dir}\" $fpath)\n\n"
+    install += f"to remove it again, run:\n" \
+               f"  rm -f {target}\n"
 
     return install
 

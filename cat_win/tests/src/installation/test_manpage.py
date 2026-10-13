@@ -85,7 +85,7 @@ class TestInstallHint(TestCase):
     def test_explains_the_install_and_removal_commands(self):
         hint = install_hint()
         self.assertIn('to install the man page, run:', hint)
-        self.assertIn('catw --generate-man > ', hint)
+        self.assertIn('catw --generate-man ', hint)
         self.assertIn(MAN_DIR, hint)
         self.assertIn('rm -f', hint)
         self.assertIn('man catw', hint)
