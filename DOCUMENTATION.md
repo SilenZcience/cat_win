@@ -31,15 +31,17 @@
             <li><a href="#linemanipulation">Line Manipulation</a></li>
             <li><a href="#input">Input Types</a></li>
             <li><a href="#summary">Summaries</a></li>
-            <li><a href="#search">Search and Match</a></li>
+            <li><a href="#search">Search & Match</a></li>
             <li><a href="#meta">Meta Information</a></li>
             <li><a href="#mathematical">Mathematical</a></li>
             <li><a href="#byteview">Byte Representation</a></li>
-            <li><a href="#edit">Editor</a></li>
+            <li><a href="#edit">Editors & Pagers</a></li>
             <li><a href="#visualizer">Visualization</a></li>
-            <li><a href="#settings">Settings/Behaviour</a></li>
+            <li><a href="#settings">Behavioural</a></li>
             <li><a href="#configuration">Configuration</a></li>
-            <li><a href="#encoding">Text Encoding</a></li>
+            <li><a href="#encoding">(Stream) Encoding</a></li>
+            <li><a href="#installation">Installation</a></li>
+            <li><a href="#transforms">Text Transforms</a></li>
          </ul>
       </li>
       <li>
@@ -47,7 +49,7 @@
          <ul>
             <li><a href="#-h---help">-h, --help</a></li>
             <li><a href="#-v---version">-v, --version</a></li>
-            <li><a href="#--debug---debug">--debug, --debug</a></li>
+            <li><a href="#--debug">--debug</a></li>
             <li><a href="#--debuglog---debug-log">--debuglog, --debug-log</a></li>
             <li><a href="#-l---linelength">-l, --linelength</a></li>
             <li><a href="#-n---number">-n, --number</a></li>
@@ -71,20 +73,23 @@
             <li><a href="#-s---sum">-s, --sum</a></li>
             <li><a href="#--wc---wordcount">--wc, --wordcount</a></li>
             <li><a href="#--cc---charcount">--cc, --charcount</a></li>
+            <li><a href="#findx-findx">find=X, find&#42889;X</a></li>
+            <li><a href="#matchx-matchx">match=X, match&#42889;X</a></li>
+            <li><a href="#replacex-replacex">replace=X, replace&#42889;X</a></li>
             <li><a href="#-g---grep">-g, --grep</a></li>
             <li><a href="#--nk---nokeyword">--nk, --nokeyword</a></li>
             <li><a href="#--nb---nobreak">--nb, --nobreak</a></li>
             <li><a href="#-a---attributes">-a, --attributes</a></li>
             <li><a href="#-m---checksum">-m, --checksum</a></li>
-            <li><a href="#--strings---strings">--strings, --strings</a></li>
-            <li><a href="#--b64d---b64d">--b64d, --b64d</a></li>
-            <li><a href="#--b64e---b64e">--b64e, --b64e</a></li>
+            <li><a href="#--strings">--strings</a></li>
+            <li><a href="#--b64d">--b64d</a></li>
+            <li><a href="#--b64e">--b64e</a></li>
             <li><a href="#--eval---eval">--eval, --EVAL</a></li>
             <li><a href="#--hex---hex">--hex, --HEX</a></li>
             <li><a href="#--dec---dec">--dec, --DEC</a></li>
             <li><a href="#--oct---oct">--oct, --OCT</a></li>
             <li><a href="#--bin---bin">--bin, --BIN</a></li>
-            <li><a href="#--binview---binview">--binview, --binview</a></li>
+            <li><a href="#--binview">--binview</a></li>
             <li><a href="#--hexview---hexview">--hexview, --HEXVIEW</a></li>
             <li><a href="#----edit">-!, --edit</a></li>
             <li><a href="#----hexedit">-#, --hexedit</a></li>
@@ -103,16 +108,16 @@
             <li><a href="#--dot---dotfiles">--dot, --dotfiles</a></li>
             <li><a href="#--plain---plain-only">--plain, --plain-only</a></li>
             <li><a href="#--nc---nocolor">--nc, --nocolor</a></li>
-            <li><a href="#--config---config">--config, --config</a></li>
-            <li><a href="#--cconfig---cconfig">--cconfig, --cconfig</a></li>
+            <li><a href="#--config">--config</a></li>
+            <li><a href="#--cconfig">--cconfig</a></li>
             <li><a href="#--config-clear---config-reset">--config-clear, --config-reset</a></li>
             <li><a href="#--cconfig-clear---cconfig-reset">--cconfig-clear, --cconfig-reset</a></li>
             <li><a href="#--config-remove---cconfig-remove">--config-remove, --cconfig-remove</a></li>
-            <li><a href="#-r---rstream">-R, --R&ltstream&gt</a></li>
             <li><a href="#encx-encx">enc=X, enc&#42889;X</a></li>
-            <li><a href="#findx-findx">find=X, find&#42889;X</a></li>
-            <li><a href="#matchx-matchx">match=X, match&#42889;X</a></li>
-            <li><a href="#replacex-replacex">replace=X, replace&#42889;X</a></li>
+            <li><a href="#-r---rstream">-R, --R&ltstream&gt</a></li>
+            <li><a href="#--generate-man">--generate-man</a></li>
+            <li><a href="#--generate-completion">--generate-completion</a></li>
+            <li><a href="#--generate-sudoshim">--generate-sudoshim</a></li>
             <li><a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a></li>
             <li><a href="#ab">[a,b]</a></li>
             <li><a href="#abc">[a&#42889;b&#42889;c]</a></li>
@@ -138,7 +143,7 @@
 |-------------------|-------------|:--------------:|
 | *<a href="#-h---help">-h, --help</a>* | show help message and exit |✔|
 | *<a href="#-v---version">-v, --version</a>* | output version information and exit |✔|
-| *<a href="#--debug---debug">--debug, --debug</a>* | show debug information |✔|
+| *<a href="#--debug">--debug</a>* | show debug information |✔|
 | *<a href="#--debuglog---debug-log">--debuglog, --debug-log</a>* | log debug information to file |✔|
 ||||
 | *<a href="#-l---linelength">-l, --linelength</a>* | display the length of each line |✔|
@@ -168,23 +173,26 @@
 | *<a href="#--wc---wordcount">--wc, --wordcount</a>* | display the wordcount |❌|
 | *<a href="#--cc---charcount">--cc, --charcount</a>* | display the charcount |❌|
 ||||
+| *<a href="#findx-findx">find=X, find&#42889;X</a>* | find/query a substring X in the given files |✔|
+| *<a href="#matchx-matchx">match=X, match&#42889;X</a>* | find/query a pattern X in the given files |✔|
+| *<a href="#replacex-replacex">replace=X, replace&#42889;X</a>* | replace queried substring(s)/pattern(s) in the given files |✔|
 | *<a href="#-g---grep">-g, --grep</a>* | only show lines containing queried keywords or patterns |✔|
 | *<a href="#--nk---nokeyword">--nk, --nokeyword</a>* | inverse the grep output |✔|
 | *<a href="#--nb---nobreak">--nb, --nobreak</a>* | do not interrupt the output |✔|
 ||||
 | *<a href="#-a---attributes">-a, --attributes</a>* | show meta-information about the files |❌|
 | *<a href="#-m---checksum">-m, --checksum</a>* | show the checksums of all files |❌|
-| *<a href="#--strings---strings">--strings, --strings</a>* | print the sequences of printable characters |✔|
+| *<a href="#--strings">--strings</a>* | print the sequences of printable characters |✔|
 ||||
-| *<a href="#--b64d---b64d">--b64d, --b64d</a>* | decode the input from base64 |✔|
-| *<a href="#--b64e---b64e">--b64e, --b64e</a>* | encode the input to base64 |✔|
+| *<a href="#--b64d">--b64d</a>* | decode the input from base64 |✔|
+| *<a href="#--b64e">--b64e</a>* | encode the input to base64 |✔|
 | *<a href="#--eval---eval">--eval, --EVAL</a>* | evaluate simple mathematical equations |✔|
 | *<a href="#--hex---hex">--hex, --HEX</a>* | convert hexadecimal numbers to binary, octal, decimal and utf-8 |✔|
 | *<a href="#--dec---dec">--dec, --DEC</a>* | convert decimal numbers to binary, octal, hexadecimal and utf-8 |✔|
 | *<a href="#--oct---oct">--oct, --oct</a>* | convert octal numbers to binary, decimal, hexadecimal and utf-8 |✔|
 | *<a href="#--bin---bin">--bin, --BIN</a>* | convert binary numbers to octal, decimal, hexadecimal and utf-8 |✔|
 ||||
-| *<a href="#--binview---binview">--binview, --binview</a>* | display the raw byte representation in binary |❌|
+| *<a href="#--binview">--binview</a>* | display the raw byte representation in binary |❌|
 | *<a href="#--hexview---hexview">--hexview, --HEXVIEW</a>* | display the raw byte representation in hexadecimal |❌|
 ||||
 | *<a href="#----edit">-!, --edit</a>* | open each file in a simple editor |❌|
@@ -207,20 +215,20 @@
 | *<a href="#--plain---plain-only">--plain, --plain-only</a>* | ignore non-plaintext files automatically |❌|
 | *<a href="#--nc---nocolor">--nc, --nocolor</a>* | disable colored output |✔|
 ||||
-| *<a href="#--config---config">--config, --config</a>* | change default parameters |✔|
-| *<a href="#--cconfig---cconfig">--cconfig, --cconfig</a>* | change color configuration |✔|
+| *<a href="#--config">--config</a>* | change default parameters |✔|
+| *<a href="#--cconfig">--cconfig</a>* | change color configuration |✔|
 | *<a href="#--config-clear---config-reset">--config-clear, --config-reset</a>* | reset the config to default settings |✔|
 | *<a href="#--cconfig-clear---cconfig-reset">--cconfig-clear, --cconfig-reset</a>* | reset the color config to default settings |✔|
 | *<a href="#--config-remove---cconfig-remove">--config-remove, --cconfig-remove</a>* | remove the config-file |✔|
 ||||
+| *<a href="#encx-encx">enc=X, enc&#42889;X</a>* | set file enconding to X (default is utf-8) |✔|
 | *<a href="#-r---rstream">-R, --R\<stream\></a>* | reconfigure the std-stream(s) with the parsed encoding </br> \<stream\> = 'in'/'out'/'err' (default is stdin & stdout) | ✔ |
 ||||
-| *<a href="#encx-encx">enc=X, enc&#42889;X</a>* | set file enconding to X (default is utf-8) |✔|
-| *<a href="#findx-findx">find=X, find&#42889;X</a>* | find/query a substring X in the given files |✔|
-| *<a href="#matchx-matchx">match=X, match&#42889;X</a>* | find/query a pattern X in the given files |✔|
-| *<a href="#replacex-replacex">replace=X, replace&#42889;X</a>* | replace queried substring(s)/pattern(s) in the given files |✔|
-| *<a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>* | truncate file to lines X and Y (python-like) |❌|
+| *<a href="#--generate-man">--generate-man</a>* | print the man page and how to install it |❌|
+| *<a href="#--generate-completion">--generate-completion</a>* | print a shell completion script and how to install it (bash/zsh/fish) |❌|
+| *<a href="#--generate-sudoshim">--generate-sudoshim</a>* | print a shim so sudo can find cat_win and how to install it |❌|
 ||||
+| *<a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>* | truncate file to lines X and Y (python-like) |❌|
 | *<a href="#ab">[a,b]</a>* | replace a with b in every line |✔|
 | *<a href="#abc">[a&#42889;b&#42889;c]</a>* | python-like string indexing syntax (line by line) |✔|
 
@@ -283,7 +291,7 @@ Install time:   YYYY-MM-DD HH:MM:SS
 Author:         Silas A. Kraume
 ```
 
-### <a id="--debug---debug">--debug, --debug</a>
+### <a id="--debug">--debug</a>
 
 Displays debug Information throughout the Code Execution.
 This Argument is not shown in the Default Help Message and is provided for Developers/Development.
@@ -291,7 +299,7 @@ This Argument is not shown in the Default Help Message and is provided for Devel
 ### <a id="--debuglog---debug-log">--debuglog, --debug-log</a>
 
 Writes the debug Information into a File called `catw_debug.log` instead of using the Stderr Stream.
-This Parameter only works in Combination with the <a href="#--debug---debug">--debug, --debug</a> Parameter
+This Parameter only works in Combination with the <a href="#--debug">--debug</a> Parameter
 
 - - - -
 <a id="prefix"></a>
@@ -356,7 +364,7 @@ Using the Lowercase Argument in Combination with the <a href="#-n---number">-n, 
 
 Displays a '$' Character at the End of each Line.
 This can be useful to detect Whitespaces.
-The Character to display can be configured using the `end_marker_symbol` Element in the Config Menu (<a href="#--config---config">--config, --config</a>).
+The Character to display can be configured using the `end_marker_symbol` Element in the Config Menu (<a href="#--config">--config</a>).
 
 ```console
 > catw test.txt --ends
@@ -392,14 +400,13 @@ c<CR>
 d<EOF-noeol>
 ```
 
-
 - - - -
 <a id="linemanipulation"></a>
 ### <a id="-b---blank">-b, --blank</a>
 
 Removes empty Lines from the Output.
 Beware that other Arguments can change a Line to be not empty beforehand.
-When toggling the `blank_remove_ws_lines` Element in the Config Menu (<a href="#--config---config">--config, --config</a>) also Lines which only contain Whitespaces such as Space or Tab will be removed from the Output.
+When toggling the `blank_remove_ws_lines` Element in the Config Menu (<a href="#--config">--config</a>) also Lines which only contain Whitespaces such as Space or Tab will be removed from the Output.
 
 ```console
 > catw test.txt -nb
@@ -413,7 +420,7 @@ Only displays the first and last 5 Lines of each File.
 Between the Beginning and End of the File will be displayed how many Lines have been skipped.
 Useful for getting a quick Impression of how Data in a given File is structured.
 Does nothing when the File has at most 10 Lines.
-The `peek_size` Element in the Config Menu (<a href="#--config---config">--config, --config</a>) defines how many Lines to display.
+The `peek_size` Element in the Config Menu (<a href="#--config">--config</a>) defines how many Lines to display.
 
 ```console
 > catw test.txt -p
@@ -448,7 +455,7 @@ Line 1 From Test1
 
 Suppresses repeated Lines if they occur exactly one after the other.
 Additionally displays a Linesuffix indicating how many Lines have been collapsed.
-This Behaviour can be changed using the `squeeze_collapse_suffixes` Element in the Config Menu (<a href="#--config---config">--config, --config</a>).
+This Behaviour can be changed using the `squeeze_collapse_suffixes` Element in the Config Menu (<a href="#--config">--config</a>).
 
 ```console
 > catw test.txt
@@ -728,6 +735,74 @@ u: 1
 
 - - - -
 <a id="search"></a>
+### <a id="findx-findx">find=X, find&#42889;X</a>
+
+Defines a Literal to search for within the Text of any provided File.
+The Substring is unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_find` is set but in Case of an unicode-error the Substring will simply be used literally.
+When the Literal contains Whitespaces it is neccessary to encase the entire Parameter with Quotes as defined by the Terminal used.
+It is possible to define multiple Substrings to search for by simply providing the Parameter find=X multiple times.
+When using this Parameter in Uppercase the Case of the Substring will be ignored.
+Using the shortened Version f=X or f:X yields the same Result.
+
+```console
+> catw test.txt "find=cats and"
+It's raining cats and dogs!
+---------- Found:   ('cats and' 13-21) ----------
+
+> catw test.txt "f=CATS and"
+It's raining cats and dogs!
+```
+
+```console
+> catw test.txt "FIND=CATS and"
+It's raining cats and dogs!
+---------- Found:   ('CATS and' 13-21) ----------
+```
+
+### <a id="matchx-matchx">match=X, match&#42889;X</a>
+
+Defines a Pattern to search for within the Text of any provided File.
+It is possible to define multiple Patterns to match for by simply providing the Parameter match=X multiple times.
+The given Patterns is simply treated as a regular Expression.
+When using this Parameter in Uppercase the Case of the Pattern will be ignored.
+Using the shortened Version m=X or m:X yields the same Result.
+
+```console
+> catw test.txt "match=cat.\s.{3,}"
+It's raining cats and dogs!
+---------- Matched: ('cat.\\s.{3,}' 13-27) ----------
+
+> catw test.txt "m=CAT.\s.{3,}"
+It's raining cats and dogs!
+```
+
+```console
+> catw test.txt "MATCH=CAT.\s.{3,}"
+It's raining cats and dogs!
+---------- Matched: ('CAT.\\s.{3,}' 13-27) ----------
+```
+
+### <a id="replacex-replacex">replace=X, replace&#42889;X</a>
+
+Defines a Replacement for queried Literals and Patterns given by <a href="#findx-findx">find=X, find&#42889;X</a> and <a href="#matchx-matchx">match=X, match&#42889;X</a>.
+The Replacement will be used for all Queries previously defined up to the last Definition of this Argument.
+The Interpretation of the Replacement is dependent on the queried Literal or Pattern.
+This way regular Expressions can be substituted.
+Using the shortened Version r=X or r:X yields the same Result.
+
+```console
+> catw test.txt "m:([a-z]{3})s" "replace=\\1\\1"
+It's raining catcat and dogdog!
+
+> catw test.txt f:and r=or
+It's raining cats or dogs!
+```
+
+```console
+> catw test.txt "m:([a-z]{3})s" f:and "replace=\\1\\1"
+It's raining catcat \1\1 dogdog!
+```
+
 ### <a id="-g---grep">-g, --grep</a>
 
 Skips every Line that does not contain any matched Patterns or queried Substrings.
@@ -816,10 +891,10 @@ Checksum of '<Path>/test.txt':
         SHA512:  db9a71ef22360f171daa4e4aed033337f4f97812baf38a51bdd6ed64b5c2a0d4a5c4152e20b68f881df9e5f1087c1293853eac13f928b845b9b71c3ce517c9e3
 ```
 
-### <a id="--strings---strings">--strings, --strings</a>
+### <a id="--strings">--strings</a>
 
 Only displays Sequences of printable Characters that exceed a certain Length.
-This Length can be configured using the `strings_minimum_sequence_length` Element in the Config Menu (<a href="#--config---config">--config, --config</a>).
+This Length can be configured using the `strings_minimum_sequence_length` Element in the Config Menu (<a href="#--config">--config</a>).
 The Delimeter of different Sequences on the same Line can be configured using the `strings_delimeter` Element in the Config Menu.
 
 ```console
@@ -836,7 +911,7 @@ GLIBC_2.34
 
 - - - -
 <a id="mathematical"></a>
-### <a id="--b64d---b64d">--b64d, --b64d</a>
+### <a id="--b64d">--b64d</a>
 
 Decodes a Base64 encoded Input and continues Code Execution with the decoded Text.
 This Parameter will be used before most other Arguments such that other Parameters will be used on the decoded Text.
@@ -847,7 +922,7 @@ This means a Base64 encoded Input is expected and neccessary.
 Hello World
 ```
 
-### <a id="--b64e---b64e">--b64e, --b64e</a>
+### <a id="--b64e">--b64e</a>
 
 Encodes a given Text in Base64.
 This Parameter will be used after most other Arguments such that other Parameter will be used on the plain Text beforehand.
@@ -952,7 +1027,7 @@ When using the Uppercase Variant (--BIN) the Numbers will not include their Pref
 
 - - - -
 <a id="byteview"></a>
-### <a id="--binview---binview">--binview, --binview</a>
+### <a id="--binview">--binview</a>
 
 Displays a Binary View for each File passed in.
 Special Characters like Newline or Backspace will be displayed as specific readable Chars if the Font and the Encoding do support that Behaviour.
@@ -995,7 +1070,7 @@ The Editor will not save Changes automatically.
 Files will be saved with the Text Encoding defined by <a href="#encx-encx">enc=X, enc&#42889;X</a>.
 Note that ^D (Ctrl-D) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
 The Auto-Indendation Feature can be turned on in the Config Menu using the `editor_auto_indent` Element.
-The Indendation when using Auto-Indendation can be configured in the Config Menu (<a href="#--config---config">--config, --config</a>) using `editor_indentation`.
+The Indendation when using Auto-Indendation can be configured in the Config Menu (<a href="#--config">--config</a>) using `editor_indentation`.
 The Input inside the Find Prompt (see Key Bindings) is unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_editor_search` is set but in Case of an unicode-error the Input will simply be used literally.
 The Input inside the Replace Prompt (see Key Bindings) behaves similiar using the Config Option `unicode_escaped_editor_replace`.
 On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module.
@@ -1078,7 +1153,7 @@ Opens a simple Hex-Editor to write/edit the Content of any provided File.
 Not-existing Files will be opened first and existing Ones will be able to be edited after that.
 The Editor will not save Changes automatically.
 Note that ^D (Ctrl-D) is reserved for the KeyboardInterrupt meaning that it will stop the entire Program instantly.
-The displayed Columns per Row can be configured in the Config Menu (<a href="#--config---config">--config, --config</a>) using `hex_editor_columns`.
+The displayed Columns per Row can be configured in the Config Menu (<a href="#--config">--config</a>) using `hex_editor_columns`.
 On Windows this Feature uses the [windows-curses](https://pypi.org/project/windows-curses/) Module.
 The currently supported Key Bindings are as follows:
 
@@ -1222,7 +1297,7 @@ J JUMP <x>   jump to line x
 
 Opens the given Files in Binary Mode.
 Prints the Output as Raw Binary to the StdOut Stream.
-The only valid Parameters in Combination to -`b`, --`raw` are <a href="#--b64e---b64e">--b64e, --b64e</a>, <a href="#--b64d---b64d">--b64d, --b64d</a> and <a href="#--strings---strings">--strings, --strings</a>.
+The only valid Parameters in Combination to -`b`, --`raw` are <a href="#--b64e">--b64e</a>, <a href="#--b64d">--b64d</a> and <a href="#--strings">--strings</a>.
 
 ```console
 > catw img.png > copy.png
@@ -1381,7 +1456,7 @@ Using --nocolor will disable all Colors and only display the Output in plain mon
 
 - - - -
 <a id="configuration"></a>
-### <a id="--config---config">--config, --config</a>
+### <a id="--config">--config</a>
 
 Displays a User interactive Config Menu allowing the User to change specific Default Parameters.
 Stops Code Execution after finishing the Configuration.
@@ -1401,8 +1476,8 @@ Valid Options are:
 | blank_remove_ws_lines | additionally remove whitespace Lines when using <a href="#-b---blank">-b, --blank</a> | true | false |
 | peek_size | define the amount of Lines shown by <a href="#-p---peek">-p, --peek</a> | 10 | 5 |
 | summary_unique_elements | display only unique elements in summary overviews | true | false |
-| strings_minimum_sequence_length | set the minimum Length of a String </br> (for the <a href="#--strings---strings">--strings, --strings</a> Parameter) | 2 | 4 |
-| strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the <a href="#--strings---strings">--strings, --strings</a> Parameter) | \| | \\n |
+| strings_minimum_sequence_length | set the minimum Length of a String </br> (for the <a href="#--strings">--strings</a> Parameter) | 2 | 4 |
+| strings_delimeter | set the Delimeter for Strings found on the same Line </br> (for the <a href="#--strings">--strings</a> Parameter) | \| | \\n |
 | grep_context_lines | set the amount of context lines visible before and after every </br> grep-line when using <a href="#-g---grep">-g, --grep</a> | 5 | 0 |
 | grep_query_separator | define the separator string between all found queries when using <a href="#-g---grep">-G, --GREP</a> | \n | , |
 | diff_strip_whitespace | strip leading and trailing whitespace from the file contents when using the DiffViewer (<a href="#-?---diff">-?, --diff</a>) to ignore whitespace-only differences | true | false |
@@ -1425,7 +1500,7 @@ Accepted Input for disabling a Setting: `false, no, n, 0`
 </br>
 (Input is not case sensitive)
 
-### <a id="--cconfig---cconfig">--cconfig, --cconfig</a>
+### <a id="--cconfig">--cconfig</a>
 
 Displays a User interactive Config Menu allowing the User to change the Colors for specific Elements and Arguments.
 Stops Code Execution after finishing the Configuration.
@@ -1452,7 +1527,7 @@ Valid Options are:
 | checksum_message | the calculated checksum of a given file using <a href="#-m---checksum">-m, --checksum</a> |
 | number_evaluation | the evaluated value using <a href="#--eval---eval">--eval, --EVAL</a> |
 | number_conversion | the converted values using <a href="#--bin---bin">--bin</a>/<a href="#--oct---oct">--oct</a>/<a href="#--dec---dec">--dec</a>/<a href="#--hex---hex">--hex</a> |
-| raw_viewer | the output using <a href="#--hexview---hexview">--hexview, --HEXVIEW</a>/<a href="#--binview---binview">--binview, --binview</a> |
+| raw_viewer | the output using <a href="#--hexview---hexview">--hexview, --HEXVIEW</a>/<a href="#--binview">--binview</a> |
 | found_keyword | the found substring using <a href="#findx-findx">find=X, find&#42889;X</a> |
 | found_keyword_message | the message displayed when using <a href="#findx-findx">find=X, find&#42889;X</a> |
 | matched_pattern | the matched pattern using <a href="#matchx-matchx">match=X, match&#42889;X</a> |
@@ -1470,7 +1545,7 @@ Valid Options are:
 
 ### <a id="--config-clear---config-reset">--config-clear, --config-reset</a>
 
-Reset the Configuration (of <a href="#--config---config">--config, --config</a>) to their Default Values.
+Reset the Configuration (of <a href="#--config">--config</a>) to their Default Values.
 
 ```console
 > catw --config-clear
@@ -1480,7 +1555,7 @@ Successfully updated config file:
 
 ### <a id="--cconfig-clear---cconfig-reset">--cconfig-clear, --cconfig-reset</a>
 
-Reset the Configuration (of <a href="#--cconfig---cconfig">--cconfig, --cconfig</a>) to their Default Values.
+Reset the Configuration (of <a href="#--cconfig">--cconfig</a>) to their Default Values.
 
 ```console
 > catw --cconfig-clear
@@ -1491,7 +1566,7 @@ Successfully updated config file:
 ### <a id="--config-remove---cconfig-remove">--config-remove, --cconfig-remove</a>
 
 Delete the Config File.
-This will reset both <a href="#--config---config">--config, --config</a> and <a href="#--cconfig---cconfig">--cconfig, --cconfig</a> Configurations to their Default Values.
+This will reset both <a href="#--config">--config</a> and <a href="#--cconfig">--cconfig</a> Configurations to their Default Values.
 The cat.config File will be erased from the System.
 
 ```console
@@ -1504,6 +1579,22 @@ No active config file has been found.
 
 - - - -
 <a id="encoding"></a>
+### <a id="encx-encx">enc=X, enc&#42889;X</a>
+
+Sets the Text Encoding that is being used to read and write Files.
+Valid Options are defined by the Python Interpreter used (e.g. for [Python3.10](https://docs.python.org/3.8/library/codecs.html#standard-encodings)).
+The Default Encoding is Utf-8.
+The Default Encoding can be configured using the `default_file_encoding` Element in the Config Menu (<a href="#--config">--config</a>).
+
+```console
+> catw test.txt
+��This Text is written in Utf-16! d'�
+```
+```console
+> catw test.txt enc=utf-16
+This Text is written in Utf-16! ❤️
+```
+
 ### <a id="-r---rstream">-R, --R\<stream\></a>
 
 Python uses Utf-8 to encode the Streams by Default.
@@ -1525,94 +1616,60 @@ UnicodeEncodeError: 'charmap' codec can't encode character ...
 > catw ./CHANGELOG.md --Rout > test.txt
 ```
 
-### <a id="encx-encx">enc=X, enc&#42889;X</a>
+- - - -
+<a id="installation"></a>
+### <a id="--generate-man">--generate-man</a>
 
-Sets the Text Encoding that is being used to read and write Files.
-Valid Options are defined by the Python Interpreter used (e.g. for [Python3.10](https://docs.python.org/3.8/library/codecs.html#standard-encodings)).
-The Default Encoding is Utf-8.
-The Default Encoding can be configured using the `default_file_encoding` Element in the Config Menu (<a href="#--config---config">--config, --config</a>).
-
-```console
-> catw test.txt
-��This Text is written in Utf-16! d'�
-```
-```console
-> catw test.txt enc=utf-16
-This Text is written in Utf-16! ❤️
-```
-
-### <a id="findx-findx">find=X, find&#42889;X</a>
-
-Defines a Literal to search for within the Text of any provided File.
-The Substring is unicode-escaped (\\n will be interpreted as an actual Newline) if the Config Option `unicode_escaped_find` is set but in Case of an unicode-error the Substring will simply be used literally.
-When the Literal contains Whitespaces it is neccessary to encase the entire Parameter with Quotes as defined by the Terminal used.
-It is possible to define multiple Substrings to search for by simply providing the Parameter find=X multiple times.
-When using this Parameter in Uppercase the Case of the Substring will be ignored.
-Using the shortened Version f=X or f:X yields the same Result.
+Prints the man Page in roff Format to stdout.
+The Code Execution will stop after printing it.
+`man cats` is not available since it is for the most Part covered by `man catw`.
 
 ```console
-> catw test.txt "find=cats and"
-It's raining cats and dogs!
----------- Found:   ('cats and' 13-21) ----------
-
-> catw test.txt "f=CATS and"
-It's raining cats and dogs!
+> catw --generate-man
+[Man Page Content ...]
+to install the man page, run:
+  mkdir -p ~/.local/share/man/man1
+  catw --generate-man 2>/dev/null > ~/.local/share/man/man1/catw.1
+...
 ```
+
+### <a id="--generate-completion">--generate-completion[=SHELL]</a>
+
+Prints a Shell Completion Script to stdout.
+The Code Execution will stop after printing it.
+Accepts a Shell as a Value: `--generate-completion=bash`, `--generate-completion=zsh` or
+`--generate-completion=fish`. Without a Value the current Shell is used.
 
 ```console
-> catw test.txt "FIND=CATS and"
-It's raining cats and dogs!
----------- Found:   ('CATS and' 13-21) ----------
+> catw --generate-completion=zsh > ~/.local/share/zsh/site-functions/_catw
 ```
 
-### <a id="matchx-matchx">match=X, match&#42889;X</a>
+| Shell | Path |
+|-------|------|
+| bash | `~/.local/share/bash-completion/completions/catw` |
+| zsh | `~/.local/share/zsh/site-functions/_catw` |
+| fish | `~/.config/fish/completions/catw.fish` |
 
-Defines a Pattern to search for within the Text of any provided File.
-It is possible to define multiple Patterns to match for by simply providing the Parameter match=X multiple times.
-The given Patterns is simply treated as a regular Expression.
-When using this Parameter in Uppercase the Case of the Pattern will be ignored.
-Using the shortened Version m=X or m:X yields the same Result.
+### <a id="--generate-sudoshim">--generate-sudoshim[=SCRIPT]</a>
+
+Prints a small Shim Script that makes `sudo catw` and `sudo cats` find cat_win.
+Stops Code Execution after printing it.
+Accepts a Script as Value: `--generate-sudoshim=catw` or `--generate-sudoshim=cats`. Without a Value both Scripts are used.
 
 ```console
-> catw test.txt "match=cat.\s.{3,}"
-It's raining cats and dogs!
----------- Matched: ('cat.\\s.{3,}' 13-27) ----------
-
-> catw test.txt "m=CAT.\s.{3,}"
-It's raining cats and dogs!
+> catw --generate-sudoshim=catw
+[Shim ...]
+to install the shim, run:
+  catw --generate-sudoshim 2>/dev/null | sudo tee /usr/local/bin/catw > /dev/null
+  sudo chmod 755 /usr/local/bin/catw
 ```
 
-```console
-> catw test.txt "MATCH=CAT.\s.{3,}"
-It's raining cats and dogs!
----------- Matched: ('CAT.\\s.{3,}' 13-27) ----------
-```
-
-### <a id="replacex-replacex">replace=X, replace&#42889;X</a>
-
-Defines a Replacement for queried Literals and Patterns given by <a href="#findx-findx">find=X, find&#42889;X</a> and <a href="#matchx-matchx">match=X, match&#42889;X</a>.
-The Replacement will be used for all Queries previously defined up to the last Definition of this Argument.
-The Interpretation of the Replacement is dependent on the queried Literal or Pattern.
-This way regular Expressions can be substituted.
-Using the shortened Version r=X or r:X yields the same Result.
-
-```console
-> catw test.txt "m:([a-z]{3})s" "replace=\\1\\1"
-It's raining catcat and dogdog!
-
-> catw test.txt f:and r=or
-It's raining cats or dogs!
-```
-
-```console
-> catw test.txt "m:([a-z]{3})s" f:and "replace=\\1\\1"
-It's raining catcat \1\1 dogdog!
-```
-
+- - - -
+<a id="transforms"></a>
 ### <a id="truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>
 
 Truncates every File by the Specifics defined.
-When using <a href="#--binview---binview">--binview, --binview</a> or <a href="#--hexview---hexview">--hexview, --HEXVIEW</a> this Paremeter will slice the Bytestream instead.
+When using <a href="#--binview">--binview</a> or <a href="#--hexview---hexview">--hexview, --HEXVIEW</a> this Paremeter will slice the Bytestream instead.
 This Parameter uses the Default Python slicing Mechanic and uses it on the Lines of each File.
 The Argument is valid by defining trunc=\<start\>\:\<stop\> or trunc=\<start\>\:\<stop\>\:\<step\>.
 Using the shortened Version t=X:Y or t:X:Y yields the same Result.

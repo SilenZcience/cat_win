@@ -290,7 +290,7 @@ SECTION_NAMES = {
      3: 'Line Manipulation',
      4: 'Input Types',
      5: 'Summaries',
-     6: 'Search and Match',
+     6: 'Search & Match',
      7: 'Meta Information',
      8: 'Mathematical',
      9: 'Byte Representation',
