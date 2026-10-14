@@ -55,7 +55,11 @@ class Files:
             if len(display_url) > 30:
                 display_url = f"{display_url[:20]}...{display_url[-10:]}"
             return f"<URL {display_url}>"
-        return str(file)
+
+        try:
+            return str(Path("~") / file.relative_to(Path.home()))
+        except ValueError:
+            return str(file)
 
     def is_temp_file(self, file_index: int) -> bool:
         """

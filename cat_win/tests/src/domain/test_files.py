@@ -1,18 +1,20 @@
 from unittest import TestCase
+from unittest.mock import patch
 import os
+from pathlib import Path
 
 from cat_win.src.domain.files import Files
 # import sys
 # sys.path.append('../cat_win')
 
 
-test_file_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'texts')
-test_file_path        = os.path.join(test_file_dir, 'test.txt')
-test_file_edge_case_1 = os.path.join(test_file_dir, 'test_holderEdgeCase_1.txt')
-test_file_edge_case_2 = os.path.join(test_file_dir, 'test_holderEdgeCase_2.txt')
-test_file_edge_case_3 = os.path.join(test_file_dir, 'test_holderEdgeCase_3.txt')
-test_file_edge_case_4 = os.path.join(test_file_dir, 'test_holderEdgeCase_4.txt')
-test_file_empty       = os.path.join(test_file_dir, 'test_empty.txt')
+test_file_dir = Path(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'texts')))
+test_file_path        = test_file_dir / 'test.txt'
+test_file_edge_case_1 = test_file_dir / 'test_holderEdgeCase_1.txt'
+test_file_edge_case_2 = test_file_dir / 'test_holderEdgeCase_2.txt'
+test_file_edge_case_3 = test_file_dir / 'test_holderEdgeCase_3.txt'
+test_file_edge_case_4 = test_file_dir / 'test_holderEdgeCase_4.txt'
+test_file_empty       = test_file_dir / 'test_empty.txt'
 
 
 class TestFiles(TestCase):
@@ -102,14 +104,27 @@ class TestFiles(TestCase):
             u_files.get_file_display_name('STDINFILE'), '<STDIN>')
         self.assertEqual(
             u_files.get_file_display_name('TEMPFILEECHO'), '<ECHO>')
-        self.assertEqual(
-            u_files.get_file_display_name(test_file_edge_case_3), test_file_edge_case_3)
-        self.assertEqual(
-            u_files.get_file_display_name(test_file_edge_case_4), test_file_edge_case_4)
+        with patch('pathlib.Path.home', return_value=test_file_dir):
+            self.assertEqual(
+                u_files.get_file_display_name(test_file_edge_case_3),
+                str(Path('~') / 'test_holderEdgeCase_3.txt'))
+            self.assertEqual(
+                u_files.get_file_display_name(test_file_edge_case_4),
+                str(Path('~') / 'test_holderEdgeCase_4.txt'))
         self.assertEqual(
             u_files.get_file_display_name('TEMPFILEURL1'), '<URL www.example.com>')
         self.assertEqual(
             u_files.get_file_display_name('TEMPFILEURL2'), '<URL abcdefghijklmnopqrst...0123456789>')
+
+    def test_get_file_display_name_relative_to_home(self):
+        u_files = Files()
+        inside = Path.home() / 'some' / 'nested' / 'file.txt'
+        self.assertEqual(
+            u_files.get_file_display_name(inside),
+            str(Path('~') / 'some' / 'nested' / 'file.txt'))
+        outside = Path('/', 'outside', 'file.txt')
+        self.assertEqual(
+            u_files.get_file_display_name(outside), str(outside))
 
     def test_is_temp_file(self):
         u_files = Files()

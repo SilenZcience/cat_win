@@ -1,6 +1,7 @@
 from unittest.mock import patch
 from unittest import TestCase
 import os
+from pathlib import Path
 
 from cat_win.src import cat
 from cat_win.src.domain.appcontext import AppContext
@@ -33,6 +34,14 @@ def _clear_caches():
     _calculate_line_prefix_spacing.cache_clear()
     _calculate_line_length_prefix_spacing.cache_clear()
     cat._ctx = AppContext()
+
+
+def _expected_display_name(path) -> str:
+    path = Path(path)
+    try:
+        return str(Path('~') / path.relative_to(Path.home()))
+    except ValueError:
+        return str(path)
 
 
 @patch('sys.stdin', StdInMock())
@@ -169,9 +178,9 @@ class TestCatFull(TestCase):
         with patch('sys.stdout', new=StdOutMock()) as fake_out:
             cat.main()
             lower_out = fake_out.getvalue().casefold()
-            self.assertIn(test_file_path.casefold(), lower_out)
-            self.assertIn(test_empty_path.casefold(), lower_out)
-            self.assertIn(test_peek.casefold(), lower_out)
+            self.assertIn(_expected_display_name(test_file_path).casefold(), lower_out)
+            self.assertIn(_expected_display_name(test_empty_path).casefold(), lower_out)
+            self.assertIn(_expected_display_name(test_peek).casefold(), lower_out)
 
     @patch('sys.argv', ['<CAT>', test_file_path, test_empty_path, test_peek, '-S'])
     def test_cat_output_full_show_sum(self):
