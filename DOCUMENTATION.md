@@ -1,3 +1,5 @@
+<div id="top"></div>
+
 <div align="center">
 <h2 align="center">cat_win</h2>
    <p align="center">
@@ -265,6 +267,9 @@
       - Tar and compressed Tar Formats: `.tar` `.tar.gz` `.tgz` `.tar.bz2` `.tz2`
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 ### <a id="-h---help">-h, --help</a>
 
 Displays the help Message.
@@ -302,6 +307,9 @@ Writes the debug Information into a File called `catw_debug.log` instead of usin
 This Parameter only works in Combination with the <a href="#--debug">--debug</a> Parameter
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 <a id="prefix"></a>
 ### <a id="-l---linelength">-l, --linelength</a>
 
@@ -359,6 +367,9 @@ Using the Lowercase Argument in Combination with the <a href="#-n---number">-n, 
 ```
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 <a id="simplereplace"></a>
 ### <a id="-e---ends">-e, --ends</a>
 
@@ -401,6 +412,9 @@ d<EOF-noeol>
 ```
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 <a id="linemanipulation"></a>
 ### <a id="-b---blank">-b, --blank</a>
 
@@ -526,6 +540,9 @@ Currently supported are `.json` and `.xml`.
 ```
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 <a id="input"></a>
 ### <a id="-e---echo">-E, --echo</a>
 
@@ -583,6 +600,9 @@ When not providing a raw Data URL the Content will include the HTML Elements.
 ```
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 <a id="summary"></a>
 ### <a id="-f---files">-f, --files</a>
 
@@ -734,6 +754,9 @@ u: 1
 ```
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 <a id="search"></a>
 ### <a id="findx-findx">find=X, find&#42889;X</a>
 
@@ -842,6 +865,9 @@ Using this Argument the Output will not halt when a queried Substring or Pattern
 This Behaviour is included by Default when using <a href="#--nk---nokeyword">--nk, --nokeyword</a> or <a href="#-g---grep">-g, --grep</a>.
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 <a id="meta"></a>
 ### <a id="-a---attributes">-a, --attributes</a>
 
@@ -910,6 +936,9 @@ GLIBC_2.34
 ```
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 <a id="mathematical"></a>
 ### <a id="--b64d">--b64d</a>
 
@@ -1026,6 +1055,9 @@ When using the Uppercase Variant (--BIN) the Numbers will not include their Pref
 ```
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 <a id="byteview"></a>
 ### <a id="--binview">--binview</a>
 
@@ -1061,6 +1093,9 @@ Address  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F # Decoded Text
 ```
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 <a id="edit"></a>
 ### <a id="----edit">-!, --edit</a>
 
@@ -1313,6 +1348,9 @@ UnicodeEncodeError: 'charmap' codec can't encode character '\ufffd' in position 
 ```
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 <a id="visualizer"></a>
 ### <a id="--visb---visualizeb">--visb, --visualizeb</a>
 
@@ -1398,6 +1436,9 @@ Different File Formats can have different Digraph Dot Plot View Characteristics.
 The Data of the Files used can be limited using the <a href="#truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a> Parameter. This way only Chunks/Blocks of a File can be visualized.
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 <a id="settings"></a>
 ### <a id="-c---clip">-c, --clip</a>
 
@@ -1455,6 +1496,9 @@ By Default different Colors will be used to better highlight specific Parts of t
 Using --nocolor will disable all Colors and only display the Output in plain monochrome Text.
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 <a id="configuration"></a>
 ### <a id="--config">--config</a>
 
@@ -1578,6 +1622,9 @@ No active config file has been found.
 ```
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 <a id="encoding"></a>
 ### <a id="encx-encx">enc=X, enc&#42889;X</a>
 
@@ -1617,6 +1664,9 @@ UnicodeEncodeError: 'charmap' codec can't encode character ...
 ```
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 <a id="installation"></a>
 ### <a id="--generate-man">--generate-man</a>
 
@@ -1665,6 +1715,9 @@ to install the shim, run:
 ```
 
 - - - -
+
+<p align="right">(<a href="#top">↑back to top↑</a>)</p>
+
 <a id="transforms"></a>
 ### <a id="truncxy-truncxy">trunc=X&#42889;Y, trunc&#42889;X&#42889;Y</a>
 
