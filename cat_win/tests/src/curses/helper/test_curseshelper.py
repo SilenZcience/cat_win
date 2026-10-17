@@ -1,17 +1,198 @@
-from unittest.mock import patch, MagicMock
-from unittest import TestCase
+from unittest.mock import call, patch, MagicMock
+from unittest import skipUnless, TestCase
 import importlib.util
 import os
+import signal
 import sys
-import types
 
 from cat_win.src.curses.helper import curseshelper
 if not hasattr(curseshelper, 'curses'):
     setattr(curseshelper, 'curses', None)
-from cat_win.src.curses.helper.curseshelper import Position, History, frepr
+from cat_win.src.curses.helper.curseshelper import (
+    Position, History, frepr,
+    release_sigwinch, resize_term,
+)
 from cat_win.tests.mocks.edit import EditorHistoryMock
 
 mm = MagicMock()
+
+UNIX_SIGWINCH = getattr(signal, 'SIGWINCH', 28)
+
+
+class TestSigwinchHandover(TestCase):
+    @skipUnless(hasattr(signal, 'SIGWINCH'), 'unix only: SIGWINCH does not exist on windows')
+    def test_hands_sigwinch_back_to_ncurses(self):
+        with patch('cat_win.src.curses.helper.curseshelper.signal.signal') as sig:
+            release_sigwinch()
+        sig.assert_called_once_with(signal.SIGWINCH, signal.SIG_DFL)
+
+    def test_is_a_noop_without_sigwinch(self):
+        with patch.object(curseshelper, 'SIGWINCH', None):
+            with patch('cat_win.src.curses.helper.curseshelper.signal.signal') as sig:
+                release_sigwinch()
+        sig.assert_not_called()
+
+    def test_survives_a_refused_signal_call(self):
+        for error in (ValueError('main thread'), OSError('not permitted')):
+            with patch('cat_win.src.curses.helper.curseshelper.signal.signal', side_effect=error):
+                release_sigwinch()
+
+
+class TestResizeTerm(TestCase):
+    def setUp(self):
+        patcher = patch.object(curseshelper, 'SIGWINCH', UNIX_SIGWINCH)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def _win(self, rows=24, cols=80):
+        win = MagicMock()
+        win.getmaxyx.return_value = (rows, cols)
+        return win
+
+    def _terminal(self, columns, lines):
+        return os.terminal_size((columns, lines))
+
+    def _curses_stub(self, resize_term_error=None):
+        stub = MagicMock()
+        stub.error = Exception
+        if resize_term_error is not None:
+            stub.resize_term.side_effect = resize_term_error
+        return stub
+
+    def test_resizes_to_the_real_terminal_size(self):
+        win = self._win(24, 80)
+        with patch.object(curseshelper, 'curses', self._curses_stub()):
+            with patch('cat_win.src.curses.helper.curseshelper.os.get_terminal_size',
+                       return_value=self._terminal(91, 31)):
+                self.assertTrue(resize_term(win))
+        win.clear.assert_called_once()
+
+    def test_does_nothing_when_the_size_already_matches(self):
+        win = self._win(24, 80)
+        curses_stub = self._curses_stub()
+        with patch.object(curseshelper, 'curses', curses_stub):
+            with patch('cat_win.src.curses.helper.curseshelper.os.get_terminal_size',
+                       return_value=self._terminal(80, 24)):
+                self.assertFalse(resize_term(win))
+        curses_stub.resize_term.assert_not_called()
+        win.clear.assert_not_called()
+
+    def test_resizes_again_after_the_terminal_grew_back(self):
+        win = self._win(24, 80)
+        curses_stub = self._curses_stub()
+        with patch.object(curseshelper, 'curses', curses_stub):
+            with patch('cat_win.src.curses.helper.curseshelper.os.get_terminal_size',
+                       return_value=self._terminal(60, 20)):
+                self.assertTrue(resize_term(win))
+            win.getmaxyx.return_value = (20, 60)
+            with patch('cat_win.src.curses.helper.curseshelper.os.get_terminal_size',
+                       return_value=self._terminal(80, 24)):
+                self.assertTrue(resize_term(win))
+        self.assertEqual(
+            curses_stub.resize_term.call_args_list,
+            [call(20, 60), call(24, 80)]
+        )
+
+    def test_passes_lines_and_columns_in_that_order(self):
+        win = self._win(24, 80)
+        curses_stub = self._curses_stub()
+        with patch.object(curseshelper, 'curses', curses_stub):
+            with patch('cat_win.src.curses.helper.curseshelper.os.get_terminal_size',
+                       return_value=self._terminal(91, 31)):
+                resize_term(win)
+        curses_stub.resize_term.assert_called_once_with(31, 91)
+        curses_stub.resizeterm.assert_not_called()
+
+    def test_survives_a_failing_curses(self):
+        win = self._win(24, 80)
+        curses_stub = self._curses_stub(resize_term_error=Exception('boom'))
+        with patch.object(curseshelper, 'curses', curses_stub):
+            with patch('cat_win.src.curses.helper.curseshelper.os.get_terminal_size',
+                       return_value=self._terminal(91, 31)):
+                self.assertFalse(resize_term(win))
+        win.clear.assert_not_called()
+
+    def test_is_a_noop_without_a_queryable_terminal(self):
+        # stdout may not be a terminal, and os.get_terminal_size may be absent.
+        win = self._win(24, 80)
+        curses_stub = self._curses_stub()
+        for error in (OSError('not a terminal'), AttributeError('no such function')):
+            with patch.object(curseshelper, 'curses', curses_stub):
+                with patch('cat_win.src.curses.helper.curseshelper.os.get_terminal_size',
+                           side_effect=error):
+                    self.assertFalse(resize_term(win))
+        curses_stub.resize_term.assert_not_called()
+        win.clear.assert_not_called()
+
+    def test_is_a_noop_on_an_unknown_size(self):
+        # A non-console handle on Windows reports 0x0.
+        win = self._win(24, 80)
+        curses_stub = self._curses_stub()
+        for columns, lines in ((0, 0), (91, 0), (0, 31), (-1, 24)):
+            with patch.object(curseshelper, 'curses', curses_stub):
+                with patch('cat_win.src.curses.helper.curseshelper.os.get_terminal_size',
+                           return_value=self._terminal(columns, lines)):
+                    self.assertFalse(resize_term(win))
+        curses_stub.resize_term.assert_not_called()
+        win.clear.assert_not_called()
+
+    def test_is_a_noop_without_curses(self):
+        win = self._win(24, 80)
+        with patch.object(curseshelper, 'CURSES_MODULE_ERROR', True):
+            with patch('cat_win.src.curses.helper.curseshelper.os.get_terminal_size',
+                       return_value=self._terminal(91, 31)):
+                self.assertFalse(resize_term(win))
+        win.clear.assert_not_called()
+
+
+class TestResizeTermWithoutSigwinch(TestCase):
+    def _win(self, rows=31, cols=91):
+        win = MagicMock()
+        win.getmaxyx.return_value = (rows, cols)
+        return win
+
+    def _curses_stub(self, resize_term_error=None):
+        stub = MagicMock()
+        stub.error = Exception
+        if resize_term_error is not None:
+            stub.resize_term.side_effect = resize_term_error
+        return stub
+
+    def test_uses_getmaxyx_instead_of_get_terminal_size(self):
+        win = self._win(31, 91)
+        curses_stub = self._curses_stub()
+        with patch.object(curseshelper, 'SIGWINCH', None):
+            with patch.object(curseshelper, 'curses', curses_stub):
+                with patch('cat_win.src.curses.helper.curseshelper.os.get_terminal_size') as gts:
+                    self.assertTrue(resize_term(win))
+        gts.assert_not_called()
+        curses_stub.resize_term.assert_called_once_with(31, 91)
+        curses_stub.resizeterm.assert_not_called()
+        win.clear.assert_called_once()
+
+    def test_resizes_even_though_getmaxyx_matches(self):
+        win = self._win(24, 80)
+        curses_stub = self._curses_stub()
+        with patch.object(curseshelper, 'SIGWINCH', None):
+            with patch.object(curseshelper, 'curses', curses_stub):
+                self.assertTrue(resize_term(win))
+        curses_stub.resize_term.assert_called_once_with(24, 80)
+        win.clear.assert_called_once()
+
+    def test_survives_a_failing_curses(self):
+        win = self._win(24, 80)
+        curses_stub = self._curses_stub(resize_term_error=Exception('boom'))
+        with patch.object(curseshelper, 'SIGWINCH', None):
+            with patch.object(curseshelper, 'curses', curses_stub):
+                self.assertFalse(resize_term(win))
+        win.clear.assert_not_called()
+
+    def test_is_a_noop_without_curses(self):
+        win = self._win(24, 80)
+        with patch.object(curseshelper, 'SIGWINCH', None):
+            with patch.object(curseshelper, 'CURSES_MODULE_ERROR', True):
+                self.assertFalse(resize_term(win))
+        win.clear.assert_not_called()
 
 @patch('cat_win.src.curses.helper.curseshelper.curses', mm)
 class TestCursesHelper(TestCase):
