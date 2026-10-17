@@ -250,7 +250,7 @@ def _visualize_files(view_name: str):
     return _run
 
 
-register_pre(ARGS_LESS)
+@register_pre(ARGS_LESS)
 def _page_files_lazily(ctx) -> bool:
     for file in ctx.u_files:
         stepper = More()
