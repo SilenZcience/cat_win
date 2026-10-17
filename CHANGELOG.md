@@ -20,6 +20,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fixed --`nc`, --`nocolor` not working correctly when adding or deleting it inside of the cat-repl (cats).
 - fixed cat-repl (cats) CRASH on certain inputs.
 - fixed broken cat-repl (cats) behaviour on unix systems.
+- fixed -`L`, --`less` not working at all.
 
 
 ## [2.0.2] - 2026-08-22
