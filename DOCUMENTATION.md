@@ -1447,7 +1447,8 @@ Copies the entire Output to the Clipboard additionally to printing it to the Std
 ### <a id="-w---watch">-w, --watch</a>
 
 Continuously keep tracking if the given Files have been changed/modified in which Case the Output will be freshly generated again.
-This endless cycle can be terminated via KeyboardInterrupt after which the execution will continue as usual.
+The new Output will include the Diff in Comparison to the previous File Content.
+This endless Cycle can be terminated via KeyboardInterrupt after which the Execution will continue as usual.
 Works well in Combinations with <a id="-?---diff">-?, --diff</a>.
 
 ```console
@@ -1562,9 +1563,14 @@ Valid Options are:
 | line_numbers | the numbering of each line using <a href="#-n---number">-n, --number</a> |
 | file_prefix | the file prefix using <a href="#--fp---file-prefix">--fp, --file-prefix</a> |
 | line_ends | the end of line marker using <a href="#-e---ends">-e, --ends</a> |
-| squeeze_counter | the collapse counter suffixes using <a href="#-u---unique">-u, --unique</a> |
 | special_chars | special chars using <a href="#--chr---char">--chr, --char</a> |
+| squeeze_counter | the collapse counter suffixes using <a href="#-u---unique">-u, --unique</a> |
 | summary_message | the message displayed using <a href="#-f---files">-f, --files</a>/<a href="#-d---dirs">-d, --dirs</a>/<a href="#-s---sum">-s, --sum</a>/<a href="#--wc---wordcount">--wc, --wordcount</a>/<a href="#--cc---charcount">--cc, --charcount</a> |
+| found_keyword | the found substring using <a href="#findx-findx">find=X, find&#42889;X</a> |
+| found_keyword_message | the message displayed when using <a href="#findx-findx">find=X, find&#42889;X</a> |
+| matched_pattern | the matched pattern using <a href="#matchx-matchx">match=X, match&#42889;X</a> |
+| matched_pattern_message | the message displayed when using <a href="#matchx-matchx">match=X, match&#42889;X</a> |
+| substring_replacement | the replaced string using <a href="#ab">[a,b]</a> or <a href="#replacex-replacex">replace=X, replace&#42889;X</a> |
 | file_attribute_message | the message containing time stamps and file size using <a href="#-a---attributes">-a, --attributes</a> |
 | active_file_attributes | the attributes a file has set using <a href="#-a---attributes">-a, --attributes</a> |
 | missing_file_attributes | the attributes a file has not set using <a href="#-a---attributes">-a, --attributes</a> |
@@ -1572,15 +1578,13 @@ Valid Options are:
 | number_evaluation | the evaluated value using <a href="#--eval---eval">--eval, --EVAL</a> |
 | number_conversion | the converted values using <a href="#--bin---bin">--bin</a>/<a href="#--oct---oct">--oct</a>/<a href="#--dec---dec">--dec</a>/<a href="#--hex---hex">--hex</a> |
 | raw_viewer | the output using <a href="#--hexview---hexview">--hexview, --HEXVIEW</a>/<a href="#--binview">--binview</a> |
-| found_keyword | the found substring using <a href="#findx-findx">find=X, find&#42889;X</a> |
-| found_keyword_message | the message displayed when using <a href="#findx-findx">find=X, find&#42889;X</a> |
-| matched_pattern | the matched pattern using <a href="#matchx-matchx">match=X, match&#42889;X</a> |
-| matched_pattern_message | the message displayed when using <a href="#matchx-matchx">match=X, match&#42889;X</a> |
-| substring_replacement | the replaced string using <a href="#ab">[a,b]</a> or <a href="#replacex-replacex">replace=X, replace&#42889;X</a> |
+| more_less_prompt | the prompt displayed when using <a href="#-m---more">-M, --more</a> or <a href="#-l---less">-L, --less</a> |
+| watch_diff_added | the color of newly added lines when using <a href="#-w---watch">-w, --watch</a> |
+| watch_diff_deleted | the color of removed lines when using <a href="#-w---watch">-w, --watch</a> |
+| watch_diff_changed | the color of changed lines when using <a href="#-w---watch">-w, --watch</a> |
 | progressbar_done | the progress that is already done (displayed when using <a href="#--vise---visualizee">--vise, --visualizee</a> or reading large files) |
 | progressbar_missing | the progress that is still missing (displayed when using <a href="#--vise---visualizee">--vise, --visualizee</a> or reading large files) |
 | repl_prefix | the prefix displayed when using the cat_win REPL (cats) |
-| more_less_prompt | the prompt displayed when using <a href="#-m---more">-M, --more</a> or <a href="#-l---less">-L, --less</a> |
 | debug | any debug information message |
 | info | any informational message |
 | warning | any warning message |
