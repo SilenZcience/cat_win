@@ -2,6 +2,7 @@
 iohelper
 """
 
+import builtins
 import codecs
 import contextlib
 import ctypes
@@ -285,6 +286,88 @@ def create_file(file: Path, content: str, file_encoding: str) -> bool:
                 continue
         return False
     return True
+
+
+class _TeeBuffer:
+    """
+    byte-buffer counterpart of _TeeStdout, capturing raw byte writes.
+    """
+    def __init__(self, real_buffer, sink: list, quiet: bool) -> None:
+        self._real = real_buffer
+        self._sink = sink
+        self._quiet = quiet
+
+    def write(self, data) -> int:
+        self._sink.append(data.decode('utf-8', errors='replace'))
+        if not self._quiet and self._real is not None:
+            return self._real.write(data)
+        return len(data)
+
+    def flush(self) -> None:
+        if not self._quiet and self._real is not None:
+            self._real.flush()
+
+
+class _TeeStdout:
+    """
+    sys.stdout stand-in that records everything written through it.
+    """
+    def __init__(self, real, sink: list, quiet: bool) -> None:
+        self._real = real
+        self._sink = sink
+        self._quiet = quiet
+        self.buffer = _TeeBuffer(getattr(real, 'buffer', None), sink, quiet)
+
+    def write(self, text) -> int:
+        self._sink.append(text)
+        if not self._quiet:
+            return self._real.write(text)
+        return len(text)
+
+    def flush(self) -> None:
+        if not self._quiet:
+            self._real.flush()
+
+    def fileno(self) -> int:
+        return self._real.fileno()
+
+    def isatty(self) -> bool:
+        return self._real.isatty()
+
+    def __getattr__(self, name):
+        return getattr(object.__getattribute__(self, '_real'), name)
+
+
+def _raise_eof(*_args, **_kwargs) -> None:
+    raise EOFError
+
+@contextlib.contextmanager
+def dup_IO(quiet: bool):
+    """
+    temporarily replace sys.stdout with a recording tee
+    and input with a stand-in that raises EOFError.
+
+    Parameters:
+    quiet (bool):
+        determines if output should be forwarded to the real stdout
+        or silently surpressed
+
+    Yields:
+    (list):
+        the sink collecting everything written to stdout (and its byte buffer)
+    """
+    sink = []
+    real_stdout = sys.stdout
+    real_input = builtins.input
+    sys.stdout = _TeeStdout(real_stdout, sink, quiet)
+    if quiet:
+        builtins.input = _raise_eof
+    try:
+        yield sink
+    finally:
+        sys.stdout = real_stdout
+        if quiet:
+            builtins.input = real_input
 
 
 class IoHelper:

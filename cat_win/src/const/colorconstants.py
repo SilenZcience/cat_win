@@ -114,10 +114,17 @@ class CKW:
     FILE_PREFIX         = 'file_prefix'
 
     ENDS                = 'line_ends'
-    SQUEEZE             = 'squeeze_counter'
     CHARS               = 'special_chars'
 
+    SQUEEZE             = 'squeeze_counter'
+
     SUMMARY             = 'summary_message'
+
+    FOUND               = 'found_keyword'
+    FOUND_MESSAGE       = 'found_keyword_message'
+    MATCHED             = 'matched_pattern'
+    MATCHED_MESSAGE     = 'matched_pattern_message'
+    REPLACE             = 'substring_replacement'
 
     ATTRIB              = 'file_attribute_message'
     ATTRIB_POSITIVE     = 'active_file_attributes'
@@ -129,18 +136,16 @@ class CKW:
 
     RAWVIEWER           = 'raw_viewer'
 
-    FOUND               = 'found_keyword'
-    FOUND_MESSAGE       = 'found_keyword_message'
-    MATCHED             = 'matched_pattern'
-    MATCHED_MESSAGE     = 'matched_pattern_message'
-    REPLACE             = 'substring_replacement'
+    MORE_LESS_PROMPT    = 'more_less_prompt'
+
+    WATCH_DIFF_ADDED    = 'watch_diff_added'
+    WATCH_DIFF_DELETED  = 'watch_diff_deleted'
+    WATCH_DIFF_CHANGED  = 'watch_diff_changed'
 
     PROGRESSBAR_DONE    = 'progressbar_done'
     PROGRESSBAR_MISSING = 'progressbar_missing'
 
     REPL_PREFIX         = 'repl_prefix'
-
-    MORE_LESS_PROMPT    = 'more_less_prompt'
 
     DEBUG               = 'debug'
     INFO                = 'info'

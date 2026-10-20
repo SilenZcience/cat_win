@@ -13,7 +13,15 @@ from cat_win.tests.mocks.std import StdInMock
 from cat_win.tests.mocks.logger import LoggerStub
 from cat_win.tests.mocks.pbar import PBarMock
 from cat_win.src.const.colorconstants import CKW
-from cat_win.src.service.helper.iohelper import IoHelper, StatusLogger, create_file, path_parts
+from cat_win.src.processor.fileprocessor import _collect_lines
+from cat_win.src.service.helper.iohelper import (
+    IoHelper,
+    StatusLogger,
+    dup_IO,
+    _raise_eof,
+    create_file,
+    path_parts
+)
 
 
 test_file_dir = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'texts')
@@ -582,3 +590,47 @@ class TestWriteCsToConsoleBuffer(TestCase):
         self.assertFalse(result)
         # the mode is only altered once the console could be opened
         set_console_mode.assert_not_called()
+
+    def test_capture_stdout_tee_and_quiet_modes(self):
+        tee_real = io.StringIO()
+        with patch('sys.stdout', tee_real):
+            with dup_IO(quiet=False) as sink:
+                print('hello')
+            forwarded = tee_real.getvalue()
+        self.assertEqual(_collect_lines(sink), ['hello'])
+        self.assertEqual(forwarded, 'hello\n')
+
+        quiet_real = io.StringIO()
+        with patch('sys.stdout', quiet_real):
+            with dup_IO(quiet=True) as quiet_sink:
+                print('hidden')
+            withheld = quiet_real.getvalue()
+        self.assertEqual(_collect_lines(quiet_sink), ['hidden'])
+        self.assertEqual(withheld, '')
+
+    def test_capture_stdout_patches_input_to_eof_and_restores(self):
+        import builtins
+
+        real_input = builtins.input
+
+        # quiet mode: input() is patched to bail out like a closed stdin
+        with dup_IO(quiet=True):
+            self.assertIs(builtins.input, _raise_eof)
+            with self.assertRaises(EOFError):
+                builtins.input('prompt that must not block')
+            with self.assertRaises(EOFError):
+                input()  # the bare builtin the pipeline actually calls
+        # ...and is restored afterwards
+        self.assertIs(builtins.input, real_input)
+
+        # tee mode: output still reaches the terminal, so input stays live
+        with dup_IO(quiet=False):
+            self.assertIs(builtins.input, real_input)
+        self.assertIs(builtins.input, real_input)
+
+        # restoration also happens when the body raises
+        with self.assertRaises(RuntimeError):
+            with dup_IO(quiet=True):
+                self.assertIsNot(builtins.input, real_input)
+                raise RuntimeError('boom')
+        self.assertIs(builtins.input, real_input)

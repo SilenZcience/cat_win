@@ -2,6 +2,7 @@
 fileprocessor
 """
 
+import difflib
 import os
 import sys
 from time import sleep
@@ -16,6 +17,7 @@ from cat_win.src.const.argconstants import (
     ARGS_REVERSE,
     ARGS_WATCH
 )
+from cat_win.src.const.colorconstants import CKW
 from cat_win.src.const.defaultconstants import DKW
 from cat_win.src.domain.contentbuffer import ContentBuffer
 from cat_win.src.processor.contentprocessor import (
@@ -26,7 +28,7 @@ from cat_win.src.processor.outputprocessor import print_raw_view
 from cat_win.src.service.cbase64 import decode_base64
 from cat_win.src.service.fileattributes import _convert_size, get_file_mtime
 from cat_win.src.service.helper.archiveviewer import display_archive
-from cat_win.src.service.helper.iohelper import IoHelper, logger
+from cat_win.src.service.helper.iohelper import IoHelper, dup_IO, logger
 from cat_win.src.service.querymanager import remove_ansi_codes_from_line
 
 
@@ -131,6 +133,59 @@ def decode_files_base64(ctx, tmp_file_helper) -> None:
             )
 
 
+def _collect_lines(sink: list) -> list:
+    """
+    join all captured stdout chunks and split them into lines.
+
+    Parameters:
+    sink (list):
+        the chunks collected by _capture_stdout
+
+    Returns:
+    (list):
+        the captured output as a list of lines
+    """
+    return ''.join(sink).splitlines()
+
+
+def _print_watch_diff(ctx, prev_lines: list, new_lines: list) -> None:
+    """
+    print the freshly captured output of a file with diff markers.
+
+    Parameters:
+    ctx (AppContext):
+        the current invocation context
+    prev_lines (list):
+        the previously printed output lines of the file
+    new_lines (list):
+        the freshly captured output lines of the file
+    """
+    prev_plain = [remove_ansi_codes_from_line(line) for line in prev_lines]
+    new_plain = [remove_ansi_codes_from_line(line) for line in new_lines]
+
+    diff_colors = {
+        '+ ': ctx.color_dic[CKW.WATCH_DIFF_ADDED],
+        '- ': ctx.color_dic[CKW.WATCH_DIFF_DELETED],
+        '? ': ctx.color_dic[CKW.WATCH_DIFF_CHANGED],
+        '  ': '',
+    }
+    restore = ctx.color_dic.get(CKW.RESET_ALL, '')
+
+    new_idx = 0
+    for diff_line in difflib.Differ().compare(prev_plain, new_plain):
+        tag = diff_line[:2] if len(diff_line) >= 2 else ''
+        if tag == '? ':
+            print(f"{diff_colors[tag]}{diff_line.rstrip(chr(10))}{restore}")
+        elif tag == '  ':
+            print(f"  {new_lines[new_idx]}{restore}")
+            new_idx += 1
+        elif tag == '+ ':
+            print(f"{diff_colors[tag]}{diff_line}{restore}")
+            new_idx += 1
+        else: # '- '
+            print(f"{diff_colors[tag]}{diff_line}{restore}")
+
+
 def edit_files(ctx) -> None:
     """
     Iterate over all files in ctx.u_files and process each one.
@@ -156,10 +211,18 @@ def edit_files(ctx) -> None:
         else:
             print_raw_view(ctx, i, raw_view_mode)
 
-    for i in range(start, end, step):
-        _process(i)
+    watch_mode = ctx.u_args[ARGS_WATCH] and not ctx.u_args[ARGS_DIFF]
+    prev_outputs = {}
 
-    if ctx.u_args[ARGS_WATCH] and not ctx.u_args[ARGS_DIFF]:
+    for i in range(start, end, step):
+        if watch_mode:
+            with dup_IO(quiet=False) as sink:
+                _process(i)
+            prev_outputs[ctx.u_files[i].path] = _collect_lines(sink)
+        else:
+            _process(i)
+
+    if watch_mode:
         mtimes = {f.path: get_file_mtime(f.path) for f in ctx.u_files}
         try:
             while True:
@@ -168,9 +231,14 @@ def edit_files(ctx) -> None:
                     if get_file_mtime(ctx.u_files[i].path) != mtimes[ctx.u_files[i].path]:
                         mtimes[ctx.u_files[i].path] = get_file_mtime(ctx.u_files[i].path)
                         logger(
-                            f"File '{ctx.u_files[i].displayname}' has been modified. Reloading ...",
+                            f"File '{ctx.u_files[i].displayname}' has been modified. Reloading ...\a",
                             priority=logger.INFO,
                         )
-                        _process(i)
+                        with dup_IO(quiet=True) as sink:
+                            _process(i)
+                        f_path = ctx.u_files[i].path
+                        new_lines = _collect_lines(sink)
+                        _print_watch_diff(ctx, prev_outputs.get(f_path, []), new_lines)
+                        prev_outputs[f_path] = new_lines
         except KeyboardInterrupt:
             pass

@@ -26,29 +26,45 @@ class CConfig:
         CKW.RESET_ALL           : ColorOptions.Style['RESET'],
         CKW.RESET_FOUND         : ColorOptions.Fore['RESET'],
         CKW.RESET_MATCHED       : ColorOptions.Back['RESET'],
+
         CKW.LINE_LENGTH         : ColorOptions.Fore['LIGHTBLUE'],
         CKW.NUMBER              : ColorOptions.Fore['GREEN'],
         CKW.FILE_PREFIX         : ColorOptions.Fore['LIGHTMAGENTA'],
+
         CKW.ENDS                : ColorOptions.Back['YELLOW'],
-        CKW.SQUEEZE             : ColorOptions.Fore['LIGHTCYAN'],
         CKW.CHARS               : ColorOptions.Fore['YELLOW'],
+
+        CKW.SQUEEZE             : ColorOptions.Fore['LIGHTCYAN'],
+
         CKW.SUMMARY             : ColorOptions.Fore['CYAN'],
-        CKW.ATTRIB              : ColorOptions.Fore['CYAN'],
-        CKW.ATTRIB_POSITIVE     : ColorOptions.Fore['LIGHTGREEN'],
-        CKW.ATTRIB_NEGATIVE     : ColorOptions.Fore['LIGHTRED'],
-        CKW.CHECKSUM            : ColorOptions.Fore['CYAN'],
-        CKW.EVALUATION          : ColorOptions.Fore['BLUE'],
-        CKW.CONVERSION          : ColorOptions.Fore['CYAN'],
-        CKW.RAWVIEWER           : ColorOptions.Fore['LIGHTBLACK'],
+
         CKW.FOUND               : ColorOptions.Fore['RED'],
         CKW.FOUND_MESSAGE       : ColorOptions.Fore['MAGENTA'],
         CKW.MATCHED             : ColorOptions.Back['CYAN'],
         CKW.MATCHED_MESSAGE     : ColorOptions.Fore['LIGHTCYAN'],
         CKW.REPLACE             : ColorOptions.Fore['YELLOW'],
+
+        CKW.ATTRIB              : ColorOptions.Fore['CYAN'],
+        CKW.ATTRIB_POSITIVE     : ColorOptions.Fore['LIGHTGREEN'],
+        CKW.ATTRIB_NEGATIVE     : ColorOptions.Fore['LIGHTRED'],
+        CKW.CHECKSUM            : ColorOptions.Fore['CYAN'],
+
+        CKW.EVALUATION          : ColorOptions.Fore['BLUE'],
+        CKW.CONVERSION          : ColorOptions.Fore['CYAN'],
+
+        CKW.RAWVIEWER           : ColorOptions.Fore['LIGHTBLACK'],
+
+        CKW.MORE_LESS_PROMPT    : ColorOptions.Fore['GREEN'],
+
+        CKW.WATCH_DIFF_ADDED    : ColorOptions.Fore['LIGHTGREEN'],
+        CKW.WATCH_DIFF_DELETED  : ColorOptions.Fore['LIGHTRED'],
+        CKW.WATCH_DIFF_CHANGED  : ColorOptions.Fore['LIGHTBLACK'],
+
         CKW.PROGRESSBAR_DONE    : ColorOptions.Fore['LIGHTGREEN'],
         CKW.PROGRESSBAR_MISSING : ColorOptions.Fore['LIGHTMAGENTA'],
+
         CKW.REPL_PREFIX         : ColorOptions.Fore['MAGENTA'],
-        CKW.MORE_LESS_PROMPT    : ColorOptions.Fore['GREEN'],
+
         CKW.DEBUG               : ColorOptions.Fore['LIGHTBLACK'],
         CKW.INFO                : ColorOptions.Fore['LIGHTYELLOW'],
         CKW.WARNING             : ColorOptions.Fore['YELLOW'],

@@ -1,10 +1,13 @@
+from contextlib import contextmanager
 from unittest import TestCase
 from unittest.mock import call, patch
 
 from cat_win.src.const.argconstants import ARGS_BINVIEW, ARGS_EOL, ARGS_HEXVIEW, ARGS_PLAIN_ONLY, ARGS_RAW, ARGS_REVERSE, ARGS_WATCH
+from cat_win.src.const.colorconstants import CKW
 from cat_win.src.const.defaultconstants import DKW
 
 from cat_win.src.processor.fileprocessor import (
+    _print_watch_diff,
     decode_files_base64,
     edit_file,
     edit_files,
@@ -234,17 +237,58 @@ class TestFileProcessor(TestCase):
             edit_files(ctx_xl)
         prv.assert_called_once_with(ctx_xl, 0, 'x')
 
-    def test_edit_files_watch_mode_reloads_modified_file_and_stops_on_interrupt(self):
+    def test_edit_files_watch_mode_prints_diff_after_modification_and_stops_on_interrupt(self):
         files = [DummyFile('A', path='a'), DummyFile('B', path='b')]
         ctx = self._mk_ctx(files, args=DummyArgs({ARGS_WATCH: True}))
 
+        b_calls = []
+        sinks = []
+
+        @contextmanager
+        def fake_dup_IO(*_, **__):
+            sink = []
+            sinks.append(sink)
+            yield sink
+
+        def fake_edit_file(_ctx, i):
+            if i == 1:
+                b_calls.append(1)
+                sinks[-1].append('B0' if len(b_calls) == 1 else 'B1')
+            else:
+                sinks[-1].append('A0')
+
         mtime_values = [1, 2, 1, 3, 4]
         with patch('cat_win.src.processor.fileprocessor.get_file_mtime', side_effect=mtime_values):
-            with patch('cat_win.src.processor.fileprocessor.edit_file') as edit_file_m:
-                with patch('cat_win.src.processor.fileprocessor.sleep', side_effect=[None, KeyboardInterrupt]):
-                    with patch('cat_win.src.processor.fileprocessor.logger') as log:
-                        edit_files(ctx)
+            with patch('cat_win.src.processor.fileprocessor.dup_IO', new=fake_dup_IO):
+                with patch('cat_win.src.processor.fileprocessor.edit_file',
+                           side_effect=fake_edit_file) as edit_file_m:
+                    with patch('cat_win.src.processor.fileprocessor._print_watch_diff') as diff_m:
+                        with patch('cat_win.src.processor.fileprocessor.sleep',
+                                   side_effect=[None, KeyboardInterrupt]):
+                            with patch('cat_win.src.processor.fileprocessor.logger') as log:
+                                edit_files(ctx)
 
-        self.assertEqual(edit_file_m.call_args_list[0:2], [call(ctx, 0), call(ctx, 1)])
-        self.assertIn(call(ctx, 1), edit_file_m.call_args_list)
+        self.assertEqual(edit_file_m.call_args_list, [call(ctx, 0), call(ctx, 1), call(ctx, 1)])
+        diff_m.assert_called_once_with(ctx, ['B0'], ['B1'])
         self.assertTrue(any("File 'B' has been modified. Reloading" in c[0][0] for c in log.call_args_list if c[0]))
+
+    def test_print_watch_diff_line_by_line(self):
+        files = [DummyFile('A', path='a')]
+        ctx = self._mk_ctx(files)
+        ctx.color_dic = {
+            CKW.WATCH_DIFF_ADDED: '<INS>',
+            CKW.WATCH_DIFF_DELETED: '<DEL>',
+            CKW.WATCH_DIFF_CHANGED: '<CHG>',
+            CKW.RESET_ALL: '<RST>',
+        }
+        with patch('builtins.print') as print_m:
+            _print_watch_diff(ctx, ['1', '2', '3'], ['1', 'X', '3', '4'])
+
+        printed = [c[0][0] for c in print_m.call_args_list]
+        self.assertEqual(printed, [
+            '  1<RST>',
+            '<DEL>- 2<RST>',
+            '<INS>+ X<RST>',
+            '  3<RST>',
+            '<INS>+ 4<RST>',
+        ])
