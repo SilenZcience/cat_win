@@ -42,7 +42,7 @@ UNIFY_HOTKEYS = {
     b'CTL_PADSTOP'  : b'_key_dl', # numpad
 
     # (shift -) backspace
-    b'^H'           : b'_key_backspace', # windows (ctrl-backspace on xterm...)
+    b'^H'           : b'_key_backspace' if os.name == 'nt' else b'_key_ctl_backspace', # windows (ctrl-backspace on xterm...)
     b'KEY_BACKSPACE': b'_key_backspace', # xterm
     # alt - backspace
     b'ALT_BKSP'     : b'_key_backspace', # windows
