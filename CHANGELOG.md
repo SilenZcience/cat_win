@@ -23,6 +23,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fixed cat-repl (cats) CRASH on certain inputs.
 - fixed broken cat-repl (cats) behaviour on unix systems.
 - fixed -`L`, --`less` not working at all.
+- fixed Bug where ctrl-backspace inside the curses applications was not working on unix.
 
 
 ## [2.0.2] - 2026-08-22
