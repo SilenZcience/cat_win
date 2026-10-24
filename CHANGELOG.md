@@ -8,7 +8,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 ### Minor Changes
 
 - added `diff_strip_whitespace` element to the config menu to strip leading and trailing whitespace from the file contents when using the DiffViewer.
-- added --`--generate-man` to print the man page in roff format to stdout, along with the commands that install it.
+- added --`generate-man` to print the man page in roff format to stdout, along with the commands that install it.
 - added --`generate-completion[=SHELL]` to print a shell completion script for bash, zsh or fish to stdout, along with the commands that install it.
 - added --`generate-sudoshim` to print a shim making cat_win reachable via sudo on unix systems, along with the commands that install it.
 - -`w`, --`watch` will now include the diff indicating the change of the watched files.
@@ -20,7 +20,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - fixed Crash when visualizing an empty file.
 - fixed corrupted encoding on large files.
 - fixed --`nc`, --`nocolor` not working correctly when adding or deleting it inside of the cat-repl (cats).
-- fixed cat-repl (cats) CRASH on certain inputs.
+- fixed cat-repl (cats) Crash on certain inputs.
 - fixed broken cat-repl (cats) behaviour on unix systems.
 - fixed -`L`, --`less` not working at all.
 - fixed Bug where ctrl-backspace inside the curses applications was not working on unix.
