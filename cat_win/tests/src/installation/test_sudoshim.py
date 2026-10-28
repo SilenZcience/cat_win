@@ -4,10 +4,11 @@ test_sudoshim
 
 import ast
 import io
+import shutil
 import subprocess
 import tokenize
 from pathlib import Path
-from unittest import TestCase
+from unittest import TestCase, skipIf
 from unittest.mock import patch
 
 from cat_win.src.installation import sudoshim as sh
@@ -21,6 +22,7 @@ from cat_win.src.installation.sudoshim import (
 
 
 class TestBuildShim(TestCase):
+    @skipIf(shutil.which('sh') is None, 'sh not available on PATH')
     def test_is_valid_posix_shell(self):
         #check syntax errors with 'sh -n'
         result = subprocess.run(
