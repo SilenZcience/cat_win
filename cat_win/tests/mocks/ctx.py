@@ -69,3 +69,4 @@ class DummyCtx:
         self.const_dic = {} if const_dic is None else const_dic
         self.arg_parser = arg_parser
         self.content = content
+        self.loaded_mods = self.failed_mods = []

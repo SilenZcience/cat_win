@@ -6,6 +6,7 @@ from cat_win.src.argparser import ArgParser
 from cat_win.src.const.defaultconstants import DKW
 from cat_win.src.domain.arguments import Arguments
 from cat_win.src.domain.files import Files
+from cat_win.src.mods import load_mods
 from cat_win.src.persistence.cconfig import CConfig
 from cat_win.src.persistence.config import Config
 
@@ -16,13 +17,23 @@ class AppContext:
     """
 
     __slots__ = (
-        'cconfig', 'config',
-        'default_color_dic', 'color_dic', 'const_dic',
-        'arg_parser', 'u_args', 'u_files',
+        'cconfig',
+        'config',
+        'default_color_dic', 'color_dic',
+        'const_dic',
+
+        'u_args', 'u_files',
+
+        'arg_parser',
         'args', 'unknown_args',
-        'known_files', 'unknown_files', 'valid_urls',
-        'known_dirs', 'echo_args',
+        'known_files', 'unknown_files',
+        'valid_urls',
+        'known_dirs',
+        'echo_args',
+
         'content',
+
+        'loaded_mods', 'failed_mods',
     )
 
     def __init__(self) -> None:
@@ -48,6 +59,8 @@ class AppContext:
         # This will be populated during edit_content()/edit_raw_content()
         self.content = None
 
+        self.loaded_mods, self.failed_mods = [], []
+
     def init(self) -> None:
         """
         Reload configs and create fresh per-run objects and runtime lists.
@@ -55,6 +68,8 @@ class AppContext:
         self.default_color_dic = self.cconfig.load_config()
         self.color_dic = self.default_color_dic.copy()
         self.const_dic = self.config.load_config()
+
+        self.loaded_mods, self.failed_mods = load_mods()
 
         self.arg_parser = ArgParser(
             self.const_dic[DKW.DEFAULT_FILE_ENCODING],

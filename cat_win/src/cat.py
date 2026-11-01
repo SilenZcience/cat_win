@@ -166,6 +166,11 @@ def init(repl: bool = False) -> None:
 
     init_colors()
 
+    for mod_name in _ctx.loaded_mods:
+        logger(f"Successfully loaded mod '{mod_name}'", priority=logger.DEBUG)
+    for mod_name, exc in _ctx.failed_mods:
+        logger(f"Failed to fully load mod '{mod_name}' due to {exc}", priority=logger.DEBUG)
+
     arg_suggestions = show_unknown_args_suggestions(repl)
 
     run_startup_actions(

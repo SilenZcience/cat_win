@@ -161,7 +161,7 @@ def _show_help(ctx, repl: bool = False) -> None:
         if not entries:
             continue
 
-        help_message += colored(SECTION_NAMES[section_id], bold_cyan) + '\n'
+        help_message += colored(SECTION_NAMES.get(section_id, 'Other'), bold_cyan) + '\n'
         help_message += ''.join(entries)
         for value_taken in values_taken:
             value_desc = ' '.join(map(str, VALUE_DESCRIPTIONS[value_taken]))
