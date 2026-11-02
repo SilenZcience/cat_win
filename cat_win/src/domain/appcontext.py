@@ -6,7 +6,7 @@ from cat_win.src.argparser import ArgParser
 from cat_win.src.const.defaultconstants import DKW
 from cat_win.src.domain.arguments import Arguments
 from cat_win.src.domain.files import Files
-from cat_win.src.mods import load_mods
+from cat_win.src.modding.mods import load_mods
 from cat_win.src.persistence.cconfig import CConfig
 from cat_win.src.persistence.config import Config
 
