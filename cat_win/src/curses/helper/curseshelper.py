@@ -174,6 +174,8 @@ UNIFY_HOTKEYS = {
     b'^X'           : b'_action_cut',
     b'KEY_RESIZE'   : b'_action_resize',
 
+    b'KEY_F(6)'     : b'_action_hot_reload',
+
     b'KEY_F(25)'    : b'_action_file_selection',
 
     b'KEY_F(1)'     : b'_function_help',

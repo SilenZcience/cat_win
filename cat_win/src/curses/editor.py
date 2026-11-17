@@ -40,6 +40,7 @@ from cat_win.src.curses.helper.editorsearchhelper import (
 )
 from cat_win.src.curses.helper.fileselectionhelper import run_file_selection
 from cat_win.src.curses.helper.githelper import GitHelper
+from cat_win.src.curses.helper.hotreload import hot_swap_view
 from cat_win.src.curses.helper.syntaxhighlight import SyntaxHighlighter
 from cat_win.src.persistence.viewstate import (
     get_view_state_time,
@@ -1624,6 +1625,53 @@ class Editor:
                 break
 
         return True
+
+    def _action_hot_reload(self) -> bool:
+        """
+        dynamically reload the editor code and apply
+        the changes to the running editor instance.
+
+        Returns:
+        (bool):
+            indicates if the editor should keep running
+        """
+        if not Editor.debug_mode:
+            self._action_render_scr(
+                'Hot reload is only available in debug mode!'
+            )
+            curses.napms(1000)
+            return True
+        tmp_error = hot_swap_view(
+            self, __name__, self.__class__.__name__,
+            class_flags=(
+                'loading_failed', 'special_indentation', 'auto_indent',
+                'cursor_style', 'save_with_alt', 'debug_mode',
+                'unicode_escaped_search', 'unicode_escaped_replace',
+                'file_encoding', '_SYNTAX_COLOR_IDS',
+            ),
+            char_gen_method='_get_new_char',
+            on_status=self._action_render_scr
+        )
+        if tmp_error:
+            self._action_render_scr(
+                'Hot reload failed! Keeping the previous version.', tmp_error
+            )
+            return True
+        curses.napms(400)
+        self._action_render_scr('Hot reload: applied your code changes!')
+        curses.napms(1000)
+
+        # refresh the cached highlighter plugin, token cache and colors
+        self._syntax_highlighter = SyntaxHighlighter.get_plugin(
+            self._syntax_highlighter_key
+        )
+        self._syntax_cache.clear()
+        self._init_highlighter_colors()
+
+        # unwind recursion once the new instance is closed
+        self._run()
+        return False
+
 
     def _action_insert(self) -> bool:
         """

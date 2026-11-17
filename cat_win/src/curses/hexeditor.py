@@ -32,6 +32,7 @@ from cat_win.src.curses.helper.editorsearchhelper import \
     search_iter_hex_factory
 from cat_win.src.curses.helper.fileselectionhelper import run_file_selection
 from cat_win.src.curses.helper.githelper import GitHelper
+from cat_win.src.curses.helper.hotreload import hot_swap_view
 from cat_win.src.persistence.viewstate import (
     get_view_state_time,
     save_view_state
@@ -873,6 +874,43 @@ class HexEditor:
                 break
 
         return True
+
+    def _action_hot_reload(self) -> bool:
+        """
+        dynamically reload the hex editor code and apply
+        the changes to the running hex editor instance.
+
+        Returns:
+        (bool):
+            indicates if the hex editor should keep running
+        """
+        if not HexEditor.debug_mode:
+            self._action_render_scr(
+                'Hot reload is only available in debug mode!'
+            )
+            curses.napms(1000)
+            return True
+        tmp_error = hot_swap_view(
+            self, __name__, self.__class__.__name__,
+            class_flags=(
+                'loading_failed', 'save_with_alt', 'debug_mode',
+                'unicode_escaped_search', 'unicode_escaped_insert',
+                'columns',
+            ),
+            char_gen_method='_get_char_gen',
+            on_status=self._action_render_scr
+        )
+        if tmp_error:
+            self._action_render_scr(
+                'Hot reload failed! Keeping the previous version.', tmp_error
+            )
+            return True
+        curses.napms(400)
+        self._action_render_scr('Hot reload: applied your code changes!')
+        curses.napms(1000)
+        # unwind recursion once the new instance is closed
+        self._run()
+        return False
 
     def _action_insert(self) -> bool:
         """
