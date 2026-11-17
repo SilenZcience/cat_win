@@ -19,6 +19,7 @@ from cat_win.src.installation.sudoshim import (
     install_hint,
     show_shim
 )
+from cat_win.tests.mocks.std import StdOutMock
 
 
 class TestBuildShim(TestCase):
@@ -89,12 +90,20 @@ class TestInstallHint(TestCase):
 
 class TestShowShim(TestCase):
     def test_exits_zero(self):
-        with patch.object(sh, 'on_windows_os', False):
+        with patch.object(sh, 'on_windows_os', False), \
+             patch.object(sh, 'logger') as fake_logger, \
+             patch('sys.stdout', new=StdOutMock()) as fake_out:
             self.assertEqual(show_shim(), 0)
+        self.assertEqual(fake_out.getvalue(), build_shim())
+        self.assertTrue(fake_logger.called)
 
     def test_noop_on_windows(self):
-        with patch.object(sh, 'on_windows_os', True):
+        with patch.object(sh, 'on_windows_os', True), \
+             patch.object(sh, 'logger') as fake_logger, \
+             patch('sys.stdout', new=StdOutMock()) as fake_out:
             self.assertEqual(show_shim(), 0)
+        self.assertEqual(fake_out.getvalue(), '')
+        self.assertTrue(fake_logger.called)
 
 
 class TestNoEscalation(TestCase):
