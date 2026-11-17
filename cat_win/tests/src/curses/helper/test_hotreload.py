@@ -248,8 +248,8 @@ class TestHotReload(TestCase):
                     # success returns False: the outdated loop frame unwinds
                     self.assertFalse(view._action_hot_reload())
                 pseudo_swap.assert_called_once()
-                self.assertEqual(pseudo_swap.call_args.args[1], view_module)
-                self.assertEqual(pseudo_swap.call_args.args[2], class_name)
+                self.assertEqual(pseudo_swap.call_args[0][1], view_module)
+                self.assertEqual(pseudo_swap.call_args[0][2], class_name)
                 view._action_render_scr.assert_any_call(
                     'Hot reload: applied your code changes!')
                 # the outdated main loop frame is replaced by the reloaded one
