@@ -13,6 +13,7 @@ Start of documentation: 2023-02-16 / v1.1.0
 - added --`generate-sudoshim` to print a shim making cat_win reachable via sudo on unix systems, along with the commands that install it.
 - -`w`, --`watch` will now include the diff indicating the change of the watched files.
 - added `watch_diff_added`, `watch_diff_deleted` and `watch_diff_changed` elements to the color config to configure the color of the new diff feature when using -`w`, --`watch`.
+- added hot-reloading (`F6`) to the curses applications to instantly apply changes in the source code to the running cat_win instance (available only in debug mode).
 
 ### Bugfixes
 
