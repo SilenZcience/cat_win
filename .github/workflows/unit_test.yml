@@ -27,6 +27,8 @@ jobs:
             python-version: 'pypy-3.7'
           - os: ubuntu-latest
             python-version: '3.7'
+          - os: ubuntu-latest
+            python-version: '3.9'
         include:
           - os: macos-15-intel
             python-version: '3.7'
@@ -34,6 +36,8 @@ jobs:
             python-version: 'pypy-3.7'
           - os: ubuntu-22.04
             python-version: '3.7'
+          - os: ubuntu-22.04
+            python-version: '3.9'
     steps:
       - name: Git Checkout
         uses: actions/checkout@v6
